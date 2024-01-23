@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - mar_sumaken_web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- アイコン設定 -->
+    <link rel="shortcut icon" type="image/png" href="~/image/appicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="~/image/appicon.png">
+
+    <!--Bootstrap admin template-->
+    <link rel="stylesheet" href="~/lib/startbootstrap-sb-admin-gh-pages/css/styles.css" />
+
     <!-- font-awesome -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <!-- sb-admin-2 -->
@@ -12,15 +20,13 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <!-- font-awesome -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <!-- sb-admin-2 -->
-    <link href="~/lib/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-          rel="stylesheet">
     <link href="~/css/sb-admin-2.css?@DateTime.Now" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/mar_sumaken_web.styles.css" asp-append-version="true" />
-</head>
 
+    <!--Micromodal.js-->
+    <link rel="stylesheet" href="~/css/micromodal.css" />
+    <link rel="stylesheet" href="~/css/site.css?@DateTime.Now" />
+
+</head>
 @{
     var bodyClass = Context.Request.Cookies["Sidebar"];
     if (string.IsNullOrWhiteSpace(bodyClass))
@@ -31,101 +37,153 @@
 <body class="@bodyClass">
     <nav class="sb-topnav navbar navbar-expand navbar-dark">
         <!-- Navbar Brand-->
-        <div class="d-flex justify-content-between top-menu">
-            <a id="home-title" class="navbar-brand ps-3" asp-controller="Home" asp-action="Index">アプリ名</a>
-            <!-- Sidebar Toggle-->
-            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-angles-left"></i></button>
-        </div>
-
+        <a id="home-title" class="navbar-brand ps-3" asp-controller="Home" asp-action="Index">アプリ名</a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-angles-left"></i></button>
         <!-- Navbar Search-->
         <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
         </div>
         <!-- Navbar-->
         <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
             <li class="nav-item dropdown">
-                <div class="d-flex justify-content-end align-items-center">
+                <div class="d-flex justify-content-end align-items-center" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <span class="text-white">ログインユーザー名</span>
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"><i class="fa-solid fa-user"></i></a>
+                    <a class="nav-link dropdown-toggle"><i class="fas fa-user fa-fw"></i></a>
                 </div>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><div class="ps-4 pt-3 small fw-bold">会社名</div></li>
+                    <li><div class="ps-4 pt-3 small fw-bold">管理者名</div></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li><a class="dropdown-item p-4 fw-bold"><i class="fas fa-lock fa-fw"></i> パスワード変更</a></li>
+                    <li><a class="dropdown-item p-4 fw-bold" id="logout-button" href="#" role="button" data-micromodal-trigger="modal-logout"><i class="fas fa-sign-out-alt fa-fw"></i> ログアウト</a></li>
+                </ul>
             </li>
         </ul>
     </nav>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <ul class="navbar-nav bg-gradient-imagecolor sidebar sidebar-dark accordion" id="accordionSidebar">
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu1"
+                                   aria-expanded="true" aria-controls="menu1">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    <span>メニュー名1</span>
+                                </a>
+                                <div id="menu1" class="collapse" data-parent="#accordionSidebar">
+                                    <div class="bg-white py-2 collapse-inner rounded">
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            メニュー名1
+                                        </a>
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            メニュー名1
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
 
-    <div id="content-wrapper" class="wrapper">
-        <!-- Sidebar Holder -->
-        <nav id="sidebar">
-            <!-- Sidebar -->
-            <ul class="navbar-nav bg-gradient-imagecolor sidebar sidebar-dark accordion" id="accordionSidebar">
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu1"
-                       aria-expanded="true" aria-controls="menu1">
-                        <i class="fa-solid fa-calendar-days"></i>
-                        <span>メニュー名1</span>
-                    </a>
-                    <div id="menu1" class="collapse" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <a class="collapse-item collapse-item-imagecolor">
-                                メニュー名1
-                            </a>
-                            <a class="collapse-item collapse-item-imagecolor">
-                                メニュー名1
-                            </a>
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu2"
+                                   aria-expanded="true" aria-controls="menu2">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    <span>メニュー名2</span>
+                                </a>
+                                <div id="menu2" class="collapse" data-parent="#accordionSidebar">
+                                    <div class="bg-white py-2 collapse-inner rounded">
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            メニュー名1
+                                        </a>
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            メニュー名1
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu3"
+                                   aria-expanded="true" aria-controls="menu3">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    <span>メニュー名3</span>
+                                </a>
+                                <div id="menu3" class="collapse" data-parent="#accordionSidebar">
+                                    <div class="bg-white py-2 collapse-inner rounded">
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            メニュー名1
+                                        </a>
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            メニュー名1
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
                         </div>
                     </div>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu2"
-                       aria-expanded="true" aria-controls="menu2">
-                        <i class="fa-solid fa-calendar-days"></i>
-                        <span>メニュー名2</span>
-                    </a>
-                    <div id="menu2" class="collapse" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <a class="collapse-item collapse-item-imagecolor">
-                                メニュー名1
-                            </a>
-                            <a class="collapse-item collapse-item-imagecolor">
-                                メニュー名1
-                            </a>
-                        </div>
-                    </div>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu3"
-                       aria-expanded="true" aria-controls="menu3">
-                        <i class="fa-solid fa-calendar-days"></i>
-                        <span>メニュー名3</span>
-                    </a>
-                    <div id="menu3" class="collapse" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <a class="collapse-item collapse-item-imagecolor">
-                                メニュー名1
-                            </a>
-                            <a class="collapse-item collapse-item-imagecolor">
-                                メニュー名1
-                            </a>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-            <!-- End of Sidebar -->
-        </nav>
-
-        <!-- Page Content Holder -->
-        <div id="content">
+            </nav>
+        </div>
+        <div id="layoutSidenav_content">
             <main>
                 @RenderBody()
             </main>
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; TOZAN 2023</div>
+                        <div>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
 
-    <!-- Custom scripts for all pages-->
+    <div class="modal micromodal-slide" id="modal-logout" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+            <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-logout-title">
+                <header class="modal__header">
+                    <h3>確認</h3>
+                    <button class="btn btn-custom  btn-lg" aria-label="Close modal" data-micromodal-close><i class="fas fa-times"></i></button>
+                </header>
+                <main class="modal__content">
+                    <p>
+                        ログアウトします。よろしいですか？
+                    </p>
+                </main>
+                <footer class="modal__footer d-grid gap-2">
+                    <a class="btn btn-custom btn-lg">ログアウト</a>
+                </footer>
+            </div>
+        </div>
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!--Bootstrap admin template-->
+    <script src="~/lib/startbootstrap-sb-admin-gh-pages/js/scripts.js"></script>
+
+    <!--datepicker-->
+    <!--Micromodal.js-->
+    <script src="https://cdn.jsdelivr.net/npm/micromodal/dist/micromodal.min.js"></script>
+
+    <!--jQueryの動的validation-->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script>
+    MicroModal.init({
+        disableFocus: true,
+        awaitOpenAnimation: true,
+        awaitCloseAnimation: true
+    });
+</script>
