@@ -11,7 +11,6 @@ $(document).ready(function () {
         $("#sidebarToggle").toggleClass("rotateBtn");
         let className = $("body").attr("class");
         $.cookie("Sidebar", className, { path: '/' });
-        console.log({ className });
     });
 })
 

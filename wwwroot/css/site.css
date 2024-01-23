@@ -256,8 +256,12 @@ table.sticky_table {
     display: block !important;
 }
 
+#navbarDropdown .dropdown-toggle::after {
+    content: unset;
+}
+
 .sb-topnav .navbar-brand {
-    width: 185px !important;
+    width: 175px !important;
 }
 .fa-angles-left{
     font-size: 20px;
@@ -280,5 +284,45 @@ table.sticky_table {
 
 #layoutSidenav #layoutSidenav_content {
     min-height: calc(100vh - 45px);
+}
+
+#user-detail-dropdown-item:hover{
+    background: none !important;
+}
+
+.dropdown-item {
+    padding: 0.25rem 0.5rem;
+}
+
+.dropdown-item a{
+    padding: 0;
+}
+.dropdown-item .logout{
+    padding: 5px;
+}
+
+.navbar-expand .navbar-nav .dropdown-menu{
+    top: 45px;
+}
+
+#accordionSidebar .collapse-inner {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+#accordionSidebar .collapse.show .collapse-inner {
+    max-height: 1000px;
+    transition: max-height 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .sidebar .nav-item .nav-link {
+        width: 5rem;
+    }
+
+    .sidebar .nav-item .collapse {
+        left: calc(3.8rem + 1.5rem / 2);
+    }
 }
 
