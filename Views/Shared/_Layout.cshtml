@@ -5,45 +5,127 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - mar_sumaken_web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- font-awesome -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- sb-admin-2 -->
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- font-awesome -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- sb-admin-2 -->
+    <link href="~/lib/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+    <link href="~/css/sb-admin-2.css?@DateTime.Now" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/mar_sumaken_web.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">mar_sumaken_web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+
+@{
+    var bodyClass = Context.Request.Cookies["Sidebar"];
+    if (string.IsNullOrWhiteSpace(bodyClass))
+    {
+        bodyClass = "sb-nav-fixed";
+    }
+}
+<body class="@bodyClass">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark">
+        <!-- Navbar Brand-->
+        <div class="d-flex justify-content-between top-menu">
+            <a id="home-title" class="navbar-brand ps-3" asp-controller="Home" asp-action="Index">アプリ名</a>
+            <!-- Sidebar Toggle-->
+            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-angles-left"></i></button>
+        </div>
+
+        <!-- Navbar Search-->
+        <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+        </div>
+        <!-- Navbar-->
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <div class="d-flex justify-content-end align-items-center">
+                    <span class="text-white">ログインユーザー名</span>
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"><i class="fa-solid fa-user"></i></a>
                 </div>
-            </div>
+            </li>
+        </ul>
+    </nav>
+
+    <div id="content-wrapper" class="wrapper">
+        <!-- Sidebar Holder -->
+        <nav id="sidebar">
+            <!-- Sidebar -->
+            <ul class="navbar-nav bg-gradient-imagecolor sidebar sidebar-dark accordion" id="accordionSidebar">
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu1"
+                       aria-expanded="true" aria-controls="menu1">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span>メニュー名1</span>
+                    </a>
+                    <div id="menu1" class="collapse" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <a class="collapse-item collapse-item-imagecolor">
+                                メニュー名1
+                            </a>
+                            <a class="collapse-item collapse-item-imagecolor">
+                                メニュー名1
+                            </a>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu2"
+                       aria-expanded="true" aria-controls="menu2">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span>メニュー名2</span>
+                    </a>
+                    <div id="menu2" class="collapse" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <a class="collapse-item collapse-item-imagecolor">
+                                メニュー名1
+                            </a>
+                            <a class="collapse-item collapse-item-imagecolor">
+                                メニュー名1
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu3"
+                       aria-expanded="true" aria-controls="menu3">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span>メニュー名3</span>
+                    </a>
+                    <div id="menu3" class="collapse" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <a class="collapse-item collapse-item-imagecolor">
+                                メニュー名1
+                            </a>
+                            <a class="collapse-item collapse-item-imagecolor">
+                                メニュー名1
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <!-- End of Sidebar -->
         </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+        <!-- Page Content Holder -->
+        <div id="content">
+            <main>
+                @RenderBody()
+            </main>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - mar_sumaken_web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+    <!-- Custom scripts for all pages-->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
