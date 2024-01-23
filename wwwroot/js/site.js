@@ -4,13 +4,16 @@
 // Write your JavaScript code.
 
 // サイドバーがアクティブ
-$(function () {
-    $("#sidebarToggle").on("click", function () {
+$(document).ready(function () {
+    $("#sidebarToggle").click(function () {
+        $.removeCookie("Sidebar", { path: '/' });
+        $("body").toggleClass("sb-sidenav-toggled");
         $("#sidebarToggle").toggleClass("rotateBtn");
-        $("#sidebar").toggleClass("active");
-        $(this).toggleClass("active");
+        let className = $("body").attr("class");
+        $.cookie("Sidebar", className, { path: '/' });
+        console.log({ className });
     });
-});
+})
 
 
 

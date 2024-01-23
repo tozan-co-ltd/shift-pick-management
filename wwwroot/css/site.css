@@ -1,5 +1,218 @@
-html {
-    font-size: 14px;
+:root {
+    --maincolor: #DC143C;
+    --mainlightcolor: #FACED7;
+    --subcolor: #14DBB3;
+    --sublightcolor: #CDFAF1;
+    --fontcolor: #252F3B;
+    --othercolor: whitesmoke;
+    --font-family-sans-serif: "Noto Sans JP", Meiryo UI, sans-serif;
+    --font-title: "Kiwi Maru","Noto Sans JP", Meiryo UI, sans-serif;
+}
+
+html .modal {
+    font-family: var(--font-family-sans-serif) !important;
+}
+
+body {
+    color: var(--fontcolor);
+    background-color: whitesmoke !important;
+    font-family: var(--font-family-sans-serif) !important;
+}
+
+#login-title, #home-title {
+    font-family: var(--font-title) !important;
+}
+
+/*画面が小さい時は、文字の大きさを小さくする*/
+@media screen and (max-width: 1200px) {
+    html {
+        font-size: 80% !important;
+    }
+}
+
+.rotateBtn {
+    transform: rotate(180deg);
+}
+
+.navbar-brand {
+    --font-family-sans-serif: "BIZ UDPGothic", Meiryo UI, sans-serif !important;
+}
+
+.text-danger-custom {
+    color: var(--maincolor);
+    font-weight: 800;
+}
+
+.text-success-custom {
+    color: var(--subcolor);
+    font-weight: 800;
+}
+
+.btn-search {
+    border: none !important;
+    border-bottom: 2px solid var(--fontcolor) !important;
+    border-radius: 0px !important;
+    background-color: #ffffff !important;
+    color: var(--fontcolor) !important;
+}
+
+.btn-custom {
+    /*font-weight: 800 !important;*/
+    background-color: var(--othercolor) !important;
+    color: var(--fontcolor) !important;
+    border: 0px solid var(--fontcolor) !important;
+}
+
+    .btn-custom:hover, .btn-search:hover {
+        background-color: var(--sublightcolor) !important;
+    }
+
+.btn-selection {
+    border: 1px solid var(--fontcolor) !important;
+    background-color: transparent !important;
+    color: var(--fontcolor) !important;
+    border-radius: 0px !important;
+}
+
+    .btn-selection:hover {
+        background-color: var(--othercolor) !important;
+    }
+
+.form-control {
+    border: none !important;
+    border-bottom: 2px solid var(--fontcolor) !important;
+    border-radius: 0px !important;
+}
+
+    .form-control:focus, .btn:focus, a.page-link:focus, select:focus {
+        box-shadow: 0 0 0 3px var(--othercolor) !important;
+    }
+
+    .form-control:disabled, .form-control[readonly] {
+        background-color: var(--othercolor) !important;
+        border: none !important;
+        border-bottom: 0px !important;
+        border-radius: 0px !important;
+    }
+
+.text-right {
+    text-align: right !important;
+}
+
+.required-mark:after {
+    content: "*";
+    color: var(--maincolor);
+    font-weight: bold;
+}
+
+.card {
+    border-color: var(--bs-border-color-translucent) !important;
+    min-width: 300px !important;
+}
+
+.card-header {
+    background-color: var(--othercolor) !important;
+}
+
+.bd-callout {
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #eee;
+    border-left-width: .25rem;
+    border-radius: .25rem;
+    border-left-color: var(--subcolor);
+}
+
+/*↓navbar custom*/
+.navbar-dark {
+    background-color: #3EB135 !important;
+}
+
+.navbar-brand {
+    color: aliceblue !important;
+}
+/*↑navbar custom*/
+
+/*↓dropdown-menu custom*/
+.dropdown-menu {
+    --bs-dropdown-min-width: 20rem !important;
+}
+
+    .dropdown-menu a.dropdown-item:focus {
+        background-color: var(--subcolor) !important;
+    }
+/*↑dropdown-menu custom*/
+
+.page-item.active > .page-link {
+    font-weight: 800;
+    background-color: var(--othercolor) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+}
+
+.page-link {
+    color: var(--fontcolor) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+}
+
+.page-link:hover {
+    background-color: var(--othercolor) !important;
+}
+/*↑ページャーデザイン上書き*/
+
+/*↓table update animation*/
+.table-update-row {
+    animation: blinking 0.6s 4 ease-in-out alternate;
+}
+
+@keyframes blinking {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        background-color: var(--subcolor);
+    }
+}
+/*↑table update animation*/
+
+/*↓table-hover*/
+.table-hover-evant tr:hover td {
+    background-color: var(--sublightcolor) !important;
+}
+
+th.table-border-less, td.table-border-less {
+    border: none !important;
+    background-color: #fff !important;
+    min-width: auto !important;
+}
+
+.table-hover-evant tr:hover tr.table-border-less, .table-hover-evant tr:hover td.table-border-less {
+    background-color: #fff !important;
+}
+/*↑table-hover*/
+
+/*↓Micromodal.js*/
+.modal__container {
+    min-width: 300px !important;
+}
+/*↑Micromodal.js*/
+
+.fadeIn {
+    animation-name: fadeInAnime;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInAnime {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @media (min-width: 768px) {
@@ -14,114 +227,50 @@ html {
 }
 
 body {
-    font-family: "Poppins", sans-serif;
-    background: #fafafa;
+    margin-bottom: 60px;
 }
 
-p {
-    font-family: "Poppins", sans-serif;
-    font-size: 1.1em;
-    font-weight: 300;
-    line-height: 1.7em;
-    color: #999;
+table.sticky_table {
+    display: block;
+    overflow: scroll;
+    width: 100%;
+    height: 550px;
+    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    padding-left: 0;
+    padding-top: 0;
 }
 
-a,
-a:hover,
-a:focus {
-    text-decoration: none;
-    transition: all 0.3s;
+.container-custom {
+    color: #842029;
+    width: 70%;
+    margin-left: 0px;
 }
 
-.top-menu {
-    width: 210px;
+.no-scroll {
+    overflow: hidden;
 }
 
-.navbar {
-    background: #3EB135;
-    border: none;
-    border-radius: 0;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+.nav-item .nav-link{
+    display: block !important;
 }
 
-.navbar-btn {
-    box-shadow: none;
-    outline: none !important;
-    border: none;
+.sb-topnav .navbar-brand {
+    width: 185px !important;
+}
+.fa-angles-left{
+    font-size: 20px;
 }
 
-.wrapper {
-    display: flex;
-    align-items: stretch;
+.sb-topnav{
+    height: 45px;
 }
 
-#sidebar {
-    background: #2F2F2F;
+.nav-item .collapse-item {
+    cursor: pointer;
+}
+.sb-topnav.navbar-dark #sidebarToggle{
     color: #fff;
-    transition: all 0.3s;
 }
-
-#sidebar a,
-#sidebar a:hover,
-#sidebar a:focus {
-    color: inherit;
-}
-
-#sidebar.active {
-    margin-left: -250px;
-}
-
-#sidebarToggle .fa-angles-left {
-    color: #fff;
-    font-size: 26px;
-    padding: 0;
-    margin: 0;
-}
-
-.rotateBtn {
-    transform: rotate(180deg);
-}
-
-#content-wrapper{
-    padding-top: 50px;
-}
-/* ---------------------------------------------------
-    CONTENT STYLE
------------------------------------------------------ */
-#content {
-    padding: 20px;
-    min-height: 100vh;
-    transition: all 0.3s;
-}
-
-/* ---------------------------------------------------
-    MEDIAQUERIES
------------------------------------------------------ */
-
-@media (max-width: 768px) {
-    #sidebar {
-        margin-left: -250px;
-    }
-
-    #sidebar.active {
-        margin-left: 0;
-    }
-
-    #sidebarCollapse span {
-        display: none;
-    }
-}
-
-
-/*menu collapsed*/
-.nav-link.collapsed {
-    transition: 0.25s;
-}
-
-.nav-link.collapsed:hover {
-    transform: scale(1.04);
-}
-
-
-
 
