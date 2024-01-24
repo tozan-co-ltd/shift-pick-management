@@ -1,22 +1,33 @@
+/* || システム全体の配色 */
 :root {
-    --maincolor: #DC143C;
-    --mainlightcolor: #FACED7;
-    --subcolor: #14DBB3;
-    --sublightcolor: #CDFAF1;
-    --fontcolor: #252F3B;
-    --othercolor: whitesmoke;
-    --font-family-sans-serif: "Noto Sans JP", Meiryo UI, sans-serif;
-    --font-title: "Kiwi Maru","Noto Sans JP", Meiryo UI, sans-serif;
+    /* メインカラー */
+    --base-color-main: rgb(0, 30, 100);
+    --rgb-base-color-main: 0, 30, 100;
+    /* アクセントカラー(ボタン等) */
+    --base-color-accent: rgb(196, 0, 11);
+    --rgb-base-color-accent: 196, 0, 11;
+    /* 背景カラー */
+    --base-color-bg: rgba(var(--rgb-base-color-main), 0.3);
 }
 
-html .modal {
-    font-family: var(--font-family-sans-serif) !important;
+/* || システム全体のレイアウト */
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-    color: var(--fontcolor);
-    background-color: whitesmoke !important;
-    font-family: var(--font-family-sans-serif) !important;
+    margin-bottom: 60px;
 }
 
 #login-title, #home-title {

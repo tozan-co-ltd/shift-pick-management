@@ -22,15 +22,13 @@ builder.Services.AddAuthentication(options =>
 })
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
-    // リダイレクトするログインURLも小文字に変える
-    options.LoginPath = CookieAuthenticationDefaults.LoginPath.ToString().ToLower();
     //options.Cookie.IsEssential = true;
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.None;
     options.Cookie.Name = CookieAuthenticationDefaults.AuthenticationScheme;
     //options.Cookie.MaxAge = TimeSpan.FromMinutes(1440);
-    //options.LoginPath = "/Account/index";
+    options.LoginPath = "/Login";
     options.SlidingExpiration = false;
     //options.ExpireTimeSpan = TimeSpan.FromMinutes(1440);
 });
