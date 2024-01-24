@@ -1,18 +1,328 @@
-html {
-  font-size: 14px;
+:root {
+    --maincolor: #DC143C;
+    --mainlightcolor: #FACED7;
+    --subcolor: #14DBB3;
+    --sublightcolor: #CDFAF1;
+    --fontcolor: #252F3B;
+    --othercolor: whitesmoke;
+    --font-family-sans-serif: "Noto Sans JP", Meiryo UI, sans-serif;
+    --font-title: "Kiwi Maru","Noto Sans JP", Meiryo UI, sans-serif;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+html .modal {
+    font-family: var(--font-family-sans-serif) !important;
 }
 
 body {
-  margin-bottom: 60px;
+    color: var(--fontcolor);
+    background-color: whitesmoke !important;
+    font-family: var(--font-family-sans-serif) !important;
 }
+
+#login-title, #home-title {
+    font-family: var(--font-title) !important;
+}
+
+/*画面が小さい時は、文字の大きさを小さくする*/
+@media screen and (max-width: 1200px) {
+    html {
+        font-size: 80% !important;
+    }
+}
+
+.rotateBtn {
+    transform: rotate(180deg);
+}
+
+.navbar-brand {
+    --font-family-sans-serif: "BIZ UDPGothic", Meiryo UI, sans-serif !important;
+}
+
+.text-danger-custom {
+    color: var(--maincolor);
+    font-weight: 800;
+}
+
+.text-success-custom {
+    color: var(--subcolor);
+    font-weight: 800;
+}
+
+.btn-search {
+    border: none !important;
+    border-bottom: 2px solid var(--fontcolor) !important;
+    border-radius: 0px !important;
+    background-color: #ffffff !important;
+    color: var(--fontcolor) !important;
+}
+
+.btn-custom {
+    /*font-weight: 800 !important;*/
+    background-color: var(--othercolor) !important;
+    color: var(--fontcolor) !important;
+    border: 0px solid var(--fontcolor) !important;
+}
+
+    .btn-custom:hover, .btn-search:hover {
+        background-color: var(--sublightcolor) !important;
+    }
+
+.btn-selection {
+    border: 1px solid var(--fontcolor) !important;
+    background-color: transparent !important;
+    color: var(--fontcolor) !important;
+    border-radius: 0px !important;
+}
+
+    .btn-selection:hover {
+        background-color: var(--othercolor) !important;
+    }
+
+.form-control {
+    border: none !important;
+    border-bottom: 2px solid var(--fontcolor) !important;
+    border-radius: 0px !important;
+}
+
+    .form-control:focus, .btn:focus, a.page-link:focus, select:focus {
+        box-shadow: 0 0 0 3px var(--othercolor) !important;
+    }
+
+    .form-control:disabled, .form-control[readonly] {
+        background-color: var(--othercolor) !important;
+        border: none !important;
+        border-bottom: 0px !important;
+        border-radius: 0px !important;
+    }
+
+.text-right {
+    text-align: right !important;
+}
+
+.required-mark:after {
+    content: "*";
+    color: var(--maincolor);
+    font-weight: bold;
+}
+
+.card {
+    border-color: var(--bs-border-color-translucent) !important;
+    min-width: 300px !important;
+}
+
+.card-header {
+    background-color: var(--othercolor) !important;
+}
+
+.bd-callout {
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #eee;
+    border-left-width: .25rem;
+    border-radius: .25rem;
+    border-left-color: var(--subcolor);
+}
+
+/*↓navbar custom*/
+.navbar-dark {
+    background-color: #3EB135 !important;
+}
+
+.navbar-brand {
+    color: aliceblue !important;
+}
+/*↑navbar custom*/
+
+/*↓dropdown-menu custom*/
+.dropdown-menu {
+    --bs-dropdown-min-width: 20rem !important;
+}
+
+    .dropdown-menu a.dropdown-item:focus {
+        background-color: var(--subcolor) !important;
+    }
+/*↑dropdown-menu custom*/
+
+.page-item.active > .page-link {
+    font-weight: 800;
+    background-color: var(--othercolor) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+}
+
+.page-link {
+    color: var(--fontcolor) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+}
+
+.page-link:hover {
+    background-color: var(--othercolor) !important;
+}
+/*↑ページャーデザイン上書き*/
+
+/*↓table update animation*/
+.table-update-row {
+    animation: blinking 0.6s 4 ease-in-out alternate;
+}
+
+@keyframes blinking {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        background-color: var(--subcolor);
+    }
+}
+/*↑table update animation*/
+
+/*↓table-hover*/
+.table-hover-evant tr:hover td {
+    background-color: var(--sublightcolor) !important;
+}
+
+th.table-border-less, td.table-border-less {
+    border: none !important;
+    background-color: #fff !important;
+    min-width: auto !important;
+}
+
+.table-hover-evant tr:hover tr.table-border-less, .table-hover-evant tr:hover td.table-border-less {
+    background-color: #fff !important;
+}
+/*↑table-hover*/
+
+/*↓Micromodal.js*/
+.modal__container {
+    min-width: 300px !important;
+}
+/*↑Micromodal.js*/
+
+.fadeIn {
+    animation-name: fadeInAnime;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInAnime {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+table.sticky_table {
+    display: block;
+    overflow: scroll;
+    width: 100%;
+    height: 550px;
+    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    padding-left: 0;
+    padding-top: 0;
+}
+
+.container-custom {
+    color: #842029;
+    width: 70%;
+    margin-left: 0px;
+}
+
+.no-scroll {
+    overflow: hidden;
+}
+
+.nav-item .nav-link{
+    display: block !important;
+}
+
+#navbarDropdown .dropdown-toggle::after {
+    content: unset;
+}
+
+.sb-topnav .navbar-brand {
+    width: 175px !important;
+}
+.fa-angles-left{
+    font-size: 20px;
+}
+
+.sb-topnav{
+    height: 45px;
+}
+
+.nav-item .collapse-item {
+    cursor: pointer;
+}
+.sb-topnav.navbar-dark #sidebarToggle{
+    color: #fff;
+}
+
+.sb-nav-fixed #layoutSidenav #layoutSidenav_content {
+    top: 45px;
+}
+
+#layoutSidenav #layoutSidenav_content {
+    min-height: calc(100vh - 45px);
+}
+
+#user-detail-dropdown-item:hover{
+    background: none !important;
+}
+
+.dropdown-item {
+    padding: 0.25rem 0.5rem;
+}
+
+.dropdown-item a{
+    padding: 0;
+}
+.dropdown-item .logout{
+    padding: 5px;
+}
+
+.navbar-expand .navbar-nav .dropdown-menu{
+    top: 45px;
+}
+
+#accordionSidebar .collapse-inner {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+#accordionSidebar .collapse.show .collapse-inner {
+    max-height: 1000px;
+    transition: max-height 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .sidebar .nav-item .nav-link {
+        width: 5rem;
+    }
+
+    .sidebar .nav-item .collapse {
+        left: calc(3.8rem + 1.5rem / 2);
+    }
+}
+
