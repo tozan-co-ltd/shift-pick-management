@@ -1,5 +1,6 @@
-﻿using mar_sumaken_web.Commons;
+﻿//using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using static mar_sumaken_web.Models.M_UserModel;
@@ -14,6 +15,8 @@ namespace mar_sumaken_web.Controllers
         {
             _logger = logger;
         }
+
+        [AllowAnonymous]
         public IActionResult Index(M_UserModel model)
         {
             string? errorMessage;
@@ -23,15 +26,6 @@ namespace mar_sumaken_web.Controllers
 
             try
             {
-                // ハンディエラーメッセージ履歴取得
-                //var listShippingImportError = GetListShippingImportError(model);
-
-                //if (listShippingImportError.Count > 0)
-                //{
-                //    IEnumerable<HandyErrorModel> query = listShippingImportError.Select(s => s);
-                //    model.ListShippingImportError = query.ToPagedList();
-                //}
-
                 List<M_User> users = new List<M_User> ();
 
                 for (int i = 4; i < 100; i++)
@@ -52,19 +46,20 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception ex)
             {
-                // エラーメッセージ取得
-                // 「SQLServerでエラーが発生しました。」
-                errorMessage = ErrorHandling.CreateErrorMessage("E4002");
+                //// エラーメッセージ取得
+                //// 「SQLServerでエラーが発生しました。」
+                //errorMessage = ErrorHandling.CreateErrorMessage("E4002");
 
-                // log取得
-                var exceptionMessage = ex.Message;
-                _logger.LogError($"{exceptionMessage} {errorMessage}");
+                //// log取得
+                //var exceptionMessage = ex.Message;
+                //_logger.LogError($"{exceptionMessage} {errorMessage}");
 
-                var shippingImportErrorModel = new HandyErrorMessageModel
-                {
-                    Message = errorMessage + exceptionMessage
-                };
-                return View(shippingImportErrorModel);
+                //var shippingImportErrorModel = new HandyErrorMessageModel
+                //{
+                //    Message = errorMessage + exceptionMessage
+                //};
+                //return View(shippingImportErrorModel);
+                return View();
             }
         }
 

@@ -13,4 +13,8 @@
     <Folder Include="ConnectControllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="X.PagedList.Mvc.Core" Version="8.4.7" />
+  </ItemGroup>
+
 </Project>
