@@ -1,0 +1,136 @@
+﻿@{
+    ViewData["Title"] = "マスター情報 ー ユーザーマスター - 登録";
+}
+
+
+<div class="user-master shadow masterInfo">
+
+    <div class="card-header text-gray-800">
+        @ViewData["Title"]
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <form>
+                    <div class="top-area">
+                        <div class="col-12 pb-2">
+                            <a href="#" class="btn btn-secondary btn-icon-split" style="height: 34px">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-arrow-left-long"></i>
+                                </span>
+                                <span class="text">戻る</span>
+                            </a>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-2 mb-1">
+                                <label>ログインID<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-5 mb-1">
+                                <input class="form-control" id="loginId" type="text">
+                                <label for="loginId"><small>4~12文字の半角英数字が使用できます。</small></label>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-2">
+                                <label>ユーザー名<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-5 mb-1">
+                                <input class="form-control" id="loginId" type="text">
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-2 mb-1">
+                                <label>パスワード<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-5 mb-1">
+                                <input class="form-control" id="loginId" type="text">
+                                <label for="loginId"><small>4~12文字の半角英数字が使用できます。</small></label>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-2 mb-1">
+                                <label>管理権限区分<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-5 mb-1">
+                                <select class="form-control" id="exampleFormControlSelect1">
+                                    <option>管理者</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="down-area">
+                        <div class="col-12 form-group d-flex flex-wrap">
+                            <div class="col-12 col-md-6 d-flex flex-wrap">
+                                <div class="col-12 col-sm-4 mb-1 pl-0">
+                                    <label>使用倉庫名<span style="color:red">*</span></label>
+                                </div>
+                                <div class="col-12 col-sm-8 mb-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" id="flexCheckDefault" type="checkbox" value="">
+                                        <label class="form-check-label" for="flexCheckDefault">西尾物流センター</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" id="flexCheckChecked" type="checkbox" value="" checked">
+                                        <label class="form-check-label" for="flexCheckChecked">○○センター</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 d-flex flex-wrap pl-0">
+                                <div class="col-12 col-sm-4 mb-1">
+                                    <label>メイン倉庫区分<span style="color:red">*</span></label>
+                                </div>
+                                <div class="col-12 col-sm-8 mb-1">
+                                    <select class="form-control" id="exampleFormControlSelect1">
+                                        <option>--使用倉庫名を選択してください--</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex flex-wrap mb-0">
+                            <div class="col-12 col-md-6 d-flex flex-wrap">
+                                <div class="col-12 col-sm-4 mb-1 pl-0">
+                                    <label>使用ハンディメニュー名</label>
+                                </div>
+                                <div class="col-12 col-sm-8 mb-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" id="flexCheckDefault" type="checkbox" value="">
+                                        <label class="form-check-label" for="flexCheckDefault">入庫</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" id="flexCheckChecked" type="checkbox" value="" checked">
+                                        <label class="form-check-label" for="flexCheckChecked">まとめ入庫</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" id="flexCheckChecked" type="checkbox" value="" checked">
+                                        <label class="form-check-label" for="flexCheckChecked">出庫</label>
+                                    </div>
+                                    @*<label class="mt-2"><small>作業者の場合は、使用するハンディメニューに<br />チェックを入れないとハンディで操作できません。</small></label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 d-flex flex-wrap">
+                                <div class="col-12 offset-4">
+                                    <label><small>作業者の場合は、使用するハンディメニューに<br />チェックを入れないとハンディで操作できません。</small></label>
+                                </div>
+                            </div>
+                        <button class="btn btn-primary btn-icon-split" style="height: 34px">
+                            <span class="text">登録</span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,151 @@
+﻿@using X.PagedList
+@model mar_sumaken_web.Models.M_UserModel
+
+@{
+    ViewData["Title"] = "マスター情報 ー ユーザーマスター";
+}
+<style type="text/css">
+    .card {
+        border: 0px;
+    }
+    .card-body {
+        width: 100%;
+    }
+
+    .pdf-list ul li {
+        margin-right: 5px;
+    }
+
+    .border-left-custom {
+        border-right: none;
+        border-left: none;
+    }
+
+    .btn-info {
+        color: white;
+    }
+
+    table.dataTable.compact tbody td {
+        padding: 4px !important;
+    }
+
+    table.dataTable td {
+        padding: 0px !important;
+    }
+
+    table.dataTable .icon i {
+        font-size: larger;
+    }
+
+    .btn-register {
+        width: auto !important;
+        margin-right: 5px;
+    }
+
+    .table > :not(caption) > * > * {
+        border-bottom-color: lightgray;
+    }
+
+    th {
+        white-space: nowrap;
+    }
+</style>
+<div class="user-master shadow masterInfo">
+
+    <div class="card-header text-gray-800">
+        @ViewData["Title"]
+    </div>
+
+    <div class="col-lg-12 p-0">
+        <div class="card">
+            <div class="card-body col-12 d-flex xs-block justify-content-start align-items-center pl-4 pb-0">
+                <div class="input-group-append">
+                    <a href="#" class="btn btn-primary btn-icon-split btn-register">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">新規作成</span>
+                    </a>
+                </div>
+                <div class="input-group-append">
+                    <a href="#" class="btn btn-info btn-icon-split">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-file-export"></i>
+                        </span>
+                        <span class="text">取込</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12">
+        <div class="card border-left-custom">
+            <div class="card-body">
+                <div class="tableContent mt-10">
+                    <table class="table table-sm compact row-border compact stripe hover nowrap order-column" id="userTbl">
+                        <thead>
+                            <tr>
+                                <th width="40"></th>
+                                <th class="font-weight-bold">ユーザーID</th>
+                                <th class="font-weight-bold">ログインID</th>
+                                <th class="font-weight-bold">ユーザー名</th>
+                                <th class="font-weight-bold">メイン倉庫ID</th>
+                                <th class="font-weight-bold">管理権限区分</th>
+                                <th class="font-weight-bold">更新日時</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (@Model != null && @Model.MUserList != null && @Model.MUserList.Count > 0)
+                            {
+                                @foreach (var item in @Model.MUserList)
+                                {
+                                    <tr>
+                                        <td>
+                                            <button class="btn btn-secondary btn-icon-split" onclick="OnDetailErrorClick('@item.UserId')">
+                                                <i class="fa-solid fa-list"></i>
+                                            </button>
+                                            <button class="btn btn-success btn-icon-split ml-1 mr-1" onclick="OnDetailErrorClick('@item.UserId')">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+                                            <button class="btn btn-danger btn-icon-split" onclick="OnDetailErrorClick('@item.UserId')">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                        <td>@item.UserId</td>
+                                        <td>@item.LoginId</td>
+                                        <td>@item.UserName</td>
+                                        <td>@item.DepoId</td>
+                                        <td>@item.AuthorizedKubun</td>
+                                        <td>@item.UpdatedAt</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="~/lib/billboard/billboard.css">
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="~/lib/billboard/billboard.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Or load different theme style -->
+@*<link rel="stylesheet" href="$YOUR_PATH/theme/insight.css">*@
+
+
+<script>
+
+    function OnDetailErrorClick(id) {
+        alert(id);
+    }
+
+    function navigate(url) {
+        window.location.href = url;
+    }
+
+
+</script>
