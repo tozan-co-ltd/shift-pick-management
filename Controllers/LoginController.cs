@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using mar_sumaken_web.Commons;
+//using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
 
 namespace mar_sumaken_web.Controllers
