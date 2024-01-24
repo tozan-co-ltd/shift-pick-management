@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 //using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
+using Microsoft.Extensions.Logging;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -27,6 +28,25 @@ namespace mar_sumaken_web.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        /// <summary>
+        /// ログイン
+        /// </summary>
+        /// <param name="model">LoginModel</param>
+        /// <returns>トップ画面</returns>
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginModel model)
+        {
+            try
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                return View();
+            }
         }
     }
 }

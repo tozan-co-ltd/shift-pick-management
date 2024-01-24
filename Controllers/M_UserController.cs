@@ -1,5 +1,6 @@
 ﻿//using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using static mar_sumaken_web.Models.M_UserModel;
@@ -14,6 +15,8 @@ namespace mar_sumaken_web.Controllers
         {
             _logger = logger;
         }
+
+        [AllowAnonymous]
         public IActionResult Index(M_UserModel model)
         {
             string? errorMessage;
