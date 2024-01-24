@@ -8,15 +8,12 @@ namespace mar_sumaken_web.Models
     /// </summary>
     public class M_UserModel
     {
-        public IFormFile PostedFile { get; set; }
-        public string FileName { get; set; }
-        public int UserId { get; set; }
-        public string CopySavePath { get; set; }
         public IPagedList<M_User> MUserList { get; set; }
+
         public class M_User
         {
             /// <summary>
-            /// ユーザーid
+            /// ユーザーID
             /// </summary>
             [Display(Name = "ユーザーID")]
             public int UserId { get; set; }
@@ -96,13 +93,6 @@ namespace mar_sumaken_web.Models
             /// </summary>
             [Display(Name = "削除フラグ")]
             public int IsDeleted { get; set; }
-
-            /// <summary>
-            /// log用のメッセージ
-            /// </summary>
-            public string Message { set; get; }
         }
-
-        public List<string> LstErrorMsg { set; get; }//エラーメッセージリスト
     }
 }
