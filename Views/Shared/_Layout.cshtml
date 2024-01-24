@@ -1,26 +1,25 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - mar_sumaken_web</title>
-    <!-- アイコン設定 -->
+    <title>@ViewData["Title"] - スマホDE検品</title>
+
+    <!-- ▼ファビコン -->
     <link rel="shortcut icon" type="image/png" href="~/image/appicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="~/image/appicon.png">
 
+    <!-- ▼CSSファイル読み込み -->
     <!--Bootstrap admin template-->
     <link rel="stylesheet" href="~/lib/startbootstrap-sb-admin-gh-pages/css/styles.css" />
-
     <!-- font-awesome -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <!-- sb-admin-2 -->
     <!-- bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <!-- font-awesome -->
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- sb-admin-2 -->
     <link href="~/css/sb-admin-2.css?@DateTime.Now" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/site.css?@DateTime.Now" />
-
+    <!-- 内部ファイル -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 @{
     var bodyClass = Context.Request.Cookies["Sidebar"];
@@ -63,6 +62,8 @@
             </li>
         </ul>
     </nav>
+
+    <!-- Side Navbar-->
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
@@ -169,8 +170,11 @@
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 
+    <!--jquery.cookie.js-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
