@@ -4,40 +4,15 @@
 @{
     ViewData["Title"] = "トップ";
 }
-<style type="text/css">
-    .menu-top .card-body {
-        width: 100%;
-    }
-
-    .menu-top .pdf-list ul li {
-        margin-right: 5px;
-    }
-
-    .menu-top .border-left-custom {
-        border-right: none;
-        border-left: none;
-    }
-
-    .menu-top .btn-info {
-        color: white;
-        background-color: gray;
-        border-color: darkgray;
-    }
-
-    .menu-top .btn-info.btn-icon-split {
-        /* min-width: 100px; */
-        margin-right: 10px;
-    }
-
-    #handyErrorTbl th {
-        white-space: nowrap;
-    }
+<style type="text/css"> 
 </style>
+
 <div class="card shadow m-4">
     <div class="card-header text-gray-800">
         @ViewData["Title"]
     </div>
 
+    <p class="card-body pb-0">作業進捗(2023-01-01)</p>
     <div class="chart-part p-2 col-12 d-flex">
         <div class="col-6 d-flex" id="donut-chart"></div>
         <div class="col-6 d-flex justify-content-center">
@@ -45,50 +20,46 @@
         </div>
     </div>
 
-    <div class="handy-error-tbl card-body">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="border-left-custom">
-                    <div class="card-body">
-                        <p>ハンディエラーメッセージ履歴(直近1週間)</p>
-                        <div class="tableContent mt-10">
-                            <table class="table table-sm row-border compact stripe hover nowrap order-column" id="handyErrorTbl">
-                                <thead>
+    <div class="p-0">
+        <div class="row col-lg-12">
+            <div class="card-body  pb-0">
+                <p>ハンディエラーメッセージ履歴(直近1週間)</p>
+                <div class="tableContent mt-10">
+                    <table class="table table-sm row-border compact stripe hover nowrap order-column" id="handyErrorTbl">
+                        <thead>
+                            <tr>
+                                <th width="5%"></th>
+                                <th width="10%" class="font-weight-bold">取込日時</th>
+                                <th width="20%" class="font-weight-bold">ハンディメニュー名</th>
+                                <th width="50%" class="font-weight-bold">エラーメッセージ</th>
+                                <th width="10%" class="font-weight-bold">登録者</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (@Model != null && @Model.D_HandyErrorMessageList != null && @Model.D_HandyErrorMessageList.Count > 0)
+                            {
+                                @foreach (var item in @Model.D_HandyErrorMessageList)
+                                {
                                     <tr>
-                                        <th width="5%"></th>
-                                        <th width="10%" class="font-weight-bold">取込日時</th>
-                                        <th width="20%" class="font-weight-bold">ハンディメニュー名</th>
-                                        <th width="50%" class="font-weight-bold">エラーメッセージ</th>
-                                        <th width="10%" class="font-weight-bold">登録者</th>
+                                        <td class="d-flex justify-content-center">
+                                            <button class="btn btn-secondary btn-icon-split" onclick="OnDetailErrorClick('@item.HandyErrorMessageID')">
+                                                <i class="fa-solid fa-list"></i>
+                                            </button>
+                                        </td>
+                                        <td>@item.ReadingTime</td>
+                                        <td>@item.HandyMenuName</td>
+                                        <td>@item.ErrorMessage</td>
+                                        <td>@item.CreatedBy</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @if (@Model != null && @Model.D_HandyErrorMessageList != null && @Model.D_HandyErrorMessageList.Count > 0)
-                                    {
-                                        @foreach (var item in @Model.D_HandyErrorMessageList)
-                                        {
-                                            <tr>
-                                                <td class="d-flex justify-content-center">
-                                                    <button class="btn btn-secondary btn-icon-split" onclick="OnDetailErrorClick('@item.HandyErrorMessageID')">
-                                                        <i class="fa-solid fa-list"></i>
-                                                    </button>
-                                                </td>
-                                                <td>@item.ReadingTime</td>
-                                                <td>@item.HandyMenuName</td>
-                                                <td>@item.ErrorMessage</td>
-                                                <td>@item.CreatedBy</td>
-                                            </tr>
-                                        }
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                                }
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <div class="system-manual p-2">
+        <div class="card-body pt-0">
             <div id="pdf-list">
                 <p>システムマニュアル</p>
                 <ul>
