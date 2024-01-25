@@ -50,7 +50,7 @@
             <div class="col-lg-12">
                 <div class="border-left-custom">
                     <div class="card-body">
-                        <p>ハンディエラーメッセージ履歴（直近1週間）</p>
+                        <p>ハンディエラーメッセージ履歴(直近1週間)</p>
                         <div class="tableContent mt-10">
                             <table class="table table-sm row-border compact stripe hover nowrap order-column" id="handyErrorTbl">
                                 <thead>
@@ -63,13 +63,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (@Model != null && @Model.HandyErrorList != null && @Model.HandyErrorList.Count > 0)
+                                    @if (@Model != null && @Model.D_HandyErrorMessageList != null && @Model.D_HandyErrorMessageList.Count > 0)
                                     {
-                                        @foreach (var item in @Model.HandyErrorList)
+                                        @foreach (var item in @Model.D_HandyErrorMessageList)
                                         {
                                             <tr>
                                                 <td class="d-flex justify-content-center">
-                                                    <button class="btn btn-secondary btn-icon-split" onclick="OnDetailErrorClick('@item.HandyErrorId')">
+                                                    <button class="btn btn-secondary btn-icon-split" onclick="OnDetailErrorClick('@item.HandyErrorMessageID')">
                                                         <i class="fa-solid fa-list"></i>
                                                     </button>
                                                 </td>
