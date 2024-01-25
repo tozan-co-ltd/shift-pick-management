@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <!-- sb-admin-2 -->
     <link href="~/css/sb-admin-2.css?@DateTime.Now" rel="stylesheet">
+    <!-- dataTables-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <!-- 内部ファイル -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
@@ -74,18 +76,18 @@
                                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu1"
                                    aria-expanded="true" aria-controls="menu1">
                                     <i class="fa-solid fa-calendar-days"></i>
-                                    <span>メニュー名1</span>
+                                    <span>入庫</span>
                                 </a>
                                 <div id="menu1" class="collapse" data-parent="#accordionSidebar">
                                     <div class="bg-white py-2 collapse-inner rounded">
                                         <a class="collapse-item collapse-item-imagecolor">
-                                            メニュー名1
+                                            入荷予定取込
                                         </a>
                                         <a class="collapse-item collapse-item-imagecolor">
-                                            メニュー名1
+                                            入荷予定照会
                                         </a>
                                         <a class="collapse-item collapse-item-imagecolor">
-                                            メニュー名1
+                                            入荷実績照会
                                         </a>
                                     </div>
                                 </div>
@@ -95,15 +97,15 @@
                                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu2"
                                    aria-expanded="true" aria-controls="menu2">
                                     <i class="fa-solid fa-calendar-days"></i>
-                                    <span>メニュー名2</span>
+                                    <span>出庫</span>
                                 </a>
                                 <div id="menu2" class="collapse" data-parent="#accordionSidebar">
                                     <div class="bg-white py-2 collapse-inner rounded">
                                         <a class="collapse-item collapse-item-imagecolor">
-                                            メニュー名1
+                                            出荷指示取込
                                         </a>
                                         <a class="collapse-item collapse-item-imagecolor">
-                                            メニュー名1
+                                            出荷指示照会
                                         </a>
                                     </div>
                                 </div>
@@ -113,22 +115,52 @@
                                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu3"
                                    aria-expanded="true" aria-controls="menu3">
                                     <i class="fa-solid fa-calendar-days"></i>
-                                    <span>メニュー名3</span>
+                                    <span>在庫</span>
                                 </a>
                                 <div id="menu3" class="collapse" data-parent="#accordionSidebar">
                                     <div class="bg-white py-2 collapse-inner rounded">
                                         <a class="collapse-item collapse-item-imagecolor">
-                                            メニュー名1
+                                            在庫照会
                                         </a>
                                         <a class="collapse-item collapse-item-imagecolor">
-                                            メニュー名1
+                                            入庫実績照会・修正
+                                        </a>
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            出庫実績照会・修正
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu3"
+                                   aria-expanded="true" aria-controls="menu3">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    <span>マスター情報</span>
+                                </a>
+                                <div id="menu3" class="collapse" data-parent="#accordionSidebar">
+                                    <div class="bg-white py-2 collapse-inner rounded">
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            倉庫マスター
+                                        </a>
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            ユーザーマスター
+                                        </a>
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            会社マスター
+                                        </a>
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            品番マスター
+                                        </a>
+                                        <a class="collapse-item collapse-item-imagecolor">
+                                            仕入先かんばんマスター
                                         </a>
                                     </div>
                                 </div>
                             </li>
                         </ul>
-                        </div>
                     </div>
+                </div>
             </nav>
         </div>
         <div id="layoutSidenav_content">
@@ -169,6 +201,9 @@
     <!--jQueryの動的validation-->
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <!--dataTables↓-->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
     <!--jquery.cookie.js-->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>

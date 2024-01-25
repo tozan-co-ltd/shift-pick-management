@@ -337,3 +337,17 @@ table.sticky_table {
     }
 }
 
+/* データテーブルのボタン */
+table .btn-icon-split {
+    padding: 4px;
+}
+
+table .btn.btn-secondary.btn-icon-split span, .masterInfo .btn.btn-primary.btn-icon-split span {
+    line-height: 1.4;
+}
+
+table .btn-primary.btn-icon-split {
+    height: 39px;
+    width: 101px;
+}
+/* データテーブルのボタン */
