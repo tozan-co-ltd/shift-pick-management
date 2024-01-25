@@ -338,6 +338,10 @@ table.sticky_table {
 }
 
 /* データテーブルのボタン */
+table.dataTable {
+    margin: 0;
+}
+
 table .btn-icon-split {
     padding: 4px;
 }

@@ -153,7 +153,6 @@ function onUploadFile(page) {
 
     if (page == 'm-routes-master-upload-form')
         modelTitle = "運行便マスター";
-    });
 
     $('body').append(
         '<div class="modal fade" id="ImportModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">' +
