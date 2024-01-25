@@ -3,14 +3,23 @@
 
 // Write your JavaScript code.
 
+// ドキュメントが読み込まれたら実行
 $(document).ready(function () {
-    // サイドバーがアクティブ
+    // #sidebarToggle 要素がクリックされたときに、サイドバーの表示/非表示の状態をトグルし、クッキーに保存する
     $("#sidebarToggle").click(function () {
+        // Sidebar クッキーを削除し、パスをルートに設定
         $.removeCookie("Sidebar", { path: '/' });
+
+        // body 要素に sb-sidenav-toggled クラスをトグルする
         $("body").toggleClass("sb-sidenav-toggled");
+
+        // #sidebarToggle 要素に rotateBtn クラスをトグルする
         $("#sidebarToggle").toggleClass("rotateBtn");
-        let className = $("body").attr("class");
-        $.cookie("Sidebar", className, { path: '/' });
+        // body 要素のクラスを取得
+        let $className = $("body").attr("class");
+
+        // Sidebar クッキーに body 要素のクラスを保存し、パスをルートに設定
+        $.cookie("Sidebar", $className, { path: '/' });
     });
 
     //------------------- DataTables　------------------//
@@ -144,6 +153,7 @@ function onUploadFile(page) {
 
     if (page == 'm-routes-master-upload-form')
         modelTitle = "運行便マスター";
+    });
 
     $('body').append(
         '<div class="modal fade" id="ImportModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">' +
