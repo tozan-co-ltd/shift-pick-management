@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Folder Include="Filters\" />
-    <Folder Include="Commons\" />
     <Folder Include="ConnectControllers\" />
   </ItemGroup>
 
