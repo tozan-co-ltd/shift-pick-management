@@ -32,7 +32,7 @@ namespace mar_sumaken_web.Controllers
                 {
                     M_UserModel.M_User item = new M_UserModel.M_User
                     { 
-                        UserId = i, LoginId = "sfsd", UserName = "User name " + i,  DepoId = 1, AuthorizedKubun = 1, UpdatedAt = DateTime.Now };
+                        UserID = i, LoginID = "sfsd", UserName = "User name " + i,  DepoID = 1, AuthorizedKubun = 1, UpdatedAt = DateTime.Now };
                         users.Add(item);
                     }
 
