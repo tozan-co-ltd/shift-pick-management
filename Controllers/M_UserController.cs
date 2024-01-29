@@ -63,6 +63,7 @@ namespace mar_sumaken_web.Controllers
             }
         }
 
+        [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
