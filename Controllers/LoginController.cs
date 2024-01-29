@@ -117,7 +117,7 @@ namespace mar_sumaken_web.Controllers
 
                 // (2) (3) 会社マスター情報の取得
                 var mCompany = GetCompany();
-                if (mCompany == null)
+                if (mCompany == null ||  string.IsNullOrWhiteSpace(mCompany.DatabaseName))
                 {
                     // エラーを作成
                     // エラーコード：E2011
@@ -125,7 +125,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ログインユーザー情報取得
-                List<M_User> mUsers = LoginController.GetUserToLoginAndCheckPassword(loginId);
+                List<M_User> mUsers = LoginController.GetUserToLoginAndCheckPassword(mCompany.DatabaseName, loginId);
                 M_User? mUser = mUsers.FirstOrDefault();
                 
                 // 一致するデータが無い場合
@@ -180,14 +180,14 @@ namespace mar_sumaken_web.Controllers
         /// <param name="loginId">ログインID</param>
         /// <param name="authorizedKubunList">管理権限区分リスト</param>
         /// <returns>MUsersViewModel</returns>
-        public static List<M_User> GetUserToLoginAndCheckPassword(string loginId)
+        public static List<M_User> GetUserToLoginAndCheckPassword(string databaseName, string loginId)
         {
             try
             {
                 // SQL作成
                 var sql = LoginConnectController.CreateSQLToGetLoginUser(loginId);
                 // DB接続
-                List<M_User> userList = M_UserConnectController.ConnectMUsers(sql);
+                List<M_User> userList = M_UserConnectController.ConnectMUsers(sql, databaseName);
                 return userList;
             }
             catch (Exception)

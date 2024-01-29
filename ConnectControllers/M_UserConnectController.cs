@@ -14,8 +14,9 @@ namespace mar_sumaken_web.Commons
         /// データベースに接続し、SQL実行
         /// </summary>
         /// <param name="sql">SQL</param>
+        /// <param name="databaseName">データベース名</param>
         /// <returns>ユーザー情報</returns>
-        public static List<M_UserModel.M_User> ConnectMUsers(string sql)
+        public static List<M_UserModel.M_User> ConnectMUsers(string sql, string databaseName)
         {
             // 戻り値
             List<M_UserModel.M_User> strList = new();
@@ -24,7 +25,7 @@ namespace mar_sumaken_web.Commons
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("warehouse_2_marutamaunsou");
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {
