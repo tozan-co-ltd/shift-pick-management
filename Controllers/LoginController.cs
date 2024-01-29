@@ -44,6 +44,12 @@ namespace mar_sumaken_web.Controllers
                 // ログインの入力値 チェック
                 LoginUserModel loginUserModel = this.CheckInputValuesForLogin(model);
 
+                // エラー入力の場合
+                if (loginUserModel == null)
+                {
+                    return View();
+                }
+
                 // 現在時刻取得
                 string now = DateTime.Now.ToString(); ;
 
@@ -112,7 +118,8 @@ namespace mar_sumaken_web.Controllers
                 {
                     // エラーを作成
                     // エラーコード：E2011
-                    throw new Exception();
+                    //throw new Exception();
+                    return null;
                 }
 
                 // (2) (3) 会社マスター情報の取得
@@ -121,7 +128,8 @@ namespace mar_sumaken_web.Controllers
                 {
                     // エラーを作成
                     // エラーコード：E2011
-                    throw new Exception();
+                    //throw new Exception();
+                    return null;
                 }
 
                 // ログインユーザー情報取得
@@ -133,7 +141,8 @@ namespace mar_sumaken_web.Controllers
                 {
                     // エラーを作成
                     // エラーコード：E2011
-                    throw new Exception();
+                    //throw new Exception();
+                    return null;
                 }
 
                 // (4) 16進数文字列をbyte列に変換
@@ -148,7 +157,8 @@ namespace mar_sumaken_web.Controllers
                 {
                     // エラーを作成
                     // エラーコード：E2011
-                    throw new Exception();
+                    //throw new Exception();
+                    return null;
                 }
                 LoginUserModel loginUserModel = new LoginUserModel()
                 {
@@ -170,7 +180,8 @@ namespace mar_sumaken_web.Controllers
             {
                 // エラーを作成
                 // エラーコード：E2011
-                throw new Exception();
+                //throw new Exception();
+                return null;
             }
         }
 

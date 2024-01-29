@@ -19,22 +19,22 @@ namespace mar_sumaken_web.Commons
         {
             var sql = $@"
                     SELECT
-                         U.UserID
-                        ,U.LoginID
-                        ,U.UserName
-                        ,U.DepoID
-                        ,U.AuthorizedKubun
-                        ,U.Password
-                        ,U.Salt
-                        ,U.LastLoginDatetime
-                        ,U.IsLogin
-                        ,depo.DepoName
+                         m_user.UserID
+                        ,m_user.LoginID
+                        ,m_user.UserName
+                        ,m_user.DepoID
+                        ,m_user.AuthorizedKubun
+                        ,m_user.Password
+                        ,m_user.Salt
+                        ,m_user.LastLoginDatetime
+                        ,m_user.IsLogin
+                        ,m_depo.DepoName
                     FROM 
-                        M_User U
-                    INNER JOIN M_Depo depo ON U.DepoID = depo.DepoID
+                        M_User AS m_user
+                    INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
                     WHERE
-                        U.NotUseFlag = 0
-                        AND U.LoginID = '{@loginId}' COLLATE Japanese_CS_AS_KS_WS
+                        m_user.NotUseFlag = 0
+                        AND m_user.LoginID = '{@loginId}' COLLATE Japanese_CS_AS_KS_WS
             ";
 
             return sql;
