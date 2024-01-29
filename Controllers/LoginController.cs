@@ -47,7 +47,7 @@ namespace mar_sumaken_web.Controllers
                 // エラー入力の場合
                 if (loginUserModel == null)
                 {
-                    return View();
+                   return RedirectToAction("Index", "Login");
                 }
 
                 // 現在時刻取得
