@@ -5,6 +5,9 @@
 }
 
 <style>
+    body {
+        background-color: #e2eec3;
+    }
     .login-img {
         margin: 20px;
         margin-bottom: 0px;
@@ -21,7 +24,7 @@
                 <span>スマホDE検品<br/>WEBアプリ</span>
             </div>
             <div class="login-form">
-                <form method="post" action="Home">
+                <form method="post" action="Login/Login">
                     @*@if (!(ViewData["ErrorMessage"] is null))
                     {
                         <span class="text-danger">@Html.Raw(ViewData["ErrorMessage"])</span>
@@ -34,7 +37,6 @@
                     <div class="input-icon-with input-password">
                         <input class="login-text" type="password" placeholder="パスワード" asp-for="Password">
                         <span class="material-icons">lock</span>
-                        <i class="fas fa-eye" id="eye-login"></i>
                     </div>
 
                     <button type="submit" class="login-btn btn-imagecolor">ログイン</button>
@@ -50,17 +52,8 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <!-- Bootstrap core JavaScript -->
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<!-- icheck -->
-<script src="~/js/icheck.min.js"></script>
-<!-- jquery-ui -->
-<script src="~/lib/jqueryui/jquery-ui.min.js"></script>
 <!-- sb-admin-2 -->
 <script src="~/js/sb-admin-2.js"></script>
-<!-- 内部ファイル -->
-<script src="~/js/site.js" asp-append-version="true"></script>
-@* <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.1.0/jquery-migrate.min.js"></script> *@
 
 <script>
-
 </script>
