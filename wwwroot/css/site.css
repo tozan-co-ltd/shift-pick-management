@@ -1,11 +1,11 @@
 /* || システム全体の配色 */
 :root {
     /* メインカラー */
-    --base-color-main: rgb(0, 30, 100);
-    --rgb-base-color-main: 0, 30, 100;
+    --base-color-main: rgb(0 170 40);
+    --rgb-base-color-main: 0 170 40;
     /* アクセントカラー(ボタン等) */
-    --base-color-accent: rgb(196, 0, 11);
-    --rgb-base-color-accent: 196, 0, 11;
+    --base-color-accent: rgb(240 132 75);
+    --rgb-base-color-accent: 240 132 75;
     /* 背景カラー */
     --base-color-bg: rgba(var(--rgb-base-color-main), 0.3);
 }
