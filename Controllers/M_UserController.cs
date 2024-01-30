@@ -1,13 +1,13 @@
 ﻿//using mar_sumaken_web.Commons;
+using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using X.PagedList;
 using static mar_sumaken_web.Models.M_UserModel;
 
 namespace mar_sumaken_web.Controllers
 {
-    public class M_UserController : Controller
+    public class M_UserController : BaseController
     {
         private readonly ILogger<M_UserController> _logger;
 
@@ -16,7 +16,6 @@ namespace mar_sumaken_web.Controllers
             _logger = logger;
         }
 
-        [AllowAnonymous]
         public IActionResult Index(M_UserModel model)
         {
             string? errorMessage;
@@ -26,20 +25,28 @@ namespace mar_sumaken_web.Controllers
 
             try
             {
-                List<M_User> users = new List<M_User> ();
+                // クレームからユーザー情報の管理権限区分を取得する
+                var user = UserDataList();
 
-                for (int i = 4; i < 100; i++)
+                // 管理権限区分チェック
+                // 1(管理者)でない場合はエラーとする
+                if (user == null || user.AuthorizedKubun != 1 || string.IsNullOrWhiteSpace(user.DatabaseName))
                 {
-                    M_UserModel.M_User item = new M_UserModel.M_User
-                    { 
-                        UserID = i, LoginID = "sfsd", UserName = "User name " + i,  DepoID = 1, AuthorizedKubun = 1, UpdatedAt = DateTime.Now };
-                        users.Add(item);
-                    }
+                    // エラーを作成
+                    // エラーコード：E2011
+                    throw new Exception();
+                }
 
-                if (users.Count > 0)
+                // ユーザーマスター情報取得SQL作成
+                var sql = M_UserConnectController.CreateSQLToGetMUsers();
+                // DB接続
+                List<M_User> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
+                
+                if (userList.Count > 0)
                 {
-                    IEnumerable<M_User> query = users.Select(s => s);
-                    model.MUserList = query.ToPagedList();
+                    // ユーザーマスターリストの詳細を取得する
+                    userList = M_UserConnectController.GetUserListDetail(userList, user.DatabaseName);
+                    model.M_UserList = userList;
                 }
 
                 return View(model);

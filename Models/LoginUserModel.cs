@@ -54,5 +54,10 @@
         /// 管理権限区分
         /// </summary>
         public int AuthorizedKubun { set; get; }
+
+        /// <summary>
+        /// タイムスタンプ
+        /// </summary>
+        public DateTime TimeStamp { set; get; }
     }
 }

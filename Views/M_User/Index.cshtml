@@ -1,5 +1,4 @@
-﻿@using X.PagedList
-@model mar_sumaken_web.Models.M_UserModel
+﻿@model mar_sumaken_web.Models.M_UserModel
 
 @{
     ViewData["Title"] = "マスター情報 - ユーザーマスター";
@@ -96,27 +95,27 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (@Model != null && @Model.MUserList != null && @Model.MUserList.Count > 0)
+                            @if (@Model != null && @Model.M_UserList != null && @Model.M_UserList.Count > 0)
                             {
-                                @foreach (var item in @Model.MUserList)
+                                @foreach (var item in @Model.M_UserList)
                                 {
                                     <tr>
                                         <td>
-                                            <button class="btn btn-secondary btn-icon-split" onclick="OnDetailErrorClick('@item.UserID')">
+                                            <button class="btn btn-secondary btn-icon-split" onclick="OnDetailClick('@item.UserID')"  data-id="@item.UserID" data-toggle="modal" data-target="#userDetailModal">
                                                 <i class="fa-solid fa-list"></i>
                                             </button>
-                                            <button class="btn btn-success btn-icon-split ml-1 mr-1" onclick="OnDetailErrorClick('@item.UserID')">
+                                            <button class="btn btn-success btn-icon-split ml-1 mr-1" onclick="OnEditClick('@item.UserID')">
                                                 <i class="fa-solid fa-pen"></i>
                                             </button>
-                                            <button class="btn btn-danger btn-icon-split" onclick="OnDetailErrorClick('@item.UserID')">
+                                            <button class="btn btn-danger btn-icon-split" onclick="OnDeleteClick('@item.UserID')">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </td>
-                                        <td>@item.UserID</td>
-                                        <td>@item.LoginID</td>
-                                        <td>@item.UserName</td>
+                                        <td class="item_@item.UserID">@item.UserID</td>
+                                        <td id="loginId">@item.LoginID</td>
+                                        <td id="useName">@item.UserName</td>
                                         <td>@item.DepoID</td>
-                                        <td>@item.AuthorizedKubun</td>
+                                        <td>@item.AuthorizedKubunName</td>
                                         <td>@item.UpdatedAt</td>
                                     </tr>
                                 }
@@ -129,23 +128,100 @@
     </div>
 </div>
 
+<!-- User Detail Modal-->
+<div class="modal fade" id="userDetailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">ユーザーマスター詳細</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12">
+                    <p class="mb-0">ログインID：<span id="detailLoginId"></span></p>
+                    <p>ユーザー名：<span id="detailUserName"></span></p>
+                    <p class="mb-1">使用倉庫名</p>
+                    <div class="p-2">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-left border-top-0 font-weight-bold" scope="col">倉庫コード</th>
+                                    <th class="text-left border-top-0 font-weight-bold" scope="col">倉庫名</th>
+                                </tr>
+                            </thead>
+                            <tbody id="depo-contatiner">
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="mb-1">使用ハンディメニュー名</p>
+                    <div class="col-12 p-2">
+                        <table class="col-6 table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-left border-top-0 font-weight-bold" scope="col">ハンディメニュー名</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menu-contatiner">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <link rel="stylesheet" href="~/lib/billboard/billboard.css">
 <script src="https://d3js.org/d3.v6.min.js"></script>
 <script src="~/lib/billboard/billboard.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Or load different theme style -->
-@*<link rel="stylesheet" href="$YOUR_PATH/theme/insight.css">*@
 
+<script type="text/javascript">
 
-<script>
+    // 詳細ボタン押下
+    function OnDetailClick(userID) {
+        // M_UserModel取得
+        var data = @Html.Raw(Json.Serialize(Model));
+        var userModel = data.m_UserList;
 
-    function OnDetailErrorClick(id) {
-        alert(id);
+        userModel.forEach(function(item) {
+            // ユーザーIDが一致する情報のみ取得
+            if (item.userID == userID) {
+                // ログインID
+                $("#detailLoginId").text(item.loginID);
+
+                // ユーザー名
+                $("#detailUserName").text(item.userName);
+
+                // 使用倉庫
+                var depoList = item.m_DepoList;
+                var listContainer = $("#depo-contatiner");
+                listContainer.empty();
+                if (depoList != null) {
+                    depoList.forEach(function (depo) {
+                        let th1 = "<th class='text-left' scope='row'>" + depo.depoCode + "</th>";
+                        let th2 = "<td class='text-left'>" + depo.depoName + "</td>";
+                         listContainer.append("<tr>" + th1 + th2 + "</tr>");
+                    });
+                }
+
+                // 使用ハンディメニュー
+                var menuList = item.m_HandyMenuList;
+                var menuContainer = $("#menu-contatiner");
+                menuContainer.empty();
+                if (menuList != null) {
+                    menuList.forEach(function (menu) {
+                        menuContainer.append("<tr><td class='text-left'>" + menu.handyMenuName + "</td></tr>");
+                    });
+                }
+            }
+        });
     }
 
     function navigate(url) {
         window.location.href = url;
     }
-
 
 </script>
