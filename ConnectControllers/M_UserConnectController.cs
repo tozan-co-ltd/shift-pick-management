@@ -61,7 +61,6 @@ namespace mar_sumaken_web.Commons
                     connection.ConnectionString = connectionString;
                     connection.Open();
 
-                    // m_depo
                     if (userList.Count > 0)
                     {
                         foreach (M_User user in userList)

@@ -133,15 +133,15 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">ユーザーマスター明細</h5>
+                <h5 class="modal-title" id="exampleModalLabel">ユーザーマスター詳細</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="col-12">
-                    <p class="mb-0">ログインID　：　<span id="detailLoginId"></span></p>
-                    <p>ユーザー名　：　<span id="detailUserName"></span></p>
+                    <p class="mb-0">ログインID：<span id="detailLoginId"></span></p>
+                    <p>ユーザー名：<span id="detailUserName"></span></p>
                     <p class="mb-1">使用倉庫名</p>
                     <div class="p-2">
                         <table class="table table-sm table-striped">
@@ -152,14 +152,6 @@
                                 </tr>
                             </thead>
                             <tbody id="depo-contatiner">
-                                @*<tr>
-                                    <th class="text-left" scope="row">1</th>
-                                    <td class="text-left">西尾物流センター</td>
-                                </tr>
-                                <tr>
-                                    <th class="text-left" scope="row">2</th>
-                                    <td class="text-left">○○センター</td>
-                                </tr>*@
                             </tbody>
                         </table>
                     </div>
@@ -172,18 +164,11 @@
                                 </tr>
                             </thead>
                             <tbody id="menu-contatiner">
-                                @*<tr><td class="text-left">入庫</td></tr>
-                                <tr><td class="text-left">まとめ入庫</td></tr>
-                                <tr><td class="text-left">出庫</td></tr>*@
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            @*<div class="modal-footer">
-            <button class="btn btn-secondary" type="button" data-dismiss="modal">キャンセル</button>
-            <a class="btn btn-accent" asp-area="" asp-controller="Account" asp-action="Logout">ログアウト</a>
-            </div>*@
         </div>
     </div>
 </div>
@@ -192,22 +177,18 @@
 <script src="https://d3js.org/d3.v6.min.js"></script>
 <script src="~/lib/billboard/billboard.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Or load different theme style -->
-@*<link rel="stylesheet" href="$YOUR_PATH/theme/insight.css">*@
 
 <script type="text/javascript">
 
-    function OnDetailClick(id) {
-
+    // 詳細ボタン押下
+    function OnDetailClick(userID) {
+        // M_UserModel取得
         var data = @Html.Raw(Json.Serialize(Model));
         var userModel = data.m_UserList;
 
         userModel.forEach(function(item) {
-
-            if (item.userID == id) {
-
-                console.log(item);
-
+            // ユーザーIDが一致する情報のみ取得
+            if (item.userID == userID) {
                 // ログインID
                 $("#detailLoginId").text(item.loginID);
 
@@ -226,7 +207,7 @@
                     });
                 }
 
-                //使用ハンディメニュー
+                // 使用ハンディメニュー
                 var menuList = item.m_HandyMenuList;
                 var menuContainer = $("#menu-contatiner");
                 menuContainer.empty();
