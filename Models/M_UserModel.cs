@@ -8,10 +8,23 @@ namespace mar_sumaken_web.Models
     /// </summary>
     public class M_UserModel
     {
-        public IPagedList<M_User> MUserList { get; set; }
+        /// <summary>
+        /// ユーザーマスターリスト
+        /// </summary>
+        public List<M_User> M_UserList { get; set; }
 
         public class M_User
         {
+            /// <summary>
+            /// 倉庫マスターリスト
+            /// </summary>
+            public List<M_DepoModel> M_DepoList { get; set; }
+
+            /// <summary>
+            /// ハンディメニューリスト
+            /// </summary>
+            public List<M_HandyMenuModel> M_HandyMenuList { get; set; }
+
             /// <summary>
             /// ユーザーID
             /// </summary>
@@ -55,6 +68,11 @@ namespace mar_sumaken_web.Models
             /// </summary>
             [Display(Name = "管理権限区分")]
             public int AuthorizedKubun { get; set; }
+
+            /// <summary>
+            /// 管理権限区分名
+            /// </summary>
+            public string AuthorizedKubunName { get; set; }
 
             /// <summary>
             /// パスワード

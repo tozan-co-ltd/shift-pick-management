@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews(options =>
 {
     //options.Filters.Add(typeof(MyFilter));
+    //options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
 });
 
 // セッションの追加
@@ -72,7 +73,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Cookieの原則機能を有効にする
+app.UseCookiePolicy();
+// IDを有効にする
+app.UseAuthentication();
+//認証機能を有効にします
 app.UseAuthorization();
+//これらの3つの前後の順序を逆にすることはできません
+app.UseSession();
+app.UseMvc();
 
 app.MapControllerRoute(
     name: "default",
