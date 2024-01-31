@@ -59,7 +59,7 @@
         <div class="card">
             <div class="card-body col-12 d-flex xs-block justify-content-start align-items-center pl-4 pb-0">
                 <div class="input-group-append">
-                    <a href="#" class="btn btn-primary btn-icon-split btn-register">
+                    <a href="#" class="btn btn-primary btn-icon-split btn-register" onclick="navigateRegister()">
                         <span class="icon text-white-50">
                             <i class="fas fa-plus"></i>
                         </span>
@@ -222,6 +222,15 @@
 
     function navigate(url) {
         window.location.href = url;
+    }
+
+    function navigateRegister() {
+        var curUrl = window.location.origin + window.location.pathname;
+        if (!curUrl.endsWith("/")) {
+            curUrl += "/";
+        }
+        var newUrl = curUrl + "register";
+        window.location.href = newUrl;
     }
 
 </script>
