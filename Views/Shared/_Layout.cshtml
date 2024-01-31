@@ -1,4 +1,14 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@using System.Security.Claims
+@using mar_sumaken_web.Commons;
+@{
+    var Model = new WebMenuModel();
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.ViewTitle;
+}
+
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="utf-8" />
@@ -33,7 +43,7 @@
 <body class="@bodyClass">
     <nav class="sb-topnav navbar navbar-expand navbar-dark">
         <!-- Navbar Brand-->
-        <a id="home-title" class="navbar-brand ps-3" asp-controller="Home" asp-action="Index">アプリ名</a>
+        <a id="home-title" class="navbar-brand ps-3" asp-controller="Top" asp-action="Index">スマホDE検品</a>
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-angles-left"></i></button>
         <!-- Navbar Search-->
@@ -72,92 +82,31 @@
                 <div class="sb-sidenav-menu">
                     <div class="nav">
                         <ul class="navbar-nav bg-gradient-imagecolor sidebar sidebar-dark accordion" id="accordionSidebar">
-                            <li class="nav-item">
-                                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu1"
-                                   aria-expanded="true" aria-controls="menu1">
-                                    <i class="fa-solid fa-calendar-days"></i>
-                                    <span>入庫</span>
-                                </a>
-                                <div id="menu1" class="collapse" data-parent="#accordionSidebar">
-                                    <div class="bg-white py-2 collapse-inner rounded">
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            入荷予定取込
+                            @foreach (var category in Model.WebMenuCategoryList())
+                            {
+                                var categoryMenuList = Model.GetWebMenuCategoryList(category);
+                                var categoryName = categoryMenuList.Category.CategoryName;
+                                var categoryID = categoryMenuList.Category.CategoryID;
+                                var menuList = categoryMenuList.MenuList;
+                                if (menuList.Count != 0)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse@(categoryID)"
+                                           aria-expanded="true" aria-controls="collapse@(categoryID)">
+                                            <i class="icon-category @("icon-categoryid-" + categoryID)"></i>
+                                            <span>@(categoryName)</span>
                                         </a>
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            入荷予定照会
-                                        </a>
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            入荷実績照会
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu2"
-                                   aria-expanded="true" aria-controls="menu2">
-                                    <i class="fa-solid fa-calendar-days"></i>
-                                    <span>出庫</span>
-                                </a>
-                                <div id="menu2" class="collapse" data-parent="#accordionSidebar">
-                                    <div class="bg-white py-2 collapse-inner rounded">
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            出荷指示取込
-                                        </a>
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            出荷指示照会
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu3"
-                                   aria-expanded="true" aria-controls="menu3">
-                                    <i class="fa-solid fa-calendar-days"></i>
-                                    <span>在庫</span>
-                                </a>
-                                <div id="menu3" class="collapse" data-parent="#accordionSidebar">
-                                    <div class="bg-white py-2 collapse-inner rounded">
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            在庫照会
-                                        </a>
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            入庫実績照会・修正
-                                        </a>
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            出庫実績照会・修正
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#menu3"
-                                   aria-expanded="true" aria-controls="menu3">
-                                    <i class="fa-solid fa-calendar-days"></i>
-                                    <span>マスター情報</span>
-                                </a>
-                                <div id="menu3" class="collapse" data-parent="#accordionSidebar">
-                                    <div class="bg-white py-2 collapse-inner rounded">
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            倉庫マスター
-                                        </a>
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            ユーザーマスター
-                                        </a>
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            会社マスター
-                                        </a>
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            品番マスター
-                                        </a>
-                                        <a class="collapse-item collapse-item-imagecolor">
-                                            仕入先かんばんマスター
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
+                                        <div id="collapse@(categoryID)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                            <div class="bg-white py-2 collapse-inner rounded">
+                                                @foreach (var obj in menuList)
+                                                {
+                                                    <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action">@obj.MenuName</a>
+                                                }
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                            }
                         </ul>
                     </div>
                 </div>

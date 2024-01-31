@@ -18,7 +18,6 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// トップ画面表示
         /// </summary>
-        [AllowAnonymous]
         public IActionResult Index(D_HandyErrorMessageModel model)
         {
             string? errorMessage;
