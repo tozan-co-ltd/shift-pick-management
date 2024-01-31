@@ -28,6 +28,7 @@ namespace mar_sumaken_web.Commons
                         ,m_user.Salt
                         ,m_user.LastLoginDatetime
                         ,m_user.IsLogin
+                        ,m_user.Role
                         ,m_depo.DepoName
                     FROM 
                         M_User AS m_user
