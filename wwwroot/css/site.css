@@ -330,8 +330,8 @@ table .btn-icon-split {
 }
 
 table .btn.btn-secondary.btn-icon-split span,
-.masterInfo .btn.btn-primary.btn-icon-split span,
-.masterInfo .btn.btn-secondary.btn-icon-split span {
+.de-inspection .btn.btn-primary.btn-icon-split span,
+.de-inspection .btn.btn-secondary.btn-icon-split span {
     line-height: 1.3;
 }
 
@@ -378,19 +378,19 @@ table .btn-primary.btn-icon-split {
     background-color: #ffeeee;
 }
 
-.masterInfo .dataTables_wrapper .dataTables_paginate .paginate_button.previous,
-.masterInfo .dataTables_wrapper .dataTables_paginate .paginate_button.next {
+.de-inspection .dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+.de-inspection .dataTables_wrapper .dataTables_paginate .paginate_button.next {
     display: none;
 }
 
-.masterInfo .dataTables_wrapper .dataTables_paginate .current {
+.de-inspection .dataTables_wrapper .dataTables_paginate .current {
     border: 1px solid #C4000B !important;
     background: #C4000B !important;
     color: white !important;
     border-radius: 7px !important;
 }
 
-.masterInfo .paginate_button {
+.de-inspection .paginate_button {
     border: 1px solid #C4000B !important;
     border-radius: 7px !important;
     margin-right: 7px !important;
@@ -401,46 +401,46 @@ table .btn-primary.btn-icon-split {
     border: 1px solid #001E64 !important;
 }
 
-.masterInfo .dataTables_wrapper .dataTables_paginate {
+.de-inspection .dataTables_wrapper .dataTables_paginate {
     float: left;
     padding-top: 0.5rem;
 }
 
-.masterInfo .dataTables_wrapper .dataTables_filter input {
+.de-inspection .dataTables_wrapper .dataTables_filter input {
     border-radius: 7px !important;
     margin-left: 15px;
 }
 
-.masterInfo .excel-input {
+.de-inspection .excel-input {
     display: none;
 }
 
-.masterInfo .input-group {
+.de-inspection .input-group {
     padding: 10px 20px;
     background: #EAECF4;
 }
 
-.masterInfo .input-group-btn {
+.de-inspection .input-group-btn {
     margin: 0;
 }
 
-.masterInfo .btn-pd20 {
+.de-inspection .btn-pd20 {
     padding: 6px 20px;
     margin-right: 20px;
 }
 
-.masterInfo .btn-info.btn-icon-split {
+.de-inspection .btn-info.btn-icon-split {
     min-width: 100px;
     margin-right: 10px;
 }
 
-.masterInfo .btn-primary.btn-icon-split {
+.de-inspection .btn-primary.btn-icon-split {
     min-width: 100px;
     height: 39px;
     width: 101px;
 }
 
-.masterInfo .change-password-icon {
+.de-inspection .change-password-icon {
     cursor: pointer !important;
 }
 
@@ -483,7 +483,18 @@ select[readonly] {
     width: 218px;
 }
 
+/*入荷予定照会*/
+.warehouse-name-drs {
+    width: 150px;
+}
 
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: #3EB135;
+}
+
+#startDate, #endDate{
+    width: 178px;
+}
 /*スマートフォン対応*/
 @media (max-width: 1200px) {
     .warehouse-name {
@@ -494,8 +505,11 @@ select[readonly] {
         margin-top: 10px;
     }
 
-    .sp-mg-bt-10 {
+/*    .sp-mg-bt-10 {
         margin-bottom: 10px;
+    }*/
+    .de-inspection .btn-info.btn-icon-split{
+        min-width: unset;
     }
 
     .wd-100 {
@@ -520,11 +534,11 @@ select[readonly] {
         margin-left: 0 !important;
     }
 
-    .masterInfo .btn-info.btn-icon-split {
+    .de-inspection .btn-info.btn-icon-split {
         max-height: 36px;
     }
 
-    .masterInfo .btn-primary.btn-icon-split {
+    .de-inspection .btn-primary.btn-icon-split {
         height: unset !important;
         min-width: unset !important;
         width: unset !important;
@@ -578,13 +592,13 @@ select[readonly] {
         display: block !important;
     }
 
-    .masterInfo .btn-info.btn-icon-split {
+    .de-inspection .btn-info.btn-icon-split {
 /*        width: 92px !important;
         min-width: 92px !important;
         display: block;*/
     }
 
-    .masterInfo .btn-primary.btn-icon-split {
+    .de-inspection .btn-primary.btn-icon-split {
         height: unset !important;
         min-width: unset !important;
         width: unset !important;
