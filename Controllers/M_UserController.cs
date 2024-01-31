@@ -26,7 +26,7 @@ namespace mar_sumaken_web.Controllers
             try
             {
                 // クレームからユーザー情報の管理権限区分を取得する
-                var user = UserDataList();
+                var user = ClaimsLoginUserData();
 
                 // 管理権限区分チェック
                 // 1(管理者)でない場合はエラーとする

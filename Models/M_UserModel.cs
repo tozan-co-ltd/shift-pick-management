@@ -1,5 +1,6 @@
 ﻿using X.PagedList;
 using System.ComponentModel.DataAnnotations;
+using mar_sumaken_web.Properties;
 
 namespace mar_sumaken_web.Models
 {
@@ -35,7 +36,7 @@ namespace mar_sumaken_web.Models
             /// ログインID
             /// </summary>
             [Display(Name = "ログインID")]
-            [Required(ErrorMessage = "E1001 値が未入力です。値を入力してください。")]
+            [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
             [RegularExpression(@"[a-zA-Z0-9]+", ErrorMessage = "ログインIDは半角英数字のみ入力できます")]
             public string LoginID { get; set; }
 
