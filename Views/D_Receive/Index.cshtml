@@ -1,12 +1,12 @@
 ﻿@*@using X.PagedList*@
 @* @model mar_sumaken_web.Models.D_ReceiveScheduleModel *@
 @{
-    ViewData["Title"] = "入荷予定照会";
+    ViewData["Title"] = "入荷実績照会";
 }
 
 <div class="card shadow de-inspection d-receive-schedule m-4">
     <div class="card-header text-gray-800">
-        入庫 - 入荷予定照会
+        入庫 - 入荷実績照会
     </div>
     <div class="card-body">
         <div class="row">
@@ -57,23 +57,19 @@
                     <div class="col-lg-12">
                         <form id="form" name="form" class="form-inline cus-input-validation-error">
                             <div class="form-group d-flex justify-content-between fix-w-50 sp-fix-w-100">
-                                    <input id="startDate" type="text" class="form-control">　～　<input id="endDate" type="text" class="form-control">
-                                    <div class="custom-control custom-checkbox ml-3">
-                                        <input type="checkbox" class="custom-control-input" id="customCheckBox1">
-                                        <label class="custom-control-label" for="customCheckBox1">実績数不一致のみ</label>
-                                    </div>
-                                    <button type="submit" class="btn btn-secondary btn-icon-split ml-3 sp-cs">
-                                        <span class="icon text-white-50">
-                                            <i class="fa-solid fa-magnifying-glass"></i>
-                                        </span>
-                                        <span class="text">検索</span>
-                                    </button>
-                                    <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3 sp-cs">
-                                        <span class="icon text-white-50">
-                                            <i class="fa-solid fa-file-export"></i>
-                                        </span>
-                                        <span class="text">出力</span>
-                                    </button>
+                                <input id="startDate" type="text" class="form-control">　～　<input id="endDate" type="text" class="form-control">
+                                <button type="submit" class="btn btn-secondary btn-icon-split ml-3 sp-cs">
+                                    <span class="icon text-white-50">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </span>
+                                    <span class="text">検索</span>
+                                </button>
+                                <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3 sp-cs">
+                                    <span class="icon text-white-50">
+                                        <i class="fa-solid fa-file-export"></i>
+                                    </span>
+                                    <span class="text">出力</span>
+                                </button>
                             </div>
 
                         </form>
@@ -87,14 +83,13 @@
                     <tr>
                         <th>ID</th>
                         <th>仕入先名</th>
-                        <th>入荷予定日</th>
+                        <th>入荷日</th>
                         <th>仕入先品番</th>
-                        <th>ロット番号</th>
-                        <th>予定箱数</th>
-                        <th>予定数量</th>
-                        <th>入庫箱数</th>
-                        <th>入庫数量</th>
+                        <th>キー</th>
+                        <th>箱数</th>
+                        <th>数量</th>
                         <th>登録日時</th>
+                        <th>読取日時</th>
                         <th>登録者</th>
                     </tr>
                 </thead>
