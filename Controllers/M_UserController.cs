@@ -75,5 +75,47 @@ namespace mar_sumaken_web.Controllers
         {
             return View();
         }
+
+        /// <summary>
+        /// ユーザーマスター削除
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> Delete(int userId)
+        {
+            //string? errorMessage;
+            try
+            {
+                // クレームからユーザー情報の管理権限区分を取得する
+                var user = ClaimsLoginUserData();
+
+                if (user == null || userId == null)
+                {
+                    // エラーコード：E2011
+                    throw new Exception();
+                }
+
+                // ユーザーマスター削除
+                int deleteAffectedRows = M_UserConnectController.DeleteMUser(userId, user.DatabaseName);
+                if (deleteAffectedRows == 0)
+                {
+                    // エラーコード：E2011
+                    return new JsonResult(new { res = "NG", error = "エラーコード：E2011" });
+                }
+
+                return new JsonResult(new { res = "OK", error = "" });
+            }
+            catch (Exception ex)
+            {
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
+
+                // log取得
+                //var exceptionMessage = ex.Message;
+                //_logger.LogError($"{exceptionMessage} {errorMessage}");
+                return new JsonResult(new { res = "NG", error = "エラーコード：E2011" });
+            }
+        }
     }
 }

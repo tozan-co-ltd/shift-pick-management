@@ -92,6 +92,63 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
+        /// ユーザーマスター削除
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="databaseName"></param>
+        /// <returns></returns>
+        public static int DeleteMUser(int userId, string databaseName)
+        {
+            int delteAffectedRows = 0;
+
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
+                // DB接続
+                try
+                {
+                    // ユーザーマスター削除SQL作成
+                    string userDeleteSql = CreateSQLToDeleteMUser(userId);
+                    // ユーザーマスター削除
+                    delteAffectedRows = connection.Execute(userDeleteSql, null, transaction);
+                    // 更新件数が0の場合はエラーとする
+                    if(delteAffectedRows == 0)
+                    {
+                        // エラーコード：E2011
+                        throw new Exception();
+                    }
+
+                    // ユーザー-倉庫中間テーブル削除SQL作成
+                    string userDepoDeleteSql = CreateSQLToDeleteUserDepo(userId);
+                    // ユーザー-倉庫中間テーブル削除
+                    connection.Execute(userDepoDeleteSql, null, transaction);
+
+                    // ユーザー-ハンディメニュー中間テーブル削除SQL作成
+                    string userMenuDeleteSql = CreateSQLToDeleteUserHandyMenu(userId);
+                    connection.Execute(userMenuDeleteSql, null, transaction);
+
+                    transaction.Commit();
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    // エラーコード：E2011
+                    throw e;
+                }
+            }
+
+            return delteAffectedRows;
+        }
+
+        /// <summary>
         /// ユーザーマスターSELECT文SQL作成
         /// </summary>
         /// <returns>SQL</returns>
@@ -197,6 +254,54 @@ namespace mar_sumaken_web.Commons
                     ";
             return sql;
         }
+
+        /// <summary>
+        /// ユーザーマスター削除SQL作成
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public static string CreateSQLToDeleteMUser(int userId)
+        {
+            var sql = $@"
+                         UPDATE M_User
+                         SET NotUseFlag = 1
+                         WHERE 
+	                        UserID = {userId}
+                            AND NotUseFlag = 0
+                    ";
+            return sql;
+        }
+
+        /// <summary>
+        /// ユーザー-倉庫中間テーブル削除SQL作成
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public static string CreateSQLToDeleteUserHandyMenu(int userId)
+        {
+            var sql = $@"
+                         DELETE FROM R_UserHandyMenu
+                         WHERE 
+	                        UserID = {userId}
+                    ";
+            return sql;
+        }
+
+        /// <summary>
+        /// ユーザー-ハンディメニュー中間テーブル削除SQL作成
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public static string CreateSQLToDeleteUserDepo(int userId)
+        {
+            var sql = $@"
+                         DELETE FROM R_UserDepo
+                         WHERE 
+	                        UserID = {userId}
+                    ";
+            return sql;
+        }
+
 
     }
 }
