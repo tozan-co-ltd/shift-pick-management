@@ -340,3 +340,278 @@ table .btn-primary.btn-icon-split {
     width: 101px;
 }
 /* データテーブルのボタン */
+
+
+
+/* カード フォーム*/
+
+.border-left-custom {
+    border-left: .25rem solid #f0844b !important;
+    margin-bottom: 1.5rem;
+    font-size: 0.8rem;
+}
+
+.border-left-custom > .card-body {
+    padding: 0.4rem;
+}
+
+.c-dialog {
+    max-width: 600px !important;
+}
+
+.c-dialog-area {
+    padding: 1.5rem;
+    border: none;
+}
+
+.c-label-text {
+    border: 1px solid #fff !important;
+    width: 100%;
+    padding-top: 0.375rem;
+    padding-right: 0.75rem;
+    padding-bottom: 0.375rem;
+    padding-left: 0rem;
+}
+
+.input-validation-error {
+    border: 1px solid #ff0000;
+    background-color: #ffeeee;
+}
+
+.masterInfo .dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+.masterInfo .dataTables_wrapper .dataTables_paginate .paginate_button.next {
+    display: none;
+}
+
+.masterInfo .dataTables_wrapper .dataTables_paginate .current {
+    border: 1px solid #C4000B !important;
+    background: #C4000B !important;
+    color: white !important;
+    border-radius: 7px !important;
+}
+
+.masterInfo .paginate_button {
+    border: 1px solid #C4000B !important;
+    border-radius: 7px !important;
+    margin-right: 7px !important;
+}
+
+.paginate_button:hover {
+    background: #001E64 !important;
+    border: 1px solid #001E64 !important;
+}
+
+.masterInfo .dataTables_wrapper .dataTables_paginate {
+    float: left;
+    padding-top: 0.5rem;
+}
+
+.masterInfo .dataTables_wrapper .dataTables_filter input {
+    border-radius: 7px !important;
+    margin-left: 15px;
+}
+
+.masterInfo .excel-input {
+    display: none;
+}
+
+.masterInfo .input-group {
+    padding: 10px 20px;
+    background: #EAECF4;
+}
+
+.masterInfo .input-group-btn {
+    margin: 0;
+}
+
+.masterInfo .btn-pd20 {
+    padding: 6px 20px;
+    margin-right: 20px;
+}
+
+.masterInfo .btn-info.btn-icon-split {
+    min-width: 100px;
+    margin-right: 10px;
+}
+
+.masterInfo .btn-primary.btn-icon-split {
+    min-width: 100px;
+    height: 39px;
+    width: 101px;
+}
+
+.masterInfo .change-password-icon {
+    cursor: pointer !important;
+}
+
+
+input[type="text"][disabled],
+select[disabled] {
+    border: 1px solid #eaecf4 !important;
+    color: #858796 !important;
+}
+
+input[type="text"][disabled],
+select[disabled],
+input[type="text"][readonly],
+select[readonly] {
+    border: 1px solid #eaecf4 !important;
+}
+
+.file-export {
+    border: none;
+    border-radius: 4px;
+    background: #2E9DAE;
+}
+
+    .file-export .fa-file-export {
+        color: white;
+        padding: 7px 0;
+    }
+
+.cus-input-validation-error .input-validation-error {
+    background-color: #fff !important;
+    border: 1px solid #d1d3e2;
+}
+
+.modal-content {
+    position: absolute;
+    top: 10px;
+}
+
+.warehouse-name{
+    width: 218px;
+}
+
+
+/*スマートフォン対応*/
+@media (max-width: 1200px) {
+    .warehouse-name {
+        width: 50px;
+    }
+
+    .sp-mg-top-10 {
+        margin-top: 10px;
+    }
+
+    .sp-mg-bt-10 {
+        margin-bottom: 10px;
+    }
+
+    .wd-100 {
+        width: 100% !important;
+    }
+
+    .pd-0-sp {
+        padding: 0 !important;
+    }
+
+    .sp-tablet {
+        display: block !important;
+    }
+
+    #startDate, #endDate {
+        width: 100%;
+        display: block;
+    }
+
+    .sp-cs {
+        margin-top: 10px;
+        margin-left: 0 !important;
+    }
+
+    .masterInfo .btn-info.btn-icon-split {
+        max-height: 36px;
+    }
+
+    .masterInfo .btn-primary.btn-icon-split {
+        height: unset !important;
+        min-width: unset !important;
+        width: unset !important;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .sidebar {
+        z-index: 0;
+    }
+
+    .container-fluid {
+        padding-top: 5.2rem;
+        padding-left: 1rem;
+    }
+
+    #fadeLayer {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        visibility: hidden;
+        opacity: 0.75;
+        z-index: 1;
+    }
+
+        #fadeLayer.fadeon {
+            visibility: visible !important;
+        }
+
+    #fadeLayer_container {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        visibility: hidden;
+        opacity: 0.75;
+        z-index: 1;
+    }
+
+        #fadeLayer_container.fadeon {
+            visibility: visible !important;
+        }
+
+    .sp-tablet {
+        display: block !important;
+    }
+
+    .masterInfo .btn-info.btn-icon-split {
+/*        width: 92px !important;
+        min-width: 92px !important;
+        display: block;*/
+    }
+
+    .masterInfo .btn-primary.btn-icon-split {
+        height: unset !important;
+        min-width: unset !important;
+        width: unset !important;
+    }
+
+    .wd-100 {
+        width: 100% !important;
+    }
+
+    .sp-tablet .file-input {
+        margin-top: 10px;
+    }
+
+    .sp-fix-w-100 {
+        display: block !important;
+        width: 100%;
+    }
+
+    #startDate, #endDate {
+        width: 100%;
+    }
+
+    .sp-mg-left-0 {
+        margin-left: 0 !important;
+    }
+
+    .sp-flex {
+        display: block !important;
+    }
+}
