@@ -1,39 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Security.Claims;
-using mar_sumaken_web.Controllers;
+﻿using Dapper;
 using mar_sumaken_web.Commons;
 using System.Data.SqlClient;
-using Dapper;
-using static mar_sumaken_web.Models.M_UserModel;
 
 namespace mar_sumaken_web.Models
 {
-    public class MenuModel:CommonModel
+    public class WebMenuModel : CommonModel
     {
-
         /// <summary>
         /// カテゴリー一覧を取得
         /// </summary>
-        /// <returns> カテゴリー一覧</returns>
-        public List<Category> CategoryList()
+        /// <returns>カテゴリー一覧</returns>
+        public List<M_WebMenuCategory> WebMenuCategoryList()
         {
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionStringForMaster();
             using (var connection = new SqlConnection(connectionString))
             {
-                //open-------------------------------------------------------------
                 connection.Open();
 
-                //SQLの準備
-                var commandText = "";
-                commandText = $@"SELECT
-                                                 CategoryID
-                                                ,CategoryName
-                                            FROM M_WebMenuCategory
-                                            ;";
-                var selectCategoryList = connection.Query<Category>(commandText).ToList();
+                var commandText = $@"SELECT
+                                    CategoryID
+                                    ,CategoryName
+                                FROM M_WebMenuCategory
+                                ;";
+                var selectCategoryList = connection.Query<M_WebMenuCategory>(commandText).ToList();
                 return selectCategoryList;
             }
         }
@@ -41,9 +30,9 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// カテゴリーのメニュー一覧を取得
         /// </summary>
-        /// <param name="category">Category</param>
+        /// <param name="category">M_WebMenuCategory</param>
         /// <returns>カテゴリーのメニュー一覧</returns>
-        public CategoryMenuList GetCategoryMenuList(Category category)
+        public CategoryMenuList GetWebMenuCategoryList(M_WebMenuCategory category)
         {
             var categoryMenuList = new CategoryMenuList();
 
@@ -56,11 +45,11 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// メニュー一覧を取得
         /// </summary>
-        /// <param name="category">Category</param>
+        /// <param name="category">M_WebMenuCategory</param>
         /// <returns>メニュー一覧</returns>
-        public List<Menu> MenuList(Category category)
+        public List<M_WebMenu> MenuList(M_WebMenuCategory category)
         {
-            var menuList = new List<Menu>();
+            var menuList = new List<M_WebMenu>();
 
             if (Role != 0)
             {
@@ -68,7 +57,7 @@ namespace mar_sumaken_web.Models
                 string userRoleName = "Role" + userRole;
 
                 //メニュ一覧を取得
-                var selectMenuList = GetListMenu(userRoleName, CompanyID, category);
+                var selectMenuList = GetWebMenuList(userRoleName, CompanyID, category);
 
                 menuList = selectMenuList;
             }
@@ -80,14 +69,14 @@ namespace mar_sumaken_web.Models
         /// メニュ一覧を取得
         /// <param name="userRoleName"></param>
         /// <param name="CompanyID"></param>
-        /// <param name="category">Category</param>
+        /// <param name="category">M_WebMenuCategory</param>
         /// </summary>
         /// <returns>MUsersViewModel</returns>
-        public static List<Menu> GetListMenu(string userRoleName, int CompanyID, Category category)
+        public static List<M_WebMenu> GetWebMenuList(string userRoleName, int CompanyID, M_WebMenuCategory category)
         {
             try
             {
-                List<Menu> menuList = new List<Menu>();
+                List<M_WebMenu> menuList = new List<M_WebMenu>();
                var categoryID = 0;
                 if (category != null)
                 {
@@ -110,15 +99,15 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// カテゴリー
         /// </summary>
-        public Category Category { get; set; }
+        public M_WebMenuCategory Category { get; set; }
 
         /// <summary>
         /// メニュ一覧
         /// </summary>
-        public List<Menu> MenuList { get; set; }
+        public List<M_WebMenu> MenuList { get; set; }
     }
 
-    public class Category
+    public class M_WebMenuCategory
     {
         /// <summary>
         /// カテゴリーID
@@ -131,7 +120,7 @@ namespace mar_sumaken_web.Models
         public string CategoryName { get; set; }
     }
 
-    public class Menu
+    public class M_WebMenu
     {
         /// <summary>
         /// カテゴリーID

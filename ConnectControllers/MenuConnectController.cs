@@ -17,10 +17,10 @@ namespace mar_sumaken_web.Commons
         /// <param name="CompanyID"></param>
         /// <param name="categoryID"></param>
         /// <returns>ユーザー情報</returns>
-        public static List<Menu> ConnectMenu(string sql, int CompanyID, int categoryID)
+        public static List<M_WebMenu> ConnectMenu(string sql, int CompanyID, int categoryID)
         {
             // 戻り値
-            List<Menu> menuModels = new();
+            List<M_WebMenu> menuModels = new();
 
             // DB接続
             try
@@ -40,7 +40,7 @@ namespace mar_sumaken_web.Commons
                         CategoryID = categoryID
                     };
 
-                    menuModels = connection.Query<Menu>(sql, param).ToList();
+                    menuModels = connection.Query<M_WebMenu>(sql, param).ToList();
                 }
                 return menuModels;
             }

@@ -3,7 +3,7 @@
 @using System.Security.Claims
 @using mar_sumaken_web.Commons;
 @{
-    var Model = new MenuModel();
+    var Model = new WebMenuModel();
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.ViewTitle;
 }
@@ -43,7 +43,7 @@
 <body class="@bodyClass">
     <nav class="sb-topnav navbar navbar-expand navbar-dark">
         <!-- Navbar Brand-->
-        <a id="home-title" class="navbar-brand ps-3" asp-controller="Home" asp-action="Index">アプリ名</a>
+        <a id="home-title" class="navbar-brand ps-3" asp-controller="Top" asp-action="Index">スマホDE検品</a>
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-angles-left"></i></button>
         <!-- Navbar Search-->
@@ -82,9 +82,9 @@
                 <div class="sb-sidenav-menu">
                     <div class="nav">
                         <ul class="navbar-nav bg-gradient-imagecolor sidebar sidebar-dark accordion" id="accordionSidebar">
-                            @foreach (var category in Model.CategoryList())
+                            @foreach (var category in Model.WebMenuCategoryList())
                             {
-                                var categoryMenuList = Model.GetCategoryMenuList(category);
+                                var categoryMenuList = Model.GetWebMenuCategoryList(category);
                                 var categoryName = categoryMenuList.Category.CategoryName;
                                 var categoryID = categoryMenuList.Category.CategoryID;
                                 var menuList = categoryMenuList.MenuList;
