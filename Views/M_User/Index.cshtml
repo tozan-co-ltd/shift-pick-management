@@ -220,17 +220,4 @@
         });
     }
 
-    function navigate(url) {
-        window.location.href = url;
-    }
-
-    function navigateRegister() {
-        var curUrl = window.location.origin + window.location.pathname;
-        if (!curUrl.endsWith("/")) {
-            curUrl += "/";
-        }
-        var newUrl = curUrl + "register";
-        window.location.href = newUrl;
-    }
-
 </script>
