@@ -14,6 +14,8 @@ namespace mar_sumaken_web.Commons
         /// データベースに接続し、SQL実行
         /// </summary>
         /// <param name="sql">SQL</param>
+        /// <param name="CompanyID"></param>
+        /// <param name="categoryID"></param>
         /// <returns>ユーザー情報</returns>
         public static List<Menu> ConnectMenu(string sql, int CompanyID, int categoryID)
         {
@@ -52,7 +54,7 @@ namespace mar_sumaken_web.Commons
         /// メニュSELECT文SQL作成
         /// </summary>
         /// <param name="userRoleName"></param>
-        /// <param name="whereString"></param>
+        /// <param name="categoryID"></param>
         /// <returns>SQL</returns>
         public static string CreateSQLToSelectMenu(string userRoleName, int categoryID)
         {

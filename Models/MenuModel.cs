@@ -79,7 +79,8 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// メニュ一覧を取得
         /// <param name="userRoleName"></param>
-        /// <param name="whereString"></param>
+        /// <param name="CompanyID"></param>
+        /// <param name="category">Category</param>
         /// </summary>
         /// <returns>MUsersViewModel</returns>
         public static List<Menu> GetListMenu(string userRoleName, int CompanyID, Category category)
