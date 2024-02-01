@@ -49,6 +49,7 @@
         white-space: nowrap;
     }
 </style>
+
 <div class="user-master shadow masterInfo m-4">
 
     <div class="card-header text-gray-800">
@@ -101,13 +102,15 @@
                                 {
                                     <tr>
                                         <td>
-                                            <button class="btn btn-secondary btn-icon-split" onclick="OnDetailClick('@item.UserID')"  data-id="@item.UserID" data-toggle="modal" data-target="#userDetailModal">
+                                            <button class="btn btn-secondary btn-icon-split" 
+                                                onclick="OnDetailClick('@item.UserID')"  data-id="@item.UserID" data-toggle="modal" data-target="#userDetailModal">
                                                 <i class="fa-solid fa-list"></i>
                                             </button>
                                             <button class="btn btn-success btn-icon-split ml-1 mr-1" onclick="OnEditClick('@item.UserID')">
                                                 <i class="fa-solid fa-pen"></i>
                                             </button>
-                                            <button class="btn btn-danger btn-icon-split" onclick="OnDeleteClick('@item.UserID')">
+                                            <button class="btn btn-danger btn-icon-split" 
+                                                onclick="OnDeleteClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#userDeleteModal">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </td>
@@ -129,11 +132,11 @@
 </div>
 
 <!-- User Detail Modal-->
-<div class="modal fade" id="userDetailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="userDetailModal" tabindex="-1" role="dialog" aria-labelledby="userDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">ユーザーマスター詳細</h5>
+                <h5 class="modal-title" id="userDetailModalLabel">ユーザーマスター詳細</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -168,6 +171,62 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Delete Modal-->
+<div class="modal fade" id="userDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userDeleteModalLabel">削除</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-10">
+                    <p id="import-res" class="mt-1"></p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="col-12 col-md-10">
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>ユーザーID</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                                <input class="form-control" id="deleteUserId" value="" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>ログインID</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                                <input class="form-control" id="deleteLoginId" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>ユーザー名</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                                <input class="form-control" id="deleteUserName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
+                            <button class="btn btn-danger btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteDelete()">
+                                <span class="text" style="min-width:84px">削除</span>
+                            </button>
+                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
+                                <span class="text">キャンセル</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
         </div>
     </div>
@@ -216,6 +275,62 @@
                         menuContainer.append("<tr><td class='text-left'>" + menu.handyMenuName + "</td></tr>");
                     });
                 }
+            }
+        });
+    }
+
+    // 削除ボタン押下
+    function OnDeleteClick(userID) {
+        // M_UserModel取得
+        var data = @Html.Raw(Json.Serialize(Model));
+        var userModel = data.m_UserList;
+
+        userModel.forEach(function (item) {
+            // ユーザーIDが一致する情報のみ取得
+            if (item.userID == userID) {
+                // ユーザーID
+                $("#deleteUserId").val(item.userID);
+                // ログインID
+                $("#deleteLoginId").val(item.loginID);
+                // ユーザー名
+                $("#deleteUserName").val(item.userName);
+            }
+        });
+    }
+
+    // ユーザーマスター削除のAJAXを呼びます
+    function OnExecuteDelete() {
+
+        $("#ErrorBlock").text("");
+        $('#import-res').text("");
+
+        // URL
+        var currentUrl = window.location.origin + window.location.pathname;
+        if (!currentUrl.endsWith("/")) {
+            currentUrl += "/";
+        }
+        var deleteUrl = currentUrl + "Delete";
+
+        // Sending data
+        var userId = document.getElementById('deleteUserId').value;
+        formData = { userId: userId };
+        
+        // Ajax call
+        $.ajax({
+            url: deleteUrl,
+            method: 'post',
+            data: formData
+        }).done(function (response) {
+            if (response.res == "OK") {
+                $('#userDeleteModal').modal('hide');
+                $('#userDeleteModal').hide();
+                AlertMessage('', '完了', '削除が完了しました。', null, null);
+            }
+            else {
+                $("#ErrorBlock").hide()
+                $("#import-res").show()
+                $("#import-res").addClass('text-danger');
+                $("#import-res").text(response.error);
             }
         });
     }
