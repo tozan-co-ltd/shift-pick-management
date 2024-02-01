@@ -81,7 +81,7 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<IActionResult> Delete(int userId)
+        public IActionResult Delete(int userId)
         {
             //string? errorMessage;
             try
