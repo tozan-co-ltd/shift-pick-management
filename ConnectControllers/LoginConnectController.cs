@@ -15,7 +15,7 @@ namespace mar_sumaken_web.Commons
         /// <remarks>SELECT文 ユーザーマスターのログインID・管理権限区分が一致するレコード</remarks>
         /// <param name="loginId">ログインID</param>
         /// <returns>SQL</returns>
-        public static string CreateSQLToGetLoginUser(string loginId)
+        public static string CreateSQLToSelectMUerByLoginUser(string loginId)
         {
             var sql = $@"
                     SELECT

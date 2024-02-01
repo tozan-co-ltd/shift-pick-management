@@ -45,7 +45,7 @@ namespace mar_sumaken_web.Controllers
                 if (userList.Count > 0)
                 {
                     // ユーザーマスターリストの詳細を取得する
-                    userList = M_UserConnectController.GetUserListDetail(userList, user.DatabaseName);
+                    userList = M_UserConnectController.GetMUserDetailList(userList, user.DatabaseName);
                     model.M_UserList = userList;
                 }
 

@@ -49,7 +49,7 @@ namespace mar_sumaken_web.Commons
         /// <param name="userList"></param>
         /// <param name="databaseName"></param>
         /// <returns></returns>
-        public static List<M_UserModel.M_User> GetUserListDetail(List<M_User> userList, string databaseName)
+        public static List<M_UserModel.M_User> GetMUserDetailList(List<M_User> userList, string databaseName)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace mar_sumaken_web.Commons
                         foreach (M_User user in userList)
                         {
                             // 倉庫マスター情報取得
-                            var userDepoSql = CreateSQLToGetUserDepoList(user.UserID);
+                            var userDepoSql = CreateSQLToGetRUserDepoList(user.UserID);
                             List<M_DepoModel> depoList = connection.Query<M_DepoModel>(userDepoSql).ToList();
                             if(depoList.Count > 0)
                             {
@@ -74,7 +74,7 @@ namespace mar_sumaken_web.Commons
                             }
 
                             // ハンディメニューマスター情報取得
-                            var userHandyMenuSql = CreateSQLToGetUserHandyMenuList(user.UserID);
+                            var userHandyMenuSql = CreateSQLToGetRUserHandyMenuList(user.UserID);
                             List<M_HandyMenuModel> handyMenuList = connection.Query<M_HandyMenuModel>(userHandyMenuSql).ToList();
                             if (handyMenuList.Count > 0)
                             {
@@ -127,12 +127,12 @@ namespace mar_sumaken_web.Commons
                     }
 
                     // ユーザー-倉庫中間テーブル削除SQL作成
-                    string userDepoDeleteSql = CreateSQLToDeleteUserDepo(userId);
+                    string userDepoDeleteSql = CreateSQLToDeleteRUserDepo(userId);
                     // ユーザー-倉庫中間テーブル削除
                     connection.Execute(userDepoDeleteSql, null, transaction);
 
                     // ユーザー-ハンディメニュー中間テーブル削除SQL作成
-                    string userMenuDeleteSql = CreateSQLToDeleteUserHandyMenu(userId);
+                    string userMenuDeleteSql = CreateSQLToDeleteRUserHandyMenu(userId);
                     connection.Execute(userMenuDeleteSql, null, transaction);
 
                     transaction.Commit();
@@ -182,7 +182,7 @@ namespace mar_sumaken_web.Commons
         /// 一致するユーザー取得SQL作成
         /// </summary>
         /// <returns>SQL</returns>
-        public static string CreateSQLToGetMUsersByCondition(string userId, string loginId, string isDeleted)
+        public static string CreateSQLToGetMUsersByConditions(string userId, string loginId, string isDeleted)
         {
             var sql = CreateSQLToSelectMUsers();
             sql += $@"
@@ -215,7 +215,7 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public static string CreateSQLToGetUserDepoList(int userId)
+        public static string CreateSQLToGetRUserDepoList(int userId)
         {
             var sql = $@"
                         SELECT 
@@ -238,7 +238,7 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public static string CreateSQLToGetUserHandyMenuList(int userId)
+        public static string CreateSQLToGetRUserHandyMenuList(int userId)
         {
             var sql = $@"
                          SELECT 
@@ -277,7 +277,7 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public static string CreateSQLToDeleteUserHandyMenu(int userId)
+        public static string CreateSQLToDeleteRUserHandyMenu(int userId)
         {
             var sql = $@"
                          DELETE FROM R_UserHandyMenu
@@ -292,7 +292,7 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public static string CreateSQLToDeleteUserDepo(int userId)
+        public static string CreateSQLToDeleteRUserDepo(int userId)
         {
             var sql = $@"
                          DELETE FROM R_UserDepo
