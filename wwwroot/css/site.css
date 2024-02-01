@@ -41,6 +41,47 @@ body {
     }
 }
 
+/* ‹­’²ƒ{ƒ^ƒ“ */
+.btn-accent {
+    color: #fff;
+    background-color: var(--base-color-accent);
+    border-color: var(--base-color-accent);
+    min-width: 70px;
+}
+
+    .btn-accent:hover {
+        color: #fff;
+        filter: brightness(90%);
+        background-color: lightskyblue;
+    }
+
+    .btn-accent:focus,
+    .btn-accent.focus {
+        color: #fff;
+        box-shadow: 0 0 0 0.2rem rgba(var(--rgb-base-color-accent), 0.5);
+        filter: brightness(90%);
+    }
+
+    .btn-accent.disabled,
+    .btn-accent:disabled {
+        color: #fff;
+        background-color: var(--base-color-accent);
+        border-color: var(--base-color-accent);
+    }
+
+    .btn-accent:not(:disabled):not(.disabled):active,
+    .btn-accent:not(:disabled):not(.disabled).active,
+    .show > .btn-accent.dropdown-toggle {
+        color: #fff;
+        filter: brightness(80%);
+    }
+
+        .btn-accent:not(:disabled):not(.disabled):active:focus,
+        .btn-accent:not(:disabled):not(.disabled).active:focus,
+        .show > .btn-accent.dropdown-toggle:focus {
+            box-shadow: 0 0 0 0.2rem rgba(red, 0.5);
+        }
+
 .rotateBtn {
     transform: rotate(180deg);
 }

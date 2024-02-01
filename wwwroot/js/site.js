@@ -155,11 +155,11 @@ function onUploadFile(page) {
         modelTitle = "運行便マスター";
 
     $('body').append(
-        '<div class="modal fade" id="ImportModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">' +
+        '<div class="modal fade" id="ImportModel" tabindex="-1" role="dialog" aria-labelledby="importModalCenterTitle" aria-hidden="true">' +
         '    <div class="modal-dialog modal-dialog-centered" role="document">' +
         '        <div class="modal-content">' +
         '            <div class="modal-header">' +
-        '                <h5 class="modal-title" id="exampleModalCenterTitle">' + modelTitle + '</h5>' +
+        '                <h5 class="modal-title" id="importModalCenterTitle">' + modelTitle + '</h5>' +
         '                <button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
         '                    <span aria-hidden="true">&times;</span>' +
         '                </button>' +
@@ -344,25 +344,22 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect) {
         '      <div class="modal-body">' +
         '        <p>' + message + '</p > ' +
         '      </div>' +
-        '      <div class="modal-footer">' +
-        '        <button type="button" class="btn btn-accent" data-dismiss="modal">' + actionAfter + '</button > ' +
+        '      <div class="modal-footer d-flex flex-wrap justify-content-center">' +
+        '        <button type="button" class="btn btn-accent confirm" data-dismiss="modal">' + actionAfter + '</button > ' +
         '      </div>' +
         '    </div>' +
         '  </div>' +
         '</div>');
 
+    $('#AlertDialogId').modal({ backdrop: 'static' });
     $('#AlertDialogId').modal('show');
-    $('#AlertDialogId').on('hidden.bs.modal', function () {
+    
+    $('#AlertDialogId .confirm, #AlertDialogId .close').on('click', function () {
         $('#AlertDialogId').modal('hide');
         if (isRedirect)
             window.location.href = urlRedirect;　// ユーザーマスターへ戻る
         else
             location.reload();
-    });
-
-    $('#exampleModal .btn-accent').click(function () {
-        $('#AlertDialogId').modal('hide');
-        location.reload();
     });
 }
 //--------------------------------------------------------//
