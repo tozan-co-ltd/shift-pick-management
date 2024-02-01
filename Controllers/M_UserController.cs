@@ -89,7 +89,7 @@ namespace mar_sumaken_web.Controllers
                 // クレームからユーザー情報の管理権限区分を取得する
                 var user = ClaimsLoginUserData();
 
-                if (user == null || userId == null)
+                if (user == null || userId == 0)
                 {
                     // エラーコード：E2011
                     throw new Exception();
