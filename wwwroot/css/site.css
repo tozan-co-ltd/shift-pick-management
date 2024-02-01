@@ -345,6 +345,10 @@ table .btn-primary.btn-icon-split {
 
 /* カード フォーム*/
 
+.selectItem{
+    width: 350px;
+}
+
 .border-left-custom {
     border-left: .25rem solid #f0844b !important;
     margin-bottom: 1.5rem;
@@ -490,17 +494,36 @@ select[readonly] {
 /*入荷予定照会*/
 .warehouse-name-drs {
     width: 150px;
+    min-width: 150px;
 }
 
-.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
-    background-color: #f0844b;
+.form-check-input:checked {
+    background-color: #f0844b !important;
+    border: 0;
+}
+
+.form-check-input:focus, .label::after, label.form-check-label:focus, .form-check-input::after, .form-check-input:not(:disabled):not(.disabled):active:focus {
+    color: black;
+    outline: 0;
+    border: 0;
+    box-shadow: 0 0 0 0.1rem #f0844b !important;
 }
 
 #startDate, #endDate{
-    width: 178px;
+    max-width: 163px;
 }
+
 /*スマートフォン対応*/
 @media (max-width: 1200px) {
+    .sp-cs-dpl{
+        display: block !important;
+    }
+    .custom-checkbox{
+        padding-left: 0;
+    }
+    .sp-unset-ml {
+        margin-left: 0 !important;
+    }
     .warehouse-name {
         width: 50px;
     }
