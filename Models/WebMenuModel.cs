@@ -21,6 +21,7 @@ namespace mar_sumaken_web.Models
                                     CategoryID
                                     ,CategoryName
                                 FROM M_WebMenuCategory
+                                ORDER BY CategoryCode ASC;
                                 ;";
                 var selectCategoryList = connection.Query<M_WebMenuCategory>(commandText).ToList();
                 return selectCategoryList;

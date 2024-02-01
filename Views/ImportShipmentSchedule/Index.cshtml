@@ -1,0 +1,114 @@
+﻿@* @model mar_sumaken_web.Models.D_ReceiveScheduleModel *@
+@{
+    ViewData["Title"] = "出庫 - 出荷指示取込";
+}
+
+<div class="card shadow de-inspection receive-schedule m-4">
+    <div class="card-header text-gray-800">
+        @ViewData["Title"]
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="card border-left-custom">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>フィール形式が「.csv」のみ取込できます。</li>
+                            <li>品番マスターに登録されている品番の行のみ取り込まれます。登録されていない品番の行はスキップします。</li>
+                            <li>納入指示日、便、納品書番号、品番が同一のデータは書きされます。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-sm-12">
+            <p id="import-res" class="mt-1"></p>
+        </div>
+
+        <div id="ErrorBlock" class="mb-3 ml-3 text-danger">
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <div class="row mt-10">
+                    <div class="col-lg-12">
+                        <form id="import-receive-schedule-upload-form" method="post" enctype="multipart/form-data" name="form" onsubmit="return false;">
+                            <div class="col-16 d-flex justify-content-start align-items-center mb-3 col-11 unset-pdl">
+                                <span class="warehouse-name-drs">倉庫名</span>
+                                <div class="selectItem unset-pdl">
+                                    <select class="form-select" aria-label="Default select example">
+                                        <option selected>選択してください</option>
+                                        <option value="1">選択1</option>
+                                        <option value="2">選択2</option>
+                                        <option value="3">選択3</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-16 d-flex justify-content-start align-items-center mb-3 col-11 unset-pdl">
+                                <span class="warehouse-name-drs">仕入先名</span>
+                                <div class="selectItem unset-pdl">
+                                    <select class="form-select" aria-label="Default select example">
+                                        <option selected>選択してください</option>
+                                        <option value="1">選択1</option>
+                                        <option value="2">選択2</option>
+                                        <option value="3">選択3</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-start align-items-center upload-part sp-tablet">
+                                <div class="col-6 mg-right-20 file-input pd-0-sp sp-mg-bt-10 unset-pdl">
+                                    <div class="input-group">
+                                        <label class="input-group-btn my-0">
+                                            <span class="btn btn-secondary btn-icon-split btn-pd20" id="browse">
+                                                ファイル選択
+                                                <input class="excel-input" name="FileUpload" type="file" accept=".xlsx" multiple>
+                                            </span>
+                                        </label>
+                                        <input type="text" class="form-control rounded-0" readonly placeholder="CSVファイルを選択してください">
+                                    </div>
+                                </div>
+                                <div class="input-group-append sp-mg-bt-10">
+                                    <button id="file-upload" class="btn btn-primary btn-icon-split" onclick="onUploadFile('import-receive-schedule-upload-form')">
+                                        <span class="icon text-white-50">
+                                            <i class="fa-solid fa-file-export"></i>
+                                        </span>
+                                        <span class="text">取込</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p>
+            取込履歴(直近1ヶ月)
+        </p>
+        <div class="tableContent mt-3">
+            <table class="table row-border compact stripe hover nowrap order-column" id="userTbl">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>取込日時</th>
+                        <th>取込ファイル名</th>
+                        <th>登録者</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <button class="btn btn-secondary btn-icon-split">
+                                <i class="fa-solid fa-list"></i>
+                            </button>
+                        </td>
+                        <td>2024/02/01</td>
+                        <td>A</td>
+                        <td>B</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@* <input id="import_action_url" type="hidden" value="@Url.Action("ImportExcel", "ScheduledArrivalImport")" /> *@
