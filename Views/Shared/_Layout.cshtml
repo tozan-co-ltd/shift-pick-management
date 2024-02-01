@@ -30,6 +30,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <!-- sb-admin-2 -->
     <link href="~/css/sb-admin-2.css?@DateTime.Now" rel="stylesheet">
+    <!-- icheck -->
+    <link rel="stylesheet" href="~/css/skins/all.css">
     <!-- dataTables-->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <!-- 内部ファイル -->
@@ -143,7 +145,6 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <!--Bootstrap admin template-->
@@ -153,6 +154,9 @@
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 
+    <!-- Core plugin JavaScript-->
+    <script src="~/js/icheck.min.js"></script>
+
     <!--datepicker↓-->
     <script src="~/lib/jquery-detetimepicker/datetimepicker.js"></script>
 
@@ -161,6 +165,8 @@
 
     <!--jquery.cookie.js-->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -70,8 +70,14 @@ namespace mar_sumaken_web.Controllers
             }
         }
 
-        [AllowAnonymous]
+        [HttpGet]
         public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(M_User model)
         {
             return View();
         }

@@ -1,6 +1,7 @@
 ﻿using X.PagedList;
 using System.ComponentModel.DataAnnotations;
 using mar_sumaken_web.Properties;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace mar_sumaken_web.Models
 {
@@ -16,6 +17,11 @@ namespace mar_sumaken_web.Models
 
         public class M_User
         {
+
+            public List<SelectItem> DepoSelectList { get; set; }
+
+            public List<SelectItem> MenuSelectList { get; set; }
+
             /// <summary>
             /// 倉庫マスターリスト
             /// </summary>
@@ -131,6 +137,14 @@ namespace mar_sumaken_web.Models
             [Display(Name = "更新者")]
             public string UpdatedBy { get; set; }
 
+        }
+
+        //Itemモデル
+        public class SelectItem
+        {
+            public string Name { get; set; }
+            public string Value { get; set; }
+            public bool IsSelected { get; set; } = false;
         }
     }
 }
