@@ -554,6 +554,11 @@ select[readonly] {
     max-width: 163px;
 }
 
+#selectDate{
+    width: 350px;
+    max-width: 350px;
+}
+
 /*スマートフォン対応*/
 @media (max-width: 1200px) {
     .sp-cs-dpl{
@@ -568,7 +573,9 @@ select[readonly] {
     .warehouse-name {
         width: 50px;
     }
-
+    #selectDate{
+        width: 100%;
+    }
     .sp-mg-top-10 {
         margin-top: 10px;
     }

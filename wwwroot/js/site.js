@@ -370,18 +370,7 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect) {
 $(document).ready(function () {
     $.datetimepicker.setLocale('ja');
 
-    $('#startDate').datetimepicker({
-        format: "Y/m/d",
-        timepicker: false,
-        onShow: function (ct) {
-            this.setOptions({
-                maxDate: jQuery("#end_datetimepicker").val() ? jQuery("#end_datetimepicker").val() : false,
-                formatDate: "Y/m/d"
-            })
-        }
-    });
-
-    $('#endDate').datetimepicker({
+    $('.pickerDate').datetimepicker({
         format: "Y/m/d",
         timepicker: false,
         onShow: function (ct) {
