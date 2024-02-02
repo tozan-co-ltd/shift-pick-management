@@ -77,18 +77,22 @@
                                     <label>使用倉庫名<span style="color:red">*</span></label>
                                 </div>
                                 <div class="col-12 col-sm-8 column-2nd warehouse-checkbox">
-                                    <div class="form-check">
-                                        <input type="hidden" asp-for="DepoSelectList[0].Value" value="1"/>
-                                        <input type="hidden" asp-for="DepoSelectList[0].Name" value="西尾物流センター" />
-                                        <input class="form-check-input checkbox" asp-for="DepoSelectList[0].IsSelected" id="home-center" type="checkbox">
-                                        <label class="form-check-label" for="home-center">西尾物流センター</label>
-                                    </div>
-                                    <div class="form-check">
+                                    @for (var i = 0; i < Model.DepoSelectList.Count; i++)
+                                    {
+                                        <div class="form-check">
+                                            <input type="hidden" asp-for="DepoSelectList[i].Value" value="@Model.DepoSelectList[i].Value" />
+                                            <input type="hidden" asp-for="DepoSelectList[i].Name" value="@Model.DepoSelectList[i].Value"/>
+                                            <input class="form-check-input checkbox" asp-for="DepoSelectList[i].IsSelected" id="select-depo-@i" type="checkbox">
+                                            <label class="form-check-label" for="home-center">@Model.DepoSelectList[i].Name</label>
+                                        </div>
+                                    }
+                                    
+                                    @*<div class="form-check">
                                         <input type="hidden" asp-for="DepoSelectList[1].Value" value="2" />
                                         <input type="hidden" asp-for="DepoSelectList[1].Name" value="○○センター" />
                                         <input class="form-check-input checkbox" asp-for="DepoSelectList[1].IsSelected" id="other-center" type="checkbox">
                                         <label class="form-check-label" for="other-center">○○センター</label>
-                                    </div>
+                                    </div>*@
                                 </div>
                             </div>
 
@@ -109,13 +113,17 @@
                                     <label>使用ハンディメニュー名</label>
                                 </div>
                                 <div class="col-12 col-sm-8 column-2nd">
-                                    <div class="form-check">
-                                        <input type="hidden" asp-for="HandyMenuSelectList[0].Value" value="1" />
-                                        <input type="hidden" asp-for="HandyMenuSelectList[0].Name" value="入庫" />
-                                        <input class="form-check-input" asp-for="HandyMenuSelectList[0].IsSelected" type="checkbox">
-                                        <label class="form-check-label" asp-for="HandyMenuSelectList[0].IsSelected">入庫</label>
-                                    </div>
-                                    <div class="form-check">
+                                    @for (var i = 0; i < Model.HandyMenuSelectList.Count; i++)
+                                    {
+                                        <div class="form-check">
+                                            <input type="hidden" asp-for="HandyMenuSelectList[i].Value" value="@Model.HandyMenuSelectList[i].Value" />
+                                            <input type="hidden" asp-for="HandyMenuSelectList[i].Name" value="@Model.HandyMenuSelectList[i].Name" />
+                                            <input class="form-check-input" asp-for="HandyMenuSelectList[i].IsSelected" type="checkbox">
+                                            <label class="form-check-label" asp-for="HandyMenuSelectList[i].IsSelected">@Model.HandyMenuSelectList[i].Name</label>
+                                        </div>
+                                    }
+                                    
+                                    @*<div class="form-check">
                                         <input type="hidden" asp-for="HandyMenuSelectList[1].Value" value="2" />
                                         <input type="hidden" asp-for="HandyMenuSelectList[1].Name" value="まとめ入庫" />
                                         <input class="form-check-input" asp-for="HandyMenuSelectList[1].IsSelected" type="checkbox">
@@ -126,7 +134,7 @@
                                         <input type="hidden" asp-for="HandyMenuSelectList[2].Name" value="出庫" />
                                         <input class="form-check-input" asp-for="HandyMenuSelectList[2].IsSelected" type="checkbox">
                                         <label class="form-check-label" asp-for="HandyMenuSelectList[2].IsSelected">出庫</label>
-                                    </div>
+                                    </div>*@
                                 </div>
                             </div>
                         </div>
@@ -151,10 +159,12 @@
 
 <script type="text/javascript">
 
+
+
     // メイン倉庫区分の値を更新
     document.addEventListener("DOMContentLoaded", function () {
-        const checkbox1 = document.getElementById('home-center');
-        const checkbox2 = document.getElementById('other-center');
+        const checkbox1 = document.getElementById('select-depo-0');
+        const checkbox2 = document.getElementById('select-depo-1');
         const selectBox = document.getElementById('warehouse-select');
 
         var selectItems = ["--使用倉庫名を選択してください--", "西尾物流センター", "○○センター"];

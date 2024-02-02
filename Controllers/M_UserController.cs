@@ -1,4 +1,5 @@
 ﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.CompilerServices;
@@ -77,7 +78,54 @@ namespace mar_sumaken_web.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            return View();
+            M_User model = new M_User();
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 倉庫マスター情報取得
+                var depoList = M_DepoConnectController.GetMDepoList(user.DatabaseName);
+                foreach (var depo in depoList)
+                {
+                    SelectItem depoItem = new SelectItem();
+                    depoItem.Name = depo.DepoName;
+                    depoItem.Value = depo.DepoID;
+                    depoItem.IsSelected = false;
+
+                    model.DepoSelectList.Add(depoItem);
+                }
+                // ハンディメニューマスター情報取得
+                var menuList = M_HandyMenuConnectController.GetMHandyMenuList(user.DatabaseName);
+                foreach (var menu in menuList)
+                {
+                    SelectItem menuItem = new SelectItem();
+                    menuItem.Name = menu.HandyMenuName;
+                    menuItem.Value = menu.HandyMenuID;
+                    menuItem.IsSelected = false;
+
+                    model.HandyMenuSelectList.Add(menuItem);
+                }
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                //// エラーメッセージ取得
+                //// 「SQLServerでエラーが発生しました。」
+                //errorMessage = ErrorHandling.CreateErrorMessage("E4002");
+
+                //// log取得
+                //var exceptionMessage = ex.Message;
+                //_logger.LogError($"{exceptionMessage} {errorMessage}");
+
+                //var shippingImportErrorModel = new HandyErrorMessageModel
+                //{
+                //    Message = errorMessage + exceptionMessage
+                //};
+                //return View(shippingImportErrorModel);
+                return View();
+            }
         }
 
         /// <summary>
@@ -132,7 +180,7 @@ namespace mar_sumaken_web.Controllers
                 bool isInsertMuser = M_UserConnectController.InsertMUser(model, user);
 
                 // 更新件数が0の場合はエラーとする
-                if (isInsertMuser)
+                if (!isInsertMuser)
                 {
                     // エラーコード：E2011
                     return NotFound(new { errorMessage = "登録はできませんでした。" });
