@@ -25,10 +25,10 @@
             </div>
             <div class="login-form">
                 <form method="post" action="Login/Login">
-                    @*@if (!(ViewData["ErrorMessage"] is null))
+                    @if (!(ViewData["ErrorMessage"] is null))
                     {
                         <span class="text-danger">@Html.Raw(ViewData["ErrorMessage"])</span>
-                    }*@
+                    }
 
                     <div class="input-icon-with">
                         <input class="login-text" type="text" placeholder="ログインID" asp-for="LoginId">
