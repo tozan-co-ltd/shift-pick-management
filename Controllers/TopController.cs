@@ -29,16 +29,12 @@ namespace mar_sumaken_web.Controllers
             {
                 List<D_HandyErrorMessageModel> handyErrors = new List<D_HandyErrorMessageModel>
                 {
-                    new D_HandyErrorMessageModel { HandyErrorMessageID = 1, ReadingTime = DateTime.Now, HandyMenuName = "Item 1", ErrorMessage = "", CreatedBy = "田中" },
-                    new D_HandyErrorMessageModel { HandyErrorMessageID = 2, ReadingTime = DateTime.Now, HandyMenuName = "Item 2", ErrorMessage = "", CreatedBy = "田中" },
-                    new D_HandyErrorMessageModel { HandyErrorMessageID = 3, ReadingTime = DateTime.Now, HandyMenuName = "Item 3", ErrorMessage = "" , CreatedBy = "田中" },
+                    new D_HandyErrorMessageModel { HandyErrorMessageID = 1, ReadingTime = DateTime.Now, HandyMenuName = "出庫", ErrorMessage = "E1001:既にスキャン済みの納入先かんばんです。", CreatedBy = "田中次郎" },
+                    new D_HandyErrorMessageModel { HandyErrorMessageID = 2, ReadingTime = DateTime.Now, HandyMenuName = "まとめ入庫", ErrorMessage = "E1002:品番マスターに一致する品番がありません。", CreatedBy = "田中次郎" },
+                    new D_HandyErrorMessageModel { HandyErrorMessageID = 3, ReadingTime = DateTime.Now, HandyMenuName = "…", ErrorMessage = "…" , CreatedBy = "田中次郎" },
+                    new D_HandyErrorMessageModel { HandyErrorMessageID = 4, ReadingTime = DateTime.Now, HandyMenuName = "…", ErrorMessage = "…" , CreatedBy = "田中次郎" },
+                    new D_HandyErrorMessageModel { HandyErrorMessageID = 5, ReadingTime = DateTime.Now, HandyMenuName = "…", ErrorMessage = "…" , CreatedBy = "田中次郎" },
                 };
-
-                for (int i = 4; i < 100; i++)
-                {
-                    D_HandyErrorMessageModel item = new D_HandyErrorMessageModel { HandyErrorMessageID = i, ReadingTime = DateTime.Now, HandyMenuName = "Item 1", ErrorMessage = "2432", CreatedBy = "田中" };
-                    handyErrors.Add(item);
-                }
 
                 if (handyErrors.Count > 0)
                 {

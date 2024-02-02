@@ -4,62 +4,26 @@
     ViewData["Title"] = "マスター情報 - ユーザーマスター";
 }
 <style type="text/css">
-    .card {
-        border: 0px;
-    }
-    .card-body {
-        width: 100%;
-    }
-
-    .pdf-list ul li {
-        margin-right: 5px;
-    }
-
-    .border-left-custom {
-        border-right: none;
-        border-left: none;
-    }
-
-    .btn-info {
-        color: white;
-    }
-
-    table.dataTable.compact tbody td {
-        padding: 4px !important;
-    }
-
-    table.dataTable td {
-        padding: 0px !important;
-    }
-
-    table.dataTable .icon i {
-        font-size: larger;
-    }
-
     .btn-register {
-        width: auto !important;
-        margin-right: 5px;
-    }
-
-    .table > :not(caption) > * > * {
-        border-bottom-color: lightgray;
-    }
-
-    th {
-        white-space: nowrap;
+        min-width: 130px !important;
     }
 </style>
 
-<div class="user-master shadow masterInfo m-4">
-
+<div class="card shadow de-inspection user-master masterInfo m-4">
     <div class="card-header text-gray-800">
         @ViewData["Title"]
     </div>
+    <div class="card-body">
+        <div class="form-group col-sm-12">
+            <p id="import-res" class="mt-1"></p>
+        </div>
 
-    <div class="col-lg-12 p-0">
-        <div class="card">
-            <div class="card-body col-12 d-flex xs-block justify-content-start align-items-center pl-4 pb-0">
-                <div class="input-group-append">
+        <div id="ErrorBlock" class="mb-3 ml-3 text-danger">
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                <div class="input-group-append mr-2">
                     <a class="btn btn-primary btn-icon-split btn-register" asp-controller="M_User" asp-action="Register">
                         <span class="icon text-white-50">
                             <i class="fas fa-plus"></i>
@@ -77,56 +41,49 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="col-lg-12">
-        <div class="card border-left-custom">
-            <div class="card-body">
-                <div class="tableContent mt-10">
-                    <table class="table table-sm compact row-border compact stripe hover nowrap order-column" id="userTbl">
-                        <thead>
+        <div class="tableContent mt-3">
+            <table class="table table-sm compact row-border compact stripe hover nowrap order-column" id="userTbl">
+                <thead>
+                    <tr>
+                        <th width="40"></th>
+                        <th class="font-weight-bold">ユーザーID</th>
+                        <th class="font-weight-bold">ログインID</th>
+                        <th class="font-weight-bold">ユーザー名</th>
+                        <th class="font-weight-bold">メイン倉庫ID</th>
+                        <th class="font-weight-bold">管理権限区分</th>
+                        <th class="font-weight-bold">更新日時</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (@Model != null && @Model.M_UserList != null && @Model.M_UserList.Count > 0)
+                    {
+                        @foreach (var item in @Model.M_UserList)
+                        {
                             <tr>
-                                <th width="40"></th>
-                                <th class="font-weight-bold">ユーザーID</th>
-                                <th class="font-weight-bold">ログインID</th>
-                                <th class="font-weight-bold">ユーザー名</th>
-                                <th class="font-weight-bold">メイン倉庫ID</th>
-                                <th class="font-weight-bold">管理権限区分</th>
-                                <th class="font-weight-bold">更新日時</th>
+                                <td>
+                                    <button class="btn btn-secondary btn-icon-split"
+                                    onclick="OnDetailClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#userDetailModal">
+                                        <i class="fa-solid fa-list"></i>
+                                    </button>
+                                    <button class="btn btn-success btn-icon-split ml-1 mr-1" onclick="OnEditClick('@item.UserID')">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-icon-split"
+                                    onclick="OnDeleteClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#userDeleteModal">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                                <td class="item_@item.UserID">@item.UserID</td>
+                                <td id="loginId">@item.LoginID</td>
+                                <td id="useName">@item.UserName</td>
+                                <td>@item.DepoID</td>
+                                <td>@item.AuthorizedKubunName</td>
+                                <td>@item.UpdatedAt</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @if (@Model != null && @Model.M_UserList != null && @Model.M_UserList.Count > 0)
-                            {
-                                @foreach (var item in @Model.M_UserList)
-                                {
-                                    <tr>
-                                        <td>
-                                            <button class="btn btn-secondary btn-icon-split" 
-                                                onclick="OnDetailClick('@item.UserID')"  data-id="@item.UserID" data-toggle="modal" data-target="#userDetailModal">
-                                                <i class="fa-solid fa-list"></i>
-                                            </button>
-                                            <button class="btn btn-success btn-icon-split ml-1 mr-1" onclick="OnEditClick('@item.UserID')">
-                                                <i class="fa-solid fa-pen"></i>
-                                            </button>
-                                            <button class="btn btn-danger btn-icon-split" 
-                                                onclick="OnDeleteClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#userDeleteModal">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </td>
-                                        <td class="item_@item.UserID">@item.UserID</td>
-                                        <td id="loginId">@item.LoginID</td>
-                                        <td id="useName">@item.UserName</td>
-                                        <td>@item.DepoID</td>
-                                        <td>@item.AuthorizedKubunName</td>
-                                        <td>@item.UpdatedAt</td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                        }
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -197,7 +154,7 @@
                                 <label>ユーザーID</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-7 mb-2">
-                                <input class="form-control" id="deleteUserId" value="" type="text" disabled>
+                                <input class="form-control" id="deleteUserId" type="text" disabled>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap">
@@ -231,11 +188,6 @@
         </div>
     </div>
 </div>
-
-<link rel="stylesheet" href="~/lib/billboard/billboard.css">
-<script src="https://d3js.org/d3.v6.min.js"></script>
-<script src="~/lib/billboard/billboard.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script type="text/javascript">
 
@@ -298,7 +250,7 @@
         });
     }
 
-    // ユーザーマスター削除のAJAXを呼びます
+    // 削除
     function OnExecuteDelete() {
 
         $("#ErrorBlock").text("");
@@ -311,26 +263,38 @@
         }
         var deleteUrl = currentUrl + "Delete";
 
-        // Sending data
+        // POSTするデータ
         var userId = document.getElementById('deleteUserId').value;
-        formData = { userId: userId };
+        formData = {
+            "userId" : userId
+        };
         
-        // Ajax call
+        // ajax
         $.ajax({
             url: deleteUrl,
-            method: 'post',
+            method: "POST",
             data: formData
-        }).done(function (response) {
-            if (response.res == "OK") {
-                $('#userDeleteModal').modal('hide');
-                $('#userDeleteModal').hide();
-                AlertMessage('', '完了', '削除が完了しました。', null, null);
-            }
-            else {
-                $("#ErrorBlock").hide()
-                $("#import-res").show()
+        })
+        .done(function (data) {
+            // 完了モーダル表示
+            $('#userDeleteModal').modal('hide');
+            $('#userDeleteModal').hide();
+            AlertMessage('', '完了', '削除が完了しました。', null, null);
+        })
+        .fail(function (xhr) {
+            if (xhr.status === 404) {
+                // データが見つからなかった場合
+                var errorMessage = xhr.responseJSON.errorMessage;
+                $("#ErrorBlock").hide();
+                $("#import-res").show();
                 $("#import-res").addClass('text-danger');
-                $("#import-res").text(response.error);
+                $("#import-res").text("エラー: " + errorMessage);
+            } else {
+                // その他のエラーの場合
+                $("#ErrorBlock").hide();
+                $("#import-res").show();
+                $("#import-res").addClass('text-danger');
+                $("#import-res").text("データの取得に失敗しました。");
             }
         });
     }

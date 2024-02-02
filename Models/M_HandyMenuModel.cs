@@ -5,7 +5,7 @@
         /// <summary>
         /// ハンディメニューID
         /// </summary>
-        public string HandyMenuID { set; get; }
+        public int HandyMenuID { set; get; }
 
         /// <summary>
         /// ソート番号
@@ -20,12 +20,12 @@
         /// <summary>
         /// 未使用フラグ
         /// </summary>
-        public string NotUseFlag { set; get; }
+        public bool IsDeleted { set; get; }
 
         /// <summary>
         /// 作成日時
         /// </summary>
-        public string CreatedAt { set; get; }
+        public DateTime CreatedAt { set; get; }
 
         /// <summary>
         /// 作成者
@@ -35,7 +35,7 @@
         /// <summary>
         /// 更新日時
         /// </summary>
-        public string UpdatedAt { set; get; }
+        public DateTime UpdatedAt { set; get; }
 
         /// <summary>
         /// 更新者

@@ -47,11 +47,12 @@ namespace mar_sumaken_web.Controllers
                 // エラー入力の場合
                 if (loginUserModel == null)
                 {
-                   return RedirectToAction("Index", "Login");
+                    ViewData["ErrorMessage"] = "ログインIDまたはパスワードが正しくありません。";
+                    return RedirectToAction("Index", "Login");
                 }
 
                 // 現在時刻取得
-                string now = DateTime.Now.ToString(); ;
+                string now = DateTime.Now.ToString();
 
                 // クレーム作成
                 // ユーザー情報をクレームに追加する
@@ -93,9 +94,8 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception ex)
             {
-                // エラーを作成
-                // エラーコード：E2011
-                return View();
+                ViewData["ErrorMessage"] = ex;
+                return RedirectToAction("Index", "Login");
             }
         }
 
@@ -181,7 +181,7 @@ namespace mar_sumaken_web.Controllers
                 // エラーを作成
                 // エラーコード：E2011
                 //throw new Exception();
-                return null;
+                throw;
             }
         }
 

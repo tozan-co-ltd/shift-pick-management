@@ -5,12 +5,12 @@
         /// <summary>
         /// 倉庫ID
         /// </summary>
-        public string DepoID { set; get; }
+        public int DepoID { set; get; }
 
         /// <summary>
         /// 倉庫コード
         /// </summary>
-        public string DepoCode { set; get; }
+        public int DepoCode { set; get; }
 
         /// <summary>
         /// 倉庫名
@@ -20,12 +20,12 @@
         /// <summary>
         /// 未使用フラグ
         /// </summary>
-        public string NotUseFlag { set; get; }
+        public bool IsDeleted { set; get; }
 
         /// <summary>
         /// 作成日時
         /// </summary>
-        public string CreatedAt { set; get; }
+        public DateTime CreatedAt { set; get; }
 
         /// <summary>
         /// 作成者
@@ -35,7 +35,7 @@
         /// <summary>
         /// 更新日時
         /// </summary>
-        public string UpdatedAt { set; get; }
+        public DateTime UpdatedAt { set; get; }
 
         /// <summary>
         /// 更新者

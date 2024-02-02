@@ -15,9 +15,6 @@
     <p class="card-body pb-0">作業進捗(2023-01-01)</p>
     <div class="chart-part p-2 col-12 d-flex">
         <div class="col-6 d-flex" id="donut-chart"></div>
-        <div class="col-6 d-flex justify-content-center">
-            <canvas id="myDoughnutChart" width="300" height="150"></canvas>
-        </div>
     </div>
 
     <div class="p-0">
@@ -29,7 +26,7 @@
                         <thead>
                             <tr>
                                 <th width="5%"></th>
-                                <th width="10%" class="font-weight-bold">取込日時</th>
+                                <th width="10%" class="font-weight-bold">読取日時</th>
                                 <th width="20%" class="font-weight-bold">ハンディメニュー名</th>
                                 <th width="50%" class="font-weight-bold">エラーメッセージ</th>
                                 <th width="10%" class="font-weight-bold">登録者</th>
@@ -42,7 +39,7 @@
                                 {
                                     <tr>
                                         <td class="d-flex justify-content-center">
-                                            <button class="btn btn-secondary btn-icon-split" onclick="OnDetailErrorClick('@item.HandyErrorMessageID')">
+                                            <button class="btn btn-secondary btn-icon-split" onclick="OnDetailClick('@item.HandyErrorMessageID')">
                                                 <i class="fa-solid fa-list"></i>
                                             </button>
                                         </td>
@@ -83,29 +80,33 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="https://d3js.org/d3.v6.min.js"></script>
 <script src="~/lib/billboard/billboard.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 
     document.addEventListener("DOMContentLoaded", function () {
-        // billboard
+        // 作業進捗表示
+        let shipmentList = [
+            ["検品済数", 60],
+            ["未検品数", 240],
+        ];
+
+        let percentage = 240 / (60 + 240) * 100;
+        let donutTitle = percentage + "%";
+
         let chart = bb.generate({
             data: {
-                columns: [
-                    ["Blue", 60],
-                    ["orange", 240],
-                ],
+                columns: shipmentList,
                 type: "donut"
             },
             title: {
-                text: "出荷検品表"
+                text: "出荷検品数"
             },
             size: {
                 width: 300,
                 height: 150
             },
             donut: {
-                title: "70%",
+                title: donutTitle,
                 label: {
                     format: function (value, ratio, id) { return value; },
                     ratio: 1,
@@ -117,69 +118,11 @@
             bindto: "#donut-chart",
         });
 
-        // chartjs
-        var data = {
-            labels: ["Label 1", "Label 2"],
-            datasets: [{
-                data: [240, 60],
-                backgroundColor: ["orange", "Blue"]
-            }]
-        };
-        const config = {
-            type: 'doughnut',
-            data: data,
-            options: {
-                responsive: false, 
-                width: 300,       
-                height: 150,  
-                plugins: {
-                    legend: {
-                        position: 'right',
-                    },
-                    title: {
-                        display: true,
-                        text: '出荷検品表'
-                    },
-                    datalabels: {
-                        color: '#000',
-                        align: 'end',
-                        anchor: 'end',
-                        formatter: function (value, context) {
-                            return context.chart.data.labels[context.dataIndex];
-                        },
-                        font: {
-                            size: 16,
-                            style: 'bold',
-                        }
-                    }
-                },
-            },
-            plugins: [
-                {
-                    //afterDraw: function (chart) {
-                    //    var width = chart.width,
-                    //        height = chart.height,
-                    //        ctx = chart.ctx;
-
-                    //    var centerX = width / 2 - 52;
-                    //    var centerY = height / 2 + 20;
-                    //    var text = "100%";
-
-                    //    ctx.font = "14px Arial";
-                    //    ctx.fillStyle = "black";
-                    //    ctx.textAlign = "center";
-                    //    ctx.textBaseline = "middle";
-                    //    ctx.fillText(text, centerX, centerY);
-                    //}
-                }
-            ]
-        };
         var ctx = document.getElementById("myDoughnutChart").getContext("2d");
         var myDoughnutChart = new Chart(ctx, config);
-
     });
 
-    function OnDetailErrorClick(id) {
+    function OnDetailClick(id) {
         alert(id);
     }
 
