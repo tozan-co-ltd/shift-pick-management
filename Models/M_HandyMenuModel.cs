@@ -20,7 +20,7 @@
         /// <summary>
         /// 未使用フラグ
         /// </summary>
-        public string NotUseFlag { set; get; }
+        public string IsDeleted { set; get; }
 
         /// <summary>
         /// 作成日時

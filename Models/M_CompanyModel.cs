@@ -55,7 +55,7 @@
         /// <summary>
         /// 未使用フラグ
         /// </summary>
-        public bool NotUseFlag { set; get; }
+        public bool IsDeleted { set; get; }
 
         /// <summary>
         /// 作成日時

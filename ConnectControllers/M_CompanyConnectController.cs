@@ -65,7 +65,7 @@ namespace mar_sumaken_web.Commons
                        ,HandyApiUrl
                        ,HandyAppMinVersion
                        ,HandyAdminPassword
-                       ,NotUseFlag
+                       ,IsDeleted
                     FROM 
                         M_Company
                 ";
@@ -83,7 +83,7 @@ namespace mar_sumaken_web.Commons
             sql += $@"
                     WHERE
                         CompanyWebPath = '{companyWebPath}'
-                        AND NotUseFlag = 0;
+                        AND IsDeleted = 0;
                 ";
 
             return sql;

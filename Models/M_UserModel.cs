@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Diagnostics.CodeAnalysis;
 
 namespace mar_sumaken_web.Models
 {
@@ -18,24 +19,24 @@ namespace mar_sumaken_web.Models
         public class M_User
         {
 
-            public List<SelectItem> DepoSelectList { get; set; }
+            public List<SelectItem> DepoSelectList { get; set; } = new List<SelectItem>();
 
-            public List<SelectItem> MenuSelectList { get; set; }
+            public List<SelectItem> HandyMenuSelectList { get; set; } = new List<SelectItem>();
 
             /// <summary>
             /// 倉庫マスターリスト
             /// </summary>
-            public List<M_DepoModel> M_DepoList { get; set; }
+            public List<M_DepoModel> M_DepoList { get; set; } = new List<M_DepoModel> { };
 
             /// <summary>
             /// ハンディメニューリスト
             /// </summary>
-            public List<M_HandyMenuModel> M_HandyMenuList { get; set; }
+            public List<M_HandyMenuModel> M_HandyMenuList { get; set; } = new List<M_HandyMenuModel> { };
 
             /// <summary>
             /// ユーザーID
             /// </summary>
-            [Display(Name = "ユーザーID")]
+            [Display(Name = "ID")]
             public int UserID { get; set; }
 
             /// <summary>
@@ -50,6 +51,7 @@ namespace mar_sumaken_web.Models
             /// ユーザー名
             /// </summary>
             [Display(Name = "ユーザー名")]
+            [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
             public string UserName { get; set; }
 
             /// <summary>
@@ -68,18 +70,19 @@ namespace mar_sumaken_web.Models
             /// 倉庫名
             /// </summary>
             [Display(Name = "倉庫名")]
-            public string DepoName { get; set; }
+            public string DepoName { get; set; } = string.Empty;
 
             /// <summary>
             /// 管理権限区分
             /// </summary>
             [Display(Name = "管理権限区分")]
+            [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
             public int AuthorizedKubun { get; set; }
 
             /// <summary>
             /// 管理権限区分名
             /// </summary>
-            public string AuthorizedKubunName { get; set; }
+            public string AuthorizedKubunName { get; set; } = string.Empty;
 
             /// <summary>
             /// パスワード
@@ -93,13 +96,13 @@ namespace mar_sumaken_web.Models
             /// ソルト
             /// </summary>
             [Display(Name = "ソルト")]
-            public string Salt { get; set; }
+            public string Salt { get; set; } = string.Empty;
 
             /// <summary>
             /// 未使用フラグ
             /// </summary>
             [Display(Name = "未使用フラグ")]
-            public bool NotUseFlag { get; set; }
+            public bool IsDeleted { get; set; }
 
             /// <summary>
             /// 最終ログイン日時
@@ -123,7 +126,7 @@ namespace mar_sumaken_web.Models
             /// 作成者
             /// </summary>
             [Display(Name = "作成者")]
-            public string CreatedBy { get; set; }
+            public string CreatedBy { get; set; } = string.Empty;
 
             /// <summary>
             /// 更新日時
@@ -135,16 +138,8 @@ namespace mar_sumaken_web.Models
             /// 更新者
             /// </summary>
             [Display(Name = "更新者")]
-            public string UpdatedBy { get; set; }
+            public string UpdatedBy { get; set; } = string.Empty;
 
-        }
-
-        //Itemモデル
-        public class SelectItem
-        {
-            public string Name { get; set; }
-            public string Value { get; set; }
-            public bool IsSelected { get; set; } = false;
         }
     }
 }

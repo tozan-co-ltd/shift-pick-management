@@ -34,7 +34,7 @@ namespace mar_sumaken_web.Commons
                         M_User AS m_user
                     INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
                     WHERE
-                        m_user.NotUseFlag = 0
+                        m_user.IsDeleted = 0
                         AND m_user.LoginID = '{@loginId}' COLLATE Japanese_CS_AS_KS_WS
             ";
 

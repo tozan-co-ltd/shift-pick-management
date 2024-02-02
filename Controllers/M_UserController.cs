@@ -1,6 +1,7 @@
 ﻿using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
 using static mar_sumaken_web.Models.M_UserModel;
 
 namespace mar_sumaken_web.Controllers
@@ -87,7 +88,69 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public IActionResult Register(M_User model)
         {
-            return View();
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                if (user == null || string.IsNullOrEmpty(model.LoginID))
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
+                }
+
+                // 重複ユーザー情報取をチェック
+                bool duplicateValid = M_UserConnectController.CheckDuplicateMUserByLoginId(model.LoginID, user.DatabaseName);
+
+                // メイン倉庫IDをチェック
+                bool depoCheck = false;
+                foreach(SelectItem item in model.DepoSelectList)
+                {
+                    if(item.IsSelected)
+                    {
+                        depoCheck = true;
+                    }
+                }
+                // 登録情報をチェック
+                if (!ModelState.IsValid || !duplicateValid || !depoCheck)
+                {
+                    // エラーを作成
+                    // エラーコード：E2011
+                    //throw new Exception();
+                    return NotFound(new { errorMessage = "登録はできませんでした。" });
+                }
+
+
+                // saltの作成とパスワードのハッシュ化
+                var salt = Hashing.GetRandomSalt();
+                var hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(model.Password, salt);
+                var stringSalt = Hashing.ConvertByteToString(salt);
+                model.Password = hashedPassword;
+                model.Salt= stringSalt;
+
+                // ユーザーマスター登録
+                bool isInsertMuser = M_UserConnectController.InsertMUser(model, user);
+
+                // 更新件数が0の場合はエラーとする
+                if (isInsertMuser)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "登録はできませんでした。" });
+                }
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
+
+                // log取得
+                //var exceptionMessage = ex.Message;
+                //_logger.LogError($"{exceptionMessage} {errorMessage}");
+                return NotFound(new { errorMessage = "予期せぬエラーが発⽣しました。" });
+            }
         }
 
         /// <summary>
