@@ -154,7 +154,7 @@
                                 <label>ユーザーID</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-7 mb-2">
-                                <input class="form-control" id="deleteUserId" value="" type="text" disabled>
+                                <input class="form-control" id="deleteUserId" type="text" disabled>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap">
@@ -255,7 +255,7 @@
         });
     }
 
-    // ユーザーマスター削除のAJAXを呼びます
+    // 削除
     function OnExecuteDelete() {
 
         $("#ErrorBlock").text("");
@@ -268,26 +268,38 @@
         }
         var deleteUrl = currentUrl + "Delete";
 
-        // Sending data
+        // POSTするデータ
         var userId = document.getElementById('deleteUserId').value;
-        formData = { userId: userId };
+        formData = {
+            "userId" : userId
+        };
         
-        // Ajax call
+        // ajax
         $.ajax({
             url: deleteUrl,
-            method: 'post',
+            method: "POST",
             data: formData
-        }).done(function (response) {
-            if (response.res == "OK") {
-                $('#userDeleteModal').modal('hide');
-                $('#userDeleteModal').hide();
-                AlertMessage('', '完了', '削除が完了しました。', null, null);
-            }
-            else {
-                $("#ErrorBlock").hide()
-                $("#import-res").show()
+        })
+        .done(function (data) {
+            // 完了モーダル表示
+            $('#userDeleteModal').modal('hide');
+            $('#userDeleteModal').hide();
+            AlertMessage('', '完了', '削除が完了しました。', null, null);
+        })
+        .fail(function (xhr) {
+            if (xhr.status === 404) {
+                // データが見つからなかった場合
+                var errorMessage = xhr.responseJSON.errorMessage;
+                $("#ErrorBlock").hide();
+                $("#import-res").show();
                 $("#import-res").addClass('text-danger');
-                $("#import-res").text(response.error);
+                $("#import-res").text("エラー: " + errorMessage);
+            } else {
+                // その他のエラーの場合
+                $("#ErrorBlock").hide();
+                $("#import-res").show();
+                $("#import-res").addClass('text-danger');
+                $("#import-res").text("データの取得に失敗しました。");
             }
         });
     }

@@ -1,7 +1,5 @@
-﻿//using mar_sumaken_web.Commons;
-using mar_sumaken_web.Commons;
+﻿using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static mar_sumaken_web.Models.M_UserModel;
 
@@ -16,23 +14,24 @@ namespace mar_sumaken_web.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// ユーザーマスター画面表示
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public IActionResult Index(M_UserModel model)
         {
-            string? errorMessage;
-
             if (model == null)
                 model = new M_UserModel();
 
             try
             {
-                // クレームからユーザー情報の管理権限区分を取得する
+                // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 管理権限区分チェック
-                // 1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1 || string.IsNullOrWhiteSpace(user.DatabaseName))
+                // 管理権限区分が1(管理者)でない場合はエラーとする
+                if (user == null || user.AuthorizedKubun != 1)
                 {
-                    // エラーを作成
                     // エラーコード：E2011
                     throw new Exception();
                 }
@@ -44,7 +43,7 @@ namespace mar_sumaken_web.Controllers
                 
                 if (userList.Count > 0)
                 {
-                    // ユーザーマスターリストの詳細を取得する
+                    // ユーザーマスターの詳細を取得する
                     userList = M_UserConnectController.GetMUserDetailList(userList, user.DatabaseName);
                     model.M_UserList = userList;
                 }
@@ -70,12 +69,21 @@ namespace mar_sumaken_web.Controllers
             }
         }
 
+        /// <summary>
+        /// ユーザーマスター登録画面表示
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
 
+        /// <summary>
+        /// ユーザーマスター登録
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult Register(M_User model)
         {
@@ -89,27 +97,28 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult Delete(int userId)
         {
-            //string? errorMessage;
             try
             {
-                // クレームからユーザー情報の管理権限区分を取得する
+                // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
                 if (user == null || userId == 0)
                 {
                     // エラーコード：E2011
-                    throw new Exception();
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
                 }
 
                 // ユーザーマスター削除
                 int deleteAffectedRows = M_UserConnectController.DeleteMUser(userId, user.DatabaseName);
+
+                // 更新件数が0の場合はエラーとする
                 if (deleteAffectedRows == 0)
                 {
                     // エラーコード：E2011
-                    return new JsonResult(new { res = "NG", error = "エラーコード：E2011" });
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
                 }
 
-                return new JsonResult(new { res = "OK", error = "" });
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -120,7 +129,7 @@ namespace mar_sumaken_web.Controllers
                 // log取得
                 //var exceptionMessage = ex.Message;
                 //_logger.LogError($"{exceptionMessage} {errorMessage}");
-                return new JsonResult(new { res = "NG", error = "エラーコード：E2011" });
+                return NotFound(new { errorMessage = "予期せぬエラーが発⽣しました。" });
             }
         }
     }

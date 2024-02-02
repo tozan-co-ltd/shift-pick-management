@@ -1,7 +1,6 @@
 ﻿using Dapper;
-using System.ComponentModel.Design;
-using System.Data.SqlClient;
 using mar_sumaken_web.Models;
+using System.Data.SqlClient;
 using static mar_sumaken_web.Models.M_UserModel;
 
 namespace mar_sumaken_web.Commons
@@ -14,7 +13,7 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// データベースに接続し、SQL実行
         /// </summary>
-        /// <param name="sql">SQL</param>
+        /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns>ユーザー情報</returns>
         public static List<M_UserModel.M_User> ConnectMUsers(string sql, string databaseName)
@@ -44,11 +43,11 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// ユーザーマスターリストの詳細を取得する
+        /// ユーザーマスターの詳細を取得する
         /// </summary>
-        /// <param name="userList"></param>
-        /// <param name="databaseName"></param>
-        /// <returns></returns>
+        /// <param name="userList">ユーザー情報</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns>ユーザー情報</returns>
         public static List<M_UserModel.M_User> GetMUserDetailList(List<M_User> userList, string databaseName)
         {
             try
@@ -94,9 +93,9 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// ユーザーマスター削除
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="databaseName"></param>
-        /// <returns></returns>
+        /// <param name="userId">ユーザーID</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns>更新件数</returns>
         public static int DeleteMUser(int userId, string databaseName)
         {
             int delteAffectedRows = 0;
@@ -135,23 +134,24 @@ namespace mar_sumaken_web.Commons
                     string userMenuDeleteSql = CreateSQLToDeleteRUserHandyMenu(userId);
                     connection.Execute(userMenuDeleteSql, null, transaction);
 
+                    // トランザクションのコミット
                     transaction.Commit();
+
+                    return delteAffectedRows;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     transaction.Rollback();
                     // エラーコード：E2011
-                    throw e;
+                    throw;
                 }
             }
-
-            return delteAffectedRows;
         }
 
         /// <summary>
         /// ユーザーマスターSELECT文SQL作成
         /// </summary>
-        /// <returns>SQL</returns>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToSelectMUsers()
         {
             var sql = $@"
@@ -167,30 +167,13 @@ namespace mar_sumaken_web.Commons
                             WHEN AuthorizedKubun = 3 THEN '作業者(解除要)'
                             ELSE''
                          END AS AuthorizedKubunName
-                        ,FORMAT (CreatedAt, 'yyyy/MM/dd ')     AS CreatedAt
+                        ,FORMAT (CreatedAt, 'yyyy/MM/dd ') AS CreatedAt
                         ,CreatedBy
-                        ,FORMAT (UpdatedAt, 'yyyy/MM/dd ')     AS UpdatedAt
+                        ,FORMAT (UpdatedAt, 'yyyy/MM/dd ') AS UpdatedAt
                         ,UpdatedBy                            
                     FROM 
                         M_User
-                ";
-
-            return sql;
-        }
-
-        /// <summary>
-        /// 一致するユーザー取得SQL作成
-        /// </summary>
-        /// <returns>SQL</returns>
-        public static string CreateSQLToGetMUsersByConditions(string userId, string loginId, string isDeleted)
-        {
-            var sql = CreateSQLToSelectMUsers();
-            sql += $@"
-                    WHERE
-                        user_id         = '{@userId}'
-                        AND login_id    = '{@loginId}'
-                        AND is_deleted  = '{@isDeleted}'
-                ";
+            ";
 
             return sql;
         }
@@ -198,23 +181,23 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// ユーザーマスター情報取得SQL作成
         /// </summary>
-        /// <returns>SQL</returns>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToGetMUsers()
         {
             var sql = CreateSQLToSelectMUsers();
             sql += $@"
                     WHERE
                         NotUseFlag = 0
-                ";
+            ";
 
             return sql;
         }
 
         /// <summary>
-        /// 倉庫マスター情報取得SQL作成
+        /// ユーザー-倉庫中間テーブル情報取得SQL作成
         /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <param name="userId">ユーザーID</param>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToGetRUserDepoList(int userId)
         {
             var sql = $@"
@@ -229,15 +212,15 @@ namespace mar_sumaken_web.Commons
                         WHERE 
 	                        userDepo.UserID = {userId}
                             AND m_depo.NotUseFlag = 0
-                    ";
+            ";
             return sql;
         }
 
         /// <summary>
-        /// ハンディメニューマスター情報取得SQL作成
+        /// ユーザー-ハンディメニュー中間テーブル情報取得SQL作成
         /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <param name="userId">ユーザーID</param>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToGetRUserHandyMenuList(int userId)
         {
             var sql = $@"
@@ -251,57 +234,56 @@ namespace mar_sumaken_web.Commons
                          WHERE 
 	                        userMenu.UserID = {userId}
                             AND menu.NotUseFlag = 0
-                    ";
+            ";
             return sql;
         }
 
         /// <summary>
         /// ユーザーマスター削除SQL作成
         /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <param name="userId">ユーザーID</param>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToDeleteMUser(int userId)
         {
             var sql = $@"
                          UPDATE M_User
-                         SET NotUseFlag = 1
+                         SET    NotUseFlag = 1
                          WHERE 
-	                        UserID = {userId}
-                            AND NotUseFlag = 0
-                    ";
+	                            UserID = {userId}
+            ";
             return sql;
         }
 
         /// <summary>
         /// ユーザー-倉庫中間テーブル削除SQL作成
         /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <param name="userId">ユーザーID</param>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToDeleteRUserHandyMenu(int userId)
         {
             var sql = $@"
-                         DELETE FROM R_UserHandyMenu
-                         WHERE 
-	                        UserID = {userId}
-                    ";
+                         DELETE 
+                            FROM    R_UserHandyMenu
+                            WHERE 
+	                                UserID = {userId}
+            ";
             return sql;
         }
 
         /// <summary>
         /// ユーザー-ハンディメニュー中間テーブル削除SQL作成
         /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <param name="userId">ユーザーID</param>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToDeleteRUserDepo(int userId)
         {
             var sql = $@"
-                         DELETE FROM R_UserDepo
-                         WHERE 
-	                        UserID = {userId}
-                    ";
+                         DELETE 
+                            FROM    R_UserDepo
+                            WHERE 
+	                                UserID = {userId}
+            ";
             return sql;
         }
-
-
     }
 }
