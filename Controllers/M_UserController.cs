@@ -140,34 +140,39 @@ namespace mar_sumaken_web.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-
-                if (user == null || string.IsNullOrEmpty(model.LoginID))
+                if (user == null)
                 {
                     // エラーコード：E2011
                     return NotFound(new { errorMessage = "データが見つかりませんでした。" });
                 }
 
-                // 重複ユーザー情報取をチェック
-                bool duplicateValid = M_UserConnectController.CheckDuplicateMUserByLoginId(model.LoginID, user.DatabaseName);
-
                 // メイン倉庫IDをチェック
-                bool depoCheck = false;
-                foreach(SelectItem item in model.DepoSelectList)
+                bool isDepoSelected = false;
+                foreach (SelectItem item in model.DepoSelectList)
                 {
-                    if(item.IsSelected)
+                    if (item.IsSelected)
                     {
-                        depoCheck = true;
+                        isDepoSelected = true;
                     }
                 }
                 // 登録情報をチェック
-                if (!ModelState.IsValid || !duplicateValid || !depoCheck)
+                if (!ModelState.IsValid || !isDepoSelected)
                 {
                     // エラーを作成
                     // エラーコード：E2011
                     //throw new Exception();
-                    return NotFound(new { errorMessage = "登録はできませんでした。" });
+                    return NotFound(new { errorMessage = "入力情報が間違っています。" });
                 }
 
+                // 重複ユーザー情報取をチェック
+                bool isDuplicate = M_UserConnectController.CheckIsDuplicateMUserByLoginId(model.LoginID, user.DatabaseName);
+                if (isDuplicate)
+                {
+                    // エラーを作成
+                    // エラーコード：E2011
+                    //throw new Exception();
+                    return NotFound(new { errorMessage = "ログインIDが重複しています。" });
+                }
 
                 // saltの作成とパスワードのハッシュ化
                 var salt = Hashing.GetRandomSalt();
@@ -186,7 +191,7 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "登録はできませんでした。" });
                 }
 
-                return View();
+                return Ok();
             }
             catch (Exception ex)
             {

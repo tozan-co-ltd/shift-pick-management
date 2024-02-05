@@ -153,10 +153,10 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="loginId">ログインID</param>
         /// <returns>重複結果</returns>
-        public static bool CheckDuplicateMUserByLoginId(string loginId, string databaseName)
+        public static bool CheckIsDuplicateMUserByLoginId(string loginId, string databaseName)
         {
             // 戻り値
-            bool isDuplicateValid = true;
+            bool isDuplicateValid = false;
 
             // DB接続
             try
@@ -175,7 +175,7 @@ namespace mar_sumaken_web.Commons
 
                     if (result > 0)
                     {
-                        isDuplicateValid = false;
+                        isDuplicateValid = true;
                     }
                 }
                 return isDuplicateValid;
