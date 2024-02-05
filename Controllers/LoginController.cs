@@ -211,17 +211,26 @@ namespace mar_sumaken_web.Controllers
         /// 会社マスター情報の取得
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="CustomExtention"></exception>
         private M_CompanyModel? GetMCompany()
         {
+            string companyWebPath = "";
             try
             {
                 // URLからパスを取得(https://www.tozan.co.jp/の直後１つ目のパス)
                 var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
-                if (urlWebPath != "")
+
+                // 会社Webアプリパスを取得("sumaken-web-***"の"***"のみ)
+                string pattern = "sumaken-web-";
+                int index = urlWebPath.IndexOf(pattern);
+                if (index != -1)
+                {
+                    companyWebPath = urlWebPath.Substring(index + pattern.Length);
+                }
+
+                if (companyWebPath != "")
                 {
                     // SQL作成
-                    var sql = M_CompanyConnectController.CreateSQLToSelectMCompanyByWebPath(urlWebPath);
+                    var sql = M_CompanyConnectController.CreateSQLToSelectMCompanyByWebPath(companyWebPath);
                     // DB接続
                     M_CompanyModel? companyModel = M_CompanyConnectController.ConnectMCompanny(sql);
 
@@ -229,12 +238,11 @@ namespace mar_sumaken_web.Controllers
                 }
                 else
                 {
-                    // エラーを作成
                     // エラーコード：E2011
                     throw new Exception();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

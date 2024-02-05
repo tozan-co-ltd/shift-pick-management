@@ -88,7 +88,7 @@ namespace mar_sumaken_web.Models
             /// パスワード
             /// </summary>
             [Display(Name = "パスワード")]
-            [Required(ErrorMessage = "パスワードは入力必須項目です")]
+            [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
             [RegularExpression(@"[a-zA-Z0-9]{4,10}", ErrorMessage = "パスワードは４～10文字入力してください。")]
             public string Password { get; set; }
 

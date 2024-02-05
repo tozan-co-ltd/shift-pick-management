@@ -158,10 +158,7 @@ namespace mar_sumaken_web.Controllers
                 // 登録情報をチェック
                 if (!ModelState.IsValid || !isDepoSelected)
                 {
-                    // エラーを作成
-                    // エラーコード：E2011
-                    //throw new Exception();
-                    return NotFound(new { errorMessage = "入力情報が間違っています。" });
+                    return NotFound();
                 }
 
                 // 重複ユーザー情報取をチェック
