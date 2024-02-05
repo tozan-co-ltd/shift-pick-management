@@ -350,46 +350,36 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// ユーザーマスターSELECT文SQL作成
+        /// ユーザーマスター情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectMUsers()
         {
             var sql = $@"
                     SELECT
-                        UserID                                
-                        ,LoginID                              
-                        ,UserName
-                        ,DepoID
-                        ,AuthorizedKubun
+                         m_user.UserID                                
+                        ,m_user.LoginID                              
+                        ,m_user.UserName
+                        ,m_user.DepoID
+	                    ,m_depo.DepoName
+                        ,m_user.AuthorizedKubun
                         ,CASE 
-                            WHEN AuthorizedKubun = 1 THEN '管理者'
-                            WHEN AuthorizedKubun = 2 THEN '作業者'
-                            WHEN AuthorizedKubun = 3 THEN '作業者(解除要)'
+                            WHEN m_user.AuthorizedKubun = 1 THEN '管理者'
+                            WHEN m_user.AuthorizedKubun = 2 THEN '作業者'
+                            WHEN m_user.AuthorizedKubun = 3 THEN '作業者(解除要)'
                             ELSE''
-                         END AS AuthorizedKubunName
-                        ,FORMAT (CreatedAt, 'yyyy/MM/dd ') AS CreatedAt
-                        ,CreatedBy
-                        ,FORMAT (UpdatedAt, 'yyyy/MM/dd ') AS UpdatedAt
-                        ,UpdatedBy                            
+                        END AS AuthorizedKubunName
+                        ,FORMAT (m_user.CreatedAt, 'yyyy/MM/dd ') AS CreatedAt
+                        ,m_user.CreatedBy
+                        ,FORMAT (m_user.UpdatedAt, 'yyyy/MM/dd ') AS UpdatedAt
+                        ,m_user.UpdatedBy                            
                     FROM 
-                        M_User
-            ";
-
-            return sql;
-        }
-
-        /// <summary>
-        /// ユーザーマスター情報取得SQL作成
-        /// </summary>
-        /// <returns>SQL文</returns>
-        public static string CreateSQLToGetMUsers()
-        {
-            var sql = CreateSQLToSelectMUsers();
-            sql += $@"
+                        M_User AS m_user
+                    INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
                     WHERE
-                        IsDeleted = 0
-            ";
+                        m_user.IsDeleted = 0
+                        AND m_depo.IsDeleted = 0
+            ;";
 
             return sql;
         }
