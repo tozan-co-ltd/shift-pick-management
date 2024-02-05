@@ -16,10 +16,10 @@ namespace mar_sumaken_web.Commons
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns>ユーザー情報</returns>
-        public static List<M_UserModel.M_User> ConnectMUsers(string sql, string databaseName)
+        public static List<M_User> ConnectMUsers(string sql, string databaseName)
         {
             // 戻り値
-            List<M_UserModel.M_User> strList = new();
+            List<M_User> strList = new();
 
             // DB接続
             try
@@ -32,7 +32,7 @@ namespace mar_sumaken_web.Commons
                     connection.ConnectionString = connectionString;
                     connection.Open();
 
-                    strList = connection.Query<M_UserModel.M_User>(sql).ToList();
+                    strList = connection.Query<M_User>(sql).ToList();
                 }
                 return strList;
             }
@@ -48,7 +48,7 @@ namespace mar_sumaken_web.Commons
         /// <param name="userList">ユーザー情報</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns>ユーザー情報</returns>
-        public static List<M_UserModel.M_User> GetMUserDetailList(List<M_User> userList, string databaseName)
+        public static List<M_User> GetMUserDetailList(List<M_User> userList, string databaseName)
         {
             try
             {

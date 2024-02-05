@@ -96,6 +96,7 @@ namespace mar_sumaken_web.Controllers
 
                     model.DepoSelectList.Add(depoItem);
                 }
+
                 // ハンディメニューマスター情報取得
                 var menuList = M_HandyMenuConnectController.GetMHandyMenuList(user.DatabaseName);
                 foreach (var menu in menuList)

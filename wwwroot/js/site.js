@@ -23,28 +23,16 @@ $(document).ready(function () {
     });
 
     //------------------- DataTables　------------------//
-    //トープ
-    $('#handyErrorTbl').DataTable({
+    // 2列目昇順
+    $('.datatable-normal').DataTable({
         "language": {           // 日本語表示
             "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
         },
         lengthChange: true,     // 表示件数
         info: false,            // 総件数
-        scrollX: true,
+        scrollX: false,         // 横スクロール不可
         scrollY: false,
-        order: [[1, "asc"]],   // 読取日時昇順
-    });
-
-    //M_User
-    $('#userTbl').DataTable({
-        "language": {           // 日本語表示
-            "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
-        },
-        lengthChange: true,     // 表示件数
-        info: false,            // 総件数
-        scrollX: false,
-        scrollY: false,
-        order: [[1, "asc"]],   // ユーザーID
+        order: [[1, "asc"]],    // 2列目昇順
     });
     //------------------- DataTables　------------------//
 

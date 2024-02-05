@@ -40,12 +40,25 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public int UserID { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string ControllerName { get; set; }
 
         /// <summary>
         /// ビュータイトル
         /// </summary>
         public string ViewTitle { get; set; }
+
+        /// <summary>
+        /// 倉庫リスト
+        /// </summary>
+        public IEnumerable<SelectListItem> MDepoList { get; set; }
+
+        /// <summary>
+        /// 会社リスト
+        /// </summary>
+        public IEnumerable<SelectListItem> MCompanyList { get; set; }
 
 
         /// <summary>
@@ -62,6 +75,8 @@ namespace mar_sumaken_web.Models
             Role = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_Role).First().Value);          
             ControllerName = viewContext.RouteData.Values["controller"].ToString();
             ViewTitle = GetViewTitle();
+            MDepoList = GetMDepoList(DataBaseName);
+            MCompanyList = GetMCompanyList(DataBaseName);
         }
 
         /// <summary>
@@ -104,6 +119,100 @@ namespace mar_sumaken_web.Models
             }
 
             return pageTitle;
+        }
+
+        /// <summary>
+        /// 倉庫リスト取得
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<SelectListItem> GetMDepoList(string databaseName)
+        {
+            var selectListItem = new List<SelectListItem>();
+
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string commandText = $@"
+                        SELECT *
+                        FROM M_Depo
+                        WHERE (1=1)
+                            AND IsDeleted = 0
+                        ";
+                    var param = new
+                    {
+                        UserID = UserID
+                    };
+
+                    var depoList = new List<M_DepoModel>();
+                    depoList = connection.Query<M_DepoModel>(commandText, param).ToList();
+
+                    foreach (var depo in depoList)
+                    {
+                        var item = new SelectListItem { 
+                            Value = depo.DepoID.ToString(), 
+                            Text = depo.DepoName.ToString() 
+                        };
+                        selectListItem.Add(item);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // エラー
+            }
+            return selectListItem;
+        }
+
+
+        /// <summary>
+        /// 会社リスト取得
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<SelectListItem> GetMCompanyList(string databaseName)
+        {
+            var selectListItem = new List<SelectListItem>();
+
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string commandText = $@"
+                        SELECT *
+                        FROM M_Company
+                        WHERE (1=1)
+                            AND IsDeleted = 0
+                        ";
+                    var param = new
+                    {
+                        UserID = UserID
+                    };
+
+                    var companyList = new List<M_CompanyModel>();
+                    companyList = connection.Query<M_CompanyModel>(commandText, param).ToList();
+
+                    foreach (var company in companyList)
+                    {
+                        var item = new SelectListItem
+                        {
+                            Value = company.CompanyID.ToString(),
+                            Text = company.CompanyName.ToString() + " : " + company.ClientName.ToString()
+                        };
+                        selectListItem.Add(item);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // エラー
+            }
+            return selectListItem;
         }
     }
 }

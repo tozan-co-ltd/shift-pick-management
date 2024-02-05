@@ -1,8 +1,5 @@
-﻿using X.PagedList;
+﻿using mar_sumaken_web.Properties;
 using System.ComponentModel.DataAnnotations;
-using mar_sumaken_web.Properties;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Diagnostics.CodeAnalysis;
 
 namespace mar_sumaken_web.Models
 {
@@ -16,11 +13,19 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public List<M_User> M_UserList { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public class M_User
         {
-
+            /// <summary>
+            /// 
+            /// </summary>
             public List<SelectItem> DepoSelectList { get; set; } = new List<SelectItem>();
 
+            /// <summary>
+            /// 
+            /// </summary>
             public List<SelectItem> HandyMenuSelectList { get; set; } = new List<SelectItem>();
 
             /// <summary>

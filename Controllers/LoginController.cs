@@ -211,7 +211,8 @@ namespace mar_sumaken_web.Controllers
         /// 会社マスター情報の取得
         /// </summary>
         /// <returns></returns>
-        private M_CompanyModel? GetMCompany()
+        /// <exception cref="CustomExtention"></exception>
+        private Warehouse_M_CompanyModel? GetMCompany()
         {
             string companyWebPath = "";
             try
@@ -232,7 +233,7 @@ namespace mar_sumaken_web.Controllers
                     // SQL作成
                     var sql = M_CompanyConnectController.CreateSQLToSelectMCompanyByWebPath(companyWebPath);
                     // DB接続
-                    M_CompanyModel? companyModel = M_CompanyConnectController.ConnectMCompanny(sql);
+                    Warehouse_M_CompanyModel? companyModel = M_CompanyConnectController.ConnectMCompanny(sql);
 
                     return companyModel;
                 }

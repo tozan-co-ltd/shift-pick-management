@@ -1,5 +1,8 @@
 ﻿namespace mar_sumaken_web.Models
 {
+    /// <summary>
+    /// 会社マスターのModel
+    /// </summary>
     public class M_CompanyModel
     {
         /// <summary>
@@ -10,17 +13,12 @@
         /// <summary>
         /// 会社コード
         /// </summary>
-        public string CompanyCode { set; get; }
+        public int CompanyCode { set; get; }
 
         /// <summary>
-        /// 会社パスワード
+        /// 会社区分
         /// </summary>
-        public string CompanyPassword { set; get; }
-
-        /// <summary>
-        /// 会社URL
-        /// </summary>
-        public string CompanyWebPath { set; get; }
+        public int CompanyKubun { set; get; }
 
         /// <summary>
         /// 会社名
@@ -28,53 +26,33 @@
         public string CompanyName { set; get; }
 
         /// <summary>
-        /// 会社名かな
+        /// 取引先名
         /// </summary>
-        public string CompanyNameKana { set; get; }
+        public string ClientName { set; get; }
 
         /// <summary>
-        /// 会社データベース名
-        /// </summary>
-        public string DatabaseName { set; get; }
-
-        /// <summary>
-        /// APIのURL
-        /// </summary>
-        public string HandyApiUrl { set; get; }
-
-        /// <summary>
-        /// ハンディアプリの最小バージョン
-        /// </summary>
-        public decimal HandyAppMinVersion { set; get; }
-
-        /// <summary>
-        /// ハンディ管理者パスワード
-        /// </summary>
-        public string HandyAdminPassword { set; get; }
-
-        /// <summary>
-        /// 未使用フラグ
+        /// 削除フラグ
         /// </summary>
         public bool IsDeleted { set; get; }
 
         /// <summary>
         /// 作成日時
         /// </summary>
-        public DateTime CreateDate { get; set; }
+        public DateTime CreatedAt { set; get; }
 
         /// <summary>
         /// 作成者
         /// </summary>
-        public string CreateUserID { get; set; }
+        public string CreatedBy { set; get; }
 
         /// <summary>
         /// 更新日時
         /// </summary>
-        public DateTime UpdateDate { get; set; }
+        public DateTime UpdatedAt { set; get; }
 
         /// <summary>
         /// 更新者
         /// </summary>
-        public string UpdateUserID { get; set; }
+        public string UpdatedBy { set; get; }
     }
 }
