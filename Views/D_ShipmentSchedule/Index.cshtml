@@ -1,11 +1,13 @@
-﻿@* @model mar_sumaken_web.Models.D_ReceiveScheduleModel *@
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.D_ShipmentScheduleModel.D_ShipmentSchedule
 @{
-    ViewData["Title"] = "出庫 - 出荷指示照会";
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.ViewTitle;
 }
 
-<div class="card shadow de-inspection d-receive-schedule m-4">
+<div class="card shadow de-inspection m-4">
     <div class="card-header text-gray-800">
-        @ViewData["Title"]
+        出庫 - @ViewData["Title"]
     </div>
     <div class="card-body">
         <div class="row">
@@ -24,38 +26,28 @@
             <p id="import-res" class="mt-1"></p>
         </div>
 
-        <div id="ErrorBlock" class="mb-3 ml-3 text-danger">
+        <div id="div-error-message" class="mb-3 ml-3 text-danger">
         </div>
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
                 <div class="row mt-10">
                     <div class="col-lg-12">
-                        <form id="import-receive-schedule-upload-form" method="post" enctype="multipart/form-data" name="form" onsubmit="return false;">
+                        <form id="import-receive-schedule-upload-form" method="post">
                             <div class="col-16 d-flex justify-content-start align-items-center mb-3 col-11 unset-pdl">
                                 <span class="warehouse-name-drs">倉庫名</span>
                                 <div class="selectItem unset-pdl">
-                                    <select class="form-select" aria-label="Default select example">
-                                        <option selected>選択してください</option>
-                                        <option value="1">選択1</option>
-                                        <option value="2">選択2</option>
-                                        <option value="3">選択3</option>
-                                    </select>
+                                    <select class="form-select" name="DepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
                                 </div>
                             </div>
                             <div class="col-16 d-flex justify-content-start align-items-center mb-3 col-11 unset-pdl">
-                                <span class="warehouse-name-drs">仕入先名</span>
+                                <span class="warehouse-name-drs">納入先名</span>
                                 <div class="selectItem unset-pdl">
-                                    <select class="form-select" aria-label="Default select example">
-                                        <option selected>選択してください</option>
-                                        <option value="1">選択1</option>
-                                        <option value="2">選択2</option>
-                                        <option value="3">選択3</option>
-                                    </select>
+                                    <select class="form-select" name="DepoID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
                                 </div>
                             </div>
                             <div class="col-12 d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                                <span class="warehouse-name-drs">入荷予定日</span>
+                                <span class="warehouse-name-drs">納入指示日</span>
                                 <input id="startDate" type="text" class="form-control pickerDate"> <lable class="m-1">～</lable> <input id="endDate" type="text" class="form-control pickerDate">
                             </div>
 
@@ -106,24 +98,84 @@
                 </div>
             </div>
         </div>
-        <div class="tableContent mt-3">
-            <table class="table row-border compact stripe hover nowrap order-column" id="userTbl">
+        <div class="mt-3">
+            <table class="table table-sm stripe hover nowrap datatable-normal">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>仕入先名</th>
-                        <th>入荷予定日</th>
+                        <th>納入先名</th>
+                        <th>出荷指示日</th>
+                        <th>便</th>
+                        <th>納入先品番</th>
                         <th>仕入先品番</th>
-                        <th>ロット番号</th>
-                        <th>予定箱数</th>
-                        <th>予定数量</th>
-                        <th>入庫箱数</th>
-                        <th>入庫数量</th>
-                        <th>登録日時</th>
-                        <th>登録者</th>
+                        <th>収容数</th>
+                        <th>箱数</th>
+                        <th>納入指数量</th>
+                        <th>出庫箱数</th>
+                        <th>出庫数量</th>
+                        <th>発注元</th>
+                        <th>発注元工区</th>
+                        <th>発注元名称</th>
+                        <th>発注元工場名</th>
+                        <th>出荷元</th>
+                        <th>出荷元工区</th>
+                        <th>出荷元名称</th>
+                        <th>納入先</th>
+                        <th>納入先工区</th>
+                        <th>納入場所</th>
+                        <th>納入先名称</th>
+                        <th>納入先工場名</th>
+                        <th>更新日時</th>
+                        <th>更新者</th>
                     </tr>
                 </thead>
                 <tbody>
+                    @if (@Model != null && @Model.D_ShipmentScheduleList != null && @Model.D_ShipmentScheduleList.Count > 0)
+                    {
+                        @foreach (var item in @Model.D_ShipmentScheduleList)
+                        {
+                            <tr>
+                                <td>
+                                    <button class="btn btn-secondary btn-icon-split"
+                                            onclick="OnDetailClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#userDetailModal">
+                                        <i class="fa-solid fa-list"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-icon-split"
+                                            onclick="OnDeleteClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#userDeleteModal">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                                <td>@item.ShipmentScheduleID</td>
+                                <td>@item.OrdererCode</td>
+                                <td>@item.OrdererFactoryKubun</td>
+                                <td>@item.OrdererName</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>@item.UpdatedAt</td>
+                                <td>@item.UpdatedBy</td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>

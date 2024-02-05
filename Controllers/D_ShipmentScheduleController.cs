@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using mar_sumaken_web.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -6,7 +7,8 @@ namespace mar_sumaken_web.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            var model = new D_ShipmentScheduleModel.D_ShipmentSchedule();
+            return View(model);
         }
     }
 }
