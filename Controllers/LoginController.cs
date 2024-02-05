@@ -37,7 +37,7 @@ namespace mar_sumaken_web.Controllers
         /// <returns>トップ画面</returns>
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Login(LoginModel model)
+        public async Task<IActionResult> Index(LoginModel model)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace mar_sumaken_web.Controllers
                 if (loginUserModel == null)
                 {
                     ViewData["ErrorMessage"] = "ログインIDまたはパスワードが正しくありません。";
-                    return RedirectToAction("Index", "Login");
+                    return View();
                 }
 
                 // 現在時刻取得
@@ -95,7 +95,7 @@ namespace mar_sumaken_web.Controllers
             catch (Exception ex)
             {
                 ViewData["ErrorMessage"] = ex;
-                return RedirectToAction("Index", "Login");
+                return View();
             }
         }
 
