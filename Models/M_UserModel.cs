@@ -1,8 +1,5 @@
-﻿using X.PagedList;
+﻿using mar_sumaken_web.Properties;
 using System.ComponentModel.DataAnnotations;
-using mar_sumaken_web.Properties;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Diagnostics.CodeAnalysis;
 
 namespace mar_sumaken_web.Models
 {
@@ -16,11 +13,19 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public List<M_User> M_UserList { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public class M_User
         {
-
+            /// <summary>
+            /// 
+            /// </summary>
             public List<SelectItem> DepoSelectList { get; set; } = new List<SelectItem>();
 
+            /// <summary>
+            /// 
+            /// </summary>
             public List<SelectItem> HandyMenuSelectList { get; set; } = new List<SelectItem>();
 
             /// <summary>
@@ -88,7 +93,7 @@ namespace mar_sumaken_web.Models
             /// パスワード
             /// </summary>
             [Display(Name = "パスワード")]
-            [Required(ErrorMessage = "パスワードは入力必須項目です")]
+            [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
             [RegularExpression(@"[a-zA-Z0-9]{4,10}", ErrorMessage = "パスワードは４～10文字入力してください。")]
             public string Password { get; set; }
 

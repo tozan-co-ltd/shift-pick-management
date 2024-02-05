@@ -14,10 +14,10 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="sql">SQL</param>
         /// <returns>ユーザー情報</returns>
-        public static M_CompanyModel? ConnectMCompanny(string sql)
+        public static Warehouse_M_CompanyModel? ConnectMCompanny(string sql)
         {
             // 戻り値
-            List<M_CompanyModel> companyModels = new();
+            List<Warehouse_M_CompanyModel> companyModels = new();
 
             // DB接続
             try
@@ -30,7 +30,7 @@ namespace mar_sumaken_web.Commons
                     connection.ConnectionString = connectionString;
                     connection.Open();
 
-                    companyModels = connection.Query<M_CompanyModel>(sql).ToList();
+                    companyModels = connection.Query<Warehouse_M_CompanyModel>(sql).ToList();
                     // 件数をチェック
                     if(companyModels.Count != 1)
                     {

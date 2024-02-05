@@ -2,6 +2,7 @@
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Runtime.CompilerServices;
 using static mar_sumaken_web.Models.M_UserModel;
 
@@ -39,7 +40,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ユーザーマスター情報取得SQL作成
-                var sql = M_UserConnectController.CreateSQLToGetMUsers();
+                var sql = M_UserConnectController.CreateSQLToSelectMUsers();
                 // DB接続
                 List<M_User> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
                 
@@ -95,6 +96,7 @@ namespace mar_sumaken_web.Controllers
 
                     model.DepoSelectList.Add(depoItem);
                 }
+
                 // ハンディメニューマスター情報取得
                 var menuList = M_HandyMenuConnectController.GetMHandyMenuList(user.DatabaseName);
                 foreach (var menu in menuList)
@@ -140,34 +142,36 @@ namespace mar_sumaken_web.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-
-                if (user == null || string.IsNullOrEmpty(model.LoginID))
+                if (user == null)
                 {
                     // エラーコード：E2011
                     return NotFound(new { errorMessage = "データが見つかりませんでした。" });
                 }
 
-                // 重複ユーザー情報取をチェック
-                bool duplicateValid = M_UserConnectController.CheckDuplicateMUserByLoginId(model.LoginID, user.DatabaseName);
-
                 // メイン倉庫IDをチェック
-                bool depoCheck = false;
-                foreach(SelectItem item in model.DepoSelectList)
+                bool isDepoSelected = false;
+                foreach (SelectItem item in model.DepoSelectList)
                 {
-                    if(item.IsSelected)
+                    if (item.IsSelected)
                     {
-                        depoCheck = true;
+                        isDepoSelected = true;
                     }
                 }
                 // 登録情報をチェック
-                if (!ModelState.IsValid || !duplicateValid || !depoCheck)
+                if (!ModelState.IsValid || !isDepoSelected)
+                {
+                    return NotFound();
+                }
+
+                // 重複ユーザー情報取をチェック
+                bool isDuplicate = M_UserConnectController.CheckIsDuplicateMUserByLoginId(model.LoginID, user.DatabaseName);
+                if (isDuplicate)
                 {
                     // エラーを作成
                     // エラーコード：E2011
                     //throw new Exception();
-                    return NotFound(new { errorMessage = "登録はできませんでした。" });
+                    return NotFound(new { errorMessage = "ログインIDが重複しています。" });
                 }
-
 
                 // saltの作成とパスワードのハッシュ化
                 var salt = Hashing.GetRandomSalt();
@@ -186,7 +190,7 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "登録はできませんでした。" });
                 }
 
-                return View();
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -243,5 +247,57 @@ namespace mar_sumaken_web.Controllers
                 return NotFound(new { errorMessage = "予期せぬエラーが発⽣しました。" });
             }
         }
+
+        /// <summary>
+        /// フォール出力
+        /// </summary>
+        public JsonResult ExportFile()
+        {
+            string? errorMessage;
+            try
+            {
+                // log取得
+                _logger.LogInformation($"Excel出力開始");
+
+                // テーブルデータ取得
+                DataTable dt = CreateDataTable();
+
+                // ファイル名
+                var tmpFilename = "ユーザーマスター.csv";
+                // CSVファイルへのパスを作成する
+                string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
+                // DataTableをCSVに変換する
+                Utils.ToCSV(dt, filePath);
+                // ファイルの作成
+                var file = System.IO.File.ReadAllBytes(filePath);
+
+                return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+            }
+            catch (Exception ex)
+            {
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
+
+                // log取得
+                //var exceptionMessage = ex.Message;
+                //_logger.LogInformation($"{exceptionMessage} {errorMessage}");
+                return Json(new { res = "NG", error = "予期せぬエラーが発⽣しました。" });
+            }
+        }
+
+        private DataTable CreateDataTable()
+        {
+            var table = new DataTable();
+            table.Columns.Add("ID", typeof(string));
+            table.Columns.Add("ログインID", typeof(string));
+            table.Columns.Add("ユーザー名 ", typeof(string));
+            table.Columns.Add("メイン倉庫名", typeof(string));
+            table.Columns.Add("管理権限区分", typeof(string));
+            table.Columns.Add("更新日時", typeof(string));
+            table.Columns.Add("更新者", typeof(string));
+            return table;
+        }
+
     }
 }

@@ -21,7 +21,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:40384/MRq2xg5",
+      "applicationUrl": "http://localhost:40384/sumaken-web-MRq2xg5",
       "sslPort": 44392
     }
   }
