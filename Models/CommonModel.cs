@@ -187,6 +187,7 @@ namespace mar_sumaken_web.Models
                         SELECT *
                         FROM M_Company
                         WHERE (1=1)
+                            AND CompanyKubun = 3
                             AND IsDeleted = 0
                         ";
                     var param = new
@@ -202,7 +203,7 @@ namespace mar_sumaken_web.Models
                         var item = new SelectListItem
                         {
                             Value = company.CompanyID.ToString(),
-                            Text = company.CompanyName.ToString() + " : " + company.ClientName.ToString()
+                            Text = company.CompanyName.ToString() + " - " + company.ClientName.ToString()
                         };
                         selectListItem.Add(item);
                     }
