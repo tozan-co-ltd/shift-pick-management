@@ -57,7 +57,7 @@
         <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
             <li class="nav-item dropdown">
                 <div class="d-flex justify-content-end align-items-center" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="text-white">ログインユーザー名</span>
+                    <span class="text-white">@(User.Identity.IsAuthenticated ? User.FindFirst("UserName").Value : null)</span>
                     <a class="nav-link dropdown-toggle"><i class="fas fa-user fa-fw"></i></a>
                 </div>
                 <!-- Dropdown -->
