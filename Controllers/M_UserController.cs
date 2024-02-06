@@ -206,6 +206,175 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
+        /// ユーザーマスター修正画面表示
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            M_User editUser = new M_User();
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+                if (user == null)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
+                }
+
+                // IDでユーザーを選択するSQLを作成
+                var sql = M_UserConnectController.CreateSQLToSelectMUserByUserId(id);
+                // DB接続
+                List<M_User> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
+                if (userList.Count != 1)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "見つかった情報は間違っています。" });
+                }
+                editUser = userList[0];
+
+                // 倉庫マスター情報取得
+                var depoList = M_DepoConnectController.GetMDepoList(user.DatabaseName);
+                foreach (var depo in depoList)
+                {
+                    SelectItem depoItem = new SelectItem();
+                    depoItem.Name = depo.DepoName;
+                    depoItem.Value = depo.DepoID;
+                    depoItem.IsSelected = false;
+
+                    editUser.DepoSelectList.Add(depoItem);
+                }
+                // ハンディメニューマスター情報取得
+                var menuList = M_HandyMenuConnectController.GetMHandyMenuList(user.DatabaseName);
+                foreach (var menu in menuList)
+                {
+                    SelectItem menuItem = new SelectItem();
+                    menuItem.Name = menu.HandyMenuName;
+                    menuItem.Value = menu.HandyMenuID;
+                    menuItem.IsSelected = false;
+
+                    editUser.HandyMenuSelectList.Add(menuItem);
+                }
+
+                // IDでユーザー倉庫中間リスト取得
+                var userDepoList = M_UserConnectController.GetUserDepoByUserId(editUser.UserID, user.DatabaseName);
+                if (userDepoList.Count > 0)
+                {
+                    foreach (var depo in userDepoList)
+                    {
+                        var checkItem = editUser.DepoSelectList.FirstOrDefault(item => item.Value == depo.DepoID);
+                        if (checkItem != null)
+                        {
+                            checkItem.IsSelected = true;
+                        }
+                    }
+                }
+
+                // IDでユーザー-ハンディメニュー中間リスト取得
+                var userMenuList = M_UserConnectController.GetUserMenuByUserId(editUser.UserID, user.DatabaseName);
+                if (userMenuList.Count > 0)
+                {
+                    foreach (var menu in userMenuList)
+                    {
+                        var checkItem = editUser.HandyMenuSelectList.FirstOrDefault(item => item.Value == menu.HandyMenuID);
+                        if (checkItem != null)
+                        {
+                            checkItem.IsSelected = true;
+                        }
+                    }
+                }
+
+                return View(editUser);
+            }
+            catch (Exception ex)
+            {
+                //// エラーメッセージ取得
+                //// 「SQLServerでエラーが発生しました。」
+                //errorMessage = ErrorHandling.CreateErrorMessage("E4002");
+
+                //// log取得
+                //var exceptionMessage = ex.Message;
+                //_logger.LogError($"{exceptionMessage} {errorMessage}");
+
+                //var shippingImportErrorModel = new HandyErrorMessageModel
+                //{
+                //    Message = errorMessage + exceptionMessage
+                //};
+                //return View(shippingImportErrorModel);
+                return View();
+            }
+        }
+
+        /// <summary>
+        /// ユーザーマスター更新
+        /// </summary>
+        /// <param name="model">ユーザーマスターの更新情報</param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> Edit(M_User model)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+                if (user == null)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
+                }
+
+                // メイン倉庫IDをチェック
+                bool isDepoSelected = false;
+                foreach (SelectItem item in model.DepoSelectList)
+                {
+                    if (item.IsSelected)
+                    {
+                        isDepoSelected = true;
+                    }
+                }
+                // 更新情報をチェック
+                if (!ModelState.IsValid || !isDepoSelected)
+                {
+                    // エラーを作成
+                    // エラーコード：E2011
+                    //throw new Exception();
+                    return NotFound(new { errorMessage = "入力情報が間違っています。" });
+                }
+
+                // saltの作成とパスワードのハッシュ化
+                var salt = Hashing.GetRandomSalt();
+                var hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(model.Password, salt);
+                var stringSalt = Hashing.ConvertByteToString(salt);
+                model.Password = hashedPassword;
+                model.Salt = stringSalt;
+
+                // ユーザーマスター更新
+                bool isUpdateMuser = await M_UserConnectController.UpdateMUser(model, user);
+
+                // 更新件数が0の場合はエラーとする
+                if (!isUpdateMuser)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "更新はできませんでした。" });
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
+
+                // log取得
+                //var exceptionMessage = ex.Message;
+                //_logger.LogError($"{exceptionMessage} {errorMessage}");
+                return NotFound(new { errorMessage = "予期せぬエラーが発⽣しました。" });
+            }
+        }
+
+        /// <summary>
         /// ユーザーマスター削除
         /// </summary>
         /// <param name="userId"></param>
