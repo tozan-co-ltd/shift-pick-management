@@ -4,7 +4,6 @@ using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
-using System.Runtime.CompilerServices;
 using static mar_sumaken_web.Models.M_UserModel;
 
 namespace mar_sumaken_web.Controllers
@@ -432,7 +431,7 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// フォール出力
+        /// ファイル出力
         /// </summary>
         public JsonResult ExportFile()
         {
@@ -442,15 +441,46 @@ namespace mar_sumaken_web.Controllers
                 // log取得
                 _logger.LogInformation($"Excel出力開始");
 
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 管理権限区分が1(管理者)でない場合はエラーとする
+                if (user == null || user.AuthorizedKubun != 1)
+                {
+                    // エラーコード：E2011
+                    throw new Exception();
+                }
+
                 // テーブルデータ取得
-                DataTable dt = CreateDataTable();
+                DataTable mUserDataTable = CreateDataTable();
+
+                // ユーザーマスター情報取得SQL作成
+                var sql = M_UserConnectController.CreateSQLToSelectMUsers();
+                // DB接続
+                List<M_User> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
+                if (userList.Count > 0)
+                {
+                    foreach (M_User userItem in userList)
+                    {
+                        DataRow newRow = mUserDataTable.NewRow();
+                        newRow["ID"] = userItem.UserID.ToString();
+                        newRow["ログインID"] = userItem.LoginID.ToString();
+                        newRow["ユーザー名"] = userItem.UserName;
+                        newRow["メイン倉庫名"] = userItem.DepoName;
+                        newRow["管理権限区分"] = userItem.AuthorizedKubunName;
+                        newRow["更新日時"] = userItem.UpdatedAt.ToString();
+                        newRow["更新者"] = userItem.UpdatedBy;
+
+                        mUserDataTable.Rows.Add(newRow);
+                    }
+                }
 
                 // ファイル名
                 var tmpFilename = "ユーザーマスター.csv";
                 // CSVファイルへのパスを作成する
                 string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
                 // DataTableをCSVに変換する
-                Utils.ToCSV(dt, filePath);
+                Utils.ToCSV(mUserDataTable, filePath);
                 // ファイルの作成
                 var file = System.IO.File.ReadAllBytes(filePath);
 
@@ -469,12 +499,15 @@ namespace mar_sumaken_web.Controllers
             }
         }
 
+        /// <summary>
+        /// ユーザーマスターテーブルを作る
+        /// </summary>
         private DataTable CreateDataTable()
         {
             var table = new DataTable();
             table.Columns.Add("ID", typeof(string));
             table.Columns.Add("ログインID", typeof(string));
-            table.Columns.Add("ユーザー名 ", typeof(string));
+            table.Columns.Add("ユーザー名", typeof(string));
             table.Columns.Add("メイン倉庫名", typeof(string));
             table.Columns.Add("管理権限区分", typeof(string));
             table.Columns.Add("更新日時", typeof(string));
