@@ -91,6 +91,67 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
+        /// ユーザーの倉庫情報取得
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="databaseName"></param>
+        /// <returns></returns>
+        public static List<M_DepoModel> GetUserDepoByUserId(int userId, string databaseName)
+        {
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    // 倉庫マスター情報取得
+                    var userDepoSql = CreateSQLToGetRUserDepoList(userId);
+                    List<M_DepoModel> depoList = connection.Query<M_DepoModel>(userDepoSql).ToList();
+                    return depoList; 
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// ユーザーのハンディメニュー情報取得
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="databaseName"></param>
+        /// <returns></returns>
+        public static List<M_HandyMenuModel> GetUserMenuByUserId(int userId, string databaseName)
+        {
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    // ハンディメニューマスター情報取得
+                    var userHandyMenuSql = CreateSQLToGetRUserHandyMenuList(userId);
+                    List<M_HandyMenuModel> handyMenuList = connection.Query<M_HandyMenuModel>(userHandyMenuSql).ToList();
+                    return handyMenuList;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
         /// ユーザーマスター削除
         /// </summary>
         /// <param name="userId">ユーザーID</param>
@@ -277,6 +338,125 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
+        /// ユーザーマスターを更新
+        /// </summary>
+        /// <param name="mUserUpdate">更新ユーザー情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns></returns>
+        public static async Task<bool> UpdateMUser(M_User mUserUpdate, LoginUserModel loginUser)
+        {
+            bool result = true;
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+
+                    // ユーザーマスター更新SQL作成
+                    string userUpdateSql = CreateSQLToUpdateMUser(mUserUpdate, sysDate, loginUser.UserName);
+                    // ユーザーマスター更新
+                    var updatedRows = connection.Execute(userUpdateSql, null, transaction);
+                    // 更件数が0の場合はエラーとする
+                    if (updatedRows == 0)
+                    {
+                        result = false;
+                        // エラーコード：E2011
+                        throw new Exception();
+                    }
+
+                    // 削除して新規作成する
+                    string userDepoDeleteSql = CreateSQLToDeleteRUserDepoByUserId(mUserUpdate.UserID);
+                    await connection.ExecuteAsync(userDepoDeleteSql, null, transaction);
+                    // ユーザー倉庫中間テーブル更新
+                    foreach (SelectItem depo in mUserUpdate.DepoSelectList)
+                    {
+                        if (depo.IsSelected)
+                        {
+                            // ユーザー倉庫中間テーブル更新SQL作成
+                            string userDepoInsertSql = CreateSQLToInsertRUserDepo(mUserUpdate.UserID, depo.Value, sysDate, loginUser.UserName);
+                            int depoInsertCount = connection.Execute(userDepoInsertSql, null, transaction);
+                            // 更件数が0の場合はエラーとする
+                            if (depoInsertCount == 0)
+                            {
+                                result = false;
+                                // エラーコード：E2011
+                                throw new Exception();
+                            }
+                        }
+                    }
+
+                    // 削除して新規作成する
+                    string userHandyMenuDeleteSql = CreateSQLToDeleteRHandyMenuByUserId(mUserUpdate.UserID);
+                    await connection.ExecuteAsync(userHandyMenuDeleteSql, null, transaction);
+                    // ユーザーハンディメニュー中間テーブル登録
+                    foreach (SelectItem menu in mUserUpdate.HandyMenuSelectList)
+                    {
+                        if (menu.IsSelected)
+                        {
+                            // ユーザーハンディメニュー中間テーブル更新SQL作成
+                            string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(mUserUpdate.UserID, menu.Value, sysDate, loginUser.UserName);
+                            int menuInsertCount = connection.Execute(userMenuInsertSql, null, transaction);
+                            // 更件数が0の場合はエラーとする
+                            if (menuInsertCount == 0)
+                            {
+                                result = false;
+                                // エラーコード：E2011
+                                throw new Exception();
+                            }
+                        }
+                    }
+
+                    // トランザクションのコミット
+                    transaction.Commit();
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    // エラーコード：E2011
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        ///  ユーザー-倉庫中間テーブル削除SQL作成
+        /// </summary>
+        /// <param name="userID">更新ユーザーID</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToDeleteRUserDepoByUserId(int userID)
+        {
+            var sql = $@"
+               DELETE FROM R_UserDepo WHERE UserID = {userID};
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// ユーザーハンディメニュー中間テーブル削除SQL作成
+        /// </summary>
+        /// <param name="userID">更新ユーザーID</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToDeleteRHandyMenuByUserId(int userID)
+        {
+            var sql = $@"
+               DELETE FROM R_UserHandyMenu WHERE UserID = {userID};
+            ";
+            return sql;
+        }
+
+        /// <summary>
         /// ユーザーハンディメニュー中間テーブル登録SQL作成
         /// </summary>
         /// <param name="userId">登録ユーザーID</param>
@@ -331,6 +511,32 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
+        /// ユーザーマスター更新SQL作成
+        /// </summary>
+        /// <param name="mUser">更新情報</param>
+        /// <param name="updateAt">システムタイム</param>
+        /// <param name="updateBy">ユーザーID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToUpdateMUser(M_User mUser, DateTime updateAt, string updateBy)
+        {
+            var sql = $@"
+
+                UPDATE M_User
+                SET 
+                    UserName = '{mUser.UserName}',
+                    DepoID = {mUser.DepoID},
+                    AuthorizedKubun = {mUser.AuthorizedKubun},
+                    {(string.IsNullOrEmpty(mUser.Password) ? "" : $"Password = '{mUser.Password}',")}
+                    {(string.IsNullOrEmpty(mUser.Password) ? "" : $"Salt = '{mUser.Salt}',")}
+                    UpdatedAt = '{updateAt}',
+                    UpdatedBy = '{updateBy}'
+                WHERE
+                    UserId = {mUser.UserID}; 
+            ";
+            return sql;
+        }
+
+        /// <summary>
         /// 重複ユーザー情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
@@ -369,6 +575,40 @@ namespace mar_sumaken_web.Commons
                             WHEN m_user.AuthorizedKubun = 3 THEN '作業者(解除要)'
                             ELSE''
                         END AS AuthorizedKubunName
+                        ,m_user.UpdatedAt
+                        ,m_user.UpdatedBy                            
+                    FROM 
+                        M_User AS m_user
+                    INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
+                    WHERE
+                        m_user.IsDeleted = 0
+                        AND m_depo.IsDeleted = 0
+            ;";
+
+            return sql;
+        }
+
+        /// <summary>
+        /// IDでユーザーを選択するSQLを作成
+        /// </summary>
+        /// <param name="userId">ユーザーID</param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectMUserByUserId(int userId)
+        {
+            var sql = $@"
+                    SELECT
+                         m_user.UserID                                
+                        ,m_user.LoginID                              
+                        ,m_user.UserName
+                        ,m_user.DepoID
+	                    ,m_depo.DepoName
+                        ,m_user.AuthorizedKubun
+                        ,CASE 
+                            WHEN m_user.AuthorizedKubun = 1 THEN '管理者'
+                            WHEN m_user.AuthorizedKubun = 2 THEN '作業者'
+                            WHEN m_user.AuthorizedKubun = 3 THEN '作業者(解除要)'
+                            ELSE''
+                        END AS AuthorizedKubunName
                         ,FORMAT (m_user.CreatedAt, 'yyyy/MM/dd ') AS CreatedAt
                         ,m_user.CreatedBy
                         ,FORMAT (m_user.UpdatedAt, 'yyyy/MM/dd ') AS UpdatedAt
@@ -377,7 +617,8 @@ namespace mar_sumaken_web.Commons
                         M_User AS m_user
                     INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
                     WHERE
-                        m_user.IsDeleted = 0
+                        m_user.UserId = { userId }
+                        AND m_user.IsDeleted = 0
                         AND m_depo.IsDeleted = 0
             ;";
 
