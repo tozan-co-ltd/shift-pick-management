@@ -10,28 +10,31 @@
     </div>
 
     <div class="card-body">
+        <div class="col-md-12 pl-3 pb-3">
+            <form method="get" asp-controller="M_User" asp-action="Index">
+                <button type="submit" class="btn btn-secondary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-arrow-left-long"></i>
+                    </span>
+                    <span class="text">戻る</span>
+                </button>
+            </form>
+        </div>
+
         <div class="form-group col-sm-12">
             <p id="import-res" class="mt-1"></p>
         </div>
 
-        <div id="ErrorBlock" class="mb-3 ml-3 text-danger">
+        <div id="div-error-message" class="mb-3 ml-3 text-danger">
         </div>
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
                 <form class="col-md-12" id="mUserForm">
                     <div class="top-area">
-                        <div class="col-12 pb-2">
-                            <button type="button" onclick="history.back()" value="戻る" class="btn btn-secondary btn-icon-split">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-arrow-left-long"></i>
-                                </span>
-                                <span class="text">戻る</span>
-                            </button>
-                        </div>
-                        <div class="col-12 input-group">
+                        <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
-                                <label>@Html.DisplayName("LoginID")
+                                <label>@Html.DisplayName("LoginID")</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-5 column-2nd">
                                 <input type="hidden" asp-for="UserID" value="@Model.UserID" />
@@ -40,7 +43,7 @@
                                 <span class="text-danger w-100" asp-validation-for="LoginID"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group">
+                        <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
                                 <label>@Html.DisplayName("UserName")<span style="color:red">*</span></label>
                             </div>
@@ -49,17 +52,17 @@
                                 <span class="text-danger w-100" asp-validation-for="UserName"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group">
+                        <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
-                                <label>@Html.DisplayName("Password")
+                                <label>@Html.DisplayName("Password")</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-5 column-2nd">
                                 <input class="form-control" type="password" asp-for="Password" autocomplete="off" placeholder="変更する場合のみ入力">
+                                <small class="form-text text-muted w-100 p-1">4～12文字の半角英数字が使用できます。</small>
                                 <span class="text-danger w-100" asp-validation-for="Password"></span>
-                                <label for="password"><small>4～12文字の半角英数字が使用できます。</small></label>
                             </div>
                         </div>
-                        <div class="col-12 input-group">
+                        <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
                                 <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                             </div>
@@ -75,7 +78,7 @@
                     </div>
                     <hr />
                     <div class="down-area">
-                        <div class="col-12 input-group">
+                        <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-md-6 d-flex flex-wrap pl-0">
                                 <div class="col-12 col-sm-4 column-1st">
                                     <label>使用倉庫名<span style="color:red">*</span></label>
@@ -96,7 +99,7 @@
 
                             <div class="col-12 col-md-6 input-group pl-0">
                                 <div class="col-12 col-sm-4 column-1st">
-                                    <label>メイン倉庫区分<span style="color:red">*</span></label>
+                                    <label>メイン倉庫名<span style="color:red">*</span></label>
                                 </div>
                                 <div class="col-12 col-sm-8 column-2nd">
                                     <input type="hidden" id="origin-depo-id" value="@Model.DepoID">
@@ -107,7 +110,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 input-group mb-0">
+                        <div class="col-12 input-group div-input-group mb-0">
                             <div class="col-12 col-md-6 input-group pl-0">
                                 <div class="col-12 col-sm-4 column-1st">
                                     <label>使用ハンディメニュー名</label>
@@ -125,14 +128,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-md-6 input-group">
+                        <div class="col-12 col-md-6 input-group div-input-group">
                             <div class="col-12 offset-0 offset-md-4">
                                 <label>
                                     <small>作業者の場合は、使用するハンディメニューに<br />チェックを入れないとハンディで操作できません。</small>
                                 </label>
                             </div>
                         </div>
-                        <button class="btn btn-success btn-icon-split ml-2" style="min-width: 80px" onclick="OnEdit()">
+                        <button class="btn btn-success btn-icon-split" style="min-width: 80px" onclick="OnEdit()">
                             <span class="text">更新</span>
                         </button>
                     </div>
@@ -150,7 +153,7 @@
     function OnEdit() {
         $('#mUserForm').submit(function (event) {
 
-            $("#ErrorBlock").text("");
+            $("#div-error-message").text("");
             $('#import-res').text("");
 
             // フォーム情報を取得する
@@ -176,13 +179,13 @@
                     if (xhr.status === 404) {
                         // データが見つからなかった場合
                         var errorMessage = xhr.responseJSON.errorMessage;
-                        $("#ErrorBlock").hide();
+                        $("#div-error-message").hide();
                         $("#import-res").show();
                         $("#import-res").addClass('text-danger');
                         $("#import-res").text("エラー: " + errorMessage);
                     } else {
                         // その他のエラーの場合
-                        $("#ErrorBlock").hide();
+                        $("#div-error-message").hide();
                         $("#import-res").show();
                         $("#import-res").addClass('text-danger');
                         $("#import-res").text("更新を失敗しました。");

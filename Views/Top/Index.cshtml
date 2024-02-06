@@ -4,7 +4,12 @@
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.ViewTitle;
 }
-
+<style>
+    .bb-chart-arcs-title {
+        font-size: 1.7em !important;
+        font-weight: bold;
+    }
+</style>
 <div class="card shadow de-inspection m-4">
     <div class="card-header text-gray-800">
         @ViewData["Title"]
@@ -103,7 +108,7 @@
             },
             size: {
                 width: 300,
-                height: 150
+                height: 180
             },
             donut: {
                 title: donutTitle,

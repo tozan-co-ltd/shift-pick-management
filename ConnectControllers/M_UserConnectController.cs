@@ -575,9 +575,7 @@ namespace mar_sumaken_web.Commons
                             WHEN m_user.AuthorizedKubun = 3 THEN '作業者(解除要)'
                             ELSE''
                         END AS AuthorizedKubunName
-                        ,FORMAT (m_user.CreatedAt, 'yyyy/MM/dd ') AS CreatedAt
-                        ,m_user.CreatedBy
-                        ,FORMAT (m_user.UpdatedAt, 'yyyy/MM/dd ') AS UpdatedAt
+                        ,m_user.UpdatedAt
                         ,m_user.UpdatedBy                            
                     FROM 
                         M_User AS m_user

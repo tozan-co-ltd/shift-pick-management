@@ -10,6 +10,17 @@
     </div>
 
     <div class="card-body">
+        <div class="col-md-12 pl-3 pb-3">
+            <form method="get" asp-controller="M_User" asp-action="Index">
+                <button type="submit" class="btn btn-secondary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-arrow-left-long"></i>
+                    </span>
+                    <span class="text">戻る</span>
+                </button>
+            </form>
+        </div>
+
         <div class="form-group col-sm-12">
             <p id="import-res" class="mt-1"></p>
         </div>
@@ -21,15 +32,7 @@
             <div class="col-16 sp-tablet mb-3">
                 <form class="col-md-12" id="mUserForm">
                     <div class="top-area">
-                        <div class="col-12 pb-2">
-                            <button type="button" onclick="history.back()" value="戻る" class="btn btn-secondary btn-icon-split">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-arrow-left-long"></i>
-                                </span>
-                                <span class="text">戻る</span>
-                            </button>
-                        </div>
-                        <div class="col-12 input-group">
+                        <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
                                 <label>@Html.DisplayName("LoginID")<span style="color:red">*</span></label>
                             </div>
@@ -39,7 +42,7 @@
                                 <span class="text-danger w-100" asp-validation-for="LoginID"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group">
+                        <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
                                 <label>@Html.DisplayName("UserName")<span style="color:red">*</span></label>
                             </div>
@@ -48,7 +51,7 @@
                                 <span class="text-danger w-100" asp-validation-for="UserName"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group">
+                        <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
                                 <label>@Html.DisplayName("Password")<span style="color:red">*</span></label>
                             </div>
@@ -58,7 +61,7 @@
                                 <span class="text-danger w-100" asp-validation-for="Password"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group">
+                        <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
                                 <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                             </div>
@@ -74,7 +77,7 @@
                     </div>
                     <hr />
                     <div class="down-area">
-                        <div class="col-12 input-group">
+                        <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-md-6 d-flex flex-wrap pl-0">
                                 <div class="col-12 col-sm-4 column-1st">
                                     <label>使用倉庫名<span style="color:red">*</span></label>
@@ -90,10 +93,11 @@
                                             <label class="form-check-label" id="label-depo-name-@i" for="home-center">@Model.DepoSelectList[i].Name</label>
                                         </div>
                                     }
+                                    <span class="text-danger w-100" asp-validation-for="DepoID"></span>
                                 </div>
                             </div>
 
-                            <div class="col-12 col-md-6 input-group pl-0">
+                            <div class="col-12 col-md-6 input-group div-input-group pl-0">
                                 <div class="col-12 col-sm-4 column-1st">
                                     <label>メイン倉庫名<span style="color:red">*</span></label>
                                 </div>
@@ -105,7 +109,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 input-group mb-0">
+                        <div class="col-12 input-group div-input-group mb-0">
                             <div class="col-12 col-md-6 input-group pl-0">
                                 <div class="col-12 col-sm-4 column-1st">
                                     <label>使用ハンディメニュー名</label>
@@ -123,14 +127,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-md-6 input-group">
+                        <div class="col-12 col-md-6 input-group div-input-group">
                             <div class="col-12 offset-0 offset-md-4">
                                 <label>
                                     <small>作業者の場合は、使用するハンディメニューに<br />チェックを入れないとハンディで操作できません。</small>
                                 </label>
                             </div>
                         </div>
-                        <button class="btn btn-primary btn-icon-split ml-2" style="min-width: 80px" onclick="OnRegister()">
+                        <button class="btn btn-primary btn-icon-split" style="min-width: 80px" onclick="OnRegister()">
                             <span class="text">登録</span>
                         </button>
                     </div>
