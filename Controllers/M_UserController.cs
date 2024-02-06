@@ -1,4 +1,5 @@
-﻿using mar_sumaken_web.Commons;
+﻿using AutoMapper;
+using mar_sumaken_web.Commons;
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -285,7 +286,12 @@ namespace mar_sumaken_web.Controllers
                     }
                 }
 
-                return View(editUser);
+
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<M_User, M_UserEditModel>());
+                IMapper mapper = config.CreateMapper();
+                M_UserEditModel editModel = mapper.Map<M_UserEditModel>(editUser);
+
+                return View(editModel);
             }
             catch (Exception ex)
             {
@@ -334,6 +340,11 @@ namespace mar_sumaken_web.Controllers
                     }
                 }
                 // 更新情報をチェック
+                bool isNotChangePassword = string.IsNullOrWhiteSpace(model.Password);
+                if (isNotChangePassword)
+                {
+                    ModelState.Remove("Password");
+                }
                 if (!ModelState.IsValid || !isDepoSelected)
                 {
                     // エラーを作成
@@ -342,12 +353,15 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "入力情報が間違っています。" });
                 }
 
-                // saltの作成とパスワードのハッシュ化
-                var salt = Hashing.GetRandomSalt();
-                var hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(model.Password, salt);
-                var stringSalt = Hashing.ConvertByteToString(salt);
-                model.Password = hashedPassword;
-                model.Salt = stringSalt;
+                if (!isNotChangePassword)
+                {
+                    // saltの作成とパスワードのハッシュ化
+                    var salt = Hashing.GetRandomSalt();
+                    var hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(model.Password, salt);
+                    var stringSalt = Hashing.ConvertByteToString(salt);
+                    model.Password = hashedPassword;
+                    model.Salt = stringSalt;
+                }
 
                 // ユーザーマスター更新
                 bool isUpdateMuser = await M_UserConnectController.UpdateMUser(model, user);

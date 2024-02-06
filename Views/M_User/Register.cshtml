@@ -80,13 +80,14 @@
                                     <label>使用倉庫名<span style="color:red">*</span></label>
                                 </div>
                                 <div class="col-12 col-sm-8 column-2nd warehouse-checkbox">
+                                    <input type="hidden" id="select-depo-count" value="@Model.DepoSelectList.Count">
                                     @for (var i = 0; i < Model.DepoSelectList.Count; i++)
                                     {
                                         <div class="form-check">
                                             <input type="hidden" asp-for="DepoSelectList[i].Value" value="@Model.DepoSelectList[i].Value" />
                                             <input type="hidden" asp-for="DepoSelectList[i].Name" value="@Model.DepoSelectList[i].Value"/>
                                             <input class="form-check-input checkbox" asp-for="DepoSelectList[i].IsSelected" id="select-depo-@i" type="checkbox">
-                                            <label class="form-check-label" for="home-center">@Model.DepoSelectList[i].Name</label>
+                                            <label class="form-check-label" id="label-depo-name-@i" for="home-center">@Model.DepoSelectList[i].Name</label>
                                         </div>
                                     }
                                 </div>
@@ -188,11 +189,17 @@
 
     // メイン倉庫区分の値を更新
     $(document).ready(function () {
+        const depoSelectCount = $('#select-depo-count').val();
         const checkbox1 = document.getElementById('select-depo-0');
         const checkbox2 = document.getElementById('select-depo-1');
         const selectBox = document.getElementById('warehouse-select');
 
-        var selectItems = ["--使用倉庫名を選択してください--", "西尾物流センター", "○○センター"];
+        var selectItems = ["--使用倉庫名を選択してください--"];
+        for(var i = 0; i < depoSelectCount; i++) 
+        {
+            let depoName = $("#label-depo-name-" + i).text();
+            selectItems.push(depoName);
+        }
 
         // Listen change event
         checkbox1.addEventListener('change', updateSelectBox);

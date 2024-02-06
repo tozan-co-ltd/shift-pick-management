@@ -526,8 +526,8 @@ namespace mar_sumaken_web.Commons
                     UserName = '{mUser.UserName}',
                     DepoID = {mUser.DepoID},
                     AuthorizedKubun = {mUser.AuthorizedKubun},
-                    Password = '{mUser.Password}',
-                    Salt = '{mUser.Salt}',
+                    {(string.IsNullOrEmpty(mUser.Password) ? "" : $"Password = '{mUser.Password}',")}
+                    {(string.IsNullOrEmpty(mUser.Password) ? "" : $"Salt = '{mUser.Salt}',")}
                     UpdatedAt = '{updateAt}',
                     UpdatedBy = '{updateBy}'
                 WHERE
