@@ -1,4 +1,5 @@
 ﻿using mar_sumaken_web.Properties;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace mar_sumaken_web.Models
@@ -21,12 +22,12 @@ namespace mar_sumaken_web.Models
             /// <summary>
             /// 
             /// </summary>
-            public List<SelectItem> DepoSelectList { get; set; } = new List<SelectItem>();
+            public List<SelectListItem> DepoSelectList { get; set; } = new List<SelectListItem>();
 
             /// <summary>
             /// 
             /// </summary>
-            public List<SelectItem> HandyMenuSelectList { get; set; } = new List<SelectItem>();
+            public List<SelectListItem> HandyMenuSelectList { get; set; } = new List<SelectListItem>();
 
             /// <summary>
             /// 倉庫マスターリスト
