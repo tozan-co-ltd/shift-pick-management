@@ -1,10 +1,21 @@
-﻿using System.Data;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data;
 using System.Text;
 
 namespace mar_sumaken_web.Commons
 {
     public static class Utils
     {
+        /// <summary>
+        /// 会社区分リスト
+        /// </summary>
+        public readonly static List<SelectListItem> Const_Company_Kubun_List = new List<SelectListItem>()
+        {
+            new SelectListItem() { Value = "1", Text = "得意先", Selected = false },
+            new SelectListItem() { Value = "2", Text = "仕入先", Selected = false },
+            new SelectListItem() { Value = "3", Text = "納入先", Selected = false }
+        };
+
         /// <summary>
         /// CSVフィオルを作る
         /// </summary>

@@ -3,6 +3,7 @@ using mar_sumaken_web.Commons;
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 using static mar_sumaken_web.Models.M_UserModel;
 
@@ -89,10 +90,10 @@ namespace mar_sumaken_web.Controllers
                 var depoList = M_DepoConnectController.GetMDepoList(user.DatabaseName);
                 foreach (var depo in depoList)
                 {
-                    SelectItem depoItem = new SelectItem();
-                    depoItem.Name = depo.DepoName;
-                    depoItem.Value = depo.DepoID;
-                    depoItem.IsSelected = false;
+                    SelectListItem depoItem = new SelectListItem();
+                    depoItem.Text = depo.DepoName;
+                    depoItem.Value = Convert.ToString(depo.DepoID);
+                    depoItem.Selected = false;
 
                     model.DepoSelectList.Add(depoItem);
                 }
@@ -101,10 +102,10 @@ namespace mar_sumaken_web.Controllers
                 var menuList = M_HandyMenuConnectController.GetMHandyMenuList(user.DatabaseName);
                 foreach (var menu in menuList)
                 {
-                    SelectItem menuItem = new SelectItem();
-                    menuItem.Name = menu.HandyMenuName;
-                    menuItem.Value = menu.HandyMenuID;
-                    menuItem.IsSelected = false;
+                    SelectListItem menuItem = new SelectListItem();
+                    menuItem.Text = menu.HandyMenuName;
+                    menuItem.Value = Convert.ToString(menu.HandyMenuID);
+                    menuItem.Selected = false;
 
                     model.HandyMenuSelectList.Add(menuItem);
                 }
@@ -150,9 +151,9 @@ namespace mar_sumaken_web.Controllers
 
                 // メイン倉庫IDをチェック
                 bool isDepoSelected = false;
-                foreach (SelectItem item in model.DepoSelectList)
+                foreach (SelectListItem item in model.DepoSelectList)
                 {
-                    if (item.IsSelected)
+                    if (item.Selected)
                     {
                         isDepoSelected = true;
                     }
@@ -238,10 +239,10 @@ namespace mar_sumaken_web.Controllers
                 var depoList = M_DepoConnectController.GetMDepoList(user.DatabaseName);
                 foreach (var depo in depoList)
                 {
-                    SelectItem depoItem = new SelectItem();
-                    depoItem.Name = depo.DepoName;
-                    depoItem.Value = depo.DepoID;
-                    depoItem.IsSelected = false;
+                    SelectListItem depoItem = new SelectListItem();
+                    depoItem.Text = depo.DepoName;
+                    depoItem.Value = Convert.ToString(depo.DepoID);
+                    depoItem.Selected = false;
 
                     editUser.DepoSelectList.Add(depoItem);
                 }
@@ -249,10 +250,10 @@ namespace mar_sumaken_web.Controllers
                 var menuList = M_HandyMenuConnectController.GetMHandyMenuList(user.DatabaseName);
                 foreach (var menu in menuList)
                 {
-                    SelectItem menuItem = new SelectItem();
-                    menuItem.Name = menu.HandyMenuName;
-                    menuItem.Value = menu.HandyMenuID;
-                    menuItem.IsSelected = false;
+                    SelectListItem menuItem = new SelectListItem();
+                    menuItem.Text = menu.HandyMenuName;
+                    menuItem.Value = Convert.ToString(menu.HandyMenuID);
+                    menuItem.Selected = false;
 
                     editUser.HandyMenuSelectList.Add(menuItem);
                 }
@@ -263,10 +264,10 @@ namespace mar_sumaken_web.Controllers
                 {
                     foreach (var depo in userDepoList)
                     {
-                        var checkItem = editUser.DepoSelectList.FirstOrDefault(item => item.Value == depo.DepoID);
+                        var checkItem = editUser.DepoSelectList.FirstOrDefault(item => item.Value == Convert.ToString(depo.DepoID));
                         if (checkItem != null)
                         {
-                            checkItem.IsSelected = true;
+                            checkItem.Selected = true;
                         }
                     }
                 }
@@ -277,10 +278,10 @@ namespace mar_sumaken_web.Controllers
                 {
                     foreach (var menu in userMenuList)
                     {
-                        var checkItem = editUser.HandyMenuSelectList.FirstOrDefault(item => item.Value == menu.HandyMenuID);
+                        var checkItem = editUser.HandyMenuSelectList.FirstOrDefault(item => item.Value == Convert.ToString(menu.HandyMenuID));
                         if (checkItem != null)
                         {
-                            checkItem.IsSelected = true;
+                            checkItem.Selected = true;
                         }
                     }
                 }
@@ -331,9 +332,9 @@ namespace mar_sumaken_web.Controllers
 
                 // メイン倉庫IDをチェック
                 bool isDepoSelected = false;
-                foreach (SelectItem item in model.DepoSelectList)
+                foreach (SelectListItem item in model.DepoSelectList)
                 {
-                    if (item.IsSelected)
+                    if (item.Selected)
                     {
                         isDepoSelected = true;
                     }

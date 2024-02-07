@@ -89,9 +89,9 @@
                                     {
                                         <div class="form-check">
                                             <input type="hidden" asp-for="DepoSelectList[i].Value" value="@Model.DepoSelectList[i].Value" />
-                                            <input type="hidden" asp-for="DepoSelectList[i].Name" value="@Model.DepoSelectList[i].Value"/>
-                                            <input class="form-check-input checkbox" asp-for="DepoSelectList[i].IsSelected" id="select-depo-@i" type="checkbox">
-                                            <label class="form-check-label" id="label-depo-name-@i" for="select-depo-@i">@Model.DepoSelectList[i].Name</label>
+                                            <input type="hidden" asp-for="DepoSelectList[i].Text" value="@Model.DepoSelectList[i].Value"/>
+                                            <input class="form-check-input checkbox" asp-for="DepoSelectList[i].Selected" id="select-depo-@i" type="checkbox">
+                                            <label class="form-check-label" id="label-depo-name-@i" for="select-depo-@i">@Model.DepoSelectList[i].Text</label>
                                         </div>
                                     }
                                 </div>
@@ -120,9 +120,9 @@
                                     {
                                         <div class="form-check">
                                             <input type="hidden" asp-for="HandyMenuSelectList[i].Value" value="@Model.HandyMenuSelectList[i].Value" />
-                                            <input type="hidden" asp-for="HandyMenuSelectList[i].Name" value="@Model.HandyMenuSelectList[i].Name" />
-                                            <input class="form-check-input" asp-for="HandyMenuSelectList[i].IsSelected" type="checkbox">
-                                            <label class="form-check-label" asp-for="HandyMenuSelectList[i].IsSelected">@Model.HandyMenuSelectList[i].Name</label>
+                                            <input type="hidden" asp-for="HandyMenuSelectList[i].Text" value="@Model.HandyMenuSelectList[i].Text" />
+                                            <input class="form-check-input" asp-for="HandyMenuSelectList[i].Selected" type="checkbox">
+                                            <label class="form-check-label" asp-for="HandyMenuSelectList[i].Selected">@Model.HandyMenuSelectList[i].Text</label>
                                         </div>
                                     }
                                 </div>

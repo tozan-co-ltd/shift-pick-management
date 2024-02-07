@@ -2,6 +2,7 @@
 using mar_sumaken_web.Models;
 using System.Data.SqlClient;
 
+
 namespace mar_sumaken_web.Commons
 {
     /// <summary>
@@ -114,6 +115,66 @@ namespace mar_sumaken_web.Commons
             }
         }
 
+        /// <summary>
+        /// 重複会社情報をチェック
+        /// </summary>
+        /// <param name="companyCode"></param>
+        /// <param name="databaseName"></param>
+        /// <returns></returns>
+        public static bool IsDuplicateMCompanyByCompanyCode(int companyCode, string databaseName)
+        {
+            // 戻り値
+            bool isDuplicateValid = false;
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    var sql = CreateSQLToSelectDuplicateMCompany(companyCode);
+
+                    int result = Convert.ToInt32(connection.ExecuteScalar(sql));
+
+                    if (result > 0)
+                    {
+                        isDuplicateValid = true;
+                    }
+                }
+                return isDuplicateValid;
+            }
+            catch (Exception ex)
+            {
+                // エラーコード：E2011
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 重複会社情報取得SQL作成
+        /// </summary>
+        /// <param name="companyCode">会社コード</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectDuplicateMCompany(int companyCode)
+        {
+            var sql = $@"
+                    SELECT
+                        COUNT(*)                      
+                    FROM 
+                        M_Company
+                    WHERE
+                        CompanyCode = {companyCode}
+                        AND IsDeleted = 0
+            ";
+
+            return sql;
+        }
+
         // <summary>
         /// 会社マスター削除SQL作成
         /// </summary>
@@ -126,6 +187,60 @@ namespace mar_sumaken_web.Commons
                 SET IsDeleted = 1
                 WHERE CompanyID = {companyId}
             ;";
+            return sql;
+        }
+
+        /// <summary>
+        /// 会社情報登録
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <param name="loginUser">ログインユーザー</param>
+        /// <returns>インサート数</returns>
+        public static int InsertMCompany(M_CompanyModel model, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+                    // ユーザーマスター登録SQL作成
+                    string companyRegisterSql = CreateSQLToInsertMCompany(model, sysDate, loginUser.UserName);
+                    // ユーザーマスター登録
+                    var insertedCount = connection.Execute(companyRegisterSql);
+
+                    return insertedCount;
+                }
+                catch (Exception ex)
+                {
+                    // エラーコード：E2011
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 会社マスター登録SQL作成
+        /// </summary>
+        /// <param name="company">登録情報</param>
+        /// <param name="createAt">システムタイム</param>
+        /// <param name="createBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToInsertMCompany(M_CompanyModel company, DateTime createdAt, string createdBy)
+        {
+            var sql = $@"
+                INSERT INTO M_Company
+                    (CompanyCode, CompanyKubun, CompanyName, ClientName, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
+                VALUES (
+                    '{company.CompanyCode}','{company.CompanyKubun}','{company.CompanyName}','{company.ClientName}','{createdAt}','{createdBy}','{createdAt}','{createdBy}'
+                );
+            ";
             return sql;
         }
     }

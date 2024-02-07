@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using mar_sumaken_web.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
 using static mar_sumaken_web.Models.M_UserModel;
 
@@ -288,12 +289,12 @@ namespace mar_sumaken_web.Commons
 
                     int userId = (int) insertedUserId;
                     // ユーザー倉庫中間テーブル登録
-                    foreach (SelectItem depo in mUserRegister.DepoSelectList)
+                    foreach (SelectListItem depo in mUserRegister.DepoSelectList)
                     {
-                        if (depo.IsSelected)
+                        if (depo.Selected)
                         {
                             // ユーザー倉庫中間テーブル登録SQL作成
-                            string userDepoInsertSql = CreateSQLToInsertRUserDepo(userId, depo.Value, sysDate, loginUser.UserName);
+                            string userDepoInsertSql = CreateSQLToInsertRUserDepo(userId, Convert.ToInt32(depo.Value), sysDate, loginUser.UserName);
                             int depoInsertCount = connection.Execute(userDepoInsertSql, null, transaction);
                             // 更件数が0の場合はエラーとする
                             if (depoInsertCount == 0)
@@ -306,12 +307,12 @@ namespace mar_sumaken_web.Commons
                     }
 
                     // ユーザーハンディメニュー中間テーブル登録
-                    foreach (SelectItem menu in mUserRegister.HandyMenuSelectList)
+                    foreach (SelectListItem menu in mUserRegister.HandyMenuSelectList)
                     {
-                        if(menu.IsSelected)
+                        if(menu.Selected)
                         {
                             // ユーザーハンディメニュー中間テーブル登録SQL作成
-                            string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(userId, menu.Value, sysDate, loginUser.UserName);
+                            string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(userId, Convert.ToInt32(menu.Value), sysDate, loginUser.UserName);
                             int menuInsertCount = connection.Execute(userMenuInsertSql, null, transaction);
                             // 更件数が0の場合はエラーとする
                             if (menuInsertCount == 0)
@@ -378,12 +379,12 @@ namespace mar_sumaken_web.Commons
                     string userDepoDeleteSql = CreateSQLToDeleteRUserDepoByUserId(mUserUpdate.UserID);
                     await connection.ExecuteAsync(userDepoDeleteSql, null, transaction);
                     // ユーザー倉庫中間テーブル更新
-                    foreach (SelectItem depo in mUserUpdate.DepoSelectList)
+                    foreach (SelectListItem depo in mUserUpdate.DepoSelectList)
                     {
-                        if (depo.IsSelected)
+                        if (depo.Selected)
                         {
                             // ユーザー倉庫中間テーブル更新SQL作成
-                            string userDepoInsertSql = CreateSQLToInsertRUserDepo(mUserUpdate.UserID, depo.Value, sysDate, loginUser.UserName);
+                            string userDepoInsertSql = CreateSQLToInsertRUserDepo(mUserUpdate.UserID, Convert.ToInt32(depo.Value), sysDate, loginUser.UserName);
                             int depoInsertCount = connection.Execute(userDepoInsertSql, null, transaction);
                             // 更件数が0の場合はエラーとする
                             if (depoInsertCount == 0)
@@ -399,12 +400,12 @@ namespace mar_sumaken_web.Commons
                     string userHandyMenuDeleteSql = CreateSQLToDeleteRHandyMenuByUserId(mUserUpdate.UserID);
                     await connection.ExecuteAsync(userHandyMenuDeleteSql, null, transaction);
                     // ユーザーハンディメニュー中間テーブル登録
-                    foreach (SelectItem menu in mUserUpdate.HandyMenuSelectList)
+                    foreach (SelectListItem menu in mUserUpdate.HandyMenuSelectList)
                     {
-                        if (menu.IsSelected)
+                        if (menu.Selected)
                         {
                             // ユーザーハンディメニュー中間テーブル更新SQL作成
-                            string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(mUserUpdate.UserID, menu.Value, sysDate, loginUser.UserName);
+                            string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(mUserUpdate.UserID, Convert.ToInt32(menu.Value), sysDate, loginUser.UserName);
                             int menuInsertCount = connection.Execute(userMenuInsertSql, null, transaction);
                             // 更件数が0の場合はエラーとする
                             if (menuInsertCount == 0)
