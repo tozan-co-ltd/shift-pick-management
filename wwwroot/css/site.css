@@ -748,6 +748,9 @@ select[readonly] {
 }
 
 /*Å@--------------Input form ---------------*/
+.div-input-group {
+    margin-bottom: 10px;
+}
 .column-1st {
     padding-left: 0 !important;
     margin-bottom: 0.25rem !important;
@@ -756,5 +759,4 @@ select[readonly] {
 .column-2nd {
     margin-bottom: 0.25rem !important;
 }
-
 /*Å@--------------Input form ---------------*/

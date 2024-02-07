@@ -60,14 +60,14 @@
                         {
                             <tr>
                                 <td>
-                                    <button class="btn btn-secondary btn-icon-split"
+                                    <button class="btn btn-secondary btn-icon-split" title="詳細" 
                                     onclick="OnDetailClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#userDetailModal">
                                         <i class="fa-solid fa-list"></i>
                                     </button>
-                                    <button class="btn btn-success btn-icon-split ml-1 mr-1" onclick="OnEditClick('@item.UserID')">
+                                    <a class="btn btn-success btn-icon-split ml-1 mr-1" title="編集" asp-controller="M_User" asp-action="Edit" asp-route-id="@item.UserID">
                                         <i class="fa-solid fa-pen"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-icon-split"
+                                    </a>
+                                    <button class="btn btn-danger btn-icon-split" title="削除"
                                     onclick="OnDeleteClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#userDeleteModal">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>

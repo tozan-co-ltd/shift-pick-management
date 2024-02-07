@@ -68,5 +68,104 @@ namespace mar_sumaken_web.Properties {
                 return ResourceManager.GetString("E1001", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   {0}は{2}～{1}文字の間で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1002 {
+            get {
+                return ResourceManager.GetString("E1002", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   {0}は半角英数字で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1003 {
+            get {
+                return ResourceManager.GetString("E1003", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   QRコードが正しくありません。正しいQRコードを読み取ってください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2001 {
+            get {
+                return ResourceManager.GetString("E2001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   アプリのバージョンが正しくありません。最新バージョンをダウンロードしてください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2002 {
+            get {
+                return ResourceManager.GetString("E2002", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   {0}データがありません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2003 {
+            get {
+                return ResourceManager.GetString("E2003", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ログインIDが正しくありません。正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2004 {
+            get {
+                return ResourceManager.GetString("E2004", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   データベースに接続できませんでした。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E3001 {
+            get {
+                return ResourceManager.GetString("E3001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   サーバーに接続できませんでした。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E3002 {
+            get {
+                return ResourceManager.GetString("E3002", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ネットワークに接続できませんでした。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E3003 {
+            get {
+                return ResourceManager.GetString("E3003", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   SQLServerでエラーが発生しました。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E4001 {
+            get {
+                return ResourceManager.GetString("E4001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   予期せぬエラーが発生しました。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E9999 {
+            get {
+                return ResourceManager.GetString("E9999", resourceCulture);
+            }
+        }
     }
 }
