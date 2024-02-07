@@ -21,6 +21,11 @@
         public int CompanyKubun { set; get; }
 
         /// <summary>
+        /// 会社区分名
+        /// </summary>
+        public string CompanyKubunName { set; get; }
+
+        /// <summary>
         /// 会社名
         /// </summary>
         public string CompanyName { set; get; }
