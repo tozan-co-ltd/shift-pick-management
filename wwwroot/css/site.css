@@ -216,8 +216,10 @@ body {
 /*Å™navbar custom*/
 
 /*Å´dropdown-menu custom*/
+
 .dropdown-menu {
     --bs-dropdown-min-width: 20rem !important;
+    min-width: 14rem;
 }
 
     .dropdown-menu a.dropdown-item:focus {
@@ -384,7 +386,7 @@ table.sticky_table {
 
 .navbar-expand .navbar-nav .dropdown-menu{
     top: 45px;
-    left: -45px;
+    left: -195px;
 }
 
 #accordionSidebar .collapse-inner {
@@ -399,6 +401,9 @@ table.sticky_table {
 }
 
 @media (max-width: 768px) {
+    .navbar-expand .navbar-nav .dropdown-menu{
+        left: -40vw;
+    }
     .sidebar .nav-item .nav-link {
         width: 5rem;
     }
@@ -524,7 +529,7 @@ table .btn-primary.btn-icon-split {
 .de-inspection .btn-primary.btn-icon-split {
     min-width: 100px;
     height: 39px;
-    width: 101px;
+    /*width: 101px;*/
 }
 
 .de-inspection .change-password-icon {

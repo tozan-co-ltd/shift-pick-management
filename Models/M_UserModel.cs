@@ -6,7 +6,7 @@ namespace mar_sumaken_web.Models
     /// <summary>
     /// ユーザーマスターのModel
     /// </summary>
-    public class M_UserModel
+    public class M_UserModel: CommonModel
     {
         /// <summary>
         /// ユーザーマスターリスト
@@ -16,7 +16,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 
         /// </summary>
-        public class M_User
+        public class M_User : CommonModel
         {
             /// <summary>
             /// 

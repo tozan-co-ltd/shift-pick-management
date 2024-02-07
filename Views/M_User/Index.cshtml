@@ -1,6 +1,8 @@
-﻿@model mar_sumaken_web.Models.M_UserModel
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.M_UserModel
 @{
-    ViewData["Title"] = "マスター情報 - ユーザーマスター";
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = "マスター情報 - " + Model.ViewTitle;
 }
 <style type="text/css">
     .btn-register {

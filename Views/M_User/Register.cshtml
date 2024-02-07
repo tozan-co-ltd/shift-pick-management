@@ -1,6 +1,8 @@
-﻿@model mar_sumaken_web.Models.M_UserModel.M_User
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.M_UserModel.M_User
 @{
-    ViewData["Title"] = "マスター情報 - ユーザーマスター - 登録";
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = "マスター情報 - " + Model.ViewTitle;
 }
 
 <div class="card user-master shadow masterInfo m-4">
