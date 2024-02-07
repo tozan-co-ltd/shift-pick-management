@@ -1,11 +1,12 @@
 ﻿using Dapper;
-using System.Data.SqlClient;
 using mar_sumaken_web.Models;
+using System.Data.SqlClient;
+
 
 namespace mar_sumaken_web.Commons
 {
     /// <summary>
-    /// 会社に関する関数
+    /// 会社マスターに関する関数
     /// </summary>
     public static class M_CompanyConnectController
     {
@@ -14,7 +15,7 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
-        /// <returns>ユーザー情報</returns>
+        /// <returns>会社情報</returns>
         public static List<M_CompanyModel> ConnectMCompanys(string sql, string databaseName)
         {
             // 戻り値
@@ -42,9 +43,9 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 会社SELECT文SQL作成
+        /// 会社マスターSELECT文SQL作成
         /// </summary>
-        /// <returns>SQL</returns>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToSelectMCompanys()
         {
             var sql = $@"

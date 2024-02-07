@@ -110,7 +110,7 @@
                         <th>仕入先品番</th>
                         <th>収容数</th>
                         <th>箱数</th>
-                        <th>納入指数量</th>
+                        <th>納入指示数</th>
                         <th>出庫箱数</th>
                         <th>出庫数量</th>
                         <th>発注元</th>
@@ -137,11 +137,11 @@
                             <tr>
                                 <td>
                                     <button class="btn btn-secondary btn-icon-split"
-                                            onclick="OnDetailClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#userDetailModal">
+                                            onclick="OnDetailClick('@item.ShipmentScheduleID')" data-id="@item.ShipmentScheduleID" data-toggle="modal" data-target="#shipmentScheduleDetailModal">
                                         <i class="fa-solid fa-list"></i>
                                     </button>
                                     <button class="btn btn-danger btn-icon-split"
-                                            onclick="OnDeleteClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#userDeleteModal">
+                                            onclick="OnDeleteClick('@item.ShipmentScheduleID')" data-id="@item.ShipmentScheduleID" data-toggle="modal" data-target="#shipmentScheduleDeleteModal">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </td>
@@ -149,13 +149,13 @@
                                 <td>@item.OrdererCode</td>
                                 <td>@item.OrdererFactoryKubun</td>
                                 <td>@item.OrdererName</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>@item.OrdererFactoryName</td>
+                                <td>@item.ShipperCode</td>
+                                <td>@item.ShipperFactoryKubun</td>
+                                <td>@item.ShipperName</td>
+                                <td>@item.DeliveryCode</td>
+                                <td>@item.DeliveryFactoryKubun</td>
+                                <td>@item.DeliveryLocation</td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
