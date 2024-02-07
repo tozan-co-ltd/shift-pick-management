@@ -231,9 +231,9 @@ namespace mar_sumaken_web.Controllers
                 if (companyWebPath != "")
                 {
                     // SQL作成
-                    var sql = M_CompanyConnectController.CreateSQLToSelectMCompanyByWebPath(companyWebPath);
+                    var sql = Warehouse_M_CompanyConnectController.CreateSQLToSelectMCompanyByWebPath(companyWebPath);
                     // DB接続
-                    Warehouse_M_CompanyModel? companyModel = M_CompanyConnectController.ConnectMCompanny(sql);
+                    Warehouse_M_CompanyModel? companyModel = Warehouse_M_CompanyConnectController.ConnectMCompanny(sql);
 
                     return companyModel;
                 }

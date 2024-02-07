@@ -1,7 +1,7 @@
 ﻿namespace mar_sumaken_web.Models
 {
     /// <summary>
-    /// ログインユーザーモデル
+    /// ログイン中ユーザーモデル
     /// </summary>
     public class LoginUserModel
     {
