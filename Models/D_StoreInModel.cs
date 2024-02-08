@@ -5,9 +5,8 @@ using X.PagedList;
 
 namespace mar_sumaken_web.Models
 {
-    public class D_StoreOutModel : CommonModel
+    public class D_StoreInModel: CommonModel
     {
-
         /// <summary>
         /// 出庫日
         /// </summary>
@@ -58,18 +57,17 @@ namespace mar_sumaken_web.Models
         public List<string> LstErrorMsg { set; get; }//エラーメッセージリスト
         public string Message { set; get; }
 
-        public IPagedList<D_StoreOutModel> LstD_StoreOut { set; get; }//一覧画面のlistを取得と設定
+        public IPagedList<D_StoreInModel> LstD_StoreOut { set; get; }//一覧画面のlistを取得と設定
 
         // <summary>
         /// 初期値設定
         /// </summary>
-        public D_StoreOutModel()
+        public D_StoreInModel()
         {
             var now = DateTime.Today.ToString("yyyy/MM/dd"); //　現在日
             var oneMonthAgo = DateTime.Today.AddMonths(-1).ToString("yyyy/MM/dd");  //　一月前
             DateSearchStart = oneMonthAgo;
             DateSearchEnd = now;
         }
-        
     }
 }

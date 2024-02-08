@@ -15,10 +15,10 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns>倉庫マスター情報</returns>
-        public static List<D_StoreOutModel.D_StoreOut> ConnectD_StoreOut(string sql, string databaseName)
+        public static List<D_StoreOutModel> ConnectD_StoreOut(string sql, string databaseName)
         {
             // 戻り値
-            List<D_StoreOutModel.D_StoreOut> strList = new();
+            List<D_StoreOutModel> strList = new();
 
             // DB接続
             try
@@ -31,7 +31,7 @@ namespace mar_sumaken_web.ConnectControllers
                     connection.ConnectionString = connectionString;
                     connection.Open();
 
-                    strList = connection.Query<D_StoreOutModel.D_StoreOut>(sql).ToList();
+                    strList = connection.Query<D_StoreOutModel>(sql).ToList();
                 }
                 return strList;
             }
@@ -45,7 +45,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// 出庫情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetD_StoreOutList(D_StoreOutModel.D_StoreOut model)
+        public static string CreateSQLToGetD_StoreOutList(D_StoreOutModel model)
         {
             string dateSearchStart = model.DateSearchStart + " " + "00:00:00.000";
             string dateSearchEnd = model.DateSearchEnd + " " + "23:59:59.999";
@@ -53,7 +53,7 @@ namespace mar_sumaken_web.ConnectControllers
             var sql = $@"
                         SELECT 
                             StoreOutID,
-                            StoreOutDate
+                            FORMAT(StoreOutDate, 'yyyy/MM/dd HH:mm:ss') AS StoreOutDate
                         FROM 
 	                        D_StoreOut
                         WHERE StoreOutDate >= CONVERT(datetime, '{dateSearchStart}') 

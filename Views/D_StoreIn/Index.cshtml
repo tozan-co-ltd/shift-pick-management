@@ -1,6 +1,8 @@
-﻿@* @model mar_sumaken_web.Models.D_ReceiveScheduleModel *@
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.D_StoreInModel;
 @{
-    ViewData["Title"] = "在庫 - 入庫実績照会・修正";
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 
 <div class="card shadow de-inspection d-store-in m-4">

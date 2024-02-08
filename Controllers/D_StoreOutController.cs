@@ -9,10 +9,10 @@ namespace mar_sumaken_web.Controllers
 {
     public class D_StoreOutController : BaseController
     {
-        public IActionResult Index(D_StoreOutModel.D_StoreOut model)
+        public IActionResult Index(D_StoreOutModel model)
         {
             if (model == null)
-                model = new D_StoreOutModel.D_StoreOut();
+                model = new D_StoreOutModel();
 
             return View(model);
         }
@@ -23,7 +23,7 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         /// <param name="model">model</param>
         /// <returns>倉庫マスター情報</returns>
-        public IActionResult SearchData(D_StoreOutModel.D_StoreOut model)
+        public IActionResult SearchData(D_StoreOutModel model)
         {
             string? errorMessage;
 
@@ -33,7 +33,7 @@ namespace mar_sumaken_web.Controllers
                 var searchData = string.Empty;
                 if (listD_StoreOut.Count > 0)
                 {
-                    IEnumerable<D_StoreOutModel.D_StoreOut> query = listD_StoreOut.Select(s => s);
+                    IEnumerable<D_StoreOutModel> query = listD_StoreOut.Select(s => s);
                     model.LstD_StoreOut = query.ToPagedList();
 
                     foreach (var item in model.LstD_StoreOut)
@@ -71,13 +71,13 @@ namespace mar_sumaken_web.Controllers
         /// <param name="model">model</param>
         /// <param name="databaseName">string</param>
         /// <returns> 在庫 - 出庫情報</returns>
-        public List<D_StoreOutModel.D_StoreOut> GetListD_StoreOut(D_StoreOutModel.D_StoreOut model, string databaseName)
+        public List<D_StoreOutModel> GetListD_StoreOut(D_StoreOutModel model, string databaseName)
         {
             // SQL作成
             var sql = D_StoreOutConnectController.CreateSQLToGetD_StoreOutList(model);
 
             // DB接続
-            List<D_StoreOutModel.D_StoreOut> strList = D_StoreOutConnectController.ConnectD_StoreOut(sql, databaseName);
+            List<D_StoreOutModel> strList = D_StoreOutConnectController.ConnectD_StoreOut(sql, databaseName);
 
             return strList;
         }

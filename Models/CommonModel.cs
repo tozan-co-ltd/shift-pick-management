@@ -51,6 +51,11 @@ namespace mar_sumaken_web.Models
         public string ViewTitle { get; set; }
 
         /// <summary>
+        /// カテゴリーイトル
+        /// </summary>
+        public string CategoryTitle { get; set; }
+
+        /// <summary>
         /// 倉庫リスト
         /// </summary>
         public IEnumerable<SelectListItem> MDepoList { get; set; }
@@ -74,9 +79,52 @@ namespace mar_sumaken_web.Models
             UserID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value);
             Role = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_Role).First().Value);          
             ControllerName = viewContext.RouteData.Values["controller"].ToString();
+            CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();
             MDepoList = GetMDepoList(DataBaseName);
             MCompanyList = GetMCompanyList(DataBaseName);
+        }
+
+        /// <summary>
+        /// タイトルビューを取得
+        /// </summary>
+        /// <returns>ページのタイトル</returns>
+        public string GetCategoryTitle()
+        {
+            string categoryTitle = "";
+
+            try
+            {
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionStringForMaster();
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string commandText = $@"
+                              SELECT
+	                            A.CategoryName AS CategoryName
+                              FROM M_WebMenuCategory AS A
+                              LEFT OUTER JOIN M_WebMenuController AS B ON  (A.CategoryID = B.CategoryID)
+                              LEFT OUTER JOIN M_WebMenu AS C ON  (C.CategoryID = B.CategoryID AND C.MenuID = B.MenuID)
+                              WHERE 1=1
+                                  AND C.CompanyID = @CompanyID
+                                  AND B.Controller    = @Controller
+                        ";
+
+                     var param = new
+                    {
+                        CompanyID = CompanyID,
+                        Controller = ControllerName
+                    };
+                    categoryTitle = connection.ExecuteScalar<string>(commandText, param);
+                }
+            }
+            catch (Exception ex)
+            {
+                //DB取得エラー
+                return categoryTitle;
+            }
+
+            return categoryTitle;
         }
 
         /// <summary>
