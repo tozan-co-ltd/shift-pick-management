@@ -86,9 +86,9 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// タイトルビューを取得
+        /// ページタイトル(カテゴリー名)取得
         /// </summary>
-        /// <returns>ページのタイトル</returns>
+        /// <returns>カテゴリー名</returns>
         public string GetCategoryTitle()
         {
             string categoryTitle = "";
@@ -101,13 +101,15 @@ namespace mar_sumaken_web.Models
                     connection.Open();
                     string commandText = $@"
                               SELECT
-	                            A.CategoryName AS CategoryName
+	                                A.CategoryName AS CategoryName
                               FROM M_WebMenuCategory AS A
-                              LEFT OUTER JOIN M_WebMenuController AS B ON  (A.CategoryID = B.CategoryID)
-                              LEFT OUTER JOIN M_WebMenu AS C ON  (C.CategoryID = B.CategoryID AND C.MenuID = B.MenuID)
+                              LEFT OUTER JOIN 
+                                    M_WebMenuController AS B ON (A.CategoryID = B.CategoryID)
+                              LEFT OUTER JOIN 
+                                    M_WebMenu AS C ON (C.CategoryID = B.CategoryID AND C.MenuID = B.MenuID)
                               WHERE 1=1
-                                  AND C.CompanyID = @CompanyID
-                                  AND B.Controller    = @Controller
+                                  AND C.CompanyID   = @CompanyID
+                                  AND B.Controller  = @Controller
                         ";
 
                      var param = new
@@ -128,9 +130,9 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// タイトルビューを取得
+        /// ページタイトル(WEBメニュー名)取得
         /// </summary>
-        /// <returns>ページのタイトル</returns>
+        /// <returns>WEBメニュー名</returns>
         public string GetViewTitle()
         {
             string pageTitle = "";
@@ -143,12 +145,14 @@ namespace mar_sumaken_web.Models
                     connection.Open();
                     string commandText = $@"
                               SELECT
-	                            A.MenuName AS MenuName
-                              FROM M_WebMenu AS A
-                              LEFT OUTER JOIN M_WebMenuController AS B ON  (A.CategoryID = B.CategoryID AND A.MenuID = B.MenuID)
+	                                A.MenuName          AS MenuName
+                              FROM M_WebMenu            AS A
+                              LEFT OUTER JOIN 
+                                    M_WebMenuController AS B 
+                                    ON (A.CategoryID = B.CategoryID AND A.MenuID = B.MenuID)
                               WHERE 1=1
-                                  AND A.CompanyID = @CompanyID
-                                  AND B.Controller    = @Controller
+                                    AND A.CompanyID     = @CompanyID
+                                    AND B.Controller    = @Controller
                               ORDER BY SortNumber Asc
                         ";
 

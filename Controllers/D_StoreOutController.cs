@@ -9,6 +9,11 @@ namespace mar_sumaken_web.Controllers
 {
     public class D_StoreOutController : BaseController
     {
+        /// <summary>
+        /// 出庫実績照会・修正画面表示
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public IActionResult Index(D_StoreOutModel model)
         {
             if (model == null)
@@ -19,10 +24,10 @@ namespace mar_sumaken_web.Controllers
 
 
         /// <summary>
-        /// 検索実装
+        /// 検索ボタン押下
         /// </summary>
-        /// <param name="model">model</param>
-        /// <returns>倉庫マスター情報</returns>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public IActionResult SearchData(D_StoreOutModel model)
         {
             string? errorMessage;
@@ -31,6 +36,8 @@ namespace mar_sumaken_web.Controllers
             {
                 var listD_StoreOut = GetListD_StoreOut(model, ClaimsLoginUserData().DatabaseName);
                 var searchData = string.Empty;
+
+                // 表示用のhtml作成
                 if (listD_StoreOut.Count > 0)
                 {
                     IEnumerable<D_StoreOutModel> query = listD_StoreOut.Select(s => s);
@@ -57,24 +64,22 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception ex)
             {
-                // log取得
                 var exceptionMessage = ex.Message;
-     
                 return Content(exceptionMessage);
             }
         }
 
 
         /// <summary>
-        /// 在庫 - 出庫一覧データを取得
+        /// 出庫実績情報取得
         /// </summary>
         /// <param name="model">model</param>
         /// <param name="databaseName">string</param>
-        /// <returns> 在庫 - 出庫情報</returns>
+        /// <returns>出庫実績情報</returns>
         public List<D_StoreOutModel> GetListD_StoreOut(D_StoreOutModel model, string databaseName)
         {
             // SQL作成
-            var sql = D_StoreOutConnectController.CreateSQLToGetD_StoreOutList(model);
+            var sql = D_StoreOutConnectController.CreateSQLToGetDStoreOut(model);
 
             // DB接続
             List<D_StoreOutModel> strList = D_StoreOutConnectController.ConnectD_StoreOut(sql, databaseName);

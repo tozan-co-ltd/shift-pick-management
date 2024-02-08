@@ -41,10 +41,6 @@ namespace mar_sumaken_web.Models
             }
         }
 
-        public int StoreOutID { get; set; }
-
-        public string StoreOutDate { get; set; }
-
         /// <summary>
         /// 選択された倉庫ID
         /// </summary>
@@ -55,18 +51,41 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public int SelectedCompanyID { get; set; }
 
-        public List<string> LstErrorMsg { set; get; }//エラーメッセージリスト
+        /// <summary>
+        /// 
+        /// </summary>
+        public int StoreOutID { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string StoreOutDate { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<string> LstErrorMsg { set; get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string Message { set; get; }
 
-        public IPagedList<D_StoreOutModel> LstD_StoreOut { set; get; }//一覧画面のlistを取得と設定
+        /// <summary>
+        /// 
+        /// </summary>
+        public IPagedList<D_StoreOutModel> LstD_StoreOut { set; get; }
 
-        // <summary>
+        /// <summary>
         /// 初期値設定
         /// </summary>
         public D_StoreOutModel()
         {
-            var now = DateTime.Today.ToString("yyyy/MM/dd"); //　現在日
-            var oneMonthAgo = DateTime.Today.AddMonths(-1).ToString("yyyy/MM/dd");  //　一月前
+            // 現在日
+            var now = DateTime.Today.ToString("yyyy/MM/dd");
+            // 1ヶ月前
+            var oneMonthAgo = DateTime.Today.AddMonths(-1).ToString("yyyy/MM/dd"); 
+
             DateSearchStart = oneMonthAgo;
             DateSearchEnd = now;
         }

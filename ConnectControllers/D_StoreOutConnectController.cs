@@ -42,18 +42,17 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
-        /// 出庫情報取得SQL作成
+        /// 出庫実績情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetD_StoreOutList(D_StoreOutModel model)
+        public static string CreateSQLToGetDStoreOut(D_StoreOutModel model)
         {
             string dateSearchStart = model.DateSearchStart + " " + "00:00:00.000";
             string dateSearchEnd = model.DateSearchEnd + " " + "23:59:59.999";
 
             var sql = $@"
                         SELECT 
-                            StoreOutID,
-                            FORMAT(StoreOutDate, 'yyyy/MM/dd HH:mm:ss') AS StoreOutDate
+                            *
                         FROM 
 	                        D_StoreOut
                         WHERE StoreOutDate >= CONVERT(datetime, '{dateSearchStart}') 
