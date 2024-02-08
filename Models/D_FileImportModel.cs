@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using X.PagedList;
 
 namespace mar_sumaken_web.Models
 {
@@ -13,7 +14,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// ファイル取込実績リスト
         /// </summary>
-        public List<D_FileImportModel> D_FileImportList { get; set; }
+        public IPagedList<D_FileImportModel> D_FileImportList { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -79,5 +80,10 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "登録者")]
         public string CreatedBy { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Message { set; get; }
     }
 }
