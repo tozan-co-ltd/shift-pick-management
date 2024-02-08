@@ -153,7 +153,10 @@ namespace mar_sumaken_web.Controllers
 
                 // 使用倉庫をチェック
                 bool isSelectedDepo = model.RDepoProductsRegister.Any(item => item.Selected);
-                if (!isSelectedDepo) { ModelState.AddModelError("RDepoProductsRegister", ErrorMessagesResources.E1001); }
+                if (!isSelectedDepo)
+                {
+                    ModelState.AddModelError("RDepoProductsRegister", ErrorMessagesResources.E1001); 
+                }
 
                 // 登録情報をチェック
                 if (!ModelState.IsValid)
