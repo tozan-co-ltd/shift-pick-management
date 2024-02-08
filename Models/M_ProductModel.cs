@@ -24,7 +24,6 @@ namespace mar_sumaken_web.Models
         /// 登録使用倉庫リスト
         /// </summary>
         [Display(Name = "使用倉庫名")]
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public List<SelectListItem> RDepoProductsRegister {
             get
             {
