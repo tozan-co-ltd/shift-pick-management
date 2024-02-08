@@ -1,0 +1,228 @@
+﻿@model List<mar_sumaken_web.Models.M_ProductModel>
+@{
+    ViewData["Title"] = "マスター情報 - 品番マスター";
+}
+<style type="text/css">
+    .btn-register {
+        min-width: 130px !important;
+    }
+</style>
+
+<div class="card shadow de-inspection masterInfo m-4">
+    <div class="card-header text-gray-800">
+        @ViewData["Title"]
+    </div>
+    <div class="card-body">
+        @if (ViewData["ErrorMessage"] != null || ViewData["Message"] != null)
+        {
+            <div id="div-message" class="mb-3 ml-3 text-danger">
+                <span class="text-danger-custom">@ViewData["ErrorMessage"] </span>
+                <span class="text-success-custom">@ViewData["Message"] </span>
+            </div>
+        }
+        <div class="mg-bot-20">
+            <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                <div class="input-group-append mr-2">
+                    <a class="btn btn-primary btn-icon-split btn-register" asp-controller="M_Product" asp-action="Register">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">新規作成</span>
+                    </a>
+                </div>
+                <div class="input-group-append">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFile('M_Product')">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-file-export"></i>
+                        </span>
+                        <span class="text">出力</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <table class="table table-sm stripe hover nowrap datatable-normal">
+                <thead>
+                    <tr>
+                        <th width="40"></th>
+                        <th class="font-weight-bold">ID</th>
+                        <th class="font-weight-bold">仕入先名</th>
+                        <th class="font-weight-bold">仕入先品番</th>
+                        <th class="font-weight-bold">納入先名</th>
+                        <th class="font-weight-bold">納入先品番</th>
+                        <th class="font-weight-bold">品名</th>
+                        <th class="font-weight-bold">収容数</th>
+                        <th class="font-weight-bold">使用倉庫名</th>
+                        <th class="font-weight-bold">更新日時</th>
+                        <th class="font-weight-bold">更新者</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (@Model != null  && @Model.Count > 0)
+                    {
+                        @foreach (var item in @Model)
+                        {
+                            <tr>
+                                <td>
+                                    <a class="btn btn-success btn-icon-split ml-1 mr-1" asp-controller="M_Product" asp-action="Edit" asp-route-id="@item.ProductID">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <button class="btn btn-danger btn-icon-split"
+                                    onclick="OnDeleteClick('@item.ProductID')" data-id="@item.ProductID" data-toggle="modal" data-target="#productDeleteModal">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                                <td>@item.ProductID</td>
+                                <td>@item.SupplierName</td>
+                                <td>@item.SupplierProductNumber</td>
+                                <td>@item.DeliveryName</td>
+                                <td>@item.DeliveryProductNumber</td>
+                                <td>@item.ProductName</td>
+                                <td>@item.LotQuantity</td>
+                                <td>@item.UsedWarehouseName</td>
+                                <td>@item.UpdatedAt</td>
+                                <td>@item.UpdatedBy</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!--  Delete Modal-->
+<div class="modal fade" id="productDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productDeleteModalLabel">削除</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-10">
+                    <p id="import-res" class="mt-1"></p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="col-12 col-md-10">
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>ID</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                                <input class="form-control" id="deleteProductId" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>仕入先名</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                                <input class="form-control" id="deleteSupplierName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>仕入先品番</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                                <input class="form-control" id="deleteSupplierProductNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>品名</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                                <input class="form-control" id="deleteDeliveryProductNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>収容数</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                                <input class="form-control" id="deleteProductName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
+                            <button class="btn btn-danger btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteDelete()">
+                                <span class="text" style="min-width:84px">削除</span>
+                            </button>
+                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
+                                <span class="text">キャンセル</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    // 削除ボタン押下
+    function OnDeleteClick(productID) {
+        // M_ProductModel取得
+        var productModel = @Html.Raw(Json.Serialize(Model));
+        productModel.forEach(function (item) {
+            console.log(item);
+            // 会社IDが一致する情報のみ取得
+            if (item.productID == productID) {
+                $("#deleteProductId").val(item.productID); // 品番ID
+                $("#deleteSupplierName").val(item.supplierName); // 仕入先名
+                $("#deleteSupplierProductNumber").val(item.supplierProductNumber); // 仕入先品番
+                $("#deleteDeliveryProductNumber").val(item.deliveryProductNumber); // 納入先品番
+                $("#deleteProductName").val(item.productName); // 品名
+                $("#deleteLotQuantity").val(item.lotQuantity); // 収容数
+            }
+        });
+    }
+
+    // 削除
+    function OnExecuteDelete() {
+
+        $("#div-error-message").text("");
+        $('#import-res').text("");
+
+        // POSTするデータ
+        var productId = document.getElementById('deleteProductId').value;
+        formData = {
+            "productId": productId
+        };
+        
+        // ajax
+        $.ajax({
+            url: window.location.origin + '@Url.Action("Delete", "M_Product")',
+            method: "POST",
+            data: formData
+        })
+        .done(function (data) {
+            // 完了モーダル表示
+            $('#productDeleteModal').modal('hide');
+            $('#productDeleteModal').hide();
+            AlertMessage('', '完了', '削除が完了しました。', null, null);
+        })
+        .fail(function (xhr) {
+            if (xhr.status === 404) {
+                // データが見つからなかった場合
+                var errorMessage = xhr.responseJSON.errorMessage;
+                $("#div-error-message").hide();
+                $("#import-res").show();
+                $("#import-res").addClass('text-danger');
+                $("#import-res").text("エラー: " + errorMessage);
+            } else {
+                // その他のエラーの場合
+                $("#div-error-message").hide();
+                $("#import-res").show();
+                $("#import-res").addClass('text-danger');
+                $("#import-res").text("削除が失敗しました。");
+            }
+        });
+    }
+
+</script>
