@@ -1,0 +1,185 @@
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.M_ProductModel
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.ViewTitle;
+}
+
+<div class="card shadow masterInfo m-4">
+
+    <div class="card-header text-gray-800">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+        <div class="col-md-12 pl-3 pb-3">
+            <form method="get" asp-controller="M_Product" asp-action="Index">
+                <button type="submit" class="btn btn-secondary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-arrow-left-long"></i>
+                    </span>
+                    <span class="text">戻る</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="form-group col-sm-12">
+            <p id="import-res" class="mt-1"></p>
+        </div>
+
+        <div id="div-error-message" class="mb-3 ml-3 text-danger">
+        </div>
+
+        @if (ViewData["ErrorMessage"] != null || ViewData["Message"] != null)
+        {
+            <div id="div-message" class="mb-3 ml-3 text-danger">
+                <span class="text-danger-custom">@ViewData["ErrorMessage"] </span>
+                <span class="text-success-custom">@ViewData["Message"] </span>
+            </div>
+        }
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <form class="col-md-12" id="mProductForm">
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("SupplierName")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" asp-for="SupplierID" required>
+                                @for (var i = 0; i < Model.SuplierSelectList.Count; i++)
+                                {
+                                    <option value="@Model.SuplierSelectList[i].Value">@Model.SuplierSelectList[i].Text</option>
+                                }
+                            </select>
+                            <span class="text-danger w-100" asp-validation-for="SupplierID"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("SupplierProductNumber")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="text" asp-for="SupplierProductNumber" autocomplete="off" required>
+                            <span class="text-danger w-100" asp-validation-for="SupplierProductNumber"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("DeliveryName")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" asp-for="DeliveryID" required>
+                                @for (var i = 0; i < Model.DeliverySelectList.Count; i++)
+                                {
+                                    <option value="@Model.DeliverySelectList[i].Value">@Model.DeliverySelectList[i].Text</option>
+                                }
+                            </select>
+                            <span class="text-danger w-100" asp-validation-for="DeliveryID"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("SupplierProductNumber")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="text" asp-for="DeliveryProductNumber" autocomplete="off" required>
+                            <span class="text-danger w-100" asp-validation-for="DeliveryProductNumber"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("ProductName")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="text" asp-for="ProductName" autocomplete="off" required>
+                            <span class="text-danger w-100" asp-validation-for="ProductName"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("LotQuantity")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="text" asp-for="LotQuantity" value="" autocomplete="off" required>
+                            <span class="text-danger w-100" asp-validation-for="LotQuantity"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("RDepoProductsRegister")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd warehouse-checkbox">
+                            @for (var i = 0; i < @Model.RDepoProductsRegister.Count; i++)
+                            {
+                                <div class="form-check">
+                                    <input type="hidden" asp-for="RDepoProductsRegister[i].Value" value="@Model.RDepoProductsRegister[i].Value" />
+                                    <input type="hidden" asp-for="RDepoProductsRegister[i].Text" value="@Model.RDepoProductsRegister[i].Value" />
+                                    <input class="form-check-input checkbox" asp-for="RDepoProductsRegister[i].Selected" id="select-depo-@i" type="checkbox">
+                                    <label class="form-check-label" id="label-depo-name-@i">@Model.RDepoProductsRegister[i].Text</label>
+                                </div>
+                            }
+                            <span class="text-danger w-100" asp-validation-for="RDepoProductsRegister"></span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-icon-split" style="min-width: 80px" onclick="OnRegister()">
+                        <span class="text">登録</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript">
+
+    // 品番マスター登録
+    function OnRegister() {
+        $('#mProductForm').submit(function (event) {
+
+            $("#div-error-message").text("");
+            $('#import-res').text("");
+
+            // フォーム情報を取得する
+            var formData = $('#mProductForm').serializeArray();
+
+            console.log(formData);
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // Ajax call
+            $.ajax({
+                url: window.location.origin + '@Url.Action("Register", "M_Product")',
+                method: "POST",
+                data: formData
+            })
+                .done(function (response) {
+                    $('#mProductForm')[0].reset();
+                    // 完了モーダル表示
+                    AlertMessage('', '完了', '登録が完了しました。', null, null);
+                })
+                .fail(function (xhr) {
+                    if (xhr.status === 404) {
+                        // データが見つからなかった場合
+                        var errorMessage = xhr.responseJSON.errorMessage;
+                        $("#div-error-message").hide();
+                        $("#import-res").show();
+                        $("#import-res").addClass('text-danger');
+                        $("#import-res").text("エラー: " + errorMessage);
+                    } else {
+                        // その他のエラーの場合
+                        $("#div-error-message").hide();
+                        $("#import-res").show();
+                        $("#import-res").addClass('text-danger');
+                        $("#import-res").text("データの取得に失敗しました。");
+                    }
+                });
+        });
+    }
+
+</script>
+
