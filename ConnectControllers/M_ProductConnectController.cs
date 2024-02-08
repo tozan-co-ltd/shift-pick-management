@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
 
 namespace mar_sumaken_web.ConnectControllers
@@ -86,11 +87,13 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番マスター削除
         /// </summary>
-        /// <param name="companyId">品番ID</param>
+        /// <param name="productId">品番ID</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns>更新件数</returns>
-        public static int DeleteMProduct(int companyId, string databaseName)
+        public static bool DeleteMProduct(int productId, string databaseName)
         {
+            bool deleteFlag = true;
+
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
             // SQLServer接続
@@ -98,28 +101,274 @@ namespace mar_sumaken_web.ConnectControllers
             {
                 connection.ConnectionString = connectionString;
                 connection.Open();
+
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
                 // DB接続
                 try
                 {
                     // 品番マスター削除SQL作成
-                    string deleteSql = CreateSQLToDeleteMCompany(companyId);
+                    string productDeleteSql = CreateSQLToDeleteMCompany(productId);
                     // 品番マスター削除
-                    int deleteAffectedRows = connection.Execute(deleteSql);
+                    int productDeleteCount = connection.Execute(productDeleteSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
-                    if (deleteAffectedRows == 0)
+                    if (productDeleteCount == 0)
                     {
+                        deleteFlag = false;
                         // エラーコード：E2011
                         throw new Exception();
                     }
 
-                    return deleteAffectedRows;
+                    // 倉庫-品番中間テーブル削除SQL作成
+                    string depoProductDeleteSql = CreateSQLToDeleteRUserDepo(productId);
+                    // 倉庫-品番中間テーブル削除
+                    int depoProductDelCount = connection.Execute(depoProductDeleteSql, null, transaction);
+                    if (depoProductDelCount == 0)
+                    {
+                        deleteFlag = false;
+                        // エラーコード：E2011
+                        throw new Exception();
+                    }
+                    
+                    // トランザクションのコミット
+                    transaction.Commit();
+
+                    return deleteFlag;
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    deleteFlag = false;
+                    // エラーコード：E2011
+                    throw;
+                }
+            }
+        }
+
+
+
+        /// <summary>
+        /// 会社区分ごとに会社リストを取得する
+        /// </summary>
+        /// <returns></returns>
+        public static List<SelectListItem> GetCompanysByCompanyKubun(int companyKubun, string databaseName)
+        {
+            var companyList = new List<SelectListItem>();
+
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string commandText = $@"
+                        SELECT  
+	                        CONCAT(CompanyName, ' - ', ClientName) AS Text
+	                        ,CompanyID as Value
+                        FROM M_Company
+                        WHERE (1=1)
+                            AND CompanyKubun = {companyKubun}
+                            AND IsDeleted = 0
+                        ORDER BY
+                            CompanyID ASC
+                        ";
+
+                    companyList = connection.Query<SelectListItem>(commandText).ToList();
+                }
+            }
+            catch (Exception)
+            {
+                // エラー
+            }
+
+            return companyList;
+        }
+
+        /// <summary>
+        /// 重複品番情報をチェック
+        /// </summary>
+        /// <param name="companyCode"></param>
+        /// <param name="databaseName"></param>
+        /// <returns></returns>
+        public static bool IsDuplicateMProduct(M_ProductModel product, string databaseName)
+        {
+            // 戻り値
+            bool isDuplicateValid = false;
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    var sql = CreateSQLToSelectDuplicateMProduct(product);
+
+                    int result = Convert.ToInt32(connection.ExecuteScalar(sql));
+
+                    if (result > 0)
+                    {
+                        isDuplicateValid = true;
+                    }
+                }
+                return isDuplicateValid;
+            }
+            catch (Exception ex)
+            {
+                // エラーコード：E2011
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 品番マスター登録
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="databaseName"></param>
+        /// <returns>登録結果</returns>
+        public static bool InsertMProduct(M_ProductModel product, LoginUserModel loginUser)
+        {
+            bool result = true;
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+
+                    // 品番マスター登録SQL作成
+                    string insertSql = CreateSQLToInsertMProduct(product, sysDate, loginUser.UserName);
+                    // 品番マスター登録
+                    var insertedProductId = connection.ExecuteScalar(insertSql, null, transaction);
+                    // 更件数が0の場合はエラーとする
+                    if (insertedProductId == null)
+                    {
+                        result = false;
+                        // エラーコード：E2011
+                        throw new Exception();
+                    }
+
+                    int productId = (int)insertedProductId;
+                    // 倉庫-品番中間テーブル登録
+                    foreach (SelectListItem item in product.RDepoProductsRegister)
+                    {
+                        if (item.Selected)
+                        {
+                            // 倉庫-品番中間テーブル登録SQL作成
+                            string depoProductInsertSql = CreateSQLToInsertRDepoProduct(Convert.ToInt32(item.Value), productId, sysDate, loginUser.UserName);
+                            int depoProductInsertCount = connection.Execute(depoProductInsertSql, null, transaction);
+                            // 更件数が0の場合はエラーとする
+                            if (depoProductInsertCount == 0)
+                            {
+                                result = false;
+                                // エラーコード：E2011
+                                throw new Exception();
+                            }
+                        }
+                    }
+
+                    // トランザクションのコミット
+                    transaction.Commit();
+
+                    return result;
                 }
                 catch (Exception ex)
                 {
+                    transaction.Rollback();
                     // エラーコード：E2011
-                    throw ex;
+                    throw;
                 }
             }
+        }
+
+        /// <summary>
+        /// 倉庫-品番中間テーブル登録SQL作成
+        /// </summary>
+        /// <param name="depoId">登録倉庫ID</param>
+        /// <param name="productId">登録品番ID</param>
+        /// <param name="createAt">システムタイム</param>
+        /// <param name="createBy">ユーザーID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToInsertRDepoProduct(int depoId, int productId, DateTime createAt, string createBy)
+        {
+            var sql = $@"
+               INSERT INTO R_DepoProduct
+                        (DepoID, ProductID, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
+               VALUES ({depoId}, {productId}, '{createAt}', '{createBy}', '{createAt}', '{createBy}');
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 品番マスター登録SQL作成
+        /// </summary>
+        /// <param name="product">登録情報</param>
+        /// <param name="createAt">システムタイム</param>
+        /// <param name="createBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToInsertMProduct(M_ProductModel product, DateTime createdAt, string createdBy)
+        {
+            var sql = $@"
+                INSERT INTO M_Product
+                    (SupplierID, SupplierProductNumber, DeliveryID, DeliveryProductNumber, ProductName, LotQuantity, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
+                OUTPUT INSERTED.ProductID
+                VALUES (
+                    {product.SupplierID}, '{product.SupplierProductNumber}', {product.DeliveryID}, '{product.DeliveryProductNumber}', '{product.ProductName}', {product.LotQuantity}, '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}'
+                )
+;
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 重複品番情報取得SQL作成
+        /// </summary>
+        /// <param name="companyCode">品番コード</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectDuplicateMProduct(M_ProductModel product)
+        {
+            var sql = $@"
+                    SELECT
+                        COUNT(*)                      
+                    FROM
+                        M_Product AS product
+                    INNER JOIN M_Company AS supplier ON product.SupplierID = supplier.CompanyID
+                    INNER JOIN M_Company AS delivery ON product.DeliveryID = delivery.CompanyID
+                    WHERE 
+                        (1=1)
+	                    AND  
+                        (
+                            (
+		                        supplier.CompanyID = {product.SupplierID}
+		                        AND supplier.IsDeleted = 0
+		                        AND product.SupplierProductNumber = '{product.SupplierProductNumber}'
+	                        )
+	                        OR
+	                        (
+		                        delivery.CompanyID = {product.DeliveryID}
+		                        AND delivery.IsDeleted = 0
+		                        AND product.DeliveryProductNumber = '{product.DeliveryProductNumber}'
+	                        )
+                        )
+                        AND product.IsDeleted = 0
+            ";
+
+            return sql;
         }
 
         // <summary>
@@ -183,7 +432,13 @@ namespace mar_sumaken_web.ConnectControllers
                     product.CreatedAt,
                     product.CreatedBy,
                     product.UpdatedAt,
-                    product.UpdatedBy
+                    product.UpdatedBy,
+                    (
+		                SELECT STRING_AGG(mdepo.DepoName, ' , ')
+		                FROM R_DepoProduct AS depoProduct
+		                INNER JOIN M_Depo AS mdepo ON depoProduct.DepoID = mdepo.DepoID
+		                WHERE depoProduct.ProductID = product.ProductID
+	                ) as  RDepoProductNames
                 FROM
                     M_Product AS product
                 INNER JOIN M_Company AS supplier ON product.SupplierID = supplier.CompanyID
@@ -196,6 +451,21 @@ namespace mar_sumaken_web.ConnectControllers
                     product.ProductID ASC;
             ;";
 
+            return sql;
+        }
+
+        /// <summary>
+        /// 倉庫-品番中間テーブル削除SQL作成
+        /// </summary>
+        /// <param name="productId">品番ID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToDeleteRUserDepo(int productId)
+        {
+            var sql = $@"
+                DELETE 
+                FROM R_DepoProduct
+                WHERE ProductID = {productId}
+            ";
             return sql;
         }
     }

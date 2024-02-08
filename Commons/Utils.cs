@@ -6,6 +6,10 @@ namespace mar_sumaken_web.Commons
 {
     public static class Utils
     {
+        public readonly static int Const_Customer_ID = 1; // 得意先
+        public readonly static int Const_Supplier_ID = 2; // 仕入先
+        public readonly static int Const_Delivery_ID = 3; // 納入先
+
         /// <summary>
         /// 会社区分リスト
         /// </summary>

@@ -1,7 +1,10 @@
-﻿@model List<mar_sumaken_web.Models.M_ProductModel>
+﻿@using mar_sumaken_web.Commons;
+@model List<mar_sumaken_web.Models.M_ProductModel>
 @{
-    ViewData["Title"] = "マスター情報 - 品番マスター";
+    Model[0].GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model[0].ViewTitle;
 }
+
 <style type="text/css">
     .btn-register {
         min-width: 130px !important;
@@ -79,7 +82,7 @@
                                 <td>@item.DeliveryProductNumber</td>
                                 <td>@item.ProductName</td>
                                 <td>@item.LotQuantity</td>
-                                <td>@item.UsedWarehouseName</td>
+                                <td>@item.RDepoProductNames</td>
                                 <td>@item.UpdatedAt</td>
                                 <td>@item.UpdatedBy</td>
                             </tr>

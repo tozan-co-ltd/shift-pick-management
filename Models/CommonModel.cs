@@ -28,7 +28,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// データベース名
         /// </summary>
-        public string DataBaseName { get; set; }
+        public string DataBaseName { get; set; } = string.Empty;
 
         /// <summary>
         /// ロール
@@ -43,22 +43,22 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 
         /// </summary>
-        public string ControllerName { get; set; }
+        public string ControllerName { get; set; } = string.Empty;
 
         /// <summary>
         /// ビュータイトル
         /// </summary>
-        public string ViewTitle { get; set; }
+        public string ViewTitle { get; set; } = string.Empty;
 
         /// <summary>
         /// 倉庫リスト
         /// </summary>
-        public IEnumerable<SelectListItem> MDepoList { get; set; }
+        public IEnumerable<SelectListItem> MDepoList { get; set; } = new List<SelectListItem>();
 
         /// <summary>
         /// 会社リスト
         /// </summary>
-        public IEnumerable<SelectListItem> MCompanyList { get; set; }
+        public IEnumerable<SelectListItem> MCompanyList { get; set; } = new List<SelectListItem>();
 
 
         /// <summary>
