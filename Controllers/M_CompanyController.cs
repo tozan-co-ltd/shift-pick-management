@@ -221,13 +221,13 @@ namespace mar_sumaken_web.Controllers
                     foreach (M_CompanyModel item in selectedList)
                     {
                         DataRow newRow = dataTable.NewRow();
-                        newRow["会社ID"] = item.CompanyID.ToString();
-                        newRow["会社コード"] = item.CompanyCode.ToString();
-                        newRow["会社区分"] = item.CompanyKubunName;
-                        newRow["会社名"] = item.CompanyName;
-                        newRow["取引先名"] = item.ClientName;
-                        newRow["更新日時"] = item.UpdatedAt.ToString();
-                        newRow["更新者"] = item.UpdatedBy;
+                        newRow[Utils.GetDisplayName<M_CompanyModel>("CompanyID")] = item.CompanyID.ToString();
+                        newRow[Utils.GetDisplayName<M_CompanyModel>("CompanyCode")] = item.CompanyCode.ToString();
+                        newRow[Utils.GetDisplayName<M_CompanyModel>("CompanyKubun")] = item.CompanyKubunName;
+                        newRow[Utils.GetDisplayName<M_CompanyModel>("CompanyName")] = item.CompanyName;
+                        newRow[Utils.GetDisplayName<M_CompanyModel>("ClientName")] = item.ClientName;
+                        newRow[Utils.GetDisplayName<M_CompanyModel>("UpdatedAt")] = item.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<M_CompanyModel>("UpdatedBy")] = item.UpdatedBy;
 
                         dataTable.Rows.Add(newRow);
                     }
@@ -263,13 +263,13 @@ namespace mar_sumaken_web.Controllers
         private DataTable CreateDataTable()
         {
             var table = new DataTable();
-            table.Columns.Add("会社ID", typeof(string));
-            table.Columns.Add("会社コード", typeof(string));
-            table.Columns.Add("会社区分", typeof(string));
-            table.Columns.Add("会社名", typeof(string));
-            table.Columns.Add("取引先名", typeof(string));
-            table.Columns.Add("更新日時", typeof(string));
-            table.Columns.Add("更新者", typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_CompanyModel>("CompanyID"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_CompanyModel>("CompanyCode"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_CompanyModel>("CompanyKubun"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_CompanyModel>("CompanyName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_CompanyModel>("ClientName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_CompanyModel>("UpdatedAt"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_CompanyModel>("UpdatedBy"), typeof(string));
             return table;
         }
     }

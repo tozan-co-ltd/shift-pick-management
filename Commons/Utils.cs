@@ -1,11 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Reflection;
 using System.Text;
 
 namespace mar_sumaken_web.Commons
 {
     public static class Utils
     {
+        public readonly static int Const_Customer_ID = 1; // 得意先
+        public readonly static int Const_Supplier_ID = 2; // 仕入先
+        public readonly static int Const_Delivery_ID = 3; // 納入先
+
         /// <summary>
         /// 会社区分リスト
         /// </summary>
@@ -66,6 +72,27 @@ namespace mar_sumaken_web.Commons
                 //CSVファイルを閉じる
                 sw.Close();
             }
+        }
+
+        /// <summary>
+        /// プロパティの表示名を取得する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName">プロパティ名</param>
+        /// <returns>表示名</returns>
+        public static string GetDisplayName<T>(string propertyName)
+        {
+            var displayName = string.Empty;
+            var property = typeof(T).GetProperty(propertyName);
+            if (property != null)
+            {
+                var displayAttribute = property.GetCustomAttribute<DisplayAttribute>();
+                if (displayAttribute != null)
+                {
+                    displayName = displayAttribute.Name;
+                }
+            }
+            return displayName;
         }
     }
 }
