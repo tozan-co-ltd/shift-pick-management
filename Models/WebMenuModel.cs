@@ -4,6 +4,9 @@ using System.Data.SqlClient;
 
 namespace mar_sumaken_web.Models
 {
+    /// <summary>
+    /// WEBメニューのModel
+    /// </summary>
     public class WebMenuModel : CommonModel
     {
         /// <summary>

@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 namespace mar_sumaken_web.Models
 {
     /// <summary>
-    /// 出荷指示テーブルModel
+    /// 出荷指示テーブルのModel
     /// </summary>
     public class D_ShipmentScheduleModel
     {

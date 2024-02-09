@@ -14,9 +14,6 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public List<M_User> M_UserList { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public class M_User : CommonModel
         {
             /// <summary>

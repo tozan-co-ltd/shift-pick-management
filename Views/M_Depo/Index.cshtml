@@ -1,6 +1,8 @@
-﻿@model List<mar_sumaken_web.Models.M_CompanyModel>
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.M_DepoModel
 @{
-    ViewData["Title"] = "マスター情報 - 会社マスター";
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 <style type="text/css">
     .btn-register {
@@ -23,7 +25,7 @@
         <div class="mg-bot-20">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-2">
-                    <a class="btn btn-primary btn-icon-split btn-register" asp-controller="M_Company" asp-action="Register">
+                    <a class="btn btn-primary btn-icon-split btn-register" asp-controller="M_Depo" asp-action="Register">
                         <span class="icon text-white-50">
                             <i class="fas fa-plus"></i>
                         </span>
@@ -31,7 +33,7 @@
                     </a>
                 </div>
                 <div class="input-group-append">
-                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFile('M_Company')">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFile('M_Depo')">
                         <span class="icon text-white-50">
                             <i class="fas fa-file-export"></i>
                         </span>
@@ -46,34 +48,30 @@
                     <tr>
                         <th width="40"></th>
                         <th class="font-weight-bold">ID</th>
-                        <th class="font-weight-bold">会社コード</th>
-                        <th class="font-weight-bold">会社区分</th>
-                        <th class="font-weight-bold">会社名</th>
-                        <th class="font-weight-bold">取引先名</th>
+                        <th class="font-weight-bold">倉庫コード</th>
+                        <th class="font-weight-bold">倉庫名</th>
                         <th class="font-weight-bold">更新日時</th>
                         <th class="font-weight-bold">更新者</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if (@Model != null  && @Model.Count > 0)
+                    @if (@Model.M_DepoList != null)
                     {
-                        @foreach (var item in @Model)
+                        @foreach (var item in @Model.M_DepoList)
                         {
                             <tr>
                                 <td>
-                                    <a class="btn btn-success btn-icon-split ml-1 mr-1" asp-controller="M_Company" asp-action="Edit" asp-route-id="@item.CompanyID">
+                                    <a class="btn btn-success btn-icon-split ml-1 mr-1" asp-controller="M_Depo" asp-action="Edit" asp-route-id="@item.DepoID">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
                                     <button class="btn btn-danger btn-icon-split"
-                                    onclick="OnDeleteClick('@item.CompanyID')" data-id="@item.CompanyID" data-toggle="modal" data-target="#companyDeleteModal">
+                                            onclick="OnDeleteClick('@item.DepoID')" data-id="@item.DepoID" data-toggle="modal" data-target="#DepoDeleteModal">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </td>
-                                <td>@item.CompanyID</td>
-                                <td>@item.CompanyCode</td>
-                                <td>@item.CompanyKubunName</td>
-                                <td>@item.CompanyName</td>
-                                <td>@item.ClientName</td>
+                                <td>@item.DepoID</td>
+                                <td>@item.DepoCode</td>
+                                <td>@item.DepoName</td>
                                 <td>@item.UpdatedAt</td>
                                 <td>@item.UpdatedBy</td>
                             </tr>
@@ -86,11 +84,11 @@
 </div>
 
 <!--  Delete Modal-->
-<div class="modal fade" id="companyDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="DepoDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="companyDeleteModalLabel">削除</h5>
+                <h5 class="modal-title" id="DepoDeleteModalLabel">削除</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -106,48 +104,24 @@
                                 <label>ID</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-7 mb-2">
-                                <input class="form-control" id="deleteCompanyId" type="text" disabled>
+                                <input class="form-control" id="deleteDepoId" type="text" disabled>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap">
                             <div class="col-12 col-sm-4 col-md-4">
-                                <label>会社コード</label>
+                                <label>倉庫コード</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-7 mb-2">
-                                <input class="form-control" id="deleteCompanyCode" type="text" disabled>
+                                <input class="form-control" id="deleteDepoCode" type="text" disabled>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap">
                             <div class="col-12 col-sm-4 col-md-4">
-                                <label>会社区分</label>
+                                <label>倉庫名</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-7 mb-2">
-                                <input class="form-control" id="deleteCompanyKubun" type="text" disabled>
+                                <input class="form-control" id="deleteDepoName" type="text" disabled>
                             </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
-                                <label>会社名</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-7 mb-2">
-                                <input class="form-control" id="deleteCompanyName" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
-                                <label>取引先名</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-7 mb-2">
-                                <input class="form-control" id="deleteClientName" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
-                            <button class="btn btn-danger btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteDelete()">
-                                <span class="text" style="min-width:84px">削除</span>
-                            </button>
-                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
-                                <span class="text">キャンセル</span>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -160,17 +134,15 @@
 <script type="text/javascript">
 
     // 削除ボタン押下
-    function OnDeleteClick(companyID) {
-        // M_CompanyModel取得
-        var companyModel = @Html.Raw(Json.Serialize(Model));
-        companyModel.forEach(function (item) {
-            // 会社IDが一致する情報のみ取得
-            if (item.companyID == companyID) {
-                $("#deleteCompanyId").val(item.companyID);
-                $("#deleteCompanyCode").val(item.companyCode);
-                $("#deleteCompanyKubun").val(item.companyKubunName);
-                $("#deleteCompanyName").val(item.companyName);
-                $("#deleteClientName").val(item.clientName);
+    function OnDeleteClick(DepoID) {
+        // M_DepoModel取得
+        var DepoModel = @Html.Raw(Json.Serialize(Model));
+        DepoModel.forEach(function (item) {
+            // 倉庫IDが一致する情報のみ取得
+            if (item.DepoID == DepoID) {
+                $("#deleteDepoId").val(item.DepoID);
+                $("#deleteDepoCode").val(item.DepoCode);
+                $("#deleteDepoName").val(item.DepoName);
             }
         });
     }
@@ -181,21 +153,21 @@
         $('#import-res').text("");
 
         // POSTするデータ
-        var companyId = document.getElementById('deleteCompanyId').value;
+        var DepoId = document.getElementById('deleteDepoId').value;
         formData = {
-            "companyId" : companyId
+            "DepoId" : DepoId
         };
         
         // ajax
         $.ajax({
-            url: window.location.origin + '@Url.Action("Delete", "M_Company")',
+            url: window.location.origin + '@Url.Action("Delete", "M_Depo")',
             method: "POST",
             data: formData
         })
         .done(function (data) {
             // 完了モーダル表示
-            $('#companyDeleteModal').modal('hide');
-            $('#companyDeleteModal').hide();
+            $('#DepoDeleteModal').modal('hide');
+            $('#DepoDeleteModal').hide();
             AlertMessage('', '完了', '削除が完了しました。', null, null);
         })
         .fail(function (xhr) {
