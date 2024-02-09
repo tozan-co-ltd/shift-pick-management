@@ -7,7 +7,7 @@ using X.PagedList;
 namespace mar_sumaken_web.Models
 {
     /// <summary>
-    /// ファイル取込実績テーブルModel
+    /// ファイル取込実績テーブルのModel
     /// </summary>
     public class D_FileImportModel : CommonModel
     {

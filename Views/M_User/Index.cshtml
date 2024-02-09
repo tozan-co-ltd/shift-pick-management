@@ -53,6 +53,7 @@
                         <th class="font-weight-bold">メイン倉庫名</th>
                         <th class="font-weight-bold">管理権限区分</th>
                         <th class="font-weight-bold">更新日時</th>
+                        <th class="font-weight-bold">更新者</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -80,6 +81,7 @@
                                 <td>@item.DepoName</td>
                                 <td>@item.AuthorizedKubunName</td>
                                 <td>@item.UpdatedAt</td>
+                                <td>@item.UpdatedBy</td>
                             </tr>
                         }
                     }
@@ -254,8 +256,7 @@
 
     // 削除
     function OnExecuteDelete() {
-
-        $("#div-error-message").text("");
+        $('#div-error-message').text("");
         $('#import-res').text("");
 
         // URL

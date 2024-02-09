@@ -9,7 +9,6 @@ namespace mar_sumaken_web.Models
     /// </summary>
     public class M_CompanyModel
     {
-
         /// <summary>
         /// 会社区分リスト
         /// </summary>
