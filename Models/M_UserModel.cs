@@ -70,13 +70,14 @@ namespace mar_sumaken_web.Models
             /// メイン倉庫ID
             /// </summary>
             [Display(Name = "メイン倉庫ID")]
+            [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
             public int DepoID { get; set; }
 
             /// <summary>
             /// 倉庫名
             /// </summary>
             [Display(Name = "倉庫名")]
-            public string DepoName { get; set; } = string.Empty;
+            public string? DepoName { get; set; }
 
             /// <summary>
             /// 管理権限区分
@@ -88,7 +89,7 @@ namespace mar_sumaken_web.Models
             /// <summary>
             /// 管理権限区分名
             /// </summary>
-            public string AuthorizedKubunName { get; set; } = string.Empty;
+            public string? AuthorizedKubunName { get; set; }
 
             /// <summary>
             /// パスワード
@@ -102,8 +103,7 @@ namespace mar_sumaken_web.Models
             /// ソルト
             /// </summary>
             [Display(Name = "ソルト")]
-            public string Salt { get; set; } = string.Empty;
-
+            public string? Salt { get; set; }
             /// <summary>
             /// 未使用フラグ
             /// </summary>
@@ -132,7 +132,7 @@ namespace mar_sumaken_web.Models
             /// 作成者
             /// </summary>
             [Display(Name = "作成者")]
-            public string CreatedBy { get; set; } = string.Empty;
+            public string? CreatedBy { get; set; }
 
             /// <summary>
             /// 更新日時
@@ -144,7 +144,7 @@ namespace mar_sumaken_web.Models
             /// 更新者
             /// </summary>
             [Display(Name = "更新者")]
-            public string UpdatedBy { get; set; } = string.Empty;
+            public string? UpdatedBy { get; set; }
 
         }
     }

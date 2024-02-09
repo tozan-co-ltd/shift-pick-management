@@ -161,7 +161,7 @@ namespace mar_sumaken_web.Controllers
                 // 登録情報をチェック
                 if (!ModelState.IsValid || !isDepoSelected)
                 {
-                    return NotFound();
+                    return NotFound(new { errorMessage = "正しい入力を入れてください。" });
                 }
 
                 // 重複ユーザー情報取をチェック
