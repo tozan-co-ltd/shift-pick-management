@@ -1,19 +1,23 @@
-﻿using mar_sumaken_web.Properties;
+﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using X.PagedList;
 
 namespace mar_sumaken_web.Models
 {
-    /// <summary>
-    /// ファイル取込実績テーブルModel
-    /// </summary>
-    public class D_FileImportModel : CommonModel
+    public class D_StoreOutModel : CommonModel
     {
+
         /// <summary>
-        /// ファイル取込実績リスト
+        /// 出庫日
         /// </summary>
-        public List<D_FileImportModel> D_FileImportList { get; set; }
+        [Display(Name = "出庫日")]
+        public string DateSearchStart { set; get; }
+
+        /// <summary>
+        /// 出庫日(終了)
+        /// </summary>
+        public string DateSearchEnd { set; get; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -48,36 +52,43 @@ namespace mar_sumaken_web.Models
         public int SelectedCompanyID { get; set; }
 
         /// <summary>
-        /// ファイル取込実績ID
+        /// 
         /// </summary>
-        public int FileImportID { get; set; }
+        public int StoreOutID { get; set; }
 
         /// <summary>
-        /// 倉庫名
+        /// 
         /// </summary>
-        public string DepoName { get; set; }
+        public string StoreOutDate { get; set; }
 
         /// <summary>
-        /// メニュー名
+        /// 
         /// </summary>
-        [Display(Name = "メニュー名")]
-        public string MenuName { get; set; }
+        public List<string> LstErrorMsg { set; get; }
 
         /// <summary>
-        /// 取込ファイル名
+        /// 
         /// </summary>
-        [Display(Name = "取込ファイル名")]
-        public string ImportFileName { get; set; }
+        public string Message { set; get; }
 
         /// <summary>
-        /// 作成日時
+        /// 
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public IPagedList<D_StoreOutModel> LstD_StoreOut { set; get; }
 
         /// <summary>
-        /// 登録者
+        /// 初期値設定
         /// </summary>
-        [Display(Name = "登録者")]
-        public string CreatedBy { get; set; } = string.Empty;
+        public D_StoreOutModel()
+        {
+            // 現在日
+            var now = DateTime.Today.ToString("yyyy/MM/dd");
+            // 1ヶ月前
+            var oneMonthAgo = DateTime.Today.AddMonths(-1).ToString("yyyy/MM/dd"); 
+
+            DateSearchStart = oneMonthAgo;
+            DateSearchEnd = now;
+        }
+        
     }
 }

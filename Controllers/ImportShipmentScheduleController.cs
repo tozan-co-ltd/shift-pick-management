@@ -11,7 +11,7 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult Index()
         {
-            var model = new D_FileImportModel.D_FileImport();
+            var model = new D_FileImportModel();
             return View(model);
         }
     }
