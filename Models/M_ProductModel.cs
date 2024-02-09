@@ -98,12 +98,6 @@ namespace mar_sumaken_web.Models
         public int LotQuantity { get; set; }
 
         /// <summary>
-        /// 重複許容フラグ
-        /// </summary>
-        [Display(Name = "重複許容フラグ")]
-        public bool AllowedDuplicatesFlag { get; set; }
-
-        /// <summary>
         /// 未使用フラグ
         /// </summary>
         [Display(Name = "未使用フラグ")]
