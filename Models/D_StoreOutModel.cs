@@ -5,9 +5,11 @@ using X.PagedList;
 
 namespace mar_sumaken_web.Models
 {
+    /// <summary>
+    /// 出庫実績テーブルのModel
+    /// </summary>
     public class D_StoreOutModel : CommonModel
     {
-
         /// <summary>
         /// 出庫日
         /// </summary>

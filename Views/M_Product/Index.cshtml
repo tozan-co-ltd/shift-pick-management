@@ -172,20 +172,19 @@
             console.log(item);
             // 会社IDが一致する情報のみ取得
             if (item.productID == productID) {
-                $("#deleteProductId").val(item.productID); // 品番ID
-                $("#deleteSupplierName").val(item.supplierName); // 仕入先名
-                $("#deleteSupplierProductNumber").val(item.supplierProductNumber); // 仕入先品番
-                $("#deleteDeliveryProductNumber").val(item.deliveryProductNumber); // 納入先品番
-                $("#deleteProductName").val(item.productName); // 品名
-                $("#deleteLotQuantity").val(item.lotQuantity); // 収容数
+                $("#deleteProductId").val(item.productID);
+                $("#deleteSupplierName").val(item.supplierName);
+                $("#deleteSupplierProductNumber").val(item.supplierProductNumber);
+                $("#deleteDeliveryProductNumber").val(item.deliveryProductNumber);
+                $("#deleteProductName").val(item.productName);
+                $("#deleteLotQuantity").val(item.lotQuantity);
             }
         });
     }
 
     // 削除
     function OnExecuteDelete() {
-
-        $("#div-error-message").text("");
+        $('#div-error-message').text("");
         $('#import-res').text("");
 
         // POSTするデータ

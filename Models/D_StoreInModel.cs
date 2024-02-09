@@ -5,6 +5,9 @@ using X.PagedList;
 
 namespace mar_sumaken_web.Models
 {
+    /// <summary>
+    /// 入庫実績テーブルのModel
+    /// </summary>
     public class D_StoreInModel: CommonModel
     {
         /// <summary>

@@ -1,7 +1,17 @@
-﻿namespace mar_sumaken_web.Models
+﻿using X.PagedList;
+
+namespace mar_sumaken_web.Models
 {
-    public class M_DepoModel
+    /// <summary>
+    /// 倉庫マスターのModel
+    /// </summary>
+    public class M_DepoModel : CommonModel
     {
+        /// <summary>
+        /// 倉庫リスト
+        /// </summary>
+        public IPagedList<M_DepoModel> M_DepoList { get; set; }
+
         /// <summary>
         /// 倉庫ID
         /// </summary>
@@ -42,5 +52,9 @@
         /// </summary>
         public string UpdatedBy { set; get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Message { set; get; }
     }
 }

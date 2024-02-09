@@ -6,7 +6,7 @@ using System.Xml.Linq;
 namespace mar_sumaken_web.Models
 {
     /// <summary>
-    /// 品番マスター
+    /// 品番マスターのModel
     /// </summary>
     public class M_ProductModel : CommonModel
     {

@@ -1,6 +1,9 @@
 ﻿namespace mar_sumaken_web.Models
 {
-    public class M_HandyMenuModel
+    /// <summary>
+    /// ハンディメニューマスターのModel
+    /// </summary>
+    public class M_HandyMenuModel : CommonModel
     {
         /// <summary>
         /// ハンディメニューID
