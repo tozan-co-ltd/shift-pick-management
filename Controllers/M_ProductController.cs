@@ -237,19 +237,18 @@ namespace mar_sumaken_web.Controllers
                     foreach (M_ProductModel item in selectedList)
                     {
                         DataRow newRow = dataTable.NewRow();
-                        newRow["品番ID"] = item.ProductID.ToString();
-                        newRow["仕入先名"] = item.SupplierName;
-                        newRow["仕入先品番"] = item.SupplierProductNumber;
-                        newRow["納入先名"] = item.DeliveryName;
-                        newRow["納入先品番"] = item.DeliveryProductNumber;
-                        newRow["品名"] = item.ProductName;
-                        newRow["収容数"] = item.LotQuantity.ToString();
-                        newRow["使用倉庫名"] = item.RDepoProductNames;
-                        newRow["更新日時"] = item.UpdatedAt.ToString();
-                        newRow["更新者"] = item.UpdatedBy;
+                        newRow[Utils.GetDisplayName<M_ProductModel>("ProductID")] = item.ProductID.ToString();
+                        newRow[Utils.GetDisplayName<M_ProductModel>("SupplierName")] = item.SupplierName;
+                        newRow[Utils.GetDisplayName<M_ProductModel>("SupplierProductNumber")] = item.SupplierProductNumber;
+                        newRow[Utils.GetDisplayName<M_ProductModel>("DeliveryName")] = item.DeliveryName;
+                        newRow[Utils.GetDisplayName<M_ProductModel>("DeliveryProductNumber")] = item.DeliveryProductNumber;
+                        newRow[Utils.GetDisplayName<M_ProductModel>("ProductName")] = item.ProductName;
+                        newRow[Utils.GetDisplayName<M_ProductModel>("LotQuantity")] = item.LotQuantity.ToString();
+                        newRow[Utils.GetDisplayName<M_ProductModel>("RDepoProductNames")] = item.RDepoProductNames;
+                        newRow[Utils.GetDisplayName<M_ProductModel>("UpdatedAt")] = item.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<M_ProductModel>("UpdatedBy")] = item.UpdatedBy;
 
                         dataTable.Rows.Add(newRow);
-
                     }
                 }
 
@@ -283,16 +282,17 @@ namespace mar_sumaken_web.Controllers
         private DataTable CreateDataTable()
         {
             var table = new DataTable();
-            table.Columns.Add("品番ID", typeof(string));
-            table.Columns.Add("仕入先名", typeof(string));
-            table.Columns.Add("仕入先品番", typeof(string));
-            table.Columns.Add("納入先名", typeof(string));
-            table.Columns.Add("納入先品番", typeof(string));
-            table.Columns.Add("品名", typeof(string));
-            table.Columns.Add("収容数", typeof(string));
-            table.Columns.Add("使用倉庫名", typeof(string));
-            table.Columns.Add("更新日時", typeof(string));
-            table.Columns.Add("更新者", typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_ProductModel>("ProductID"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_ProductModel>("SupplierName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_ProductModel>("SupplierProductNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_ProductModel>("DeliveryName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_ProductModel>("DeliveryProductNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_ProductModel>("ProductName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_ProductModel>("LotQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_ProductModel>("RDepoProductNames"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_ProductModel>("UpdatedAt"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_ProductModel>("UpdatedBy"), typeof(string));
+
             return table;
         }
     }
