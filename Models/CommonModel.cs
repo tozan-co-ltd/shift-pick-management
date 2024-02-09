@@ -42,7 +42,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// カテゴリーイトル
         /// </summary>
-        public string CategoryTitle { get; set; }
+        public string? CategoryTitle { get; set; }
 
         /// <summary>
         /// 倉庫リスト

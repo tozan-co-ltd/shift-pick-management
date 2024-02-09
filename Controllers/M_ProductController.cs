@@ -3,6 +3,7 @@ using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 
 namespace mar_sumaken_web.Controllers
@@ -122,6 +123,9 @@ namespace mar_sumaken_web.Controllers
                     return View(model);
                 }
 
+                // 倉庫リスト
+                model.RDepoProductsRegister = (List<SelectListItem>)model.GetMDepoList(user.DatabaseName);
+
                 // 仕入先リストを取得
                 model.SuplierSelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_Supplier_ID, user.DatabaseName);
 
@@ -150,7 +154,7 @@ namespace mar_sumaken_web.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-                if (user == null)
+                if (user == null || model.RDepoProductsRegister == null)
                 {
                     // エラーコード：E2011
                     return NotFound(new { errorMessage = "データが見つかりませんでした。" });

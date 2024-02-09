@@ -427,7 +427,6 @@ namespace mar_sumaken_web.ConnectControllers
                     product.DeliveryProductNumber,
                     product.ProductName,
                     product.LotQuantity,
-                    product.AllowedDuplicatesFlag,
                     product.IsDeleted,
                     product.CreatedAt,
                     product.CreatedBy,

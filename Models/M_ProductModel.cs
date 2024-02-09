@@ -24,12 +24,7 @@ namespace mar_sumaken_web.Models
         /// 登録使用倉庫リスト
         /// </summary>
         [Display(Name = "使用倉庫名")]
-        public List<SelectListItem> RDepoProductsRegister {
-            get
-            {
-                return (List<SelectListItem>)MDepoList;
-            }
-        }
+        public List<SelectListItem> RDepoProductsRegister { get; set; } = new List<SelectListItem>();
 
         /// <summary>
         /// 使用倉庫リスト
