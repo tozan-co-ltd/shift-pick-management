@@ -44,6 +44,11 @@ namespace mar_sumaken_web.Controllers
                     productList = M_ProductConnectController.GetRDepoProducts(productList, user.DatabaseName);
                 }
 
+                // ビューのタイトル取得
+                M_ProductModel model = new M_ProductModel();
+                model.ControllerName = "M_Product";
+                model.CompanyID = user.CompanyID;
+                ViewData["Title"] = model.GetViewTitle();
                 return View(productList);
             }
             catch (Exception ex)
