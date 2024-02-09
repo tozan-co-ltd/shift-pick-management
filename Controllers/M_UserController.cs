@@ -464,13 +464,13 @@ namespace mar_sumaken_web.Controllers
                     foreach (M_User userItem in userList)
                     {
                         DataRow newRow = mUserDataTable.NewRow();
-                        newRow["ID"] = userItem.UserID.ToString();
-                        newRow["ログインID"] = userItem.LoginID.ToString();
-                        newRow["ユーザー名"] = userItem.UserName;
-                        newRow["メイン倉庫名"] = userItem.DepoName;
-                        newRow["管理権限区分"] = userItem.AuthorizedKubunName;
-                        newRow["更新日時"] = userItem.UpdatedAt.ToString();
-                        newRow["更新者"] = userItem.UpdatedBy;
+                        newRow[Utils.GetDisplayName<M_User>("UserID")] = userItem.UserID.ToString();
+                        newRow[Utils.GetDisplayName<M_User>("LoginID")] = userItem.LoginID.ToString();
+                        newRow[Utils.GetDisplayName<M_User>("UserName")] = userItem.UserName;
+                        newRow[Utils.GetDisplayName<M_User>("DepoName")] = userItem.DepoName;
+                        newRow[Utils.GetDisplayName<M_User>("AuthorizedKubun")] = userItem.AuthorizedKubun;
+                        newRow[Utils.GetDisplayName<M_User>("UpdatedAt")] = userItem.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<M_User>("UpdatedBy")] = userItem.UpdatedBy;
 
                         mUserDataTable.Rows.Add(newRow);
                     }
@@ -506,13 +506,15 @@ namespace mar_sumaken_web.Controllers
         private DataTable CreateDataTable()
         {
             var table = new DataTable();
-            table.Columns.Add("ID", typeof(string));
-            table.Columns.Add("ログインID", typeof(string));
-            table.Columns.Add("ユーザー名", typeof(string));
-            table.Columns.Add("メイン倉庫名", typeof(string));
-            table.Columns.Add("管理権限区分", typeof(string));
-            table.Columns.Add("更新日時", typeof(string));
-            table.Columns.Add("更新者", typeof(string));
+
+            table.Columns.Add(Utils.GetDisplayName<M_User>("UserID"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_User>("LoginID"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_User>("UserName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_User>("DepoName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_User>("AuthorizedKubun"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_User>("UpdatedAt"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_User>("UpdatedBy"), typeof(string));
+
             return table;
         }
 
