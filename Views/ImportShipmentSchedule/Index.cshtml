@@ -87,31 +87,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>2024/02/01</td>
-                        <td>納入指示_400095060_P_20240118_1_Y3470_07075.csv</td>
-                        <td>山田太郎</td>
-                    </tr>
-                    <tr>
-                        <td>2024/02/01</td>
-                        <td>納入指示_400095060_P_20240118_1_Y3470_07075.csv</td>
-                        <td>山田太郎</td>
-                    </tr>
-                    <tr>
-                        <td>2024/02/01</td>
-                        <td>納入指示_400095060_P_20240118_1_Y3470_07075.csv</td>
-                        <td>山田太郎</td>
-                    </tr>
-                    <tr>
-                        <td>2024/02/01</td>
-                        <td>納入指示_400095060_P_20240118_1_Y3470_07075.csv</td>
-                        <td>山田太郎</td>
-                    </tr>
-                    <tr>
-                        <td>2024/02/01</td>
-                        <td>納入指示_400095060_P_20240118_1_Y3470_07075.csv</td>
-                        <td>山田太郎</td>
-                    </tr>
+                    @if (@Model.D_FileImportList != null)
+                    {
+                        @foreach (var item in @Model.D_FileImportList)
+                        {
+                            <tr>
+                                <td>@item.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")</td>
+                                <td>@item.ImportFileName</td>
+                                <td>@item.CreatedBy</td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>
