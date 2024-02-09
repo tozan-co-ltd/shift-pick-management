@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Reflection;
 using System.Text;
 
 namespace mar_sumaken_web.Commons
@@ -70,6 +72,27 @@ namespace mar_sumaken_web.Commons
                 //CSVファイルを閉じる
                 sw.Close();
             }
+        }
+
+        /// <summary>
+        /// プロパティの表示名を取得する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName">プロパティ名</param>
+        /// <returns>表示名</returns>
+        public static string GetDisplayName<T>(string propertyName)
+        {
+            var displayName = string.Empty;
+            var property = typeof(T).GetProperty(propertyName);
+            if (property != null)
+            {
+                var displayAttribute = property.GetCustomAttribute<DisplayAttribute>();
+                if (displayAttribute != null)
+                {
+                    displayName = displayAttribute.Name;
+                }
+            }
+            return displayName;
         }
     }
 }

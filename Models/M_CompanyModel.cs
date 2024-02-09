@@ -18,6 +18,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 会社ID
         /// </summary>
+        [Display(Name = "ID")]
         public int CompanyID { set; get; }
 
         /// <summary>
@@ -38,7 +39,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 会社区分名
         /// </summary>
-        public string CompanyKubunName { set; get; } = string.Empty;
+        public string? CompanyKubunName { set; get; }
 
         /// <summary>
         /// 会社名
@@ -51,32 +52,36 @@ namespace mar_sumaken_web.Models
         /// 取引先名
         /// </summary>
         [Display(Name = "取引先名")]
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string ClientName { set; get; }
+        public string? ClientName { set; get; }
 
         /// <summary>
         /// 削除フラグ
         /// </summary>
+        [Display(Name = "未使用フラグ")]
         public bool IsDeleted { set; get; } = false;
 
         /// <summary>
         /// 作成日時
         /// </summary>
+        [Display(Name = "作成日時")]
         public DateTime CreatedAt { set; get; }
 
         /// <summary>
         /// 作成者
         /// </summary>
-        public string CreatedBy { set; get; } = string.Empty;
+        [Display(Name = "作成者")]
+        public string? CreatedBy { set; get; }
 
         /// <summary>
         /// 更新日時
         /// </summary>
+        [Display(Name = "更新日時")]
         public DateTime UpdatedAt { set; get; }
 
         /// <summary>
         /// 更新者
         /// </summary>
-        public string UpdatedBy { set; get; } = string.Empty; 
+        [Display(Name = "更新者")]
+        public string? UpdatedBy { set; get; }
     }
 }

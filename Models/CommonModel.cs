@@ -1,20 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Data.SqlClient;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
+﻿using System.Data.SqlClient;
 using mar_sumaken_web.Commons;
-using System.Threading.Tasks;
-using System.CodeDom;
 using System.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using mar_sumaken_web.Controllers;
 using System.Security.Claims;
 using Dapper;
-using System.ComponentModel;
-using System.Reflection;
-using Microsoft.AspNetCore.Http;
 
 namespace mar_sumaken_web.Models
 {
@@ -28,7 +17,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// データベース名
         /// </summary>
-        public string DataBaseName { get; set; } = string.Empty;
+        public string? DataBaseName { get; set; }
 
         /// <summary>
         /// ロール
@@ -43,22 +32,22 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 
         /// </summary>
-        public string ControllerName { get; set; } = string.Empty;
+        public string? ControllerName { get; set; }
 
         /// <summary>
         /// ビュータイトル
         /// </summary>
-        public string ViewTitle { get; set; } = string.Empty;
+        public string? ViewTitle { get; set; }
 
         /// <summary>
         /// 倉庫リスト
         /// </summary>
-        public IEnumerable<SelectListItem> MDepoList { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem>? MDepoList { get; set; }
 
         /// <summary>
         /// 会社リスト
         /// </summary>
-        public IEnumerable<SelectListItem> MCompanyList { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem>? MCompanyList { get; set; }
 
 
         /// <summary>
