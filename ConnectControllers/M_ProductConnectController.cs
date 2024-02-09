@@ -427,7 +427,6 @@ namespace mar_sumaken_web.ConnectControllers
                     product.DeliveryProductNumber,
                     product.ProductName,
                     product.LotQuantity,
-                    product.AllowedDuplicatesFlag,
                     product.IsDeleted,
                     product.CreatedAt,
                     product.CreatedBy,
@@ -438,7 +437,7 @@ namespace mar_sumaken_web.ConnectControllers
 		                FROM R_DepoProduct AS depoProduct
 		                INNER JOIN M_Depo AS mdepo ON depoProduct.DepoID = mdepo.DepoID
 		                WHERE depoProduct.ProductID = product.ProductID
-	                ) as  RDepoProductNames
+	                ) AS RDepoProductNames
                 FROM
                     M_Product AS product
                 INNER JOIN M_Company AS supplier ON product.SupplierID = supplier.CompanyID
