@@ -98,7 +98,7 @@ body {
     .btn-accent:hover {
         color: #fff;
         filter: brightness(90%);
-        background-color: lightskyblue;
+        background-color: var(--base-color-accent);
     }
 
     .btn-accent:focus,

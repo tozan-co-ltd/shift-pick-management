@@ -106,29 +106,33 @@
 <script>
     $(document).ready(function () {
         $("#dstoreTbl").hide();
-        $('#D_StoreOut').submit(function (e) {
-            $('#dstoreTbl').DataTable().destroy();
-            e.preventDefault(); 
-            var formData = $(this).serialize(); 
-            $.ajax({
-                type: "POST",
-                url: '@Url.Action("SearchData", "D_StoreOut")',
-                data: formData,
-                success: function (result) {
-                    $("#dstoreTbl").show();
-                    $("#dstoreTbl tbody").html(result);
-                    $("#dstoreTbl").DataTable({
-                        "language": {           // 日本語表示
-                            "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
-                        },
-                        info: false,            // 総件数
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error(xhr.responseText);
-                }
+        $('.searchDStoreOut').click(function () {
+            $('#D_StoreOut').submit(function (e) {
+                $('#dstoreTbl').DataTable().destroy();
+                e.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SearchData", "D_StoreOut")',
+                    data: formData,
+                    success: function (result) {
+                        $("#dstoreTbl").show();
+                        $("#dstoreTbl tbody").html(result);
+                        $("#dstoreTbl").DataTable({
+                            "language": {           // 日本語表示
+                                "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+                            },
+                            info: false,            // 総件数
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
             });
-        });
+
+         });
+
     });
    
 </script>
