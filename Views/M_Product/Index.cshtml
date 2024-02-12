@@ -107,43 +107,51 @@
                 <div class="d-flex justify-content-center">
                     <div class="col-12 col-md-10">
                         <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
+                            <div class="col-12 col-sm-4">
                                 <label>ID</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
                                 <input class="form-control" id="deleteProductId" type="text" disabled>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
+                            <div class="col-12 col-sm-4">
                                 <label>仕入先名</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
                                 <input class="form-control" id="deleteSupplierName" type="text" disabled>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
+                            <div class="col-12 col-sm-4">
                                 <label>仕入先品番</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
                                 <input class="form-control" id="deleteSupplierProductNumber" type="text" disabled>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
-                                <label>品名</label>
+                            <div class="col-12 col-sm-4">
+                                <label>納入先品番</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
                                 <input class="form-control" id="deleteDeliveryProductNumber" type="text" disabled>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
+                            <div class="col-12 col-sm-4">
+                                <label>品名</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteProductName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
                                 <label>収容数</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-7 mb-2">
-                                <input class="form-control" id="deleteProductName" type="text" disabled>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteLotQuantity" type="text" disabled>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
@@ -169,7 +177,6 @@
         // M_ProductModel取得
         var productModel = @Html.Raw(Json.Serialize(Model));
         productModel.forEach(function (item) {
-            console.log(item);
             // 会社IDが一致する情報のみ取得
             if (item.productID == productID) {
                 $("#deleteProductId").val(item.productID);
