@@ -23,6 +23,7 @@ $(document).ready(function () {
     });
 
     //------------------- DataTables　------------------//
+    // 横スクロール不可
     // 2列目昇順
     $('.datatable-normal').DataTable({
         "language": {           // 日本語表示
@@ -33,6 +34,16 @@ $(document).ready(function () {
         scrollX: false,         // 横スクロール不可
         scrollY: false,
         order: [[1, "asc"]],    // 2列目昇順
+    });
+
+    // 横スクロール可
+    $('.datatable-scroll-x').DataTable({
+        "language": {           // 日本語表示
+            "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+        },
+        lengthChange: true,     // 表示件数
+        info: false,            // 総件数
+        scrollX: true
     });
     //------------------- DataTables　------------------//
 
