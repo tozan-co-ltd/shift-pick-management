@@ -313,6 +313,10 @@ body {
     margin-bottom: 60px;
 }
 
+table.dataTable, .dataTables_scrollHeadInner {
+    width: 100% !important;
+}
+
 table.sticky_table {
     display: block;
     overflow: scroll;
