@@ -56,7 +56,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl sp-cs-dpl">
+                            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                                     <span class="warehouse-name-drs">入庫日</span>
                                     <input id="startDate" type="text" class="form-control pickerDate"> <lable class="m-1">～</lable> <input id="endDate" type="text" class="form-control pickerDate">
@@ -87,8 +87,8 @@
                 </div>
             </div>
         </div>
-        <div class="tableContent mt-3">
-            <table class="table row-border compact stripe hover nowrap order-column" id="userTbl">
+        <div class="mt-3" id="div-table" style="display: none;">
+            <table class="table table-sm stripe hover nowrap datatable-normal">
                 <thead>
                     <tr>
                         <th>ID</th>
