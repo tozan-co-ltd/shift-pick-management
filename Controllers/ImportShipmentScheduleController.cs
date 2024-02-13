@@ -94,7 +94,7 @@ namespace mar_sumaken_web.Controllers
                 if (user == null || user.AuthorizedKubun != 1)
                 {
                     // エラーメッセージ取得
-                    return new JsonResult(new { res = "NG", error = ErrorMessagesResources.E9999 });
+                    return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
                 }
 
 
@@ -267,13 +267,6 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         private D_ShipmentScheduleModel SetReadDataInModel(D_ShipmentScheduleModel model, List<string[]> lines, int readCount)
         {
-            for (int i = 0; i < lines[readCount].Count(); i++)
-            {
-                lines[readCount][i] = lines[readCount][i].ToString().Replace("\"", "");
-            }
-
-            var check = lines[readCount];
-
             model.OrdererCode = lines[readCount][6];
             model.OrdererFactoryKubun = lines[readCount][7];
             model.OrdererName = lines[readCount][8];
@@ -309,7 +302,14 @@ namespace mar_sumaken_web.Controllers
             model.Quantity = Convert.ToInt32(lines[readCount][44]);
 
             // 箱数＝納入指示数/収容数
-            model.SupplierProductNumber = Convert.ToString(model.Quantity / model.LotQuantity);
+            if (model.Quantity == 0 || model.LotQuantity == 0)
+            {
+                model.NumberOfBoxes = 0;
+            }
+            else
+            {
+                model.NumberOfBoxes = model.Quantity / model.LotQuantity;
+            }
 
             return model;
         }
