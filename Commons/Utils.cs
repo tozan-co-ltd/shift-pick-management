@@ -121,13 +121,13 @@ namespace mar_sumaken_web.Commons
         /// <param name="fileName">ファイル名</param>
         /// <param name="categoryName">保存フォルダー</param>
         /// <returns>取込ファイルパス</returns>
-        public static string CreateImportFilePath(string fileName,string categoryName)
+        public static string CreateImportFilePath(string fileName, int userId, string categoryName)
         {
             try
             {
                 // ファイル名(日付_ファイル名)
                 var tmpFileName = string.Concat(
-                    DateTime.Now.ToString("yyyyMMddHHmmssfff"), "_", Path.GetFileName(fileName)
+                    DateTime.Now.ToString("yyyyMMddHHmmssfff"), "_", userId, "_", Path.GetFileName(fileName)
                 );
 
                 // フォルダパス
@@ -182,52 +182,44 @@ namespace mar_sumaken_web.Commons
         /// CSVファイルデータチェック
         /// </summary>
         /// <param name="lines">CSV行配列</param>
-        /// <param name="headerList">ヘッダー名リスト</param>
-        public static bool CheckCsvData(List<string> lines, List<string> headerList)
+        public static bool CheckCsvData(List<string[]> lines)
         {
-            // 配列の行がnullまたは要素がない場合
+            // リストが null または空の場合、エラー
             if (lines == null || lines.Count == 0)
                 return false;
 
-            // ヘッダーリストがnullまたは要素がない場合
-            if (headerList == null || headerList.Count == 0)
-                return false;
-
-            // 最初の行（ヘッダー）をチェックする
+            // 最初の行（ヘッダー）を確認する
             var header = lines.First();
-            if (string.IsNullOrWhiteSpace(header))
+            if (header == null || header.Length == 0)
                 return false;
 
-            // ヘッダーをカンマで分割する
-            var columns = header.Split(',');
-
-            // ヘッダーが存在しないか、列数が少なすぎる場合
-            if (columns == null || columns.Length != headerList.Count)
-                return false;
-
-            // ヘッダー内の列名がheaderListと一致しない場合
-            for (int i = 0; i < columns.Length; i++)
+            // ヘッダー内の各要素をチェックする
+            foreach (var column in header)
             {
-                if (!string.Equals(columns[i], headerList[i]))
-                    return false;
+                if (string.IsNullOrWhiteSpace(column))
+                    return false; // ヘッダーに null または空の要素がある場合、エラー
             }
 
-            // データ行が存在しない場合、falseを返す
+            // 行が1つだけ（ヘッダーのみ）の場合、エラー
             if (lines.Count == 1)
                 return false;
 
-            // 各データ行の列数がヘッダーと一致しない場合、falseを返す
-            foreach (var line in lines.Skip(1)) // ヘッダーをスキップして2行目からチェックする
-            {
-                if (string.IsNullOrWhiteSpace(line))
-                    continue; // 空行をスキップする
+            // ヘッダーの列数を取得する
+            int columnCount = header.Length;
 
-                var data = line.Split(',');
-                if (data.Length != columns.Length)
-                    return false; // 列数がヘッダーと一致しない場合、falseを返す
+            // 各データ行の列数をチェックする
+            foreach (var line in lines.Skip(1)) // 最初の行（ヘッダー）をスキップして2行目からチェックする
+            {
+                // 行が null もしくは空の場合、次の行に進む
+                if (line == null || line.Length == 0)
+                    continue;
+
+                // データ行の列数をチェックする
+                if (line.Length != columnCount)
+                    return false; // 列数がヘッダーと一致しない場合、エラー
             }
 
-            // エラーがない場合、データは有効であると見なす
+            // エラーがない場合、データは有効
             return true;
         }
 

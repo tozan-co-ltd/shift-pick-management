@@ -96,14 +96,17 @@ $('#eye-login').click(function () {
 
 //------------------- Excel取込　------------------//
 function onUploadFile(page) {
+
+    // ページの更新を禁止する
+    event.preventDefault();
+
     $("#FailMsg").text("");
     $('#import-res').empty;
     $('#import-res').removeClass('text-danger');
 
-    console.log(page);
-
     // FormDataオブジェクト利用
     var formData = new FormData(document.querySelector('#' + page + ''));
+
     var IsFirst = true;
     for (var file of formData) {
         if (IsFirst) {
@@ -130,6 +133,9 @@ function onUploadFile(page) {
     }
 
     var modelTitle = "";
+    if (page == 'import-shimpment-schedule-upload-form')
+        modelTitle = "出荷指示取込";
+
     if (page == 'shipping-plan-import-upload-form')
         modelTitle = "出荷計画取込";
 
@@ -179,7 +185,7 @@ function onUploadFile(page) {
         $('#ImportModel').modal('hide');
 
         var importUrl = document.getElementById('import_action_url').value;
-        formData.append("userName", "@User.Identity.Name");
+
         showLoading()
         $.ajax({
             url: importUrl,
@@ -189,19 +195,8 @@ function onUploadFile(page) {
             contentType: false
         }).done(function (response) {
             if (response.res == "OK") {
-                if (response.data != "OK") {
-                    let data = JSON.parse(response.data);
-                    console.log(data);
-                    $("#import-res").addClass('text-danger');
-                    $("#ErrorBlock").show()
-                    RenderErrorBlock(data);
-                    $('#' + page + '')[0].reset();
-                    hideLoading()
-                }
-                else {
-                    hideLoading()
-                    AlertMessage('', '' + modelTitle + '', '登録が完了しました。', null, null);
-                }
+                hideLoading()
+                AlertMessage('', '' + modelTitle + '', '登録が完了しました。', null, null);
             }
             else {
                 hideLoading()

@@ -1,7 +1,5 @@
-﻿using mar_sumaken_web.Commons;
-using mar_sumaken_web.Models;
+﻿using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc;
-using static mar_sumaken_web.Models.D_ShipmentScheduleModel;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -21,7 +19,7 @@ namespace mar_sumaken_web.Controllers
             //// DB接続
             //List<D_ShipmentScheduleModel> model = D_ShipmentScheduleConnectController.ConnectDShipmentSchedules(sql, user.DatabaseName);
 
-            var model = new D_ShipmentScheduleModel.D_ShipmentSchedule();
+            var model = new D_ShipmentScheduleModel();
             return View(model);
         }
     }
