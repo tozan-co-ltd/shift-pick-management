@@ -61,7 +61,7 @@ namespace mar_sumaken_web.Models
         /// 選択された会社名
         /// </summary>
         [Display(Name = "納入先名")]
-        public string SelectedCompanyName { get; set; } = string.Empty;
+        public string? SelectedCompanyName { get; set; }
 
         /// <summary>
         /// 出荷指示実績ID
@@ -244,7 +244,7 @@ namespace mar_sumaken_web.Models
         [DisplayName("背番号")]
         [MaxLength(100)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string DeliveryProductAbbreviation { get; set; } = string.Empty;
+        public string? DeliveryProductAbbreviation { get; set; }
 
         /// <summary>
         /// 品名
@@ -252,7 +252,7 @@ namespace mar_sumaken_web.Models
         [DisplayName("品名")]
         [MaxLength(100)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string DeliveryProductName { get; set; } = string.Empty;
+        public string? DeliveryProductName { get; set; }
 
         /// <summary>
         /// 収容数
@@ -279,9 +279,7 @@ namespace mar_sumaken_web.Models
         /// 仕入先品番
         /// </summary>
         [DisplayName("仕入先品番")]
-        [MaxLength(100)]
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string SupplierProductNumber { get; set; } = string.Empty;
+        public string? SupplierProductNumber { get; set; }
 
         /// <summary>
         /// 箱数
@@ -298,6 +296,6 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 更新者
         /// </summary>
-        public string UpdatedBy { get; set; } = string.Empty;
+        public string? UpdatedBy { get; set; }
     }
 }

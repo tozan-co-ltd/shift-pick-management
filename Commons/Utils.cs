@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace mar_sumaken_web.Commons
 {
@@ -167,9 +168,17 @@ namespace mar_sumaken_web.Commons
                     // CSVファイルの一行を読み込む
                     string line = reader.ReadLine();
                     // 読み込んだ一行をカンマ毎に分けて配列に格納する
-                    string[] lineValues = line.Split(',');
+                    string[] lineArr = Regex.Split(line, @"(?<=,)(?=(?:[^""]*""[^""]*"")*[^""]*$)");
+
+                    for (int i = 0; i < lineArr.Count(); i++)
+                    {
+                        if (lineArr[i] != null)
+                        {
+                            lineArr[i] = lineArr[i].Trim(',').Trim('"').ToString();
+                        }
+                    }
                     //strに格納
-                    csvLines.Add(lineValues.Take(itemCount).ToArray());
+                    csvLines.Add(lineArr.Take(itemCount).ToArray());
                 }
 
                 //CSVファイルを閉じる

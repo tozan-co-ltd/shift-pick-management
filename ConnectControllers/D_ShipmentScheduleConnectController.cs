@@ -160,17 +160,20 @@ namespace mar_sumaken_web.Commons
 		            WHERE 
                         DepoID = {depoId} 
                         AND CompanyID = {companyId}
-                        AND DeliveryDate = {model.DeliveryDate}
+                        AND DeliveryDate = '{model.DeliveryDate}'
                         AND DeliveryTimeClass = {model.DeliveryTimeClass}
-                        AND DeliverySlipNumber = {model.DeliverySlipNumber}
-                        AND DeliveryProductNumber = {model.DeliveryProductNumber}
+                        AND DeliverySlipNumber = '{model.DeliverySlipNumber}'
+                        AND DeliveryProductNumber = '{model.DeliveryProductNumber}'
 	            )
 	            BEGIN
 		            DELETE FROM D_ShipmentSchedule
 		            WHERE 
-                        OrdererFactoryName = '{model.OrdererFactoryName}' 
-                        AND DepoID = {depoId} 
+                        DepoID = {depoId} 
                         AND CompanyID = {companyId}
+                        AND DeliveryDate = '{model.DeliveryDate}'
+                        AND DeliveryTimeClass = {model.DeliveryTimeClass}
+                        AND DeliverySlipNumber = '{model.DeliverySlipNumber}'
+                        AND DeliveryProductNumber = '{model.DeliveryProductNumber}'
 	            END
             
                 BEGIN

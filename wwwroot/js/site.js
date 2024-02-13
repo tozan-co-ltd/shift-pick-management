@@ -194,26 +194,23 @@ function onUploadFile(page) {
             processData: false,
             contentType: false
         }).done(function (response) {
-            if (response.res == "OK") {
-                hideLoading()
-                AlertMessage('', '' + modelTitle + '', '登録が完了しました。', null, null);
-            }
-            else {
-                hideLoading()
-                $("#ErrorBlock").hide()
-                $("#import-res").show()
-                $("#import-res").addClass('text-danger');
-                $("#import-res").text(response.error);
-                $('#' + page + '')[0].reset();
-            }
-        }).fail(function (jqXHR, textStatus, errorThrown) {
             hideLoading()
-            console.log("jqXHR", jqXHR.status);
-            console.log("textStatus", textStatus);
-            console.log("errorThrown", errorThrown.message);
-            $("#import-res").addClass('text-danger');
-            $("#import-res").show()
-            AlertMessage('bg-danger', 'エラー', 'E3003 サーバーに接続できませんでした。<br> ' + 'HttpRequest : ' + jqXHR.status + '<br> ' + 'textStatus : ' + textStatus, null, null);
+            AlertMessage('', '' + modelTitle + '', '登録が完了しました。', null, null);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (xhr.status === 404) {
+                // データが見つからなかった場合
+                var errorMessage = xhr.responseJSON.errorMessage;
+                $("#div-error-message").hide();
+                $("#import-res").show();
+                $("#import-res").addClass('text-danger');
+                $("#import-res").text("エラー: " + errorMessage);
+            } else {
+                // その他のエラーの場合
+                $("#div-error-message").hide();
+                $("#import-res").show();
+                $("#import-res").addClass('text-danger');
+                $("#import-res").text("データの取得に失敗しました。");
+            }
             $('#' + page + '')[0].reset();
         });
     });
