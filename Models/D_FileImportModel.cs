@@ -1,6 +1,4 @@
-﻿using mar_sumaken_web.Properties;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
@@ -52,6 +50,12 @@ namespace mar_sumaken_web.Models
         /// ファイル取込実績ID
         /// </summary>
         public int FileImportID { get; set; }
+
+
+        /// <summary>
+        /// 倉庫ID
+        /// </summary>
+        public int DepoID { get; set; }
 
         /// <summary>
         /// 倉庫名
