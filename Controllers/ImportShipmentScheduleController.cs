@@ -34,12 +34,7 @@ namespace mar_sumaken_web.Controllers
                 var model = new D_FileImportModel();
 
                 var listD_FileImport = GetListD_FileImport(ClaimsLoginUserData().DatabaseName);
-
-                if (listD_FileImport.Count > 0)
-                {
-                    IEnumerable<D_FileImportModel> query = listD_FileImport.Select(s => s);
-                    model.D_FileImportList = query.ToPagedList();
-                }
+                model.D_FileImportList = listD_FileImport;
 
                 return View(model);
             }

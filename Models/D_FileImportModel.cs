@@ -12,7 +12,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// ファイル取込実績リスト
         /// </summary>
-        public IPagedList<D_FileImportModel> D_FileImportList { get; set; }
+        public List<D_FileImportModel>? D_FileImportList { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
