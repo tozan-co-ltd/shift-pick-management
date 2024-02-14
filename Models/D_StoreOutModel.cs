@@ -85,10 +85,7 @@ namespace mar_sumaken_web.Models
         {
             // 現在日
             var now = DateTime.Today.ToString("yyyy/MM/dd");
-            // 1ヶ月前
-            var oneMonthAgo = DateTime.Today.AddMonths(-1).ToString("yyyy/MM/dd"); 
-
-            DateSearchStart = oneMonthAgo;
+            DateSearchStart = now;
             DateSearchEnd = now;
         }
         
