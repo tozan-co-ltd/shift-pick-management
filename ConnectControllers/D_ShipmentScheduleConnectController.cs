@@ -128,12 +128,20 @@ namespace mar_sumaken_web.Commons
 
                     return insertFlg;
                 }
-                catch (Exception)
+                catch (SqlException ex)
                 {
                     transaction.Rollback();
                     insertFlg = false;
                     // エラーコード：E2011
-                    throw;
+                    throw ex;
+                }
+                catch (Exception ex)
+                {
+
+                    transaction.Rollback();
+                    insertFlg = false;
+                    // エラーコード：E2011
+                    throw ex;
                 }
             }
         }
@@ -153,6 +161,11 @@ namespace mar_sumaken_web.Commons
             BEGIN 
 	            DECLARE @SupplierProductNumber AS nvarchar(100);
 	            SET @SupplierProductNumber = (SELECT TOP 1 SupplierProductNumber FROM M_Product WHERE DeliveryProductNumber = '{model.DeliveryProductNumber}' );
+                IF @SupplierProductNumber IS NULL
+		        BEGIN
+			        RAISERROR('表示用品番は正しくありません。', 16, 1)
+			        RETURN;
+		        END                
 
 	            IF EXISTS (
 		            SELECT 1
