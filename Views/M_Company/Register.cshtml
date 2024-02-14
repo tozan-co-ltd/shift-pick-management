@@ -98,22 +98,24 @@
     // 会社マスター登録
     function OnRegister() {
         $('#mCompanyForm').submit(function (event) {
-
             $("#div-error-message").text("");
             $('#import-res').text("");
 
             // フォーム情報を取得する
             var formData = $('#mCompanyForm').serializeArray();
-
             // ページの更新を禁止する
             event.preventDefault();
+            //送信イベントが他のハンドラーに伝播するのを防ぎます
+            event.stopImmediatePropagation();
 
-            // Ajax call
-            $.ajax({
-                url: window.location.origin + '@Url.Action("Register", "M_Company")',
-                method: "POST",
-                data: formData
-            })
+            // フォーム送信前に条件をご確認ください
+            if (isNotNullOrWhitespace(formData[0].value) && isNotNullOrWhitespace(formData[1].value) && isNotNullOrWhitespace(formData[2].value)) {
+                // Ajax call
+                $.ajax({
+                    url: '@Url.Action("Register", "M_Company")',
+                    method: "POST",
+                    data: formData
+                })
                 .done(function (response) {
                     $('#mCompanyForm')[0].reset();
                     // 完了モーダル表示
@@ -135,7 +137,13 @@
                         $("#import-res").text("データの取得に失敗しました。");
                     }
                 });
+            }
         });
+    }
+
+    // Null または空白ではありません
+    function isNotNullOrWhitespace(input) {
+        return input != null && input.trim() != '';
     }
 
 </script>
