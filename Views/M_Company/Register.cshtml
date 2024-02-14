@@ -1,6 +1,8 @@
-﻿@model mar_sumaken_web.Models.M_CompanyModel
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.M_CompanyModel;
 @{
-    ViewData["Title"] = "マスター情報 - 会社マスター - 登録";
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "登録";
 }
 
 <div class="card shadow masterInfo m-4">
@@ -22,23 +24,17 @@
         </div>
 
         <div class="form-group col-sm-12">
-            <p id="import-res" class="mt-1"></p>
+            <p id="div-error-message" class="mt-1 text-danger"></p>
         </div>
 
-        <div id="div-error-message" class="mb-3 ml-3 text-danger">
-        </div>
-
-        @if (ViewData["ErrorMessage"] != null || ViewData["Message"] != null)
+        @if (ViewData["ErrorMessage"] != null)
         {
-            <div id="div-message" class="mb-3 ml-3 text-danger">
-                <span class="text-danger-custom">@ViewData["ErrorMessage"] </span>
-                <span class="text-success-custom">@ViewData["Message"] </span>
-            </div>
+            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
-                <form class="col-md-12" id="mCompanyForm">
+                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="MCompanyForm">
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
                             <label>@Html.DisplayName("CompanyCode")<span style="color:red">*</span></label>
@@ -82,42 +78,38 @@
                         </div>
                     </div>
 
-                    <button class="btn btn-primary btn-icon-split" style="min-width: 80px" onclick="OnRegister()">
+                    <button class="btn btn-primary btn-icon-split" id="register-btn" style="min-width: 80px">
                         <span class="text">登録</span>
                     </button>
                 </form>
             </div>
         </div>
     </div>
-
 </div>
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript">
-
-    // 会社マスター登録
-    function OnRegister() {
-        $('#mCompanyForm').submit(function (event) {
-            $("#div-error-message").text("");
-            $('#import-res').text("");
+    // 登録ボタン押下
+    $('#register-btn').click(function () {
+        $('#MCompanyForm').submit(function (event) {
+            $('#div-error-message').text('');
 
             // フォーム情報を取得する
-            var formData = $('#mCompanyForm').serializeArray();
+            var formData = $('#MCompanyForm').serializeArray();
+
             // ページの更新を禁止する
             event.preventDefault();
-            //送信イベントが他のハンドラーに伝播するのを防ぎます
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
             event.stopImmediatePropagation();
 
-            // フォーム送信前に条件をご確認ください
-            if (isNotNullOrWhitespace(formData[0].value) && isNotNullOrWhitespace(formData[1].value) && isNotNullOrWhitespace(formData[2].value)) {
-                // Ajax call
-                $.ajax({
-                    url: '@Url.Action("Register", "M_Company")',
-                    method: "POST",
-                    data: formData
-                })
+            // Ajax call
+            $.ajax({
+                url: '@Url.Action("Register", "M_Company")',
+                method: 'POST',
+                data: formData
+            })
                 .done(function (response) {
-                    $('#mCompanyForm')[0].reset();
+                    $('#MCompanyForm')[0].reset();
                     // 完了モーダル表示
                     AlertMessage('', '完了', '登録が完了しました。', null, null);
                 })
@@ -125,26 +117,14 @@
                     if (xhr.status === 404) {
                         // データが見つからなかった場合
                         var errorMessage = xhr.responseJSON.errorMessage;
-                        $("#div-error-message").hide();
-                        $("#import-res").show();
-                        $("#import-res").addClass('text-danger');
-                        $("#import-res").text("エラー: " + errorMessage);
+                        $('#div-error-message').text(errorMessage);
                     } else {
                         // その他のエラーの場合
-                        $("#div-error-message").hide();
-                        $("#import-res").show();
-                        $("#import-res").addClass('text-danger');
-                        $("#import-res").text("データの取得に失敗しました。");
+                        $('#div-error-message').text(errorMessage);
                     }
                 });
-            }
         });
-    }
-
-    // Null または空白ではありません
-    function isNotNullOrWhitespace(input) {
-        return input != null && input.trim() != '';
-    }
+    });
 
 </script>
 

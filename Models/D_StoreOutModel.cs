@@ -11,7 +11,12 @@ namespace mar_sumaken_web.Models
     public class D_StoreOutModel : CommonModel
     {
         /// <summary>
-        /// 出庫日
+        /// 出庫実績リスト
+        /// </summary>
+        public IPagedList<D_StoreOutModel> D_StoreOutList { set; get; }
+
+        /// <summary>
+        /// 出庫日(開始)
         /// </summary>
         [Display(Name = "出庫日")]
         public string DateSearchStart { set; get; }
@@ -62,21 +67,6 @@ namespace mar_sumaken_web.Models
         /// 
         /// </summary>
         public string StoreOutDate { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<string> LstErrorMsg { set; get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Message { set; get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public IPagedList<D_StoreOutModel> LstD_StoreOut { set; get; }
 
         /// <summary>
         /// 初期値設定

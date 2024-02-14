@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using System.Data;
+using System.Reflection;
+using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -16,11 +18,13 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// 会社マスターリスト取得
+        /// 会社マスター画面表示
         /// </summary>
-        public IActionResult Index()
+        public IActionResult Index(M_CompanyModel model)
         {
-            List<M_CompanyModel> listCompany = new List<M_CompanyModel>();
+            if (model == null)
+                model = new M_CompanyModel();
+
             try
             {
                 // ログイン中ユーザー情報取得
@@ -29,26 +33,24 @@ namespace mar_sumaken_web.Controllers
                 // 管理権限区分が1(管理者)でない場合はエラーとする
                 if (user == null || user.AuthorizedKubun != 1)
                 {
-                    // エラーコード：E2011
                     ViewData["ErrorMessage"] = ErrorMessagesResources.E2001;
-                    return View(listCompany);
+                    return View(model);
                 }
 
                 // 会社マスター情報取得SQL作成
                 var sql = M_CompanyConnectController.CreateSQLToSelectMCompanys();
-                // DB接続
-                List<M_CompanyModel> companyList = M_CompanyConnectController.ConnectMCompanys(sql, user.DatabaseName);
-                if (companyList.Count > 0)
-                {
-                    listCompany = companyList;
-                }
 
-                return View(listCompany);
+                // DB接続
+                IEnumerable<M_CompanyModel> companyList = M_CompanyConnectController.ConnectMCompanys(sql, user.DatabaseName);
+
+                model.M_CompanyList = companyList.ToPagedList();
+
+                return View(model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
-                return View(listCompany);
+                return View(model);
             }
         }
 
@@ -59,7 +61,7 @@ namespace mar_sumaken_web.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            M_CompanyModel model = new M_CompanyModel();
+            M_CompanyModel model = new();
             try
             {
                 // ログイン中ユーザー情報取得
@@ -78,7 +80,7 @@ namespace mar_sumaken_web.Controllers
 
                 return View(model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // エラーメッセージ取得
                 // 「予期せぬエラーが発⽣しました。」
@@ -107,7 +109,7 @@ namespace mar_sumaken_web.Controllers
                 // 登録情報をチェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
+                    return NotFound();
                 }
 
                 // 重複会社情報取をチェック
@@ -132,21 +134,14 @@ namespace mar_sumaken_web.Controllers
 
                 return Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
-
-                // log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogError($"{exceptionMessage} {errorMessage}");
                 return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
             }
         }
 
         /// <summary>
-        /// 会社マスターを削除
+        /// 会社マスター削除
         /// </summary>
         /// <param name="companyId">会社ID</param>
         /// <returns></returns>
@@ -175,15 +170,8 @@ namespace mar_sumaken_web.Controllers
 
                 return Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
-
-                // log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogError($"{exceptionMessage} {errorMessage}");
                 return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
             }
         }

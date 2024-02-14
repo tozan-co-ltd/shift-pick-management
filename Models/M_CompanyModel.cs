@@ -1,14 +1,20 @@
 ﻿using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using X.PagedList;
 
 namespace mar_sumaken_web.Models
 {
     /// <summary>
     /// 会社マスターのModel
     /// </summary>
-    public class M_CompanyModel
+    public class M_CompanyModel : CommonModel
     {
+        /// <summary>
+        /// 会社マスターリスト
+        /// </summary>
+        public IPagedList<M_CompanyModel> M_CompanyList { set; get; }
+
         /// <summary>
         /// 会社区分リスト
         /// </summary>
