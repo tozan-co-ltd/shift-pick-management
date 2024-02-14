@@ -44,7 +44,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// 出荷指示取込一覧取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetD_FileImport()
+        public static string CreateSQLToGetD_FileImport(string menuName)
         {
             var sql = $@"
                         SELECT 
@@ -53,7 +53,9 @@ namespace mar_sumaken_web.ConnectControllers
                             CreatedBy
                         FROM 
 	                        D_FileImport
-                        WHERE CreatedAt >= DATEADD(MONTH, -1, GETDATE());
+                        WHERE
+                            MenuName = '{menuName}'
+                            AND CreatedAt >= DATEADD(MONTH, -1, GETDATE());
             ";
 
             return sql;

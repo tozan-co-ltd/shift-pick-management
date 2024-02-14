@@ -1,6 +1,5 @@
 ﻿using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace mar_sumaken_web.Models
@@ -11,11 +10,6 @@ namespace mar_sumaken_web.Models
     public class D_ReceiveScheduleModel : CommonModel
     {
         /// <summary>
-        /// 入荷予定リスト
-        /// </summary>
-        public List<D_ReceiveScheduleModel> D_ShipmentScheduleList { get; set; }
-
-        /// <summary>
         /// 検索倉庫リスト
         /// </summary>
         public IEnumerable<SelectListItem> SearchDepoList
@@ -23,17 +17,6 @@ namespace mar_sumaken_web.Models
             get
             {
                 return MDepoList;
-            }
-        }
-
-        /// <summary>
-        /// 検索会社リスト
-        /// </summary>
-        public IEnumerable<SelectListItem> SearchCompanyList
-        {
-            get
-            {
-                return MCompanyList;
             }
         }
 
@@ -53,16 +36,23 @@ namespace mar_sumaken_web.Models
         public int SelectedCompanyID { get; set; }
 
         /// <summary>
+        /// 会社コード
+        /// </summary>
+        [Display(Name = "会社コード")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? CompanyCode { get; set; }
+
+        /// <summary>
         /// 入荷予定ID
         /// </summary>
-        [DisplayName("入荷予定ID")]
+        [Display(Name = "入荷予定ID")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int ReceiveScheduleID { get; set; }
 
         /// <summary>
         /// 入荷予定日
         /// </summary>
-        [DisplayName("入荷予定日")]
+        [Display(Name = "入荷予定日")]
         [DataType(DataType.Date)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public DateTime ReceiveScheduleDate { get; set; }
@@ -70,23 +60,23 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 仕入先品番
         /// </summary>
-        [DisplayName("仕入先品番")]
-        [MaxLength(100)]
+        [Display(Name = "仕入先品番")]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? SupplierProductNumber { get; set; }
 
         /// <summary>
         /// ロット番号
         /// </summary>
-        [DisplayName("ロット番号")]
-        [MaxLength(100)]
+        [Display(Name = "ロット番号")]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? LotNumber { get; set; }
 
         /// <summary>
         /// 数量
         /// </summary>
-        [DisplayName("数量")]
+        [Display(Name = "数量")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int Quantity { get; set; }
 

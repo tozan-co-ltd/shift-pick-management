@@ -37,7 +37,7 @@
                         </div>
                     </div>
                     <div class="col-16 d-flex justify-content-start align-items-center sp-tablet mb-3">
-                        <button class="btn btn-info btn-icon-split sp-mg-bt-10">
+                    <button class="btn btn-info btn-icon-split sp-mg-bt-10" onclick="onExportFile('ImportReceiveSchedule')">
                             <span class="icon text-white-50">
                                 <i class="fa-solid fa-file-export"></i>
                             </span>
@@ -49,7 +49,7 @@
                                     <label class="input-group-btn my-0">
                                         <span class="btn btn-secondary btn-icon-split btn-pd20" id="browse">
                                             ファイル選択
-                                            <input class="excel-input" name="FileUpload" type="file" accept=".xlsx" multiple>
+                                        <input class="excel-input" id="FileUpload" name="FileUpload" type="file" accept=".csv" multiple>
                                         </span>
                                     </label>
                                     <input type="text" class="form-control rounded-0" readonly placeholder="CSVファイルを選択してください">
