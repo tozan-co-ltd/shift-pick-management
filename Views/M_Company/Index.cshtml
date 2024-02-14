@@ -1,6 +1,8 @@
-﻿@model List<mar_sumaken_web.Models.M_CompanyModel>
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.M_CompanyModel;
 @{
-    ViewData["Title"] = "マスター情報 - 会社マスター";
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 <style type="text/css">
     .btn-register {
@@ -55,9 +57,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (@Model != null  && @Model.Count > 0)
+                    @if (@Model != null && @Model.M_CompanyList != null && @Model.M_CompanyList.Count > 0)
                     {
-                        @foreach (var item in @Model)
+                        @foreach (var item in @Model.M_CompanyList)
                         {
                             <tr>
                                 <td>

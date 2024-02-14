@@ -133,8 +133,8 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ログインユーザー情報取得
-                List<M_User> mUsers = LoginController.GetMUserToLogin(mCompany.DatabaseName, loginId);
-                M_User? mUser = mUsers.FirstOrDefault();
+                List<M_UserModel> mUsers = LoginController.GetMUserToLogin(mCompany.DatabaseName, loginId);
+                M_UserModel? mUser = mUsers.FirstOrDefault();
                 
                 // 一致するデータが無い場合
                 if (mUser == null)
@@ -176,11 +176,8 @@ namespace mar_sumaken_web.Controllers
 
                 return loginUserModel;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーを作成
-                // エラーコード：E2011
-                //throw new Exception();
                 throw;
             }
         }
@@ -191,14 +188,14 @@ namespace mar_sumaken_web.Controllers
         /// <param name="loginId">ログインID</param>
         /// <param name="authorizedKubunList">管理権限区分リスト</param>
         /// <returns>MUsersViewModel</returns>
-        public static List<M_User> GetMUserToLogin(string databaseName, string loginId)
+        public static List<M_UserModel> GetMUserToLogin(string databaseName, string loginId)
         {
             try
             {
                 // SQL作成
                 var sql = LoginConnectController.CreateSQLToSelectMUerByLoginUser(loginId);
                 // DB接続
-                List<M_User> userList = M_UserConnectController.ConnectMUsers(sql, databaseName);
+                List<M_UserModel> userList = M_UserConnectController.ConnectMUsers(sql, databaseName);
                 return userList;
             }
             catch (Exception)
@@ -239,7 +236,6 @@ namespace mar_sumaken_web.Controllers
                 }
                 else
                 {
-                    // エラーコード：E2011
                     throw new Exception();
                 }
             }

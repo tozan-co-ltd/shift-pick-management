@@ -136,7 +136,7 @@ body {
     --font-family-sans-serif: "BIZ UDPGothic", Meiryo UI, sans-serif !important;
 }
 
-.text-danger-custom {
+/*.text-danger-custom {
     color: var(--maincolor);
     font-weight: 800;
 }
@@ -144,7 +144,7 @@ body {
 .text-success-custom {
     color: var(--subcolor);
     font-weight: 800;
-}
+}*/
 
 .btn-search {
     border: none !important;
