@@ -213,11 +213,11 @@ namespace mar_sumaken_web.Controllers
         private bool CheckIsValidHeader(string[] headerCheck)
         {
             Dictionary<int, string> headerSettings = new Dictionary<int, string>();
-            headerSettings[0] = "会社コード";
-            headerSettings[1] = "入荷予定日";
-            headerSettings[2] = "仕入先品番";
-            headerSettings[3] = "ロット番号";
-            headerSettings[4] = "数量";
+            headerSettings[0] = Utils.GetDisplayName<D_ReceiveScheduleModel>("CompanyCode");
+            headerSettings[1] = Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleDate");
+            headerSettings[2] = Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber");
+            headerSettings[3] = Utils.GetDisplayName<D_ReceiveScheduleModel>("LotNumber");
+            headerSettings[4] = Utils.GetDisplayName<D_ReceiveScheduleModel>("Quantity");
 
             foreach (var setItem in headerSettings)
             {
