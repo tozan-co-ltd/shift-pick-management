@@ -4,8 +4,7 @@ using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using X.PagedList;
+using System.Data.SqlClient;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -99,6 +98,7 @@ namespace mar_sumaken_web.Controllers
                     foreach (var file in files)
                     {
                         List<D_ShipmentScheduleModel> importModelList = new();
+                        List<string> errorList = new List<string>();
                         var fileName = file.FileName;
                         if (file.Length > 0)
                         {
@@ -170,16 +170,27 @@ namespace mar_sumaken_web.Controllers
                                     var validationResults = new List<ValidationResult>();
                                     bool isValid = Validator.TryValidateObject(shipmentSchedule, validationContext, validationResults, true);
 
+                                    // エラーがあります。
                                     if (!isValid)
                                     {
-                                        // エラーメッセージ取得
-                                        return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                                        foreach (var err in validationResults)
+                                        {
+                                            var msg = readCount + "行目" + "　" + err.ErrorMessage;
+                                            errorList.Add(msg);
+                                        }
                                     }
-
+                                    // リストに項目を追加
                                     importModelList.Add(shipmentSchedule);
                                 }
                                 readCount++;
                             }
+                        }
+
+                        // エラーチェック
+                        if (errorList.Count > 0)
+                        {
+                            var errorMsg = "<br/>" + string.Join("</br>", errorList);
+                            return NotFound(new { errorMessage = errorMsg });
                         }
 
                         // 出荷指示データ書き込み
@@ -200,6 +211,10 @@ namespace mar_sumaken_web.Controllers
 
                 return Ok();
             }
+            catch (SqlException ex)
+            {
+                return NotFound(new { errorMessage = ex.Message });
+            }
             catch (Exception ex)
             {
                 // エラーメッセージ取得
@@ -218,34 +233,33 @@ namespace mar_sumaken_web.Controllers
         private bool CheckIsValidHeader(string[] headerCheck)
         {
             Dictionary<int, string> headerSettings = new Dictionary<int, string>();
-            headerSettings[0] = "発注者";
-            headerSettings[1] = "発注者事業所";
-            headerSettings[2] = "受注者";
-            headerSettings[3] = "受注者事業所";
-            headerSettings[4] = "品番";
-            headerSettings[5] = "部品取扱識別";
-            headerSettings[6] = "発注元";
-            headerSettings[7] = "発注元工区";
-            headerSettings[8] = "発注元名称";
-            headerSettings[9] = "発注元工場名";
-            headerSettings[10] = "出荷元";
-            headerSettings[11] = "出荷元工区";
-            headerSettings[13] = "出荷元名称";
-            headerSettings[22] = "定期／不定期区分名称";
-            headerSettings[24] = "発行日";
-            headerSettings[25] = "納入指示日";
-            headerSettings[26] = "納入指示時刻";
-            headerSettings[27] = "便";
-            headerSettings[28] = "輸送識別";
-            headerSettings[30] = "納品書番号";
-            headerSettings[31] = "ページ数";
-            headerSettings[32] = "行No";
-            headerSettings[34] = "表示用品番";
-            headerSettings[35] = "背番号";
-            headerSettings[36] = "品名";
-            headerSettings[37] = "収容数";
-            headerSettings[43] = "枝番";
-            headerSettings[44] = "納入指示数";
+            headerSettings[6] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererCode");
+            headerSettings[7] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererFactoryKubun");
+            headerSettings[8] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererName");
+            headerSettings[9] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererFactoryName");
+            headerSettings[10] = Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipperCode");
+            headerSettings[11] = Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipperFactoryKubun");
+            headerSettings[13] = Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipperName");
+            headerSettings[16] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryCode");
+            headerSettings[17] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryKubun");
+            headerSettings[18] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryLocation");
+            headerSettings[19] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryName");
+            headerSettings[20] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryName");
+            headerSettings[22] = Utils.GetDisplayName<D_ShipmentScheduleModel>("RegularKubun");
+            headerSettings[24] = Utils.GetDisplayName<D_ShipmentScheduleModel>("IssuedDate");
+            headerSettings[25] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryDate");
+            headerSettings[26] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryTime");
+            headerSettings[27] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryTimeClass");
+            headerSettings[28] = Utils.GetDisplayName<D_ShipmentScheduleModel>("TranspotationIdentify");
+            headerSettings[30] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipNumber");
+            headerSettings[31] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipPageNumber");
+            headerSettings[32] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipRowNumber");
+            headerSettings[34] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductNumber");
+            headerSettings[35] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductAbbreviation");
+            headerSettings[36] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductName");
+            headerSettings[37] = Utils.GetDisplayName<D_ShipmentScheduleModel>("LotQuantity");
+            headerSettings[43] = Utils.GetDisplayName<D_ShipmentScheduleModel>("BranchNumber");
+            headerSettings[44] = Utils.GetDisplayName<D_ShipmentScheduleModel>("Quantity");
 
             foreach (var setItem in headerSettings)
             {
@@ -278,32 +292,34 @@ namespace mar_sumaken_web.Controllers
 
             model.RegularKubun = lines[readCount][22];
 
-            model.IssuedDate = DateTime.ParseExact(lines[readCount][24], Utils.DateFormats, CultureInfo.InvariantCulture);
-            model.DeliveryDate = DateTime.ParseExact(lines[readCount][25], Utils.DateFormats, CultureInfo.InvariantCulture);
+            model.IssuedDate = lines[readCount][24];
+            model.DeliveryDate = lines[readCount][25];
             model.DeliveryTime = lines[readCount][26];
-            model.DeliveryTimeClass = Convert.ToInt32(lines[readCount][27]);
+            model.DeliveryTimeClass = lines[readCount][27];
             model.TranspotationIdentify = lines[readCount][28];
 
             model.DeliverySlipNumber = lines[readCount][30];
-            model.DeliverySlipPageNumber = Convert.ToInt32(lines[readCount][31]);
-            model.DeliverySlipRowNumber = Convert.ToInt32(lines[readCount][32]);
+            model.DeliverySlipPageNumber = lines[readCount][31];
+            model.DeliverySlipRowNumber = lines[readCount][32];
 
             model.DeliveryProductNumber = lines[readCount][34];
             model.DeliveryProductAbbreviation = lines[readCount][35];
             model.DeliveryProductName = lines[readCount][36];
-            model.LotQuantity = Convert.ToInt32(lines[readCount][37]);
+            model.LotQuantity = lines[readCount][37];
 
-            model.BranchNumber = Convert.ToInt32(lines[readCount][43]);
-            model.Quantity = Convert.ToInt32(lines[readCount][44]);
+            model.BranchNumber = lines[readCount][43];
+            model.Quantity = lines[readCount][44];
 
             // 箱数＝納入指示数/収容数
-            if (model.Quantity == 0 || model.LotQuantity == 0)
+            var quantityValue = Convert.ToInt32(model.Quantity);
+            var lotQuantity = Convert.ToInt32(model.LotQuantity);
+            if (quantityValue == 0 || lotQuantity == 0)
             {
                 model.NumberOfBoxes = 0;
             }
             else
             {
-                model.NumberOfBoxes = model.Quantity / model.LotQuantity;
+                model.NumberOfBoxes = quantityValue / lotQuantity;
             }
 
             return model;

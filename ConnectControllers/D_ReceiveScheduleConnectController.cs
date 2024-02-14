@@ -127,12 +127,19 @@ namespace mar_sumaken_web.Commons
 
                     return insertFlg;
                 }
-                catch (Exception)
+                catch (SqlException ex)
                 {
                     transaction.Rollback();
                     insertFlg = false;
                     // エラーコード：E2011
-                    throw;
+                    throw ex;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    insertFlg = false;
+                    // エラーコード：E2011
+                    throw ex;
                 }
             }
         }
@@ -150,8 +157,25 @@ namespace mar_sumaken_web.Commons
             var sql = $@"
 
             BEGIN 
-	            DECLARE @CompanyID AS int;
-	            SET @CompanyID = (SELECT TOP 1 CompanyID FROM M_Company WHERE CompanyCode = '{model.CompanyCode}' );
+	            --会社コードチェック
+                DECLARE @CompanyID AS int;
+	            SET @CompanyID = (SELECT TOP 1 CompanyID FROM M_Company WHERE CompanyCode = {model.CompanyCode} );
+                IF @CompanyID IS NULL
+		        BEGIN
+			        RAISERROR('会社コードは正しくありません。', 16, 1)
+			        RETURN;
+		        END
+                
+                --仕入先品番チェック
+                DECLARE @productExist INT;
+                SELECT @productExist = COUNT(*) FROM M_Product AS product 
+                                 WHERE product.SupplierProductNumber = '{model.SupplierProductNumber}'
+                                 AND product.IsDeleted = 0;
+                IF @productExist = 0
+                BEGIN
+                    RAISERROR('仕入先品番は正しくありません。', 16, 1);
+                    RETURN;
+                END
 
 	            IF EXISTS (
 		            SELECT 1

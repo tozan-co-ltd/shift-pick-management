@@ -3,9 +3,12 @@ using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Data.SqlClient;
 using System.Globalization;
+using System.Transactions;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -95,6 +98,7 @@ namespace mar_sumaken_web.Controllers
                     foreach (var file in files)
                     {
                         List<D_ReceiveScheduleModel> importModelList = new();
+                        List<string> errorList = new List<string>();
                         var fileName = file.FileName;
                         if (file.Length > 0)
                         {
@@ -164,17 +168,27 @@ namespace mar_sumaken_web.Controllers
                                     var validationContext = new ValidationContext(receiveSchedule);
                                     var validationResults = new List<ValidationResult>();
                                     bool isValid = Validator.TryValidateObject(receiveSchedule, validationContext, validationResults, true);
-
+                                    
+                                    // エラーがあります。
                                     if (!isValid)
                                     {
-                                        // エラーメッセージ取得
-                                        return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                                        foreach(var err in validationResults)
+                                        {
+                                            var msg = readCount + "行目" + "　" + err.ErrorMessage;
+                                            errorList.Add(msg);
+                                        }
                                     }
-
+                                    // リストに項目を追加
                                     importModelList.Add(receiveSchedule);
                                 }
                                 readCount++;
                             }
+                        }
+                        // エラーチェック
+                        if (errorList.Count > 0)
+                        {
+                            var errorMsg = "<br/>" + string.Join("</br>", errorList);
+                            return NotFound(new { errorMessage = errorMsg });
                         }
 
                         // 入荷予定データ書き込み
@@ -194,6 +208,10 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 return Ok();
+            }
+            catch (SqlException ex)
+            {
+                return NotFound(new { errorMessage = ex.Message });
             }
             catch (Exception ex)
             {
@@ -235,10 +253,10 @@ namespace mar_sumaken_web.Controllers
         private D_ReceiveScheduleModel SetReadDataInModel(D_ReceiveScheduleModel model, List<string[]> lines, int readCount)
         {
             model.CompanyCode = lines[readCount][0];
-            model.ReceiveScheduleDate = DateTime.ParseExact(lines[readCount][1], Utils.DateFormats, CultureInfo.InvariantCulture);
+            model.ReceiveScheduleDate = lines[readCount][1];
             model.SupplierProductNumber = lines[readCount][2];
             model.LotNumber = lines[readCount][3];
-            model.Quantity = Convert.ToInt32(lines[readCount][4]);
+            model.Quantity = lines[readCount][4];
 
             return model;
         }

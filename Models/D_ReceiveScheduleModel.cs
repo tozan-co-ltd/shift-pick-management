@@ -40,6 +40,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "会社コード")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [RegularExpression(@"[0-9]+")]
         public string? CompanyCode { get; set; }
 
         /// <summary>
@@ -53,9 +54,9 @@ namespace mar_sumaken_web.Models
         /// 入荷予定日
         /// </summary>
         [Display(Name = "入荷予定日")]
-        [DataType(DataType.Date)]
+        [RegularExpression(@"^\d{4}/\d{1,2}/\d{1,2}$")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public DateTime ReceiveScheduleDate { get; set; }
+        public string ReceiveScheduleDate { get; set; }
 
         /// <summary>
         /// 仕入先品番
@@ -78,7 +79,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "数量")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public int Quantity { get; set; }
+        public string Quantity { get; set; }
 
         /// <summary>
         /// 更新日時

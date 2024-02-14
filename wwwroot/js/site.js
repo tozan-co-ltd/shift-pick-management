@@ -196,7 +196,7 @@ function onUploadFile(page) {
                 $("#div-error-message").hide();
                 $("#import-res").show();
                 $("#import-res").addClass('text-danger');
-                $("#import-res").text("エラー: " + errorMessage);
+                $("#import-res").html("エラー: " + errorMessage);
             } else {
                 // その他のエラーの場合
                 $("#import-res").addClass('text-danger');
