@@ -6,20 +6,15 @@ using X.PagedList;
 namespace mar_sumaken_web.Models
 {
     /// <summary>
-    /// 入庫実績テーブルのModel
+    /// 入荷予定照会テーブルのModel
     /// </summary>
-    public class D_StoreInModel: CommonModel
+    public class StockStatusModel : CommonModel
     {
         /// <summary>
-        /// 入庫日
+        /// 年月日
         /// </summary>
-        [Display(Name = "入庫日")]
+        [Display(Name = "年月日")]
         public string DateSearchStart { set; get; }
-
-        /// <summary>
-        /// 入庫日(終了)
-        /// </summary>
-        public string DateSearchEnd { set; get; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -53,19 +48,29 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public int SelectedCompanyID { get; set; }
 
-        public List<string> LstErrorMsg { set; get; }//エラーメッセージリスト
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<string> LstErrorMsg { set; get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string Message { set; get; }
 
-        public IPagedList<D_StoreInModel> LstD_StoreIn { set; get; }//一覧画面のlistを取得と設定
+        /// <summary>
+        /// 
+        /// </summary>
+        public IPagedList<StockStatusModel> LstStockStatus { set; get; }
 
-        // <summary>
+        /// <summary>
         /// 初期値設定
         /// </summary>
-        public D_StoreInModel()
+        public StockStatusModel()
         {
-            var now = DateTime.Today.ToString("yyyy/MM/dd"); //　現在日
+            // 現在日
+            var now = DateTime.Today.ToString("yyyy/MM/dd");
             DateSearchStart = now;
-            DateSearchEnd = now;
         }
     }
 }

@@ -10,6 +10,18 @@ namespace mar_sumaken_web.Models
     /// </summary>
     public class D_ShipmentScheduleModel : CommonModel
     {
+
+        /// <summary>
+        /// 出庫日
+        /// </summary>
+        [Display(Name = "入荷日")]
+        public string DateSearchStart { set; get; }
+
+        /// <summary>
+        /// 出庫日(終了)
+        /// </summary>
+        public string DateSearchEnd { set; get; }
+
         /// <summary>
         /// 出荷指示リスト
         /// </summary>
@@ -303,6 +315,17 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 更新者
         /// </summary>
-        public string? UpdatedBy { get; set; }
+        public string UpdatedBy { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 初期値設定
+        /// </summary>
+        public D_ShipmentScheduleModel()
+        {
+            // 現在日
+            var now = DateTime.Today.AddDays(+1).ToString("yyyy/MM/dd");
+            DateSearchStart = now;
+            DateSearchEnd = now;
+        }
     }
 }
