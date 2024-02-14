@@ -107,6 +107,15 @@ function onUploadFile(page) {
     // FormDataオブジェクト利用
     var formData = new FormData(document.querySelector('#' + page + ''));
 
+    var fileUpload = document.getElementById('FileUpload');
+    if (fileUpload.files.length <= 0) {
+        $('#import-res').text('ファイルが選択されていません。');
+        $("#import-res").show()
+        $("#import-res").addClass('text-danger');
+        $("#ErrorBlock").hide()
+        return false;
+    }
+
     var IsFirst = true;
     for (var file of formData) {
         if (IsFirst) {
@@ -135,6 +144,9 @@ function onUploadFile(page) {
     var modelTitle = "";
     if (page == 'import-shimpment-schedule-upload-form')
         modelTitle = "出荷指示取込";
+
+    if (page == 'import-receive-schedule-upload-form')
+        modelTitle = "入荷予定取込";
 
     if (page == 'shipping-plan-import-upload-form')
         modelTitle = "出荷計画取込";
@@ -197,20 +209,10 @@ function onUploadFile(page) {
             hideLoading()
             AlertMessage('', '' + modelTitle + '', '登録が完了しました。', null, null);
         }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (xhr.status === 404) {
-                // データが見つからなかった場合
-                var errorMessage = xhr.responseJSON.errorMessage;
-                $("#div-error-message").hide();
-                $("#import-res").show();
-                $("#import-res").addClass('text-danger');
-                $("#import-res").text("エラー: " + errorMessage);
-            } else {
-                // その他のエラーの場合
-                $("#div-error-message").hide();
-                $("#import-res").show();
-                $("#import-res").addClass('text-danger');
-                $("#import-res").text("データの取得に失敗しました。");
-            }
+            hideLoading()
+            $("#import-res").addClass('text-danger');
+            $("#import-res").show()
+            AlertMessage('bg-danger', 'エラー', 'E3003 サーバーに接続できませんでした。<br> ' + 'HttpRequest : ' + jqXHR.status + '<br> ' + 'textStatus : ' + textStatus, null, null);
             $('#' + page + '')[0].reset();
         });
     });

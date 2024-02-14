@@ -6,20 +6,20 @@ using System.Data.SqlClient;
 namespace mar_sumaken_web.Commons
 {
     /// <summary>
-    /// 出荷指示テーブルに関する関数
+    /// 入荷予定テーブルに関する関数
     /// </summary>
-    public static class D_ShipmentScheduleConnectController
+    public static class D_ReceiveScheduleConnectController
     {
         /// <summary>
         /// データベースに接続し、SQL実行
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
-        /// <returns>出荷指示情報</returns>
-        public static List<D_ShipmentScheduleModel> ConnectDShipmentSchedules(string sql, string databaseName)
+        /// <returns>入荷予定情報</returns>
+        public static List<D_ReceiveScheduleModel> ConnectDReceiveSchedules(string sql, string databaseName)
         {
             // 戻り値
-            List<D_ShipmentScheduleModel> strList = new();
+            List<D_ReceiveScheduleModel> strList = new();
 
             // DB接続
             try
@@ -32,7 +32,7 @@ namespace mar_sumaken_web.Commons
                     connection.ConnectionString = connectionString;
                     connection.Open();
 
-                    strList = connection.Query<D_ShipmentScheduleModel>(sql).ToList();
+                    strList = connection.Query<D_ReceiveScheduleModel>(sql).ToList();
                 }
                 return strList;
             }
@@ -43,16 +43,16 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 会社マスターSELECT文SQL作成
+        /// 入荷予定SELECT文SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectDShipmentSchedules()
+        public static string CreateSQLToSelectDReceiveSchedules()
         {
             var sql = $@"
                     SELECT
                        *
                     FROM 
-                        D_ShipmentSchedule
+                        D_ReceiveSchedule
                     WHERE
                         IsDeleted = 0
                 ;";
@@ -61,15 +61,14 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 出荷指示データ書き込み
+        /// 入荷予定データ書き込み
         /// </summary>
         /// <param name="model"></param>
         /// <param name="depoId">倉庫ID</param>
-        /// <param name="companyId">会社ID</param>
         /// <param name="importFileName">取込ファイル名</param>
         /// <param name="user">ユーザー</param>
         /// <returns></returns>
-        public static bool InsertDShipmentSchedule(List<D_ShipmentScheduleModel> modelList, int depoId, int companyId, string importFileName,　LoginUserModel user)
+        public static bool InsertDReceiveSchedule(List<D_ReceiveScheduleModel> modelList, int depoId, string importFileName,　LoginUserModel user)
         {
             bool insertFlg = true;
 
@@ -91,9 +90,9 @@ namespace mar_sumaken_web.Commons
 
                     foreach (var model in modelList) 
                     {
-                        // 出荷指示取込SQL作成
-                        string insertSql = CreateSQLToInsertDShipmentSchedule(model, depoId, companyId, systemDate, user.UserName);
-                        // 出荷指示取込
+                        // 入荷予定取込SQL作成
+                        string insertSql = CreateSQLToInsertDReceiveSchedule(model, depoId, systemDate, user.UserName);
+                        // 入荷予定取込
                         int affectRows = connection.Execute(insertSql, null, transaction);
                         // 更新件数が0の場合はエラーとする
                         if (affectRows == 0)
@@ -107,7 +106,7 @@ namespace mar_sumaken_web.Commons
                     //　ファイル取込実績テーブル
                     D_FileImportModel dFileImportModel = new D_FileImportModel();
                     dFileImportModel.DepoID = depoId;
-                    dFileImportModel.MenuName = "出荷指示取込";
+                    dFileImportModel.MenuName = "入荷予定取込";
                     dFileImportModel.ImportFileName = importFileName;
                     dFileImportModel.CreatedAt = systemDate;
                     dFileImportModel.CreatedBy = user.UserName;
@@ -139,79 +138,54 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 出荷指示データINSERT文SQL作成
+        /// 入荷予定データINSERT文SQL作成
         /// </summary>
         /// <param name="model">モデル</param>
         /// <param name="depoId">倉庫ID</param>
-        /// <param name="companyId">会社ID</param>
+        /// <param name="createdAt">システム時間</param>
         /// <param name="userName">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToInsertDShipmentSchedule(D_ShipmentScheduleModel model, int depoId, int companyId, DateTime createdAt,string userName)
+        private static string CreateSQLToInsertDReceiveSchedule(D_ReceiveScheduleModel model, int depoId, DateTime createdAt,string userName)
         {
             var sql = $@"
 
             BEGIN 
-	            DECLARE @SupplierProductNumber AS nvarchar(100);
-	            SET @SupplierProductNumber = (SELECT TOP 1 SupplierProductNumber FROM M_Product WHERE DeliveryProductNumber = '{model.DeliveryProductNumber}' );
+	            DECLARE @CompanyID AS int;
+	            SET @CompanyID = (SELECT TOP 1 CompanyID FROM M_Company WHERE CompanyCode = '{model.CompanyCode}' );
 
 	            IF EXISTS (
 		            SELECT 1
-		            FROM D_ShipmentSchedule
+		            FROM D_ReceiveSchedule
 		            WHERE 
                         DepoID = {depoId} 
-                        AND CompanyID = {companyId}
-                        AND DeliveryDate = '{model.DeliveryDate}'
-                        AND DeliveryTimeClass = {model.DeliveryTimeClass}
-                        AND DeliverySlipNumber = '{model.DeliverySlipNumber}'
-                        AND DeliveryProductNumber = '{model.DeliveryProductNumber}'
+                        AND CompanyID = @CompanyID
+                        AND ReceiveScheduleDate = '{model.ReceiveScheduleDate}'
+                        AND SupplierProductNumber = '{model.SupplierProductNumber}'
+                        AND LotNumber = '{model.LotNumber}'
                         AND IsDeleted = 0
 	            )
 	            BEGIN
-		            DELETE FROM D_ShipmentSchedule
+
+                    UPDATE D_ReceiveSchedule
+                    SET Quantity = {model.Quantity}, UpdatedAt = '{createdAt}', UpdatedBy = '{userName}'
 		            WHERE 
                         DepoID = {depoId} 
-                        AND CompanyID = {companyId}
-                        AND DeliveryDate = '{model.DeliveryDate}'
-                        AND DeliveryTimeClass = {model.DeliveryTimeClass}
-                        AND DeliverySlipNumber = '{model.DeliverySlipNumber}'
-                        AND DeliveryProductNumber = '{model.DeliveryProductNumber}'
+                        AND CompanyID = @CompanyID
+                        AND ReceiveScheduleDate = '{model.ReceiveScheduleDate}'
+                        AND SupplierProductNumber = '{model.SupplierProductNumber}'
+                        AND LotNumber = '{model.LotNumber}'
                         AND IsDeleted = 0
 	            END
-            
+                ELSE
                 BEGIN
-                    INSERT INTO D_ShipmentSchedule
+                    INSERT INTO D_ReceiveSchedule
                     (
                         DepoID,
                         CompanyID,
-                        OrdererCode,
-                        OrdererFactoryKubun,
-                        OrdererName,
-                        OrdererFactoryName,
-                        ShipperCode,
-                        ShipperFactoryKubun,
-                        ShipperName,
-                        DeliveryCode,
-                        DeliveryFactoryKubun,
-                        DeliveryLocation,
-                        DeliveryName,
-                        DeliveryFactoryName,
-                        RegularKubun,
-                        IssuedDate,
-                        DeliveryDate,
-                        DeliveryTime,
-                        DeliveryTimeClass,
-                        TranspotationIdentify,
-                        DeliverySlipNumber,
-                        DeliverySlipPageNumber,
-                        DeliverySlipRowNumber,
-                        DeliveryProductNumber,
-                        DeliveryProductAbbreviation,
-                        DeliveryProductName,
-                        LotQuantity,
-                        BranchNumber,
-                        Quantity,
+                        ReceiveScheduleDate,
                         SupplierProductNumber,
-                        NumberOfBoxes,
+                        LotNumber,
+                        Quantity,
                         CreatedAt,
                         CreatedBy,
                         UpdatedAt,
@@ -220,36 +194,11 @@ namespace mar_sumaken_web.Commons
                     VALUES 
                     (
                         {depoId},
-                        {companyId},
-                        '{model.OrdererCode}',
-                        '{model.OrdererFactoryKubun}',
-                        '{model.OrdererName}',
-                        '{model.OrdererFactoryName}',
-                        '{model.ShipperCode}',
-                        '{model.ShipperFactoryKubun}',
-                        '{model.ShipperName}',
-                        '{model.DeliveryCode}',
-                        '{model.DeliveryFactoryKubun}',
-                        '{model.DeliveryLocation}',
-                        '{model.DeliveryName}',
-                        '{model.DeliveryFactoryName}',
-                        '{model.RegularKubun}',
-                        '{model.IssuedDate}',
-                        '{model.DeliveryDate}',
-                        '{model.DeliveryTime}',
-                        {model.DeliveryTimeClass},
-                        '{model.TranspotationIdentify}',
-                        '{model.DeliverySlipNumber}',
-                        {model.DeliverySlipPageNumber},
-                        {model.DeliverySlipRowNumber},
-                        '{model.DeliveryProductNumber}',
-                        '{model.DeliveryProductAbbreviation}',
-                        '{model.DeliveryProductName}',
-                        {model.LotQuantity},
-                        {model.BranchNumber},
-                        {model.Quantity},
-                        @SupplierProductNumber,
-                        {model.NumberOfBoxes},
+                        @CompanyID,
+                        '{model.ReceiveScheduleDate}',
+                        '{model.SupplierProductNumber}',
+                        '{model.LotNumber}',
+                        '{model.Quantity}',
                         '{createdAt}',
                         '{userName}',
                         '{createdAt}',

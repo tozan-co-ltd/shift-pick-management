@@ -60,7 +60,7 @@ namespace mar_sumaken_web.Controllers
         public List<D_FileImportModel> GetListD_FileImport(string databaseName)
         {
             // SQL作成
-            var sql = D_FileImportConnectController.CreateSQLToGetD_FileImport();
+            var sql = D_FileImportConnectController.CreateSQLToGetD_FileImport("出荷指示取込");
 
             // DB接続
             List<D_FileImportModel> strList = D_FileImportConnectController.ConnectD_FileImport(sql, databaseName);
@@ -127,7 +127,7 @@ namespace mar_sumaken_web.Controllers
                             if (!isValidCsv)
                             {
                                 // エラーメッセージ取得
-                                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                                return NotFound(new { errorMessage = "正しいファイルを指定してください。" });
                             }
 
                             // 空行削除
@@ -278,8 +278,8 @@ namespace mar_sumaken_web.Controllers
 
             model.RegularKubun = lines[readCount][22];
 
-            model.IssuedDate = DateTime.ParseExact(lines[readCount][24], "yyyyMMdd", CultureInfo.InvariantCulture);
-            model.DeliveryDate = DateTime.ParseExact(lines[readCount][25], "yyyyMMdd", CultureInfo.InvariantCulture);
+            model.IssuedDate = DateTime.ParseExact(lines[readCount][24], Utils.DateFormats, CultureInfo.InvariantCulture);
+            model.DeliveryDate = DateTime.ParseExact(lines[readCount][25], Utils.DateFormats, CultureInfo.InvariantCulture);
             model.DeliveryTime = lines[readCount][26];
             model.DeliveryTimeClass = Convert.ToInt32(lines[readCount][27]);
             model.TranspotationIdentify = lines[readCount][28];
