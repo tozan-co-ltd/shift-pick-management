@@ -6,6 +6,11 @@ namespace mar_sumaken_web.Controllers
 {
     public class D_StoreInController : Controller
     {
+        /// <summary>
+        /// 入庫 - 入荷実績照会
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public IActionResult Index(D_StoreInModel model)
         {
             if (model == null)

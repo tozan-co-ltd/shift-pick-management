@@ -1,12 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using mar_sumaken_web.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace mar_sumaken_web.Controllers
 {
-    public class StockStatusController : Controller
+    public class StockStatusController : BaseController
     {
-        public IActionResult Index()
+        /// <summary>
+        /// 入庫 - 入荷予定照会
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public IActionResult Index(StockStatusModel model)
         {
-            return View();
+            if (model == null)
+                model = new StockStatusModel();
+
+            return View(model);
         }
     }
 }
