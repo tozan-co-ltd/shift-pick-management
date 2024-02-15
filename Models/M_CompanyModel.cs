@@ -13,7 +13,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 会社マスターリスト
         /// </summary>
-        public IPagedList<M_CompanyModel> M_CompanyList { set; get; }
+        public IPagedList<M_CompanyModel> M_CompanyList { get; set; }
 
         /// <summary>
         /// 会社区分リスト
@@ -24,7 +24,7 @@ namespace mar_sumaken_web.Models
         /// 会社ID
         /// </summary>
         [Display(Name = "ID")]
-        public int CompanyID { set; get; }
+        public int CompanyID { get; set; }
 
         /// <summary>
         /// 会社コード
@@ -32,61 +32,61 @@ namespace mar_sumaken_web.Models
         [Display(Name = "会社コード")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [RegularExpression(@"[0-9]{1,10}")]
-        public int CompanyCode { set; get; }
+        public int CompanyCode { get; set; }
 
         /// <summary>
         /// 会社区分
         /// </summary>
         [Display(Name = "会社区分")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public int CompanyKubun { set; get; }
+        public int CompanyKubun { get; set; }
 
         /// <summary>
         /// 会社区分名
         /// </summary>
-        public string? CompanyKubunName { set; get; }
+        public string? CompanyKubunName { get; set; }
 
         /// <summary>
         /// 会社名
         /// </summary>
         [Display(Name = "会社名")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string CompanyName { set; get; }
+        public string CompanyName { get; set; }
 
         /// <summary>
         /// 取引先名
         /// </summary>
         [Display(Name = "取引先名")]
-        public string? ClientName { set; get; }
+        public string? ClientName { get; set; }
 
         /// <summary>
         /// 削除フラグ
         /// </summary>
         [Display(Name = "未使用フラグ")]
-        public bool IsDeleted { set; get; } = false;
+        public bool IsDeleted { get; set; } = false;
 
         /// <summary>
         /// 作成日時
         /// </summary>
         [Display(Name = "作成日時")]
-        public DateTime CreatedAt { set; get; }
+        public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// 作成者
         /// </summary>
         [Display(Name = "作成者")]
-        public string? CreatedBy { set; get; }
+        public string? CreatedBy { get; set; }
 
         /// <summary>
         /// 更新日時
         /// </summary>
         [Display(Name = "更新日時")]
-        public DateTime UpdatedAt { set; get; }
+        public DateTime UpdatedAt { get; set; }
 
         /// <summary>
         /// 更新者
         /// </summary>
         [Display(Name = "更新者")]
-        public string? UpdatedBy { set; get; }
+        public string? UpdatedBy { get; set; }
     }
 }

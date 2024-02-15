@@ -109,16 +109,13 @@ namespace mar_sumaken_web.Controllers
                 // 登録情報をチェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound();
+                    return NotFound(new { errorMessage = "" });
                 }
 
                 // 重複会社情報取をチェック
                 bool isDuplicate = M_CompanyConnectController.IsDuplicateMCompanyByCompanyCode(model.CompanyCode, user.DatabaseName);
                 if (isDuplicate)
                 {
-                    // エラーを作成
-                    // エラーコード：E2011
-                    //throw new Exception();
                     return NotFound(new { errorMessage = "会社コードが重複しています。" });
                 }
 

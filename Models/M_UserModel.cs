@@ -13,7 +13,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// ユーザーマスターリスト
         /// </summary>
-        public IPagedList<M_UserModel> M_UserList { set; get; }
+        public IPagedList<M_UserModel> M_UserList { get; set; }
 
         /// <summary>
         /// 
@@ -100,6 +100,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "ソルト")]
         public string? Salt { get; set; }
+
         /// <summary>
         /// 未使用フラグ
         /// </summary>

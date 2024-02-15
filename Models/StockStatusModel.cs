@@ -14,7 +14,7 @@ namespace mar_sumaken_web.Models
         /// 年月日
         /// </summary>
         [Display(Name = "年月日")]
-        public string DateSearchStart { set; get; }
+        public string DateSearchStart { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -51,17 +51,17 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 
         /// </summary>
-        public List<string> LstErrorMsg { set; get; }
+        public List<string> LstErrorMsg { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string Message { set; get; }
+        public string Message { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IPagedList<StockStatusModel> LstStockStatus { set; get; }
+        public IPagedList<StockStatusModel> LstStockStatus { get; set; }
 
         /// <summary>
         /// 初期値設定

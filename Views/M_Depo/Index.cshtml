@@ -15,13 +15,16 @@
         @ViewData["Title"]
     </div>
     <div class="card-body">
-        @if (ViewData["ErrorMessage"] != null || ViewData["Message"] != null)
+
+        <div class="form-group col-sm-12">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+        </div>
+
+        @if (ViewData["ErrorMessage"] != null)
         {
-            <div id="div-message" class="mb-3 ml-3 text-danger">
-                <span class="text-danger-custom">@ViewData["ErrorMessage"] </span>
-                <span class="text-success-custom">@ViewData["Message"] </span>
-            </div>
+            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
+
         <div class="mg-bot-20">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-2">

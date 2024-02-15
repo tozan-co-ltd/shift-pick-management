@@ -24,11 +24,13 @@
         </div>
 
         <div class="form-group col-sm-12">
-            <p id="import-res" class="mt-1"></p>
+            <p id="div-error-message" class="mt-1 text-danger"></p>
         </div>
 
-        <div id="ErrorBlock" class="mb-3 ml-3 text-danger">
-        </div>
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+        }
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">

@@ -13,18 +13,18 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 出庫実績リスト
         /// </summary>
-        public IPagedList<D_StoreOutModel> D_StoreOutList { set; get; }
+        public IPagedList<D_StoreOutModel> D_StoreOutList { get; set; }
 
         /// <summary>
         /// 出庫日(開始)
         /// </summary>
         [Display(Name = "出庫日")]
-        public string DateSearchStart { set; get; }
+        public string DateSearchStart { get; set; }
 
         /// <summary>
         /// 出庫日(終了)
         /// </summary>
-        public string DateSearchEnd { set; get; }
+        public string DateSearchEnd { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
