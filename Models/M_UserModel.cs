@@ -16,17 +16,7 @@ namespace mar_sumaken_web.Models
         public IPagedList<M_UserModel> M_UserList { get; set; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public List<SelectListItem> DepoSelectList { get; set; } = new List<SelectListItem>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<SelectListItem> HandyMenuSelectList { get; set; } = new List<SelectListItem>();
-
-        /// <summary>
-        /// 倉庫マスターリスト
+        /// 倉庫リスト
         /// </summary>
         public List<M_DepoModel> M_DepoList { get; set; } = new List<M_DepoModel> { };
 
@@ -34,6 +24,16 @@ namespace mar_sumaken_web.Models
         /// ハンディメニューリスト
         /// </summary>
         public List<M_HandyMenuModel> M_HandyMenuList { get; set; } = new List<M_HandyMenuModel> { };
+
+        /// <summary>
+        /// 選択倉庫リスト
+        /// </summary>
+        public List<SelectListItem> DepoSelectList { get; set; } = new List<SelectListItem>();
+
+        /// <summary>
+        /// 選択ハンディメニューリスト
+        /// </summary>
+        public List<SelectListItem> HandyMenuSelectList { get; set; } = new List<SelectListItem>();
 
         /// <summary>
         /// ユーザーID

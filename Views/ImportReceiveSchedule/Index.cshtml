@@ -1,6 +1,7 @@
-﻿@* @model mar_sumaken_web.Models.D_ReceiveScheduleModel *@
+﻿@model mar_sumaken_web.Models.D_FileImportModel
 @{
-    ViewData["Title"] = "入庫 - 入荷予定取込";
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.ViewTitle;
 }
 
 <div class="card shadow de-inspection receive-schedule m-4">
@@ -14,7 +15,7 @@
                     <div class="card-body">
                         <ul class="mb-0">
                             <li>「フォーマット出力」ボタンから取込フォーマットダウンロードしてください。</li>
-                            <li>フィール形式が「.csv」のみ取込できます。</li>
+                            <li>ファイル形式が「.csv」のみ取込できます。</li>
                         </ul>
                     </div>
                 </div>
@@ -31,17 +32,12 @@
                 <form id="import-receive-schedule-upload-form" method="post" enctype="multipart/form-data" name="form" onsubmit="return false;">
                     <div class="col-16 d-flex justify-content-start align-items-center mb-3">
                         <span class="warehouse-name">倉庫名</span>
-                        <div class="selectItem">
-                            <select class="form-select" aria-label="Default select example">
-                                <option selected>選択してください</option>
-                                <option value="1">選択1</option>
-                                <option value="2">選択2</option>
-                                <option value="3">選択3</option>
-                            </select>
+                        <div class="selectItem unset-pdl">
+                            <select class="form-select" name="DepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
                         </div>
                     </div>
                     <div class="col-16 d-flex justify-content-start align-items-center sp-tablet mb-3">
-                        <button class="btn btn-info btn-icon-split sp-mg-bt-10">
+                    <button class="btn btn-info btn-icon-split sp-mg-bt-10" onclick="onExportFile('ImportReceiveSchedule')">
                             <span class="icon text-white-50">
                                 <i class="fa-solid fa-file-export"></i>
                             </span>
@@ -53,7 +49,7 @@
                                     <label class="input-group-btn my-0">
                                         <span class="btn btn-secondary btn-icon-split btn-pd20" id="browse">
                                             ファイル選択
-                                            <input class="excel-input" name="FileUpload" type="file" accept=".xlsx" multiple>
+                                        <input class="excel-input" id="FileUpload" name="FileUpload" type="file" accept=".csv" multiple>
                                         </span>
                                     </label>
                                     <input type="text" class="form-control rounded-0" readonly placeholder="CSVファイルを選択してください">
@@ -84,10 +80,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                            
+                    @if (@Model.D_FileImportList != null)
+                    {
+                        @foreach (var item in @Model.D_FileImportList)
+                        {
+                            <tr>
+                                <td>@item.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")</td>
+                                <td>@item.ImportFileName</td>
+                                <td>@item.CreatedBy</td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-@* <input id="import_action_url" type="hidden" value="@Url.Action("ImportExcel", "ScheduledArrivalImport")" /> *@
+<input id="import_action_url" type="hidden" value="@Url.Action("ImportExcel", "ImportReceiveSchedule")" />

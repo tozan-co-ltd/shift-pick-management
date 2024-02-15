@@ -102,9 +102,9 @@
                             @foreach (var category in Model.WebMenuCategoryList())
                             {
                                 var categoryMenuList = Model.GetWebMenuCategoryList(category);
-                                var categoryName = categoryMenuList.Category.CategoryName;
-                                var categoryID = categoryMenuList.Category.CategoryID;
-                                var menuList = categoryMenuList.MenuList;
+                                var categoryName = categoryMenuList.M_WebMenuCategoryModel.CategoryName;
+                                var categoryID = categoryMenuList.M_WebMenuCategoryModel.CategoryID;
+                                var menuList = categoryMenuList.WebMenuList;
                                 if (menuList.Count != 0)
                                 {
                                     <li class="nav-item">

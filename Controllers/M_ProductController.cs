@@ -46,13 +46,15 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ビューのタイトル取得
-                M_ProductModel model = new M_ProductModel();
-                model.ControllerName = "M_Product";
-                model.CompanyID = user.CompanyID;
+                M_ProductModel model = new()
+                {
+                    ControllerName = "M_Product",
+                    CompanyID = user.CompanyID
+                };
                 ViewData["Title"] = model.GetViewTitle();
                 return View(productList);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
                 return View();
@@ -89,15 +91,8 @@ namespace mar_sumaken_web.Controllers
 
                 return Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
-
-                // log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogError($"{exceptionMessage} {errorMessage}");
                 return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
             }
         }
@@ -134,7 +129,7 @@ namespace mar_sumaken_web.Controllers
 
                 return View(model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // エラーメッセージ取得
                 // 「予期せぬエラーが発⽣しました。」
@@ -268,15 +263,8 @@ namespace mar_sumaken_web.Controllers
 
                 return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
-
-                // log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogInformation($"{exceptionMessage} {errorMessage}");
                 return Json(new { res = "NG", error = "予期せぬエラーが発⽣しました。" });
             }
         }
@@ -284,7 +272,7 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// 品番マスターテーブルを作る
         /// </summary>
-        private DataTable CreateDataTable()
+        private static DataTable CreateDataTable()
         {
             var table = new DataTable();
             table.Columns.Add(Utils.GetDisplayName<M_ProductModel>("ProductID"), typeof(string));

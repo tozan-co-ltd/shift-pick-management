@@ -44,7 +44,7 @@ namespace mar_sumaken_web.Models
         public int ProductID { get; set; }
 
         /// <summary>
-        /// 仕入先ID: 会社マスターの会社IDと紐づく
+        /// 仕入先ID
         /// </summary>
         [Display(Name = "仕入先ID")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
@@ -54,26 +54,25 @@ namespace mar_sumaken_web.Models
         /// 仕入先名
         /// </summary>
         [Display(Name = "仕入先名")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string SupplierName { get; set; } = string.Empty;
 
         /// <summary>
         /// 仕入先品番
         /// </summary>
-        [Display(Name = "仕入先品番")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string SupplierProductNumber { get; set; } = string.Empty;
 
         /// <summary>
-        /// 納入先ID: 会社マスターの会社IDと紐づく
+        /// 納入先ID
         /// </summary>
-        [Display(Name = "納入先ID")]
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int DeliveryID { get; set; }
 
         /// <summary>
         /// 納入先名
         /// </summary>
         [Display(Name = "納入先名")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string DeliveryName { get; set; } = string.Empty;
 
         /// <summary>

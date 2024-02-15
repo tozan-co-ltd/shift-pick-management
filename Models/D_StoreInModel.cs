@@ -11,13 +11,18 @@ namespace mar_sumaken_web.Models
     public class D_StoreInModel: CommonModel
     {
         /// <summary>
-        /// 入庫日
+        /// 入庫実績リスト
+        /// </summary>
+        public IPagedList<D_StoreInModel> D_StoreInList { get; set; }
+
+        /// <summary>
+        /// 検索入庫日(開始)
         /// </summary>
         [Display(Name = "入庫日")]
         public string DateSearchStart { get; set; }
 
         /// <summary>
-        /// 入庫日(終了)
+        /// 検索入庫日(終了)
         /// </summary>
         public string DateSearchEnd { get; set; }
 
@@ -33,6 +38,11 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
+
+        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem> SearchCompanyList
@@ -44,19 +54,9 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
-
-        public List<string> LstErrorMsg { get; set; }//エラーメッセージリスト
-        public string Message { get; set; }
-
-        public IPagedList<D_StoreInModel> LstD_StoreIn { get; set; }//一覧画面のlistを取得と設定
 
         // <summary>
         /// 初期値設定

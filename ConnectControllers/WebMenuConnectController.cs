@@ -1,0 +1,126 @@
+﻿using Dapper;
+using mar_sumaken_web.Models;
+using System.Data.SqlClient;
+
+namespace mar_sumaken_web.Commons
+{
+    /// <summary>
+    /// WEBメニューに関する関数
+    /// </summary>
+    public static class WebMenuConnectController
+    {
+        /// <summary>
+        /// データベースに接続し、SQL実行
+        /// </summary>
+        /// <param name="sql">SQL</param>
+        /// <param name="CompanyID"></param>
+        /// <param name="categoryID"></param>
+        /// <returns></returns>
+        public static List<M_WebMenuCategory> ConnectMWebMenuCategory(string sql)
+        {
+            // 戻り値
+            List<M_WebMenuCategory> menuModels = new();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionStringForMaster();
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    var param = new{};
+
+                    menuModels = connection.Query<M_WebMenuCategory>(sql, param).ToList();
+                }
+                return menuModels;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// WEBメニューカテゴリー取得SQL作成
+        /// </summary>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectMWebMenuCategory()
+        {
+            var sql = $@"SELECT
+                            CategoryID,
+                            CategoryName
+                        FROM M_WebMenuCategory
+                        ORDER BY CategoryCode ASC;
+            ;";
+
+            return sql;
+        }
+
+        /// <summary>
+        /// データベースに接続し、SQL実行
+        /// </summary>
+        /// <param name="sql">SQL</param>
+        /// <param name="CompanyID"></param>
+        /// <param name="categoryID"></param>
+        /// <returns></returns>
+        public static List<M_WebMenu> ConnectMWebMenu(string sql)
+        {
+            // 戻り値
+            List<M_WebMenu> menuModels = new();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionStringForMaster();
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    var param = new
+                    {
+                        RoleFlag = 1
+                    };
+
+                    menuModels = connection.Query<M_WebMenu>(sql, param).ToList();
+                }
+                return menuModels;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// WEBメニュー取得SQL作成
+        /// </summary>
+        /// <param name="userRoleName"></param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectMWebMenu(int companyID, string userRoleName, int categoryID)
+        {
+            var sql = $@"SELECT
+                            A.CategoryID,
+                            A.MenuID,
+                            A.MenuName,
+                            B.Controller,
+                            B.Action
+                        FROM M_WebMenu A
+                        LEFT OUTER JOIN M_WebMenuController B ON (A.CategoryID = B.CategoryID) AND (A.MenuID = B.MenuID)
+                        WHERE (1=1)
+                            AND (A.CompanyID = {companyID})
+                            AND (A.{userRoleName} = @RoleFlag)
+                            AND (A.CategoryID = {categoryID})
+                        ORDER BY SortNumber ASC
+            ;";
+
+            return sql;
+        }
+    }
+}

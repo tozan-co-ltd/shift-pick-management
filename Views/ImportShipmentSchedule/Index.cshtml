@@ -35,7 +35,7 @@
             <div class="col-16 sp-tablet mb-3">
                 <div class="row mt-10">
                     <div class="col-lg-12">
-                        <form id="import-receive-schedule-upload-form" method="post">
+                        <form id="import-shimpment-schedule-upload-form" method="post">
                             <div class="col-16 d-flex justify-content-start align-items-center mb-3 col-11 unset-pdl">
                                 <span class="warehouse-name-drs">倉庫名</span>
                                 <div class="selectItem unset-pdl">
@@ -45,7 +45,7 @@
                             <div class="col-16 d-flex justify-content-start align-items-center mb-3 col-11 unset-pdl">
                                 <span class="warehouse-name-drs">納入先名</span>
                                 <div class="selectItem unset-pdl">
-                                    <select class="form-select" name="DepoID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
+                                    <select class="form-select" name="CompanyID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-start align-items-center upload-part sp-tablet">
@@ -54,14 +54,14 @@
                                         <label class="input-group-btn my-0">
                                             <span class="btn btn-secondary btn-icon-split btn-pd20" id="browse">
                                                 ファイル選択
-                                                <input class="excel-input" name="FileUpload" type="file" accept=".xlsx" multiple>
+                                                <input class="excel-input" id="FileUpload" name="FileUpload" type="file" accept=".csv" multiple>
                                             </span>
                                         </label>
                                         <input type="text" class="form-control rounded-0" readonly placeholder="CSVファイルを選択してください">
                                     </div>
                                 </div>
                                 <div class="input-group-append sp-mg-bt-10">
-                                    <button id="file-upload" class="btn btn-primary btn-icon-split" onclick="onUploadFile('import-receive-schedule-upload-form')">
+                                    <button id="file-upload" class="btn btn-primary btn-icon-split" onclick="onUploadFile('import-shimpment-schedule-upload-form')">
                                         <span class="icon text-white-50">
                                             <i class="fa-solid fa-file-export"></i>
                                         </span>
@@ -103,4 +103,4 @@
         </div>
     </div>
 </div>
-@* <input id="import_action_url" type="hidden" value="@Url.Action("ImportExcel", "ScheduledArrivalImport")" /> *@
+<input id="import_action_url" type="hidden" value="@Url.Action("ImportExcel", "ImportShipmentSchedule")" />

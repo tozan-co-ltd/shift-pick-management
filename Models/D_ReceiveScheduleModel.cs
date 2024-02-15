@@ -1,3 +1,4 @@
+﻿using mar_sumaken_web.Properties;
 ﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
@@ -6,20 +7,25 @@ using X.PagedList;
 namespace mar_sumaken_web.Models
 {
     /// <summary>
-    ///  出荷指示照会テーブルのModel
+    /// 入荷予定テーブルのModel
     /// </summary>
     public class D_ReceiveScheduleModel : CommonModel
     {
         /// <summary>
-        /// 入荷予定日
+        /// 入荷予定リスト
         /// </summary>
-        [Display(Name = "入荷予定日")]
-        public string DateSearchStart { get; set; }
+        public IPagedList<D_ReceiveScheduleModel> D_ReceiveScheduleList { set; get; }
 
         /// <summary>
-        /// 入荷予定日(終了)
+        /// 検索入荷予定日(開始)
         /// </summary>
-        public string DateSearchEnd { get; set; }
+        [Display(Name = "入荷予定日")]
+        public string SearchStartDate { get; set; }
+
+        /// <summary>
+        /// 検索入荷予定日(終了)
+        /// </summary>
+        public string SearchEndDate { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -33,6 +39,11 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
+
+        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem> SearchCompanyList
@@ -44,40 +55,76 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-            /// 選択された倉庫ID
-            /// </summary>
-            public int SelectedDepoID { get; set; }
-
-            /// <summary>
-            /// 選択された倉庫名
-            /// </summary>
-            public string SelectedDepoName { get; set; } = string.Empty;
-
-            /// <summary>
-            /// 選択された会社ID
-            /// </summary>
-            public int SelectedCompanyID { get; set; }
-
-            /// <summary>
-            /// 選択された会社名
-            /// </summary>
-            [Display(Name = "納入先名")]
-            public string SelectedCompanyName { get; set; } = string.Empty;
+        /// 選択された会社ID
+        /// </summary>
+        public int SelectedCompanyID { get; set; }
 
         /// <summary>
-        /// 
+        /// 選択された会社名
         /// </summary>
-        public List<string> LstErrorMsg { get; set; }
+        [Display(Name = "納入先名")]
+        public string SelectedCompanyName { get; set; } = string.Empty;
 
         /// <summary>
-        /// 
+        /// 取込ファイル名
         /// </summary>
-        public string Message { get; set; }
+        public string? ImportFileName { get; set; }
 
         /// <summary>
-        /// 
+        /// 会社コード
         /// </summary>
-        public IPagedList<D_ReceiveScheduleModel> LstD_ReceiveSchedule { get; set; }
+        [Display(Name = "会社コード")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [RegularExpression(@"[0-9]+")]
+        public string? CompanyCode { get; set; }
+
+        /// <summary>
+        /// 入荷予定ID
+        /// </summary>
+        [Display(Name = "入荷予定ID")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public int ReceiveScheduleID { get; set; }
+
+        /// <summary>
+        /// 入荷予定日
+        /// </summary>
+        [Display(Name = "入荷予定日")]
+        [RegularExpression(@"^\d{4}/\d{1,2}/\d{1,2}$")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string ReceiveScheduleDate { get; set; }
+
+        /// <summary>
+        /// 仕入先品番
+        /// </summary>
+        [Display(Name = "仕入先品番")]
+        [MaxLength(50)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? SupplierProductNumber { get; set; }
+
+        /// <summary>
+        /// ロット番号
+        /// </summary>
+        [Display(Name = "ロット番号")]
+        [MaxLength(50)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? LotNumber { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        [Display(Name = "数量")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string Quantity { get; set; }
+
+        /// <summary>
+        /// 更新日時
+        /// </summary>
+        public DateTime UpdatedAt { get; set; }
+
+        /// <summary>
+        /// 更新者
+        /// </summary>
+        public string? UpdatedBy { get; set; }
 
         /// <summary>
         /// 初期値設定
@@ -89,9 +136,8 @@ namespace mar_sumaken_web.Models
             // 1ヶ月前
             var oneWeeklater = DateTime.Today.AddDays(+7).ToString("yyyy/MM/dd");
 
-            DateSearchStart = now;
-            DateSearchEnd = oneWeeklater;
+            SearchStartDate = now;
+            SearchEndDate = oneWeeklater;
         }
-
     }
 }

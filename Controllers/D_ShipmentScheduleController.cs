@@ -27,12 +27,6 @@ namespace mar_sumaken_web.Controllers
                 return View(model);
             }
 
-            //// 出荷指示テーブル情報取得SQL作成
-            //var sql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedules();
-
-            //// DB接続
-            //List<D_ShipmentScheduleModel> model = D_ShipmentScheduleConnectController.ConnectDShipmentSchedules(sql, user.DatabaseName);
-
             // 出荷指示テーブル情報取得SQL作成
             var sql = M_CompanyConnectController.CreateSQLToSelectMCompanys();
 

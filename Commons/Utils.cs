@@ -1,13 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace mar_sumaken_web.Commons
 {
     public static class Utils
     {
+        public readonly static string[] DateFormats = { "yyyy/MM/dd", "yyyy/M/d", "yyyy-MM-dd", "yyyy-M-d", "yyyyMMdd" };
+
         public readonly static int Const_Customer_ID = 1; // 得意先
         public readonly static int Const_Supplier_ID = 2; // 仕入先
         public readonly static int Const_Delivery_ID = 3; // 納入先
@@ -94,5 +99,140 @@ namespace mar_sumaken_web.Commons
             }
             return displayName;
         }
+
+        /// <summary>
+        /// CSV拡張子チェック
+        /// </summary>
+        /// <param name="fileName">ファイル名</param>
+        public static bool IsCsvFile(string fileName)
+        {
+            if (fileName.Length > 0)
+            {
+                // ファイル形式チェック
+                var extension = Path.GetExtension(fileName);
+                if (extension == ".csv")
+                {
+                    return true;
+                };
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// CSVファイル保存 
+        /// </summary>
+        /// <param name="fileName">ファイル名</param>
+        /// <param name="categoryName">保存フォルダー</param>
+        /// <returns>取込ファイルパス</returns>
+        public static string CreateImportFilePath(string fileName, int userId, string categoryName)
+        {
+            try
+            {
+                // ファイル名(日付_ファイル名)
+                var tmpFileName = string.Concat(
+                    DateTime.Now.ToString("yyyyMMddHHmmssfff"), "_", userId, "_", Path.GetFileName(fileName)
+                );
+
+                // フォルダパス
+                var rootPath = Directory.GetCurrentDirectory();
+                var folderPath = Path.Combine(rootPath, string.Concat(@"wwwroot\UploadFiles\", categoryName));
+
+                // フォルダが存在しない場合は新規作成
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                // 取込ファイルパス
+                return Path.Combine(folderPath, tmpFileName);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// フィールを読みます。
+        /// </summary>
+        /// <param name="csvFilePath">csvファイルのパス</param>
+        /// <param name="itemCount">項目数</param>
+        /// <returns>配列</returns>
+        public static List<string[]> ReadCsvFile(string csvFilePath, int itemCount)
+        {
+            //リスト型の初期化と宣言
+            List<string[]> csvLines = new List<string[]>();
+            // Encoding.RegisterProviderをShift JISを扱う前にコールする
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            //CSVを読み込みモードで開く,文字種はsjis,※代表的なものでいうとUTF-8
+            using (StreamReader reader = new StreamReader(csvFilePath, Encoding.GetEncoding("Shift_JIS")))
+            {
+                while (!reader.EndOfStream)
+                {
+                    // CSVファイルの一行を読み込む
+                    string line = reader.ReadLine();
+                    // 読み込んだ一行をカンマ毎に分けて配列に格納する
+                    string[] lineArr = Regex.Split(line, @"(?<=,)(?=(?:[^""]*""[^""]*"")*[^""]*$)");
+
+                    for (int i = 0; i < lineArr.Count(); i++)
+                    {
+                        if (lineArr[i] != null)
+                        {
+                            lineArr[i] = lineArr[i].Trim(',').Trim('"').ToString();
+                        }
+                    }
+                    //strに格納
+                    csvLines.Add(lineArr.Take(itemCount).ToArray());
+                }
+
+                //CSVファイルを閉じる
+                reader.Close();
+            }
+            return csvLines;
+        }
+
+        /// <summary>
+        /// CSVファイルデータチェック
+        /// </summary>
+        /// <param name="lines">CSV行配列</param>
+        public static bool CheckCsvData(List<string[]> lines)
+        {
+            // リストが null または空の場合、エラー
+            if (lines == null || lines.Count == 0)
+                return false;
+
+            // 最初の行（ヘッダー）を確認する
+            var header = lines.First();
+            if (header == null || header.Length == 0)
+                return false;
+
+            // ヘッダー内の各要素をチェックする
+            foreach (var column in header)
+            {
+                if (string.IsNullOrWhiteSpace(column))
+                    return false; // ヘッダーに null または空の要素がある場合、エラー
+            }
+
+            // 行が1つだけ（ヘッダーのみ）の場合、エラー
+            if (lines.Count == 1)
+                return false;
+
+            // ヘッダーの列数を取得する
+            int columnCount = header.Length;
+
+            // 各データ行の列数をチェックする
+            foreach (var line in lines.Skip(1)) // 最初の行（ヘッダー）をスキップして2行目からチェックする
+            {
+                // 行が null もしくは空の場合、次の行に進む
+                if (line == null || line.Length == 0)
+                    continue;
+
+                // データ行の列数をチェックする
+                if (line.Length != columnCount)
+                    return false; // 列数がヘッダーと一致しない場合、エラー
+            }
+
+            // エラーがない場合、データは有効
+            return true;
+        }
+
     }
 }

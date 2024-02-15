@@ -2,7 +2,6 @@
 using System.Data.SqlClient;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Commons;
-using System.Reflection;
 
 namespace mar_sumaken_web.ConnectControllers
 {
@@ -45,7 +44,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// 出荷指示取込一覧取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetD_FileImport()
+        public static string CreateSQLToGetD_FileImport(string menuName)
         {
             var sql = $@"
                         SELECT 
@@ -54,9 +53,28 @@ namespace mar_sumaken_web.ConnectControllers
                             CreatedBy
                         FROM 
 	                        D_FileImport
-                        WHERE CreatedAt >= DATEADD(MONTH, -1, GETDATE());
+                        WHERE
+                            MenuName = '{menuName}'
+                            AND CreatedAt >= DATEADD(MONTH, -1, GETDATE());
             ";
 
+            return sql;
+        }
+
+        /// <summary>
+        /// ファイル取込実績テーブルINSERTのSQL作成
+        /// </summary>
+        /// <param name="model">モデル</param>
+        /// <param name="createdAt">システム</param>
+        /// <param name="createdBy"></param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToInsertD_FileImport(D_FileImportModel model, DateTime createdAt, string createdBy)
+        {
+            var sql = $@"
+                    INSERT INTO D_FileImport
+                            (DepoID, MenuName, ImportFileName, CreatedAt, CreatedBy)
+                    VALUES ({model.DepoID}, '{model.MenuName}', '{model.ImportFileName}', '{createdAt}', '{createdBy}');
+            ";
             return sql;
         }
     }

@@ -229,7 +229,7 @@ namespace mar_sumaken_web.Controllers
 
                 return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // エラーメッセージ取得
                 // 「予期せぬエラーが発⽣しました。」
@@ -245,7 +245,7 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// 会社マスターテーブルを作る
         /// </summary>
-        private DataTable CreateDataTable()
+        private static DataTable CreateDataTable()
         {
             var table = new DataTable();
             table.Columns.Add(Utils.GetDisplayName<M_CompanyModel>("CompanyID"), typeof(string));

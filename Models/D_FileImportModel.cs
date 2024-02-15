@@ -1,6 +1,4 @@
-﻿using mar_sumaken_web.Properties;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
@@ -14,7 +12,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// ファイル取込実績リスト
         /// </summary>
-        public IPagedList<D_FileImportModel> D_FileImportList { get; set; }
+        public List<D_FileImportModel>? D_FileImportList { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -28,6 +26,11 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
+
+        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem> SearchCompanyList
@@ -39,11 +42,6 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
@@ -52,6 +50,11 @@ namespace mar_sumaken_web.Models
         /// ファイル取込実績ID
         /// </summary>
         public int FileImportID { get; set; }
+
+        /// <summary>
+        /// 倉庫ID
+        /// </summary>
+        public int DepoID { get; set; }
 
         /// <summary>
         /// 倉庫名
@@ -80,10 +83,5 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "登録者")]
         public string CreatedBy { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Message { get; set; }
     }
 }

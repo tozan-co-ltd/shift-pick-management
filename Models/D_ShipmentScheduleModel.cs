@@ -1,6 +1,5 @@
 ﻿using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
@@ -18,15 +17,15 @@ namespace mar_sumaken_web.Models
         public IPagedList<D_ShipmentScheduleModel> D_ShipmentScheduleList { get; set; }
 
         /// <summary>
-        /// 出庫日
+        /// 検索納入指示日(開始)
         /// </summary>
-        [Display(Name = "入荷日")]
-        public string DateSearchStart { get; set; }
+        [Display(Name = "納入指示日")]
+        public string SearchStartDate { get; set; }
 
         /// <summary>
-        /// 出庫日(終了)
+        /// 検索納入指示日(終了)
         /// </summary>
-        public string DateSearchEnd { get; set; }
+        public string SearchEndDate { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -40,6 +39,16 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
+
+        /// <summary>
+        /// 選択された倉庫名
+        /// </summary>
+        public string? SelectedDepoName { get; set; }
+
+        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem> SearchCompanyList
@@ -51,16 +60,6 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
-        /// 選択された倉庫名
-        /// </summary>
-        public string SelectedDepoName { get; set; } = string.Empty;
-
-        /// <summary>
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
@@ -69,7 +68,12 @@ namespace mar_sumaken_web.Models
         /// 選択された会社名
         /// </summary>
         [Display(Name = "納入先名")]
-        public string SelectedCompanyName { get; set; } = string.Empty;
+        public string? SelectedCompanyName { get; set; }
+
+        /// <summary>
+        /// 取込ファイル名
+        /// </summary>
+        public string? ImportFileName { get; set; }
 
         /// <summary>
         /// 出荷指示実績ID
@@ -79,176 +83,228 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 発注元
         /// </summary>
-        [DisplayName("発注元")]
-        public string OrdererCode { get; set; } = string.Empty;
+        [Display(Name = "発注元")]
+        [MaxLength(20)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? OrdererCode { get; set; }
 
         /// <summary>
         /// 発注元工区
         /// </summary>
-        [DisplayName("発注元工区")]
-        public string OrdererFactoryKubun { get; set; } = string.Empty;
+        [Display(Name = "発注元工区")]
+        [MaxLength(10)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? OrdererFactoryKubun { get; set; }
 
         /// <summary>
         /// 発注元名称
         /// </summary>
-        [DisplayName("発注元名称")]
-        public string OrdererName { get; set; } = string.Empty;
+        [Display(Name = "発注元名称")]
+        [MaxLength(100)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? OrdererName { get; set; }
 
         /// <summary>
         /// 発注元工場名
         /// </summary>
-        [DisplayName("発注元工場名")]
-        public string OrdererFactoryName { get; set; } = string.Empty;
+        [Display(Name = "発注元工場名")]
+        [MaxLength(100)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? OrdererFactoryName { get; set; }
 
         /// <summary>
         /// 出荷元
         /// </summary>
-        [DisplayName("出荷元")]
-        public string ShipperCode { get; set; } = string.Empty;
+        [Display(Name = "出荷元")]
+        [MaxLength(20)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? ShipperCode { get; set; }
 
         /// <summary>
         /// 出荷元工区
         /// </summary>
-        [DisplayName("出荷元工区")]
-        public string ShipperFactoryKubun { get; set; } = string.Empty;
+        [Display(Name = "出荷元工区")]
+        [MaxLength(10)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? ShipperFactoryKubun { get; set; }
 
         /// <summary>
         /// 出荷元名称
         /// </summary>
-        [DisplayName("出荷元名称")]
-        public string ShipperName { get; set; } = string.Empty;
+        [Display(Name = "出荷元名称")]
+        [MaxLength(100)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? ShipperName { get; set; }
 
         /// <summary>
         /// 納入先
         /// </summary>
-        [DisplayName("納入先")]
-        public string DeliveryCode { get; set; } = string.Empty;
+        [Display(Name = "納入先")]
+        [MaxLength(20)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliveryCode { get; set; }
 
         /// <summary>
         /// 納入先工区
         /// </summary>
-        [DisplayName("納入先工区")]
-        public string DeliveryFactoryKubun { get; set; } = string.Empty;
+        [Display(Name = "納入先工区")]
+        [MaxLength(10)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliveryFactoryKubun { get; set; }
 
         /// <summary>
         /// 納入場所
         /// </summary>
-        [DisplayName("納入場所")]
-        public string DeliveryLocation { get; set; } = string.Empty;
+        [Display(Name = "納入場所")]
+        [MaxLength(10)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliveryLocation { get; set; }
 
         /// <summary>
         /// 納入先名称
         /// </summary>
-        [DisplayName("納入先名称")]
-        public string DeliveryName { get; set; } = string.Empty;
+        [Display(Name = "納入先名称")]
+        [MaxLength(100)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliveryName { get; set; }
 
         /// <summary>
         /// 納入先工場名
         /// </summary>
-        [DisplayName("納入先工場名")]
-        public string DeliveryFactoryName { get; set; } = string.Empty;
+        [Display(Name = "納入先工場名")]
+        [MaxLength(100)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliveryFactoryName { get; set; }
 
         /// <summary>
         /// 定期／不定期区分名称
         /// </summary>
-        [DisplayName("定期／不定期区分名称")]
-        public string RegularKubun { get; set; } = string.Empty;
+        [Display(Name = "定期／不定期区分名称")]
+        [MaxLength(100)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? RegularKubun { get; set; }
 
         /// <summary>
         /// 発行日
         /// </summary>
-        [DisplayName("発行日")]
-        [DataType(DataType.Date)]
-        public DateTime IssuedDate { get; set; }
+        [Display(Name = "発行日")]
+        [RegularExpression(@"^(19\d{2}|[2-9]\d{3}|99999)(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$")]
+        public string? IssuedDate { get; set; }
 
         /// <summary>
         /// 納入指示日
         /// </summary>
-        [DisplayName("納入指示日")]
-        public DateTime DeliveryDate { get; set; }
+        [Display(Name = "納入指示日")]
+        [RegularExpression(@"^(19\d{2}|[2-9]\d{3}|99999)(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$")]
+        public string? DeliveryDate { get; set; }
 
         /// <summary>
         /// 納入指示時刻
         /// </summary>
-        [DisplayName("納入指示時刻")]
-        public string DeliveryTime { get; set; } = string.Empty;
+        [Display(Name = "納入指示時刻")]
+        [MaxLength(8)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliveryTime { get; set; }
 
         /// <summary>
         /// 便
         /// </summary>
-        [DisplayName("便")]
-        public int DeliveryTimeClass { get; set; }
+        [Display(Name = "便")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [RegularExpression(@"[0-9]+")]
+        public string? DeliveryTimeClass { get; set; }
 
         /// <summary>
         /// 輸送識別
         /// </summary>
-        [DisplayName("輸送識別")]
-        public string TranspotationIdentify { get; set; } = string.Empty;
+        [Display(Name = "輸送識別")]
+        [MaxLength(100)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? TranspotationIdentify { get; set; }
 
         /// <summary>
         /// 納品書番号
         /// </summary>
-        [DisplayName("納品書番号")]
-        public string DeliverySlipNumber { get; set; } = string.Empty;
+        [Display(Name = "納品書番号")]
+        [MaxLength(100)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliverySlipNumber { get; set; }
 
         /// <summary>
         /// ページ数
         /// </summary>
-        [DisplayName("ページ数")]
-        public int DeliverySlipPageNumber { get; set; }
+        [Display(Name = "ページ数")]
+        [RegularExpression(@"[0-9]+")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliverySlipPageNumber { get; set; }
 
         /// <summary>
         /// 行No
         /// </summary>
-        [DisplayName("行No")]
-        public int DeliverySlipRowNumber { get; set; }
+        [Display(Name = "行No")]
+        [RegularExpression(@"[0-9]+")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliverySlipRowNumber { get; set; }
 
         /// <summary>
         /// 納入先品番(表示用品番)
         /// </summary>
-        [DisplayName("表示用品番")]
-        public string DeliveryProductNumber { get; set; } = string.Empty;
+        [Display(Name = "表示用品番")]
+        [MaxLength(100)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliveryProductNumber { get; set; }
 
         /// <summary>
         /// 背番号
         /// </summary>
-        [DisplayName("背番号")]
-        public string DeliveryProductAbbreviation { get; set; } = string.Empty;
+        [Display(Name = "背番号")]
+        [MaxLength(100)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliveryProductAbbreviation { get; set; }
 
         /// <summary>
         /// 品名
         /// </summary>
-        [DisplayName("品名")]
-        public string DeliveryProductName { get; set; } = string.Empty;
+        [Display(Name = "品名")]
+        [MaxLength(100)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DeliveryProductName { get; set; }
 
         /// <summary>
         /// 収容数
         /// </summary>
-        [DisplayName("収容数")]
-        public int LotQuantity { get; set; }
+        [Display(Name = "収容数")]
+        [RegularExpression(@"[0-9]+")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? LotQuantity { get; set; }
 
         /// <summary>
         /// 枝番
         /// </summary>
-        [DisplayName("枝番")]
-        public int BranchNumber { get; set; }
+        [Display(Name = "枝番")]
+        [RegularExpression(@"[0-9]+")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? BranchNumber { get; set; }
 
         /// <summary>
         /// 納入指示数
         /// </summary>
-        [DisplayName("納入指示数")]
-        public int Quantity { get; set; }
+        [Display(Name = "納入指示数")]
+        [RegularExpression(@"[0-9]+")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? Quantity { get; set; }
 
         /// <summary>
         /// 仕入先品番
         /// </summary>
-        [DisplayName("仕入先品番")]
-        public string SupplierProductNumber { get; set; } = string.Empty;
+        [Display(Name = "仕入先品番")]
+        public string? SupplierProductNumber { get; set; }
 
         /// <summary>
         /// 箱数
         /// </summary>
-        [DisplayName("箱数")]
+        [Display(Name = "箱数")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int NumberOfBoxes { get; set; }
 
         /// <summary>
@@ -268,8 +324,8 @@ namespace mar_sumaken_web.Models
         {
             // 現在日
             var now = DateTime.Today.AddDays(+1).ToString("yyyy/MM/dd");
-            DateSearchStart = now;
-            DateSearchEnd = now;
+            SearchStartDate = now;
+            SearchEndDate = now;
         }
     }
 }

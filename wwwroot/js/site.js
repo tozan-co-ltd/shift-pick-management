@@ -100,14 +100,26 @@ $('#eye-login').click(function () {
 
 //------------------- Excel取込　------------------//
 function onUploadFile(page) {
+
+    // ページの更新を禁止する
+    event.preventDefault();
+
     $("#FailMsg").text("");
     $('#import-res').empty;
     $('#import-res').removeClass('text-danger');
 
-    console.log(page);
-
     // FormDataオブジェクト利用
     var formData = new FormData(document.querySelector('#' + page + ''));
+
+    var fileUpload = document.getElementById('FileUpload');
+    if (fileUpload.files.length <= 0) {
+        $('#import-res').text('ファイルが選択されていません。');
+        $("#import-res").show()
+        $("#import-res").addClass('text-danger');
+        $("#ErrorBlock").hide()
+        return false;
+    }
+
     var IsFirst = true;
     for (var file of formData) {
         if (IsFirst) {
@@ -128,30 +140,16 @@ function onUploadFile(page) {
     }
 
     const dialog = document.getElementById("ImportModel");
-
     if (dialog) {
         dialog.parentNode.removeChild(dialog);
     }
-
-    var modelTitle = "";
-    if (page == 'shipping-plan-import-upload-form')
-        modelTitle = "出荷計画取込";
-
-    if (page == 'user-master-upload-form')
-        modelTitle = "ユーザーマスター";
-
-    if (page == 'shipping-master-upload-form')
-        modelTitle = "出荷レーンマスター";
-
-    if (page == 'm-routes-master-upload-form')
-        modelTitle = "運行便マスター";
 
     $('body').append(
         '<div class="modal fade" id="ImportModel" tabindex="-1" role="dialog" aria-labelledby="importModalCenterTitle" aria-hidden="true">' +
         '    <div class="modal-dialog modal-dialog-centered" role="document">' +
         '        <div class="modal-content">' +
         '            <div class="modal-header">' +
-        '                <h5 class="modal-title" id="importModalCenterTitle">' + modelTitle + '</h5>' +
+        '                <h5 class="modal-title" id="importModalCenterTitle">取込</h5>' +
         '                <button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
         '                    <span aria-hidden="true">&times;</span>' +
         '                </button>' +
@@ -183,7 +181,7 @@ function onUploadFile(page) {
         $('#ImportModel').modal('hide');
 
         var importUrl = document.getElementById('import_action_url').value;
-        formData.append("userName", "@User.Identity.Name");
+
         showLoading()
         $.ajax({
             url: importUrl,
@@ -192,37 +190,23 @@ function onUploadFile(page) {
             processData: false,
             contentType: false
         }).done(function (response) {
-            if (response.res == "OK") {
-                if (response.data != "OK") {
-                    let data = JSON.parse(response.data);
-                    console.log(data);
-                    $("#import-res").addClass('text-danger');
-                    $("#ErrorBlock").show()
-                    RenderErrorBlock(data);
-                    $('#' + page + '')[0].reset();
-                    hideLoading()
-                }
-                else {
-                    hideLoading()
-                    AlertMessage('', '' + modelTitle + '', '登録が完了しました。', null, null);
-                }
-            }
-            else {
-                hideLoading()
-                $("#ErrorBlock").hide()
-                $("#import-res").show()
-                $("#import-res").addClass('text-danger');
-                $("#import-res").text(response.error);
-                $('#' + page + '')[0].reset();
-            }
+            hideLoading()
+            AlertMessage('', '取込', '登録が完了しました。', null, null);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             hideLoading()
-            console.log("jqXHR", jqXHR.status);
-            console.log("textStatus", textStatus);
-            console.log("errorThrown", errorThrown.message);
-            $("#import-res").addClass('text-danger');
-            $("#import-res").show()
-            AlertMessage('bg-danger', 'エラー', 'E3003 サーバーに接続できませんでした。<br> ' + 'HttpRequest : ' + jqXHR.status + '<br> ' + 'textStatus : ' + textStatus, null, null);
+            if (jqXHR.status === 404) {
+                // データが見つからなかった場合
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").hide();
+                $("#import-res").show();
+                $("#import-res").addClass('text-danger');
+                $("#import-res").html("エラー: " + errorMessage);
+            } else {
+                // その他のエラーの場合
+                $("#import-res").addClass('text-danger');
+                $("#import-res").show()
+                AlertMessage('bg-danger', 'エラー', 'E3003 サーバーに接続できませんでした。<br> ' + 'HttpRequest : ' + jqXHR.status + '<br> ' + 'textStatus : ' + textStatus, null, null);
+            }
             $('#' + page + '')[0].reset();
         });
     });
