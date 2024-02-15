@@ -141,11 +141,11 @@ namespace mar_sumaken_web.Controllers
                             int readCount = 0;
                             while (readCount < lines.Count)
                             {
-                                D_ReceiveScheduleModel receiveSchedule = new();
-                                receiveSchedule.ImportFileName = fileName;
-
-                                // 倉庫ID取得
-                                receiveSchedule.SelectedDepoID = DepoID;
+                                D_ReceiveScheduleModel receiveSchedule = new()
+                                {
+                                    ImportFileName = fileName,
+                                    SelectedDepoID = DepoID
+                                };
 
                                 // ヘッダー名チェック
                                 if (readCount == 0)
@@ -215,12 +215,8 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception ex)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                // log取得
                 var exceptionMessage = ex.Message;
-                _logger.LogError($"{exceptionMessage} {ErrorMessagesResources.E9999}");
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                return NotFound(new { errorMessage = exceptionMessage });
             }
         }
 
@@ -228,14 +224,16 @@ namespace mar_sumaken_web.Controllers
         /// ヘッダー名チェック
         /// </summary>
         /// <param name="headerCheck">チェックされたヘッダー</param>
-        private bool CheckIsValidHeader(string[] headerCheck)
+        private static bool CheckIsValidHeader(string[] headerCheck)
         {
-            Dictionary<int, string> headerSettings = new Dictionary<int, string>();
-            headerSettings[0] = Utils.GetDisplayName<D_ReceiveScheduleModel>("CompanyCode");
-            headerSettings[1] = Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleDate");
-            headerSettings[2] = Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber");
-            headerSettings[3] = Utils.GetDisplayName<D_ReceiveScheduleModel>("LotNumber");
-            headerSettings[4] = Utils.GetDisplayName<D_ReceiveScheduleModel>("Quantity");
+            Dictionary<int, string> headerSettings = new()
+            {
+                [0] = Utils.GetDisplayName<D_ReceiveScheduleModel>("CompanyCode"),
+                [1] = Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleDate"),
+                [2] = Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"),
+                [3] = Utils.GetDisplayName<D_ReceiveScheduleModel>("LotNumber"),
+                [4] = Utils.GetDisplayName<D_ReceiveScheduleModel>("Quantity")
+            };
 
             foreach (var setItem in headerSettings)
             {
@@ -250,7 +248,7 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// 読み取りデータをモデルに設定
         /// </summary>
-        private D_ReceiveScheduleModel SetReadDataInModel(D_ReceiveScheduleModel model, List<string[]> lines, int readCount)
+        private static D_ReceiveScheduleModel SetReadDataInModel(D_ReceiveScheduleModel model, List<string[]> lines, int readCount)
         {
             model.CompanyCode = lines[readCount][0];
             model.ReceiveScheduleDate = lines[readCount][1];
@@ -297,15 +295,8 @@ namespace mar_sumaken_web.Controllers
 
                 return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
-
-                // log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogInformation($"{exceptionMessage} {errorMessage}");
                 return Json(new { res = "NG", error = "予期せぬエラーが発⽣しました。" });
             }
         }
@@ -313,7 +304,7 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// 入荷予定テーブルを作る
         /// </summary>
-        private DataTable CreateDataTable()
+        private static DataTable CreateDataTable()
         {
             var table = new DataTable();
             table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("CompanyCode"), typeof(string));

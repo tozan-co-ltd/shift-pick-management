@@ -49,7 +49,7 @@ namespace mar_sumaken_web.Controllers
                 if (userList.Count > 0)
                 {
                     // ユーザーマスターの詳細を取得
-                    IEnumerable<M_UserModel> query = M_UserConnectController.GetMUserDetailList(userList, user.DatabaseName);
+                    IEnumerable<M_UserModel> query = (IEnumerable<M_UserModel>)M_UserConnectController.GetMUserDetailList(userList, user.DatabaseName);
                     model.M_UserList = query.ToPagedList();
                 }
 
@@ -437,7 +437,7 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// ユーザーマスターテーブルを作る
         /// </summary>
-        private DataTable CreateDataTable()
+        private static DataTable CreateDataTable()
         {
             var table = new DataTable();
 

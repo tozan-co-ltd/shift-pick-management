@@ -219,9 +219,8 @@ namespace mar_sumaken_web.ConnectControllers
                 }
                 return isDuplicateValid;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーコード：E2011
                 throw;
             }
         }

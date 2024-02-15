@@ -104,12 +104,14 @@ namespace mar_sumaken_web.Commons
                     }
 
                     //　ファイル取込実績テーブル
-                    D_FileImportModel dFileImportModel = new D_FileImportModel();
-                    dFileImportModel.DepoID = depoId;
-                    dFileImportModel.MenuName = "入荷予定取込";
-                    dFileImportModel.ImportFileName = importFileName;
-                    dFileImportModel.CreatedAt = systemDate;
-                    dFileImportModel.CreatedBy = user.UserName;
+                    D_FileImportModel dFileImportModel = new()
+                    {
+                        DepoID = depoId,
+                        MenuName = "入荷予定取込",
+                        ImportFileName = importFileName,
+                        CreatedAt = systemDate,
+                        CreatedBy = user.UserName
+                    };
 
                     // SQL作成
                     string dFileImportInserSql = D_FileImportConnectController.CreateSQLToInsertD_FileImport(dFileImportModel, systemDate, user.UserName);

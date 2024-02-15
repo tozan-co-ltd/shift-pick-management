@@ -1,4 +1,5 @@
-﻿using mar_sumaken_web.Models;
+﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;

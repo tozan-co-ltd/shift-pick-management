@@ -11,6 +11,11 @@ namespace mar_sumaken_web.Models
     public class D_ReceiveScheduleModel : CommonModel
     {
         /// <summary>
+        /// 入荷予定リスト
+        /// </summary>
+        public IPagedList<D_ReceiveScheduleModel> D_ReceiveScheduleList { set; get; }
+
+        /// <summary>
         /// 入荷予定日
         /// </summary>
         [Display(Name = "入荷予定日")]
@@ -33,31 +38,42 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
+        /// 検索会社リスト
+        /// </summary>
+        public IEnumerable<SelectListItem> SearchCompanyList
+        {
+            get
+            {
+                return MCompanyList;
+            }
+        }
+
+        /// <summary>
         /// 取込ファイル名
         /// </summary>
         public string? ImportFileName { get; set; }
 
         /// <summary>
-            /// 選択された倉庫ID
-            /// </summary>
-            public int SelectedDepoID { get; set; }
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
 
-            /// <summary>
+        /// <summary>
         /// 選択された会社ID
-            /// </summary>
+        /// </summary>
         public int SelectedCompanyID { get; set; }
 
-            /// <summary>
+        /// <summary>
         /// 会社コード
-            /// </summary>
+        /// </summary>
         [Display(Name = "会社コード")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [RegularExpression(@"[0-9]+")]
         public string? CompanyCode { get; set; }
 
-            /// <summary>
+        /// <summary>
         /// 入荷予定ID
-            /// </summary>
+        /// </summary>
         [Display(Name = "入荷予定ID")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int ReceiveScheduleID { get; set; }
@@ -65,17 +81,26 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 入荷予定日
         /// </summary>
-        public List<string> LstErrorMsg { set; get; }
+        [Display(Name = "入荷予定日")]
+        [RegularExpression(@"^\d{4}/\d{1,2}/\d{1,2}$")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string ReceiveScheduleDate { get; set; }
 
         /// <summary>
         /// 仕入先品番
         /// </summary>
-        public string Message { set; get; }
+        [Display(Name = "仕入先品番")]
+        [MaxLength(50)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? SupplierProductNumber { get; set; }
 
         /// <summary>
         /// ロット番号
         /// </summary>
-        public IPagedList<D_ReceiveScheduleModel> LstD_ReceiveSchedule { set; get; }
+        [Display(Name = "ロット番号")]
+        [MaxLength(50)]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? LotNumber { get; set; }
 
         /// <summary>
         /// 数量
