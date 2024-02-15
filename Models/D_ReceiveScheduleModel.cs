@@ -1,4 +1,5 @@
 ﻿using mar_sumaken_web.Properties;
+﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
@@ -36,7 +37,7 @@ namespace mar_sumaken_web.Models
                 return MDepoList;
             }
         }
-
+        
         /// <summary>
         /// 検索会社リスト
         /// </summary>
@@ -63,6 +64,12 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public int SelectedCompanyID { get; set; }
 
+        /// <summary>
+        /// 選択された会社名
+        /// </summary>
+        [Display(Name = "納入先名")]
+        public string SelectedCompanyName { get; set; } = string.Empty;
+        
         /// <summary>
         /// 会社コード
         /// </summary>
@@ -118,5 +125,19 @@ namespace mar_sumaken_web.Models
         /// 更新者
         /// </summary>
         public string? UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 初期値設定
+        /// </summary>
+        public D_ReceiveScheduleModel()
+        {
+            // 現在日
+            var now = DateTime.Today.ToString("yyyy/MM/dd");
+            // 1ヶ月前
+            var oneWeeklater = DateTime.Today.AddDays(+7).ToString("yyyy/MM/dd");
+
+            DateSearchStart = now;
+            DateSearchEnd = oneWeeklater;
+        }
     }
 }
