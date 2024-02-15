@@ -23,16 +23,20 @@ $(document).ready(function () {
     });
 
     //------------------- DataTables　------------------//
-    // 2列目昇順
+    // 日本語表示
+    const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+
+    // ID(2列目)昇順
     $('.datatable-normal').DataTable({
-        "language": {           // 日本語表示
-            "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+        "language": {
+            "url": language_url
         },
         lengthChange: true,     // 表示件数
         info: false,            // 総件数
-        scrollX: false,         // 横スクロール不可
-        scrollY: false,
-        order: [[1, "asc"]],    // 2列目昇順
+        scrollX: true,          // 横スクロール可
+        order: [[1, "asc"]],    // ID昇順
+        fixedColumns: true,
+        scrollCollapse: true
     });
     //------------------- DataTables　------------------//
 

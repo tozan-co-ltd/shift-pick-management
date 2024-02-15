@@ -15,17 +15,17 @@
             /// <summary>
             /// ハンディエラーメッセージID
             /// </summary>
-            public int HandyErrorMessageID { set; get; }
+            public int HandyErrorMessageID { get; set; }
 
             /// <summary>
             /// ハンディメニュー名
             /// </summary>
-            public string HandyMenuName { set; get; }
+            public string HandyMenuName { get; set; }
 
             /// <summary>
             /// エラーメッセージ
             /// </summary>
-            public string? ErrorMessage { set; get; }
+            public string? ErrorMessage { get; set; }
 
             // <summary>
             /// 読取日時

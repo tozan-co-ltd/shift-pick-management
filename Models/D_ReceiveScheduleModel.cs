@@ -1,6 +1,8 @@
 ﻿using mar_sumaken_web.Properties;
+﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using X.PagedList;
 
 namespace mar_sumaken_web.Models
 {
@@ -9,6 +11,17 @@ namespace mar_sumaken_web.Models
     /// </summary>
     public class D_ReceiveScheduleModel : CommonModel
     {
+        /// <summary>
+        /// 入荷予定日
+        /// </summary>
+        [Display(Name = "入荷予定日")]
+        public string DateSearchStart { get; set; }
+
+        /// <summary>
+        /// 入荷予定日(終了)
+        /// </summary>
+        public string DateSearchEnd { get; set; }
+
         /// <summary>
         /// 検索倉庫リスト
         /// </summary>
@@ -19,11 +32,16 @@ namespace mar_sumaken_web.Models
                 return MDepoList;
             }
         }
-
-        /// <summary>
-        /// 取込ファイル名
+        
+        /// 検索会社リスト
         /// </summary>
-        public string? ImportFileName { get; set; }
+        public IEnumerable<SelectListItem> SearchCompanyList
+        {
+            get
+            {
+                return MCompanyList;
+            }
+        }
 
         /// <summary>
         /// 選択された倉庫ID
@@ -31,9 +49,25 @@ namespace mar_sumaken_web.Models
         public int SelectedDepoID { get; set; }
 
         /// <summary>
+        /// 選択された倉庫名
+        /// </summary>
+        public string SelectedDepoName { get; set; } = string.Empty;
+
+        /// <summary>
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
+
+        /// <summary>
+        /// 選択された会社名
+        /// </summary>
+        [Display(Name = "納入先名")]
+        public string SelectedCompanyName { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// 取込ファイル名
+        /// </summary>
+        public string? ImportFileName { get; set; }
 
         /// <summary>
         /// 会社コード
@@ -90,5 +124,19 @@ namespace mar_sumaken_web.Models
         /// 更新者
         /// </summary>
         public string? UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 初期値設定
+        /// </summary>
+        public D_ReceiveScheduleModel()
+        {
+            // 現在日
+            var now = DateTime.Today.ToString("yyyy/MM/dd");
+            // 1ヶ月前
+            var oneWeeklater = DateTime.Today.AddDays(+7).ToString("yyyy/MM/dd");
+
+            DateSearchStart = now;
+            DateSearchEnd = oneWeeklater;
+        }
     }
 }

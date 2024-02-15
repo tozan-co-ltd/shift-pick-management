@@ -98,7 +98,7 @@ body {
     .btn-accent:hover {
         color: #fff;
         filter: brightness(90%);
-        background-color: lightskyblue;
+        background-color: var(--base-color-accent);
     }
 
     .btn-accent:focus,
@@ -136,7 +136,7 @@ body {
     --font-family-sans-serif: "BIZ UDPGothic", Meiryo UI, sans-serif !important;
 }
 
-.text-danger-custom {
+/*.text-danger-custom {
     color: var(--maincolor);
     font-weight: 800;
 }
@@ -144,7 +144,7 @@ body {
 .text-success-custom {
     color: var(--subcolor);
     font-weight: 800;
-}
+}*/
 
 .btn-search {
     border: none !important;
@@ -311,6 +311,10 @@ html {
 
 body {
     margin-bottom: 60px;
+}
+
+table.dataTable, .dataTables_scrollHeadInner {
+    width: 100% !important;
 }
 
 table.sticky_table {

@@ -2,7 +2,6 @@
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
-using static mar_sumaken_web.Models.M_UserModel;
 
 namespace mar_sumaken_web.Commons
 {
@@ -17,10 +16,10 @@ namespace mar_sumaken_web.Commons
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns>ユーザー情報</returns>
-        public static List<M_User> ConnectMUsers(string sql, string databaseName)
+        public static List<M_UserModel> ConnectMUsers(string sql, string databaseName)
         {
             // 戻り値
-            List<M_User> strList = new();
+            List<M_UserModel> strList = new();
 
             // DB接続
             try
@@ -33,7 +32,7 @@ namespace mar_sumaken_web.Commons
                     connection.ConnectionString = connectionString;
                     connection.Open();
 
-                    strList = connection.Query<M_User>(sql).ToList();
+                    strList = connection.Query<M_UserModel>(sql).ToList();
                 }
                 return strList;
             }
@@ -49,7 +48,7 @@ namespace mar_sumaken_web.Commons
         /// <param name="userList">ユーザー情報</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns>ユーザー情報</returns>
-        public static List<M_User> GetMUserDetailList(List<M_User> userList, string databaseName)
+        public static List<M_UserModel> GetMUserDetailList(List<M_UserModel> userList, string databaseName)
         {
             try
             {
@@ -63,7 +62,7 @@ namespace mar_sumaken_web.Commons
 
                     if (userList.Count > 0)
                     {
-                        foreach (M_User user in userList)
+                        foreach (M_UserModel user in userList)
                         {
                             // 倉庫マスター情報取得
                             var userDepoSql = CreateSQLToGetRUserDepoList(user.UserID);
@@ -204,7 +203,6 @@ namespace mar_sumaken_web.Commons
                 catch (Exception)
                 {
                     transaction.Rollback();
-                    // エラーコード：E2011
                     throw;
                 }
             }
@@ -242,9 +240,8 @@ namespace mar_sumaken_web.Commons
                 }
                 return isDuplicateValid;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーコード：E2011
                 throw;
             }
         }
@@ -256,7 +253,7 @@ namespace mar_sumaken_web.Commons
         /// <param name="user"></param>
         /// <param name="databaseName"></param>
         /// <returns>登録結果</returns>
-        public static bool InsertMUser(M_User mUserRegister, LoginUserModel loginUser)
+        public static bool InsertMUser(M_UserModel mUserRegister, LoginUserModel loginUser)
         {
             bool result = true;
             // SQLServer接続文字列取得
@@ -283,7 +280,6 @@ namespace mar_sumaken_web.Commons
                     if (insertedUserId == null)
                     {
                         result = false;
-                        // エラーコード：E2011
                         throw new Exception();
                     }
 
@@ -300,7 +296,6 @@ namespace mar_sumaken_web.Commons
                             if (depoInsertCount == 0)
                             {
                                 result = false;
-                                // エラーコード：E2011
                                 throw new Exception();
                             }
                         }
@@ -318,7 +313,6 @@ namespace mar_sumaken_web.Commons
                             if (menuInsertCount == 0)
                             {
                                 result = false;
-                                // エラーコード：E2011
                                 throw new Exception();
                             }
                         }
@@ -329,10 +323,9 @@ namespace mar_sumaken_web.Commons
 
                     return result;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     transaction.Rollback();
-                    // エラーコード：E2011
                     throw;
                 }
             }
@@ -344,7 +337,7 @@ namespace mar_sumaken_web.Commons
         /// <param name="mUserUpdate">更新ユーザー情報</param>
         /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns></returns>
-        public static async Task<bool> UpdateMUser(M_User mUserUpdate, LoginUserModel loginUser)
+        public static async Task<bool> UpdateMUser(M_UserModel mUserUpdate, LoginUserModel loginUser)
         {
             bool result = true;
             // SQLServer接続文字列取得
@@ -371,7 +364,6 @@ namespace mar_sumaken_web.Commons
                     if (updatedRows == 0)
                     {
                         result = false;
-                        // エラーコード：E2011
                         throw new Exception();
                     }
 
@@ -390,7 +382,6 @@ namespace mar_sumaken_web.Commons
                             if (depoInsertCount == 0)
                             {
                                 result = false;
-                                // エラーコード：E2011
                                 throw new Exception();
                             }
                         }
@@ -411,7 +402,6 @@ namespace mar_sumaken_web.Commons
                             if (menuInsertCount == 0)
                             {
                                 result = false;
-                                // エラーコード：E2011
                                 throw new Exception();
                             }
                         }
@@ -422,10 +412,9 @@ namespace mar_sumaken_web.Commons
 
                     return result;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     transaction.Rollback();
-                    // エラーコード：E2011
                     throw;
                 }
             }
@@ -500,7 +489,7 @@ namespace mar_sumaken_web.Commons
         /// <param name="createAt">システムタイム</param>
         /// <param name="createBy">ユーザーID</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToInsertMUser(M_User mUser, DateTime createAt, string createBy)
+        public static string CreateSQLToInsertMUser(M_UserModel mUser, DateTime createAt, string createBy)
         {
             var sql = $@"
                 INSERT INTO M_User 
@@ -518,7 +507,7 @@ namespace mar_sumaken_web.Commons
         /// <param name="updateAt">システムタイム</param>
         /// <param name="updateBy">ユーザーID</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToUpdateMUser(M_User mUser, DateTime updateAt, string updateBy)
+        public static string CreateSQLToUpdateMUser(M_UserModel mUser, DateTime updateAt, string updateBy)
         {
             var sql = $@"
 

@@ -5,7 +5,7 @@ using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
-using static mar_sumaken_web.Models.M_UserModel;
+using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -42,33 +42,21 @@ namespace mar_sumaken_web.Controllers
 
                 // ユーザーマスター情報取得SQL作成
                 var sql = M_UserConnectController.CreateSQLToSelectMUsers();
+
                 // DB接続
-                List<M_User> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
+                var userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
                 
                 if (userList.Count > 0)
                 {
-                    // ユーザーマスターの詳細を取得する
-                    userList = M_UserConnectController.GetMUserDetailList(userList, user.DatabaseName);
-                    model.M_UserList = userList;
+                    // ユーザーマスターの詳細を取得
+                    IEnumerable<M_UserModel> query = M_UserConnectController.GetMUserDetailList(userList, user.DatabaseName);
+                    model.M_UserList = query.ToPagedList();
                 }
 
                 return View(model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //// エラーメッセージ取得
-                //// 「SQLServerでエラーが発生しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E4002");
-
-                //// log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogError($"{exceptionMessage} {errorMessage}");
-
-                //var shippingImportErrorModel = new HandyErrorMessageModel
-                //{
-                //    Message = errorMessage + exceptionMessage
-                //};
-                //return View(shippingImportErrorModel);
                 return View();
             }
         }
@@ -80,7 +68,8 @@ namespace mar_sumaken_web.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            M_User model = new M_User();
+            M_UserModel model = new();
+
             try
             {
                 // ログイン中ユーザー情報取得
@@ -90,10 +79,12 @@ namespace mar_sumaken_web.Controllers
                 var depoList = M_DepoConnectController.GetMDepoList(user.DatabaseName);
                 foreach (var depo in depoList)
                 {
-                    SelectListItem depoItem = new SelectListItem();
-                    depoItem.Text = depo.DepoName;
-                    depoItem.Value = Convert.ToString(depo.DepoID);
-                    depoItem.Selected = false;
+                    SelectListItem depoItem = new()
+                    {
+                        Text = depo.DepoName,
+                        Value = Convert.ToString(depo.DepoID),
+                        Selected = false
+                    };
 
                     model.DepoSelectList.Add(depoItem);
                 }
@@ -102,31 +93,20 @@ namespace mar_sumaken_web.Controllers
                 var menuList = M_HandyMenuConnectController.GetMHandyMenuList(user.DatabaseName);
                 foreach (var menu in menuList)
                 {
-                    SelectListItem menuItem = new SelectListItem();
-                    menuItem.Text = menu.HandyMenuName;
-                    menuItem.Value = Convert.ToString(menu.HandyMenuID);
-                    menuItem.Selected = false;
+                    SelectListItem menuItem = new()
+                    {
+                        Text = menu.HandyMenuName,
+                        Value = Convert.ToString(menu.HandyMenuID),
+                        Selected = false
+                    };
 
                     model.HandyMenuSelectList.Add(menuItem);
                 }
 
                 return View(model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //// エラーメッセージ取得
-                //// 「SQLServerでエラーが発生しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E4002");
-
-                //// log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogError($"{exceptionMessage} {errorMessage}");
-
-                //var shippingImportErrorModel = new HandyErrorMessageModel
-                //{
-                //    Message = errorMessage + exceptionMessage
-                //};
-                //return View(shippingImportErrorModel);
                 return View();
             }
         }
@@ -137,7 +117,7 @@ namespace mar_sumaken_web.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Register(M_User model)
+        public IActionResult Register(M_UserModel model)
         {
             try
             {
@@ -158,19 +138,16 @@ namespace mar_sumaken_web.Controllers
                         isDepoSelected = true;
                     }
                 }
-                // 登録情報をチェック
+                // 入力規則チェック
                 if (!ModelState.IsValid || !isDepoSelected)
                 {
                     return NotFound(new { errorMessage = "正しい入力を入れてください。" });
                 }
 
-                // 重複ユーザー情報取をチェック
+                // 重複ユーザーチェック
                 bool isDuplicate = M_UserConnectController.CheckIsDuplicateMUserByLoginId(model.LoginID, user.DatabaseName);
                 if (isDuplicate)
                 {
-                    // エラーを作成
-                    // エラーコード：E2011
-                    //throw new Exception();
                     return NotFound(new { errorMessage = "ログインIDが重複しています。" });
                 }
 
@@ -193,15 +170,8 @@ namespace mar_sumaken_web.Controllers
 
                 return Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
-
-                // log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogError($"{exceptionMessage} {errorMessage}");
                 return NotFound(new { errorMessage = "予期せぬエラーが発⽣しました。" });
             }
         }
@@ -213,7 +183,7 @@ namespace mar_sumaken_web.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            M_User editUser = new M_User();
+            M_UserModel editUser = new();
             try
             {
                 // ログイン中ユーザー情報取得
@@ -227,7 +197,7 @@ namespace mar_sumaken_web.Controllers
                 // IDでユーザーを選択するSQLを作成
                 var sql = M_UserConnectController.CreateSQLToSelectMUserByUserId(id);
                 // DB接続
-                List<M_User> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
+                List<M_UserModel> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
                 if (userList.Count != 1)
                 {
                     // エラーコード：E2011
@@ -239,10 +209,12 @@ namespace mar_sumaken_web.Controllers
                 var depoList = M_DepoConnectController.GetMDepoList(user.DatabaseName);
                 foreach (var depo in depoList)
                 {
-                    SelectListItem depoItem = new SelectListItem();
-                    depoItem.Text = depo.DepoName;
-                    depoItem.Value = Convert.ToString(depo.DepoID);
-                    depoItem.Selected = false;
+                    SelectListItem depoItem = new()
+                    {
+                        Text = depo.DepoName,
+                        Value = Convert.ToString(depo.DepoID),
+                        Selected = false
+                    };
 
                     editUser.DepoSelectList.Add(depoItem);
                 }
@@ -250,10 +222,12 @@ namespace mar_sumaken_web.Controllers
                 var menuList = M_HandyMenuConnectController.GetMHandyMenuList(user.DatabaseName);
                 foreach (var menu in menuList)
                 {
-                    SelectListItem menuItem = new SelectListItem();
-                    menuItem.Text = menu.HandyMenuName;
-                    menuItem.Value = Convert.ToString(menu.HandyMenuID);
-                    menuItem.Selected = false;
+                    SelectListItem menuItem = new()
+                    {
+                        Text = menu.HandyMenuName,
+                        Value = Convert.ToString(menu.HandyMenuID),
+                        Selected = false
+                    };
 
                     editUser.HandyMenuSelectList.Add(menuItem);
                 }
@@ -286,28 +260,14 @@ namespace mar_sumaken_web.Controllers
                     }
                 }
 
-
-                var config = new MapperConfiguration(cfg => cfg.CreateMap<M_User, M_UserEditModel>());
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<M_UserModel, M_UserEditModel>());
                 IMapper mapper = config.CreateMapper();
                 M_UserEditModel editModel = mapper.Map<M_UserEditModel>(editUser);
 
                 return View(editModel);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //// エラーメッセージ取得
-                //// 「SQLServerでエラーが発生しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E4002");
-
-                //// log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogError($"{exceptionMessage} {errorMessage}");
-
-                //var shippingImportErrorModel = new HandyErrorMessageModel
-                //{
-                //    Message = errorMessage + exceptionMessage
-                //};
-                //return View(shippingImportErrorModel);
                 return View();
             }
         }
@@ -318,7 +278,7 @@ namespace mar_sumaken_web.Controllers
         /// <param name="model">ユーザーマスターの更新情報</param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Edit(M_User model)
+        public async Task<IActionResult> Edit(M_UserModel model)
         {
             try
             {
@@ -347,9 +307,6 @@ namespace mar_sumaken_web.Controllers
                 }
                 if (!ModelState.IsValid || !isDepoSelected)
                 {
-                    // エラーを作成
-                    // エラーコード：E2011
-                    //throw new Exception();
                     return NotFound(new { errorMessage = "入力情報が間違っています。" });
                 }
 
@@ -375,15 +332,8 @@ namespace mar_sumaken_web.Controllers
 
                 return Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
-
-                // log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogError($"{exceptionMessage} {errorMessage}");
                 return NotFound(new { errorMessage = "予期せぬエラーが発⽣しました。" });
             }
         }
@@ -418,15 +368,8 @@ namespace mar_sumaken_web.Controllers
 
                 return Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
-
-                // log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogError($"{exceptionMessage} {errorMessage}");
                 return NotFound(new { errorMessage = "予期せぬエラーが発⽣しました。" });
             }
         }
@@ -436,7 +379,6 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         public JsonResult ExportFile()
         {
-            string? errorMessage;
             try
             {
                 // log取得
@@ -448,7 +390,6 @@ namespace mar_sumaken_web.Controllers
                 // 管理権限区分が1(管理者)でない場合はエラーとする
                 if (user == null || user.AuthorizedKubun != 1)
                 {
-                    // エラーコード：E2011
                     throw new Exception();
                 }
 
@@ -458,19 +399,19 @@ namespace mar_sumaken_web.Controllers
                 // ユーザーマスター情報取得SQL作成
                 var sql = M_UserConnectController.CreateSQLToSelectMUsers();
                 // DB接続
-                List<M_User> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
+                List<M_UserModel> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
                 if (userList.Count > 0)
                 {
-                    foreach (M_User userItem in userList)
+                    foreach (M_UserModel userItem in userList)
                     {
                         DataRow newRow = mUserDataTable.NewRow();
-                        newRow[Utils.GetDisplayName<M_User>("UserID")] = userItem.UserID.ToString();
-                        newRow[Utils.GetDisplayName<M_User>("LoginID")] = userItem.LoginID.ToString();
-                        newRow[Utils.GetDisplayName<M_User>("UserName")] = userItem.UserName;
-                        newRow[Utils.GetDisplayName<M_User>("DepoName")] = userItem.DepoName;
-                        newRow[Utils.GetDisplayName<M_User>("AuthorizedKubun")] = userItem.AuthorizedKubun;
-                        newRow[Utils.GetDisplayName<M_User>("UpdatedAt")] = userItem.UpdatedAt.ToString();
-                        newRow[Utils.GetDisplayName<M_User>("UpdatedBy")] = userItem.UpdatedBy;
+                        newRow[Utils.GetDisplayName<M_UserModel>("UserID")] = userItem.UserID.ToString();
+                        newRow[Utils.GetDisplayName<M_UserModel>("LoginID")] = userItem.LoginID.ToString();
+                        newRow[Utils.GetDisplayName<M_UserModel>("UserName")] = userItem.UserName;
+                        newRow[Utils.GetDisplayName<M_UserModel>("DepoName")] = userItem.DepoName;
+                        newRow[Utils.GetDisplayName<M_UserModel>("AuthorizedKubun")] = userItem.AuthorizedKubun;
+                        newRow[Utils.GetDisplayName<M_UserModel>("UpdatedAt")] = userItem.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<M_UserModel>("UpdatedBy")] = userItem.UpdatedBy;
 
                         mUserDataTable.Rows.Add(newRow);
                     }
@@ -487,15 +428,8 @@ namespace mar_sumaken_web.Controllers
 
                 return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
-
-                // log取得
-                //var exceptionMessage = ex.Message;
-                //_logger.LogInformation($"{exceptionMessage} {errorMessage}");
                 return Json(new { res = "NG", error = "予期せぬエラーが発⽣しました。" });
             }
         }
@@ -507,13 +441,13 @@ namespace mar_sumaken_web.Controllers
         {
             var table = new DataTable();
 
-            table.Columns.Add(Utils.GetDisplayName<M_User>("UserID"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<M_User>("LoginID"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<M_User>("UserName"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<M_User>("DepoName"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<M_User>("AuthorizedKubun"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<M_User>("UpdatedAt"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<M_User>("UpdatedBy"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_UserModel>("UserID"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_UserModel>("LoginID"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_UserModel>("UserName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_UserModel>("DepoName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_UserModel>("AuthorizedKubun"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_UserModel>("UpdatedAt"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_UserModel>("UpdatedBy"), typeof(string));
 
             return table;
         }

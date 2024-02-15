@@ -6,23 +6,18 @@ using X.PagedList;
 namespace mar_sumaken_web.Models
 {
     /// <summary>
-    /// 出庫実績テーブルのModel
+    /// 入荷予定照会テーブルのModel
     /// </summary>
-    public class D_StoreOutModel : CommonModel
+    public class D_ReceiveModel : CommonModel
     {
         /// <summary>
-        /// 出庫実績リスト
+        /// 入荷日
         /// </summary>
-        public IPagedList<D_StoreOutModel> D_StoreOutList { get; set; }
-
-        /// <summary>
-        /// 出庫日(開始)
-        /// </summary>
-        [Display(Name = "出庫日")]
+        [Display(Name = "入荷日")]
         public string DateSearchStart { get; set; }
 
         /// <summary>
-        /// 出庫日(終了)
+        /// 入庫日(終了)
         /// </summary>
         public string DateSearchEnd { get; set; }
 
@@ -61,23 +56,27 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 
         /// </summary>
-        public int StoreOutID { get; set; }
+        public List<string> LstErrorMsg { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string StoreOutDate { get; set; }
+        public string Message { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IPagedList<D_ReceiveModel> LstD_ReceiveModel { get; set; }
 
         /// <summary>
         /// 初期値設定
         /// </summary>
-        public D_StoreOutModel()
+        public D_ReceiveModel()
         {
             // 現在日
             var now = DateTime.Today.ToString("yyyy/MM/dd");
             DateSearchStart = now;
             DateSearchEnd = now;
         }
-        
     }
 }

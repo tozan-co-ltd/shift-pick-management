@@ -30,20 +30,23 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult SearchData(D_StoreOutModel model)
         {
-            string? errorMessage;
+            var searchData = string.Empty;
 
             try
             {
-                var listD_StoreOut = GetListD_StoreOut(model, ClaimsLoginUserData().DatabaseName);
-                var searchData = string.Empty;
+                // SQL作成
+                var sql = D_StoreOutConnectController.CreateSQLToGetDStoreOut(model);
+
+                // DB接続
+                List<D_StoreOutModel> listD_StoreOut = D_StoreOutConnectController.ConnectD_StoreOut(sql, ClaimsLoginUserData().DatabaseName);
 
                 // 表示用のhtml作成
                 if (listD_StoreOut.Count > 0)
                 {
                     IEnumerable<D_StoreOutModel> query = listD_StoreOut.Select(s => s);
-                    model.LstD_StoreOut = query.ToPagedList();
+                    model.D_StoreOutList = query.ToPagedList();
 
-                    foreach (var item in model.LstD_StoreOut)
+                    foreach (var item in model.D_StoreOutList)
                     {
                         searchData += "<tr>" +
                             "<td>" + @item.StoreOutID + "</td>" +
@@ -67,24 +70,6 @@ namespace mar_sumaken_web.Controllers
                 var exceptionMessage = ex.Message;
                 return Content(exceptionMessage);
             }
-        }
-
-
-        /// <summary>
-        /// 出庫実績情報取得
-        /// </summary>
-        /// <param name="model">model</param>
-        /// <param name="databaseName">string</param>
-        /// <returns>出庫実績情報</returns>
-        public List<D_StoreOutModel> GetListD_StoreOut(D_StoreOutModel model, string databaseName)
-        {
-            // SQL作成
-            var sql = D_StoreOutConnectController.CreateSQLToGetDStoreOut(model);
-
-            // DB接続
-            List<D_StoreOutModel> strList = D_StoreOutConnectController.ConnectD_StoreOut(sql, databaseName);
-
-            return strList;
         }
     }
 }

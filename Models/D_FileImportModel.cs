@@ -88,6 +88,6 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 
         /// </summary>
-        public string Message { set; get; }
+        public string Message { get; set; }
     }
 }
