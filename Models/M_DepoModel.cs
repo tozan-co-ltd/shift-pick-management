@@ -15,46 +15,46 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 倉庫ID
         /// </summary>
-        public int DepoID { set; get; }
+        public int DepoID { get; set; }
 
         /// <summary>
         /// 倉庫コード
         /// </summary>
-        public int DepoCode { set; get; }
+        public int DepoCode { get; set; }
 
         /// <summary>
         /// 倉庫名
         /// </summary>
-        public string DepoName { set; get; }
+        public string DepoName { get; set; }
 
         /// <summary>
         /// 未使用フラグ
         /// </summary>
-        public bool IsDeleted { set; get; }
+        public bool IsDeleted { get; set; }
 
         /// <summary>
         /// 作成日時
         /// </summary>
-        public DateTime CreatedAt { set; get; }
+        public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// 作成者
         /// </summary>
-        public string CreatedBy { set; get; }
+        public string CreatedBy { get; set; }
 
         /// <summary>
         /// 更新日時
         /// </summary>
-        public DateTime UpdatedAt { set; get; }
+        public DateTime UpdatedAt { get; set; }
 
         /// <summary>
         /// 更新者
         /// </summary>
-        public string UpdatedBy { set; get; }
+        public string UpdatedBy { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string Message { set; get; }
+        public string Message { get; set; }
     }
 }

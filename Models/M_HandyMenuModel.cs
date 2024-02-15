@@ -8,41 +8,41 @@
         /// <summary>
         /// ハンディメニューID
         /// </summary>
-        public int HandyMenuID { set; get; }
+        public int HandyMenuID { get; set; }
 
         /// <summary>
         /// ソート番号
         /// </summary>
-        public int SortNumber { set; get; }
+        public int SortNumber { get; set; }
 
         /// <summary>
         /// ハンディメニュー名
         /// </summary>
-        public string HandyMenuName { set; get; }
+        public string HandyMenuName { get; set; }
 
         /// <summary>
         /// 未使用フラグ
         /// </summary>
-        public bool IsDeleted { set; get; }
+        public bool IsDeleted { get; set; }
 
         /// <summary>
         /// 作成日時
         /// </summary>
-        public DateTime CreatedAt { set; get; }
+        public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// 作成者
         /// </summary>
-        public string CreatedBy { set; get; }
+        public string CreatedBy { get; set; }
 
         /// <summary>
         /// 更新日時
         /// </summary>
-        public DateTime UpdatedAt { set; get; }
+        public DateTime UpdatedAt { get; set; }
 
         /// <summary>
         /// 更新者
         /// </summary>
-        public string UpdatedBy { set; get; }
+        public string UpdatedBy { get; set; }
     }
 }

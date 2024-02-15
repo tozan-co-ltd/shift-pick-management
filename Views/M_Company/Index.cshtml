@@ -1,6 +1,8 @@
-﻿@model List<mar_sumaken_web.Models.M_CompanyModel>
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.M_CompanyModel;
 @{
-    ViewData["Title"] = "マスター情報 - 会社マスター";
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 <style type="text/css">
     .btn-register {
@@ -13,13 +15,16 @@
         @ViewData["Title"]
     </div>
     <div class="card-body">
-        @if (ViewData["ErrorMessage"] != null || ViewData["Message"] != null)
+
+        <div class="form-group col-sm-12">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+        </div>
+
+        @if (ViewData["ErrorMessage"] != null)
         {
-            <div id="div-message" class="mb-3 ml-3 text-danger">
-                <span class="text-danger-custom">@ViewData["ErrorMessage"] </span>
-                <span class="text-success-custom">@ViewData["Message"] </span>
-            </div>
+            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
+
         <div class="mg-bot-20">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-2">
@@ -55,9 +60,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (@Model != null  && @Model.Count > 0)
+                    @if (@Model != null && @Model.M_CompanyList != null && @Model.M_CompanyList.Count > 0)
                     {
-                        @foreach (var item in @Model)
+                        @foreach (var item in @Model.M_CompanyList)
                         {
                             <tr>
                                 <td>

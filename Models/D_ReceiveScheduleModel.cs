@@ -6,23 +6,18 @@ using X.PagedList;
 namespace mar_sumaken_web.Models
 {
     /// <summary>
-    /// 出庫実績テーブルのModel
+    ///  出荷指示照会テーブルのModel
     /// </summary>
-    public class D_StoreOutModel : CommonModel
+    public class D_ReceiveScheduleModel : CommonModel
     {
         /// <summary>
-        /// 出庫実績リスト
+        /// 入荷予定日
         /// </summary>
-        public IPagedList<D_StoreOutModel> D_StoreOutList { get; set; }
-
-        /// <summary>
-        /// 出庫日(開始)
-        /// </summary>
-        [Display(Name = "出庫日")]
+        [Display(Name = "入荷予定日")]
         public string DateSearchStart { get; set; }
 
         /// <summary>
-        /// 出庫日(終了)
+        /// 入荷予定日(終了)
         /// </summary>
         public string DateSearchEnd { get; set; }
 
@@ -49,35 +44,54 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
+            /// 選択された倉庫ID
+            /// </summary>
+            public int SelectedDepoID { get; set; }
 
-        /// <summary>
-        /// 選択された会社ID
-        /// </summary>
-        public int SelectedCompanyID { get; set; }
+            /// <summary>
+            /// 選択された倉庫名
+            /// </summary>
+            public string SelectedDepoName { get; set; } = string.Empty;
+
+            /// <summary>
+            /// 選択された会社ID
+            /// </summary>
+            public int SelectedCompanyID { get; set; }
+
+            /// <summary>
+            /// 選択された会社名
+            /// </summary>
+            [Display(Name = "納入先名")]
+            public string SelectedCompanyName { get; set; } = string.Empty;
 
         /// <summary>
         /// 
         /// </summary>
-        public int StoreOutID { get; set; }
+        public List<string> LstErrorMsg { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string StoreOutDate { get; set; }
+        public string Message { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IPagedList<D_ReceiveScheduleModel> LstD_ReceiveSchedule { get; set; }
 
         /// <summary>
         /// 初期値設定
         /// </summary>
-        public D_StoreOutModel()
+        public D_ReceiveScheduleModel()
         {
             // 現在日
             var now = DateTime.Today.ToString("yyyy/MM/dd");
+            // 1ヶ月前
+            var oneWeeklater = DateTime.Today.AddDays(+7).ToString("yyyy/MM/dd");
+
             DateSearchStart = now;
-            DateSearchEnd = now;
+            DateSearchEnd = oneWeeklater;
         }
-        
+
     }
 }

@@ -1,5 +1,5 @@
 ﻿@using mar_sumaken_web.Commons;
-@model mar_sumaken_web.Models.M_UserModel.M_User
+@model mar_sumaken_web.Models.M_UserModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "登録";
@@ -24,11 +24,13 @@
         </div>
 
         <div class="form-group col-sm-12">
-            <p id="import-res" class="mt-1"></p>
+            <p id="div-error-message" class="mt-1 text-danger"></p>
         </div>
 
-        <div id="div-error-message" class="mb-3 ml-3 text-danger">
-        </div>
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+        }
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
@@ -163,9 +165,7 @@
     // ユーザーマスター登録
     function OnRegister() {
         $('#mUserForm').submit(function (event) {
-
             $("#div-error-message").text("");
-            $('#import-res').text("");
 
             // フォーム情報を取得する
             var formData = $('#mUserForm').serializeArray();
@@ -175,6 +175,9 @@
 
             // ページの更新を禁止する
             event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
 
             // Ajax call
             $.ajax({
@@ -191,16 +194,10 @@
                     if (xhr.status === 404) {
                         // データが見つからなかった場合
                         var errorMessage = xhr.responseJSON.errorMessage;
-                        $("#div-error-message").hide();
-                        $("#import-res").show();
-                        $("#import-res").addClass('text-danger');
-                        $("#import-res").text("エラー: " + errorMessage);
+                        $('#div-error-message').text(errorMessage);
                     } else {
                         // その他のエラーの場合
-                        $("#div-error-message").hide();
-                        $("#import-res").show();
-                        $("#import-res").addClass('text-danger');
-                        $("#import-res").text("データの取得に失敗しました。");
+                        $('#div-error-message').text(errorMessage);
                     }
                 });
         });

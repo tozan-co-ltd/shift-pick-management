@@ -11,15 +11,15 @@ namespace mar_sumaken_web.Models
     public class D_StoreInModel: CommonModel
     {
         /// <summary>
-        /// 出庫日
+        /// 入庫日
         /// </summary>
-        [Display(Name = "出庫日")]
-        public string DateSearchStart { set; get; }
+        [Display(Name = "入庫日")]
+        public string DateSearchStart { get; set; }
 
         /// <summary>
-        /// 出庫日(終了)
+        /// 入庫日(終了)
         /// </summary>
-        public string DateSearchEnd { set; get; }
+        public string DateSearchEnd { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -43,10 +43,6 @@ namespace mar_sumaken_web.Models
             }
         }
 
-        public int StoreOutID { get; set; }
-
-        public string StoreOutDate { get; set; }
-
         /// <summary>
         /// 選択された倉庫ID
         /// </summary>
@@ -57,10 +53,10 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public int SelectedCompanyID { get; set; }
 
-        public List<string> LstErrorMsg { set; get; }//エラーメッセージリスト
-        public string Message { set; get; }
+        public List<string> LstErrorMsg { get; set; }//エラーメッセージリスト
+        public string Message { get; set; }
 
-        public IPagedList<D_StoreInModel> LstD_StoreOut { set; get; }//一覧画面のlistを取得と設定
+        public IPagedList<D_StoreInModel> LstD_StoreIn { get; set; }//一覧画面のlistを取得と設定
 
         // <summary>
         /// 初期値設定
@@ -68,8 +64,7 @@ namespace mar_sumaken_web.Models
         public D_StoreInModel()
         {
             var now = DateTime.Today.ToString("yyyy/MM/dd"); //　現在日
-            var oneMonthAgo = DateTime.Today.AddMonths(-1).ToString("yyyy/MM/dd");  //　一月前
-            DateSearchStart = oneMonthAgo;
+            DateSearchStart = now;
             DateSearchEnd = now;
         }
     }

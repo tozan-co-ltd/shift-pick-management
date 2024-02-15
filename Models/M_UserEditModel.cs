@@ -1,13 +1,12 @@
 ﻿using mar_sumaken_web.Properties;
 using System.ComponentModel.DataAnnotations;
-using static mar_sumaken_web.Models.M_UserModel;
 
 namespace mar_sumaken_web.Models
 {
     /// <summary>
     /// ユーザーマスターのModel(修正画面用)
     /// </summary>
-    public class M_UserEditModel : M_User
+    public class M_UserEditModel : M_UserModel
     {
         /// <summary>
         /// パスワード

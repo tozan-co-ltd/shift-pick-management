@@ -8,56 +8,56 @@
         /// <summary>
         /// 会社ID
         /// </summary>
-        public int CompanyID { set; get; }
+        public int CompanyID { get; set; }
 
         /// <summary>
         /// 会社コード
         /// </summary>
-        public String CompanyCode { set; get; }
+        public String CompanyCode { get; set; }
 
         /// <summary>
         /// 会社名
         /// </summary>
-        public String CompanyName { set; get; }
+        public String CompanyName { get; set; }
 
         /// <summary>
         /// データベース名
         /// </summary>
-        public String DatabaseName { set; get; }
+        public String DatabaseName { get; set; }
 
         /// <summary>
         /// ユーザーID
         /// </summary>
-        public int UserID { set; get; }
+        public int UserID { get; set; }
 
         /// <summary>
         /// ユーザー名
         /// </summary>
-        public String UserName { set; get; }
+        public String UserName { get; set; }
 
         /// <summary>
         /// ロール
         /// </summary>
-        public int Role { set; get; }
+        public int Role { get; set; }
 
         /// <summary>
         /// メイン倉庫ID
         /// </summary>
-        public int MainDepoID { set; get; }
+        public int MainDepoID { get; set; }
 
         /// <summary>
         /// メイン倉庫名
         /// </summary>
-        public String MainDepoName { set; get; }
+        public String MainDepoName { get; set; }
 
         /// <summary>
         /// 管理権限区分
         /// </summary>
-        public int AuthorizedKubun { set; get; }
+        public int AuthorizedKubun { get; set; }
 
         /// <summary>
         /// タイムスタンプ
         /// </summary>
-        public DateTime TimeStamp { set; get; }
+        public DateTime TimeStamp { get; set; }
     }
 }

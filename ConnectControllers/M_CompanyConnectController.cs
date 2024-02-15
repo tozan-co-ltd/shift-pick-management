@@ -234,11 +234,13 @@ namespace mar_sumaken_web.Commons
         /// <returns>SQL文</returns>
         private static string CreateSQLToInsertMCompany(M_CompanyModel company, DateTime createdAt, string createdBy)
         {
+            string formatCreatedAt = createdAt.ToString("yyyy/MM/dd HH:mm:ss");
+
             var sql = $@"
                 INSERT INTO M_Company
                     (CompanyCode, CompanyKubun, CompanyName, ClientName, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
                 VALUES (
-                    '{company.CompanyCode}','{company.CompanyKubun}','{company.CompanyName}','{company.ClientName}','{createdAt}','{createdBy}','{createdAt}','{createdBy}'
+                    '{company.CompanyCode}','{company.CompanyKubun}','{company.CompanyName}','{company.ClientName}','{formatCreatedAt}','{createdBy}','{formatCreatedAt}','{createdBy}'
                 );
             ";
             return sql;
