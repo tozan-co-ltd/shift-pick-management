@@ -26,6 +26,11 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
+
+        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem> SearchCompanyList
@@ -37,11 +42,6 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
@@ -50,7 +50,6 @@ namespace mar_sumaken_web.Models
         /// ファイル取込実績ID
         /// </summary>
         public int FileImportID { get; set; }
-
 
         /// <summary>
         /// 倉庫ID
@@ -84,10 +83,5 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "登録者")]
         public string CreatedBy { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Message { get; set; }
     }
 }

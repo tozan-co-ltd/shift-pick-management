@@ -107,10 +107,9 @@ namespace mar_sumaken_web.Commons
 
                     return deleteAffectedRows;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    // エラーコード：E2011
-                    throw ex;
+                    throw;
                 }
             }
         }
@@ -148,9 +147,8 @@ namespace mar_sumaken_web.Commons
                 }
                 return isDuplicateValid;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーコード：E2011
                 throw;
             }
         }
@@ -183,9 +181,9 @@ namespace mar_sumaken_web.Commons
         private static string CreateSQLToDeleteMCompany(int companyId)
         {
             var sql = $@"
-                UPDATE M_Company
-                SET IsDeleted = 1
-                WHERE CompanyID = {companyId}
+                        UPDATE M_Company
+                        SET IsDeleted = 1
+                        WHERE CompanyID = {companyId}
             ;";
             return sql;
         }
@@ -210,16 +208,15 @@ namespace mar_sumaken_web.Commons
                 try
                 {
                     DateTime sysDate = DateTime.Now;
-                    // ユーザーマスター登録SQL作成
+                    // 会社マスター登録SQL作成
                     string companyRegisterSql = CreateSQLToInsertMCompany(model, sysDate, loginUser.UserName);
-                    // ユーザーマスター登録
+                    // 会社マスター登録
                     var insertedCount = connection.Execute(companyRegisterSql);
 
                     return insertedCount;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    // エラーコード：E2011
                     throw;
                 }
             }
@@ -232,15 +229,30 @@ namespace mar_sumaken_web.Commons
         /// <param name="createAt">システムタイム</param>
         /// <param name="createBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToInsertMCompany(M_CompanyModel company, DateTime createdAt, string createdBy)
+        private static string CreateSQLToInsertMCompany(M_CompanyModel mCompany, DateTime createdAt, string createdBy)
         {
             string formatCreatedAt = createdAt.ToString("yyyy/MM/dd HH:mm:ss");
 
             var sql = $@"
-                INSERT INTO M_Company
-                    (CompanyCode, CompanyKubun, CompanyName, ClientName, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
+                INSERT INTO M_Company(
+                    CompanyCode, 
+                    CompanyKubun, 
+                    CompanyName, 
+                    ClientName, 
+                    CreatedAt, 
+                    CreatedBy, 
+                    UpdatedAt, 
+                    UpdatedBy
+                )
                 VALUES (
-                    '{company.CompanyCode}','{company.CompanyKubun}','{company.CompanyName}','{company.ClientName}','{formatCreatedAt}','{createdBy}','{formatCreatedAt}','{createdBy}'
+                    '{mCompany.CompanyCode}',
+                    '{mCompany.CompanyKubun}',
+                    '{mCompany.CompanyName}',
+                    '{mCompany.ClientName}',
+                    '{formatCreatedAt}',
+                    '{createdBy}',
+                    '{formatCreatedAt}',
+                    '{createdBy}'
                 );
             ";
             return sql;

@@ -31,7 +31,7 @@
         public string CompanyName { get; set; }
 
         /// <summary>
-        /// 会社名かな
+        /// 会社名カナ
         /// </summary>
         public string CompanyNameKana { get; set; }
 
@@ -41,43 +41,8 @@
         public string DatabaseName { get; set; }
 
         /// <summary>
-        /// APIのURL
-        /// </summary>
-        public string HandyApiUrl { get; set; }
-
-        /// <summary>
         /// ハンディアプリの最小バージョン
         /// </summary>
         public decimal HandyAppMinVersion { get; set; }
-
-        /// <summary>
-        /// ハンディ管理者パスワード
-        /// </summary>
-        public string HandyAdminPassword { get; set; }
-
-        /// <summary>
-        /// 未使用フラグ
-        /// </summary>
-        public bool IsDeleted { get; set; }
-
-        /// <summary>
-        /// 作成日時
-        /// </summary>
-        public DateTime CreateDate { get; set; }
-
-        /// <summary>
-        /// 作成者
-        /// </summary>
-        public string CreateUserID { get; set; }
-
-        /// <summary>
-        /// 更新日時
-        /// </summary>
-        public DateTime UpdateDate { get; set; }
-
-        /// <summary>
-        /// 更新者
-        /// </summary>
-        public string UpdateUserID { get; set; }
     }
 }

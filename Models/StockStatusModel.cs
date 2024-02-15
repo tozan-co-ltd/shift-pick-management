@@ -6,10 +6,15 @@ using X.PagedList;
 namespace mar_sumaken_web.Models
 {
     /// <summary>
-    /// 入荷予定照会テーブルのModel
+    /// 在庫照会のModel
     /// </summary>
     public class StockStatusModel : CommonModel
     {
+        /// <summary>
+        /// 在庫リスト
+        /// </summary>
+        public IPagedList<StockStatusModel> StockStatusList { get; set; }
+
         /// <summary>
         /// 年月日
         /// </summary>
@@ -28,6 +33,11 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
+
+        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem> SearchCompanyList
@@ -39,29 +49,9 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<string> LstErrorMsg { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Message { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public IPagedList<StockStatusModel> LstStockStatus { get; set; }
 
         /// <summary>
         /// 初期値設定

@@ -17,15 +17,15 @@ namespace mar_sumaken_web.Models
         public IPagedList<D_ShipmentScheduleModel> D_ShipmentScheduleList { get; set; }
 
         /// <summary>
-        /// 出庫日
+        /// 検索納入指示日(開始)
         /// </summary>
-        [Display(Name = "入荷日")]
-        public string DateSearchStart { get; set; }
+        [Display(Name = "納入指示日")]
+        public string SearchStartDate { get; set; }
 
         /// <summary>
-        /// 出庫日(終了)
+        /// 検索納入指示日(終了)
         /// </summary>
-        public string DateSearchEnd { get; set; }
+        public string SearchEndDate { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -39,6 +39,16 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
+
+        /// <summary>
+        /// 選択された倉庫名
+        /// </summary>
+        public string? SelectedDepoName { get; set; }
+
+        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem> SearchCompanyList
@@ -50,21 +60,6 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 取込ファイル名
-        /// </summary>
-        public string? ImportFileName { get; set; }
-
-        /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
-        /// 選択された倉庫名
-        /// </summary>
-        public string? SelectedDepoName { get; set; }
-
-        /// <summary>
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
@@ -74,6 +69,11 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "納入先名")]
         public string? SelectedCompanyName { get; set; }
+
+        /// <summary>
+        /// 取込ファイル名
+        /// </summary>
+        public string? ImportFileName { get; set; }
 
         /// <summary>
         /// 出荷指示実績ID
@@ -324,8 +324,8 @@ namespace mar_sumaken_web.Models
         {
             // 現在日
             var now = DateTime.Today.AddDays(+1).ToString("yyyy/MM/dd");
-            DateSearchStart = now;
-            DateSearchEnd = now;
+            SearchStartDate = now;
+            SearchEndDate = now;
         }
     }
 }

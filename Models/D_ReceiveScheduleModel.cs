@@ -17,15 +17,15 @@ namespace mar_sumaken_web.Models
         public IPagedList<D_ReceiveScheduleModel> D_ReceiveScheduleList { set; get; }
 
         /// <summary>
-        /// 入荷予定日
+        /// 検索入荷予定日(開始)
         /// </summary>
         [Display(Name = "入荷予定日")]
-        public string DateSearchStart { get; set; }
+        public string SearchStartDate { get; set; }
 
         /// <summary>
-        /// 入荷予定日(終了)
+        /// 検索入荷予定日(終了)
         /// </summary>
-        public string DateSearchEnd { get; set; }
+        public string SearchEndDate { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -37,7 +37,12 @@ namespace mar_sumaken_web.Models
                 return MDepoList;
             }
         }
-        
+
+        /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
+
         /// <summary>
         /// 検索会社リスト
         /// </summary>
@@ -50,16 +55,6 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 取込ファイル名
-        /// </summary>
-        public string? ImportFileName { get; set; }
-
-        /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
@@ -69,7 +64,12 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "納入先名")]
         public string SelectedCompanyName { get; set; } = string.Empty;
-        
+
+        /// <summary>
+        /// 取込ファイル名
+        /// </summary>
+        public string? ImportFileName { get; set; }
+
         /// <summary>
         /// 会社コード
         /// </summary>
@@ -136,8 +136,8 @@ namespace mar_sumaken_web.Models
             // 1ヶ月前
             var oneWeeklater = DateTime.Today.AddDays(+7).ToString("yyyy/MM/dd");
 
-            DateSearchStart = now;
-            DateSearchEnd = oneWeeklater;
+            SearchStartDate = now;
+            SearchEndDate = oneWeeklater;
         }
     }
 }

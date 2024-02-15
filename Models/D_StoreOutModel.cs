@@ -16,15 +16,15 @@ namespace mar_sumaken_web.Models
         public IPagedList<D_StoreOutModel> D_StoreOutList { get; set; }
 
         /// <summary>
-        /// 出庫日(開始)
+        /// 検索出庫日(開始)
         /// </summary>
         [Display(Name = "出庫日")]
-        public string DateSearchStart { get; set; }
+        public string SearchStartDate { get; set; }
 
         /// <summary>
-        /// 出庫日(終了)
+        /// 検索出庫日(終了)
         /// </summary>
-        public string DateSearchEnd { get; set; }
+        public string SearchEndDate { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -38,6 +38,11 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
+
+        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem> SearchCompanyList
@@ -49,22 +54,17 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
 
         /// <summary>
-        /// 
+        /// 出庫実績ID
         /// </summary>
         public int StoreOutID { get; set; }
 
         /// <summary>
-        /// 
+        /// 出庫日
         /// </summary>
         public string StoreOutDate { get; set; }
 
@@ -75,8 +75,8 @@ namespace mar_sumaken_web.Models
         {
             // 現在日
             var now = DateTime.Today.ToString("yyyy/MM/dd");
-            DateSearchStart = now;
-            DateSearchEnd = now;
+            SearchStartDate = now;
+            SearchEndDate = now;
         }
         
     }

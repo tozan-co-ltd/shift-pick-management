@@ -47,8 +47,8 @@ namespace mar_sumaken_web.ConnectControllers
         /// <returns>SQL文</returns>
         public static string CreateSQLToGetDStoreOut(D_StoreOutModel model)
         {
-            string dateSearchStart = model.DateSearchStart + " " + "00:00:00.000";
-            string dateSearchEnd = model.DateSearchEnd + " " + "23:59:59.999";
+            string dateSearchStart = model.SearchStartDate + " " + "00:00:00.000";
+            string dateSearchEnd = model.SearchEndDate + " " + "23:59:59.999";
 
             var sql = $@"
                         SELECT 

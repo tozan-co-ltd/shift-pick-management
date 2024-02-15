@@ -11,15 +11,20 @@ namespace mar_sumaken_web.Models
     public class D_ReceiveModel : CommonModel
     {
         /// <summary>
-        /// 入荷日
+        /// 入荷予定照会リスト
         /// </summary>
-        [Display(Name = "入荷日")]
-        public string DateSearchStart { get; set; }
+        public IPagedList<D_ReceiveModel> D_ReceiveModelList { get; set; }
 
         /// <summary>
-        /// 入庫日(終了)
+        /// 検索入荷日(開始)
         /// </summary>
-        public string DateSearchEnd { get; set; }
+        [Display(Name = "入荷日")]
+        public string SearchStartDate { get; set; }
+
+        /// <summary>
+        /// 検索入荷日(終了)
+        /// </summary>
+        public string SearchEndDate { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -33,6 +38,11 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
+
+        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem> SearchCompanyList
@@ -44,29 +54,9 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<string> LstErrorMsg { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Message { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public IPagedList<D_ReceiveModel> LstD_ReceiveModel { get; set; }
 
         /// <summary>
         /// 初期値設定
@@ -75,8 +65,8 @@ namespace mar_sumaken_web.Models
         {
             // 現在日
             var now = DateTime.Today.ToString("yyyy/MM/dd");
-            DateSearchStart = now;
-            DateSearchEnd = now;
+            SearchStartDate = now;
+            SearchEndDate = now;
         }
     }
 }

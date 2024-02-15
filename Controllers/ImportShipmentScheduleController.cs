@@ -5,6 +5,7 @@ using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
+using System.Reflection;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -39,17 +40,16 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception ex)
             {
-                // log取得
-                var exceptionMessage = ex.Message;
+                return View();
+                //var exceptionMessage = ex.Message;
 
-                var d_FileImportModel = new D_FileImportModel
-                {
-                    Message = exceptionMessage
-                };
-                return View(d_FileImportModel);
+                //var d_FileImportModel = new D_FileImportModel
+                //{
+                //    Message = exceptionMessage
+                //};
+                //return View(d_FileImportModel);
             }
         }
-
 
         /// <summary>
         /// 出荷指示取込一覧取得
