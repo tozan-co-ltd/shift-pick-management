@@ -107,19 +107,19 @@
     // 検索ボタン押下
     $('#search-btn').click(function () {
         $('#DStoreOutForm').submit(function (e) {
-            $('#table-datatable').DataTable().destroy();
-
             // フォーム情報を取得する
             var formData = $(this).serialize();
-
             // ページの更新を禁止する
             e.preventDefault();
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            e.stopImmediatePropagation();
 
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("SearchData", "D_StoreOut")',
                 data: formData,
                 success: function (result) {
+                    $('#table-datatable').DataTable().destroy();
                     $("#div-table").show();
                     $("#table-datatable tbody").html(result);
                     $("#table-datatable").DataTable({
