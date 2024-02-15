@@ -8,57 +8,57 @@
         /// <summary>
         /// 会社ID
         /// </summary>
-        public int CompanyID { set; get; }
+        public int CompanyID { get; set; }
 
         /// <summary>
         /// 会社コード
         /// </summary>
-        public string CompanyCode { set; get; }
+        public string CompanyCode { get; set; }
 
         /// <summary>
         /// 会社パスワード
         /// </summary>
-        public string CompanyPassword { set; get; }
+        public string CompanyPassword { get; set; }
 
         /// <summary>
         /// 会社URL
         /// </summary>
-        public string CompanyWebPath { set; get; }
+        public string CompanyWebPath { get; set; }
 
         /// <summary>
         /// 会社名
         /// </summary>
-        public string CompanyName { set; get; }
+        public string CompanyName { get; set; }
 
         /// <summary>
         /// 会社名かな
         /// </summary>
-        public string CompanyNameKana { set; get; }
+        public string CompanyNameKana { get; set; }
 
         /// <summary>
         /// 会社データベース名
         /// </summary>
-        public string DatabaseName { set; get; }
+        public string DatabaseName { get; set; }
 
         /// <summary>
         /// APIのURL
         /// </summary>
-        public string HandyApiUrl { set; get; }
+        public string HandyApiUrl { get; set; }
 
         /// <summary>
         /// ハンディアプリの最小バージョン
         /// </summary>
-        public decimal HandyAppMinVersion { set; get; }
+        public decimal HandyAppMinVersion { get; set; }
 
         /// <summary>
         /// ハンディ管理者パスワード
         /// </summary>
-        public string HandyAdminPassword { set; get; }
+        public string HandyAdminPassword { get; set; }
 
         /// <summary>
         /// 未使用フラグ
         /// </summary>
-        public bool IsDeleted { set; get; }
+        public bool IsDeleted { get; set; }
 
         /// <summary>
         /// 作成日時

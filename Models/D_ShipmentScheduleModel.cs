@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using X.PagedList;
 
 namespace mar_sumaken_web.Models
 {
@@ -10,22 +11,21 @@ namespace mar_sumaken_web.Models
     /// </summary>
     public class D_ShipmentScheduleModel : CommonModel
     {
+        /// <summary>
+        /// 出荷指示リスト
+        /// </summary>
+        public IPagedList<D_ShipmentScheduleModel> D_ShipmentScheduleList { get; set; }
 
         /// <summary>
         /// 出庫日
         /// </summary>
         [Display(Name = "入荷日")]
-        public string DateSearchStart { set; get; }
+        public string DateSearchStart { get; set; }
 
         /// <summary>
         /// 出庫日(終了)
         /// </summary>
-        public string DateSearchEnd { set; get; }
-
-        /// <summary>
-        /// 出荷指示リスト
-        /// </summary>
-        public List<D_ShipmentScheduleModel> D_ShipmentScheduleList { get; set; }
+        public string DateSearchEnd { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト

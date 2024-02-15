@@ -14,12 +14,12 @@ namespace mar_sumaken_web.Models
         /// 入荷日
         /// </summary>
         [Display(Name = "入荷日")]
-        public string DateSearchStart { set; get; }
+        public string DateSearchStart { get; set; }
 
         /// <summary>
         /// 入庫日(終了)
         /// </summary>
-        public string DateSearchEnd { set; get; }
+        public string DateSearchEnd { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -56,17 +56,17 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 
         /// </summary>
-        public List<string> LstErrorMsg { set; get; }
+        public List<string> LstErrorMsg { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string Message { set; get; }
+        public string Message { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IPagedList<D_ReceiveModel> LstD_ReceiveModel { set; get; }
+        public IPagedList<D_ReceiveModel> LstD_ReceiveModel { get; set; }
 
         /// <summary>
         /// 初期値設定
