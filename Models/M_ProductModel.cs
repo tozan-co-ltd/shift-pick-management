@@ -35,7 +35,7 @@ namespace mar_sumaken_web.Models
         /// 使用倉庫名
         /// </summary>
         [Display(Name = "使用倉庫名")]
-        public string RDepoProductNames { get; set; } = string.Empty;
+        public string? RDepoProductNames { get; set; }
 
         /// <summary>
         /// 品番ID
@@ -54,14 +54,14 @@ namespace mar_sumaken_web.Models
         /// 仕入先名
         /// </summary>
         [Display(Name = "仕入先名")]
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string SupplierName { get; set; } = string.Empty;
+        public string? SupplierName { get; set; } = string.Empty;
 
         /// <summary>
         /// 仕入先品番
         /// </summary>
+        [Display(Name = "仕入先品番")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string SupplierProductNumber { get; set; } = string.Empty;
+        public string SupplierProductNumber { get; set; }
 
         /// <summary>
         /// 納入先ID
@@ -72,22 +72,21 @@ namespace mar_sumaken_web.Models
         /// 納入先名
         /// </summary>
         [Display(Name = "納入先名")]
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string DeliveryName { get; set; } = string.Empty;
+        public string? DeliveryName { get; set; }
 
         /// <summary>
         /// 納入先品番
         /// </summary>
         [Display(Name = "納入先品番")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string DeliveryProductNumber { get; set; } = string.Empty;
+        public string? DeliveryProductNumber { get; set; }
 
         /// <summary>
         /// 品名
         /// </summary>
         [Display(Name = "品名")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string ProductName { get; set; } = string.Empty;
+        public string? ProductName { get; set; }
 
         /// <summary>
         /// 収容数
@@ -112,7 +111,7 @@ namespace mar_sumaken_web.Models
         /// 作成者
         /// </summary>
         [Display(Name = "作成者")]
-        public string CreatedBy { get; set; } = string.Empty;
+        public string? CreatedBy { get; set; }
 
         /// <summary>
         /// 更新日時
@@ -124,6 +123,6 @@ namespace mar_sumaken_web.Models
         /// 更新者
         /// </summary>
         [Display(Name = "更新者")]
-        public string UpdatedBy { get; set; } = string.Empty;
+        public string? UpdatedBy { get; set; }
     }
 }

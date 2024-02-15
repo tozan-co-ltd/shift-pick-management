@@ -311,15 +311,18 @@ namespace mar_sumaken_web.Controllers
             model.Quantity = lines[readCount][44];
 
             // 箱数＝納入指示数/収容数
-            var quantityValue = Convert.ToInt32(model.Quantity);
-            var lotQuantity = Convert.ToInt32(model.LotQuantity);
-            if (quantityValue == 0 || lotQuantity == 0)
+            bool isValidQuantity = int.TryParse(model.Quantity, out int quantity);
+            bool isValidLotQuantity = int.TryParse(model.LotQuantity, out int lotQuantity);
+            if (isValidQuantity && isValidLotQuantity)
             {
-                model.NumberOfBoxes = 0;
-            }
-            else
-            {
-                model.NumberOfBoxes = quantityValue / lotQuantity;
+                if (quantity == 0 || lotQuantity == 0)
+                {
+                    model.NumberOfBoxes = 0;
+                }
+                else
+                {
+                    model.NumberOfBoxes = quantity / lotQuantity;
+                }
             }
 
             return model;

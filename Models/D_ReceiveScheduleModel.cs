@@ -89,7 +89,7 @@ namespace mar_sumaken_web.Models
         /// 入荷予定日
         /// </summary>
         [Display(Name = "入荷予定日")]
-        [RegularExpression(@"^\d{4}/\d{1,2}/\d{1,2}$")]
+        [RegularExpression(@"^(?:\d{4})\/(?:[1-9]|0[1-9]|1[0-2])\/(?:[1-9]|[12]\d|3[01])$")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string ReceiveScheduleDate { get; set; }
 
@@ -113,6 +113,7 @@ namespace mar_sumaken_web.Models
         /// 数量
         /// </summary>
         [Display(Name = "数量")]
+        [RegularExpression(@"[0-9]+")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string Quantity { get; set; }
 
