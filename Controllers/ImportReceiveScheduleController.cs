@@ -165,7 +165,24 @@ namespace mar_sumaken_web.Controllers
                                     var validationContext = new ValidationContext(receiveSchedule);
                                     var validationResults = new List<ValidationResult>();
                                     bool isValid = Validator.TryValidateObject(receiveSchedule, validationContext, validationResults, true);
-                                    
+
+                                    // 会社コードで会社IDを取得
+                                    var companyId = M_CompanyConnectController.GetCompanyIdByCompanyCode(receiveSchedule.CompanyCode, user.DatabaseName);
+                                    if (companyId == -1)
+                                    {
+                                        isValid = false;
+                                        validationResults.Add(new ValidationResult("会社コードは正しくありません。"));
+                                    }
+                                    receiveSchedule.CompanyID = companyId;
+
+                                    // 仕入先品番で品番チェック
+                                    bool isExistProduct = M_ProductConnectController.CheckMProductExist(receiveSchedule.SupplierProductNumber, user.DatabaseName);
+                                    if (!isExistProduct)
+                                    {
+                                        isValid = false;
+                                        validationResults.Add(new ValidationResult("仕入先品番は正しくありません。"));
+                                    }
+
                                     // エラーメッセージを追加
                                     if (!isValid)
                                     {

@@ -5,7 +5,6 @@ using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
-using System.Reflection;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -160,6 +159,15 @@ namespace mar_sumaken_web.Controllers
                                     var validationContext = new ValidationContext(shipmentSchedule);
                                     var validationResults = new List<ValidationResult>();
                                     bool isValid = Validator.TryValidateObject(shipmentSchedule, validationContext, validationResults, true);
+
+                                    // 納入先品番で仕入先品番を取得
+                                    var supplierProductNumber = M_ProductConnectController.GetSupplierProductNumberByDeliveryProductNumber(shipmentSchedule.DeliveryProductNumber, user.DatabaseName);
+                                    if (supplierProductNumber.Equals(string.Empty))
+                                    {
+                                        isValid = false;
+                                        validationResults.Add(new ValidationResult("表示用品番は正しくありません。"));
+                                    }
+                                    shipmentSchedule.SupplierProductNumber = supplierProductNumber;
 
                                     // エラーメッセージを追加
                                     if (!isValid)

@@ -2,7 +2,9 @@
 using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Reflection;
 
 namespace mar_sumaken_web.ConnectControllers
 {
@@ -83,6 +85,90 @@ namespace mar_sumaken_web.ConnectControllers
                 throw;
             }
         }
+
+        /// <summary>
+        /// 仕入先品番で品番チェック
+        /// </summary>
+        /// <param name="supplierProductNumber">仕入先品番</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static bool CheckMProductExist(string? supplierProductNumber, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    // SQL作成
+                    string sql = $@"
+                        SELECT COUNT(*) 
+                        FROM M_Product AS product
+                        WHERE 
+                            product.SupplierProductNumber = '{supplierProductNumber}'
+                            AND product.IsDeleted = 0
+                    ";
+
+                    // 仕入先品番で品番チェック
+                    var productCount = connection.ExecuteScalar<int>(sql);
+                    if (productCount == 0)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 納入先品番で仕入先品番を取得
+        /// </summary>
+        /// <param name="DeliveryProductNumber">納入先品番</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static string GetSupplierProductNumberByDeliveryProductNumber(string? deliveryProductNumber, string databaseName)
+        {
+            var result = string.Empty;
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    // SQL作成
+                    string sql = $@"
+                        SELECT TOP 1 SupplierProductNumber FROM M_Product WHERE DeliveryProductNumber = '{deliveryProductNumber}'
+                    ";
+                    // 納入先品番で仕入先品番を取得
+                    var supplierProductNumber = connection.ExecuteScalar<string>(sql);
+                    if (!string.IsNullOrEmpty(supplierProductNumber))
+                    {
+                        return supplierProductNumber;
+                    }
+
+                    return result;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
 
         /// <summary>
         /// 品番マスター削除

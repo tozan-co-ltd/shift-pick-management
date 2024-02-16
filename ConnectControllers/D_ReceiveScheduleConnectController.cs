@@ -157,34 +157,13 @@ namespace mar_sumaken_web.Commons
         private static string CreateSQLToInsertDReceiveSchedule(D_ReceiveScheduleModel model, int depoId, DateTime createdAt,string userName)
         {
             var sql = $@"
-
-            BEGIN 
-	            --会社コードチェック
-                DECLARE @CompanyID AS int;
-	            SET @CompanyID = (SELECT TOP 1 CompanyID FROM M_Company WHERE CompanyCode = {model.CompanyCode} );
-                IF @CompanyID IS NULL
-		        BEGIN
-			        RAISERROR('会社コードは正しくありません。', 16, 1)
-			        RETURN;
-		        END
-                
-                --仕入先品番チェック
-                DECLARE @productExist INT;
-                SELECT @productExist = COUNT(*) FROM M_Product AS product 
-                                 WHERE product.SupplierProductNumber = '{model.SupplierProductNumber}'
-                                 AND product.IsDeleted = 0;
-                IF @productExist = 0
-                BEGIN
-                    RAISERROR('仕入先品番は正しくありません。', 16, 1);
-                    RETURN;
-                END
-
+            BEGIN
 	            IF EXISTS (
 		            SELECT 1
 		            FROM D_ReceiveSchedule
 		            WHERE 
                         DepoID = {depoId} 
-                        AND CompanyID = @CompanyID
+                        AND CompanyID = {model.CompanyID}
                         AND ReceiveScheduleDate = '{model.ReceiveScheduleDate}'
                         AND SupplierProductNumber = '{model.SupplierProductNumber}'
                         AND LotNumber = '{model.LotNumber}'
@@ -196,7 +175,7 @@ namespace mar_sumaken_web.Commons
                     SET Quantity = {model.Quantity}, UpdatedAt = '{createdAt}', UpdatedBy = '{userName}'
 		            WHERE 
                         DepoID = {depoId} 
-                        AND CompanyID = @CompanyID
+                        AND CompanyID = {model.CompanyID}
                         AND ReceiveScheduleDate = '{model.ReceiveScheduleDate}'
                         AND SupplierProductNumber = '{model.SupplierProductNumber}'
                         AND LotNumber = '{model.LotNumber}'
@@ -220,7 +199,7 @@ namespace mar_sumaken_web.Commons
                     VALUES 
                     (
                         {depoId},
-                        @CompanyID,
+                        {model.CompanyID},
                         '{model.ReceiveScheduleDate}',
                         '{model.SupplierProductNumber}',
                         '{model.LotNumber}',
@@ -231,7 +210,6 @@ namespace mar_sumaken_web.Commons
                         '{userName}'
                     );
                 END
-
             END
             ";
 

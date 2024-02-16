@@ -159,14 +159,6 @@ namespace mar_sumaken_web.Commons
             var sql = $@"
 
             BEGIN 
-	            DECLARE @SupplierProductNumber AS nvarchar(100);
-	            SET @SupplierProductNumber = (SELECT TOP 1 SupplierProductNumber FROM M_Product WHERE DeliveryProductNumber = '{model.DeliveryProductNumber}' );
-                IF @SupplierProductNumber IS NULL
-		        BEGIN
-			        RAISERROR('表示用品番は正しくありません。', 16, 1)
-			        RETURN;
-		        END                
-
 	            IF EXISTS (
 		            SELECT 1
 		            FROM D_ShipmentSchedule
@@ -261,7 +253,7 @@ namespace mar_sumaken_web.Commons
                         {model.LotQuantity},
                         {model.BranchNumber},
                         {model.Quantity},
-                        @SupplierProductNumber,
+                        '{model.SupplierProductNumber}',
                         {model.NumberOfBoxes},
                         '{createdAt}',
                         '{userName}',
