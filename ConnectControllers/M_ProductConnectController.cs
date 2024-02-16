@@ -382,6 +382,85 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 品番マスター更新
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="databaseName"></param>
+        /// <returns>更新結果</returns>
+        public static bool UpdateMProduct(M_ProductModel product, LoginUserModel loginUser)
+        {
+            bool result = true;
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+
+                    // 品番マスター更新SQL作成
+                    string sql = CreateSQLToUpdateMProduct(product, sysDate, loginUser.UserName);
+                    // 品番マスター更新
+                    var affectRows = connection.Execute(sql, null, transaction);
+                    // 更件数が0の場合はエラーとする
+                    if (affectRows == 0)
+                    {
+                        result = false;
+                        // エラーコード：E2011
+                        throw new Exception();
+                    }
+
+                    // 倉庫-品番中間テーブル削除SQL作成
+                    string depoProductDeleteSql = CreateSQLToDeleteRUserDepo(product.ProductID);
+                    // 倉庫-品番中間テーブル削除
+                    int depoProductDelCount = connection.Execute(depoProductDeleteSql, null, transaction);
+                    if (depoProductDelCount == 0)
+                    {
+                        // エラーコード：E2011
+                        throw new Exception();
+                    }
+
+                    // 倉庫-品番中間テーブル更新
+                    foreach (SelectListItem item in product.RDepoProductsRegister)
+                    {
+                        if (item.Selected)
+                        {
+                            // 倉庫-品番中間テーブル登録SQL作成
+                            string depoProductInsertSql = CreateSQLToInsertRDepoProduct(Convert.ToInt32(item.Value), product.ProductID, sysDate, loginUser.UserName);
+                            int depoProductInsertCount = connection.Execute(depoProductInsertSql, null, transaction);
+                            // 更件数が0の場合はエラーとする
+                            if (depoProductInsertCount == 0)
+                            {
+                                result = false;
+                                // エラーコード：E2011
+                                throw new Exception();
+                            }
+                        }
+                    }
+
+                    // トランザクションのコミット
+                    transaction.Commit();
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    // エラーコード：E2011
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// 倉庫-品番中間テーブル登録SQL作成
         /// </summary>
         /// <param name="depoId">登録倉庫ID</param>
@@ -417,6 +496,32 @@ namespace mar_sumaken_web.ConnectControllers
                 )
 ;
             ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 品番マスター更新SQL作成
+        /// </summary>
+        /// <param name="product">登録情報</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToUpdateMProduct(M_ProductModel product, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+                UPDATE M_Product
+                SET 
+                    SupplierID = {product.SupplierID},
+                    SupplierProductNumber = '{product.SupplierProductNumber}',
+                    DeliveryID = {product.DeliveryID},
+                    DeliveryProductNumber = '{product.DeliveryProductNumber}',
+                    ProductName = '{product.ProductName}',
+                    LotQuantity = {product.LotQuantity},
+                    UpdatedAt = '{updatedAt}',
+                    UpdatedBy = '{updatedBy}'
+                WHERE
+                    ProductID = {product.ProductID}
+            ;";
             return sql;
         }
 
