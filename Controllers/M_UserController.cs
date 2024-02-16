@@ -183,7 +183,7 @@ namespace mar_sumaken_web.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            M_UserModel editUser = new();
+            M_UserEditModel editModel = new();
             try
             {
                 // ログイン中ユーザー情報取得
@@ -203,7 +203,7 @@ namespace mar_sumaken_web.Controllers
                     // エラーコード：E2011
                     return NotFound(new { errorMessage = "見つかった情報は間違っています。" });
                 }
-                editUser = userList[0];
+                M_UserModel editUser = userList[0];
 
                 // 倉庫マスター情報取得
                 var depoList = M_DepoConnectController.GetMDepoList(user.DatabaseName);
@@ -260,15 +260,18 @@ namespace mar_sumaken_web.Controllers
                     }
                 }
 
-                var config = new MapperConfiguration(cfg => cfg.CreateMap<M_UserModel, M_UserEditModel>());
+                var config = new MapperConfiguration(
+                    cfg => cfg.CreateMap<M_UserModel, M_UserEditModel>()
+                            .ForMember(dest => dest.M_UserList, opt => opt.Ignore())
+                );
                 IMapper mapper = config.CreateMapper();
-                M_UserEditModel editModel = mapper.Map<M_UserEditModel>(editUser);
+                editModel = mapper.Map<M_UserEditModel>(editUser);
 
                 return View(editModel);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return View();
+                return View(editModel);
             }
         }
 
