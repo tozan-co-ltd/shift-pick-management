@@ -63,11 +63,11 @@ namespace mar_sumaken_web.Controllers
         }
 
         // <summary>
-        /// Excel取込
+        /// Csv取込
         /// <param name="FileUpload">ファイル</param>
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> ImportExcel(List<IFormFile> FileUpload, int DepoID)
+        public async Task<IActionResult> ImportCsv(List<IFormFile> FileUpload, int DepoID, string GamenName)
         {
             try
             {
@@ -99,32 +99,21 @@ namespace mar_sumaken_web.Controllers
 
                         if (file.Length > 0)
                         {
-
-                            // ファイル形式チェック
-                            if (!Utils.IsCsvFile(fileName))
+                            var csvInputFile = new CsvFileInputModel()
                             {
-                                // エラーメッセージ取得
-                                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                                FileName = file.FileName,
+                                ImportFile = file,
+                                HeaderColumnCount = Header_Column_Count,
+                                HeaderSettings = GetModelHeaderCheck()
                             };
 
-                            // 取込ファイルパス
-                            string importFilePath = Utils.CreateImportFilePath(fileName, user.UserID, "ReceiveSchedule");
-
-                            // ファイルコピー
-                            using (var stream = new FileStream(importFilePath, FileMode.Create))
-                            {
-                                await file.CopyToAsync(stream);
-                            }
-
                             // CSVファイルデータ読み取り
-                            var lines = Utils.ReadCsvFile(importFilePath, Header_Column_Count);
+                            var lines = await ReadFile.ReadCsv(csvInputFile, GamenName, user.UserID);
 
-                            // CSVファイルデータチェック
-                            bool isValidCsv = Utils.CheckCsvData(lines);
-                            if (!isValidCsv)
+                            if (lines == null)
                             {
                                 // エラーメッセージ取得
-                                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                                return NotFound(new { errorMessage = "正しいファイルを指定してください。" });
                             }
 
                             // 空行削除
@@ -143,17 +132,6 @@ namespace mar_sumaken_web.Controllers
                                     ImportFileName = fileName,
                                     SelectedDepoID = DepoID
                                 };
-
-                                // ヘッダー名チェック
-                                if (readCount == 0)
-                                {
-                                    bool isValidHeader = CheckIsValidHeader(lines[0]);
-                                    if (!isValidHeader)
-                                    {
-                                        // エラーメッセージ取得
-                                        return NotFound(new { errorMessage = "正しいファイルを指定してください。" });
-                                    }
-                                }
 
                                 // データチェック
                                 if (readCount > 0)
@@ -233,10 +211,9 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// ヘッダー名チェック
+        /// モデルヘッダー名リスト取得
         /// </summary>
-        /// <param name="headerCheck">チェックされたヘッダー</param>
-        private static bool CheckIsValidHeader(string[] headerCheck)
+        private Dictionary<int, string> GetModelHeaderCheck()
         {
             Dictionary<int, string> headerSettings = new()
             {
@@ -247,14 +224,7 @@ namespace mar_sumaken_web.Controllers
                 [4] = Utils.GetDisplayName<D_ReceiveScheduleModel>("Quantity")
             };
 
-            foreach (var setItem in headerSettings)
-            {
-                if (!setItem.Value.Equals(headerCheck[setItem.Key]))
-                {
-                    return false;
-                }
-            }
-            return true;
+            return headerSettings;
         }
 
         /// <summary>
@@ -301,7 +271,7 @@ namespace mar_sumaken_web.Controllers
                 // CSVファイルへのパスを作成する
                 string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
                 // DataTableをCSVに変換する
-                Utils.ToCSV(dataTable, filePath);
+                ReadFile.ToCSV(dataTable, filePath);
                 // ファイルの作成
                 var file = System.IO.File.ReadAllBytes(filePath);
 

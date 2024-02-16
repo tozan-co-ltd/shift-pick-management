@@ -58,11 +58,11 @@ namespace mar_sumaken_web.Controllers
         }
 
         // <summary>
-        /// Excel取込
+        /// Csv取込
         /// <param name="FileUpload">ファイル</param>
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> ImportExcel(List<IFormFile> FileUpload, int DepoID, int CompanyID)
+        public async Task<IActionResult> ImportCsv(List<IFormFile> FileUpload, int DepoID, int CompanyID, string GamenName)
         {
             try
             {
@@ -81,7 +81,6 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
                 }
 
-
                 // モデルリスト取得
                 if (files != null && files.Count > 0)
                 {
@@ -93,42 +92,25 @@ namespace mar_sumaken_web.Controllers
                         if (file.Length > 0)
                         {
 
-                            // ファイル形式チェック
-                            if (!Utils.IsCsvFile(fileName))
+                            var csvInputFile = new CsvFileInputModel()
                             {
-                                // エラーメッセージ取得
-                                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                                FileName = file.FileName,
+                                ImportFile = file,
+                                HeaderColumnCount = Header_Column_Count,
+                                HeaderSettings = GetModelHeaderCheck()
                             };
 
-                            // 取込ファイルパス
-                            string importFilePath = Utils.CreateImportFilePath(fileName, user.UserID, "ShipmentSchedule");
-
-                            // ファイルコピー
-                            using (var stream = new FileStream(importFilePath, FileMode.Create))
-                            {
-                                await file.CopyToAsync(stream);
-                            }
-
                             // CSVファイルデータ読み取り
-                            var lines = Utils.ReadCsvFile(importFilePath, Header_Column_Count);
+                            var lines = await ReadFile.ReadCsv(csvInputFile, GamenName, user.UserID);
 
-                            // CSVファイルデータチェック
-                            bool isValidCsv = Utils.CheckCsvData(lines);
-                            if (!isValidCsv)
+                            if (lines == null)
                             {
                                 // エラーメッセージ取得
                                 return NotFound(new { errorMessage = "正しいファイルを指定してください。" });
                             }
 
-                            // 空行削除
-                            for (var i = lines.Count - 1; i >= 0; i--)
-                            {
-                                if (string.IsNullOrWhiteSpace(string.Join("", lines[i])))
-                                    lines.RemoveAt(i);
-                            }
-
                             // 読み取りデータを更新
-                            int readCount = 0;
+                            int readCount = 1;
                             while (readCount < lines.Count)
                             {
                                 D_ShipmentScheduleModel shipmentSchedule = new()
@@ -138,49 +120,35 @@ namespace mar_sumaken_web.Controllers
                                     SelectedCompanyID = CompanyID
                                 };
 
-                                // ヘッダー名チェック
-                                if (readCount == 0)
+                                // 読み取りデータをモデルに設定
+                                shipmentSchedule = SetReadDataInModel(shipmentSchedule, lines, readCount);
+
+                                // 出荷指示データチェック
+                                var validationContext = new ValidationContext(shipmentSchedule);
+                                var validationResults = new List<ValidationResult>();
+                                bool isValid = Validator.TryValidateObject(shipmentSchedule, validationContext, validationResults, true);
+
+                                // 納入先品番で仕入先品番を取得
+                                var supplierProductNumber = M_ProductConnectController.GetSupplierProductNumberByDeliveryProductNumber(shipmentSchedule.DeliveryProductNumber, user.DatabaseName);
+                                if (supplierProductNumber.Equals(string.Empty))
                                 {
-                                    bool isValidHeader = CheckIsValidHeader(lines[0]);
-                                    if (!isValidHeader)
+                                    isValid = false;
+                                    validationResults.Add(new ValidationResult("表示用品番は正しくありません。"));
+                                }
+                                shipmentSchedule.SupplierProductNumber = supplierProductNumber;
+
+                                // エラーメッセージを追加
+                                if (!isValid)
+                                {
+                                    foreach (var err in validationResults)
                                     {
-                                        // エラーメッセージ取得
-                                        return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                                        var msg = readCount + "行目" + "　" + err.ErrorMessage;
+                                        errorMessageList.Add(msg);
                                     }
                                 }
+                                // リストに項目を追加
+                                importModelList.Add(shipmentSchedule);
 
-                                // データチェック
-                                if (readCount > 0)
-                                {
-                                    // 読み取りデータをモデルに設定
-                                    shipmentSchedule = SetReadDataInModel(shipmentSchedule, lines, readCount);
-
-                                    // 出荷指示データチェック
-                                    var validationContext = new ValidationContext(shipmentSchedule);
-                                    var validationResults = new List<ValidationResult>();
-                                    bool isValid = Validator.TryValidateObject(shipmentSchedule, validationContext, validationResults, true);
-
-                                    // 納入先品番で仕入先品番を取得
-                                    var supplierProductNumber = M_ProductConnectController.GetSupplierProductNumberByDeliveryProductNumber(shipmentSchedule.DeliveryProductNumber, user.DatabaseName);
-                                    if (supplierProductNumber.Equals(string.Empty))
-                                    {
-                                        isValid = false;
-                                        validationResults.Add(new ValidationResult("表示用品番は正しくありません。"));
-                                    }
-                                    shipmentSchedule.SupplierProductNumber = supplierProductNumber;
-
-                                    // エラーメッセージを追加
-                                    if (!isValid)
-                                    {
-                                        foreach (var err in validationResults)
-                                        {
-                                            var msg = readCount + "行目" + "　" + err.ErrorMessage;
-                                            errorMessageList.Add(msg);
-                                        }
-                                    }
-                                    // リストに項目を追加
-                                    importModelList.Add(shipmentSchedule);
-                                }
                                 readCount++;
                             }
                         }
@@ -223,10 +191,9 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// ヘッダー名チェック
+        /// モデルヘッダー名リスト取得
         /// </summary>
-        /// <param name="headerCheck">チェックされたヘッダー</param>
-        private bool CheckIsValidHeader(string[] headerCheck)
+        private Dictionary<int, string> GetModelHeaderCheck()
         {
             Dictionary<int, string> headerSettings = new Dictionary<int, string>();
             headerSettings[6] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererCode");
@@ -257,14 +224,7 @@ namespace mar_sumaken_web.Controllers
             headerSettings[43] = Utils.GetDisplayName<D_ShipmentScheduleModel>("BranchNumber");
             headerSettings[44] = Utils.GetDisplayName<D_ShipmentScheduleModel>("Quantity");
 
-            foreach (var setItem in headerSettings)
-            {
-                if (!setItem.Value.Equals(headerCheck[setItem.Key]))
-                {
-                    return false;
-                }
-            }
-            return true;
+            return headerSettings;
         }
 
         /// <summary>
