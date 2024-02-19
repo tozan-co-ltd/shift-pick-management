@@ -312,6 +312,44 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 重複品番更新情報をチェック
+        /// </summary>
+        /// <param name="product">品番情報</param>
+        /// <param name="databaseName">デターベース名</param>
+        public static bool IsDuplicateEditMProduct(M_ProductModel product, string databaseName)
+        {
+            // 戻り値
+            bool isDuplicateValid = false;
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    var sql = CreateSQLToSelectDuplicateEditMProduct(product);
+
+                    int result = Convert.ToInt32(connection.ExecuteScalar(sql));
+
+                    if (result > 0)
+                    {
+                        isDuplicateValid = true;
+                    }
+                }
+                return isDuplicateValid;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
         /// 品番マスター登録
         /// </summary>
         /// <param name="user"></param>
@@ -528,7 +566,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 重複品番情報取得SQL作成
         /// </summary>
-        /// <param name="companyCode">品番コード</param>
+        /// <param name="product">品番情報</param>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectDuplicateMProduct(M_ProductModel product)
         {
@@ -554,6 +592,32 @@ namespace mar_sumaken_web.ConnectControllers
 		                        AND delivery.IsDeleted = 0
 		                        AND product.DeliveryProductNumber = '{product.DeliveryProductNumber}'
 	                        )
+                        )
+                        AND product.IsDeleted = 0
+            ";
+
+            return sql;
+        }
+
+        /// <summary>
+        /// 重複品番更新情報取得SQL作成
+        /// </summary>
+        /// <param name="product">品番情報</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectDuplicateEditMProduct(M_ProductModel product)
+        {
+            var sql = $@"
+                    SELECT
+                        COUNT(*)                      
+                    FROM
+                        M_Product AS product
+                    WHERE 
+                        (1=1)
+                        AND product.ProductID <> {product.ProductID}
+	                    AND 
+                        (
+                            product.SupplierProductNumber = '{product.SupplierProductNumber}'
+                            OR product.DeliveryProductNumber = '{product.DeliveryProductNumber}'
                         )
                         AND product.IsDeleted = 0
             ";

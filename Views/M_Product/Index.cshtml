@@ -190,7 +190,7 @@
             </div>
             <div class="modal-body">
                 <div class="col-12 col-md-10">
-                    <p id="import-res" class="mt-1"></p>
+                    <p id="edit-res" class="mt-1"></p>
                 </div>
                 <div class="d-flex justify-content-center">
                     <form class="col-md-12" id="mProductForm">
@@ -429,16 +429,19 @@
                 .done(function (response) {
                     //$('#mProductForm')[0].reset();
                     // 完了モーダル表示
-                    AlertMessage('', '完了', '修正が完了しました。', null, null);
+                    AlertMessage('', '完了', '登録が完了しました。', null, null);
                 })
                 .fail(function (xhr) {
                     if (xhr.status === 404) {
                         // データが見つからなかった場合
                         var errorMessage = xhr.responseJSON.errorMessage;
-                        $('#div-error-message').text(errorMessage);
+                        $("#edit-res").addClass('text-danger');
+                        $("#edit-res").text(errorMessage);
                     } else {
                         // その他のエラーの場合
-                        $('#div-error-message').text(errorMessage);
+                        $("#edit-res").show();
+                        $("#edit-res").addClass('text-danger');
+                        $("#edit-res").text("登録が失敗しました。");
                     }
                 });
         });

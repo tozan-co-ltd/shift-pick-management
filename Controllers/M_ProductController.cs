@@ -177,7 +177,7 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
                 }
 
-                // 重複品番情報取をチェック
+                // 重複品番情報をチェック
                 bool isDuplicate = M_ProductConnectController.IsDuplicateMProduct(model, user.DatabaseName);
                 if (isDuplicate)
                 {
@@ -240,6 +240,16 @@ namespace mar_sumaken_web.Controllers
                 if (!ModelState.IsValid)
                 {
                     return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
+                }
+
+                // 重複品番更新情報をチェック
+                bool isDuplicate = M_ProductConnectController.IsDuplicateEditMProduct(model, user.DatabaseName);
+                if (isDuplicate)
+                {
+                    // エラーを作成
+                    // エラーコード：E2011
+                    //throw new Exception();
+                    return NotFound(new { errorMessage = "更新品番情報が重複しています。" });
                 }
 
                 // 品番マスター更新
