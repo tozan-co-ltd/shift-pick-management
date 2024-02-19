@@ -140,6 +140,14 @@
                         </div>
                         <div class="col-12 d-flex flex-wrap">
                             <div class="col-12 col-sm-4">
+                                <label>納入先名</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteDeliveryName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
                                 <label>納入先品番</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-8 mb-2">
@@ -312,6 +320,7 @@
                 $("#deleteProductId").val(item.productID);
                 $("#deleteSupplierName").val(item.supplierName);
                 $("#deleteSupplierProductNumber").val(item.supplierProductNumber);
+                $("#deleteDeliveryName").val(item.deliveryName);
                 $("#deleteDeliveryProductNumber").val(item.deliveryProductNumber);
                 $("#deleteProductName").val(item.productName);
                 $("#deleteLotQuantity").val(item.lotQuantity);
@@ -321,6 +330,8 @@
 
     // 修正ボタン押下
     function OnEditClick(productID) {
+        $("#div-error-message").text("");
+        $("#edit-res").text("");
 
         // M_ProductModel取得
         var productModel = @Html.Raw(Json.Serialize(Model));
@@ -407,6 +418,7 @@
     function OnExecuteEdit() {
         $('#mProductForm').submit(function (event) {
             $("#div-error-message").text("");
+            $("#edit-res").text("");
 
             // フォーム情報を取得する
             var formData = $('#mProductForm').serializeArray();
