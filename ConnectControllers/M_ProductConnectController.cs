@@ -135,9 +135,8 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="DeliveryProductNumber">納入先品番</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static string GetSupplierProductNumberByDeliveryProductNumber(string? deliveryProductNumber, string databaseName)
+        public static M_ProductModel? GeProductByDeliveryProductNumber(int deliveryId, string? deliveryProductNumber, string databaseName)
         {
-            var result = string.Empty;
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
             // SQLServer接続
@@ -151,16 +150,16 @@ namespace mar_sumaken_web.ConnectControllers
                 {
                     // SQL作成
                     string sql = $@"
-                        SELECT TOP 1 SupplierProductNumber FROM M_Product WHERE DeliveryProductNumber = '{deliveryProductNumber}'
+                        SELECT TOP 1 *
+                        FROM M_Product
+                        WHERE 
+                            DeliveryID = {deliveryId}
+                            AND DeliveryProductNumber = '{deliveryProductNumber}'
+                            AND IsDeleted = 0
                     ";
                     // 納入先品番で仕入先品番を取得
-                    var supplierProductNumber = connection.ExecuteScalar<string>(sql);
-                    if (!string.IsNullOrEmpty(supplierProductNumber))
-                    {
-                        return supplierProductNumber;
-                    }
-
-                    return result;
+                    var product = connection.QueryFirstOrDefault<M_ProductModel>(sql);
+                    return product;
                 }
                 catch (Exception)
                 {
@@ -309,6 +308,64 @@ namespace mar_sumaken_web.ConnectControllers
             {
                 throw;
             }
+        }
+
+        /// <summary>
+        /// 倉庫-品番中間テーブルに存在するかチェック
+        /// </summary>
+        /// <param name="productId">品番ID</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static bool IsExistRDepoProduct(int productId, int depoId, string databaseName)
+        {
+            // 戻り値
+            bool isExistFlg = false;
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    var sql = CreateSQLToCheckIsExistRDepoProduct(productId, depoId);
+
+                    int result = Convert.ToInt32(connection.ExecuteScalar(sql));
+
+                    if (result > 0)
+                    {
+                        isExistFlg = true;
+                    }
+                }
+                return isExistFlg;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        ///  倉庫-品番中間テーブルに存在するかチェックSQL作成
+        /// </summary>
+        /// <param name="productId">品番ID</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToCheckIsExistRDepoProduct(int productId, int depoId)
+        {
+            var sql = $@"
+                SELECT COUNT(*)  
+                FROM R_DepoProduct
+                WHERE 
+                    DepoID = {depoId}
+                    AND ProductID = {productId}
+            ";
+            return sql;
         }
 
         /// <summary>

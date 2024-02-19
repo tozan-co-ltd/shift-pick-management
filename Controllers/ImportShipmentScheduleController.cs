@@ -91,7 +91,6 @@ namespace mar_sumaken_web.Controllers
                         var fileName = file.FileName;
                         if (file.Length > 0)
                         {
-
                             var csvInputFile = new CsvFileInputModel()
                             {
                                 FileName = file.FileName,
@@ -101,12 +100,12 @@ namespace mar_sumaken_web.Controllers
                             };
 
                             // CSVファイルデータ読み取り
-                            var lines = await ReadFile.ReadCsv(csvInputFile, GamenName, user.UserID);
+                            var (readCsvErrorMsg, lines) = await ReadFile.ReadCsv(csvInputFile, GamenName, user.UserID);
 
-                            if (lines == null)
+                            if (!string.Empty.Equals(readCsvErrorMsg))
                             {
                                 // エラーメッセージ取得
-                                return NotFound(new { errorMessage = "正しいファイルを指定してください。" });
+                                return NotFound(new { errorMessage = readCsvErrorMsg });
                             }
 
                             // 読み取りデータを更新
@@ -123,19 +122,30 @@ namespace mar_sumaken_web.Controllers
                                 // 読み取りデータをモデルに設定
                                 shipmentSchedule = SetReadDataInModel(shipmentSchedule, lines, readCount);
 
+                                // 納入先品番で仕入先品番を取得
+                                // 品番マスターに登録されている品番の行のみ取り込まれます。登録されていない品番の行はスキップします。
+                                var product = M_ProductConnectController.GeProductByDeliveryProductNumber(
+                                    shipmentSchedule.SelectedCompanyID,  shipmentSchedule.DeliveryProductNumber, user.DatabaseName
+                                );
+                                if (product == null)
+                                {
+                                    readCount++;
+                                    continue;
+                                }
+                                shipmentSchedule.SupplierProductNumber = product.SupplierProductNumber;
+
+                                // 倉庫-品番中間テーブルチェック
+                                bool isExist = M_ProductConnectController.IsExistRDepoProduct(product.ProductID, DepoID, user.DatabaseName);
+                                if (!isExist)
+                                {
+                                    readCount++;
+                                    continue;
+                                }
+
                                 // 出荷指示データチェック
                                 var validationContext = new ValidationContext(shipmentSchedule);
                                 var validationResults = new List<ValidationResult>();
                                 bool isValid = Validator.TryValidateObject(shipmentSchedule, validationContext, validationResults, true);
-
-                                // 納入先品番で仕入先品番を取得
-                                var supplierProductNumber = M_ProductConnectController.GetSupplierProductNumberByDeliveryProductNumber(shipmentSchedule.DeliveryProductNumber, user.DatabaseName);
-                                if (supplierProductNumber.Equals(string.Empty))
-                                {
-                                    isValid = false;
-                                    validationResults.Add(new ValidationResult("表示用品番は正しくありません。"));
-                                }
-                                shipmentSchedule.SupplierProductNumber = supplierProductNumber;
 
                                 // エラーメッセージを追加
                                 if (!isValid)
@@ -156,8 +166,14 @@ namespace mar_sumaken_web.Controllers
                         // エラーが1件以上ある場合はreturn
                         if (errorMessageList.Count > 0)
                         {
-                            var errorMessage = "<br/>" + string.Join("</br>", errorMessageList);
-                            return NotFound(new { errorMessage = errorMessage });
+                            var errorMessage = string.Join("</br>", errorMessageList);
+                            return NotFound(new { errorMessage });
+                        }
+
+                        // 登録データが存在するかチェック
+                        if (importModelList.Count == 0)
+                        {
+                            return NotFound(new { errorMessage = "登録する情報がありません。" });
                         }
 
                         // 出荷指示データ書き込み

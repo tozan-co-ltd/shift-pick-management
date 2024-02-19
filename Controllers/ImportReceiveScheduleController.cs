@@ -108,19 +108,12 @@ namespace mar_sumaken_web.Controllers
                             };
 
                             // CSVファイルデータ読み取り
-                            var lines = await ReadFile.ReadCsv(csvInputFile, GamenName, user.UserID);
+                            var (readCsvErrorMsg, lines) = await ReadFile.ReadCsv(csvInputFile, GamenName, user.UserID);
 
-                            if (lines == null)
+                            if (!string.Empty.Equals(readCsvErrorMsg))
                             {
                                 // エラーメッセージ取得
-                                return NotFound(new { errorMessage = "正しいファイルを指定してください。" });
-                            }
-
-                            // 空行削除
-                            for (var i = lines.Count - 1; i >= 0; i--)
-                            {
-                                if (string.IsNullOrWhiteSpace(string.Join("", lines[i])))
-                                    lines.RemoveAt(i);
+                                return NotFound(new { errorMessage = readCsvErrorMsg });
                             }
 
                             // 読み取りデータを更新
@@ -180,7 +173,7 @@ namespace mar_sumaken_web.Controllers
                         // エラーが1件以上ある場合はreturn
                         if (errorMessageList.Count > 0)
                         {
-                            var errorMessage = "<br/>" + string.Join("</br>", errorMessageList);
+                            var errorMessage = string.Join("</br>", errorMessageList);
                             return NotFound(new { errorMessage = errorMessage });
                         }
 

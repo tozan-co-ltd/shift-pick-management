@@ -200,7 +200,7 @@ function onUploadFile(page) {
                 $("#div-error-message").hide();
                 $("#import-res").show();
                 $("#import-res").addClass('text-danger');
-                $("#import-res").html("エラー: " + errorMessage);
+                $("#import-res").html(errorMessage);
             } else {
                 // その他のエラーの場合
                 $("#import-res").addClass('text-danger');
@@ -241,8 +241,6 @@ async function onExportFile(page) {
     event.preventDefault();
     $("#ErrorBlock").text("");
     $('#import-res').text("");
-
-    console.log(page);
 
     const response = await fetch('' + page + '/ExportFile', {
         method: 'GET', // *GET, POST, PUT, DELETE, etc.

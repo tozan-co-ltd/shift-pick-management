@@ -14,31 +14,41 @@ namespace mar_sumaken_web.Commons
         /// <param name="gamenName">画面名</param>
         /// <param name="userId">ユーザーID</param>
         /// <returns></returns>
-        public async static Task<List<string[]>?> ReadCsv(CsvFileInputModel csvModel, string gamenName, int userId)
+        public async static Task<(string, List<string[]>?)> ReadCsv(CsvFileInputModel csvModel, string gamenName, int userId)
         {
-            // ファイル形式チェック
-            if (!IsCsvFile(csvModel.FileName))
+            var errorMsg = string.Empty;
+            var lines = new List<string[]>();
+
+            try
             {
-                // エラーメッセージ取得
-                return null;
-            };
+                // ファイル形式チェック
+                if (!IsCsvFile(csvModel.FileName))
+                {
+                    // エラーメッセージ取得
+                    return ("ファイルの形式が正しくありません。", null);
+                };
 
-            // ファイルコピー
-            // 取込ファイルパス
-            string importFilePath = await CopyFile(csvModel.ImportFile, csvModel.FileName, gamenName, userId);
+                // ファイルコピー
+                // 取込ファイルパス
+                string importFilePath = await CopyFile(csvModel.ImportFile, csvModel.FileName, gamenName, userId);
 
-            // CSVファイルデータ読み取り
-            var lines = ReadCsvFile(importFilePath, csvModel.HeaderColumnCount);
+                // CSVファイルデータ読み取り
+                lines = ReadCsvFile(importFilePath, csvModel.HeaderColumnCount);
 
-            // CSVファイルデータチェック
-            bool isValidCsv = CheckCsvData(lines, csvModel.HeaderSettings);
-            if (!isValidCsv)
-            {
-                // エラーメッセージ取得
-                return null;
+                // CSVファイルデータチェック
+                bool isValidCsv = CheckCsvData(lines, csvModel.HeaderSettings);
+                if (!isValidCsv)
+                {
+                    // エラーメッセージ取得
+                    return ("ファイルの内容が正しくありません。", null);
+                }
+
+                return (errorMsg, lines);
             }
-
-            return lines;
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -48,48 +58,55 @@ namespace mar_sumaken_web.Commons
         /// <param name="filePath">ファイルパス</param>
         public static void ToCSV(this DataTable dataTable, string filePath)
         {
-            // エンコード設定
-            Encoding encoding = Encoding.GetEncoding("Shift_JIS");
-            using (StreamWriter sw = new StreamWriter(filePath, false, encoding))
+            try
             {
-                // ヘッダー
-                for (int i = 0; i < dataTable.Columns.Count; i++)
+                // エンコード設定
+                Encoding encoding = Encoding.GetEncoding("Shift_JIS");
+                using (StreamWriter sw = new StreamWriter(filePath, false, encoding))
                 {
-                    sw.Write(dataTable.Columns[i]);
-                    if (i < dataTable.Columns.Count - 1)
-                    {
-                        sw.Write(",");
-                    }
-                }
-                sw.Write(sw.NewLine);
-
-                // CSVの内容
-                foreach (DataRow dr in dataTable.Rows)
-                {
+                    // ヘッダー
                     for (int i = 0; i < dataTable.Columns.Count; i++)
                     {
-                        if (!Convert.IsDBNull(dr[i]))
-                        {
-                            string value = dr[i].ToString();
-                            if (value.Contains(','))
-                            {
-                                value = String.Format("\"{0}\"", value);
-                                sw.Write(value);
-                            }
-                            else
-                            {
-                                sw.Write(dr[i].ToString());
-                            }
-                        }
+                        sw.Write(dataTable.Columns[i]);
                         if (i < dataTable.Columns.Count - 1)
                         {
                             sw.Write(",");
                         }
                     }
                     sw.Write(sw.NewLine);
+
+                    // CSVの内容
+                    foreach (DataRow dr in dataTable.Rows)
+                    {
+                        for (int i = 0; i < dataTable.Columns.Count; i++)
+                        {
+                            if (!Convert.IsDBNull(dr[i]))
+                            {
+                                string value = dr[i].ToString();
+                                if (value.Contains(','))
+                                {
+                                    value = String.Format("\"{0}\"", value);
+                                    sw.Write(value);
+                                }
+                                else
+                                {
+                                    sw.Write(dr[i].ToString());
+                                }
+                            }
+                            if (i < dataTable.Columns.Count - 1)
+                            {
+                                sw.Write(",");
+                            }
+                        }
+                        sw.Write(sw.NewLine);
+                    }
+                    //CSVファイルを閉じる
+                    sw.Close();
                 }
-                //CSVファイルを閉じる
-                sw.Close();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 
@@ -99,16 +116,23 @@ namespace mar_sumaken_web.Commons
         /// <param name="fileName">ファイル名</param>
         public static bool IsCsvFile(string fileName)
         {
-            if (fileName.Length > 0)
+            try
             {
-                // ファイル形式チェック
-                var extension = Path.GetExtension(fileName);
-                if (extension == ".csv")
+                if (fileName.Length > 0)
                 {
-                    return true;
-                };
+                    // ファイル形式チェック
+                    var extension = Path.GetExtension(fileName);
+                    if (extension == ".csv")
+                    {
+                        return true;
+                    };
+                }
+                return false;
             }
-            return false;
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -151,35 +175,42 @@ namespace mar_sumaken_web.Commons
         /// <returns>配列</returns>
         public static List<string[]> ReadCsvFile(string csvFilePath, int itemCount)
         {
-            //リスト型の初期化と宣言
-            List<string[]> csvLines = new List<string[]>();
-            // Encoding.RegisterProviderをShift JISを扱う前にコールする
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            //CSVを読み込みモードで開く,文字種はsjis,※代表的なものでいうとUTF-8
-            using (StreamReader reader = new StreamReader(csvFilePath, Encoding.GetEncoding("Shift_JIS")))
+            try
             {
-                while (!reader.EndOfStream)
+                //リスト型の初期化と宣言
+                List<string[]> csvLines = new List<string[]>();
+                // Encoding.RegisterProviderをShift JISを扱う前にコールする
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                //CSVを読み込みモードで開く,文字種はsjis,※代表的なものでいうとUTF-8
+                using (StreamReader reader = new StreamReader(csvFilePath, Encoding.GetEncoding("Shift_JIS")))
                 {
-                    // CSVファイルの一行を読み込む
-                    string line = reader.ReadLine();
-                    // 読み込んだ一行をカンマ毎に分けて配列に格納する
-                    string[] lineArr = Regex.Split(line, @"(?<=,)(?=(?:[^""]*""[^""]*"")*[^""]*$)");
-
-                    for (int i = 0; i < lineArr.Count(); i++)
+                    while (!reader.EndOfStream)
                     {
-                        if (lineArr[i] != null)
-                        {
-                            lineArr[i] = lineArr[i].Trim(',').Trim('"').ToString();
-                        }
-                    }
-                    //strに格納
-                    csvLines.Add(lineArr.Take(itemCount).ToArray());
-                }
+                        // CSVファイルの一行を読み込む
+                        string line = reader.ReadLine();
+                        // 読み込んだ一行をカンマ毎に分けて配列に格納する
+                        string[] lineArr = Regex.Split(line, @"(?<=,)(?=(?:[^""]*""[^""]*"")*[^""]*$)");
 
-                //CSVファイルを閉じる
-                reader.Close();
+                        for (int i = 0; i < lineArr.Count(); i++)
+                        {
+                            if (lineArr[i] != null)
+                            {
+                                lineArr[i] = lineArr[i].Trim(',').Trim('"').ToString();
+                            }
+                        }
+                        //strに格納
+                        csvLines.Add(lineArr.Take(itemCount).ToArray());
+                    }
+
+                    //CSVファイルを閉じる
+                    reader.Close();
+                }
+                return csvLines;
             }
-            return csvLines;
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -192,16 +223,23 @@ namespace mar_sumaken_web.Commons
         /// <returns>ファイルパス</returns>
         public async static Task<string> CopyFile(IFormFile readFile, string fileName, string gamenName, int userId)
         {
-            // 取込ファイルパス
-            string filePath = CreateImportFilePath(fileName, userId, gamenName);
-
-            // ファイルコピー
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await readFile.CopyToAsync(stream);
-            }
+                // 取込ファイルパス
+                string filePath = CreateImportFilePath(fileName, userId, gamenName);
 
-            return filePath;
+                // ファイルコピー
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await readFile.CopyToAsync(stream);
+                }
+
+                return filePath;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -210,53 +248,60 @@ namespace mar_sumaken_web.Commons
         /// <param name="lines">CSV行配列</param>
         public static bool CheckCsvData(List<string[]> lines, Dictionary<int, string> headerSettings)
         {
-            // リストが null または空の場合、エラー
-            if (lines == null || lines.Count == 0)
-                return false;
-
-            // 最初の行（ヘッダー）を確認する
-            var header = lines.First();
-            if (header == null || header.Length == 0)
-                return false;
-
-            // ヘッダー内の各要素をチェックする
-            foreach (var column in header)
+            try
             {
-                if (string.IsNullOrWhiteSpace(column))
-                    return false; // ヘッダーに null または空の要素がある場合、エラー
+                // リストが null または空の場合、エラー
+                if (lines == null || lines.Count == 0)
+                    return false;
+
+                // 最初の行（ヘッダー）を確認する
+                var header = lines.First();
+                if (header == null || header.Length == 0)
+                    return false;
+
+                // ヘッダー内の各要素をチェックする
+                foreach (var column in header)
+                {
+                    if (string.IsNullOrWhiteSpace(column))
+                        return false; // ヘッダーに null または空の要素がある場合、エラー
+                }
+
+                // 行が1つだけ（ヘッダーのみ）の場合、エラー
+                if (lines.Count == 1)
+                    return false;
+
+                // ヘッダー名チェック
+                bool isValidHeader = CheckIsValidHeader(lines[0], headerSettings);
+                if (!isValidHeader)
+                {
+                    return false;
+                }
+
+                // ヘッダーの列数を取得する
+                int columnCount = header.Length;
+
+                // 空行削除
+                lines.RemoveAll(line => string.IsNullOrWhiteSpace(string.Join("", line)));
+
+                // 各データ行の列数をチェックする
+                foreach (var line in lines.Skip(1)) // 最初の行（ヘッダー）をスキップして2行目からチェックする
+                {
+                    // 行が null もしくは空の場合、次の行に進む
+                    if (line == null || line.Length == 0)
+                        continue;
+
+                    // データ行の列数をチェックする
+                    if (line.Length != columnCount)
+                        return false; // 列数がヘッダーと一致しない場合、エラー
+                }
+
+                // エラーがない場合、データは有効
+                return true;
             }
-
-            // 行が1つだけ（ヘッダーのみ）の場合、エラー
-            if (lines.Count == 1)
-                return false;
-
-            // ヘッダー名チェック
-            bool isValidHeader = CheckIsValidHeader(lines[0], headerSettings);
-            if (!isValidHeader)
+            catch (Exception ex)
             {
-                return false;
+                throw ex;
             }
-
-            // ヘッダーの列数を取得する
-            int columnCount = header.Length;
-
-            // 空行削除
-            lines.RemoveAll(line => string.IsNullOrWhiteSpace(string.Join("", line)));
-
-            // 各データ行の列数をチェックする
-            foreach (var line in lines.Skip(1)) // 最初の行（ヘッダー）をスキップして2行目からチェックする
-            {
-                // 行が null もしくは空の場合、次の行に進む
-                if (line == null || line.Length == 0)
-                    continue;
-
-                // データ行の列数をチェックする
-                if (line.Length != columnCount)
-                    return false; // 列数がヘッダーと一致しない場合、エラー
-            }
-
-            // エラーがない場合、データは有効
-            return true;
         }
 
         /// <summary>
@@ -267,14 +312,21 @@ namespace mar_sumaken_web.Commons
         /// <returns></returns>
         public static bool CheckIsValidHeader(string[] headerCheck, Dictionary<int, string> headerSettings)
         {
-            foreach (var setItem in headerSettings)
+            try
             {
-                if (!setItem.Value.Equals(headerCheck[setItem.Key]))
+                foreach (var setItem in headerSettings)
                 {
-                    return false;
+                    if (setItem.Key >= headerCheck.Length || !setItem.Value.Equals(headerCheck[setItem.Key]))
+                    {
+                        return false;
+                    }
                 }
+                return true;
             }
-            return true;
+            catch (Exception ex)
+            {
+                throw ex; 
+            }
         }
 
     }
