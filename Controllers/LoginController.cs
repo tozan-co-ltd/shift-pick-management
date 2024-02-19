@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using mar_sumaken_web.Models;
-using mar_sumaken_web.Commons;
-using static mar_sumaken_web.Models.M_UserModel;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -27,8 +26,54 @@ namespace mar_sumaken_web.Controllers
         [AllowAnonymous]
         public IActionResult Index()
         {
-            return View();
+            try
+            {
+                ViewData["IsDevelopment"] = null;
+
+                string companyWebPath = GetCompanyWebPathByURL();
+
+                // 開発環境("_test"が含まれている)の場合はViewDataに"true"を代入し、
+                // _LayoutLogin.cshtmlで背景の色を変更する(薄紫#EFEDFF)
+                if (companyWebPath.Contains("_test"))
+                {
+                    ViewData["IsDevelopment"] = "true";
+                }
+
+                return View();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
+
+        /// <summary>
+        /// URLから会社WEBアプリパス取得
+        /// </summary>
+        /// <returns>会社WEBアプリパス</returns>
+        private string GetCompanyWebPathByURL()
+        {
+            string companyWebPath = "";
+            try
+            {
+                // URLからパスを取得(https://www.tozan.co.jp/の直後１つ目のパス)
+                var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
+
+                // 会社WEBアプリパスを取得("sumaken-web-***"の"***"のみ)
+                string pattern = "sumaken-web-";
+
+                int index = urlWebPath.IndexOf(pattern);
+                if (index != -1)
+                {
+                    companyWebPath = urlWebPath.Substring(index + pattern.Length);
+                }
+                return companyWebPath;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+}
 
         /// <summary>
         /// ログイン
@@ -100,7 +145,7 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// ログインの入力値 チェック
+        /// ログインの入力値チェック
         /// </summary>
         /// <param name="loginModel"></param>
         /// <returns></returns>
@@ -111,55 +156,42 @@ namespace mar_sumaken_web.Controllers
                 var loginId = loginModel.LoginId;
                 var password = loginModel.Password;
 
-                // (1) 入力規則チェック
-                // ログインIDまたはパスワードが空欄
-                // パスワードが4桁未満、または10桁を超える場合
+                // 入力規則チェック
+                // ログインIDまたはパスワードが空欄、パスワードが4桁未満または10桁を超える場合はエラー
                 if (!ModelState.IsValid)
                 {
-                    // エラーを作成
-                    // エラーコード：E2011
-                    //throw new Exception();
                     return null;
                 }
 
-                // (2) (3) 会社マスター情報の取得
+                // 会社マスターからデータベース名取得
                 var mCompany = GetMCompany();
                 if (mCompany == null ||  string.IsNullOrWhiteSpace(mCompany.DatabaseName))
                 {
-                    // エラーを作成
-                    // エラーコード：E2011
-                    //throw new Exception();
                     return null;
                 }
 
                 // ログインユーザー情報取得
-                List<M_UserModel> mUsers = LoginController.GetMUserToLogin(mCompany.DatabaseName, loginId);
+                var sql = LoginConnectController.CreateSQLToSelectMUerByLoginUser(loginId);
+                List<M_UserModel> mUsers = M_UserConnectController.ConnectMUsers(sql, mCompany.DatabaseName);
                 M_UserModel? mUser = mUsers.FirstOrDefault();
                 
                 // 一致するデータが無い場合
                 if (mUser == null)
                 {
-                    // エラーを作成
-                    // エラーコード：E2011
-                    //throw new Exception();
                     return null;
                 }
 
-                // (4) 16進数文字列をbyte列に変換
-                // (5) 平文パスワードをハッシュ化されたパスワードに変換
                 // 入力されたパスワードをハッシュ化
                 byte[] salt = Hashing.ConvertStringToBytes(mUser.Salt);
                 string hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(password, salt);
 
                 // パスワードチェック
-                // ハッシュ化されたパスワードと一致するデータが無い場合
+                // ハッシュ化されたパスワードと一致するデータが無い場合はエラー
                 if (!mUser.Password.Equals(hashedPassword))
                 {
-                    // エラーを作成
-                    // エラーコード：E2011
-                    //throw new Exception();
                     return null;
                 }
+
                 LoginUserModel loginUserModel = new LoginUserModel()
                 {
                     CompanyID = mCompany.CompanyID,
@@ -183,47 +215,14 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// ログインユーザー情報取得
-        /// </summary>
-        /// <param name="loginId">ログインID</param>
-        /// <param name="authorizedKubunList">管理権限区分リスト</param>
-        /// <returns>MUsersViewModel</returns>
-        public static List<M_UserModel> GetMUserToLogin(string databaseName, string loginId)
-        {
-            try
-            {
-                // SQL作成
-                var sql = LoginConnectController.CreateSQLToSelectMUerByLoginUser(loginId);
-                // DB接続
-                List<M_UserModel> userList = M_UserConnectController.ConnectMUsers(sql, databaseName);
-                return userList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// 会社マスター情報の取得
+        /// 会社マスター情報取得
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="CustomExtention"></exception>
         private Warehouse_M_CompanyModel? GetMCompany()
         {
-            string companyWebPath = "";
             try
             {
-                // URLからパスを取得(https://www.tozan.co.jp/の直後１つ目のパス)
-                var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
-
-                // 会社Webアプリパスを取得("sumaken-web-***"の"***"のみ)
-                string pattern = "sumaken-web-";
-                int index = urlWebPath.IndexOf(pattern);
-                if (index != -1)
-                {
-                    companyWebPath = urlWebPath.Substring(index + pattern.Length);
-                }
+                string companyWebPath = GetCompanyWebPathByURL();
 
                 if (companyWebPath != "")
                 {

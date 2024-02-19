@@ -1,11 +1,11 @@
 /* || システム全体の配色 */
 :root {
     /* メインカラー */
-    --base-color-main: rgb(0 170 40);
-    --rgb-base-color-main: 0 170 40;
+    --base-color-main: rgb(0, 170, 40);
+    --rgb-base-color-main: 0, 170, 40;
     /* アクセントカラー(ボタン等) */
-    --base-color-accent: rgb(240 132 75);
-    --rgb-base-color-accent: 240 132 75;
+    --base-color-accent: rgb(240, 132, 75);
+    --rgb-base-color-accent: 240, 132, 75;
     /* 背景カラー */
     --base-color-bg: rgba(var(--rgb-base-color-main), 0.3);
 }
@@ -34,11 +34,11 @@ body {
     font-family: var(--font-title) !important;
 }
 
-/*↓カテゴリーアイコン*/
 .sidebar-dark .nav-item .nav-link, .sidebar-dark .nav-item .nav-link i {
     color: rgba(255, 255, 255, 0.7);
 }
 
+/* || WEBメニューカテゴリーのアイコン */
 .icon-category {
     width: 1.2857142857142858em;
     text-align: center;
@@ -76,11 +76,7 @@ body {
     content: '\f0ad';
 }
 
-
-
-/*↑カテゴリーアイコン*/
-
-/*画面が小さい時は、文字の大きさを小さくする*/
+/* || レスポンシブデザイン */
 @media screen and (max-width: 1200px) {
     html {
         font-size: 80% !important;
@@ -95,38 +91,38 @@ body {
     min-width: 70px;
 }
 
-    .btn-accent:hover {
-        color: #fff;
-        filter: brightness(90%);
-        background-color: var(--base-color-accent);
-    }
+.btn-accent:hover {
+    color: #fff;
+    filter: brightness(90%);
+    background-color: var(--base-color-accent);
+}
 
-    .btn-accent:focus,
-    .btn-accent.focus {
-        color: #fff;
-        box-shadow: 0 0 0 0.2rem rgba(var(--rgb-base-color-accent), 0.5);
-        filter: brightness(90%);
-    }
+.btn-accent:focus,
+.btn-accent.focus {
+    color: #fff;
+    box-shadow: 0 0 0 0.2rem rgba(var(--rgb-base-color-accent), 0.5);
+    filter: brightness(90%);
+}
 
-    .btn-accent.disabled,
-    .btn-accent:disabled {
-        color: #fff;
-        background-color: var(--base-color-accent);
-        border-color: var(--base-color-accent);
-    }
+.btn-accent.disabled,
+.btn-accent:disabled {
+    color: #fff;
+    background-color: var(--base-color-accent);
+    border-color: var(--base-color-accent);
+}
 
-    .btn-accent:not(:disabled):not(.disabled):active,
-    .btn-accent:not(:disabled):not(.disabled).active,
-    .show > .btn-accent.dropdown-toggle {
-        color: #fff;
-        filter: brightness(80%);
-    }
+.btn-accent:not(:disabled):not(.disabled):active,
+.btn-accent:not(:disabled):not(.disabled).active,
+.show > .btn-accent.dropdown-toggle {
+    color: #fff;
+    filter: brightness(80%);
+}
 
-        .btn-accent:not(:disabled):not(.disabled):active:focus,
-        .btn-accent:not(:disabled):not(.disabled).active:focus,
-        .show > .btn-accent.dropdown-toggle:focus {
-            box-shadow: 0 0 0 0.2rem rgba(red, 0.5);
-        }
+.btn-accent:not(:disabled):not(.disabled):active:focus,
+.btn-accent:not(:disabled):not(.disabled).active:focus,
+.show > .btn-accent.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(red, 0.5);
+}
 
 .rotateBtn {
     transform: rotate(180deg);
@@ -135,16 +131,6 @@ body {
 .navbar-brand {
     --font-family-sans-serif: "BIZ UDPGothic", Meiryo UI, sans-serif !important;
 }
-
-/*.text-danger-custom {
-    color: var(--maincolor);
-    font-weight: 800;
-}
-
-.text-success-custom {
-    color: var(--subcolor);
-    font-weight: 800;
-}*/
 
 .btn-search {
     border: none !important;
@@ -205,27 +191,29 @@ body {
     border-left-color: var(--subcolor);
 }
 
-/*↓navbar custom*/
+/* ナビゲーションバー */
 .navbar-dark {
-    background-color: #3EB135 !important;
+    background-color: #3EB135;
+}
+
+.navbar-dark-test {
+    background-color: #9999CC; /* 開発環境は紫色 */
 }
 
 .navbar-brand {
     color: aliceblue !important;
 }
-/*↑navbar custom*/
 
-/*↓dropdown-menu custom*/
 
+/* ドロップダウンメニュー */
 .dropdown-menu {
     --bs-dropdown-min-width: 20rem !important;
     min-width: 14rem;
 }
 
-    .dropdown-menu a.dropdown-item:focus {
-        background-color: var(--subcolor) !important;
-    }
-/*↑dropdown-menu custom*/
+.dropdown-menu a.dropdown-item:focus {
+    background-color: var(--subcolor) !important;
+}
 
 .page-item.active > .page-link {
     font-weight: 800;
@@ -274,12 +262,6 @@ th.table-border-less, td.table-border-less {
     background-color: #fff !important;
 }
 /*↑table-hover*/
-
-/*↓Micromodal.js*/
-.modal__container {
-    min-width: 300px !important;
-}
-/*↑Micromodal.js*/
 
 .fadeIn {
     animation-name: fadeInAnime;
@@ -417,6 +399,7 @@ table.sticky_table {
     }
 }
 
+/* || dataTableのカスタマイズ */
 /* データテーブルのボタン */
 table.dataTable {
     margin: 0;
@@ -425,7 +408,6 @@ table.dataTable {
 table .btn-icon-split {
     padding: 4px;
 }
-
 
 table .btn-primary.btn-icon-split {
     height: 39px;

@@ -31,20 +31,13 @@
             min-height: 100vh;
         }
 
-/*         footer {
-            margin-top: auto;
-            color: #9E9E9E;
-        } */
-
-/*         .footer-inner {
-            display: flex;
-            justify-content: center;
-        } */
+        .wrapper-bg-for-test {
+            background-color: #EFEDFF; /* 開発環境は薄紫色 */
+        }
 
         body {
             margin: 0;
             padding: 0;
-            background-color: var(--base-color-bg);
             text-rendering: optimizeLegibility;
             font-kerning: normal;
             font-variant-ligatures: common-ligatures;
@@ -65,7 +58,16 @@
         }
     </style>
 
-    <div id="wrapper">
+    @{
+        /* 開発環境は背景を薄紫色に変更 */
+        var wrapperClass = ViewData["IsDevelopment"];
+        if (wrapperClass != null)
+        {
+            wrapperClass = "wrapper-bg-for-test";
+        }
+    }
+
+    <div id="wrapper" class="@wrapperClass">
         <main>
             <div id="main-inner">
                 @RenderBody()
