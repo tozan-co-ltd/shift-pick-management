@@ -2,7 +2,9 @@
 using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Reflection;
 
 namespace mar_sumaken_web.ConnectControllers
 {
@@ -83,6 +85,89 @@ namespace mar_sumaken_web.ConnectControllers
                 throw;
             }
         }
+
+        /// <summary>
+        /// 仕入先品番で品番チェック
+        /// </summary>
+        /// <param name="supplierProductNumber">仕入先品番</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static bool CheckMProductExist(string? supplierProductNumber, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    // SQL作成
+                    string sql = $@"
+                        SELECT COUNT(*) 
+                        FROM M_Product AS product
+                        WHERE 
+                            product.SupplierProductNumber = '{supplierProductNumber}'
+                            AND product.IsDeleted = 0
+                    ";
+
+                    // 仕入先品番で品番チェック
+                    var productCount = connection.ExecuteScalar<int>(sql);
+                    if (productCount == 0)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 納入先品番で仕入先品番を取得
+        /// </summary>
+        /// <param name="DeliveryProductNumber">納入先品番</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static M_ProductModel? GeProductByDeliveryProductNumber(int deliveryId, string? deliveryProductNumber, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    // SQL作成
+                    string sql = $@"
+                        SELECT TOP 1 *
+                        FROM M_Product
+                        WHERE 
+                            DeliveryID = {deliveryId}
+                            AND DeliveryProductNumber = '{deliveryProductNumber}'
+                            AND IsDeleted = 0
+                    ";
+                    // 納入先品番で仕入先品番を取得
+                    var product = connection.QueryFirstOrDefault<M_ProductModel>(sql);
+                    return product;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
 
         /// <summary>
         /// 品番マスター削除
@@ -226,6 +311,102 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 倉庫-品番中間テーブルに存在するかチェック
+        /// </summary>
+        /// <param name="productId">品番ID</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static bool IsExistRDepoProduct(int productId, int depoId, string databaseName)
+        {
+            // 戻り値
+            bool isExistFlg = false;
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    var sql = CreateSQLToCheckIsExistRDepoProduct(productId, depoId);
+
+                    int result = Convert.ToInt32(connection.ExecuteScalar(sql));
+
+                    if (result > 0)
+                    {
+                        isExistFlg = true;
+                    }
+                }
+                return isExistFlg;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        ///  倉庫-品番中間テーブルに存在するかチェックSQL作成
+        /// </summary>
+        /// <param name="productId">品番ID</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToCheckIsExistRDepoProduct(int productId, int depoId)
+        {
+            var sql = $@"
+                SELECT COUNT(*)  
+                FROM R_DepoProduct
+                WHERE 
+                    DepoID = {depoId}
+                    AND ProductID = {productId}
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 重複品番更新情報をチェック
+        /// </summary>
+        /// <param name="product">品番情報</param>
+        /// <param name="databaseName">デターベース名</param>
+        public static bool IsDuplicateEditMProduct(M_ProductModel product, string databaseName)
+        {
+            // 戻り値
+            bool isDuplicateValid = false;
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    var sql = CreateSQLToSelectDuplicateEditMProduct(product);
+
+                    int result = Convert.ToInt32(connection.ExecuteScalar(sql));
+
+                    if (result > 0)
+                    {
+                        isDuplicateValid = true;
+                    }
+                }
+                return isDuplicateValid;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
         /// 品番マスター登録
         /// </summary>
         /// <param name="user"></param>
@@ -296,6 +477,85 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 品番マスター更新
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="databaseName"></param>
+        /// <returns>更新結果</returns>
+        public static bool UpdateMProduct(M_ProductModel product, LoginUserModel loginUser)
+        {
+            bool result = true;
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+
+                    // 品番マスター更新SQL作成
+                    string sql = CreateSQLToUpdateMProduct(product, sysDate, loginUser.UserName);
+                    // 品番マスター更新
+                    var affectRows = connection.Execute(sql, null, transaction);
+                    // 更件数が0の場合はエラーとする
+                    if (affectRows == 0)
+                    {
+                        result = false;
+                        // エラーコード：E2011
+                        throw new Exception();
+                    }
+
+                    // 倉庫-品番中間テーブル削除SQL作成
+                    string depoProductDeleteSql = CreateSQLToDeleteRUserDepo(product.ProductID);
+                    // 倉庫-品番中間テーブル削除
+                    int depoProductDelCount = connection.Execute(depoProductDeleteSql, null, transaction);
+                    if (depoProductDelCount == 0)
+                    {
+                        // エラーコード：E2011
+                        throw new Exception();
+                    }
+
+                    // 倉庫-品番中間テーブル更新
+                    foreach (SelectListItem item in product.RDepoProductsRegister)
+                    {
+                        if (item.Selected)
+                        {
+                            // 倉庫-品番中間テーブル登録SQL作成
+                            string depoProductInsertSql = CreateSQLToInsertRDepoProduct(Convert.ToInt32(item.Value), product.ProductID, sysDate, loginUser.UserName);
+                            int depoProductInsertCount = connection.Execute(depoProductInsertSql, null, transaction);
+                            // 更件数が0の場合はエラーとする
+                            if (depoProductInsertCount == 0)
+                            {
+                                result = false;
+                                // エラーコード：E2011
+                                throw new Exception();
+                            }
+                        }
+                    }
+
+                    // トランザクションのコミット
+                    transaction.Commit();
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    // エラーコード：E2011
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// 倉庫-品番中間テーブル登録SQL作成
         /// </summary>
         /// <param name="depoId">登録倉庫ID</param>
@@ -335,9 +595,35 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 品番マスター更新SQL作成
+        /// </summary>
+        /// <param name="product">登録情報</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToUpdateMProduct(M_ProductModel product, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+                UPDATE M_Product
+                SET 
+                    SupplierID = {product.SupplierID},
+                    SupplierProductNumber = '{product.SupplierProductNumber}',
+                    DeliveryID = {product.DeliveryID},
+                    DeliveryProductNumber = '{product.DeliveryProductNumber}',
+                    ProductName = '{product.ProductName}',
+                    LotQuantity = {product.LotQuantity},
+                    UpdatedAt = '{updatedAt}',
+                    UpdatedBy = '{updatedBy}'
+                WHERE
+                    ProductID = {product.ProductID}
+            ;";
+            return sql;
+        }
+
+        /// <summary>
         /// 重複品番情報取得SQL作成
         /// </summary>
-        /// <param name="companyCode">品番コード</param>
+        /// <param name="product">品番情報</param>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectDuplicateMProduct(M_ProductModel product)
         {
@@ -363,6 +649,32 @@ namespace mar_sumaken_web.ConnectControllers
 		                        AND delivery.IsDeleted = 0
 		                        AND product.DeliveryProductNumber = '{product.DeliveryProductNumber}'
 	                        )
+                        )
+                        AND product.IsDeleted = 0
+            ";
+
+            return sql;
+        }
+
+        /// <summary>
+        /// 重複品番更新情報取得SQL作成
+        /// </summary>
+        /// <param name="product">品番情報</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectDuplicateEditMProduct(M_ProductModel product)
+        {
+            var sql = $@"
+                    SELECT
+                        COUNT(*)                      
+                    FROM
+                        M_Product AS product
+                    WHERE 
+                        (1=1)
+                        AND product.ProductID <> {product.ProductID}
+	                    AND 
+                        (
+                            product.SupplierProductNumber = '{product.SupplierProductNumber}'
+                            OR product.DeliveryProductNumber = '{product.DeliveryProductNumber}'
                         )
                         AND product.IsDeleted = 0
             ";

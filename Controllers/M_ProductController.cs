@@ -22,6 +22,7 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         public IActionResult Index()
         {
+            M_ProductModel model = new();
             try
             {
                 // ログイン中ユーザー情報取得
@@ -46,18 +47,26 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ビューのタイトル取得
-                M_ProductModel model = new()
+                model = new()
                 {
                     ControllerName = "M_Product",
-                    CompanyID = user.CompanyID
+                    CompanyID = user.CompanyID,
+                    MProductList = productList
                 };
+                // 倉庫リスト
+                model.RDepoProductsRegister = (List<SelectListItem>)model.GetMDepoList(user.DatabaseName);
+                // 仕入先リストを取得
+                model.SuplierSelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_Supplier_ID, user.DatabaseName);
+                // 納入先リストを取得
+                model.DeliverySelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_Delivery_ID, user.DatabaseName);
+
                 ViewData["Title"] = model.GetViewTitle();
-                return View(productList);
+                return View(model);
             }
             catch (Exception)
             {
                 ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
-                return View();
+                return View(model);
             }
         }
 
@@ -168,7 +177,7 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
                 }
 
-                // 重複品番情報取をチェック
+                // 重複品番情報をチェック
                 bool isDuplicate = M_ProductConnectController.IsDuplicateMProduct(model, user.DatabaseName);
                 if (isDuplicate)
                 {
@@ -186,6 +195,71 @@ namespace mar_sumaken_web.Controllers
                 {
                     // エラーコード：E2011
                     return NotFound(new { errorMessage = "登録はできませんでした。" });
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                //errorMessage = ErrorHandling.CreateErrorMessage("E9999");
+
+                // log取得
+                //var exceptionMessage = ex.Message;
+                //_logger.LogError($"{exceptionMessage} {errorMessage}");
+                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+            }
+        }
+
+        /// <summary>
+        /// 品番マスター更新
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        [HttpPost]
+        public IActionResult Edit(M_ProductModel model)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+                if (user == null || model.RDepoProductsRegister == null)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
+                }
+
+                // 使用倉庫をチェック
+                bool isSelectedDepo = model.RDepoProductsRegister.Any(item => item.Selected);
+                if (!isSelectedDepo)
+                {
+                    ModelState.AddModelError("RDepoProductsRegister", ErrorMessagesResources.E1001);
+                }
+
+                // 更新情報をチェック
+                if (!ModelState.IsValid)
+                {
+                    return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
+                }
+
+                // 重複品番更新情報をチェック
+                bool isDuplicate = M_ProductConnectController.IsDuplicateEditMProduct(model, user.DatabaseName);
+                if (isDuplicate)
+                {
+                    // エラーを作成
+                    // エラーコード：E2011
+                    //throw new Exception();
+                    return NotFound(new { errorMessage = "更新品番情報が重複しています。" });
+                }
+
+                // 品番マスター更新
+                bool updatedFlg = M_ProductConnectController.UpdateMProduct(model, user);
+
+                // 更新件数が0の場合はエラーとする
+                if (!updatedFlg)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "更新はできませんでした。" });
                 }
 
                 return Ok();
@@ -257,7 +331,7 @@ namespace mar_sumaken_web.Controllers
                 // CSVファイルへのパスを作成する
                 string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
                 // DataTableをCSVに変換する
-                Utils.ToCSV(dataTable, filePath);
+                ReadFile.ToCSV(dataTable, filePath);
                 // ファイルの作成
                 var file = System.IO.File.ReadAllBytes(filePath);
 

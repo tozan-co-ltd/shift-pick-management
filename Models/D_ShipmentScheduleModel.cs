@@ -84,7 +84,7 @@ namespace mar_sumaken_web.Models
         /// 発注元
         /// </summary>
         [Display(Name = "発注元")]
-        [MaxLength(20)]
+        [MaxLength(10)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? OrdererCode { get; set; }
 
@@ -92,7 +92,7 @@ namespace mar_sumaken_web.Models
         /// 発注元工区
         /// </summary>
         [Display(Name = "発注元工区")]
-        [MaxLength(10)]
+        [MaxLength(5)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? OrdererFactoryKubun { get; set; }
 
@@ -100,7 +100,7 @@ namespace mar_sumaken_web.Models
         /// 発注元名称
         /// </summary>
         [Display(Name = "発注元名称")]
-        [MaxLength(100)]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? OrdererName { get; set; }
 
@@ -108,7 +108,7 @@ namespace mar_sumaken_web.Models
         /// 発注元工場名
         /// </summary>
         [Display(Name = "発注元工場名")]
-        [MaxLength(100)]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? OrdererFactoryName { get; set; }
 
@@ -116,7 +116,7 @@ namespace mar_sumaken_web.Models
         /// 出荷元
         /// </summary>
         [Display(Name = "出荷元")]
-        [MaxLength(20)]
+        [MaxLength(10)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? ShipperCode { get; set; }
 
@@ -124,7 +124,7 @@ namespace mar_sumaken_web.Models
         /// 出荷元工区
         /// </summary>
         [Display(Name = "出荷元工区")]
-        [MaxLength(10)]
+        [MaxLength(5)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? ShipperFactoryKubun { get; set; }
 
@@ -132,7 +132,7 @@ namespace mar_sumaken_web.Models
         /// 出荷元名称
         /// </summary>
         [Display(Name = "出荷元名称")]
-        [MaxLength(100)]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? ShipperName { get; set; }
 
@@ -140,7 +140,7 @@ namespace mar_sumaken_web.Models
         /// 納入先
         /// </summary>
         [Display(Name = "納入先")]
-        [MaxLength(20)]
+        [MaxLength(10)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryCode { get; set; }
 
@@ -148,7 +148,7 @@ namespace mar_sumaken_web.Models
         /// 納入先工区
         /// </summary>
         [Display(Name = "納入先工区")]
-        [MaxLength(10)]
+        [MaxLength(5)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryFactoryKubun { get; set; }
 
@@ -156,7 +156,7 @@ namespace mar_sumaken_web.Models
         /// 納入場所
         /// </summary>
         [Display(Name = "納入場所")]
-        [MaxLength(10)]
+        [MaxLength(5)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryLocation { get; set; }
 
@@ -164,7 +164,7 @@ namespace mar_sumaken_web.Models
         /// 納入先名称
         /// </summary>
         [Display(Name = "納入先名称")]
-        [MaxLength(100)]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryName { get; set; }
 
@@ -172,7 +172,7 @@ namespace mar_sumaken_web.Models
         /// 納入先工場名
         /// </summary>
         [Display(Name = "納入先工場名")]
-        [MaxLength(100)]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryFactoryName { get; set; }
 
@@ -180,7 +180,7 @@ namespace mar_sumaken_web.Models
         /// 定期／不定期区分名称
         /// </summary>
         [Display(Name = "定期／不定期区分名称")]
-        [MaxLength(100)]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? RegularKubun { get; set; }
 
@@ -189,6 +189,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "発行日")]
         [RegularExpression(@"^(19\d{2}|[2-9]\d{3}|99999)(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? IssuedDate { get; set; }
 
         /// <summary>
@@ -196,13 +197,14 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "納入指示日")]
         [RegularExpression(@"^(19\d{2}|[2-9]\d{3}|99999)(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryDate { get; set; }
 
         /// <summary>
         /// 納入指示時刻
         /// </summary>
         [Display(Name = "納入指示時刻")]
-        [MaxLength(8)]
+        [RegularExpression(@"^(?:[01]\d|2[0-3])[0-5]\d$")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryTime { get; set; }
 
@@ -218,7 +220,7 @@ namespace mar_sumaken_web.Models
         /// 輸送識別
         /// </summary>
         [Display(Name = "輸送識別")]
-        [MaxLength(100)]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? TranspotationIdentify { get; set; }
 
@@ -226,7 +228,7 @@ namespace mar_sumaken_web.Models
         /// 納品書番号
         /// </summary>
         [Display(Name = "納品書番号")]
-        [MaxLength(100)]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliverySlipNumber { get; set; }
 
@@ -250,7 +252,7 @@ namespace mar_sumaken_web.Models
         /// 納入先品番(表示用品番)
         /// </summary>
         [Display(Name = "表示用品番")]
-        [MaxLength(100)]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryProductNumber { get; set; }
 
@@ -258,7 +260,7 @@ namespace mar_sumaken_web.Models
         /// 背番号
         /// </summary>
         [Display(Name = "背番号")]
-        [MaxLength(100)]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryProductAbbreviation { get; set; }
 
@@ -266,7 +268,7 @@ namespace mar_sumaken_web.Models
         /// 品名
         /// </summary>
         [Display(Name = "品名")]
-        [MaxLength(100)]
+        [MaxLength(50)]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryProductName { get; set; }
 

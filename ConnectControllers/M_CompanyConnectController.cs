@@ -1,6 +1,9 @@
 ﻿using Dapper;
 using mar_sumaken_web.Models;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Data.SqlClient;
+using System.Reflection;
 
 
 namespace mar_sumaken_web.Commons
@@ -214,6 +217,46 @@ namespace mar_sumaken_web.Commons
                     var insertedCount = connection.Execute(companyRegisterSql);
 
                     return insertedCount;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 会社コードで会社IDを取得
+        /// </summary>
+        /// <param name="companyCode">会社コード</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static int GetCompanyIdByCompanyCode(string? companyCode, string databaseName)
+        {
+            var result = -1;
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    // SQL作成
+                    string sql = $@"
+                        SELECT TOP 1 CompanyID FROM M_Company WHERE CompanyCode = {companyCode}
+                    ";
+                    // 会社コード取得
+                    var companyId = connection.ExecuteScalar<int>(sql);
+                    if (companyId > 0)
+                    {
+                        return companyId;
+                    }
+
+                    return result;
                 }
                 catch (Exception)
                 {

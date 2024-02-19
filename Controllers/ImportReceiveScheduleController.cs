@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.Reflection;
 using System.Transactions;
 
 namespace mar_sumaken_web.Controllers
@@ -32,47 +33,41 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult Index()
         {
-            // ログイン中ユーザー情報取得
-            var user = ClaimsLoginUserData();
-
-            // 管理権限区分が1(管理者)でない場合はエラーとする
-            if (user == null || user.AuthorizedKubun != 1)
-            {
-                // エラーメッセージ取得
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
-            }
-
             var model = new D_FileImportModel();
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
 
-            // 入荷予定取込一覧取得
-            var listD_FileImport = GetListD_FileImport(ClaimsLoginUserData().DatabaseName);
-            model.D_FileImportList = listD_FileImport;
+                // 管理権限区分が1(管理者)でない場合はエラーとする
+                if (user == null || user.AuthorizedKubun != 1)
+                {
+                    // エラーメッセージ取得
+                    return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                }
 
-            return View(model);
-        }
+                // SQL作成
+                var sql = D_FileImportConnectController.CreateSQLToGetD_FileImport("入荷予定取込");
 
-        /// <summary>
-        /// 入荷予定取込一覧取得
-        /// </summary>
-        /// <param name="databaseName">string</param>
-        /// <returns>出庫実績情報</returns>
-        public List<D_FileImportModel> GetListD_FileImport(string databaseName)
-        {
-            // SQL作成
-            var sql = D_FileImportConnectController.CreateSQLToGetD_FileImport("入荷予定取込");
+                // DB接続
+                List<D_FileImportModel> listD_FileImport = D_FileImportConnectController.ConnectD_FileImport(sql, user.DatabaseName);
 
-            // DB接続
-            List<D_FileImportModel> strList = D_FileImportConnectController.ConnectD_FileImport(sql, databaseName);
+                model.D_FileImportList = listD_FileImport;
 
-            return strList;
+                return View(model);
+            }
+            catch (Exception)
+            {
+                return View(model);
+            }
         }
 
         // <summary>
-        /// Excel取込
+        /// Csv取込
         /// <param name="FileUpload">ファイル</param>
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> ImportExcel(List<IFormFile> FileUpload, int DepoID)
+        public async Task<IActionResult> ImportCsv(List<IFormFile> FileUpload, int DepoID, string GamenName)
         {
             try
             {
@@ -98,43 +93,27 @@ namespace mar_sumaken_web.Controllers
                     foreach (var file in files)
                     {
                         List<D_ReceiveScheduleModel> importModelList = new();
-                        List<string> errorList = new List<string>();
+                        List<string> errorMessageList = new();
+
                         var fileName = file.FileName;
+
                         if (file.Length > 0)
                         {
-
-                            // ファイル形式チェック
-                            if (!Utils.IsCsvFile(fileName))
+                            var csvInputFile = new CsvFileInputModel()
                             {
-                                // エラーメッセージ取得
-                                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                                FileName = file.FileName,
+                                ImportFile = file,
+                                HeaderColumnCount = Header_Column_Count,
+                                HeaderSettings = GetModelHeaderCheck()
                             };
 
-                            // 取込ファイルパス
-                            string importFilePath = Utils.CreateImportFilePath(fileName, user.UserID, "ReceiveSchedule");
-
-                            // ファイルコピー
-                            using (var stream = new FileStream(importFilePath, FileMode.Create))
-                            {
-                                await file.CopyToAsync(stream);
-                            }
-
                             // CSVファイルデータ読み取り
-                            var lines = Utils.ReadCsvFile(importFilePath, Header_Column_Count);
+                            var (readCsvErrorMsg, lines) = await ReadFile.ReadCsv(csvInputFile, GamenName, user.UserID);
 
-                            // CSVファイルデータチェック
-                            bool isValidCsv = Utils.CheckCsvData(lines);
-                            if (!isValidCsv)
+                            if (!string.Empty.Equals(readCsvErrorMsg))
                             {
                                 // エラーメッセージ取得
-                                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
-                            }
-
-                            // 空行削除
-                            for (var i = lines.Count - 1; i >= 0; i--)
-                            {
-                                if (string.IsNullOrWhiteSpace(string.Join("", lines[i])))
-                                    lines.RemoveAt(i);
+                                return NotFound(new { errorMessage = readCsvErrorMsg });
                             }
 
                             // 読み取りデータを更新
@@ -147,17 +126,6 @@ namespace mar_sumaken_web.Controllers
                                     SelectedDepoID = DepoID
                                 };
 
-                                // ヘッダー名チェック
-                                if (readCount == 0)
-                                {
-                                    bool isValidHeader = CheckIsValidHeader(lines[0]);
-                                    if (!isValidHeader)
-                                    {
-                                        // エラーメッセージ取得
-                                        return NotFound(new { errorMessage = "正しいファイルを指定してください。" });
-                                    }
-                                }
-
                                 // データチェック
                                 if (readCount > 0)
                                 {
@@ -168,14 +136,31 @@ namespace mar_sumaken_web.Controllers
                                     var validationContext = new ValidationContext(receiveSchedule);
                                     var validationResults = new List<ValidationResult>();
                                     bool isValid = Validator.TryValidateObject(receiveSchedule, validationContext, validationResults, true);
-                                    
-                                    // エラーがあります。
+
+                                    // 会社コードで会社IDを取得
+                                    var companyId = M_CompanyConnectController.GetCompanyIdByCompanyCode(receiveSchedule.CompanyCode, user.DatabaseName);
+                                    if (companyId == -1)
+                                    {
+                                        isValid = false;
+                                        validationResults.Add(new ValidationResult("会社コードは正しくありません。"));
+                                    }
+                                    receiveSchedule.CompanyID = companyId;
+
+                                    // 仕入先品番で品番チェック
+                                    bool isExistProduct = M_ProductConnectController.CheckMProductExist(receiveSchedule.SupplierProductNumber, user.DatabaseName);
+                                    if (!isExistProduct)
+                                    {
+                                        isValid = false;
+                                        validationResults.Add(new ValidationResult("仕入先品番は正しくありません。"));
+                                    }
+
+                                    // エラーメッセージを追加
                                     if (!isValid)
                                     {
                                         foreach(var err in validationResults)
                                         {
                                             var msg = readCount + "行目" + "　" + err.ErrorMessage;
-                                            errorList.Add(msg);
+                                            errorMessageList.Add(msg);
                                         }
                                     }
                                     // リストに項目を追加
@@ -184,26 +169,24 @@ namespace mar_sumaken_web.Controllers
                                 readCount++;
                             }
                         }
-                        // エラーチェック
-                        if (errorList.Count > 0)
+
+                        // エラーが1件以上ある場合はreturn
+                        if (errorMessageList.Count > 0)
                         {
-                            var errorMsg = "<br/>" + string.Join("</br>", errorList);
-                            return NotFound(new { errorMessage = errorMsg });
+                            var errorMessage = string.Join("</br>", errorMessageList);
+                            return NotFound(new { errorMessage = errorMessage });
                         }
 
                         // 入荷予定データ書き込み
                         bool insertResult = D_ReceiveScheduleConnectController.InsertDReceiveSchedule(importModelList, DepoID, fileName, user);
                         if (!insertResult)
                         {
-                            // エラーメッセージ取得 (E2011)
                             return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
                         }
                     }
                 }
                 else
                 {
-                    // エラーメッセージ取得
-                    // 「該当データがありません。」
                     return NotFound(new { errorMessage = "該当データがありません。" });
                 }
 
@@ -221,10 +204,9 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// ヘッダー名チェック
+        /// モデルヘッダー名リスト取得
         /// </summary>
-        /// <param name="headerCheck">チェックされたヘッダー</param>
-        private static bool CheckIsValidHeader(string[] headerCheck)
+        private Dictionary<int, string> GetModelHeaderCheck()
         {
             Dictionary<int, string> headerSettings = new()
             {
@@ -235,14 +217,7 @@ namespace mar_sumaken_web.Controllers
                 [4] = Utils.GetDisplayName<D_ReceiveScheduleModel>("Quantity")
             };
 
-            foreach (var setItem in headerSettings)
-            {
-                if (!setItem.Value.Equals(headerCheck[setItem.Key]))
-                {
-                    return false;
-                }
-            }
-            return true;
+            return headerSettings;
         }
 
         /// <summary>
@@ -289,7 +264,7 @@ namespace mar_sumaken_web.Controllers
                 // CSVファイルへのパスを作成する
                 string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
                 // DataTableをCSVに変換する
-                Utils.ToCSV(dataTable, filePath);
+                ReadFile.ToCSV(dataTable, filePath);
                 // ファイルの作成
                 var file = System.IO.File.ReadAllBytes(filePath);
 

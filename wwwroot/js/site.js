@@ -98,7 +98,7 @@ $('#eye-login').click(function () {
     }
 });
 
-//------------------- Excel取込　------------------//
+//------------------- Csv取込　------------------//
 function onUploadFile(page) {
 
     // ページの更新を禁止する
@@ -200,7 +200,7 @@ function onUploadFile(page) {
                 $("#div-error-message").hide();
                 $("#import-res").show();
                 $("#import-res").addClass('text-danger');
-                $("#import-res").html("エラー: " + errorMessage);
+                $("#import-res").html(errorMessage);
             } else {
                 // その他のエラーの場合
                 $("#import-res").addClass('text-danger');
@@ -241,8 +241,6 @@ async function onExportFile(page) {
     event.preventDefault();
     $("#ErrorBlock").text("");
     $('#import-res').text("");
-
-    console.log(page);
 
     const response = await fetch('' + page + '/ExportFile', {
         method: 'GET', // *GET, POST, PUT, DELETE, etc.
@@ -302,18 +300,13 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect) {
     if (dialog) {
         dialog.parentNode.removeChild(dialog);
     }
-    var actionAfter = "OK";
-    if (isRedirect) {
-        message = "登録が完了しました。ユーザーマスター画面へ戻ります。";
-        actionAfter = "OK";
-    }
     $('body').append(
         '<div class="modal fade" id="AlertDialogId" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">' +
         '  <div class="modal-dialog" role="document">' +
         '    <div class="modal-content">' +
         '      <div class="modal-header ' + type + '">' +
         '        <h5 class="modal-title">' + title + '</h5 > ' +
-        '        <button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+        '        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="display:none">' +
         '          <span aria-hidden="true">&times;</span > ' +
         '        </button>' +
         '      </div>' +
@@ -321,7 +314,7 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect) {
         '        <p>' + message + '</p > ' +
         '      </div>' +
         '      <div class="modal-footer d-flex flex-wrap justify-content-center">' +
-        '        <button type="button" class="btn btn-accent confirm" data-dismiss="modal">' + actionAfter + '</button > ' +
+        '        <button type="button" class="btn btn-accent confirm" data-dismiss="modal">OK</button > ' +
         '      </div>' +
         '    </div>' +
         '  </div>' +

@@ -13,7 +13,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// ユーザーマスターリスト
         /// </summary>
-        public IPagedList<M_UserModel> M_UserList { get; set; }
+        public IPagedList<M_UserModel>? M_UserList { get; set; }
 
         /// <summary>
         /// 倉庫リスト

@@ -69,6 +69,7 @@
                                     </button>
                                 </div>
                             </div>
+                            <input type="hidden" name="GamenName" value="@Model.ViewTitle">
                         </form>
                     </div>
                 </div>
@@ -103,4 +104,4 @@
         </div>
     </div>
 </div>
-<input id="import_action_url" type="hidden" value="@Url.Action("ImportExcel", "ImportShipmentSchedule")" />
+<input id="import_action_url" type="hidden" value="@Url.Action("ImportCsv", "ImportShipmentSchedule")" />
