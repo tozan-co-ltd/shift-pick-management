@@ -20,11 +20,9 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// 会社マスター画面表示
         /// </summary>
-        public IActionResult Index(M_CompanyModel model)
+        public IActionResult Index()
         {
-            if (model == null)
-                model = new M_CompanyModel();
-
+            M_CompanyModel model = new M_CompanyModel();
             try
             {
                 // ログイン中ユーザー情報取得
@@ -44,6 +42,9 @@ namespace mar_sumaken_web.Controllers
                 IEnumerable<M_CompanyModel> companyList = M_CompanyConnectController.ConnectMCompanys(sql, user.DatabaseName);
 
                 model.M_CompanyList = companyList.ToPagedList();
+
+                // 会社区分リスト取得
+                model.KubunSelectList = Utils.Const_Company_Kubun_List;
 
                 return View(model);
             }
@@ -127,6 +128,54 @@ namespace mar_sumaken_web.Controllers
                 {
                     // エラーコード：E2011
                     return NotFound(new { errorMessage = "登録はできませんでした。" });
+                }
+
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+            }
+        }
+
+        /// <summary>
+        /// 会社マスター更新
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        [HttpPost]
+        public IActionResult Edit(M_CompanyModel model)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+                if (user == null)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
+                }
+
+                // 更新情報をチェック
+                if (!ModelState.IsValid)
+                {
+                    return NotFound(new { errorMessage = "" });
+                }
+
+                // 重複会社情報取をチェック
+                bool isDuplicate = M_CompanyConnectController.IsDuplicateEditMCompanyByCompanyCode(model.CompanyCode, model.CompanyID, user.DatabaseName);
+                if (isDuplicate)
+                {
+                    return NotFound(new { errorMessage = "会社コードが重複しています。" });
+                }
+
+                // 会社マスター更新
+                int editedCount = M_CompanyConnectController.EditMCompany(model, user);
+
+                // 更新件数が0の場合はエラーとする
+                if (editedCount == 0)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "更新はできませんでした。" });
                 }
 
                 return Ok();

@@ -332,10 +332,11 @@
     function OnEditClick(productID) {
         $("#div-error-message").text("");
         $("#edit-res").text("");
+        $(".text-danger").text("");
+        $('input').removeClass('input-validation-error');
 
         // M_ProductModel取得
         var productModel = @Html.Raw(Json.Serialize(Model));
-        console.log(productModel);
         // 会社IDが一致する情報のみ取得
         productModel.mProductList.forEach(function (item) {
 

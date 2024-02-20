@@ -13,7 +13,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 会社マスターリスト
         /// </summary>
-        public IPagedList<M_CompanyModel> M_CompanyList { get; set; }
+        public IPagedList<M_CompanyModel>? M_CompanyList { get; set; }
 
         /// <summary>
         /// 会社区分リスト
@@ -51,7 +51,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "会社名")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string CompanyName { get; set; }
+        public string? CompanyName { get; set; }
 
         /// <summary>
         /// 取引先名

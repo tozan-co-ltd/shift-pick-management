@@ -66,7 +66,8 @@
                         {
                             <tr>
                                 <td>
-                                    <a class="btn btn-success btn-icon-split ml-1 mr-1" asp-controller="M_Company" asp-action="Edit" asp-route-id="@item.CompanyID">
+                                    <a class="btn btn-success btn-icon-split ml-1 mr-1"
+                                    onclick="OnEditClick('@item.CompanyID')" data-id="@item.CompanyID" data-toggle="modal" data-target="#companytEditModal">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
                                     <button class="btn btn-danger btn-icon-split"
@@ -162,13 +163,88 @@
     </div>
 </div>
 
+<!--  Edit Modal-->
+<div class="modal fade" id="companytEditModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="companytEditModalLabel">修正</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-10">
+                    <p id="edit-res" class="mt-1"></p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <form class="col-md-12" id="mCompanyForm">
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayName("CompanyCode")<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="CompanyCode" autocomplete="off" value="" required>
+                                <small class="form-text text-muted w-100 p-1">1～10文字の数字が使用できます。</small>
+                                <span class="text-danger w-100" asp-validation-for="CompanyCode"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayName("CompanyKubun")<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <select class="form-select" asp-for="CompanyKubun" required>
+                                    @for (var i = 0; i < Model.KubunSelectList.Count; i++)
+                                    {
+                                        <option value="@Model.KubunSelectList[i].Value" selected>@Model.KubunSelectList[i].Text</option>
+                                    }
+                                </select>
+                                <span class="text-danger w-100" asp-validation-for="CompanyKubun"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayName("CompanyName")<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="CompanyName" autocomplete="off" required>
+                                <span class="text-danger w-100" asp-validation-for="CompanyName"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayName("ClientName")</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="ClientName" autocomplete="off">
+                                <span class="text-danger w-100" asp-validation-for="ClientName"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
+                            <button class="btn btn-success btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteEdit()">
+                                <span class="text" style="min-width:84px">更新</span>
+                            </button>
+                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
+                                <span class="text">キャンセル</span>
+                            </button>
+                        </div>
+                        <input type="hidden" asp-for="CompanyID" value="@Model.CompanyID" />
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
 
     // 削除ボタン押下
     function OnDeleteClick(companyID) {
         // M_CompanyModel取得
         var companyModel = @Html.Raw(Json.Serialize(Model));
-        companyModel.forEach(function (item) {
+        companyModel.m_CompanyList.forEach(function (item) {
             // 会社IDが一致する情報のみ取得
             if (item.companyID == companyID) {
                 $("#deleteCompanyId").val(item.companyID);
@@ -178,6 +254,30 @@
                 $("#deleteClientName").val(item.clientName);
             }
         });
+    }
+
+    // 修正ボタン押下
+    function OnEditClick(companyID) {
+        $("#div-error-message").text("");
+        $("#edit-res").text("");
+        $(".text-danger").text("");
+        $('input').removeClass('input-validation-error');
+
+        // M_CompanyModel取得
+        var companyModel = @Html.Raw(Json.Serialize(Model));
+
+        // 会社IDが一致する情報のみ取得
+        companyModel.m_CompanyList.forEach(function (item) {
+            // 会社IDが一致する情報のみ取得
+            if (item.companyID == companyID) {
+                $("#CompanyID").val(item.companyID);
+                $("#CompanyCode").val(item.companyCode);
+                $("#CompanyKubun").val(item.companyKubun);
+                $("#CompanyName").val(item.companyName);
+                $("#ClientName").val(item.clientName);
+            }
+        });
+
     }
 
     // 削除
@@ -218,6 +318,48 @@
                 $("#import-res").addClass('text-danger');
                 $("#import-res").text("削除が失敗しました。");
             }
+        });
+    }
+
+    // 品番マスター修正
+    function OnExecuteEdit() {
+        $('#mCompanyForm').submit(function (event) {
+            $("#div-error-message").text("");
+            $("#edit-res").text("");
+
+            // フォーム情報を取得する
+            var formData = $('#mCompanyForm').serializeArray();
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // Ajax call
+            $.ajax({
+                url: window.location.origin + '@Url.Action("Edit", "M_Company")',
+                method: "POST",
+                data: formData
+            })
+                .done(function (response) {
+                    //$('#mProductForm')[0].reset();
+                    // 完了モーダル表示
+                    AlertMessage('', '完了', '登録が完了しました。', null, null);
+                })
+                .fail(function (xhr) {
+                    if (xhr.status === 404) {
+                        // データが見つからなかった場合
+                        var errorMessage = xhr.responseJSON.errorMessage;
+                        $("#edit-res").addClass('text-danger');
+                        $("#edit-res").text(errorMessage);
+                    } else {
+                        // その他のエラーの場合
+                        $("#edit-res").show();
+                        $("#edit-res").addClass('text-danger');
+                        $("#edit-res").text("登録が失敗しました。");
+                    }
+                });
         });
     }
 

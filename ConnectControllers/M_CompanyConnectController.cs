@@ -120,8 +120,8 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// 重複会社情報をチェック
         /// </summary>
-        /// <param name="companyCode"></param>
-        /// <param name="databaseName"></param>
+        /// <param name="companyCode">会社コード</param>
+        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
         public static bool IsDuplicateMCompanyByCompanyCode(int companyCode, string databaseName)
         {
@@ -157,6 +157,46 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
+        /// 重複会社情報をチェック
+        /// </summary>
+        /// <param name="companyCode">会社コード</param>
+        /// <param name="companyId">会社ID</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static bool IsDuplicateEditMCompanyByCompanyCode(int companyCode, int companyId, string databaseName)
+        {
+            // 戻り値
+            bool isDuplicateValid = false;
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    var sql = CreateSQLToSelectDuplicateEditMCompany(companyCode, companyId);
+
+                    int result = Convert.ToInt32(connection.ExecuteScalar(sql));
+
+                    if (result > 0)
+                    {
+                        isDuplicateValid = true;
+                    }
+                }
+                return isDuplicateValid;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
         /// 重複会社情報取得SQL作成
         /// </summary>
         /// <param name="companyCode">会社コード</param>
@@ -170,6 +210,28 @@ namespace mar_sumaken_web.Commons
                         M_Company
                     WHERE
                         CompanyCode = {companyCode}
+                        AND IsDeleted = 0
+            ";
+
+            return sql;
+        }
+
+        /// <summary>
+        /// 重複会社更新情報取得SQL作成
+        /// </summary>
+        /// <param name="companyCode">会社コード</param>
+        /// <param name="companyId">会社ID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectDuplicateEditMCompany(int companyCode, int companyId)
+        {
+            var sql = $@"
+                    SELECT
+                        COUNT(*)                      
+                    FROM 
+                        M_Company
+                    WHERE
+                        CompanyCode = {companyCode}
+                        AND CompanyID <> {companyId}
                         AND IsDeleted = 0
             ";
 
@@ -217,6 +279,40 @@ namespace mar_sumaken_web.Commons
                     var insertedCount = connection.Execute(companyRegisterSql);
 
                     return insertedCount;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 会社情報更新
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        /// <param name="loginUser">ログインユーザー</param>
+        /// <returns>インサート数</returns>
+        public static int EditMCompany(M_CompanyModel model, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+                    // 会社マスター更新SQL作成
+                    string companyRegisterSql = CreateSQLToEditMCompany(model, sysDate, loginUser.UserName);
+                    // 会社マスター更新
+                    var editedCount = connection.Execute(companyRegisterSql);
+
+                    return editedCount;
                 }
                 catch (Exception)
                 {
@@ -297,6 +393,31 @@ namespace mar_sumaken_web.Commons
                     '{formatCreatedAt}',
                     '{createdBy}'
                 );
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 会社マスター更新SQL作成
+        /// </summary>
+        /// <param name="company">更新情報</param>
+        /// <param name="createAt">システムタイム</param>
+        /// <param name="createBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToEditMCompany(M_CompanyModel company, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+                UPDATE M_Company
+                SET 
+                    CompanyCode = '{company.CompanyCode}',
+                    CompanyKubun = '{company.CompanyKubun}',
+                    CompanyName = '{company.CompanyName}',
+                    ClientName = '{company.ClientName}',
+                    UpdatedAt = '{updatedAt}',
+                    UpdatedBy = '{updatedBy}'
+                WHERE
+                    CompanyID = {company.CompanyID}
+                    and IsDeleted = 0
             ";
             return sql;
         }
