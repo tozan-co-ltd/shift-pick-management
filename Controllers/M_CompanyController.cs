@@ -5,6 +5,7 @@ using mar_sumaken_web.Properties;
 using System.Data;
 using System.Reflection;
 using X.PagedList;
+using System.Data.SqlClient;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -20,11 +21,9 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// 会社マスター画面表示
         /// </summary>
-        public IActionResult Index(M_CompanyModel model)
+        public IActionResult Index()
         {
-            if (model == null)
-                model = new M_CompanyModel();
-
+            M_CompanyModel model = new M_CompanyModel();
             try
             {
                 // ログイン中ユーザー情報取得
@@ -44,6 +43,9 @@ namespace mar_sumaken_web.Controllers
                 IEnumerable<M_CompanyModel> companyList = M_CompanyConnectController.ConnectMCompanys(sql, user.DatabaseName);
 
                 model.M_CompanyList = companyList.ToPagedList();
+
+                // 会社区分リスト取得
+                model.KubunSelectList = Utils.Const_Company_Kubun_List;
 
                 return View(model);
             }
@@ -82,8 +84,6 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
                 ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
                 return View(model);
             }
@@ -122,14 +122,56 @@ namespace mar_sumaken_web.Controllers
                 // 会社マスター登録
                 int insertedCount = M_CompanyConnectController.InsertMCompany(model, user);
 
-                // 更新件数が0の場合はエラーとする
-                if (insertedCount == 0)
+                return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+            }
+        }
+
+        /// <summary>
+        /// 会社マスター更新
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        [HttpPost]
+        public IActionResult Edit(M_CompanyModel model)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+                if (user == null)
                 {
                     // エラーコード：E2011
-                    return NotFound(new { errorMessage = "登録はできませんでした。" });
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
                 }
 
+                // 更新情報をチェック
+                if (!ModelState.IsValid)
+                {
+                    return NotFound(new { errorMessage = "" });
+                }
+
+                // 重複会社情報取をチェック
+                bool isDuplicate = M_CompanyConnectController.IsDuplicateEditMCompanyByCompanyCode(model.CompanyCode, model.CompanyID, user.DatabaseName);
+                if (isDuplicate)
+                {
+                    return NotFound(new { errorMessage = "会社コードが重複しています。" });
+                }
+
+                // 会社マスター更新
+                int editedCount = M_CompanyConnectController.EditMCompany(model, user);
+
                 return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
             }
             catch (Exception)
             {
@@ -158,14 +200,11 @@ namespace mar_sumaken_web.Controllers
                 // 会社マスター削除
                 int deleteAffectedRows = M_CompanyConnectController.DeleteMCompany(companyId, user.DatabaseName);
 
-                // 更新件数が0の場合はエラーとする
-                if (deleteAffectedRows == 0)
-                {
-                    // エラーコード：E2011
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
-
                 return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
             }
             catch (Exception)
             {
