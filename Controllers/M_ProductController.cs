@@ -50,7 +50,6 @@ namespace mar_sumaken_web.Controllers
                 model = new()
                 {
                     ControllerName = "M_Product",
-                    CompanyID = user.CompanyID,
                     MProductList = productList
                 };
                 // 倉庫リスト取得
@@ -60,7 +59,6 @@ namespace mar_sumaken_web.Controllers
                 // 納入先リスト取得
                 model.DeliverySelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_Delivery_ID, user.DatabaseName);
 
-                ViewData["Title"] = model.GetViewTitle();
                 return View(model);
             }
             catch (Exception)
@@ -88,13 +86,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 品番マスター削除
-                bool isDeletedProduct = M_ProductConnectController.DeleteMProduct(productId, user.DatabaseName);
-
-                // 更新件数が0の場合はエラーとする
-                if (!isDeletedProduct)
-                {
-                    return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
-                }
+                M_ProductConnectController.DeleteMProduct(productId, user.DatabaseName);
 
                 return Ok();
             }

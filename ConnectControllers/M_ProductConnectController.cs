@@ -169,10 +169,8 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="productId">品番ID</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns>更新件数</returns>
-        public static bool DeleteMProduct(int productId, string databaseName)
+        public static void DeleteMProduct(int productId, string databaseName)
         {
-            bool deleteFlag = true;
-
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
             // SQLServer接続
@@ -194,7 +192,6 @@ namespace mar_sumaken_web.ConnectControllers
                     // 更新件数が0の場合はエラーとする
                     if (productDeleteCount == 0)
                     {
-                        deleteFlag = false;
                         throw new Exception();
                     }
 
@@ -202,21 +199,13 @@ namespace mar_sumaken_web.ConnectControllers
                     string depoProductDeleteSql = CreateSQLToDeleteRUserDepo(productId);
                     // 倉庫-品番中間テーブル削除
                     int depoProductDelCount = connection.Execute(depoProductDeleteSql, null, transaction);
-                    if (depoProductDelCount == 0)
-                    {
-                        deleteFlag = false;
-                        throw new Exception();
-                    }
                     
                     // トランザクションのコミット
                     transaction.Commit();
-
-                    return deleteFlag;
                 }
                 catch (Exception)
                 {
                     transaction.Rollback();
-                    deleteFlag = false;
                     throw;
                 }
             }
