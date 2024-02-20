@@ -1,11 +1,5 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-
-// ドキュメントが読み込まれたら実行
-$(document).ready(function () {
-    // #sidebarToggle 要素がクリックされたときに、サイドバーの表示/非表示の状態をトグルし、クッキーに保存する
+﻿$(document).ready(function () {
+    // #sidebarToggleがクリックされたときに、サイドバーの表示/非表示の状態をトグルし、クッキーに保存する
     $("#sidebarToggle").click(function () {
         // Sidebar クッキーを削除し、パスをルートに設定
         $.removeCookie("Sidebar", { path: '/' });
@@ -15,6 +9,7 @@ $(document).ready(function () {
 
         // #sidebarToggle 要素に rotateBtn クラスをトグルする
         $("#sidebarToggle").toggleClass("rotateBtn");
+
         // body 要素のクラスを取得
         let $className = $("body").attr("class");
 
@@ -22,7 +17,7 @@ $(document).ready(function () {
         $.cookie("Sidebar", $className, { path: '/' });
     });
 
-    //------------------- DataTables　------------------//
+    //------------------- DataTables ------------------//
     // 日本語表示
     const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
 
@@ -38,7 +33,7 @@ $(document).ready(function () {
         fixedColumns: true,
         scrollCollapse: true
     });
-    //------------------- DataTables　------------------//
+    //--------------------------------------------------------//
 
     // ページ上のすべてのファイル入力にfileselectイベント付与
     $(document).on("change", ":file", function () {
@@ -64,11 +59,23 @@ $(document).ready(function () {
             if (log) alert(log);
         }
     });
+
+    // タイムピッカー
+    $.datetimepicker.setLocale('ja');
+    $('.pickerDate').datetimepicker({
+        format: "Y/m/d",
+        timepicker: false,
+        onShow: function (ct) {
+            this.setOptions({
+                maxDate: jQuery("#end_datetimepicker").val() ? jQuery("#end_datetimepicker").val() : false,
+                formatDate: "Y/m/d"
+            })
+        }
+    });
 });
-//--------------------------------------------------------//
 
 
-//------------------- パスワード変更　------------------//
+//------------------- パスワード変更 ------------------//
 $("#changePasswordForm").submit(function () {
     $(".changePassword .alert-success").css("display", "none");
 });
@@ -97,26 +104,23 @@ $('#eye-login').click(function () {
         $('.input-password .login-text').attr('type', 'password');
     }
 });
+//--------------------------------------------------------//
 
-//------------------- Csv取込　------------------//
+
+//------------------- CSV取込 ------------------//
 function onUploadFile(page) {
 
     // ページの更新を禁止する
     event.preventDefault();
 
-    $("#FailMsg").text("");
-    $('#import-res').empty;
-    $('#import-res').removeClass('text-danger');
+    $('#div-error-message').empty;
 
-    // FormDataオブジェクト利用
     var formData = new FormData(document.querySelector('#' + page + ''));
 
     var fileUpload = document.getElementById('FileUpload');
     if (fileUpload.files.length <= 0) {
-        $('#import-res').text('ファイルが選択されていません。');
-        $("#import-res").show()
-        $("#import-res").addClass('text-danger');
-        $("#ErrorBlock").hide()
+        $('#div-error-message').text('ファイルが選択されていません。');
+        $("#div-error-message").show();
         return false;
     }
 
@@ -124,28 +128,25 @@ function onUploadFile(page) {
     for (var file of formData) {
         if (IsFirst) {
             if (file[1]["size"] <= 0) {
-                $('#import-res').text('ファイルが選択されていません。');
-                $("#import-res").show()
-                $("#import-res").addClass('text-danger');
-                $("#ErrorBlock").hide()
+                $('#div-error-message').text('ファイルが選択されていません。');
+                $("#div-error-message").show();
                 return false;
             }
             else {
-                $("#import-res").hide()
-                $("#ErrorBlock").hide()
+                $("#div-error-message").hide();
                 IsFirst = false;
             }
         }
 
     }
 
-    const dialog = document.getElementById("ImportModel");
+    const dialog = document.getElementById("import-modal");
     if (dialog) {
         dialog.parentNode.removeChild(dialog);
     }
 
     $('body').append(
-        '<div class="modal fade" id="ImportModel" tabindex="-1" role="dialog" aria-labelledby="importModalCenterTitle" aria-hidden="true">' +
+        '<div class="modal fade" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="importModalCenterTitle" aria-hidden="true">' +
         '    <div class="modal-dialog modal-dialog-centered" role="document">' +
         '        <div class="modal-content">' +
         '            <div class="modal-header">' +
@@ -166,23 +167,23 @@ function onUploadFile(page) {
         '</div>'
     );
 
-    $('#ImportModel').modal('show');
+    $('#import-modal').modal('show');
 
-    $('#ImportModel').on('hidden.bs.modal', function (e) {
+    $('#import-modal').on('hidden.bs.modal', function (e) {
         //なし
     });
 
-    $('#ImportModel .btn-secondary').click(function () {
-        $('#ImportModel').modal('hide');
+    $('#import-modal .btn-secondary').click(function () {
+        $('#import-modal').modal('hide');
         return false;
     });
 
-    $('#ImportModel .btn-primary').click(function () {
-        $('#ImportModel').modal('hide');
+    $('#import-modal .btn-primary').click(function () {
+        $('#import-modal').modal('hide');
 
         var importUrl = document.getElementById('import_action_url').value;
 
-        showLoading()
+        showLoading();
         $.ajax({
             url: importUrl,
             method: 'post',
@@ -190,21 +191,18 @@ function onUploadFile(page) {
             processData: false,
             contentType: false
         }).done(function (response) {
-            hideLoading()
+            hideLoading();
             AlertMessage('', '取込', '登録が完了しました。', null, null);
         }).fail(function (jqXHR, textStatus, errorThrown) {
-            hideLoading()
+            hideLoading();
             if (jqXHR.status === 404) {
                 // データが見つからなかった場合
                 var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#div-error-message").hide();
-                $("#import-res").show();
-                $("#import-res").addClass('text-danger');
-                $("#import-res").html(errorMessage);
+                $("#div-error-message").show();
+                $("#div-error-message").html(errorMessage);
             } else {
                 // その他のエラーの場合
-                $("#import-res").addClass('text-danger');
-                $("#import-res").show()
+                $("#div-error-message").show();
                 AlertMessage('bg-danger', 'エラー', 'E3003 サーバーに接続できませんでした。<br> ' + 'HttpRequest : ' + jqXHR.status + '<br> ' + 'textStatus : ' + textStatus, null, null);
             }
             $('#' + page + '')[0].reset();
@@ -236,23 +234,23 @@ function RenderErrorBlock(data) {
 }
 //--------------------------------------------------------//
 
-//------------------- フォール出力　------------------//
+
+//------------------- CSV出力 ------------------//
 async function onExportFile(page) {
     event.preventDefault();
-    $("#ErrorBlock").text("");
-    $('#import-res').text("");
+    $('#div-error-message').text("");
 
     const response = await fetch('' + page + '/ExportFile', {
-        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         },
     });
     var { data, error } = await response.json();
+
     if (error) {
-        //エラー
-        $("#ErrorBlock").show()
-        $("#ErrorBlock").text(error);
+        $("#div-error-message").show();
+        $("#div-error-message").text(error);
     } else {
         var { contentType, fileContents, fileDownloadName } = data;
         {
@@ -270,31 +268,34 @@ function onExportExcelByCondition(page) {
     var endDate = $("#endDate").val();
     formData = { startDate: startDate, endDate: endDate };
     $.ajax({
-        type: 'POST',
         url: '' + page + '/ExportExcel',
+        type: 'post',
         data: formData,
-        success: function (response) {
-            if (response.res == "OK") {
-                var { contentType, fileContents, fileDownloadName } = response.data;
-                {
-                    const link = document.createElement("a");
-                    link.href = `data:${contentType};base64,${fileContents}`;
-                    link.download = fileDownloadName;
-                    link.click();
-                }
-            } else {
-                let html = '<span class="text-danger">' + response.error + '</span>';
-                document.getElementById('ErrorBlock').innerHTML = html;
-            }
-        },
-        error: function (request, status, error) {
-            alert(request.responseText);
+    }).done(function (response) {
+        var { contentType, fileContents, fileDownloadName } = response.data;
+        {
+            const link = document.createElement("a");
+            link.href = `data:${contentType};base64,${fileContents}`;
+            link.download = fileDownloadName;
+            link.click();
+        }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status === 404) {
+            // データが見つからなかった場合
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").show();
+            $("#div-error-message").html(errorMessage);
+        } else {
+            // その他のエラーの場合
+            $("#div-error-message").show();
+            AlertMessage('bg-danger', 'エラー', 'E3003 サーバーに接続できませんでした。<br> ' + 'HttpRequest : ' + jqXHR.status + '<br> ' + 'textStatus : ' + textStatus, null, null);
         }
     });
 }
 //--------------------------------------------------------//
 
-// モーダル表示
+
+//------------------- モーダル表示 ------------------//
 function AlertMessage(type, title, message, isRedirect, urlRedirect) {
     const dialog = document.getElementById("AlertDialogId");
     if (dialog) {
@@ -327,28 +328,9 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect) {
     $('#AlertDialogId .confirm, #AlertDialogId .close').on('click', function () {
         $('#AlertDialogId').modal('hide');
         if (isRedirect)
-            window.location.href = urlRedirect;　// ユーザーマスターへ戻る
+            window.location.href = urlRedirect;
         else
             location.reload();
     });
 }
-//--------------------------------------------------------//
-
-
-
-//------------------- タイムピッカー ------------------//
-$(document).ready(function () {
-    $.datetimepicker.setLocale('ja');
-
-    $('.pickerDate').datetimepicker({
-        format: "Y/m/d",
-        timepicker: false,
-        onShow: function (ct) {
-            this.setOptions({
-                maxDate: jQuery("#end_datetimepicker").val() ? jQuery("#end_datetimepicker").val() : false,
-                formatDate: "Y/m/d"
-            })
-        }
-    });
-});
 //--------------------------------------------------------//
