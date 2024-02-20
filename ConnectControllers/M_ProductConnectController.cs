@@ -704,7 +704,7 @@ namespace mar_sumaken_web.ConnectControllers
         private static string CreateSQLToUpdateMProduct(M_ProductModel product, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
-                UPDATE M_Producta
+                UPDATE M_Product
                 SET 
                     SupplierID = {product.SupplierID},
                     SupplierProductNumber = '{product.SupplierProductNumber}',

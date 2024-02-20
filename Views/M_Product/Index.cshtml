@@ -65,11 +65,11 @@
                             <tr>
                                 <td>
                                     <a class="btn btn-success btn-icon-split ml-1 mr-1"
-                                    onclick="OnEditClick('@item.ProductID')" data-id="@item.ProductID" data-toggle="modal" data-target="#productEditModal">
+                                    onclick="OnEditClick('@item.ProductID')" data-id="@item.ProductID" data-toggle="modal" data-target="#edit-modal">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
                                     <button class="btn btn-danger btn-icon-split"
-                                    onclick="OnDeleteClick('@item.ProductID')" data-id="@item.ProductID" data-toggle="modal" data-target="#productDeleteModal">
+                                    onclick="OnDeleteClick('@item.ProductID')" data-id="@item.ProductID" data-toggle="modal" data-target="#delete-modal">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </td>
@@ -92,100 +92,12 @@
     </div>
 </div>
 
-<!--  Delete Modal-->
-<div class="modal fade" id="productDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="productDeleteModalLabel">削除</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="col-12 col-md-10">
-                    <p id="delete-modal-error-message" class="mt-1 text-danger"></p>
-                </div>
-                <div class="d-flex justify-content-center">
-                    <div class="col-12 col-md-10">
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4">
-                                <label>ID</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteProductId" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4">
-                                <label>仕入先名</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteSupplierName" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4">
-                                <label>仕入先品番</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteSupplierProductNumber" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4">
-                                <label>納入先名</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteDeliveryName" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4">
-                                <label>納入先品番</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteDeliveryProductNumber" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4">
-                                <label>品名</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteProductName" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4">
-                                <label>収容数</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteLotQuantity" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
-                            <button class="btn btn-danger btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteDelete()">
-                                <span class="text" style="min-width:84px">削除</span>
-                            </button>
-                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
-                                <span class="text">キャンセル</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
-
 <!--  Edit Modal-->
-<div class="modal fade" id="productEditModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="productEditModalLabel">修正</h5>
+                <h5 class="modal-title" id="edit-modalLabel">修正</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -301,6 +213,94 @@
     </div>
 </div>
 
+<!--  Delete Modal-->
+<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete-modalLabel">削除</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-10">
+                    <p id="delete-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="col-12 col-md-10">
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>ID</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteProductId" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>仕入先名</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteSupplierName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>仕入先品番</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteSupplierProductNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>納入先名</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteDeliveryName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>納入先品番</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteDeliveryProductNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>品名</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteProductName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>収容数</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteLotQuantity" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
+                            <button class="btn btn-danger btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteDelete()">
+                                <span class="text" style="min-width:84px">削除</span>
+                            </button>
+                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
+                                <span class="text">キャンセル</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     // 編集ボタン押下
     function OnEditClick(productID) {
@@ -356,20 +356,20 @@
                 method: "POST",
                 data: formData
             })
-                .done(function (response) {
-                    $('#productEditModal').hide();
-                    // 完了モーダル表示
-                    AlertMessage('', '完了', '登録が完了しました。', null, null);
-                })
-                .fail(function (xhr, textStatus, errorThrown) {
-                    if (xhr.status === 404) {
-                        var errorMessage = xhr.responseJSON.errorMessage;
-                        $("#edit-modal-error-message").text(errorMessage);
-                    } else {
-                        var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
-                        $("#edit-modal-error-message").text(errorMessage500);
-                    }
-                });
+            .done(function (response) {
+                $('#edit-modal').hide();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録完了しました。', null, null);
+            })
+            .fail(function (xhr, textStatus, errorThrown) {
+                if (xhr.status === 404) {
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                } else {
+                    var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
+                    $("#edit-modal-error-message").text(errorMessage500);
+                }
+            });
         });
     }
 
@@ -379,9 +379,8 @@
 
         // M_ProductModel取得
         var productModel = @Html.Raw(Json.Serialize(Model));
-        // 会社IDが一致する情報のみ取得
+
         productModel.mProductList.forEach(function (item) {
-            // 会社IDが一致する情報のみ取得
             if (item.productID == productID) {
                 $("#deleteProductId").val(item.productID);
                 $("#deleteSupplierName").val(item.supplierName);
@@ -410,21 +409,20 @@
             method: "POST",
             data: formData
         })
-            .done(function (data) {
-                // 完了モーダル表示
-                $('#productDeleteModal').modal('hide');
-                $('#productDeleteModal').hide();
-                AlertMessage('', '完了', '削除が完了しました。', null, null);
-            })
-            .fail(function (xhr, textStatus, errorThrown) {
-                if (xhr.status === 404) {
-                    var errorMessage = xhr.responseJSON.errorMessage;
-                    $("#delete-modal-error-message").text(errorMessage);
-                } else {
-                    var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
-                    $("#delete-modal-error-message").text(errorMessage500);
-                }
-            });
+        .done(function (data) {
+            // 完了モーダル表示
+            $('#delete-modal').hide();
+            AlertMessage('', '完了', '登録完了しました。', null, null);
+        })
+        .fail(function (xhr, textStatus, errorThrown) {
+            if (xhr.status === 404) {
+                var errorMessage = xhr.responseJSON.errorMessage;
+                $("#delete-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
+                $("#delete-modal-error-message").text(errorMessage500);
+            }
+        });
     }
 
     // 使用倉庫名空欄チェック
@@ -456,9 +454,11 @@
 
     // エラーメッセージ削除
     function DeleteErrorMessages() {
+        $('#div-error-message').text('');
         $('#edit-modal-error-message').text('');
         $('#delete-modal-error-message').text('');
         $('#depoProductErrorMsg').text('');
+        $('.text-danger').text('');
         $('input').removeClass('input-validation-error');
     }
 

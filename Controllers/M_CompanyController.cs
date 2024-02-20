@@ -5,6 +5,7 @@ using mar_sumaken_web.Properties;
 using System.Data;
 using System.Reflection;
 using X.PagedList;
+using System.Data.SqlClient;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -83,8 +84,6 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
                 ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
                 return View(model);
             }
@@ -123,14 +122,11 @@ namespace mar_sumaken_web.Controllers
                 // 会社マスター登録
                 int insertedCount = M_CompanyConnectController.InsertMCompany(model, user);
 
-                // 更新件数が0の場合はエラーとする
-                if (insertedCount == 0)
-                {
-                    // エラーコード：E2011
-                    return NotFound(new { errorMessage = "登録はできませんでした。" });
-                }
-
                 return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
             }
             catch (Exception)
             {
@@ -171,14 +167,11 @@ namespace mar_sumaken_web.Controllers
                 // 会社マスター更新
                 int editedCount = M_CompanyConnectController.EditMCompany(model, user);
 
-                // 更新件数が0の場合はエラーとする
-                if (editedCount == 0)
-                {
-                    // エラーコード：E2011
-                    return NotFound(new { errorMessage = "更新はできませんでした。" });
-                }
-
                 return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
             }
             catch (Exception)
             {
@@ -207,14 +200,11 @@ namespace mar_sumaken_web.Controllers
                 // 会社マスター削除
                 int deleteAffectedRows = M_CompanyConnectController.DeleteMCompany(companyId, user.DatabaseName);
 
-                // 更新件数が0の場合はエラーとする
-                if (deleteAffectedRows == 0)
-                {
-                    // エラーコード：E2011
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
-
                 return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
             }
             catch (Exception)
             {

@@ -2,9 +2,11 @@
 using mar_sumaken_web.Commons;
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
+using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
+using System.Data.SqlClient;
 using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
@@ -57,6 +59,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception)
             {
+                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
                 return View();
             }
         }
@@ -107,6 +110,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception)
             {
+                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
                 return View();
             }
         }
@@ -161,18 +165,15 @@ namespace mar_sumaken_web.Controllers
                 // ユーザーマスター登録
                 bool isInsertMuser = M_UserConnectController.InsertMUser(model, user);
 
-                // 更新件数が0の場合はエラーとする
-                if (!isInsertMuser)
-                {
-                    // エラーコード：E2011
-                    return NotFound(new { errorMessage = "登録はできませんでした。" });
-                }
-
                 return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = "予期せぬエラーが発⽣しました。" });
+                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
             }
         }
 
@@ -269,8 +270,9 @@ namespace mar_sumaken_web.Controllers
 
                 return View(editModel);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
                 return View(editModel);
             }
         }
@@ -326,18 +328,16 @@ namespace mar_sumaken_web.Controllers
                 // ユーザーマスター更新
                 bool isUpdateMuser = await M_UserConnectController.UpdateMUser(model, user);
 
-                // 更新件数が0の場合はエラーとする
-                if (!isUpdateMuser)
-                {
-                    // エラーコード：E2011
-                    return NotFound(new { errorMessage = "更新はできませんでした。" });
-                }
-
                 return Ok();
+            }
+
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = "予期せぬエラーが発⽣しました。" });
+                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
             }
         }
 
@@ -362,18 +362,15 @@ namespace mar_sumaken_web.Controllers
                 // ユーザーマスター削除
                 int deleteAffectedRows = M_UserConnectController.DeleteMUser(userId, user.DatabaseName);
 
-                // 更新件数が0の場合はエラーとする
-                if (deleteAffectedRows == 0)
-                {
-                    // エラーコード：E2011
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
-
                 return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = "予期せぬエラーが発⽣しました。" });
+                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
             }
         }
 
