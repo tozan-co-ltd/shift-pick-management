@@ -321,6 +321,7 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect) {
         '</div>');
 
     $('#AlertDialogId').modal({ backdrop: 'static' });
+    $('.modal-backdrop').css({ 'opacity': '0.1' });
     $('#AlertDialogId').modal('show');
     
     $('#AlertDialogId .confirm, #AlertDialogId .close').on('click', function () {

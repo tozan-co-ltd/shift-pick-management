@@ -350,6 +350,10 @@
                 $("#ProductName").val(item.productName);
                 $("#LotQuantity").val(item.lotQuantity);
 
+                // Reset selection
+                for (var i = 0; i < productModel.rDepoProductsRegister.length; i++) {
+                    $("#select-depo-" + i).prop("checked", false);
+                }
                 item.rDepoProducts.forEach(function (depoItem) {
 
                     for (var i = 0; i < productModel.rDepoProductsRegister.length; i++)
@@ -441,6 +445,7 @@
             })
                 .done(function (response) {
                     //$('#mProductForm')[0].reset();
+                    $('#productEditModal').hide();
                     // 完了モーダル表示
                     AlertMessage('', '完了', '登録が完了しました。', null, null);
                 })

@@ -181,6 +181,14 @@
                     <form class="col-md-12" id="mCompanyForm">
                         <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayName("CompanyID")</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="CompanyID" autocomplete="off" readonly>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
                                 <label>@Html.DisplayName("CompanyCode")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-8 column-2nd">
@@ -229,7 +237,6 @@
                                 <span class="text">キャンセル</span>
                             </button>
                         </div>
-                        <input type="hidden" asp-for="CompanyID" value="@Model.CompanyID" />
                     </form>
                 </div>
 
@@ -344,6 +351,7 @@
             })
                 .done(function (response) {
                     //$('#mProductForm')[0].reset();
+                    $('#companytEditModal').hide();
                     // 完了モーダル表示
                     AlertMessage('', '完了', '登録が完了しました。', null, null);
                 })
