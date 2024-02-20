@@ -5,12 +5,6 @@
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 
-<style type="text/css">
-    .btn-register {
-        min-width: 130px !important;
-    }
-</style>
-
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header text-gray-800">
         @ViewData["Title"]
@@ -29,7 +23,7 @@
         <div class="mg-bot-20">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-2">
-                    <a class="btn btn-primary btn-icon-split btn-register" asp-controller="M_Product" asp-action="Register">
+                    <a class="btn btn-primary btn-icon-split" asp-controller="M_Product" asp-action="Register">
                         <span class="icon text-white-50">
                             <i class="fas fa-plus"></i>
                         </span>
@@ -110,7 +104,7 @@
             </div>
             <div class="modal-body">
                 <div class="col-12 col-md-10">
-                    <p id="import-res" class="mt-1"></p>
+                    <p id="delete-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
                     <div class="col-12 col-md-10">
@@ -198,7 +192,7 @@
             </div>
             <div class="modal-body">
                 <div class="col-12 col-md-10">
-                    <p id="edit-res" class="mt-1"></p>
+                    <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
                     <form class="col-md-12" id="mProductForm">
@@ -308,9 +302,81 @@
 </div>
 
 <script type="text/javascript">
+    // 編集ボタン押下
+    function OnEditClick(productID) {
+        DeleteErrorMessages();
+
+        // M_ProductModel取得
+        var productModel = @Html.Raw(Json.Serialize(Model));
+
+        productModel.mProductList.forEach(function (item) {
+            if (item.productID == productID) {
+                $("#ProductID").val(item.productID);
+                $("#SupplierID").val(item.supplierID);
+                $("#SupplierProductNumber").val(item.supplierProductNumber);
+                $("#DeliveryProductNumber").val(item.deliveryProductNumber);
+                $("#ProductName").val(item.productName);
+                $("#LotQuantity").val(item.lotQuantity);
+
+                // チェックボックス表示
+                for (var i = 0; i < productModel.rDepoProductsRegister.length; i++) {
+                    $("#select-depo-" + i).prop("checked", false);
+                }
+                item.rDepoProducts.forEach(function (depoItem) {
+                    for (var i = 0; i < productModel.rDepoProductsRegister.length; i++) {
+                        if (productModel.rDepoProductsRegister[i].value == depoItem.depoID) {
+                            $("#select-depo-" + i).prop("checked", true);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    // 更新
+    function OnExecuteEdit() {
+        $('#mProductForm').submit(function (event) {
+            DeleteErrorMessages();
+
+            // フォーム情報を取得
+            var formData = $('#mProductForm').serializeArray();
+
+            // 使用倉庫名チェック
+            CheckIsSelectedDepoProduct();
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // Ajax
+            $.ajax({
+                url: window.location.origin + '@Url.Action("Edit", "M_Product")',
+                method: "POST",
+                data: formData
+            })
+                .done(function (response) {
+                    $('#productEditModal').hide();
+                    // 完了モーダル表示
+                    AlertMessage('', '完了', '登録が完了しました。', null, null);
+                })
+                .fail(function (xhr, textStatus, errorThrown) {
+                    if (xhr.status === 404) {
+                        var errorMessage = xhr.responseJSON.errorMessage;
+                        $("#edit-modal-error-message").text(errorMessage);
+                    } else {
+                        var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
+                        $("#edit-modal-error-message").text(errorMessage500);
+                    }
+                });
+        });
+    }
 
     // 削除ボタン押下
     function OnDeleteClick(productID) {
+        DeleteErrorMessages();
+
         // M_ProductModel取得
         var productModel = @Html.Raw(Json.Serialize(Model));
         // 会社IDが一致する情報のみ取得
@@ -328,50 +394,9 @@
         });
     }
 
-    // 修正ボタン押下
-    function OnEditClick(productID) {
-        $("#div-error-message").text("");
-        $("#edit-res").text("");
-        $(".text-danger").text("");
-        $('input').removeClass('input-validation-error');
-
-        // M_ProductModel取得
-        var productModel = @Html.Raw(Json.Serialize(Model));
-        // 会社IDが一致する情報のみ取得
-        productModel.mProductList.forEach(function (item) {
-
-            // 会社IDが一致する情報のみ取得
-            if (item.productID == productID) {
-
-                $("#ProductID").val(item.productID);
-                $("#SupplierID").val(item.supplierID);
-                $("#SupplierProductNumber").val(item.supplierProductNumber);
-                $("#DeliveryProductNumber").val(item.deliveryProductNumber);
-                $("#ProductName").val(item.productName);
-                $("#LotQuantity").val(item.lotQuantity);
-
-                // Reset selection
-                for (var i = 0; i < productModel.rDepoProductsRegister.length; i++) {
-                    $("#select-depo-" + i).prop("checked", false);
-                }
-                item.rDepoProducts.forEach(function (depoItem) {
-
-                    for (var i = 0; i < productModel.rDepoProductsRegister.length; i++)
-                    {
-                        if (productModel.rDepoProductsRegister[i].value == depoItem.depoID) {
-                            $("#select-depo-" + i).prop("checked", true);
-                        }
-                    }
-                });
-            }
-        });
-
-    }
-
     // 削除
     function OnExecuteDelete() {
-        $('#div-error-message').text("");
-        $('#import-res').text("");
+        DeleteErrorMessages();
 
         // POSTするデータ
         var productId = document.getElementById('deleteProductId').value;
@@ -391,24 +416,18 @@
                 $('#productDeleteModal').hide();
                 AlertMessage('', '完了', '削除が完了しました。', null, null);
             })
-            .fail(function (xhr) {
+            .fail(function (xhr, textStatus, errorThrown) {
                 if (xhr.status === 404) {
-                    // データが見つからなかった場合
                     var errorMessage = xhr.responseJSON.errorMessage;
-                    $("#div-error-message").hide();
-                    $("#import-res").show();
-                    $("#import-res").addClass('text-danger');
-                    $("#import-res").text("エラー: " + errorMessage);
+                    $("#delete-modal-error-message").text(errorMessage);
                 } else {
-                    // その他のエラーの場合
-                    $("#div-error-message").hide();
-                    $("#import-res").show();
-                    $("#import-res").addClass('text-danger');
-                    $("#import-res").text("削除が失敗しました。");
+                    var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
+                    $("#delete-modal-error-message").text(errorMessage500);
                 }
             });
     }
 
+    // 使用倉庫名空欄チェック
     $(document).ready(function () {
         var checkList = @Html.Raw(Json.Serialize(Model.RDepoProductsRegister));
         for (var i = 0; i < checkList.length; i++) {
@@ -418,58 +437,12 @@
             });
         }
     });
-
-    // 品番マスター修正
-    function OnExecuteEdit() {
-        $('#mProductForm').submit(function (event) {
-            $("#div-error-message").text("");
-            $("#edit-res").text("");
-
-            // フォーム情報を取得する
-            var formData = $('#mProductForm').serializeArray();
-
-            // 使用倉庫名チェック
-            CheckIsSelectedDepoProduct();
-
-            // ページの更新を禁止する
-            event.preventDefault();
-
-            // 送信イベントが他のハンドラーに伝播するのを防ぐ
-            event.stopImmediatePropagation();
-
-            // Ajax call
-            $.ajax({
-                url: window.location.origin + '@Url.Action("Edit", "M_Product")',
-                method: "POST",
-                data: formData
-            })
-                .done(function (response) {
-                    //$('#mProductForm')[0].reset();
-                    $('#productEditModal').hide();
-                    // 完了モーダル表示
-                    AlertMessage('', '完了', '登録が完了しました。', null, null);
-                })
-                .fail(function (xhr) {
-                    if (xhr.status === 404) {
-                        // データが見つからなかった場合
-                        var errorMessage = xhr.responseJSON.errorMessage;
-                        $("#edit-res").addClass('text-danger');
-                        $("#edit-res").text(errorMessage);
-                    } else {
-                        // その他のエラーの場合
-                        $("#edit-res").show();
-                        $("#edit-res").addClass('text-danger');
-                        $("#edit-res").text("登録が失敗しました。");
-                    }
-                });
-        });
-    }
-
-    // 使用倉庫名チェック
     function CheckIsSelectedDepoProduct() {
         $('#depoProductErrorMsg').text('');
+
         var checkList = @Html.Raw(Json.Serialize(Model.RDepoProductsRegister));
         var hasSelectedItem = false;
+        
         for (var i = 0; i < checkList.length; i++) {
             var item = "#select-depo-" + i;
             if ($(item).is(":checked")) {
@@ -479,7 +452,14 @@
         if (!hasSelectedItem) {
             $('#depoProductErrorMsg').text('使用倉庫名は必須項目です。');
         }
+    }
 
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('#depoProductErrorMsg').text('');
+        $('input').removeClass('input-validation-error');
     }
 
 </script>
