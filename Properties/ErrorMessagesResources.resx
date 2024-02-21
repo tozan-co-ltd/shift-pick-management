@@ -126,6 +126,42 @@
   <data name="E1003" xml:space="preserve">
     <value>{0}は半角英数字で正しい値を入力してください。</value>
   </data>
+  <data name="E1004" xml:space="preserve">
+    <value>日付指定に不正な値があります。半角YYYY/MM/DD形式で正しい値を入力してください。</value>
+  </data>
+  <data name="E1005" xml:space="preserve">
+    <value>日付指定に不正な値があります。半角YYYYMMDD形式で正しい値を入力してください。</value>
+  </data>
+  <data name="E1006" xml:space="preserve">
+    <value>時間指定に不正な値があります。半角HH:MM形式で正しい値を入力してください。</value>
+  </data>
+  <data name="E1007" xml:space="preserve">
+    <value>数値指定に不正な値があります。半角数字で正しい値を入力してください。</value>
+  </data>
+  <data name="E1008" xml:space="preserve">
+    <value>規定の桁数に満たない、または超えている値があります。正しい値を入力してください。</value>
+  </data>
+  <data name="E1009" xml:space="preserve">
+    <value>この{0}は既に存在するため登録できません。</value>
+  </data>
+  <data name="E1010" xml:space="preserve">
+    <value>{0}が品番マスターに存在しません。</value>
+  </data>
+  <data name="E1011" xml:space="preserve">
+    <value>{0}が会社マスターに存在しません。</value>
+  </data>
+  <data name="E1012" xml:space="preserve">
+    <value>ファイルが選択されていません。</value>
+  </data>
+  <data name="E1013" xml:space="preserve">
+    <value>CSV形式でないファイルが含まれているため登録できません。</value>
+  </data>
+  <data name="E1014" xml:space="preserve">
+    <value>ファイル内にデータがありません。</value>
+  </data>
+  <data name="E1015" xml:space="preserve">
+    <value>アクセス権限がありません。</value>
+  </data>
   <data name="E2001" xml:space="preserve">
     <value>QRコードが正しくありません。正しいQRコードを読み取ってください。</value>
   </data>
@@ -133,7 +169,7 @@
     <value>アプリのバージョンが正しくありません。最新バージョンをダウンロードしてください。</value>
   </data>
   <data name="E2003" xml:space="preserve">
-    <value>{0}データがありません。</value>
+    <value>{0}にデータがありません。</value>
   </data>
   <data name="E2004" xml:space="preserve">
     <value>ログインIDが正しくありません。正しい値を入力してください。</value>
@@ -147,8 +183,8 @@
   <data name="E3003" xml:space="preserve">
     <value>ネットワークに接続できませんでした。</value>
   </data>
-  <data name="E4001" xml:space="preserve">
-    <value>SQLServerでエラーが発生しました。</value>
+  <data name="E3004" xml:space="preserve">
+    <value>データベース処理実行中にエラーが発生しました。</value>
   </data>
   <data name="E9999" xml:space="preserve">
     <value>予期せぬエラーが発生しました。</value>
