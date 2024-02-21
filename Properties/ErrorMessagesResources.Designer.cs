@@ -88,6 +88,114 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
+        ///   日付指定に不正な値があります。半角YYYY/MM/DD形式で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1004 {
+            get {
+                return ResourceManager.GetString("E1004", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   日付指定に不正な値があります。半角YYYYMMDD形式で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1005 {
+            get {
+                return ResourceManager.GetString("E1005", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   時間指定に不正な値があります。半角HH:MM形式で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1006 {
+            get {
+                return ResourceManager.GetString("E1006", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   数値指定に不正な値があります。半角数字で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1007 {
+            get {
+                return ResourceManager.GetString("E1007", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   規定の桁数に満たない、または超えている値があります。正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1008 {
+            get {
+                return ResourceManager.GetString("E1008", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   この{0}は既に存在するため登録できません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1009 {
+            get {
+                return ResourceManager.GetString("E1009", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   {0}が品番マスターに存在しません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1010 {
+            get {
+                return ResourceManager.GetString("E1010", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   {0}が会社マスターに存在しません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1011 {
+            get {
+                return ResourceManager.GetString("E1011", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ファイルが選択されていません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1012 {
+            get {
+                return ResourceManager.GetString("E1012", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   CSV形式でないファイルが含まれているため登録できません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1013 {
+            get {
+                return ResourceManager.GetString("E1013", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ファイル内にデータがありません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1014 {
+            get {
+                return ResourceManager.GetString("E1014", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   アクセス権限がありません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1015 {
+            get {
+                return ResourceManager.GetString("E1015", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   QRコードが正しくありません。正しいQRコードを読み取ってください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E2001 {
@@ -106,7 +214,7 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
-        ///   {0}データがありません。 に類似しているローカライズされた文字列を検索します。
+        ///   {0}にデータがありません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E2003 {
             get {
@@ -151,11 +259,11 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
-        ///   SQLServerでエラーが発生しました。 に類似しているローカライズされた文字列を検索します。
+        ///   データベース処理実行中にエラーが発生しました。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string E4001 {
+        internal static string E3004 {
             get {
-                return ResourceManager.GetString("E4001", resourceCulture);
+                return ResourceManager.GetString("E3004", resourceCulture);
             }
         }
         

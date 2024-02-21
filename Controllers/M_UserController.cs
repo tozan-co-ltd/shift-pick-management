@@ -169,7 +169,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
+                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
@@ -333,7 +333,7 @@ namespace mar_sumaken_web.Controllers
 
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
+                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
@@ -366,7 +366,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E4001 });
+                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
