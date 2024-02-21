@@ -1,4 +1,5 @@
 ﻿using mar_sumaken_web.Models;
+using mar_sumaken_web.Properties;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -25,7 +26,7 @@ namespace mar_sumaken_web.Commons
                 if (!IsCsvFile(csvModel.FileName))
                 {
                     // エラーメッセージ取得
-                    return ("ファイルの形式が正しくありません。", null);
+                    return ("E1013: " + ErrorMessagesResources.E1013, null);
                 };
 
                 // ファイルコピー
@@ -40,14 +41,14 @@ namespace mar_sumaken_web.Commons
                 if (!isValidCsv)
                 {
                     // エラーメッセージ取得
-                    return ("ファイルの内容が正しくありません。", null);
+                    return ("E1014: " + ErrorMessagesResources.E1014, null);
                 }
 
                 return (errorMsg, lines);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 

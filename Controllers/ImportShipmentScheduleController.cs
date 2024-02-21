@@ -38,7 +38,7 @@ namespace mar_sumaken_web.Controllers
                 if (user == null || user.AuthorizedKubun != 1)
                 {
                     // エラーメッセージ取得
-                    return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
                 }
 
                 // SQL作成
@@ -78,7 +78,7 @@ namespace mar_sumaken_web.Controllers
                 if (user == null || user.AuthorizedKubun != 1)
                 {
                     // エラーメッセージ取得
-                    return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
                 }
 
                 // モデルリスト取得
@@ -173,36 +173,31 @@ namespace mar_sumaken_web.Controllers
                         // 登録データが存在するかチェック
                         if (importModelList.Count == 0)
                         {
-                            return NotFound(new { errorMessage = "登録する情報がありません。" });
+                            return NotFound(new { errorMessage = "E1014: " + ErrorMessagesResources.E1014 });
                         }
 
                         // 出荷指示データ書き込み
                         bool insertResult = D_ShipmentScheduleConnectController.InsertDShipmentSchedule(importModelList, DepoID, CompanyID, fileName, user);
                         if (!insertResult)
                         {
-                            return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                            return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
                         }
                     }
                 }
                 else
                 {
-                    return NotFound(new { errorMessage = "該当データがありません。" });
+                    return NotFound(new { errorMessage = "E1012: " + ErrorMessagesResources.E1012 });
                 }
 
                 return Ok();
             }
-            catch (SqlException ex)
+            catch (SqlException)
             {
-                return NotFound(new { errorMessage = ex.Message });
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                // log取得
-                var exceptionMessage = ex.Message;
-                _logger.LogError($"{exceptionMessage} {ErrorMessagesResources.E9999}");
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 

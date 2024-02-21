@@ -1,5 +1,5 @@
-﻿using mar_sumaken_web.Properties;
-﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
+﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
@@ -75,7 +75,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "会社コード")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [RegularExpression(@"[0-9]+")]
+        [RegularExpression(@"[0-9]+", ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? CompanyCode { get; set; }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace mar_sumaken_web.Models
         /// 入荷予定日
         /// </summary>
         [Display(Name = "入荷予定日")]
-        [RegularExpression(@"^(?:\d{4})\/(?:[1-9]|0[1-9]|1[0-2])\/(?:[1-9]|[12]\d|3[01])$")]
+        [RegularExpression(Utils.DateTimeSlashRegex, ErrorMessageResourceName = "E1004", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string ReceiveScheduleDate { get; set; }
 
@@ -97,7 +97,7 @@ namespace mar_sumaken_web.Models
         /// 仕入先品番
         /// </summary>
         [Display(Name = "仕入先品番")]
-        [MaxLength(50)]
+        [MaxLength(50, ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? SupplierProductNumber { get; set; }
 
@@ -105,7 +105,7 @@ namespace mar_sumaken_web.Models
         /// ロット番号
         /// </summary>
         [Display(Name = "ロット番号")]
-        [MaxLength(50)]
+        [MaxLength(50, ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? LotNumber { get; set; }
 
@@ -113,7 +113,7 @@ namespace mar_sumaken_web.Models
         /// 数量
         /// </summary>
         [Display(Name = "数量")]
-        [RegularExpression(@"[0-9]+")]
+        [RegularExpression(@"[0-9]+", ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string Quantity { get; set; }
 
