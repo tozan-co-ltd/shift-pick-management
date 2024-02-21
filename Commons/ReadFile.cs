@@ -52,7 +52,7 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// CSVフィオルを作る
+        /// CSVファイルを作る
         /// </summary>
         /// <param name="dataTable">データテーブル</param>
         /// <param name="filePath">ファイルパス</param>

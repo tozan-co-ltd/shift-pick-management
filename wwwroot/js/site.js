@@ -263,21 +263,31 @@ async function onExportFile(page) {
 }
 
 // 条件あり
-function onExportExcelByCondition(page) {
-    var startDate = $("#startDate").val();
-    var endDate = $("#endDate").val();
-    formData = { startDate: startDate, endDate: endDate };
+function onExportExcelByCondition(page, formData,) {
+
+    for (var pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
+
     $.ajax({
-        url: '' + page + '/ExportExcel',
+        url: '' + page + '/ExportCsv',
         type: 'post',
         data: formData,
+        contentType: false,
+        processData: false,
     }).done(function (response) {
-        var { contentType, fileContents, fileDownloadName } = response.data;
-        {
-            const link = document.createElement("a");
-            link.href = `data:${contentType};base64,${fileContents}`;
-            link.download = fileDownloadName;
-            link.click();
+        if (response.data != null) {
+            var { contentType, fileContents, fileDownloadName } = response.data;
+            {
+                const link = document.createElement("a");
+                link.href = `data:${contentType};base64,${fileContents}`;
+                link.download = fileDownloadName;
+                link.click();
+            }
+        }
+        else {
+            $("#div-error-message").show();
+            $("#div-error-message").html(response.errorMessage);
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         if (jqXHR.status === 404) {
@@ -292,7 +302,7 @@ function onExportExcelByCondition(page) {
         }
     });
 }
-//--------------------------------------------------------//
+//------------------- CSV出力 ------------------//
 
 
 //------------------- モーダル表示 ------------------//

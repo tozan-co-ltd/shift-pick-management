@@ -35,7 +35,7 @@
             <div class="col-16 sp-tablet mb-3">
                 <div class="row mt-10">
                     <div class="col-lg-12">
-                        <form id="searchForm" method="post" asp-controller="D_StoreIn" asp-action="Search">
+                        <form id="searchForm" method="post">
                             <div class="col-8 d-flex justify-content-start align-items-center mb-3  unset-pdl">
                                 <span class="warehouse-name-drs">倉庫名</span>
                                 <div class="selectItem unset-pdl">
@@ -68,7 +68,7 @@
                                         </span>
                                         <span class="text">新規作成</span>
                                     </button>
-                                    <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3">
+                                    <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3" id="export-file-btn">
                                         <span class="icon text-white-50">
                                             <i class="fa-solid fa-file-export"></i>
                                         </span>
@@ -106,6 +106,7 @@
                 </tbody>
             </table>
         </div>
+        <input type="hidden" id="viewTitle" value="@Model.ViewTitle" />
     </div>
 </div>
 
@@ -155,6 +156,33 @@
                     }
                 });
         });
+    });
+
+    // 出力ボタン押下
+    $('#export-file-btn').click(function (event) {
+        // エラーメッセージ削除
+        DeleteErrorMessages();
+        // ページの更新を禁止する
+        event.preventDefault();
+        // 送信イベントが他のハンドラーに伝播するのを防ぐ
+        event.stopImmediatePropagation();
+
+        var searchFormArr = $('#searchForm').serializeArray();
+
+        // フォーム情報を取得する
+        var exportFormData = new FormData();
+        exportFormData.append("searchModel.DepoID", searchFormArr[0].value);
+        exportFormData.append("searchModel.DepoName", $('#SelectedDepoID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.CompanyID", searchFormArr[1].value);
+        exportFormData.append("searchModel.CompanyName", $('#SelectedCompanyID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
+        exportFormData.append("searchModel.SearchEndDate", searchFormArr[3].value);
+
+        // 画面名
+        exportFormData.append("gamenName", $("#viewTitle").val());
+
+        // CSV出力
+        onExportExcelByCondition("D_StoreIn", exportFormData);
     });
 
     // エラーメッセージ削除

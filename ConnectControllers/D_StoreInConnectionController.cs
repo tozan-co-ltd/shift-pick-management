@@ -57,8 +57,8 @@ namespace mar_sumaken_web.ConnectControllers
                 SELECT 
 	                storeIn.StoreInID
                     ,storeIn.DepoID
-                    ,storeIn.CompanyID as SupplierID
-                    ,company.CompanyName as SupplierName
+                    ,storeIn.CompanyID AS SupplierID
+                    ,company.CompanyName AS SupplierName
                     ,storeIn.StoreInDate
                     ,storeIn.SupplierProductNumber
                     ,storeIn.LotNumber

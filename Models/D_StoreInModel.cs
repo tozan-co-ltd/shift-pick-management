@@ -98,6 +98,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 仕入先名
         /// </summary>
+        [Display(Name = "仕入先名")]
         public string? SupplierName { set; get; }
 
         /// <summary>

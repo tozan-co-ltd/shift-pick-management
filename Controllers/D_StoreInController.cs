@@ -1,7 +1,9 @@
-﻿using mar_sumaken_web.ConnectControllers;
+﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
 
@@ -95,7 +97,7 @@ namespace mar_sumaken_web.Controllers
                         </td>
                         <td>{@item.StoreInID}</td>
                         <td>{@item.SupplierName}</td>
-                        <td>{@item.StoreInDate}</td>
+                        <td>{@item.StoreInDate.ToString("yyyy/MM/dd")}</td>
                         <td>{@item.SupplierProductNumber}</td>
                         <td>{@item.LotNumber}</td>
                         <td>{@item.LotQuantity}</td>
@@ -105,7 +107,7 @@ namespace mar_sumaken_web.Controllers
                         <td>{@item.FirstSubProductKey}</td>
                         <td>{@item.SecondSubProductKey}</td>
                         <td>{@item.Remarks}</td>
-                        <td>{@item.CreatedAt.ToString("yyyy/MM/ddHH:mm:ss")}</td>
+                        <td>{@item.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")}</td>
                         <td>{@item.CreatedBy}</td>
                         </tr>";
                     }
@@ -122,6 +124,105 @@ namespace mar_sumaken_web.Controllers
                 var exceptionMessage = ex.Message;
                 return Content(exceptionMessage);
             }
+        }
+
+        /// <summary>
+        /// ファイル出力
+        /// </summary>
+        /// <param name="searchModel">検索モデル</param>
+        /// <param name="gamenName">画面名</param>
+        public JsonResult ExportCsv(SearchConditionModel searchModel, string gamenName)
+        {
+            try
+            {
+                // DataTable作成
+                DataTable searchResult = CreateDataTable();
+
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 管理権限区分が1(管理者)でない場合はエラーとする
+                if (user == null || user.AuthorizedKubun != 1)
+                {
+                    return Json(new { res = "NG", error = ErrorMessagesResources.E9999 });
+                }
+
+                // 検索情報取得SQL作成
+                var sql = D_StoreInConnectionController.CreateSQLToGetDStoreIns(
+                    searchModel.SearchStartDate, searchModel.SearchEndDate, searchModel.DepoID, searchModel.CompanyID);
+                // 検索情報取得
+                List<D_StoreInModel> searchList = D_StoreInConnectionController.ConnectDStoreIns(sql, user.DatabaseName);
+                if (searchList.Count > 0)
+                {
+                    foreach (D_StoreInModel item in searchList)
+                    {
+                        DataRow newRow = searchResult.NewRow();
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("StoreInID")] = item.StoreInID.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("SupplierName")] = item.SupplierName;
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("StoreInDate")] = item.StoreInDate.ToString("yyyy/MM/dd");
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("SupplierProductNumber")] = item.SupplierProductNumber;
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("LotNumber")] = item.LotNumber;
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("LotQuantity")] = item.LotQuantity.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("Quantity")] = item.Quantity.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("NumberOfBoxes")] = item.NumberOfBoxes.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("MainProductKey")] = item.MainProductKey;
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("FirstSubProductKey")] = item.FirstSubProductKey;
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("SecondSubProductKey")] = item.SecondSubProductKey;
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("Remarks")] = item.Remarks;
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("CreatedAt")] = item.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss");
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("CreatedBy")] = item.CreatedBy;
+
+                        searchResult.Rows.Add(newRow);
+                    }
+                }
+
+                // ファイル名作成
+                string fileName = CreateFileController.CreateFileName(searchModel, gamenName);
+
+                // CSVファイルへのパスを作成する
+                string filePath = Path.Combine(Path.GetTempPath(), fileName);
+
+                // DataTableをCSV形式の文字列に変換
+                CreateFileController.ConvertDataTableToCsv(searchResult, filePath);
+
+                // ファイルの作成
+                var fileResult = System.IO.File.ReadAllBytes(filePath);
+
+                return Json(new { data = File(fileResult, System.Net.Mime.MediaTypeNames.Application.Octet, fileName) });
+            }
+            catch (SqlException)
+            {
+                return Json(new { errorMessage = ErrorMessagesResources.E4001 });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { errorMessage = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// テーブルを作る
+        /// </summary>
+        private static DataTable CreateDataTable()
+        {
+            var table = new DataTable();
+
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("StoreInID"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("SupplierName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("StoreInDate"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("SupplierProductNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("LotNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("LotQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("Quantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("NumberOfBoxes"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("MainProductKey"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("FirstSubProductKey"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("SecondSubProductKey"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("Remarks"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("CreatedAt"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreInModel>("CreatedBy"), typeof(string));
+
+            return table;
         }
     }
 }
