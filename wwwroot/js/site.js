@@ -246,11 +246,11 @@ async function onExportFile(page) {
             'Content-Type': 'application/json'
         },
     });
-    var { data, error } = await response.json();
+    var { data, errorMessage } = await response.json();
 
-    if (error) {
+    if (errorMessage) {
         $("#div-error-message").show();
-        $("#div-error-message").text(error);
+        $("#div-error-message").text(errorMessage);
     } else {
         var { contentType, fileContents, fileDownloadName } = data;
         {
