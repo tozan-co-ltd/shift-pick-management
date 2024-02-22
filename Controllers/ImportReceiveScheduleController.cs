@@ -65,6 +65,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public async Task<IActionResult> ImportCsv(List<IFormFile> FileUpload, int DepoID, string GamenName)
         {
+            string tempFilePath = string.Empty;
             try
             {
                 // log取得
@@ -103,10 +104,13 @@ namespace mar_sumaken_web.Controllers
                             };
 
                             // CSVファイルデータ読み取り
-                            var (readCsvErrorMsg, lines) = await ReadFile.ReadCsv(csvInputFile, GamenName, user.UserID);
+                            var (readCsvErrorMsg, lines, newFilePath) = await ReadFile.ReadCsv(csvInputFile, GamenName);
+                            tempFilePath = newFilePath;
 
                             if (!string.Empty.Equals(readCsvErrorMsg))
                             {
+                                //ファイルを削除
+                                ReadFile.DeleteFile(tempFilePath);
                                 // エラーメッセージ取得
                                 return NotFound(new { errorMessage = readCsvErrorMsg });
                             }
@@ -137,8 +141,8 @@ namespace mar_sumaken_web.Controllers
                                     if (companyId == -1)
                                     {
                                         isValid = false;
-                                        var msg = string.Format(ErrorMessagesResources.E1011, Utils.GetDisplayName<D_ReceiveScheduleModel>("CompanyCode"));
-                                        validationResults.Add(new ValidationResult(msg));
+                                        var message = string.Format(ErrorMessagesResources.E1011, Utils.GetDisplayName<D_ReceiveScheduleModel>("CompanyCode"));
+                                        validationResults.Add(new ValidationResult(message, new List<string> { "CompanyCode" }));
                                     }
                                     receiveSchedule.CompanyID = companyId;
 
@@ -147,8 +151,8 @@ namespace mar_sumaken_web.Controllers
                                     if (!isExistProduct)
                                     {
                                         isValid = false;
-                                        var msg = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
-                                        validationResults.Add(new ValidationResult(msg));
+                                        var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
+                                        validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
                                     }
 
                                     // エラーメッセージを追加
@@ -156,8 +160,19 @@ namespace mar_sumaken_web.Controllers
                                     {
                                         foreach(var err in validationResults)
                                         {
-                                            var msg = readCount + "行目" + "　" + err.ErrorMessage;
-                                            errorMessageList.Add(msg);
+                                            // フォーマットエラーメッセージ
+                                            List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ReceiveScheduleModel>(err);
+                                            errorMessageItem.Insert(0, readCount + "行目");
+                                            
+                                            //HTMLに変換
+                                            var errorHtml = string.Empty;
+                                            foreach(var item in errorMessageItem)
+                                            {
+                                                errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
+                                            }
+                                            errorHtml = "<tr>" + errorHtml + "</tr>";
+
+                                            errorMessageList.Add(errorHtml);
                                         }
                                     }
                                     // リストに項目を追加
@@ -170,6 +185,8 @@ namespace mar_sumaken_web.Controllers
                         // エラーが1件以上ある場合はreturn
                         if (errorMessageList.Count > 0)
                         {
+                            //ファイルを削除
+                            ReadFile.DeleteFile(tempFilePath);
                             var errorMessage = string.Join("</br>", errorMessageList);
                             return NotFound(new { errorMessage });
                         }
@@ -178,6 +195,8 @@ namespace mar_sumaken_web.Controllers
                         bool insertResult = D_ReceiveScheduleConnectController.InsertDReceiveSchedule(importModelList, DepoID, fileName, user);
                         if (!insertResult)
                         {
+                            //ファイルを削除
+                            ReadFile.DeleteFile(tempFilePath);
                             return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
                         }
                     }
@@ -191,10 +210,14 @@ namespace mar_sumaken_web.Controllers
             }
             catch (SqlException)
             {
+                //ファイルを削除
+                ReadFile.DeleteFile(tempFilePath);
                 return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
+                //ファイルを削除
+                ReadFile.DeleteFile(tempFilePath);
                 return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
