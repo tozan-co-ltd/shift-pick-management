@@ -41,11 +41,17 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
                 }
 
+                string controllerName = ControllerContext.ActionDescriptor.ControllerName;
+                var commonModel = new CommonModel()
+                {
+                    ControllerName = controllerName,
+                    CompanyID = user.CompanyID
+                };
                 // SQL作成
-                var sql = D_FileImportConnectController.CreateSQLToGetD_FileImport("出荷指示取込");
+                var sql = D_FileImportConnectController.CreateSQLToGetDFileImport(commonModel.GetViewTitle());
 
                 // DB接続
-                List<D_FileImportModel> listD_FileImport = D_FileImportConnectController.ConnectD_FileImport(sql, user.DatabaseName);
+                List<D_FileImportModel> listD_FileImport = D_FileImportConnectController.ConnectDFileImport(sql, user.DatabaseName);
 
                 model.D_FileImportList = listD_FileImport;
 
@@ -122,34 +128,40 @@ namespace mar_sumaken_web.Controllers
                                     SelectedDepoID = DepoID,
                                     SelectedCompanyID = CompanyID
                                 };
+                                var validationContext = new ValidationContext(shipmentSchedule);
+                                var validationResults = new List<ValidationResult>();
 
                                 // 読み取りデータをモデルに設定
                                 shipmentSchedule = SetReadDataInModel(shipmentSchedule, lines, readCount);
 
-                                // 納入先品番で仕入先品番を取得
-                                // 品番マスターに登録されている品番の行のみ取り込まれます。登録されていない品番の行はスキップします。
-                                var product = M_ProductConnectController.GeProductByDeliveryProductNumber(
-                                    shipmentSchedule.SelectedCompanyID,  shipmentSchedule.DeliveryProductNumber, user.DatabaseName
-                                );
-                                if (product == null)
-                                {
-                                    readCount++;
-                                    continue;
-                                }
-                                shipmentSchedule.SupplierProductNumber = product.SupplierProductNumber;
-
-                                // 倉庫-品番中間テーブルチェック
-                                bool isExist = M_ProductConnectController.IsExistRDepoProduct(product.ProductID, DepoID, user.DatabaseName);
-                                if (!isExist)
-                                {
-                                    readCount++;
-                                    continue;
-                                }
-
                                 // 出荷指示データチェック
-                                var validationContext = new ValidationContext(shipmentSchedule);
-                                var validationResults = new List<ValidationResult>();
                                 bool isValid = Validator.TryValidateObject(shipmentSchedule, validationContext, validationResults, true);
+                                List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
+
+                                // 納入先品番チェック
+                                bool isContainDeliveryProductNumber = errorMembers.Contains("DeliveryProductNumber");
+                                if (!isContainDeliveryProductNumber)
+                                {
+                                    // 納入先品番で仕入先品番を取得
+                                    // 品番マスターに登録されている品番の行のみ取り込まれます。登録されていない品番の行はスキップします。
+                                    var product = M_ProductConnectController.GetProductByDeliveryProductNumber(
+                                        shipmentSchedule.SelectedCompanyID, shipmentSchedule.DeliveryProductNumber, user.DatabaseName
+                                    );
+                                    if (product == null)
+                                    {
+                                        readCount++;
+                                        continue;
+                                    }
+                                    shipmentSchedule.SupplierProductNumber = product.SupplierProductNumber;
+
+                                    // 倉庫-品番中間テーブルチェック
+                                    bool isExist = M_ProductConnectController.IsExistRDepoProduct(product.ProductID, DepoID, user.DatabaseName);
+                                    if (!isExist)
+                                    {
+                                        readCount++;
+                                        continue;
+                                    }
+                                }
 
                                 // エラーメッセージを追加
                                 if (!isValid)

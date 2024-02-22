@@ -195,7 +195,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="deliveryId">納入先品番ID</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static M_ProductModel? GeProductByDeliveryProductNumber(int deliveryId, string? deliveryProductNumber, string databaseName)
+        public static M_ProductModel? GetProductByDeliveryProductNumber(int deliveryId, string? deliveryProductNumber, string databaseName)
         {
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);

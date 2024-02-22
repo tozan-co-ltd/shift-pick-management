@@ -42,11 +42,17 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
                 }
 
+                string controllerName = ControllerContext.ActionDescriptor.ControllerName;
+                var commonModel = new CommonModel()
+                {
+                    ControllerName = controllerName,
+                    CompanyID = user.CompanyID
+                };
                 // SQL作成
-                var sql = D_FileImportConnectController.CreateSQLToGetD_FileImport("入荷予定取込");
+                var sql = D_FileImportConnectController.CreateSQLToGetDFileImport(commonModel.GetViewTitle());
 
                 // DB接続
-                List<D_FileImportModel> listD_FileImport = D_FileImportConnectController.ConnectD_FileImport(sql, user.DatabaseName);
+                List<D_FileImportModel> listD_FileImport = D_FileImportConnectController.ConnectDFileImport(sql, user.DatabaseName);
 
                 model.D_FileImportList = listD_FileImport;
 
@@ -135,24 +141,35 @@ namespace mar_sumaken_web.Controllers
                                     var validationContext = new ValidationContext(receiveSchedule);
                                     var validationResults = new List<ValidationResult>();
                                     bool isValid = Validator.TryValidateObject(receiveSchedule, validationContext, validationResults, true);
-
-                                    // 会社コードで会社IDを取得
-                                    var companyId = M_CompanyConnectController.GetCompanyIdByCompanyCode(receiveSchedule.CompanyCode, user.DatabaseName);
-                                    if (companyId == -1)
+                                    List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
+                                    
+                                    // 会社コードチェック
+                                    bool isContainCompanyCode = errorMembers.Contains("CompanyCode");
+                                    if (!isContainCompanyCode)
                                     {
-                                        isValid = false;
-                                        var message = string.Format(ErrorMessagesResources.E1011, Utils.GetDisplayName<D_ReceiveScheduleModel>("CompanyCode"));
-                                        validationResults.Add(new ValidationResult(message, new List<string> { "CompanyCode" }));
+                                        // 会社コードで会社IDを取得
+                                        var companyId = M_CompanyConnectController.GetCompanyIdByCompanyCode(receiveSchedule.CompanyCode, user.DatabaseName);
+                                        if (companyId == -1)
+                                        {
+                                            isValid = false;
+                                            var message = string.Format(ErrorMessagesResources.E1011, Utils.GetDisplayName<D_ReceiveScheduleModel>("CompanyCode"));
+                                            validationResults.Add(new ValidationResult(message, new List<string> { "CompanyCode" }));
+                                        }
+                                        receiveSchedule.CompanyID = companyId;
                                     }
-                                    receiveSchedule.CompanyID = companyId;
 
-                                    // 仕入先品番で品番チェック
-                                    bool isExistProduct = M_ProductConnectController.CheckMProductExist(receiveSchedule.SupplierProductNumber, user.DatabaseName);
-                                    if (!isExistProduct)
+                                    // 仕入先品番チェック
+                                    bool isContainSupplierProductNumber = errorMembers.Contains("SupplierProductNumber");
+                                    if (!isContainSupplierProductNumber)
                                     {
-                                        isValid = false;
-                                        var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
-                                        validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
+                                        // 仕入先品番で品番チェック
+                                        bool isExistProduct = M_ProductConnectController.CheckMProductExist(receiveSchedule.SupplierProductNumber, user.DatabaseName);
+                                        if (!isExistProduct)
+                                        {
+                                            isValid = false;
+                                            var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
+                                            validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
+                                        }
                                     }
 
                                     // エラーメッセージを追加
