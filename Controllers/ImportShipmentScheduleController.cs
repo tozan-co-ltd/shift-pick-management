@@ -15,7 +15,7 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// ヘッダー列数取得
         /// </summary>
-        public readonly int Header_Column_Count = 50;
+        public readonly int Header_Column_Count = 45;
 
         public ImportShipmentScheduleController(ILogger<ImportShipmentScheduleController> logger)
         {
