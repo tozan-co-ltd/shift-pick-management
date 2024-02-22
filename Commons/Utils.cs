@@ -6,6 +6,22 @@ namespace mar_sumaken_web.Commons
 {
     public static class Utils
     {
+
+        /// <summary>
+        /// 日付チェック（yyyy/MM/dd）Eg:入荷予定日
+        /// </summary>
+        public const string DateTimeSlashRegex = @"^(?:\d{4})\/(?:[1-9]|0[1-9]|1[0-2])\/(?:[1-9]|[12]\d|3[01])$";
+
+        /// <summary>
+        /// 日付チェック（yyyyMMdd）Eg:納入指示日
+        /// </summary>
+        public const string DateTimeNoneSlashRegex = @"^(19\d{2}|[2-9]\d{3}|99999)(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$";
+
+        /// <summary>
+        /// 数字チェック
+        /// </summary>
+        public const string NumberOnlyRegex = @"[0-9]+";
+
         public readonly static string[] DateFormats = { "yyyy/MM/dd", "yyyy/M/d", "yyyy-MM-dd", "yyyy-M-d", "yyyyMMdd" };
 
         public readonly static int Const_Customer_ID = 1; // 得意先
@@ -42,5 +58,32 @@ namespace mar_sumaken_web.Commons
             }
             return displayName;
         }
+
+        /// <summary>
+        /// フォーマットエラーメッセージ
+        /// </summary>
+        /// <param name="validationResult">検証結果</param>
+        public static List<string> FormatValidationErrorMessage<T>(ValidationResult validationResult)
+        {
+            try
+            {
+                List<string> errorItem = new();
+
+                // 列名取得
+                string memberName = validationResult.MemberNames.FirstOrDefault();
+                string checkitemName = GetDisplayName<T>(memberName);
+                errorItem.Add(checkitemName);
+
+                // エラーメッセージ取得
+                string errorMessage = validationResult.ErrorMessage;
+                errorItem.Add(errorMessage);
+
+                return errorItem;
+            }
+            catch (Exception) {
+                throw;
+            }
+        }
+
     }
 }

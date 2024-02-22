@@ -1,4 +1,5 @@
 ﻿using mar_sumaken_web.Models;
+using mar_sumaken_web.Properties;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -12,11 +13,10 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="csvModel">入力モデル</param>
         /// <param name="gamenName">画面名</param>
-        /// <param name="userId">ユーザーID</param>
         /// <returns></returns>
-        public async static Task<(string, List<string[]>?)> ReadCsv(CsvFileInputModel csvModel, string gamenName, int userId)
+        public async static Task<(string, List<string[]>?, string)> ReadCsv(CsvFileInputModel csvModel, string gamenName)
         {
-            var errorMsg = string.Empty;
+            var message = string.Empty;
             var lines = new List<string[]>();
 
             try
@@ -25,12 +25,12 @@ namespace mar_sumaken_web.Commons
                 if (!IsCsvFile(csvModel.FileName))
                 {
                     // エラーメッセージ取得
-                    return ("ファイルの形式が正しくありません。", null);
+                    return ("E1013: " + ErrorMessagesResources.E1013, null, string.Empty);
                 };
 
                 // ファイルコピー
                 // 取込ファイルパス
-                string importFilePath = await CopyFile(csvModel.ImportFile, csvModel.FileName, gamenName, userId);
+                string importFilePath = await CopyFile(csvModel.ImportFile, gamenName);
 
                 // CSVファイルデータ読み取り
                 lines = ReadCsvFile(importFilePath, csvModel.HeaderColumnCount);
@@ -40,14 +40,14 @@ namespace mar_sumaken_web.Commons
                 if (!isValidCsv)
                 {
                     // エラーメッセージ取得
-                    return ("ファイルの内容が正しくありません。", null);
+                    return ("E1014: " + ErrorMessagesResources.E1014, null, importFilePath);
                 }
 
-                return (errorMsg, lines);
+                return (message, lines, importFilePath);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -138,16 +138,15 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// CSVファイル保存 
         /// </summary>
-        /// <param name="fileName">ファイル名</param>
         /// <param name="categoryName">保存フォルダー</param>
         /// <returns>取込ファイルパス</returns>
-        public static string CreateImportFilePath(string fileName, int userId, string categoryName)
+        public static string CreateImportFilePath(string categoryName)
         {
             try
             {
                 // ファイル名(日付_ファイル名)
                 var tmpFileName = string.Concat(
-                    DateTime.Now.ToString("yyyyMMddHHmmssfff"), "_", userId, "_", Path.GetFileName(fileName)
+                    categoryName, "_", DateTime.Now.ToString("yyyyMMddHHmmssfff"), ".csv"
                 );
 
                 // フォルダパス
@@ -217,16 +216,14 @@ namespace mar_sumaken_web.Commons
         /// ファイルコピ
         /// </summary>
         /// <param name="readFile"></param>
-        /// <param name="fileName"></param>
-        /// <param name="userId"></param>
         /// <param name="gamenName"></param>
         /// <returns>ファイルパス</returns>
-        public async static Task<string> CopyFile(IFormFile readFile, string fileName, string gamenName, int userId)
+        public async static Task<string> CopyFile(IFormFile readFile, string gamenName)
         {
             try
             {
                 // 取込ファイルパス
-                string filePath = CreateImportFilePath(fileName, userId, gamenName);
+                string filePath = CreateImportFilePath(gamenName);
 
                 // ファイルコピー
                 using (var stream = new FileStream(filePath, FileMode.Create))
@@ -266,6 +263,9 @@ namespace mar_sumaken_web.Commons
                         return false; // ヘッダーに null または空の要素がある場合、エラー
                 }
 
+                // 空行削除
+                lines.RemoveAll(line => string.IsNullOrWhiteSpace(string.Join("", line)));
+
                 // 行が1つだけ（ヘッダーのみ）の場合、エラー
                 if (lines.Count == 1)
                     return false;
@@ -279,9 +279,6 @@ namespace mar_sumaken_web.Commons
 
                 // ヘッダーの列数を取得する
                 int columnCount = header.Length;
-
-                // 空行削除
-                lines.RemoveAll(line => string.IsNullOrWhiteSpace(string.Join("", line)));
 
                 // 各データ行の列数をチェックする
                 foreach (var line in lines.Skip(1)) // 最初の行（ヘッダー）をスキップして2行目からチェックする
@@ -326,6 +323,26 @@ namespace mar_sumaken_web.Commons
             catch (Exception ex)
             {
                 throw ex; 
+            }
+        }
+
+        /// <summary>
+        /// ファイルを削除
+        /// </summary>
+        /// <param name="filePath">ファイルパス</param>
+        public static void DeleteFile(string filePath)
+        {
+            try
+            {
+
+                if (!string.Empty.Equals(filePath) || File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 

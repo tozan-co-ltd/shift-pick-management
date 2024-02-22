@@ -113,7 +113,7 @@ namespace mar_sumaken_web.Commons
                     dFileImportModel.CreatedBy = user.UserName;
 
                     // SQL作成
-                    string dFileImportInserSql = D_FileImportConnectController.CreateSQLToInsertD_FileImport(dFileImportModel, systemDate, user.UserName);
+                    string dFileImportInserSql = D_FileImportConnectController.CreateSQLToInsertDFileImport(dFileImportModel, systemDate, user.UserName);
                     var insertAffectRows = connection.Execute(dFileImportInserSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
                     if (insertAffectRows == 0)

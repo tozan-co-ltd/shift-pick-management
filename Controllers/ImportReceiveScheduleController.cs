@@ -3,13 +3,9 @@ using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
-using System.Globalization;
-using System.Reflection;
-using System.Transactions;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -43,21 +39,29 @@ namespace mar_sumaken_web.Controllers
                 if (user == null || user.AuthorizedKubun != 1)
                 {
                     // エラーメッセージ取得
-                    return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
                 }
 
+                string controllerName = ControllerContext.ActionDescriptor.ControllerName;
+                var commonModel = new CommonModel()
+                {
+                    ControllerName = controllerName,
+                    CompanyID = user.CompanyID
+                };
                 // SQL作成
-                var sql = D_FileImportConnectController.CreateSQLToGetD_FileImport("入荷予定取込");
+                var sql = D_FileImportConnectController.CreateSQLToGetDFileImport(commonModel.GetViewTitle());
 
                 // DB接続
-                List<D_FileImportModel> listD_FileImport = D_FileImportConnectController.ConnectD_FileImport(sql, user.DatabaseName);
+                List<D_FileImportModel> listD_FileImport = D_FileImportConnectController.ConnectDFileImport(sql, user.DatabaseName);
 
                 model.D_FileImportList = listD_FileImport;
 
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
             }
         }
@@ -69,6 +73,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public async Task<IActionResult> ImportCsv(List<IFormFile> FileUpload, int DepoID, string GamenName)
         {
+            string tempFilePath = string.Empty;
             try
             {
                 // log取得
@@ -83,9 +88,8 @@ namespace mar_sumaken_web.Controllers
                 if (user == null || user.AuthorizedKubun != 1)
                 {
                     // エラーメッセージ取得
-                    return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
                 }
-
 
                 // モデルリスト取得
                 if (files != null && files.Count > 0)
@@ -108,10 +112,13 @@ namespace mar_sumaken_web.Controllers
                             };
 
                             // CSVファイルデータ読み取り
-                            var (readCsvErrorMsg, lines) = await ReadFile.ReadCsv(csvInputFile, GamenName, user.UserID);
+                            var (readCsvErrorMsg, lines, newFilePath) = await ReadFile.ReadCsv(csvInputFile, GamenName);
+                            tempFilePath = newFilePath;
 
                             if (!string.Empty.Equals(readCsvErrorMsg))
                             {
+                                //ファイルを削除
+                                ReadFile.DeleteFile(tempFilePath);
                                 // エラーメッセージ取得
                                 return NotFound(new { errorMessage = readCsvErrorMsg });
                             }
@@ -136,22 +143,35 @@ namespace mar_sumaken_web.Controllers
                                     var validationContext = new ValidationContext(receiveSchedule);
                                     var validationResults = new List<ValidationResult>();
                                     bool isValid = Validator.TryValidateObject(receiveSchedule, validationContext, validationResults, true);
-
-                                    // 会社コードで会社IDを取得
-                                    var companyId = M_CompanyConnectController.GetCompanyIdByCompanyCode(receiveSchedule.CompanyCode, user.DatabaseName);
-                                    if (companyId == -1)
+                                    List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
+                                    
+                                    // 会社コードチェック
+                                    bool isContainCompanyCode = errorMembers.Contains("CompanyCode");
+                                    if (!isContainCompanyCode)
                                     {
-                                        isValid = false;
-                                        validationResults.Add(new ValidationResult("会社コードは正しくありません。"));
+                                        // 会社コードで会社IDを取得
+                                        var companyId = M_CompanyConnectController.GetCompanyIdByCompanyCode(receiveSchedule.CompanyCode, user.DatabaseName);
+                                        if (companyId == -1)
+                                        {
+                                            isValid = false;
+                                            var message = string.Format(ErrorMessagesResources.E1011, Utils.GetDisplayName<D_ReceiveScheduleModel>("CompanyCode"));
+                                            validationResults.Add(new ValidationResult(message, new List<string> { "CompanyCode" }));
+                                        }
+                                        receiveSchedule.CompanyID = companyId;
                                     }
-                                    receiveSchedule.CompanyID = companyId;
 
-                                    // 仕入先品番で品番チェック
-                                    bool isExistProduct = M_ProductConnectController.CheckMProductExist(receiveSchedule.SupplierProductNumber, user.DatabaseName);
-                                    if (!isExistProduct)
+                                    // 仕入先品番チェック
+                                    bool isContainSupplierProductNumber = errorMembers.Contains("SupplierProductNumber");
+                                    if (!isContainSupplierProductNumber)
                                     {
-                                        isValid = false;
-                                        validationResults.Add(new ValidationResult("仕入先品番は正しくありません。"));
+                                        // 仕入先品番で品番チェック
+                                        bool isExistProduct = M_ProductConnectController.CheckMProductExist(receiveSchedule.SupplierProductNumber, user.DatabaseName);
+                                        if (!isExistProduct)
+                                        {
+                                            isValid = false;
+                                            var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
+                                            validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
+                                        }
                                     }
 
                                     // エラーメッセージを追加
@@ -159,8 +179,19 @@ namespace mar_sumaken_web.Controllers
                                     {
                                         foreach(var err in validationResults)
                                         {
-                                            var msg = readCount + "行目" + "　" + err.ErrorMessage;
-                                            errorMessageList.Add(msg);
+                                            // フォーマットエラーメッセージ
+                                            List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ReceiveScheduleModel>(err);
+                                            errorMessageItem.Insert(0, readCount + "行目");
+                                            
+                                            //HTMLに変換
+                                            var errorHtml = string.Empty;
+                                            foreach(var item in errorMessageItem)
+                                            {
+                                                errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
+                                            }
+                                            errorHtml = "<tr>" + errorHtml + "</tr>";
+
+                                            errorMessageList.Add(errorHtml);
                                         }
                                     }
                                     // リストに項目を追加
@@ -173,33 +204,40 @@ namespace mar_sumaken_web.Controllers
                         // エラーが1件以上ある場合はreturn
                         if (errorMessageList.Count > 0)
                         {
+                            //ファイルを削除
+                            ReadFile.DeleteFile(tempFilePath);
                             var errorMessage = string.Join("</br>", errorMessageList);
-                            return NotFound(new { errorMessage = errorMessage });
+                            return NotFound(new { errorMessage });
                         }
 
                         // 入荷予定データ書き込み
                         bool insertResult = D_ReceiveScheduleConnectController.InsertDReceiveSchedule(importModelList, DepoID, fileName, user);
                         if (!insertResult)
                         {
-                            return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                            //ファイルを削除
+                            ReadFile.DeleteFile(tempFilePath);
+                            return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
                         }
                     }
                 }
                 else
                 {
-                    return NotFound(new { errorMessage = "該当データがありません。" });
+                    return NotFound(new { errorMessage = "E1012: " + ErrorMessagesResources.E1012 });
                 }
 
                 return Ok();
             }
-            catch (SqlException ex)
+            catch (SqlException)
             {
-                return NotFound(new { errorMessage = ex.Message });
+                //ファイルを削除
+                ReadFile.DeleteFile(tempFilePath);
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                var exceptionMessage = ex.Message;
-                return NotFound(new { errorMessage = exceptionMessage });
+                //ファイルを削除
+                ReadFile.DeleteFile(tempFilePath);
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 
@@ -240,7 +278,6 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         public JsonResult ExportFile()
         {
-            string? errorMessage;
             try
             {
                 // log取得
@@ -272,7 +309,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception)
             {
-                return Json(new { res = "NG", error = "予期せぬエラーが発⽣しました。" });
+                return Json(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 

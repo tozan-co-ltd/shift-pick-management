@@ -14,7 +14,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns>倉庫マスター情報</returns>
-        public static List<D_FileImportModel> ConnectD_FileImport(string sql, string databaseName)
+        public static List<D_FileImportModel> ConnectDFileImport(string sql, string databaseName)
         {
             // 戻り値
             List<D_FileImportModel> strList = new();
@@ -44,7 +44,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// 出荷指示取込一覧取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetD_FileImport(string menuName)
+        public static string CreateSQLToGetDFileImport(string menuName)
         {
             var sql = $@"
                         SELECT 
@@ -68,7 +68,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="createdAt">システム</param>
         /// <param name="createdBy"></param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToInsertD_FileImport(D_FileImportModel model, DateTime createdAt, string createdBy)
+        public static string CreateSQLToInsertDFileImport(D_FileImportModel model, DateTime createdAt, string createdBy)
         {
             var sql = $@"
                     INSERT INTO D_FileImport

@@ -33,6 +33,19 @@
         fixedColumns: true,
         scrollCollapse: true
     });
+
+    // 作成日時(1列目)降順
+    $('.datatable-createdat-desc').DataTable({
+        "language": {
+            "url": language_url
+        },
+        lengthChange: true,     // 表示件数
+        info: false,            // 総件数
+        scrollX: true,          // 横スクロール可
+        order: [[0, "desc"]],    // 取込日時降順
+        fixedColumns: true,
+        scrollCollapse: true
+    });
     //--------------------------------------------------------//
 
     // ページ上のすべてのファイル入力にfileselectイベント付与
@@ -246,11 +259,11 @@ async function onExportFile(page) {
             'Content-Type': 'application/json'
         },
     });
-    var { data, error } = await response.json();
+    var { data, errorMessage } = await response.json();
 
-    if (error) {
+    if (errorMessage) {
         $("#div-error-message").show();
-        $("#div-error-message").text(error);
+        $("#div-error-message").text(errorMessage);
     } else {
         var { contentType, fileContents, fileDownloadName } = data;
         {
