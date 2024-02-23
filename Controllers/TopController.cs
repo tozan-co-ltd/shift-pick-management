@@ -1,12 +1,18 @@
 ﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
+using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
-    public class TopController : Controller
+    /// <summary>
+    /// トップ画面
+    /// </summary>
+    public class TopController : BaseController
     {
         private readonly ILogger<TopController> _logger;
 
@@ -20,8 +26,26 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         public IActionResult Index()
         {
-            var model = new D_HandyErrorMessageModel.D_HandyErrorMessage();
-            return View(model);
+            D_HandyErrorMessageModel model = new();
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // SQL作成
+                var sql = D_HandyErrorMessageConnectController.CreateSQLToSelectDHandyErrorMessages();
+                // DB接続
+                List<D_HandyErrorMessageModel> DHandyErrorMessageList = D_HandyErrorMessageConnectController.ConnectDHandyErrorMessages(sql, user.DatabaseName);
+                model.D_HandyErrorMessageList = (IPagedList<D_HandyErrorMessageModel>)DHandyErrorMessageList;
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return View(model);
+            }
         }
     }
 }

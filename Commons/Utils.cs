@@ -22,24 +22,38 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         public const string NumberOnlyRegex = @"[0-9]+";
 
+        /// <summary>
+        /// 日付チェック
+        /// </summary>
         public readonly static string[] DateFormats = { "yyyy/MM/dd", "yyyy/M/d", "yyyy-MM-dd", "yyyy-M-d", "yyyyMMdd" };
 
-        public readonly static int Const_Customer_ID = 1; // 得意先
-        public readonly static int Const_Supplier_ID = 2; // 仕入先
-        public readonly static int Const_Delivery_ID = 3; // 納入先
+        /// <summary>
+        /// 得意先
+        /// </summary>
+        public readonly static int Const_CustomerID = 1;
+
+        /// <summary>
+        /// 仕入先
+        /// </summary>
+        public readonly static int Const_SupplierID = 2;
+
+        /// <summary>
+        /// 納入先
+        /// </summary>
+        public readonly static int Const_DeliveryID = 3;
 
         /// <summary>
         /// 会社区分リスト
         /// </summary>
-        public readonly static List<SelectListItem> Const_Company_Kubun_List = new List<SelectListItem>()
+        public readonly static List<SelectListItem> Const_CompanyKubunList = new()
         {
-            new SelectListItem() { Value = "1", Text = "得意先", Selected = false },
-            new SelectListItem() { Value = "2", Text = "仕入先", Selected = false },
-            new SelectListItem() { Value = "3", Text = "納入先", Selected = false }
+            new() { Value = Const_CustomerID.ToString(), Text = "得意先", Selected = false },
+            new() { Value = Const_SupplierID.ToString(), Text = "仕入先", Selected = false },
+            new() { Value = Const_DeliveryID.ToString(), Text = "納入先", Selected = false }
         };
 
         /// <summary>
-        /// プロパティの表示名を取得する
+        /// プロパティの表示名取得
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="propertyName">プロパティ名</param>
@@ -60,7 +74,7 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// フォーマットエラーメッセージ
+        /// フォーマットエラーメッセージ取得
         /// </summary>
         /// <param name="validationResult">検証結果</param>
         public static List<string> FormatValidationErrorMessage<T>(ValidationResult validationResult)

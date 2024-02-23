@@ -6,18 +6,17 @@ using System.Data.SqlClient;
 namespace mar_sumaken_web.ConnectControllers
 {
     /// <summary>
-    /// 倉庫マスター
+    /// 倉庫マスターに関する関数
     /// </summary>
     public static class M_DepoConnectController
     {
-
         /// <summary>
-        /// データベースに接続し、SQL実行
+        /// 倉庫情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
-        /// <returns>倉庫マスター情報</returns>
-        public static List<M_DepoModel> ConnectMDepo(string sql, string databaseName)
+        /// <returns></returns>
+        public static List<M_DepoModel> ConnectMDepos(string sql, string databaseName)
         {
             // 戻り値
             List<M_DepoModel> strList = new();
@@ -55,7 +54,7 @@ namespace mar_sumaken_web.ConnectControllers
                 // SQL作成
                 var sql = CreateSQLToGetMDepoList();
                 // DB接続
-                List<M_DepoModel> userList = ConnectMDepo(sql, databaseName);
+                List<M_DepoModel> userList = ConnectMDepos(sql, databaseName);
                 return userList;
             }
             catch (Exception)

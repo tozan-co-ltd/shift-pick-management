@@ -11,11 +11,11 @@ namespace mar_sumaken_web.Commons
     public static class D_ReceiveScheduleConnectController
     {
         /// <summary>
-        /// データベースに接続し、SQL実行
+        /// 入荷予定情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
-        /// <returns>入荷予定情報</returns>
+        /// <returns></returns>
         public static List<D_ReceiveScheduleModel> ConnectDReceiveSchedules(string sql, string databaseName)
         {
             // 戻り値

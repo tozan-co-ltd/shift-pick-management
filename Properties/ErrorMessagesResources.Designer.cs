@@ -106,7 +106,7 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
-        ///   時間指定に不正な値があります。半角HH:MM形式で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        ///   時間指定に不正な値があります。半角HHMM形式で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1006 {
             get {

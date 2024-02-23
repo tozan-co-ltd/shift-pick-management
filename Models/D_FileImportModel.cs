@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using mar_sumaken_web.Commons;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
@@ -33,13 +34,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 検索会社リスト
         /// </summary>
-        public IEnumerable<SelectListItem> SearchCompanyList
-        {
-            get
-            {
-                return MCompanyList;
-            }
-        }
+        public IEnumerable<SelectListItem> SearchCompanyList { get; set; }
 
         /// <summary>
         /// 選択された会社ID

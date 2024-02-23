@@ -7,6 +7,10 @@ using Dapper;
 
 namespace mar_sumaken_web.Models
 {
+    /// <summary>
+    /// 共通Model
+    /// </summary>
+    /// <remarks>画面表示に必要な情報(ログイン中ユーザーのClaim,メニュー名,検索用倉庫名・会社名)を取得</remarks>
     public class CommonModel
     {
         /// <summary>
@@ -40,7 +44,7 @@ namespace mar_sumaken_web.Models
         public string? ViewTitle { get; set; }
 
         /// <summary>
-        /// カテゴリーイトル
+        /// カテゴリータイトル
         /// </summary>
         public string? CategoryTitle { get; set; }
 
@@ -71,7 +75,6 @@ namespace mar_sumaken_web.Models
             CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();
             MDepoList = GetMDepoList(DataBaseName);
-            MCompanyList = GetMCompanyList(DataBaseName);
         }
 
         /// <summary>
@@ -107,15 +110,13 @@ namespace mar_sumaken_web.Models
                         Controller = ControllerName
                     };
                     categoryTitle = connection.ExecuteScalar<string>(commandText, param);
+                    return categoryTitle;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //DB取得エラー
-                return categoryTitle;
+                throw;
             }
-
-            return categoryTitle;
         }
 
         /// <summary>
@@ -151,15 +152,13 @@ namespace mar_sumaken_web.Models
                         Controller = ControllerName
                     };
                     pageTitle = connection.ExecuteScalar<string>(commandText, param);
+                    return pageTitle;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //DB取得エラー
-                return pageTitle;
+                throw;
             }
-
-            return pageTitle;
         }
 
         /// <summary>
@@ -200,20 +199,19 @@ namespace mar_sumaken_web.Models
                         selectListItem.Add(item);
                     }
                 }
+                return selectListItem;
             }
             catch (Exception)
             {
-                // エラー
+                throw;
             }
-            return selectListItem;
         }
-
 
         /// <summary>
         /// 会社リスト取得
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<SelectListItem> GetMCompanyList(string databaseName)
+        public IEnumerable<SelectListItem> GetMCompanyList(string databaseName, int companyKubun)
         {
             var selectListItem = new List<SelectListItem>();
 
@@ -221,24 +219,22 @@ namespace mar_sumaken_web.Models
             {
                 // SQLServer接続文字列取得
                 var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-                    string commandText = $@"
+                    var sql = $@"
                         SELECT *
                         FROM M_Company
                         WHERE (1=1)
-                            AND CompanyKubun = 3
+                            AND CompanyKubun = {companyKubun}
                             AND IsDeleted = 0
                         ";
-                    var param = new
-                    {
-                        UserID = UserID
-                    };
 
                     var companyList = new List<M_CompanyModel>();
-                    companyList = connection.Query<M_CompanyModel>(commandText, param).ToList();
+                    companyList = connection.Query<M_CompanyModel>(sql).ToList();
 
+                    // 会社名(仕入先名/納入先名)のセレクトボックスに「会社名 - 得意先名」と表示させる
                     foreach (var company in companyList)
                     {
                         var item = new SelectListItem
@@ -249,12 +245,12 @@ namespace mar_sumaken_web.Models
                         selectListItem.Add(item);
                     }
                 }
+                return selectListItem;
             }
             catch (Exception)
             {
-                // エラー
+                throw;
             }
-            return selectListItem;
         }
     }
 }

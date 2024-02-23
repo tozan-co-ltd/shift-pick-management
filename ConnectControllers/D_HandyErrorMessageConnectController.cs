@@ -2,25 +2,24 @@
 using System.Data.SqlClient;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Commons;
-using System.Reflection;
 
 namespace mar_sumaken_web.ConnectControllers
 {
     /// <summary>
-    /// 出庫実績テーブルに関する関数
+    /// ハンディエラーメッセージ実績テーブルに関する関数
     /// </summary>
-    public static class D_StoreOutConnectController
+    public static class D_HandyErrorMessageConnectController
     {
         /// <summary>
-        /// 出庫実績情報取得
+        /// ハンディエラーメッセージ実績情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static List<D_StoreOutModel> ConnectDStoreOuts(string sql, string databaseName)
+        public static List<D_HandyErrorMessageModel> ConnectDHandyErrorMessages(string sql, string databaseName)
         {
             // 戻り値
-            List<D_StoreOutModel> strList = new();
+            List<D_HandyErrorMessageModel> strList = new();
 
             // DB接続
             try
@@ -33,7 +32,7 @@ namespace mar_sumaken_web.ConnectControllers
                     connection.ConnectionString = connectionString;
                     connection.Open();
 
-                    strList = connection.Query<D_StoreOutModel>(sql).ToList();
+                    strList = connection.Query<D_HandyErrorMessageModel>(sql).ToList();
                 }
                 return strList;
             }
@@ -44,21 +43,17 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
-        /// 出庫実績情報取得SQL作成
+        /// ハンディエラーメッセージ実績一覧取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetDStoreOuts(D_StoreOutModel model)
+        public static string CreateSQLToSelectDHandyErrorMessages()
         {
-            string dateSearchStart = model.SearchStartDate + " " + "00:00:00.000";
-            string dateSearchEnd = model.SearchEndDate + " " + "23:59:59.999";
-
             var sql = $@"
-                        SELECT 
-                            *
+                        SELECT *
                         FROM 
-	                        D_StoreOut
-                        WHERE StoreOutDate >= CONVERT(datetime, '{dateSearchStart}') 
-                        AND StoreOutDate <= CONVERT(datetime, '{@dateSearchEnd}');
+	                        D_HandyErrorMessage
+                        WHERE
+                            CreatedAt >= DATEADD(MONTH, -1, GETDATE());
             ";
 
             return sql;

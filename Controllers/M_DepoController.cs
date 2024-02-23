@@ -6,6 +6,9 @@ using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// 倉庫マスター画面
+    /// </summary>
     public class M_DepoController : BaseController
     {
         /// <summary>
@@ -53,7 +56,7 @@ namespace mar_sumaken_web.Controllers
             var sql = M_DepoConnectController.CreateSQLToGetMDepoList();
 
             // DB接続
-            List<M_DepoModel> strList = M_DepoConnectController.ConnectMDepo(sql, databaseName);
+            List<M_DepoModel> strList = M_DepoConnectController.ConnectMDepos(sql, databaseName);
 
             return strList;
         }

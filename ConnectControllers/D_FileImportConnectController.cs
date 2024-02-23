@@ -5,16 +5,18 @@ using mar_sumaken_web.Commons;
 
 namespace mar_sumaken_web.ConnectControllers
 {
+    /// <summary>
+    /// ファイル取込実績テーブルに関する関数
+    /// </summary>
     public static class D_FileImportConnectController
     {
-
         /// <summary>
-        /// データベースに接続し、SQL実行
+        /// ファイル取込実績情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
-        /// <returns>倉庫マスター情報</returns>
-        public static List<D_FileImportModel> ConnectDFileImport(string sql, string databaseName)
+        /// <returns></returns>
+        public static List<D_FileImportModel> ConnectDFileImports(string sql, string databaseName)
         {
             // 戻り値
             List<D_FileImportModel> strList = new();
@@ -41,10 +43,10 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
-        /// 出荷指示取込一覧取得SQL作成
+        /// ファイル取込実績一覧取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetDFileImport(string menuName)
+        public static string CreateSQLToSelectDFileImports(string menuName)
         {
             var sql = $@"
                         SELECT 

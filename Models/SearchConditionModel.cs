@@ -1,7 +1,7 @@
 ﻿namespace mar_sumaken_web.Models
 {
     /// <summary>
-    /// 検索モデル
+    /// ファイル出力用の検索状態モデル
     /// </summary>
     public class SearchConditionModel
     {

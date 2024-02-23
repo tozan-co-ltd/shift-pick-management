@@ -5,14 +5,17 @@ using System.Data.SqlClient;
 
 namespace mar_sumaken_web.ConnectControllers
 {
+    /// <summary>
+    /// ハンディメニューマスターに関する関数
+    /// </summary>
     public class M_HandyMenuConnectController
     {
         /// <summary>
-        /// データベースに接続し、SQL実行
+        /// ハンディメニューマスター情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
-        /// <returns>ハンディメニューマスター情報</returns>
+        /// <returns></returns>
         public static List<M_HandyMenuModel> ConnectMHandyMenu(string sql, string databaseName)
         {
             // 戻り値

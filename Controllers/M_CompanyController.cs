@@ -9,6 +9,9 @@ using System.Data.SqlClient;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// 会社マスター画面
+    /// </summary>
     public class M_CompanyController : BaseController
     {
         private readonly ILogger<M_CompanyController> _logger;
@@ -38,14 +41,13 @@ namespace mar_sumaken_web.Controllers
 
                 // 会社マスター情報取得SQL作成
                 var sql = M_CompanyConnectController.CreateSQLToSelectMCompanys();
-
                 // DB接続
                 IEnumerable<M_CompanyModel> companyList = M_CompanyConnectController.ConnectMCompanys(sql, user.DatabaseName);
 
                 model.M_CompanyList = companyList.ToPagedList();
 
                 // 会社区分リスト取得
-                model.KubunSelectList = Utils.Const_Company_Kubun_List;
+                model.KubunSelectList = Utils.Const_CompanyKubunList;
 
                 return View(model);
             }
@@ -78,7 +80,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 会社区分リスト取得
-                model.KubunSelectList = Utils.Const_Company_Kubun_List;
+                model.KubunSelectList = Utils.Const_CompanyKubunList;
 
                 return View(model);
             }
@@ -193,7 +195,6 @@ namespace mar_sumaken_web.Controllers
 
                 if (user == null || companyId == 0)
                 {
-                    // エラーコード：E2011
                     return NotFound(new { errorMessage = "データが見つかりませんでした。" });
                 }
 
@@ -229,7 +230,6 @@ namespace mar_sumaken_web.Controllers
                 // 管理権限区分が1(管理者)でない場合はエラーとする
                 if (user == null || user.AuthorizedKubun != 1)
                 {
-                    // エラーコード：E2011
                     throw new Exception();
                 }
 
@@ -282,8 +282,9 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// 会社マスターテーブルを作る
+        /// データテーブル作成
         /// </summary>
+        /// <returns></returns>
         private static DataTable CreateDataTable()
         {
             var table = new DataTable();
