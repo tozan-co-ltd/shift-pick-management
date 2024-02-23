@@ -62,7 +62,7 @@
                             <tr>
                                 <td>
                                     <button class="btn btn-secondary btn-icon-split" title="詳細"
-                                            onclick="OnDetailClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#userDetailModal">
+                                            onclick="OnDetailClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#detail-modal">
                                         <i class="fa-solid fa-list"></i>
                                     </button>
                                     <a class="btn btn-success btn-icon-split ml-1 mr-1" title="編集" asp-controller="M_User" asp-action="Edit" asp-route-id="@item.UserID">
@@ -90,11 +90,11 @@
 </div>
 
 <!-- Detail Modal-->
-<div class="modal fade" id="userDetailModal" tabindex="-1" role="dialog" aria-labelledby="userDetailModalLabel" aria-hidden="true">
+<div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-labelledby="detail-modal-label" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="userDetailModalLabel">ユーザーマスター詳細</h5>
+                <h5 class="modal-title" id="detail-modal-label">ユーザーマスター詳細</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -139,7 +139,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="delete-modalLabel">削除</h5>
+                <h5 class="modal-title" id="delete-modal-label">削除</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>

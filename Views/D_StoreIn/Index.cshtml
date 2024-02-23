@@ -82,7 +82,7 @@
             </div>
         </div>
         <div class="mt-3" id="div-table" style="display: none;">
-            <table class="table table-sm stripe hover nowrap datatable-normal" id="dStoreInTable">
+            <table class="table table-sm stripe hover nowrap datatable-normal" id="table-datatable">
                 <thead>
                     <tr>
                         <th></th>
@@ -111,7 +111,7 @@
 </div>
 
 <!--  Delete Modal-->
-<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-target="#delete-modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -208,7 +208,7 @@
 
 <script>
 
-    $(document).ready(function () {
+    // $(document).ready(function () {
     
         // 検索ボタン押下
         $('#search-btn').click(function () {
@@ -230,35 +230,30 @@
                     method: "POST",
                     data: formData
                 })
-                    .done(function (response) {
-                        $("#dStoreInTable tbody").empty();
-                        if (response.htmlContent) {
-                            // HTML更新
-                            $('#dStoreInTable').DataTable().destroy();
-                            $("#div-table").show();
-
-                            $("#dStoreInTable tbody").empty();
-                            $("#dStoreInTable tbody").html(response.htmlContent);
-                            $("#dStoreInTable").DataTable({
-                                "language": {           // 日本語表示
-                                    "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
-                                },
-                                lengthChange: true,     // 表示件数
-                                info: false,            // 総件数
-                                scrollX: true,          // 横スクロール可
-                                order: [[3, "asc"]],    // 仕入先品番昇順
-                            });
-                        }
-                    })
-                    .fail(function (xhr, textStatus, errorThrown) {
-                        if (xhr.status === 404) {
-                            var errorMessage = xhr.responseJSON.errorMessage;
-                            $("#div-error-message").text(errorMessage);
-                        } else {
-                            var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
-                            $("#div-error-message").text(errorMessage500);
-                        }
-                    });
+                .done(function (response) {
+                    $("#table-datatable tbody").empty();
+                        $('#table-datatable').DataTable().destroy();
+                        $("#div-table").show();
+                        $("#table-datatable tbody").html(response);
+                        $("#table-datatable").DataTable({
+                            "language": {           // 日本語表示
+                                "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+                            },
+                            lengthChange: true,     // 表示件数
+                            info: false,            // 総件数
+                            scrollX: true,          // 横スクロール可
+                            order: [[3, "asc"]],    // 仕入先品番昇順
+                        });
+                })
+                .fail(function (xhr, textStatus, errorThrown) {
+                    if (xhr.status === 404) {
+                        var errorMessage = xhr.responseJSON.errorMessage;
+                        $("#div-error-message").text(errorMessage);
+                    } else {
+                            var errorMessage500 = "E3002: サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
+                        $("#div-error-message").text(errorMessage500);
+                    }
+                });
             });
         });
 
@@ -313,24 +308,23 @@
         DeleteErrorMessages();
 
         // POSTするデータ
-        var storeInId = document.getElementById('deleteStoreInId').value;
+        var storeInId = $("#deleteStoreInId").val();
         formData = {
             "storeInId": storeInId
         };
 
         // ajax
         $.ajax({
-            url: window.location.origin + '@Url.Action("Delete", "D_StoreIn")',
             method: "POST",
+            url: window.location.origin + '@Url.Action("Delete", "D_StoreIn")',
             data: formData
         })
-            .done(async function (data) {
+            .done(function (data) {
                 // 完了モーダル表示
                 $('#delete-modal').removeClass('show');
                 $('#delete-modal').hide();
                 AlertMessage('', '完了', '登録完了しました。', null, null, true);
                 await WaitSeconds();
-                //$('#search-btn').click();
                 $('#search-btn').trigger('click');
             })
             .fail(function (xhr, textStatus, errorThrown) {

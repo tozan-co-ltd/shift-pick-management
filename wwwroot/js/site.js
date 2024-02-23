@@ -320,12 +320,12 @@ function onExportExcelByCondition(page, formData,) {
 
 //------------------- モーダル表示 ------------------//
 function AlertMessage(type, title, message, isRedirect, urlRedirect, isNotReload = false) {
-    const dialog = document.getElementById("AlertDialogId");
+    const dialog = document.getElementById("alert-modal");
     if (dialog) {
         dialog.parentNode.removeChild(dialog);
     }
     $('body').append(
-        '<div class="modal fade" id="AlertDialogId" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">' +
+        '<div class="modal fade" id="alert-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">' +
         '  <div class="modal-dialog" role="document">' +
         '    <div class="modal-content">' +
         '      <div class="modal-header ' + type + '">' +
@@ -338,18 +338,19 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect, isNotReload
         '        <p>' + message + '</p > ' +
         '      </div>' +
         '      <div class="modal-footer d-flex flex-wrap justify-content-center">' +
-        '        <button type="button" class="btn btn-accent confirm" data-dismiss="modal">OK</button > ' +
+        '        <button type="button" class="btn btn-accent confirm" data-dismiss="modal">OK</button>' +
         '      </div>' +
         '    </div>' +
         '  </div>' +
-        '</div>');
+        '</div>'
+    );
 
-    $('#AlertDialogId').modal({ backdrop: 'static' });
+    $('#alert-modal').modal({ backdrop: 'static' });
     $('.modal-backdrop').css({ 'opacity': '0.1' });
-    $('#AlertDialogId').modal('show');
+    $('#alert-modal').modal('show');
     
-    $('#AlertDialogId .confirm, #AlertDialogId .close').on('click', function () {
-        $('#AlertDialogId').modal('hide');
+    $('#alert-modal .confirm, #alert-modal .close').on('click', function () {
+        $('#alert-modal').modal('hide');
         $('.modal-backdrop').hide();
 
         if (isNotReload) return;

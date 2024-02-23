@@ -50,20 +50,12 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult SearchData(D_StoreInModel searchModel)
         {
-            D_StoreInModel model = new D_StoreInModel();
+            D_StoreInModel model = new();
             var searchData = string.Empty;
             try
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    // エラーコード：E2011
-                    ViewData["ErrorMessage"] = ErrorMessagesResources.E2001;
-                    return View();
-                }
 
                 // 検索情報をチェック
                 if (!ModelState.IsValid)
@@ -73,7 +65,7 @@ namespace mar_sumaken_web.Controllers
 
                 // 入庫実績情報取得SQL作成
                 var sql = D_StoreInConnectionController.CreateSQLToGetDStoreIns(
-                    searchModel.DateSearchStart, searchModel.DateSearchEnd, searchModel.SelectedDepoID, searchModel.SelectedCompanyID);
+                    searchModel.DateSearchStart, searchModel.DateSearchEnd, searchModel.SelectedDepoID, 2);
                 // DB接続
                 List<D_StoreInModel> storeInList = D_StoreInConnectionController.ConnectDStoreIns(sql, user.DatabaseName);
 
@@ -114,13 +106,7 @@ namespace mar_sumaken_web.Controllers
                     }
                 }
 
-                var response = new
-                {
-                    HtmlContent = searchData,
-                    DataList = model.D_StoreInList
-                };
-
-                return Json(response);
+                return Content(searchData);
             }
             catch (SqlException)
             {
