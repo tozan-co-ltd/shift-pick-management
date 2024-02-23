@@ -11,16 +11,14 @@ namespace mar_sumaken_web.Commons
     public static class WebMenuConnectController
     {
         /// <summary>
-        /// データベースに接続し、SQL実行
+        /// WEBメニューカテゴリー情報取得
         /// </summary>
         /// <param name="sql">SQL</param>
-        /// <param name="CompanyID"></param>
-        /// <param name="categoryID"></param>
         /// <returns></returns>
         public static List<M_WebMenuCategory> ConnectMWebMenuCategory(string sql)
         {
             // 戻り値
-            List<M_WebMenuCategory> menuModels = new();
+            List<M_WebMenuCategory> strList = new();
 
             // DB接続
             try
@@ -35,9 +33,9 @@ namespace mar_sumaken_web.Commons
 
                     var param = new{};
 
-                    menuModels = connection.Query<M_WebMenuCategory>(sql, param).ToList();
+                    strList = connection.Query<M_WebMenuCategory>(sql, param).ToList();
                 }
-                return menuModels;
+                return strList;
             }
             catch (Exception)
             {
@@ -62,7 +60,7 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// データベースに接続し、SQL実行
+        /// WEBメニュー情報取得
         /// </summary>
         /// <param name="sql">SQL</param>
         /// <param name="companyID"></param>
@@ -71,7 +69,7 @@ namespace mar_sumaken_web.Commons
         public static List<M_WebMenu> ConnectMWebMenu(string sql, int companyID, int categoryID)
         {
             // 戻り値
-            List<M_WebMenu> menuModels = new();
+            List<M_WebMenu> strList = new();
 
             // DB接続
             try
@@ -91,9 +89,9 @@ namespace mar_sumaken_web.Commons
                         CategoryID = categoryID
                     };
 
-                    menuModels = connection.Query<M_WebMenu>(sql, param).ToList();
+                    strList = connection.Query<M_WebMenu>(sql, param).ToList();
                 }
-                return menuModels;
+                return strList;
             }
             catch (Exception)
             {

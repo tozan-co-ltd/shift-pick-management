@@ -8,18 +8,21 @@ using System.Reflection;
 
 namespace mar_sumaken_web.ConnectControllers
 {
+    /// <summary>
+    /// 倉庫マスターに関する関数
+    /// </summary>
     public class M_ProductConnectController
     {
         /// <summary>
-        /// データベースに接続し、SQL実行
+        /// 倉庫情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
-        /// <returns>商品情報</returns>
+        /// <returns></returns>
         public static List<M_ProductModel> ConnectMProducts(string sql, string databaseName)
         {
             // 戻り値
-            List<M_ProductModel> productList = new List<M_ProductModel>();
+            List<M_ProductModel> strList = new List<M_ProductModel>();
 
             try
             {
@@ -30,10 +33,10 @@ namespace mar_sumaken_web.ConnectControllers
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-                    productList = connection.Query<M_ProductModel>(sql).ToList();
+                    strList = connection.Query<M_ProductModel>(sql).ToList();
                 }
 
-                return productList;
+                return strList;
             }
             catch (Exception)
             {

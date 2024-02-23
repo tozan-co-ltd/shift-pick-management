@@ -5,15 +5,15 @@ using mar_sumaken_web.Models;
 namespace mar_sumaken_web.Commons
 {
     /// <summary>
-    /// 会社に関する関数
+    /// warehouse_0_masterの会社マスターに関する関数
     /// </summary>
     public static class Warehouse_M_CompanyConnectController
     {
         /// <summary>
-        /// データベースに接続し、SQL実行
+        /// 会社情報取得
         /// </summary>
         /// <param name="sql">SQL</param>
-        /// <returns>ユーザー情報</returns>
+        /// <returns></returns>
         public static Warehouse_M_CompanyModel? ConnectMCompanny(string sql)
         {
             // 戻り値
@@ -31,11 +31,9 @@ namespace mar_sumaken_web.Commons
                     connection.Open();
 
                     companyModels = connection.Query<Warehouse_M_CompanyModel>(sql).ToList();
-                    // 件数をチェック
+                    // 件数チェック
                     if(companyModels.Count != 1)
                     {
-                        // エラーを作成
-                        // エラーコード：E2011
                         throw new Exception();
                     }
                 }
@@ -75,6 +73,5 @@ namespace mar_sumaken_web.Commons
 
             return sql;
         }
-       
     }
 }

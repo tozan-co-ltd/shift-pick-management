@@ -52,10 +52,10 @@ namespace mar_sumaken_web.Controllers
                     CompanyID = user.CompanyID
                 };
                 // SQL作成
-                var sql = D_FileImportConnectController.CreateSQLToGetDFileImport(commonModel.GetViewTitle());
+                var sql = D_FileImportConnectController.CreateSQLToSelectDFileImports(commonModel.GetViewTitle());
 
                 // DB接続
-                List<D_FileImportModel> DFileImportList = D_FileImportConnectController.ConnectDFileImport(sql, user.DatabaseName);
+                List<D_FileImportModel> DFileImportList = D_FileImportConnectController.ConnectDFileImports(sql, user.DatabaseName);
 
                 model.D_FileImportList = DFileImportList;
 

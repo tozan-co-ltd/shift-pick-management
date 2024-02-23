@@ -52,10 +52,10 @@ namespace mar_sumaken_web.Controllers
             try
             {
                 // SQL作成
-                var sql = D_StoreOutConnectController.CreateSQLToGetDStoreOut(model);
+                var sql = D_StoreOutConnectController.CreateSQLToGetDStoreOuts(model);
 
                 // DB接続
-                List<D_StoreOutModel> listD_StoreOut = D_StoreOutConnectController.ConnectD_StoreOut(sql, ClaimsLoginUserData().DatabaseName);
+                List<D_StoreOutModel> listD_StoreOut = D_StoreOutConnectController.ConnectDStoreOuts(sql, ClaimsLoginUserData().DatabaseName);
 
                 // 表示用のhtml作成
                 if (listD_StoreOut.Count > 0)

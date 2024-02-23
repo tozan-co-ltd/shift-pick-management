@@ -15,7 +15,7 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
-        /// <returns>ユーザー情報</returns>
+        /// <returns></returns>
         public static List<M_UserModel> ConnectMUsers(string sql, string databaseName)
         {
             // 戻り値
