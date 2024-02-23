@@ -66,10 +66,13 @@ namespace mar_sumaken_web.Controllers
             }
         }
 
-        // <summary>
-        /// Csv取込
-        /// <param name="FileUpload">ファイル</param>
+        /// <summary>
+        /// CSV取込
         /// </summary>
+        /// <param name="FileUpload"></param>
+        /// <param name="DepoID"></param>
+        /// <param name="GamenName"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> ImportCsv(List<IFormFile> FileUpload, int DepoID, string GamenName)
         {
@@ -112,14 +115,13 @@ namespace mar_sumaken_web.Controllers
                             };
 
                             // CSVファイルデータ読み取り
-                            var (readCsvErrorMsg, lines, newFilePath) = await ReadFile.ReadCsv(csvInputFile, GamenName);
+                            var (readCsvErrorMsg, lines, newFilePath) = await CreateFile.ReadCsv(csvInputFile, GamenName);
                             tempFilePath = newFilePath;
 
                             if (!string.Empty.Equals(readCsvErrorMsg))
                             {
-                                //ファイルを削除
-                                ReadFile.DeleteFile(tempFilePath);
-                                // エラーメッセージ取得
+                                // ファイル削除
+                                CreateFile.DeleteFile(tempFilePath);
                                 return NotFound(new { errorMessage = readCsvErrorMsg });
                             }
 
@@ -174,7 +176,7 @@ namespace mar_sumaken_web.Controllers
                                         }
                                     }
 
-                                    // エラーメッセージを追加
+                                    // エラーメッセージ作成
                                     if (!isValid)
                                     {
                                         foreach(var err in validationResults)
@@ -183,7 +185,7 @@ namespace mar_sumaken_web.Controllers
                                             List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ReceiveScheduleModel>(err);
                                             errorMessageItem.Insert(0, readCount + "行目");
                                             
-                                            //HTMLに変換
+                                            // HTMLに変換
                                             var errorHtml = string.Empty;
                                             foreach(var item in errorMessageItem)
                                             {
@@ -204,8 +206,8 @@ namespace mar_sumaken_web.Controllers
                         // エラーが1件以上ある場合はreturn
                         if (errorMessageList.Count > 0)
                         {
-                            //ファイルを削除
-                            ReadFile.DeleteFile(tempFilePath);
+                            // ファイル削除
+                            CreateFile.DeleteFile(tempFilePath);
                             var errorMessage = string.Join("</br>", errorMessageList);
                             return NotFound(new { errorMessage });
                         }
@@ -214,8 +216,8 @@ namespace mar_sumaken_web.Controllers
                         bool insertResult = D_ReceiveScheduleConnectController.InsertDReceiveSchedule(importModelList, DepoID, fileName, user);
                         if (!insertResult)
                         {
-                            //ファイルを削除
-                            ReadFile.DeleteFile(tempFilePath);
+                            // ファイル削除
+                            CreateFile.DeleteFile(tempFilePath);
                             return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
                         }
                     }
@@ -229,14 +231,14 @@ namespace mar_sumaken_web.Controllers
             }
             catch (SqlException)
             {
-                //ファイルを削除
-                ReadFile.DeleteFile(tempFilePath);
+                // ファイル削除
+                CreateFile.DeleteFile(tempFilePath);
                 return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
-                //ファイルを削除
-                ReadFile.DeleteFile(tempFilePath);
+                // ファイル削除
+                CreateFile.DeleteFile(tempFilePath);
                 return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
@@ -301,7 +303,7 @@ namespace mar_sumaken_web.Controllers
                 // CSVファイルへのパスを作成する
                 string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
                 // DataTableをCSVに変換する
-                ReadFile.ToCSV(dataTable, filePath);
+                CreateFile.ConvertDataTableToCsv(dataTable, filePath);
                 // ファイルの作成
                 var file = System.IO.File.ReadAllBytes(filePath);
 

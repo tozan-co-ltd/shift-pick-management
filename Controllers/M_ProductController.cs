@@ -290,7 +290,7 @@ namespace mar_sumaken_web.Controllers
                 // CSVファイルへのパスを作成する
                 string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
                 // DataTableをCSVに変換する
-                ReadFile.ToCSV(dataTable, filePath);
+                CreateFile.ConvertDataTableToCsv(dataTable, filePath);
                 // ファイルの作成
                 var file = System.IO.File.ReadAllBytes(filePath);
 

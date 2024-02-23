@@ -70,9 +70,7 @@ namespace mar_sumaken_web.Models
                     string userRoleName = "Role" + userRole;
 
                     // WEBメニューリストを取得
-                    var selectMenuList = GetWebMenuList(userRoleName, CompanyID, category);
-
-                    menuList = selectMenuList;
+                    menuList = GetWebMenuList(userRoleName, category);
                 }
                 return menuList;
             }
@@ -85,27 +83,27 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// WEBメニューリストを取得
         /// <param name="userRoleName"></param>
-        /// <param name="companyID"></param>
         /// <param name="mCategory"></param>
         /// </summary>
         /// <returns>WEBメニューリスト</returns>
-        public static List<M_WebMenu> GetWebMenuList(string userRoleName, int companyID, M_WebMenuCategory mCategory)
+        public List<M_WebMenu> GetWebMenuList(string userRoleName, M_WebMenuCategory mWebMenuCategory)
         {
             try
             {
                 List<M_WebMenu> webMenuList = new();
 
-               var categoryID = 0;
+                var categoryID = 0;
 
-                if (mCategory != null)
+                if (mWebMenuCategory != null)
                 {
-                    categoryID = mCategory.CategoryID;
-
-                    // SQL作成
-                    var sql = WebMenuConnectController.CreateSQLToSelectMWebMenu(companyID, userRoleName, categoryID);
-                    // DB接続
-                    webMenuList = WebMenuConnectController.ConnectMWebMenu(sql);
+                    categoryID = mWebMenuCategory.CategoryID;
                 }
+
+                // SQL作成
+                var sql = WebMenuConnectController.CreateSQLToSelectMWebMenu(CompanyID, userRoleName, categoryID);
+                // DB接続
+                webMenuList = WebMenuConnectController.ConnectMWebMenu(sql, CompanyID, categoryID);
+
                 return webMenuList;
             }
             catch (Exception)
