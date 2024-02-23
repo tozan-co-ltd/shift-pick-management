@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using mar_sumaken_web.Models;
+using System.ComponentModel.Design;
 using System.Data.SqlClient;
 
 namespace mar_sumaken_web.Commons
@@ -64,10 +65,10 @@ namespace mar_sumaken_web.Commons
         /// データベースに接続し、SQL実行
         /// </summary>
         /// <param name="sql">SQL</param>
-        /// <param name="CompanyID"></param>
+        /// <param name="companyID"></param>
         /// <param name="categoryID"></param>
         /// <returns></returns>
-        public static List<M_WebMenu> ConnectMWebMenu(string sql)
+        public static List<M_WebMenu> ConnectMWebMenu(string sql, int companyID, int categoryID)
         {
             // 戻り値
             List<M_WebMenu> menuModels = new();
@@ -85,7 +86,9 @@ namespace mar_sumaken_web.Commons
 
                     var param = new
                     {
-                        RoleFlag = 1
+                        CompanyID = companyID,
+                        RoleFlag = 1,
+                        CategoryID = categoryID
                     };
 
                     menuModels = connection.Query<M_WebMenu>(sql, param).ToList();
@@ -101,7 +104,9 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// WEBメニュー取得SQL作成
         /// </summary>
+        /// <param name="companyID"></param>
         /// <param name="userRoleName"></param>
+        /// <param name="categoryID"></param>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectMWebMenu(int companyID, string userRoleName, int categoryID)
         {
@@ -112,13 +117,19 @@ namespace mar_sumaken_web.Commons
                             B.Controller,
                             B.Action
                         FROM M_WebMenu A
-                        LEFT OUTER JOIN M_WebMenuController B ON (A.CategoryID = B.CategoryID) AND (A.MenuID = B.MenuID)
+                        LEFT OUTER JOIN M_WebMenuController B 
+                            ON (A.CategoryID = B.CategoryID)
+                            AND (A.MenuID = B.MenuID)
                         WHERE (1=1)
                             AND (A.CompanyID = {companyID})
-                            AND (A.{userRoleName} = @RoleFlag)
-                            AND (A.CategoryID = {categoryID})
-                        ORDER BY SortNumber ASC
-            ;";
+                            AND (A.{userRoleName} = @RoleFlag)";
+
+            if(categoryID != 0)
+            {
+                sql += $@" AND (A.CategoryID = @CategoryID)";
+            }
+
+            sql += $@" ORDER BY SortNumber ASC;";
 
             return sql;
         }

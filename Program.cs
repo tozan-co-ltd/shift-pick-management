@@ -1,6 +1,8 @@
+using mar_sumaken_web.Filters;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,8 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 // コンテナにサービスを追加
 builder.Services.AddControllersWithViews(options =>
 {
-    //options.Filters.Add(typeof(MyFilter));
-    //options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+    options.Filters.Add(typeof(AccessControlFilter));
+    options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
 });
 
 // セッションの追加
@@ -51,7 +53,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddMvc(options =>
 {
     // グローバルフィルタに承認フィルタを追加
-    // すべてのコントローラでログインが必要にしておく
+    // 全てのコントローラーでログイン必須
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     options.Filters.Add(new AuthorizeFilter(policy));
     options.EnableEndpointRouting = false;
@@ -67,22 +69,23 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
+// HTTPS必須
 app.UseHttpsRedirection();
+// 静的ファイルの提供
 app.UseStaticFiles();
-
+//ルーティング
 app.UseRouting();
-
-// Cookieの原則機能を有効にする
+// Cookie原則機能有効化
 app.UseCookiePolicy();
-// IDを有効にする
+// ID有効化
 app.UseAuthentication();
-//認証機能を有効にします
+// 認証機能有効化
 app.UseAuthorization();
-//これらの3つの前後の順序を逆にすることはできません
+// セッション状態有効化
 app.UseSession();
 app.UseMvc();
 
+// 規則ルーティング
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Top}/{action=Index}/{id?}");

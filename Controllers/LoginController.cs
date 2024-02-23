@@ -1,9 +1,12 @@
 ﻿using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
+using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 using System.Security.Claims;
 
 namespace mar_sumaken_web.Controllers
@@ -13,27 +16,26 @@ namespace mar_sumaken_web.Controllers
     /// </summary>
     public class LoginController : Controller
     {
-        private readonly ILogger<LoginController> _logger;
-
-        public LoginController(ILogger<LoginController> logger)
-        {
-            _logger = logger;
-        }
+        //private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// ログイン画面表示
         /// </summary>
         [AllowAnonymous]
-        public IActionResult Index()
+        public IActionResult Index(string param)
         {
             try
             {
-                ViewData["IsDevelopment"] = null;
-
-                string companyWebPath = GetCompanyWebPathByURL();
+                // 強制ログアウトの場合はエラーメッセージ表示
+                if (param == "autologout")
+                {
+                    ViewData["ErrorMessage"] = "異なるログインを検出したため自動ログアウトされました。";
+                }
 
                 // 開発環境("_test"が含まれている)の場合はViewDataに"true"を代入し、
-                // _LayoutLogin.cshtmlで背景の色を変更する(薄紫#EFEDFF)
+                // _LayoutLogin.cshtmlで背景の色を変更(薄紫#EFEDFF)
+                ViewData["IsDevelopment"] = null;
+                string companyWebPath = GetCompanyWebPathByURL();
                 if (companyWebPath.Contains("_test"))
                 {
                     ViewData["IsDevelopment"] = "true";
@@ -41,39 +43,12 @@ namespace mar_sumaken_web.Controllers
 
                 return View();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                ViewData["ErrorMessage"] = ex;
+                return View();
             }
         }
-
-        /// <summary>
-        /// URLから会社WEBアプリパス取得
-        /// </summary>
-        /// <returns>会社WEBアプリパス</returns>
-        private string GetCompanyWebPathByURL()
-        {
-            string companyWebPath = "";
-            try
-            {
-                // URLからパスを取得(https://www.tozan.co.jp/の直後１つ目のパス)
-                var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
-
-                // 会社WEBアプリパスを取得("sumaken-web-***"の"***"のみ)
-                string pattern = "sumaken-web-";
-
-                int index = urlWebPath.IndexOf(pattern);
-                if (index != -1)
-                {
-                    companyWebPath = urlWebPath.Substring(index + pattern.Length);
-                }
-                return companyWebPath;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-}
 
         /// <summary>
         /// ログイン
@@ -87,7 +62,7 @@ namespace mar_sumaken_web.Controllers
             try
             {
                 // ログインの入力値 チェック
-                LoginUserModel loginUserModel = this.CheckInputValuesForLogin(model);
+                LoginUserModel loginUserModel = CheckInputValuesForLogin(model);
 
                 // エラー入力の場合
                 if (loginUserModel == null)
@@ -97,7 +72,8 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 現在時刻取得
-                string now = DateTime.Now.ToString();
+                var dateTime = DateTime.Now;
+                string timeStamp = dateTime.ToString();
 
                 // クレーム作成
                 // ユーザー情報をクレームに追加する
@@ -112,7 +88,7 @@ namespace mar_sumaken_web.Controllers
                     new Claim("MainDepoID", loginUserModel.MainDepoID.ToString()),
                     new Claim("MainDepoName", loginUserModel.MainDepoName),
                     new Claim("AuthorizedKubun", loginUserModel.AuthorizedKubun.ToString()),
-                    new Claim("TimeStamp", now),
+                    new Claim("TimeStamp", timeStamp),
                 };
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
@@ -132,15 +108,101 @@ namespace mar_sumaken_web.Controllers
                   authProperties
                 );
 
+                // ログインフラグ=1,最終ログイン日時更新
+                // SQL作成
+                var sql = LoginConnectController.CreateSQLToUpdateMUserByLogin(loginUserModel.UserID, dateTime);
+                // DB接続
+                M_UserConnectController.ConnectMUsers(sql, loginUserModel.DatabaseName);
+
                 // log取得
-                _logger.LogInformation($"ログイン成功 ログインユーザー名:{loginUserModel.UserName}");
+                //Logger.Info($"ログイン成功 ログインユーザー名:{mUsersModel.UserName}");
 
                 return RedirectToAction("Index", "Top");
             }
             catch (Exception ex)
             {
-                ViewData["ErrorMessage"] = ex;
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message;
+                ViewData["ErrorMessage"] = errorMessage;
+
+                // log取得
+                //var exceptionMessage = ex.Message;
+                //Logger.Error($"{exceptionMessage} {errorMessage}");
+
                 return View();
+            }
+        }
+
+        /// <summary>
+        /// ログアウト
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> Logout(string param)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var claimsList = User.Claims.ToList();
+
+                // ログインフラグ=0に更新
+                if (claimsList.Count > 0)
+                {
+                    int userID = Convert.ToInt32(User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value);
+                    string databaseName = User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
+
+                    // SQL作成
+                    var sql = LoginConnectController.CreateSQLToUpdateMUserByLogout(userID);
+                    // DB接続
+                    M_UserConnectController.ConnectMUsers(sql, databaseName);
+                }
+
+                // サインアウト
+                // レスポンスから認証クッキーを削除
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // 強制ログアウトの場合はエラーメッセージ表示
+                if (param == "autologout")
+                {
+                    return RedirectToAction("Index", new { param = "autologout" });
+                }
+
+                // ログイン画面へリダイレクト
+                return RedirectToAction("Index");
+            }
+            catch(Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message;
+                ViewData["ErrorMessage"] = errorMessage;
+
+                return RedirectToAction("Index");
+            }
+        }
+
+        /// <summary>
+        /// URLから会社WEBアプリパス取得
+        /// </summary>
+        /// <returns>会社WEBアプリパス</returns>
+        private string GetCompanyWebPathByURL()
+        {
+            string companyWebPath = "";
+            try
+            {
+                // URLからパスを取得(https://www.tozan.co.jp/の直後１つ目のパス)
+                var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
+
+                // 会社WEBアプリパスを取得("sumaken-web-***"の"***"のみ)
+                string pattern = "sumaken-web-";
+
+                int num = urlWebPath.IndexOf(pattern);
+                if (num != -1)
+                {
+                    companyWebPath = urlWebPath.Substring(num + pattern.Length);
+                }
+                return companyWebPath;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
@@ -149,7 +211,7 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         /// <param name="loginModel"></param>
         /// <returns></returns>
-        private LoginUserModel CheckInputValuesForLogin(LoginModel loginModel)
+        private LoginUserModel? CheckInputValuesForLogin(LoginModel loginModel)
         {
             try
             {
@@ -171,11 +233,9 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ログインユーザー情報取得
-                var sql = LoginConnectController.CreateSQLToSelectMUerByLoginUser(loginId);
+                var sql = LoginConnectController.CreateSQLToSelectMUserByLoginUser(loginId);
                 List<M_UserModel> mUsers = M_UserConnectController.ConnectMUsers(sql, mCompany.DatabaseName);
                 M_UserModel? mUser = mUsers.FirstOrDefault();
-                
-                // 一致するデータが無い場合
                 if (mUser == null)
                 {
                     return null;
@@ -185,14 +245,13 @@ namespace mar_sumaken_web.Controllers
                 byte[] salt = Hashing.ConvertStringToBytes(mUser.Salt);
                 string hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(password, salt);
 
-                // パスワードチェック
-                // ハッシュ化されたパスワードと一致するデータが無い場合はエラー
+                // ハッシュ化されたパスワードと一致するかチェック
                 if (!mUser.Password.Equals(hashedPassword))
                 {
                     return null;
                 }
 
-                LoginUserModel loginUserModel = new LoginUserModel()
+                LoginUserModel loginUserModel = new()
                 {
                     CompanyID = mCompany.CompanyID,
                     CompanyCode = mCompany.CompanyCode,

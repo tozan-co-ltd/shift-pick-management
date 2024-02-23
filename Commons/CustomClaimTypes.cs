@@ -5,18 +5,39 @@ using System.Threading.Tasks;
 
 namespace mar_sumaken_web.Commons
 {
+    /// <summary>
+    /// Claim情報
+    /// </summary>
     public class CustomClaimTypes
     {
+        /// <summary>
+        /// データベース名
+        /// </summary>
         public const string ClaimType_DatabaseName = "DatabaseName";
+
+        /// <summary>
+        /// 会社ID
+        /// </summary>
         public const string ClaimType_CampanyID = "CompanyID";
-        public const string ClaimType_CampanyName = "CompanyName";
+
+        /// <summary>
+        /// メイン倉庫ID
+        /// </summary>
         public const string ClaimType_MainDepoID = "MainDepoID";
-        public const string ClaimType_MainDepoCode = "MainDepoCode";
-        public const string ClaimType_MainDepoName = "MainDepoName";
+
+        /// <summary>
+        /// ユーザーID
+        /// </summary>
         public const string ClaimType_UserID = "UserID";
-        public const string ClaimType_UserCode = "UserCode";
-        public const string ClaimType_UserName = "UserName";
+
+        /// <summary>
+        /// ロール
+        /// </summary>
         public const string ClaimType_Role = "Role";
+
+        /// <summary>
+        /// タイムスタンプ(ログイン日時)
+        /// </summary>
         public const string ClaimType_TimeStamp = "TimeStamp";
     }
 }
