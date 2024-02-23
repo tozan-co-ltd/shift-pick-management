@@ -18,7 +18,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 入庫実績リスト
         /// </summary>
-        public IPagedList<D_StoreInModel>? D_StoreInList { get; set; }
+        public IPagedList<D_StoreInModel>? DStoreInList { get; set; }
 
         /// <summary>
         /// 検索入庫日(開始)
@@ -88,6 +88,12 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "倉庫ID")]
         public int DepoID { set; get; }
+
+        /// <summary>
+        /// 倉庫名
+        /// </summary>
+        [Display(Name = "倉庫名")]
+        public int DepoName { set; get; }
 
         /// <summary>
         /// 会社ID:仕入先の会社ID

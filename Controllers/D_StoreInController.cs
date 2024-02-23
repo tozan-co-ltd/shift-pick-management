@@ -11,6 +11,9 @@ namespace mar_sumaken_web.Controllers
 {
     public class D_StoreInController : BaseController
     {
+        // 新規作成行数
+        private const int InitRegisterRowCount = 5;
+
         /// <summary>
         /// 入庫 - 入荷実績照会
         /// </summary>
@@ -80,9 +83,9 @@ namespace mar_sumaken_web.Controllers
                 // 表示用のhtml作成
                 if (storeInList.Count > 0)
                 {
-                    model.D_StoreInList = storeInList.ToPagedList();
+                    model.DStoreInList = storeInList.ToPagedList();
 
-                    foreach (var item in model.D_StoreInList)
+                    foreach (var item in model.DStoreInList)
                     {
                         searchData += $@"<tr>
                         <td>
@@ -117,7 +120,7 @@ namespace mar_sumaken_web.Controllers
                 var response = new
                 {
                     HtmlContent = searchData,
-                    DataList = model.D_StoreInList
+                    DataList = model.DStoreInList
                 };
 
                 return Json(response);
@@ -130,6 +133,80 @@ namespace mar_sumaken_web.Controllers
             {
                 var exceptionMessage = ex.Message;
                 return Content(exceptionMessage);
+            }
+        }
+
+        /// <summary>
+        /// 登録画面表示
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult Register()
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                if (user == null)
+                {
+                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                }
+
+                var model = new D_StoreInModel();
+                List<D_StoreInModel> storeInList = new();
+                for (int i = 0; i < InitRegisterRowCount; i++)
+                {
+                    var viewModel = new D_StoreInModel();
+                    viewModel.DepoID = user.MainDepoID;
+                    storeInList.Add(viewModel);
+
+                    model.DStoreInList = storeInList.ToPagedList();
+                }
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999 :" + ErrorMessagesResources.E9999 });
+            }
+        }
+
+        /// <summary>
+        /// 入庫実績登録
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        [HttpPost]
+        public IActionResult Register(M_CompanyModel model)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+                if (user == null)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
+                }
+
+                // 登録情報をチェック
+                if (!ModelState.IsValid)
+                {
+                    return NotFound(new { errorMessage = "" });
+                }
+
+                // 入庫実績登録
+                //int insertedCount = M_CompanyConnectController.InsertMCompany(model, user);
+
+                return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004 :" + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999 :" + ErrorMessagesResources.E9999 });
             }
         }
 

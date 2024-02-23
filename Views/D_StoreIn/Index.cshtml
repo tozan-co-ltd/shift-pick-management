@@ -62,7 +62,7 @@
                                         </span>
                                         <span class="text">検索</span>
                                     </button>
-                                    <button class="btn btn-primary btn-icon-split ml-3">
+                                    <button class="btn btn-primary btn-icon-split ml-3" onclick="OnRegisterClick()">
                                         <span class="icon text-white-50">
                                             <i class="fas fa-plus"></i>
                                         </span>
@@ -200,14 +200,12 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
 
 <script>
-
     $(document).ready(function () {
     
         // 検索ボタン押下
@@ -358,4 +356,11 @@
         $('.text-danger').text('');
         $('input').removeClass('input-validation-error');
     }
+
+    // 新規作成ボタンを押す
+    function OnRegisterClick() {
+        var url = window.location.origin + '@Url.Action("Register", "D_StoreIn")';
+        window.location.href = url;
+    }
+
 </script>

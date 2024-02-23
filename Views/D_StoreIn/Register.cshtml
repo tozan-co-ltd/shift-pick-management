@@ -1,0 +1,227 @@
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.D_StoreInModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "登録";
+}
+
+<div class="card shadow masterInfo m-4">
+
+    <div class="card-header text-gray-800">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+        <div class="col-md-12 pl-3 pb-3">
+            <form method="GET" asp-controller="D_StoreIn" asp-action="Index">
+                <button type="submit" class="btn btn-secondary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-arrow-left-long"></i>
+                    </span>
+                    <span class="text">戻る</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="form-group col-sm-12">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+        </div>
+
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+        }
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="DStoreInForm">
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayNameFor(model => model.DepoName)<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" name="SelectedDepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
+                            <span class="text-danger w-100" asp-validation-for="SelectedDepoID"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayNameFor(model => model.SupplierName)<span style="color:red">*</span></label>
+                        </div>
+
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" name="SelectedCompanyID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
+                            <span class="text-danger w-100" asp-validation-for="SelectedCompanyID"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <span>@Html.DisplayNameFor(model => model.DateSearchStart)<span style="color:red">*</span></span>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input id="startDate" type="text" asp-for="DateSearchStart" class="form-control pickerDate">
+                            <span class="text-danger w-100" asp-validation-for="DateSearchStart"></span>
+                        </div>
+                    </div>
+                    <hr>
+                    <table class="table table-responsive table-sm" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.SupplierProductNumber)<span style="color:red">*</span></th>
+                                <th>@Html.DisplayNameFor(model => model.LotNumber)</th>
+                                <th>@Html.DisplayNameFor(model => model.Quantity)<span style="color:red">*</span></th>
+                                <th>@Html.DisplayNameFor(model => model.MainProductKey)</th>
+                                <th>@Html.DisplayNameFor(model => model.FirstSubProductKey)</th>
+                                <th>@Html.DisplayNameFor(model => model.SecondSubProductKey)</th>
+                                <th>@Html.DisplayNameFor(model => model.Remarks)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var i = 0;
+                                foreach (var item in Model.DStoreInList)
+                                {
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control" id="DStoreInList[@i].SupplierProductNumber" value="@item.SupplierProductNumber" name="DStoreInList[@i].SupplierProductNumber" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" value="@item.LotNumber" name="DStoreInList[@i].LotNumber" />
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control" value="@item.Quantity" name="DStoreInList[@i].Quantity" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" value="@item.MainProductKey" name="DStoreInList[@i].MainProductKey" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" value="@item.FirstSubProductKey" name="DStoreInList[@i].FirstSubProductKey" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" value="@item.SecondSubProductKey" name="DStoreInList[@i].SecondSubProductKey" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" value="@item.Remarks" name="DStoreInList[@i].Remarks" />
+                                            </td>
+                                        </tr>
+                                    }
+                                    ++i;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                    <button class="btn btn-primary btn-icon-split" id="register-btn" style="min-width: 80px">
+                        <span class="text">登録</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#register-btn').click(function () {
+            $('#DStoreInForm').submit(function (event) {
+                // エラーメッセージ削除
+                DeleteErrorMessages();
+
+                // ページの更新を禁止する
+                event.preventDefault();
+
+                // 送信イベントが他のハンドラーに伝播するのを防ぐ
+                event.stopImmediatePropagation();
+
+                var form = $('#DStoreInForm');
+
+                // フォーム情報を取得する
+                var formDataArray = form.serializeArray();
+
+                formDataArray = formDataArray.filter(function (item) {
+                    return item.value.trim() !== '' && item.value.trim() !== '0';
+                });
+
+                // 編集された行数を取得
+                var editRow = [];
+                formDataArray.forEach(function (item) {
+                    if (item.name.includes("DStoreInList")) {
+                        var rowNumber = GetEditRowNumber(item.name);
+                        editRow.push(rowNumber);
+                    }
+                });
+
+                // 仕入先品番と数量チェック
+                var checkFlag = checkValue(editRow)
+                if (!checkFlag) return;
+
+                // Ajax call
+                $.ajax({
+                    url: '@Url.Action("Register", "D_StoreIn")',
+                    method: 'POST',
+                    data: JSON.stringify(formDataArray)
+                })
+                    .done(function (response) {
+                        $('#DStoreInForm')[0].reset();
+                        // 完了モーダル表示
+                        AlertMessage('', '完了', '登録が完了しました。', null, null);
+                    })
+                    .fail(function (xhr) {
+                        if (xhr.status === 404) {
+                            // データが見つからなかった場合
+                            var errorMessage = xhr.responseJSON.errorMessage;
+                            $('#div-error-message').text(errorMessage);
+                        } else {
+                            // その他のエラーの場合
+                            $('#div-error-message').text(errorMessage);
+                        }
+                    });
+            });
+        });
+    });
+
+    // 仕入先品番と数量チェック
+    function checkValue(dataArr) {
+        var checkFlag = true;
+
+        dataArr.forEach(function (index) {
+            // 仕入先品番
+            var productNumberName = "DStoreInList[" + index + "].SupplierProductNumber";
+            var productNumberElement = document.querySelector('[name="' + productNumberName + '"]');
+            if ($(productNumberElement).val() == '') {
+                productNumberElement.style.borderColor = "red";
+                checkFlag = false;
+            }
+            else {
+                productNumberElement.style.borderColor = "#d1d3e2";
+            }
+
+            // 数量
+            var quantityName = "DStoreInList[" + index + "].Quantity";
+            var quantityNameElement = document.querySelector('[name="' + quantityName + '"]');
+            if ($(quantityNameElement).val() <= 0) {
+                quantityNameElement.style.borderColor = "red";
+                checkFlag = false;
+            }
+            else {
+                quantityNameElement.style.borderColor = "#d1d3e2";
+            }
+
+            return checkFlag;
+        });
+    }
+
+    // 編集された行数を取得
+    function GetEditRowNumber(fieldName) {
+        var match = fieldName.match(/\[(\d+)\]/); 
+        return match ? parseInt(match[1]) : null;
+    }
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
+</script>
+
