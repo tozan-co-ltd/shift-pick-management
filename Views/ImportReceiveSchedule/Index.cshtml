@@ -1,7 +1,8 @@
-﻿@model mar_sumaken_web.Models.D_FileImportModel
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.D_FileImportModel
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = Model.ViewTitle;
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 
 <div class="card shadow de-inspection receive-schedule m-4">

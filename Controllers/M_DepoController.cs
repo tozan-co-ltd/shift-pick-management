@@ -6,6 +6,9 @@ using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// 倉庫マスター画面
+    /// </summary>
     public class M_DepoController : BaseController
     {
         /// <summary>

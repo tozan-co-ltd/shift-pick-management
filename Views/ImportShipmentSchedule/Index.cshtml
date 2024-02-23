@@ -2,12 +2,12 @@
 @model mar_sumaken_web.Models.D_FileImportModel
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = Model.ViewTitle;
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 
 <div class="card shadow de-inspection m-4">
     <div class="card-header text-gray-800">
-        出庫 - @ViewData["Title"]
+        @ViewData["Title"]
     </div>
     <div class="card-body">
         <div class="row">

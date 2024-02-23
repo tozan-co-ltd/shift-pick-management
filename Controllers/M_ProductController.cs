@@ -9,6 +9,9 @@ using System.Data.SqlClient;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// 品番マスター画面
+    /// </summary>
     public class M_ProductController : BaseController
     {
         private readonly ILogger<M_ProductController> _logger;
@@ -50,9 +53,9 @@ namespace mar_sumaken_web.Controllers
                 model = new()
                 {
                     MProductList = productList,
-                    RDepoProductsRegister = (List<SelectListItem>)model.GetMDepoList(user.DatabaseName),
-                    SuplierSelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_Supplier_ID, user.DatabaseName),
-                    DeliverySelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_Delivery_ID, user.DatabaseName),
+                    RDepoProductsRegister = (List<SelectListItem>)model.GetMDepoList(),
+                    SuplierSelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_SupplierID, user.DatabaseName),
+                    DeliverySelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_DeliveryID, user.DatabaseName),
 
                 };
                 return View(model);
@@ -87,9 +90,9 @@ namespace mar_sumaken_web.Controllers
                 // 表示データをModelに格納
                 model = new()
                 {
-                    RDepoProductsRegister = (List<SelectListItem>)model.GetMDepoList(user.DatabaseName),
-                    SuplierSelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_Supplier_ID, user.DatabaseName),
-                    DeliverySelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_Delivery_ID, user.DatabaseName),
+                    RDepoProductsRegister = (List<SelectListItem>)model.GetMDepoList(),
+                    SuplierSelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_SupplierID, user.DatabaseName),
+                    DeliverySelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_DeliveryID, user.DatabaseName),
 
                 };
 
@@ -303,8 +306,9 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// 品番マスターのデータテーブル作成
+        /// データテーブル作成
         /// </summary>
+        /// <returns></returns>
         private static DataTable CreateDataTable()
         {
             var table = new DataTable();

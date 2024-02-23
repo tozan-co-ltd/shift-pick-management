@@ -9,34 +9,31 @@ using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// 入庫実績照会・修正画面
+    /// </summary>
     public class D_StoreInController : BaseController
     {
         /// <summary>
-        /// 入庫 - 入荷実績照会
+        /// 入庫実績照会画面表示
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public IActionResult Index(D_StoreInModel model)
+        public IActionResult Index()
         {
+            D_StoreInModel model = new();
             try
             {
-                if (model == null)
-                    model = new D_StoreInModel();
-
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    // エラーコード：E2011
-                    ViewData["ErrorMessage"] = ErrorMessagesResources.E2001;
-                    return View();
-                }
+                // 会社リスト取得
+                CommonModel commonModel = new();
+                model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_SupplierID);
 
                 return View(model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
                 return View(model);
@@ -226,8 +223,9 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// テーブルを作る
+        /// データテーブル作成
         /// </summary>
+        /// <returns></returns>
         private static DataTable CreateDataTable()
         {
             var table = new DataTable();

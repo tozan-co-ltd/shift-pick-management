@@ -99,7 +99,7 @@
 </div>
 
 <!--  Delete Modal-->
-<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-target="#delete-modal">
+<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -235,7 +235,7 @@
                     var errorMessage = xhr.responseJSON.errorMessage;
                     $("#div-error-message").text(errorMessage);
                 } else {
-                        var errorMessage500 = "E3002: サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
+                        var errorMessage500 = "E3002: サーバーに接続できませんでした。" + ' HttpRequest : ' + xhr.status + ', textStatus : ' + textStatus;
                     $("#div-error-message").text(errorMessage500);
                 }
             });

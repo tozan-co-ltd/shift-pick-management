@@ -1,5 +1,8 @@
 ﻿namespace mar_sumaken_web.Models
 {
+    /// <summary>
+    /// CSVファイル取込のModel
+    /// </summary>
     public class CsvFileInputModel
     {
         /// <summary>

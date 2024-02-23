@@ -6,6 +6,9 @@ using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// トップ画面
+    /// </summary>
     public class TopController : Controller
     {
         private readonly ILogger<TopController> _logger;

@@ -8,6 +8,9 @@ using System.Data.SqlClient;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// 出荷指示取込画面
+    /// </summary>
     public class ImportShipmentScheduleController : BaseController
     {
         private readonly ILogger<ImportShipmentScheduleController> _logger;
@@ -28,7 +31,7 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult Index()
         {
-            var model = new D_FileImportModel();
+            D_FileImportModel model = new ();
             try
             {
                 // ログイン中ユーザー情報取得
@@ -41,19 +44,21 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
                 }
 
+
                 string controllerName = ControllerContext.ActionDescriptor.ControllerName;
-                var commonModel = new CommonModel()
+                CommonModel commonModel = new ()
                 {
                     ControllerName = controllerName,
                     CompanyID = user.CompanyID
                 };
                 // SQL作成
                 var sql = D_FileImportConnectController.CreateSQLToGetDFileImport(commonModel.GetViewTitle());
-
                 // DB接続
-                List<D_FileImportModel> listD_FileImport = D_FileImportConnectController.ConnectDFileImport(sql, user.DatabaseName);
+                List<D_FileImportModel> DFileImportList = D_FileImportConnectController.ConnectDFileImport(sql, user.DatabaseName);
+                model.D_FileImportList = DFileImportList;
 
-                model.D_FileImportList = listD_FileImport;
+                // 会社リスト取得
+                model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_DeliveryID);
 
                 return View(model);
             }

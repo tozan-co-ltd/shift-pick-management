@@ -1,5 +1,7 @@
-﻿using mar_sumaken_web.ConnectControllers;
+﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
+using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
@@ -7,6 +9,9 @@ using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// 出庫実績照会・修正画面
+    /// </summary>
     public class D_StoreOutController : BaseController
     {
         /// <summary>
@@ -14,14 +19,26 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public IActionResult Index(D_StoreOutModel model)
+        public IActionResult Index()
         {
-            if (model == null)
-                model = new D_StoreOutModel();
+            D_StoreOutModel model = new();
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
 
-            return View(model);
+                // 会社リスト取得
+                CommonModel commonModel = new();
+                model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_SupplierID);
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
+                return View(model);
+            }
         }
-
 
         /// <summary>
         /// 検索ボタン押下

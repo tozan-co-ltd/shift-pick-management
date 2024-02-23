@@ -11,6 +11,9 @@ using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// ユーザーマスター画面
+    /// </summary>
     public class M_UserController : BaseController
     {
         private readonly ILogger<M_UserController> _logger;
@@ -38,7 +41,6 @@ namespace mar_sumaken_web.Controllers
                 // 管理権限区分が1(管理者)でない場合はエラーとする
                 if (user == null || user.AuthorizedKubun != 1)
                 {
-                    // エラーコード：E2011
                     throw new Exception();
                 }
 
@@ -129,7 +131,6 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
                 if (user == null)
                 {
-                    // エラーコード：E2011
                     return NotFound(new { errorMessage = "データが見つかりませんでした。" });
                 }
 
@@ -191,7 +192,6 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
                 if (user == null)
                 {
-                    // エラーコード：E2011
                     return NotFound(new { errorMessage = "データが見つかりませんでした。" });
                 }
 
@@ -201,7 +201,6 @@ namespace mar_sumaken_web.Controllers
                 List<M_UserModel> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
                 if (userList.Count != 1)
                 {
-                    // エラーコード：E2011
                     return NotFound(new { errorMessage = "見つかった情報は間違っています。" });
                 }
                 M_UserModel editUser = userList[0];
@@ -291,7 +290,6 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
                 if (user == null)
                 {
-                    // エラーコード：E2011
                     return NotFound(new { errorMessage = "データが見つかりませんでした。" });
                 }
 
@@ -355,7 +353,6 @@ namespace mar_sumaken_web.Controllers
 
                 if (user == null || userId == 0)
                 {
-                    // エラーコード：E2011
                     return NotFound(new { errorMessage = "データが見つかりませんでした。" });
                 }
 
@@ -435,8 +432,9 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// ユーザーマスターテーブルを作る
+        /// データテーブル作成
         /// </summary>
+        /// <returns></returns>
         private static DataTable CreateDataTable()
         {
             var table = new DataTable();

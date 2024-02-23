@@ -9,6 +9,9 @@ using System.Data.SqlClient;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// 入荷予定取込画面
+    /// </summary>
     public class ImportReceiveScheduleController : BaseController
     {
         private readonly ILogger<ImportReceiveScheduleController> _logger;  
@@ -29,7 +32,7 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult Index()
         {
-            var model = new D_FileImportModel();
+            D_FileImportModel model = new ();
             try
             {
                 // ログイン中ユーザー情報取得
@@ -43,7 +46,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 string controllerName = ControllerContext.ActionDescriptor.ControllerName;
-                var commonModel = new CommonModel()
+                CommonModel commonModel = new ()
                 {
                     ControllerName = controllerName,
                     CompanyID = user.CompanyID
@@ -52,9 +55,9 @@ namespace mar_sumaken_web.Controllers
                 var sql = D_FileImportConnectController.CreateSQLToGetDFileImport(commonModel.GetViewTitle());
 
                 // DB接続
-                List<D_FileImportModel> listD_FileImport = D_FileImportConnectController.ConnectDFileImport(sql, user.DatabaseName);
+                List<D_FileImportModel> DFileImportList = D_FileImportConnectController.ConnectDFileImport(sql, user.DatabaseName);
 
-                model.D_FileImportList = listD_FileImport;
+                model.D_FileImportList = DFileImportList;
 
                 return View(model);
             }
