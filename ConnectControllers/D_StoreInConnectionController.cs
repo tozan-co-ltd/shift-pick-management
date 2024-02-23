@@ -44,6 +44,59 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 入庫実績削除
+        /// </summary>
+        /// <param name="storeInId">入庫実績ID</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns>更新件数</returns>
+        public static int DeleteDStoreIn(int storeInId, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                // DB接続
+                try
+                {
+                    // 入庫実績削除SQL作成
+                    string deleteSql = CreateSQLToDeleteDStoreIn(storeInId);
+                    // 入庫実績削除
+                    int affectedRows = connection.Execute(deleteSql);
+                    // 更新件数が0の場合はエラーとする
+                    if (affectedRows == 0)
+                    {
+                        // エラーコード：E2011
+                        throw new Exception();
+                    }
+
+                    return affectedRows;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 入庫実績削除SQL作成
+        /// </summary>
+        /// <param name="storeInId">入庫実績ID</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToDeleteDStoreIn(int storeInId)
+        {
+            var sql = $@"
+                        UPDATE D_StoreIn
+                        SET IsDeleted = 1
+                        WHERE StoreInID = {storeInId}
+            ;";
+            return sql;
+        }
+
+        /// <summary>
         /// 入庫実績情報取得SQL作成
         /// </summary>
         /// <param name="start">入庫日開始</param>
@@ -77,6 +130,8 @@ namespace mar_sumaken_web.ConnectControllers
 	                D_StoreIn AS storeIn
                 INNER JOIN M_Company AS company 
                     ON storeIn.CompanyID = company.CompanyID
+                INNER JOIN M_Depo AS depo 
+                    ON storeIn.DepoID = depo.DepoID
                 WHERE 
 	                storeIn.DepoID = {depoId}
                     AND storeIn.CompanyID = {supplierId}
@@ -84,6 +139,7 @@ namespace mar_sumaken_web.ConnectControllers
                     AND storeIn.StoreInDate <= '{end}'
                     AND storeIn.IsDeleted = 0
                     AND company.IsDeleted = 0
+                    AND depo.IsDeleted = 0
             ";
             return sql;
         }

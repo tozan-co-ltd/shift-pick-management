@@ -319,7 +319,7 @@ function onExportExcelByCondition(page, formData,) {
 
 
 //------------------- モーダル表示 ------------------//
-function AlertMessage(type, title, message, isRedirect, urlRedirect) {
+function AlertMessage(type, title, message, isRedirect, urlRedirect, isNotReload = false) {
     const dialog = document.getElementById("AlertDialogId");
     if (dialog) {
         dialog.parentNode.removeChild(dialog);
@@ -350,6 +350,9 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect) {
     
     $('#AlertDialogId .confirm, #AlertDialogId .close').on('click', function () {
         $('#AlertDialogId').modal('hide');
+        $('.modal-backdrop').hide();
+
+        if (isNotReload) return;
         if (isRedirect)
             window.location.href = urlRedirect;
         else

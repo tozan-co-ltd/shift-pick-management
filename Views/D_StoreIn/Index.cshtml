@@ -110,83 +110,252 @@
     </div>
 </div>
 
+<!--  Delete Modal-->
+<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete-modal-label">削除</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-10">
+                    <p id="delete-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="col-12 col-md-10">
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>ID</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteStoreInId" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>仕入先名</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteSupplierName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>入荷日</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteStoreInDate" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>仕入先品番</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteSupplierProductNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>ロット番号</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteLotNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>収容数</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteLotQuantity" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>箱数</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteQuantity" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>数量</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteNumberOfBoxes" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
+                            <button class="btn btn-danger btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteDelete()">
+                                <span class="text" style="min-width:84px">削除</span>
+                            </button>
+                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
+                                <span class="text">キャンセル</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    // 検索ボタン押下
-    $('#search-btn').click(function () {
-        $('#searchForm').submit(function (e) {
+
+    $(document).ready(function () {
+    
+        // 検索ボタン押下
+        $('#search-btn').click(function () {
+            $('#searchForm').submit(function (e) {
+                // エラーメッセージ削除
+                DeleteErrorMessages();
+
+                // フォーム情報を取得する
+                var formData = $(this).serialize();
+
+                // ページの更新を禁止する
+                e.preventDefault();
+                // 送信イベントが他のハンドラーに伝播するのを防ぐ
+                e.stopImmediatePropagation();
+
+                // ajax
+                $.ajax({
+                    url: '@Url.Action("SearchData", "D_StoreIn")',
+                    method: "POST",
+                    data: formData
+                })
+                    .done(function (response) {
+                        $("#dStoreInTable tbody").empty();
+                        if (response.htmlContent) {
+                            // HTML更新
+                            $('#dStoreInTable').DataTable().destroy();
+                            $("#div-table").show();
+
+                            $("#dStoreInTable tbody").empty();
+                            $("#dStoreInTable tbody").html(response.htmlContent);
+                            $("#dStoreInTable").DataTable({
+                                "language": {           // 日本語表示
+                                    "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+                                },
+                                lengthChange: true,     // 表示件数
+                                info: false,            // 総件数
+                                scrollX: true,          // 横スクロール可
+                                order: [[3, "asc"]],    // 仕入先品番昇順
+                            });
+                        }
+                    })
+                    .fail(function (xhr, textStatus, errorThrown) {
+                        if (xhr.status === 404) {
+                            var errorMessage = xhr.responseJSON.errorMessage;
+                            $("#div-error-message").text(errorMessage);
+                        } else {
+                            var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
+                            $("#div-error-message").text(errorMessage500);
+                        }
+                    });
+            });
+        });
+
+        // 出力ボタン押下
+        $('#export-file-btn').click(function (event) {
             // エラーメッセージ削除
             DeleteErrorMessages();
+            // ページの更新を禁止する
+            event.preventDefault();
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            var searchFormArr = $('#searchForm').serializeArray();
 
             // フォーム情報を取得する
-            var formData = $(this).serialize();
+            var exportFormData = new FormData();
+            exportFormData.append("searchModel.DepoID", searchFormArr[0].value);
+            exportFormData.append("searchModel.DepoName", $('#SelectedDepoID option:selected').text().replace(/ /g, ""));
+            exportFormData.append("searchModel.CompanyID", searchFormArr[1].value);
+            exportFormData.append("searchModel.CompanyName", $('#SelectedCompanyID option:selected').text().replace(/ /g, ""));
+            exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
+            exportFormData.append("searchModel.SearchEndDate", searchFormArr[3].value);
 
-            // ページの更新を禁止する
-            e.preventDefault();
-            // 送信イベントが他のハンドラーに伝播するのを防ぐ
-            e.stopImmediatePropagation();
+            // 画面名
+            exportFormData.append("gamenName", $("#viewTitle").val());
 
-            // ajax
-            $.ajax({
-                url: '@Url.Action("SearchData", "D_StoreIn")',
-                method: "POST",
-                data: formData
-            })
-                .done(function (data) {
-                    $('#dStoreInTable').DataTable().destroy();
-                    $("#div-table").show();
-
-                    $("#dStoreInTable tbody").html(data);
-                    $("#dStoreInTable").DataTable({
-                        "language": {           // 日本語表示
-                            "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
-                        },
-                        lengthChange: true,     // 表示件数
-                        info: false,            // 総件数
-                        scrollX: true,          // 横スクロール可
-                        order: [[3, "asc"]],    // 仕入先品番昇順
-                    });
-                })
-                .fail(function (xhr, textStatus, errorThrown) {
-                    if (xhr.status === 404) {
-                        var errorMessage = xhr.responseJSON.errorMessage;
-                        $("#div-error-message").text(errorMessage);
-                    } else {
-                        var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
-                        $("#div-error-message").text(errorMessage500);
-                    }
-                });
+            // CSV出力
+            onExportExcelByCondition("D_StoreIn", exportFormData);
         });
+
     });
 
-    // 出力ボタン押下
-    $('#export-file-btn').click(function (event) {
+    // 削除ボタン押下
+    function OnDeleteClick(trTag) {
         // エラーメッセージ削除
         DeleteErrorMessages();
-        // ページの更新を禁止する
-        event.preventDefault();
-        // 送信イベントが他のハンドラーに伝播するのを防ぐ
-        event.stopImmediatePropagation();
 
-        var searchFormArr = $('#searchForm').serializeArray();
+        var row = trTag.parentNode.parentNode;
 
-        // フォーム情報を取得する
-        var exportFormData = new FormData();
-        exportFormData.append("searchModel.DepoID", searchFormArr[0].value);
-        exportFormData.append("searchModel.DepoName", $('#SelectedDepoID option:selected').text().replace(/ /g, ""));
-        exportFormData.append("searchModel.CompanyID", searchFormArr[1].value);
-        exportFormData.append("searchModel.CompanyName", $('#SelectedCompanyID option:selected').text().replace(/ /g, ""));
-        exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
-        exportFormData.append("searchModel.SearchEndDate", searchFormArr[3].value);
+        $("#deleteStoreInId").val(row.getElementsByClassName("StoreInID")[0].textContent);
+        $("#deleteSupplierName").val(row.getElementsByClassName("SupplierName")[0].textContent);
+        $("#deleteStoreInDate").val(row.getElementsByClassName("StoreInDate")[0].textContent);
+        $("#deleteSupplierProductNumber").val(row.getElementsByClassName("SupplierProductNumber")[0].textContent);
+        $("#deleteLotNumber").val(row.getElementsByClassName("LotNumber")[0].textContent);
+        $("#deleteLotQuantity").val(row.getElementsByClassName("LotQuantity")[0].textContent);
+        $("#deleteQuantity").val(row.getElementsByClassName("Quantity")[0].textContent);
+        $("#deleteNumberOfBoxes").val(row.getElementsByClassName("NumberOfBoxes")[0].textContent);
+    }
 
-        // 画面名
-        exportFormData.append("gamenName", $("#viewTitle").val());
+    // 削除
+    function OnExecuteDelete() {
+        DeleteErrorMessages();
 
-        // CSV出力
-        onExportExcelByCondition("D_StoreIn", exportFormData);
-    });
+        // POSTするデータ
+        var storeInId = document.getElementById('deleteStoreInId').value;
+        formData = {
+            "storeInId": storeInId
+        };
+
+        // ajax
+        $.ajax({
+            url: window.location.origin + '@Url.Action("Delete", "D_StoreIn")',
+            method: "POST",
+            data: formData
+        })
+            .done(async function (data) {
+                // 完了モーダル表示
+                $('#delete-modal').removeClass('show');
+                $('#delete-modal').hide();
+                AlertMessage('', '完了', '登録完了しました。', null, null, true);
+                await WaitSeconds();
+                //$('#search-btn').click();
+                $('#search-btn').trigger('click');
+            })
+            .fail(function (xhr, textStatus, errorThrown) {
+                if (xhr.status === 404) {
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    $("#delete-modal-error-message").text(errorMessage);
+                } else {
+                    var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
+                    $("#delete-modal-error-message").text(errorMessage500);
+                }
+            });
+    }
+
+    function WaitSeconds() {
+        return new Promise(resolve => {
+            setTimeout(() => resolve('Data fetched!'), 2000);
+        });
+    }
 
     // エラーメッセージ削除
     function DeleteErrorMessages() {
         $('#div-error-message').text('');
+        //$('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
     }
 </script>

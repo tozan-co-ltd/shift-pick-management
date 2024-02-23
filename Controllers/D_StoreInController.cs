@@ -84,36 +84,43 @@ namespace mar_sumaken_web.Controllers
 
                     foreach (var item in model.D_StoreInList)
                     {
-                        searchData = $@"<tr>
+                        searchData += $@"<tr>
                         <td>
-                            <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                            onclick=""OnEditClick('{item.StoreInID}')"" data-id=""{item.StoreInID}"" data-toggle=""modal"" data-target=""#edit-modal"">
-                                <i class=""fa-solid fa-pen""></i>
+                            <a class='btn btn-success btn-icon-split ml-1 mr-1'
+                            onclick='OnEditClick({item.StoreInID})' data-id='{item.StoreInID}' data-toggle='modal' data-target='#edit-modal'>
+                                <i class='fa-solid fa-pen'></i>
                             </a>
-                            <button class=""btn btn-danger btn-icon-split""
-                            onclick=""OnDeleteClick('{item.StoreInID}')"" data-id=""{item.StoreInID}"" data-toggle=""modal"" data-target=""#delete-modal"">
-                                <i class=""fa-solid fa-trash""></i>
+                            <button class='btn btn-danger btn-icon-split'
+                            onclick='OnDeleteClick(this)' data-id='{item.StoreInID}' data-toggle='modal' data-target='#delete-modal'>
+                                <i class='fa-solid fa-trash'></i>
                             </button>
                         </td>
-                        <td>{@item.StoreInID}</td>
-                        <td>{@item.SupplierName}</td>
-                        <td>{@item.StoreInDate.ToString("yyyy/MM/dd")}</td>
-                        <td>{@item.SupplierProductNumber}</td>
-                        <td>{@item.LotNumber}</td>
-                        <td>{@item.LotQuantity}</td>
-                        <td>{@item.Quantity}</td>
-                        <td>{@item.NumberOfBoxes}</td>
-                        <td>{@item.MainProductKey}</td>
-                        <td>{@item.FirstSubProductKey}</td>
-                        <td>{@item.SecondSubProductKey}</td>
-                        <td>{@item.Remarks}</td>
-                        <td>{@item.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")}</td>
-                        <td>{@item.CreatedBy}</td>
+
+                        <td class='StoreInID'>{@item.StoreInID}</td>
+                        <td class='SupplierName'>{@item.SupplierName}</td>
+                        <td class='StoreInDate'>{@item.StoreInDate.ToString("yyyy/MM/dd")}</td>
+                        <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
+                        <td class='LotNumber'>{@item.LotNumber}</td>
+                        <td class='LotQuantity'>{@item.LotQuantity}</td>
+                        <td class='Quantity'>{@item.Quantity}</td>
+                        <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
+                        <td class='MainProductKey'>{@item.MainProductKey}</td>
+                        <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
+                        <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
+                        <td class='Remarks'>{@item.Remarks}</td>
+                        <td class='CreatedAt'>{@item.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")}</td>
+                        <td class='CreatedBy'>{@item.CreatedBy}</td>
                         </tr>";
                     }
                 }
 
-                return Content(searchData);
+                var response = new
+                {
+                    HtmlContent = searchData,
+                    DataList = model.D_StoreInList
+                };
+
+                return Json(response);
             }
             catch (SqlException)
             {
@@ -123,6 +130,38 @@ namespace mar_sumaken_web.Controllers
             {
                 var exceptionMessage = ex.Message;
                 return Content(exceptionMessage);
+            }
+        }
+
+        /// <summary>
+        /// 入庫実績削除
+        /// </summary>
+        /// <param name="storeInId">入庫実績ID</param>
+        /// <returns></returns>
+        public IActionResult Delete(int storeInId)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                if (user == null || storeInId == 0)
+                {
+                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                }
+
+                // 入庫実績削除
+                D_StoreInConnectionController.DeleteDStoreIn(storeInId, user.DatabaseName);
+
+                return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 
