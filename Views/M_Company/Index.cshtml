@@ -92,11 +92,11 @@
 </div>
 
 <!--  Edit Modal-->
-<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-target="#edit-modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="edit-modalLabel">修正</h5>
+                <h5 class="modal-title" id="edit-modal-label">修正</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -174,11 +174,11 @@
 </div>
 
 <!--  Delete Modal-->
-<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-target="#delete-modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="delete-modalLabel">削除</h5>
+                <h5 class="modal-title" id="delete-modal-label">削除</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -285,7 +285,7 @@
             })
             .done(function (data) {
                 // 完了モーダル表示
-                $('#edit-modal').hide();
+                    $('#edit-modal').hide();
                 AlertMessage('', '完了', '登録完了しました。', null, null);
             })
             .fail(function (xhr, textStatus, errorThrown) {

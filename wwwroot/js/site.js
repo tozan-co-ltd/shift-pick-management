@@ -276,21 +276,31 @@ async function onExportFile(page) {
 }
 
 // 条件あり
-function onExportExcelByCondition(page) {
-    var startDate = $("#startDate").val();
-    var endDate = $("#endDate").val();
-    formData = { startDate: startDate, endDate: endDate };
+function onExportExcelByCondition(page, formData,) {
+
+    for (var pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
+
     $.ajax({
-        url: '' + page + '/ExportExcel',
+        url: '' + page + '/ExportCsv',
         type: 'post',
         data: formData,
+        contentType: false,
+        processData: false,
     }).done(function (response) {
-        var { contentType, fileContents, fileDownloadName } = response.data;
-        {
-            const link = document.createElement("a");
-            link.href = `data:${contentType};base64,${fileContents}`;
-            link.download = fileDownloadName;
-            link.click();
+        if (response.data != null) {
+            var { contentType, fileContents, fileDownloadName } = response.data;
+            {
+                const link = document.createElement("a");
+                link.href = `data:${contentType};base64,${fileContents}`;
+                link.download = fileDownloadName;
+                link.click();
+            }
+        }
+        else {
+            $("#div-error-message").show();
+            $("#div-error-message").html(response.errorMessage);
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         if (jqXHR.status === 404) {
@@ -305,17 +315,17 @@ function onExportExcelByCondition(page) {
         }
     });
 }
-//--------------------------------------------------------//
+//------------------- CSV出力 ------------------//
 
 
 //------------------- モーダル表示 ------------------//
-function AlertMessage(type, title, message, isRedirect, urlRedirect) {
-    const dialog = document.getElementById("AlertDialogId");
+function AlertMessage(type, title, message, isRedirect, urlRedirect, isNotReload = false) {
+    const dialog = document.getElementById("alert-modal");
     if (dialog) {
         dialog.parentNode.removeChild(dialog);
     }
     $('body').append(
-        '<div class="modal fade" id="AlertDialogId" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">' +
+        '<div class="modal fade" id="alert-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">' +
         '  <div class="modal-dialog" role="document">' +
         '    <div class="modal-content">' +
         '      <div class="modal-header ' + type + '">' +
@@ -328,18 +338,22 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect) {
         '        <p>' + message + '</p > ' +
         '      </div>' +
         '      <div class="modal-footer d-flex flex-wrap justify-content-center">' +
-        '        <button type="button" class="btn btn-accent confirm" data-dismiss="modal">OK</button > ' +
+        '        <button type="button" class="btn btn-accent confirm" data-dismiss="modal">OK</button>' +
         '      </div>' +
         '    </div>' +
         '  </div>' +
-        '</div>');
+        '</div>'
+    );
 
-    $('#AlertDialogId').modal({ backdrop: 'static' });
+    $('#alert-modal').modal({ backdrop: 'static' });
     $('.modal-backdrop').css({ 'opacity': '0.1' });
-    $('#AlertDialogId').modal('show');
+    $('#alert-modal').modal('show');
     
-    $('#AlertDialogId .confirm, #AlertDialogId .close').on('click', function () {
-        $('#AlertDialogId').modal('hide');
+    $('#alert-modal .confirm, #alert-modal .close').on('click', function () {
+        $('#alert-modal').modal('hide');
+        $('.modal-backdrop').hide();
+
+        if (isNotReload) return;
         if (isRedirect)
             window.location.href = urlRedirect;
         else
