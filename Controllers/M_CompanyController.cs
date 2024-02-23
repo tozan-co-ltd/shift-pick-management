@@ -41,7 +41,6 @@ namespace mar_sumaken_web.Controllers
 
                 // 会社マスター情報取得SQL作成
                 var sql = M_CompanyConnectController.CreateSQLToSelectMCompanys();
-
                 // DB接続
                 IEnumerable<M_CompanyModel> companyList = M_CompanyConnectController.ConnectMCompanys(sql, user.DatabaseName);
 

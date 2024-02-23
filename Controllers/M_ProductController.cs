@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 using System.Data.SqlClient;
+using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -53,16 +54,16 @@ namespace mar_sumaken_web.Controllers
                 model = new()
                 {
                     MProductList = productList,
-                    RDepoProductsRegister = (List<SelectListItem>)model.GetMDepoList(),
+                    RDepoProductsRegister = (List<SelectListItem>)model.GetMDepoList(user.DatabaseName),
                     SuplierSelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_SupplierID, user.DatabaseName),
                     DeliverySelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_DeliveryID, user.DatabaseName),
-
                 };
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
             }
         }
@@ -90,7 +91,7 @@ namespace mar_sumaken_web.Controllers
                 // 表示データをModelに格納
                 model = new()
                 {
-                    RDepoProductsRegister = (List<SelectListItem>)model.GetMDepoList(),
+                    RDepoProductsRegister = (List<SelectListItem>)model.GetMDepoList(user.DatabaseName),
                     SuplierSelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_SupplierID, user.DatabaseName),
                     DeliverySelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_DeliveryID, user.DatabaseName),
 

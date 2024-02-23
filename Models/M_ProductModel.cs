@@ -1,6 +1,7 @@
 ﻿using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using X.PagedList;
 
 namespace mar_sumaken_web.Models
 {
@@ -9,6 +10,9 @@ namespace mar_sumaken_web.Models
     /// </summary>
     public class M_ProductModel : CommonModel
     {
+        /// <summary>
+        /// 品番リスト
+        /// </summary>
         public List<M_ProductModel>? MProductList { get; set; }
 
         /// <summary>

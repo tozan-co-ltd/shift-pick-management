@@ -53,8 +53,8 @@ namespace mar_sumaken_web.Controllers
                 // SQL作成
                 var sql = D_FileImportConnectController.CreateSQLToSelectDFileImports(commonModel.GetViewTitle());
                 // DB接続
-                List<D_FileImportModel> DFileImportList = D_FileImportConnectController.ConnectDFileImports(sql, user.DatabaseName);
-                model.D_FileImportList = DFileImportList;
+                List<D_FileImportModel> dFileImportList = D_FileImportConnectController.ConnectDFileImports(sql, user.DatabaseName);
+                model.D_FileImportList = dFileImportList;
 
                 // 会社リスト取得
                 model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_DeliveryID);

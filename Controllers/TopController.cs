@@ -33,9 +33,10 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // SQL作成
-                var sql = D_HandyErrorMessageConnectController.CreateSQLToGetDFileImport();
+                var sql = D_HandyErrorMessageConnectController.CreateSQLToSelectDHandyErrorMessages();
                 // DB接続
-                List<D_HandyErrorMessageModel> DFileImportList = D_HandyErrorMessageConnectController.ConnectDHandyErrorMessage(sql, user.DatabaseName);
+                List<D_HandyErrorMessageModel> DHandyErrorMessageList = D_HandyErrorMessageConnectController.ConnectDHandyErrorMessages(sql, user.DatabaseName);
+                model.D_HandyErrorMessageList = (IPagedList<D_HandyErrorMessageModel>)DHandyErrorMessageList;
 
                 return View(model);
             }

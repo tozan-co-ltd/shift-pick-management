@@ -24,7 +24,7 @@ namespace mar_sumaken_web.Controllers
 
                 // 会社リスト取得
                 CommonModel commonModel = new();
-                model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_DeliveryID);
+                model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_SupplierID);
 
                 return View(model);
             }

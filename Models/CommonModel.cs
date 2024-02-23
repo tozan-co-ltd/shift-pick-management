@@ -7,6 +7,10 @@ using Dapper;
 
 namespace mar_sumaken_web.Models
 {
+    /// <summary>
+    /// 共通Model
+    /// </summary>
+    /// <remarks>画面表示に必要な情報(ログイン中ユーザーのClaim,メニュー名,検索用倉庫名・会社名)を取得</remarks>
     public class CommonModel
     {
         /// <summary>
@@ -70,7 +74,7 @@ namespace mar_sumaken_web.Models
             ControllerName = viewContext.RouteData.Values["controller"].ToString();
             CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();
-            MDepoList = GetMDepoList();
+            MDepoList = GetMDepoList(DataBaseName);
         }
 
         /// <summary>
@@ -161,14 +165,14 @@ namespace mar_sumaken_web.Models
         /// 倉庫リスト取得
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<SelectListItem> GetMDepoList()
+        public IEnumerable<SelectListItem> GetMDepoList(string databaseName)
         {
             var selectListItem = new List<SelectListItem>();
 
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(DataBaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
@@ -203,51 +207,6 @@ namespace mar_sumaken_web.Models
             }
         }
 
-        /// <summary>
-        /// 会社リスト取得
-        /// </summary>
-        /// <returns></returns>
-        //public IEnumerable<SelectListItem> GetMCompanyList(int companyKubun)
-        //{
-        //    var selectListItem = new List<SelectListItem>();
-
-        //    try
-        //    {
-        //        // SQLServer接続文字列取得
-        //        var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(DataBaseName);
-        //        // SQLServer接続
-        //        using (var connection = new SqlConnection(connectionString))
-        //        {
-        //            connection.Open();
-        //            var sql = $@"
-        //                SELECT *
-        //                FROM M_Company
-        //                WHERE (1=1)
-        //                    AND CompanyKubun = {companyKubun}
-        //                    AND IsDeleted = 0
-        //                ";
-
-        //            var companyList = new List<M_CompanyModel>();
-        //            companyList = connection.Query<M_CompanyModel>(sql).ToList();
-
-        //            // 会社名(仕入先名/納入先名)のセレクトボックスに「会社名 - 得意先名」と表示させる
-        //            foreach (var company in companyList)
-        //            {
-        //                var item = new SelectListItem
-        //                {
-        //                    Value = company.CompanyID.ToString(),
-        //                    Text = company.CompanyName.ToString() + " - " + company.ClientName.ToString()
-        //                };
-        //                selectListItem.Add(item);
-        //            }
-        //        }
-        //        return selectListItem;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
         /// <summary>
         /// 会社リスト取得
         /// </summary>

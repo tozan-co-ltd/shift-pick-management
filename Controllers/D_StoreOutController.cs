@@ -55,12 +55,12 @@ namespace mar_sumaken_web.Controllers
                 var sql = D_StoreOutConnectController.CreateSQLToGetDStoreOuts(model);
 
                 // DB接続
-                List<D_StoreOutModel> listD_StoreOut = D_StoreOutConnectController.ConnectDStoreOuts(sql, ClaimsLoginUserData().DatabaseName);
+                List<D_StoreOutModel> dStoreOutList = D_StoreOutConnectController.ConnectDStoreOuts(sql, ClaimsLoginUserData().DatabaseName);
 
                 // 表示用のhtml作成
-                if (listD_StoreOut.Count > 0)
+                if (dStoreOutList.Count > 0)
                 {
-                    IEnumerable<D_StoreOutModel> query = listD_StoreOut.Select(s => s);
+                    IEnumerable<D_StoreOutModel> query = dStoreOutList.Select(s => s);
                     model.D_StoreOutList = query.ToPagedList();
 
                     foreach (var item in model.D_StoreOutList)

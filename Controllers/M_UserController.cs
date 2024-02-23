@@ -53,8 +53,8 @@ namespace mar_sumaken_web.Controllers
                 if (userList.Count > 0)
                 {
                     // ユーザーマスターの詳細を取得
-                    IEnumerable<M_UserModel> query = (IEnumerable<M_UserModel>)M_UserConnectController.GetMUserDetailList(userList, user.DatabaseName);
-                    model.M_UserList = query.ToPagedList();
+                    IEnumerable<M_UserModel> mUserList = M_UserConnectController.GetMUserDetailList(userList, user.DatabaseName);
+                    model.M_UserList = mUserList.ToPagedList();
                 }
 
                 return View(model);

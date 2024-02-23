@@ -5,7 +5,7 @@ namespace mar_sumaken_web.Models
     /// <summary>
     /// ハンディエラーメッセージ実績テーブルのModel
     /// </summary>
-    public class D_HandyErrorMessageModel
+    public class D_HandyErrorMessageModel : CommonModel
     {
         /// <summary>
         /// ハンディエラーメッセージ実績リスト
