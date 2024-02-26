@@ -42,27 +42,6 @@ namespace mar_sumaken_web.ConnectControllers
             }
         }
 
-        ///// <summary>
-        ///// ハンディメニューマスター情報取得
-        ///// </summary>
-        ///// <param name="databaseName">データベース名</param>
-        ///// <returns>ハンディメニューマスター情報</returns>
-        //public static List<M_HandyMenuModel> GetMHandyMenuList(string databaseName)
-        //{
-        //    try
-        //    {
-        //        // SQL作成
-        //        var sql = CreateSQLToGetMHandyMenuList();
-        //        // DB接続
-        //        List<M_HandyMenuModel> userList = ConnectMHandyMenus(sql, databaseName);
-        //        return userList;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
-
         /// <summary>
         /// ハンディメニューマスター情報取得SQL作成
         /// </summary>

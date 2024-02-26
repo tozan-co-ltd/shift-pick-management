@@ -42,27 +42,6 @@ namespace mar_sumaken_web.ConnectControllers
             }
         }
 
-        ///// <summary>
-        ///// 倉庫マスター情報取得
-        ///// </summary>
-        ///// <param name="databaseName">データベース名</param>
-        ///// <returns>倉庫マスター情報</returns>
-        //public static List<M_DepoModel> GetMDepoList(string databaseName)
-        //{
-        //    try
-        //    {
-        //        // SQL作成
-        //        var sql = CreateSQLToSelectMDepos();
-        //        // DB接続
-        //        List<M_DepoModel> userList = ConnectMDepos(sql, databaseName);
-        //        return userList;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
-
         /// <summary>
         /// 倉庫情報登録
         /// </summary>

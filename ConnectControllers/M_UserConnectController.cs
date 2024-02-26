@@ -157,37 +157,6 @@ namespace mar_sumaken_web.Commons
             }
         }
 
-
-        ///// <summary>
-        ///// ユーザーのハンディメニュー情報取得
-        ///// </summary>
-        ///// <param name="userId"></param>
-        ///// <param name="databaseName"></param>
-        ///// <returns></returns>
-        //public static List<M_HandyMenuModel> GetUserMenuByUserId(int userId, string databaseName)
-        //{
-        //    try
-        //    {
-        //        // SQLServer接続文字列取得
-        //        var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
-        //        // SQLServer接続
-        //        using (var connection = new SqlConnection())
-        //        {
-        //            connection.ConnectionString = connectionString;
-        //            connection.Open();
-
-        //            // ハンディメニューマスター情報取得
-        //            var userHandyMenuSql = CreateSQLToGetRUserHandyMenuList(userId);
-        //            List<M_HandyMenuModel> handyMenuList = connection.Query<M_HandyMenuModel>(userHandyMenuSql).ToList();
-        //            return handyMenuList;
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
-
         /// <summary>
         /// ユーザーマスター削除
         /// </summary>
