@@ -96,6 +96,46 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 入庫実績更新
+        /// </summary>
+        /// <param name="model">入庫実績モデル</param>
+        /// <param name="user">ログインユーザー</param>
+        public static void EditDStoreIn(D_StoreInModel model, LoginUserModel user)
+        {
+            DateTime sysDate = DateTime.Now;
+
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(user.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    // 入庫実績更新SQL作成
+                    model.DepoID = model.SelectedDepoID;
+                    model.CompanyID = model.SelectedCompanyID;
+                    model.StoreInDate = Convert.ToDateTime(model.DateSearchStart);
+                    string editSql = CreateSQLToEditDStoreIn(model, sysDate, user.UserName);
+                    // 入庫実績更新
+                    var editCount = connection.Execute(editSql);
+                    // 更件数が0の場合はエラーとする
+                    if (editCount == 0)
+                    {
+                        throw new Exception();
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// 入庫実績削除
         /// </summary>
         /// <param name="storeInId">入庫実績ID</param>
@@ -149,6 +189,38 @@ namespace mar_sumaken_web.ConnectControllers
                     {model.DepoID}, {model.CompanyID}, '{model.StoreInDate}', '{model.SupplierProductNumber}', '{model.LotNumber}', '{model.MainProductKey}', '{model.FirstSubProductKey}', '{model.SecondSubProductKey}', {model.NumberOfBoxes}, {model.Quantity}, '{model.Remarks}', '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}'
                 )
             ;";
+            return sql;
+        }
+
+        /// <summary>
+        /// 入庫実績更新SQL作成
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        /// <param name="createAt">システムタイム</param>
+        /// <param name="createBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToEditDStoreIn(D_StoreInModel model, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+                UPDATE D_StoreIn
+                SET 
+                    DepoID = {model.DepoID},
+                    CompanyID = {model.CompanyID},
+                    StoreInDate = '{model.StoreInDate}',
+                    SupplierProductNumber = '{model.SupplierProductNumber}',
+                    LotNumber = '{model.LotNumber}',
+                    MainProductKey = '{model.MainProductKey}',
+                    FirstSubProductKey = '{model.FirstSubProductKey}',
+                    SecondSubProductKey = '{model.SecondSubProductKey}',
+                    NumberOfBoxes = {model.NumberOfBoxes},
+                    Quantity = {model.Quantity},
+                    Remarks = '{model.Remarks}',
+                    UpdatedAt = '{updatedAt}',
+                    UpdatedBy = '{updatedBy}'
+                WHERE
+                    StoreInID = {model.StoreInID}
+                    AND IsDeleted = 0
+            ";
             return sql;
         }
 

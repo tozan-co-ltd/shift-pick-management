@@ -192,22 +192,22 @@
             var productNumberName = "RegisterList[" + index + "].SupplierProductNumber";
             var productNumberElement = document.querySelector('[name="' + productNumberName + '"]');
             if ($(productNumberElement).val() == '') {
-                productNumberElement.style.borderColor = "red";
+                productNumberElement.classList.add("input-validation-error");
                 checkFlag = false;
             }
             else {
-                productNumberElement.style.borderColor = "#d1d3e2";
+                productNumberElement.classList.remove("input-validation-error");
             }
 
             // 数量
             var quantityName = "RegisterList[" + index + "].Quantity";
             var quantityNameElement = document.querySelector('[name="' + quantityName + '"]');
             if ($(quantityNameElement).val() <= 0) {
-                quantityNameElement.style.borderColor = "red";
+                quantityNameElement.classList.add("input-validation-error");
                 checkFlag = false;
             }
             else {
-                quantityNameElement.style.borderColor = "#d1d3e2";
+                quantityNameElement.classList.remove("input-validation-error");
             }
         });
         return checkFlag;

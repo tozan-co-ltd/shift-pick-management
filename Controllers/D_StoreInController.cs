@@ -67,7 +67,7 @@ namespace mar_sumaken_web.Controllers
 
                 // 入庫実績情報取得SQL作成
                 var sql = D_StoreInConnectionController.CreateSQLToGetDStoreIns(
-                    searchModel.DateSearchStart, searchModel.DateSearchEnd, searchModel.SelectedDepoID, 2);
+                    searchModel.DateSearchStart, searchModel.DateSearchEnd, searchModel.SelectedDepoID, searchModel.SelectedCompanyID);
                 // DB接続
                 List<D_StoreInModel> storeInList = D_StoreInConnectionController.ConnectDStoreIns(sql, user.DatabaseName);
 
@@ -81,7 +81,7 @@ namespace mar_sumaken_web.Controllers
                         searchData += $@"<tr>
                         <td>
                             <a class='btn btn-success btn-icon-split ml-1 mr-1'
-                            onclick='OnEditClick({item.StoreInID})' data-id='{item.StoreInID}' data-toggle='modal' data-target='#edit-modal'>
+                            onclick='OnEditClick(this)' data-id='{item.StoreInID}' data-toggle='modal' data-target='#edit-modal'>
                                 <i class='fa-solid fa-pen'></i>
                             </a>
                             <button class='btn btn-danger btn-icon-split'
@@ -89,7 +89,6 @@ namespace mar_sumaken_web.Controllers
                                 <i class='fa-solid fa-trash'></i>
                             </button>
                         </td>
-
                         <td class='StoreInID'>{@item.StoreInID}</td>
                         <td class='SupplierName'>{@item.SupplierName}</td>
                         <td class='StoreInDate'>{@item.StoreInDate.ToString("yyyy/MM/dd")}</td>
@@ -104,6 +103,8 @@ namespace mar_sumaken_web.Controllers
                         <td class='Remarks'>{@item.Remarks}</td>
                         <td class='CreatedAt'>{@item.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")}</td>
                         <td class='CreatedBy'>{@item.CreatedBy}</td>
+                        <input type='hidden' class='DepoID' value='{item.DepoID}' />
+                        <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
                         </tr>";
                     }
                 }
@@ -235,6 +236,52 @@ namespace mar_sumaken_web.Controllers
 
                 // 入庫実績登録
                 D_StoreInConnectionController.InsertDStoreIns(model, user);
+
+                return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004 :" + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999 :" + ErrorMessagesResources.E9999 });
+            }
+        }
+
+        /// <summary>
+        /// 入庫実績更新
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        [HttpPost]
+        public IActionResult Edit(D_StoreInModel model)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+                if (user == null)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
+                }
+
+                // 入力値チェック
+                if (!ModelState.IsValid)
+                {
+                    return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
+                }
+
+                // 仕入先品番チェック
+                bool isExistProduct = M_ProductConnectController.CheckMProductExist(model.SupplierProductNumber, user.DatabaseName);
+                if (!isExistProduct)
+                {
+                    var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
+                    return NotFound(new { errorMessage = message });
+                }
+
+                // 入庫実績更新
+                D_StoreInConnectionController.EditDStoreIn(model, user);
 
                 return Ok();
             }
