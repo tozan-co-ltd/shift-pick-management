@@ -10,7 +10,7 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// 日付チェック（yyyy/MM/dd）Eg:入荷予定日
         /// </summary>
-        public const string DateTimeSlashRegex = @"^(?:\d{4})\/(?:[1-9]|0[1-9]|1[0-2])\/(?:[1-9]|[12]\d|3[01])$";
+        public const string DateTimeSlashRegex = @"^(?:\d{4})\/(?:[1-9]|0?[1-9]|1[0-2])\/(?:[1-9]|0?[1-9]|[12]\d|3[01])$";
 
         /// <summary>
         /// 日付チェック（yyyyMMdd）Eg:納入指示日

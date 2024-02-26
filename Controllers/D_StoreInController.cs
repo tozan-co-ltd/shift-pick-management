@@ -3,6 +3,7 @@ using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
@@ -14,6 +15,9 @@ namespace mar_sumaken_web.Controllers
     /// </summary>
     public class D_StoreInController : BaseController
     {
+        // 新規作成行数
+        private const int InitRegisterRowCount = 5;
+
         /// <summary>
         /// 入庫実績照会画面表示
         /// </summary>
@@ -55,6 +59,7 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 検索情報をチェック
+                ModelState.Remove("SupplierProductNumber");
                 if (!ModelState.IsValid)
                 {
                     return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
@@ -62,21 +67,21 @@ namespace mar_sumaken_web.Controllers
 
                 // 入庫実績情報取得SQL作成
                 var sql = D_StoreInConnectionController.CreateSQLToGetDStoreIns(
-                    searchModel.DateSearchStart, searchModel.DateSearchEnd, searchModel.SelectedDepoID, 2);
+                    searchModel.DateSearchStart, searchModel.DateSearchEnd, searchModel.SelectedDepoID, searchModel.SelectedCompanyID);
                 // DB接続
                 List<D_StoreInModel> storeInList = D_StoreInConnectionController.ConnectDStoreIns(sql, user.DatabaseName);
 
                 // 表示用のhtml作成
                 if (storeInList.Count > 0)
                 {
-                    model.D_StoreInList = storeInList.ToPagedList();
+                    model.DStoreInList = storeInList.ToPagedList();
 
-                    foreach (var item in model.D_StoreInList)
+                    foreach (var item in model.DStoreInList)
                     {
                         searchData += $@"<tr>
                         <td>
                             <a class='btn btn-success btn-icon-split ml-1 mr-1'
-                            onclick='OnEditClick({item.StoreInID})' data-id='{item.StoreInID}' data-toggle='modal' data-target='#edit-modal'>
+                            onclick='OnEditClick(this)' data-id='{item.StoreInID}' data-toggle='modal' data-target='#edit-modal'>
                                 <i class='fa-solid fa-pen'></i>
                             </a>
                             <button class='btn btn-danger btn-icon-split'
@@ -84,7 +89,6 @@ namespace mar_sumaken_web.Controllers
                                 <i class='fa-solid fa-trash'></i>
                             </button>
                         </td>
-
                         <td class='StoreInID'>{@item.StoreInID}</td>
                         <td class='SupplierName'>{@item.SupplierName}</td>
                         <td class='StoreInDate'>{@item.StoreInDate.ToString("yyyy/MM/dd")}</td>
@@ -99,6 +103,8 @@ namespace mar_sumaken_web.Controllers
                         <td class='Remarks'>{@item.Remarks}</td>
                         <td class='CreatedAt'>{@item.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")}</td>
                         <td class='CreatedBy'>{@item.CreatedBy}</td>
+                        <input type='hidden' class='DepoID' value='{item.DepoID}' />
+                        <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
                         </tr>";
                     }
                 }
@@ -113,6 +119,179 @@ namespace mar_sumaken_web.Controllers
             {
                 var exceptionMessage = ex.Message;
                 return Content(exceptionMessage);
+            }
+        }
+
+        /// <summary>
+        /// 登録画面表示
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult Register()
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                if (user == null)
+                {
+                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                }
+
+                var model = new D_StoreInModel();
+                List<D_StoreInModel> storeInList = new();
+                for (int i = 0; i < InitRegisterRowCount; i++)
+                {
+                    var viewModel = new D_StoreInModel();
+                    viewModel.DepoID = user.MainDepoID;
+                    storeInList.Add(viewModel);
+
+                    model.RegisterList = storeInList;
+                }
+                // 会社リスト取得
+                CommonModel commonModel = new();
+                model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_SupplierID);
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999 :" + ErrorMessagesResources.E9999 });
+            }
+        }
+
+        /// <summary>
+        /// 入庫実績登録
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        [HttpPost]
+        public IActionResult Register(D_StoreInModel model)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+                if (user == null)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
+                }
+
+                List<string> errorMessageList = new();
+                int readCount = 1;
+                // リストチェック
+                if (model.RegisterList != null && model.RegisterList.Count > 0)
+                {
+                    foreach(var modelItem in model.RegisterList)
+                    {
+                        var validationContext = new ValidationContext(modelItem);
+                        var validationResults = new List<ValidationResult>();
+                        bool isValid = Validator.TryValidateObject(modelItem, validationContext, validationResults, true);
+                        List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
+
+                        // 仕入先品番チェック
+                        bool isContainSupplierProductNumber = errorMembers.Contains("SupplierProductNumber");
+                        if (!isContainSupplierProductNumber)
+                        {
+                            // 仕入先品番で品番チェック
+                            bool isExistProduct = M_ProductConnectController.CheckMProductExist(modelItem.SupplierProductNumber, user.DatabaseName);
+                            if (!isExistProduct)
+                            {
+                                isValid = false;
+                                var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
+                                validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
+                            }
+                        }
+
+                        // エラーメッセージ作成
+                        if (!isValid)
+                        {
+                            foreach (var err in validationResults)
+                            {
+                                // フォーマットエラーメッセージ
+                                List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ReceiveScheduleModel>(err);
+                                errorMessageItem.Insert(0, readCount + "行目");
+
+                                // HTMLに変換
+                                var errorHtml = string.Empty;
+                                foreach (var item in errorMessageItem)
+                                {
+                                    errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
+                                }
+                                errorHtml = "<tr>" + errorHtml + "</tr>";
+
+                                errorMessageList.Add(errorHtml);
+                            }
+                        }
+                    }
+
+                    // エラーが1件以上ある場合はreturn
+                    if (errorMessageList.Count > 0)
+                    {
+                        var errorMessage = string.Join("</br>", errorMessageList);
+                        return NotFound(new { errorMessage });
+                    }
+                }
+
+                // 入庫実績登録
+                D_StoreInConnectionController.InsertDStoreIns(model, user);
+
+                return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004 :" + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999 :" + ErrorMessagesResources.E9999 });
+            }
+        }
+
+        /// <summary>
+        /// 入庫実績更新
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        [HttpPost]
+        public IActionResult Edit(D_StoreInModel model)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+                if (user == null)
+                {
+                    // エラーコード：E2011
+                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
+                }
+
+                // 入力値チェック
+                if (!ModelState.IsValid)
+                {
+                    return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
+                }
+
+                // 仕入先品番チェック
+                bool isExistProduct = M_ProductConnectController.CheckMProductExist(model.SupplierProductNumber, user.DatabaseName);
+                if (!isExistProduct)
+                {
+                    var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
+                    return NotFound(new { errorMessage = message });
+                }
+
+                // 入庫実績更新
+                D_StoreInConnectionController.EditDStoreIn(model, user);
+
+                return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004 :" + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999 :" + ErrorMessagesResources.E9999 });
             }
         }
 
