@@ -340,64 +340,62 @@
     // 検索ボタン押下
     $('#search-btn').click(function () {
         $('#searchForm').submit(function (e) {
-
-            console.log("call");
-
-            // エラーメッセージ削除
             DeleteErrorMessages();
 
-            // フォーム情報を取得する
-            var formData = $(this).serialize();
             // ページの更新を禁止する
             e.preventDefault();
             // 送信イベントが他のハンドラーに伝播するのを防ぐ
             e.stopImmediatePropagation();
 
-            // ajax
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("SearchData", "D_StoreIn")';
+            let method = 'POST';
+            var data = $(this).serialize();
+
+            // Ajax call
             $.ajax({
-                url: '@Url.Action("SearchData", "D_StoreIn")',
-                method: "POST",
-                data: formData
-            })
-                .done(function (response) {
-                    $("#table-datatable tbody").empty();
-                    $('#table-datatable').DataTable().destroy();
-                    $("#div-table").show();
-                    $("#table-datatable tbody").html(response);
-                    $("#table-datatable").DataTable({
-                        "language": {           // 日本語表示
-                            "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
-                        },
-                        lengthChange: true,     // 表示件数
-                        info: false,            // 総件数
-                        scrollX: true,          // 横スクロール可
-                        order: [[3, "asc"]],    // 仕入先品番昇順
-                    });
-                })
-                .fail(function (xhr, textStatus, errorThrown) {
-                    if (xhr.status === 404) {
-                        var errorMessage = xhr.responseJSON.errorMessage;
-                        $("#div-error-message").text(errorMessage);
-                    } else {
-                        var errorMessage500 = "E3002: サーバーに接続できませんでした。" + ' HttpRequest : ' + xhr.status + ', textStatus : ' + textStatus;
-                        $("#div-error-message").text(errorMessage500);
-                    }
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $("#table-datatable tbody").empty();
+                $('#table-datatable').DataTable().destroy();
+                $("#div-table").show();
+                $("#table-datatable tbody").html(response);
+                $("#table-datatable").DataTable({
+                    "language": {           // 日本語表示
+                        "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+                    },
+                    lengthChange: true,     // 表示件数
+                    info: false,            // 総件数
+                    scrollX: true,          // 横スクロール可
+                    order: [[3, "asc"]],    // 仕入先品番昇順
                 });
+            }).fail(function (xhr, textStatus, errorThrown) {
+                if (xhr.status === 404) {
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage500);
+                }
+            });
         });
     });
 
     // 出力ボタン押下
     $('#export-file-btn').click(function (event) {
-        // エラーメッセージ削除
         DeleteErrorMessages();
+
         // ページの更新を禁止する
         event.preventDefault();
+
         // 送信イベントが他のハンドラーに伝播するのを防ぐ
         event.stopImmediatePropagation();
 
         var searchFormArr = $('#searchForm').serializeArray();
 
-        // フォーム情報を取得する
+        // フォーム情報取得
         var exportFormData = new FormData();
         exportFormData.append("searchModel.DepoID", searchFormArr[0].value);
         exportFormData.append("searchModel.DepoName", $('#SelectedDepoID option:selected').text().replace(/ /g, ""));
@@ -406,7 +404,7 @@
         exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
         exportFormData.append("searchModel.SearchEndDate", searchFormArr[3].value);
 
-        // 画面名
+        // 画面名取得
         exportFormData.append("gamenName", $("#viewTitle").val());
 
         // CSV出力
@@ -415,15 +413,12 @@
 
     // 編集ボタン押下
     function OnEditClick(trTag) {
-        // エラーメッセージ削除
         DeleteErrorMessages();
 
         var row = trTag.parentNode.parentNode;
-
         $("#editSelectedDepoID").val(row.getElementsByClassName("DepoID")[0].value);
         $("#editSelectedCompanyID").val(row.getElementsByClassName("SupplierID")[0].value);
         $("#DateSearchStart").val(row.getElementsByClassName("StoreInDate")[0].textContent);
-
         $("#StoreInID").val(row.getElementsByClassName("StoreInID")[0].textContent);
         $("#SupplierName").val(row.getElementsByClassName("SupplierName")[0].textContent);
         $("#SupplierProductNumber").val(row.getElementsByClassName("SupplierProductNumber")[0].textContent);
@@ -437,12 +432,51 @@
         $("#Remarks").val(row.getElementsByClassName("Remarks")[0].textContent);
     }
 
+    // 更新
+    function OnExecuteEdit() {
+        $('#editForm').submit(function (event) {
+            DeleteErrorMessages();
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Edit", "D_StoreIn")';
+            let method = 'POST';
+            var data = $('#editForm').serializeArray();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(async function (data) {
+                $('#edit-modal').hide();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録完了しました。', null, null, true);
+                await WaitSeconds();
+                // 再検索
+                $('#search-btn').trigger('click');
+            }).fail(function (xhr, textStatus, errorThrown) {
+                if (xhr.status === 404) {
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                } else {
+                    var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#edit-modal-error-message").text(errorMessage500);
+                }
+            });
+        });
+    }
+
     // 削除ボタン押下
     function OnDeleteClick(trTag) {
         DeleteErrorMessages();
 
         var row = trTag.parentNode.parentNode;
-
         $("#deleteStoreInId").val(row.getElementsByClassName("StoreInID")[0].textContent);
         $("#deleteSupplierName").val(row.getElementsByClassName("SupplierName")[0].textContent);
         $("#deleteStoreInDate").val(row.getElementsByClassName("StoreInDate")[0].textContent);
@@ -453,78 +487,37 @@
         $("#deleteNumberOfBoxes").val(row.getElementsByClassName("NumberOfBoxes")[0].textContent);
     }
 
-    // 更新
-    function OnExecuteEdit() {
-        $('#editForm').submit(function (event) {
-            DeleteErrorMessages();
-
-            // フォーム情報を取得する
-            var formData = $('#editForm').serializeArray();
-
-            // ページの更新を禁止する
-            event.preventDefault();
-
-            // 送信イベントが他のハンドラーに伝播するのを防ぐ
-            event.stopImmediatePropagation();
-
-            // Ajax
-            $.ajax({
-                url: window.location.origin + '@Url.Action("Edit", "D_StoreIn")',
-                method: "POST",
-                data: formData
-            })
-                .done(async function (data) {
-                    // 完了モーダル表示
-                    $('#edit-modal').hide();
-                    AlertMessage('', '完了', '登録完了しました。', null, null, true);
-                    await WaitSeconds();
-                    $('#search-btn').trigger('click');
-                })
-                .fail(function (xhr, textStatus, errorThrown) {
-                    if (xhr.status === 404) {
-                        var errorMessage = xhr.responseJSON.errorMessage;
-                        $("#edit-modal-error-message").text(errorMessage);
-                    } else {
-                        var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
-                        $("#edit-modal-error-message").text(errorMessage500);
-                    }
-                });
-        });
-    }
-
     // 削除
     function OnExecuteDelete() {
         DeleteErrorMessages();
 
-        // POSTするデータ
-        var storeInId = $("#deleteStoreInId").val();
-        formData = {
-            "storeInId": storeInId
-        };
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("Delete", "D_StoreIn")';
+        let method = 'POST';
+        var data = { "storeInId": $("#deleteStoreInId").val() };
 
-        // ajax
+        // Ajax call
         $.ajax({
-            method: "POST",
-            url: window.location.origin + '@Url.Action("Delete", "D_StoreIn")',
-            data: formData
-        })
-            .done(async function (data) {
-                // 完了モーダル表示
-                $('#delete-modal').removeClass('show');
-                $('#delete-modal').hide();
-                AlertMessage('', '完了', '登録完了しました。', null, null, true);
-                await WaitSeconds();
-                $('#search-btn').trigger('click');
-            })
-            .fail(function (xhr, textStatus, errorThrown) {
-                if (xhr.status === 404) {
-                    var errorMessage = xhr.responseJSON.errorMessage;
-                    $("#delete-modal-error-message").text(errorMessage);
-                } else {
-                    var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
-                    $("#delete-modal-error-message").text(errorMessage500);
-                }
-            });
+            url: url,
+            method: method,
+            data: data
+        }).done(async function (data) {
+            $('#delete-modal').removeClass('show');
+            $('#delete-modal').hide();
+            // 完了モーダル表示
+            AlertMessage('', '完了', '登録完了しました。', null, null, true);
+            await WaitSeconds();
+            // 再検索
+            $('#search-btn').trigger('click');
+        }).fail(function (xhr, textStatus, errorThrown) {
+            if (xhr.status === 404) {
+                var errorMessage = xhr.responseJSON.errorMessage;
+                $("#delete-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#delete-modal-error-message").text(errorMessage500);
+            }
+        });
     }
 
     function WaitSeconds() {

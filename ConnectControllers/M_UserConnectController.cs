@@ -80,7 +80,7 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// ユーザーマスターの詳細を取得する
+        /// ユーザーマスターの詳細を取得
         /// </summary>
         /// <param name="userList">ユーザー情報</param>
         /// <param name="databaseName">データベース名</param>
@@ -128,7 +128,7 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// ユーザーの倉庫情報取得
+        /// ユーザーの使用倉庫情報取得
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="databaseName"></param>
@@ -158,48 +158,48 @@ namespace mar_sumaken_web.Commons
         }
 
 
-        /// <summary>
-        /// ユーザーのハンディメニュー情報取得
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="databaseName"></param>
-        /// <returns></returns>
-        public static List<M_HandyMenuModel> GetUserMenuByUserId(int userId, string databaseName)
-        {
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
+        ///// <summary>
+        ///// ユーザーのハンディメニュー情報取得
+        ///// </summary>
+        ///// <param name="userId"></param>
+        ///// <param name="databaseName"></param>
+        ///// <returns></returns>
+        //public static List<M_HandyMenuModel> GetUserMenuByUserId(int userId, string databaseName)
+        //{
+        //    try
+        //    {
+        //        // SQLServer接続文字列取得
+        //        var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+        //        // SQLServer接続
+        //        using (var connection = new SqlConnection())
+        //        {
+        //            connection.ConnectionString = connectionString;
+        //            connection.Open();
 
-                    // ハンディメニューマスター情報取得
-                    var userHandyMenuSql = CreateSQLToGetRUserHandyMenuList(userId);
-                    List<M_HandyMenuModel> handyMenuList = connection.Query<M_HandyMenuModel>(userHandyMenuSql).ToList();
-                    return handyMenuList;
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        //            // ハンディメニューマスター情報取得
+        //            var userHandyMenuSql = CreateSQLToGetRUserHandyMenuList(userId);
+        //            List<M_HandyMenuModel> handyMenuList = connection.Query<M_HandyMenuModel>(userHandyMenuSql).ToList();
+        //            return handyMenuList;
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
 
         /// <summary>
         /// ユーザーマスター削除
         /// </summary>
         /// <param name="userId">ユーザーID</param>
-        /// <param name="databaseName">データベース名</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>更新件数</returns>
-        public static int DeleteMUser(int userId, string databaseName)
+        public static int DeleteMUser(int userId, LoginUserModel loginUser)
         {
             int deleteAffectedRows = 0;
 
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -212,23 +212,20 @@ namespace mar_sumaken_web.Commons
                 // DB接続
                 try
                 {
-                    // ユーザーマスター削除SQL作成
-                    string userDeleteSql = CreateSQLToDeleteMUser(userId);
                     // ユーザーマスター削除
+                    string userDeleteSql = CreateSQLToDeleteMUser(userId);
                     deleteAffectedRows = connection.Execute(userDeleteSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
                     if(deleteAffectedRows == 0)
                     {
-                        // エラーコード：E2011
                         throw new Exception();
                     }
 
-                    // ユーザー-倉庫中間テーブル削除SQL作成
-                    string userDepoDeleteSql = CreateSQLToDeleteRUserDepo(userId);
                     // ユーザー-倉庫中間テーブル削除
+                    string userDepoDeleteSql = CreateSQLToDeleteRUserDepo(userId);
                     connection.Execute(userDepoDeleteSql, null, transaction);
 
-                    // ユーザー-ハンディメニュー中間テーブル削除SQL作成
+                    // ユーザー-ハンディメニュー中間テーブル削除
                     string userMenuDeleteSql = CreateSQLToDeleteRUserHandyMenu(userId);
                     connection.Execute(userMenuDeleteSql, null, transaction);
 
@@ -393,29 +390,27 @@ namespace mar_sumaken_web.Commons
                 {
                     DateTime sysDate = DateTime.Now;
 
-                    // ユーザーマスター更新SQL作成
-                    string userUpdateSql = CreateSQLToUpdateMUser(mUserModel, sysDate, loginUserModel.UserName);
                     // ユーザーマスター更新
+                    string userUpdateSql = CreateSQLToUpdateMUser(mUserModel, sysDate, loginUserModel.UserName);
                     var updatedRows = connection.Execute(userUpdateSql, null, transaction);
-                    // 更件数が0の場合はエラーとする
+                    // 更新件数が0の場合はエラーとする
                     if (updatedRows == 0)
                     {
                         result = false;
                         throw new Exception();
                     }
 
-                    // 削除して新規作成する
+                    // ユーザー倉庫中間テーブル登録
+                    // 削除してから新規作成
                     string userDepoDeleteSql = CreateSQLToDeleteRUserDepoByUserId(mUserModel.UserID);
                     await connection.ExecuteAsync(userDepoDeleteSql, null, transaction);
-                    // ユーザー倉庫中間テーブル更新
                     foreach (SelectListItem depo in mUserModel.DepoSelectList)
                     {
                         if (depo.Selected)
                         {
-                            // ユーザー倉庫中間テーブル更新SQL作成
                             string userDepoInsertSql = CreateSQLToInsertRUserDepo(mUserModel.UserID, Convert.ToInt32(depo.Value), sysDate, loginUserModel.UserName);
                             int depoInsertCount = connection.Execute(userDepoInsertSql, null, transaction);
-                            // 更件数が0の場合はエラーとする
+                            // 更新件数が0の場合はエラーとする
                             if (depoInsertCount == 0)
                             {
                                 result = false;
@@ -424,18 +419,17 @@ namespace mar_sumaken_web.Commons
                         }
                     }
 
-                    // 削除して新規作成する
+                    // ユーザーハンディメニュー中間テーブル登録
+                    // 削除してから新規作成
                     string userHandyMenuDeleteSql = CreateSQLToDeleteRHandyMenuByUserId(mUserModel.UserID);
                     await connection.ExecuteAsync(userHandyMenuDeleteSql, null, transaction);
-                    // ユーザーハンディメニュー中間テーブル登録
                     foreach (SelectListItem menu in mUserModel.HandyMenuSelectList)
                     {
                         if (menu.Selected)
                         {
-                            // ユーザーハンディメニュー中間テーブル更新SQL作成
                             string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(mUserModel.UserID, Convert.ToInt32(menu.Value), sysDate, loginUserModel.UserName);
                             int menuInsertCount = connection.Execute(userMenuInsertSql, null, transaction);
-                            // 更件数が0の場合はエラーとする
+                            // 更新件数が0の場合はエラーとする
                             if (menuInsertCount == 0)
                             {
                                 result = false;
@@ -464,13 +458,13 @@ namespace mar_sumaken_web.Commons
         public static string CreateSQLToSelectDuplicateMUser(string loginId)
         {
             var sql = $@"
-                    SELECT
-                        COUNT(*)                      
-                    FROM 
-                        M_User
-                    WHERE
-                        LoginID = '{loginId}'
-                        AND IsDeleted = 0
+                SELECT
+                    COUNT(*)                      
+                FROM 
+                    M_User
+                WHERE
+                    LoginID = '{loginId}'
+                    AND IsDeleted = 0
             ";
 
             return sql;
@@ -483,64 +477,64 @@ namespace mar_sumaken_web.Commons
         public static string CreateSQLToSelectMUsers()
         {
             var sql = $@"
-                    SELECT
-                         m_user.UserID                                
-                        ,m_user.LoginID                              
-                        ,m_user.UserName
-                        ,m_user.DepoID
-	                    ,m_depo.DepoName
-                        ,m_user.AuthorizedKubun
-                        ,CASE 
-                            WHEN m_user.AuthorizedKubun = 1 THEN '管理者'
-                            WHEN m_user.AuthorizedKubun = 2 THEN '作業者'
-                            WHEN m_user.AuthorizedKubun = 3 THEN '作業者(解除要)'
-                            ELSE''
-                        END AS AuthorizedKubunName
-                        ,m_user.UpdatedAt
-                        ,m_user.UpdatedBy                            
-                    FROM 
-                        M_User AS m_user
-                    INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
-                    WHERE
-                        m_user.IsDeleted = 0
-                        AND m_depo.IsDeleted = 0
+                SELECT
+                        m_user.UserID                                
+                    ,m_user.LoginID                              
+                    ,m_user.UserName
+                    ,m_user.DepoID
+	                ,m_depo.DepoName
+                    ,m_user.AuthorizedKubun
+                    ,CASE 
+                        WHEN m_user.AuthorizedKubun = 1 THEN '管理者'
+                        WHEN m_user.AuthorizedKubun = 2 THEN '作業者'
+                        WHEN m_user.AuthorizedKubun = 3 THEN '作業者(解除要)'
+                        ELSE''
+                    END AS AuthorizedKubunName
+                    ,m_user.UpdatedAt
+                    ,m_user.UpdatedBy                            
+                FROM 
+                    M_User AS m_user
+                INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
+                WHERE
+                    m_user.IsDeleted = 0
+                    AND m_depo.IsDeleted = 0
             ;";
 
             return sql;
         }
 
         /// <summary>
-        /// IDでユーザーを選択するSQLを作成
+        /// IDが一致するユーザー情報取得SQL作成
         /// </summary>
         /// <param name="userId">ユーザーID</param>
         /// <returns></returns>
         public static string CreateSQLToSelectMUserByUserId(int userId)
         {
             var sql = $@"
-                    SELECT
-                         m_user.UserID                                
-                        ,m_user.LoginID                              
-                        ,m_user.UserName
-                        ,m_user.DepoID
-	                    ,m_depo.DepoName
-                        ,m_user.AuthorizedKubun
-                        ,CASE 
-                            WHEN m_user.AuthorizedKubun = 1 THEN '管理者'
-                            WHEN m_user.AuthorizedKubun = 2 THEN '作業者'
-                            WHEN m_user.AuthorizedKubun = 3 THEN '作業者(解除要)'
-                            ELSE''
-                        END AS AuthorizedKubunName
-                        ,FORMAT (m_user.CreatedAt, 'yyyy/MM/dd ') AS CreatedAt
-                        ,m_user.CreatedBy
-                        ,FORMAT (m_user.UpdatedAt, 'yyyy/MM/dd ') AS UpdatedAt
-                        ,m_user.UpdatedBy                            
-                    FROM 
-                        M_User AS m_user
-                    INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
-                    WHERE
-                        m_user.UserId = {userId}
-                        AND m_user.IsDeleted = 0
-                        AND m_depo.IsDeleted = 0
+                SELECT
+                        m_user.UserID                                
+                    ,m_user.LoginID                              
+                    ,m_user.UserName
+                    ,m_user.DepoID
+	                ,m_depo.DepoName
+                    ,m_user.AuthorizedKubun
+                    ,CASE 
+                        WHEN m_user.AuthorizedKubun = 1 THEN '管理者'
+                        WHEN m_user.AuthorizedKubun = 2 THEN '作業者'
+                        WHEN m_user.AuthorizedKubun = 3 THEN '作業者(解除要)'
+                        ELSE''
+                    END AS AuthorizedKubunName
+                    ,FORMAT (m_user.CreatedAt, 'yyyy/MM/dd ') AS CreatedAt
+                    ,m_user.CreatedBy
+                    ,FORMAT (m_user.UpdatedAt, 'yyyy/MM/dd ') AS UpdatedAt
+                    ,m_user.UpdatedBy                            
+                FROM 
+                    M_User AS m_user
+                INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
+                WHERE
+                    m_user.UserId = {userId}
+                    AND m_user.IsDeleted = 0
+                    AND m_depo.IsDeleted = 0
             ;";
 
             return sql;
@@ -554,17 +548,17 @@ namespace mar_sumaken_web.Commons
         public static string CreateSQLToGetRUserDepoList(int userId)
         {
             var sql = $@"
-                        SELECT 
-	                        userDepo.DepoID,
-	                        m_depo.DepoCode,
-	                        m_depo.DepoName
-                        FROM 
-	                        R_UserDepo AS userDepo
-                        INNER JOIN M_Depo AS m_depo 
-                            ON userDepo.DepoID = m_depo.DepoID
-                        WHERE 
-	                        userDepo.UserID = {userId}
-                            AND m_depo.IsDeleted = 0
+                SELECT 
+	                userDepo.DepoID,
+	                m_depo.DepoCode,
+	                m_depo.DepoName
+                FROM 
+	                R_UserDepo AS userDepo
+                INNER JOIN M_Depo AS m_depo 
+                    ON userDepo.DepoID = m_depo.DepoID
+                WHERE 
+	                userDepo.UserID = {userId}
+                    AND m_depo.IsDeleted = 0
             ";
             return sql;
         }
@@ -577,16 +571,17 @@ namespace mar_sumaken_web.Commons
         public static string CreateSQLToGetRUserHandyMenuList(int userId)
         {
             var sql = $@"
-                         SELECT 
-	                        userMenu.HandyMenuID,
-	                        menu.HandyMenuName
-                         FROM 
-	                        R_UserHandyMenu AS userMenu
-                         INNER JOIN M_HandyMenu AS menu 
-                            ON userMenu.HandyMenuID = menu.HandyMenuID
-                         WHERE 
-	                        userMenu.UserID = {userId}
-                            AND menu.IsDeleted = 0
+                SELECT 
+	                userMenu.HandyMenuID,
+	                menu.HandyMenuName
+                FROM 
+	                R_UserHandyMenu AS userMenu
+                INNER JOIN M_HandyMenu AS menu 
+                ON 
+                    userMenu.HandyMenuID = menu.HandyMenuID
+                WHERE 
+	                userMenu.UserID = {userId}
+                    AND menu.IsDeleted = 0
             ";
             return sql;
         }

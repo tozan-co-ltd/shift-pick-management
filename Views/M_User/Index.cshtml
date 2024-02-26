@@ -247,29 +247,27 @@
     function OnExecuteDelete() {
         DeleteErrorMessages();
 
-        // POSTするデータ
-        var userId = document.getElementById('deleteUserId').value;
-        formData = {
-            "userId" : userId
-        };
-        
-        // ajax
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("Delete", "M_User")';
+        let method = 'POST';
+        var data = { "userId": $("#deleteUserId").val() };
+
+        // Ajax call
         $.ajax({
-            url: window.location.origin + '@Url.Action("Delete", "M_User")',
-            method: "POST",
-            data: formData
-        })
-        .done(function (data) {
-            // 完了モーダル表示
+            url: url,
+            method: method,
+            data: data
+        }).done(async function (data) {
+            $('#delete-modal').removeClass('show');
             $('#delete-modal').hide();
+            // 完了モーダル表示
             AlertMessage('', '完了', '登録完了しました。', null, null);
-        })
-        .fail(function (xhr, textStatus, errorThrown) {
+        }).fail(function (xhr, textStatus, errorThrown) {
             if (xhr.status === 404) {
                 var errorMessage = xhr.responseJSON.errorMessage;
                 $("#delete-modal-error-message").text(errorMessage);
             } else {
-                var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
+                var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
                 $("#delete-modal-error-message").text(errorMessage500);
             }
         });

@@ -16,7 +16,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static List<M_HandyMenuModel> ConnectMHandyMenu(string sql, string databaseName)
+        public static List<M_HandyMenuModel> ConnectMHandyMenus(string sql, string databaseName)
         {
             // 戻り値
             List<M_HandyMenuModel> strList = new();
@@ -42,26 +42,26 @@ namespace mar_sumaken_web.ConnectControllers
             }
         }
 
-        /// <summary>
-        /// ハンディメニューマスター情報取得
-        /// </summary>
-        /// <param name="databaseName">データベース名</param>
-        /// <returns>ハンディメニューマスター情報</returns>
-        public static List<M_HandyMenuModel> GetMHandyMenuList(string databaseName)
-        {
-            try
-            {
-                // SQL作成
-                var sql = CreateSQLToGetMHandyMenuList();
-                // DB接続
-                List<M_HandyMenuModel> userList = ConnectMHandyMenu(sql, databaseName);
-                return userList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        ///// <summary>
+        ///// ハンディメニューマスター情報取得
+        ///// </summary>
+        ///// <param name="databaseName">データベース名</param>
+        ///// <returns>ハンディメニューマスター情報</returns>
+        //public static List<M_HandyMenuModel> GetMHandyMenuList(string databaseName)
+        //{
+        //    try
+        //    {
+        //        // SQL作成
+        //        var sql = CreateSQLToGetMHandyMenuList();
+        //        // DB接続
+        //        List<M_HandyMenuModel> userList = ConnectMHandyMenus(sql, databaseName);
+        //        return userList;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
 
         /// <summary>
         /// ハンディメニューマスター情報取得SQL作成

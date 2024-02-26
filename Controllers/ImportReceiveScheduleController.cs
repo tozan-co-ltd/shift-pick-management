@@ -168,7 +168,7 @@ namespace mar_sumaken_web.Controllers
                                     if (!isContainSupplierProductNumber)
                                     {
                                         // 仕入先品番で品番チェック
-                                        bool isExistProduct = M_ProductConnectController.CheckMProductExist(receiveSchedule.SupplierProductNumber, user.DatabaseName);
+                                        bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(receiveSchedule.SupplierProductNumber, user.DatabaseName);
                                         if (!isExistProduct)
                                         {
                                             isValid = false;

@@ -31,7 +31,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "会社コード")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [RegularExpression(@"[0-9]{1,10}")]
+        [RegularExpression(@"[0-9]+", ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int CompanyCode { get; set; }
 
         /// <summary>
@@ -62,31 +62,26 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 削除フラグ
         /// </summary>
-        [Display(Name = "未使用フラグ")]
         public bool IsDeleted { get; set; } = false;
 
         /// <summary>
         /// 作成日時
         /// </summary>
-        [Display(Name = "作成日時")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// 作成者
         /// </summary>
-        [Display(Name = "作成者")]
         public string? CreatedBy { get; set; }
 
         /// <summary>
         /// 更新日時
         /// </summary>
-        [Display(Name = "更新日時")]
         public DateTime UpdatedAt { get; set; }
 
         /// <summary>
         /// 更新者
         /// </summary>
-        [Display(Name = "更新者")]
         public string? UpdatedBy { get; set; }
     }
 }

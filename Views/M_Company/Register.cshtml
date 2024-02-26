@@ -34,7 +34,7 @@
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
-                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="MCompanyForm">
+                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="mCompanyForm">
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
                             <label>@Html.DisplayName("CompanyCode")<span style="color:red">*</span></label>
@@ -78,7 +78,7 @@
                         </div>
                     </div>
 
-                    <button class="btn btn-primary btn-icon-split" id="register-btn" style="min-width: 80px">
+                    <button class="btn btn-primary btn-icon-split" style="min-width: 80px" onclick="OnRegister()">
                         <span class="text">登録</span>
                     </button>
                 </form>
@@ -89,12 +89,9 @@
 
 <script type="text/javascript">
     // 登録ボタン押下
-    $('#register-btn').click(function () {
-        $('#MCompanyForm').submit(function (event) {
-            $('#div-error-message').text('');
-
-            // フォーム情報を取得する
-            var formData = $('#MCompanyForm').serializeArray();
+    function OnRegister() {
+        $('#mCompanyForm').submit(function (event) {
+            $("#div-error-message").text("");
 
             // ページの更新を禁止する
             event.preventDefault();
@@ -102,29 +99,34 @@
             // 送信イベントが他のハンドラーに伝播するのを防ぐ
             event.stopImmediatePropagation();
 
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Register", "M_Company")';
+            let method = 'POST';
+            let formId = 'mCompanyForm';
+            let data = $('#' + formId).serializeArray();
+
             // Ajax call
             $.ajax({
-                url: '@Url.Action("Register", "M_Company")',
-                method: 'POST',
-                data: formData
-            })
-                .done(function (response) {
-                    $('#MCompanyForm')[0].reset();
-                    // 完了モーダル表示
-                    AlertMessage('', '完了', '登録が完了しました。', null, null);
-                })
-                .fail(function (xhr) {
-                    if (xhr.status === 404) {
-                        // データが見つからなかった場合
-                        var errorMessage = xhr.responseJSON.errorMessage;
-                        $('#div-error-message').text(errorMessage);
-                    } else {
-                        // その他のエラーの場合
-                        $('#div-error-message').text(errorMessage);
-                    }
-                });
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#' + formId)[0].reset();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    // データが見つからなかった場合
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    // その他のエラーの場合
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
         });
-    });
+    }
 
 </script>
 

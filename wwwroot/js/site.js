@@ -252,6 +252,7 @@ function RenderErrorBlock(data) {
 async function onExportFile(page) {
     event.preventDefault();
     $('#div-error-message').text("");
+    console.log("export", page)
 
     const response = await fetch('' + page + '/ExportFile', {
         method: 'GET',
@@ -261,6 +262,7 @@ async function onExportFile(page) {
     });
     var { data, errorMessage } = await response.json();
 
+    console.log("data", data, errorMessage)
     if (errorMessage) {
         $("#div-error-message").show();
         $("#div-error-message").text(errorMessage);

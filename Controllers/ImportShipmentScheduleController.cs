@@ -164,8 +164,9 @@ namespace mar_sumaken_web.Controllers
                                     shipmentSchedule.SupplierProductNumber = product.SupplierProductNumber;
 
                                     // 倉庫-品番中間テーブルチェック
-                                    bool isExist = M_ProductConnectController.IsExistRDepoProduct(product.ProductID, DepoID, user.DatabaseName);
-                                    if (!isExist)
+                                    var sql = M_ProductConnectController.CreateSQLToCheckIsExistRDepoProduct(DepoID, product.ProductID);
+                                    bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
+                                    if (!isExisted)
                                     {
                                         readCount++;
                                         continue;

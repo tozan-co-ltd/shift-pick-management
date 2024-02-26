@@ -103,7 +103,7 @@
             </div>
             <div class="modal-body">
                 <div class="col-12 col-md-10">
-                    <p id="edit-modal-error-message" class="mt-1"></p>
+                    <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
                     <form class="col-md-12" id="mCompanyForm">
@@ -268,32 +268,32 @@
         $('#mCompanyForm').submit(function (event) {
             DeleteErrorMessages();
 
-            // フォーム情報を取得する
-            var formData = $('#mCompanyForm').serializeArray();
-
             // ページの更新を禁止する
             event.preventDefault();
 
             // 送信イベントが他のハンドラーに伝播するのを防ぐ
             event.stopImmediatePropagation();
 
-            // Ajax
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Edit", "M_Company")';
+            let method = 'POST';
+            var data = $('#mCompanyForm').serializeArray();
+
+            // Ajax call
             $.ajax({
-                url: window.location.origin + '@Url.Action("Edit", "M_Company")',
-                method: "POST",
-                data: formData
-            })
-            .done(function (data) {
+                url: url,
+                method: method,
+                data: data
+            }).done(async function (data) {
+                $('#edit-modal').hide();
                 // 完了モーダル表示
-                    $('#edit-modal').hide();
                 AlertMessage('', '完了', '登録完了しました。', null, null);
-            })
-            .fail(function (xhr, textStatus, errorThrown) {
+            }).fail(function (xhr, textStatus, errorThrown) {
                 if (xhr.status === 404) {
                     var errorMessage = xhr.responseJSON.errorMessage;
                     $("#edit-modal-error-message").text(errorMessage);
                 } else {
-                    var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
+                    var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
                     $("#edit-modal-error-message").text(errorMessage500);
                 }
             });
@@ -320,29 +320,27 @@
     function OnExecuteDelete() {
         DeleteErrorMessages();
 
-        // POSTするデータ
-        var companyId = document.getElementById('deleteCompanyId').value;
-        formData = {
-            "companyId" : companyId
-        };
-        
-        // ajax
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("Delete", "M_Company")';
+        let method = 'POST';
+        var data = { "companyId": $("#deleteCompanyId").val() };
+
+        // Ajax call
         $.ajax({
-            url: window.location.origin + '@Url.Action("Delete", "M_Company")',
-            method: "POST",
-            data: formData
-        })
-        .done(function (data) {
-            // 完了モーダル表示
+            url: url,
+            method: method,
+            data: data
+        }).done(async function (data) {
+            $('#delete-modal').removeClass('show');
             $('#delete-modal').hide();
-            AlertMessage('', '完了', '削除が完了しました。', null, null);
-        })
-        .fail(function (xhr, textStatus, errorThrown) {
+            // 完了モーダル表示
+            AlertMessage('', '完了', '登録完了しました。', null, null);
+        }).fail(function (xhr, textStatus, errorThrown) {
             if (xhr.status === 404) {
                 var errorMessage = xhr.responseJSON.errorMessage;
                 $("#delete-modal-error-message").text(errorMessage);
             } else {
-                var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
+                var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
                 $("#delete-modal-error-message").text(errorMessage500);
             }
         });

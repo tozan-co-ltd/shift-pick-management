@@ -61,7 +61,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception)
             {
-                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
                 return View();
             }
         }
@@ -81,7 +81,10 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 倉庫マスター情報取得
-                var depoList = M_DepoConnectController.GetMDepoList(user.DatabaseName);
+                // SQL作成
+                var depoListSql = M_DepoConnectController.CreateSQLToSelectMDepos();
+                // DB接続
+                List<M_DepoModel> depoList = M_DepoConnectController.ConnectMDepos(depoListSql, user.DatabaseName);
                 foreach (var depo in depoList)
                 {
                     SelectListItem depoItem = new()
@@ -95,13 +98,16 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ハンディメニューマスター情報取得
-                var menuList = M_HandyMenuConnectController.GetMHandyMenuList(user.DatabaseName);
-                foreach (var menu in menuList)
+                // SQL作成
+                var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToGetMHandyMenuList();
+                // DB接続
+                List<M_HandyMenuModel> handyMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(handyMenuListSql, user.DatabaseName);
+                foreach (var handyMenu in handyMenuList)
                 {
                     SelectListItem menuItem = new()
                     {
-                        Text = menu.HandyMenuName,
-                        Value = Convert.ToString(menu.HandyMenuID),
+                        Text = handyMenu.HandyMenuName,
+                        Value = Convert.ToString(handyMenu.HandyMenuID),
                         Selected = false
                     };
 
@@ -112,7 +118,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception)
             {
-                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
                 return View();
             }
         }
@@ -129,10 +135,6 @@ namespace mar_sumaken_web.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-                if (user == null)
-                {
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
 
                 // メイン倉庫IDをチェック
                 bool isDepoSelected = false;
@@ -143,17 +145,20 @@ namespace mar_sumaken_web.Controllers
                         isDepoSelected = true;
                     }
                 }
+
                 // 入力規則チェック
-                if (!ModelState.IsValid || !isDepoSelected)
+                if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "正しい入力を入れてください。" });
+                    var errorMessages = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
+                    return NotFound(new { errorMessage = errorMessages });
                 }
 
-                // 重複ユーザーチェック
-                bool isDuplicate = M_UserConnectController.CheckIsDuplicateMUserByLoginId(model.LoginID, user.DatabaseName);
-                if (isDuplicate)
+                // ログインID重複チェック
+                var sql = M_UserConnectController.CreateSQLToSelectDuplicateMUser(model.LoginID);
+                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
+                if (isExisted)
                 {
-                    return NotFound(new { errorMessage = "ログインIDが重複しています。" });
+                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_UserModel>("LoginID")) });
                 }
 
                 // saltの作成とパスワードのハッシュ化
@@ -170,11 +175,11 @@ namespace mar_sumaken_web.Controllers
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 
@@ -183,30 +188,31 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult Edit(int id)
+        public IActionResult Edit(int userId)
         {
             M_UserEditModel editModel = new();
             try
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-                if (user == null)
-                {
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
 
-                // IDでユーザーを選択するSQLを作成
-                var sql = M_UserConnectController.CreateSQLToSelectMUserByUserId(id);
+                // IDが一致するユーザー情報取得
+                // SQL作成
+                var userListSql = M_UserConnectController.CreateSQLToSelectMUserByUserId(userId);
                 // DB接続
-                List<M_UserModel> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
+                List<M_UserModel> userList = M_UserConnectController.ConnectMUsers(userListSql, user.DatabaseName);
                 if (userList.Count != 1)
                 {
-                    return NotFound(new { errorMessage = "見つかった情報は間違っています。" });
+                    ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
+                    return View(editModel);
                 }
                 M_UserModel editUser = userList[0];
 
                 // 倉庫マスター情報取得
-                var depoList = M_DepoConnectController.GetMDepoList(user.DatabaseName);
+                // SQL作成
+                var depoListSql = M_DepoConnectController.CreateSQLToSelectMDepos();
+                // DB接続
+                List<M_DepoModel> depoList = M_DepoConnectController.ConnectMDepos(depoListSql, user.DatabaseName);
                 foreach (var depo in depoList)
                 {
                     SelectListItem depoItem = new()
@@ -218,27 +224,32 @@ namespace mar_sumaken_web.Controllers
 
                     editUser.DepoSelectList.Add(depoItem);
                 }
+
                 // ハンディメニューマスター情報取得
-                var menuList = M_HandyMenuConnectController.GetMHandyMenuList(user.DatabaseName);
-                foreach (var menu in menuList)
+                // SQL作成
+                var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToGetMHandyMenuList();
+                // DB接続
+                List<M_HandyMenuModel> handyMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(handyMenuListSql, user.DatabaseName);
+                foreach (var handyMenu in handyMenuList)
                 {
                     SelectListItem menuItem = new()
                     {
-                        Text = menu.HandyMenuName,
-                        Value = Convert.ToString(menu.HandyMenuID),
+                        Text = handyMenu.HandyMenuName,
+                        Value = Convert.ToString(handyMenu.HandyMenuID),
                         Selected = false
                     };
 
                     editUser.HandyMenuSelectList.Add(menuItem);
                 }
 
-                // IDでユーザー倉庫中間リスト取得
-                var userDepoList = M_UserConnectController.GetUserDepoByUserId(editUser.UserID, user.DatabaseName);
+                // IDが一致するユーザー倉庫中間リスト取得
+                var userDepoListSql = M_UserConnectController.CreateSQLToGetRUserDepoList(editUser.UserID);
+                var userDepoList = M_DepoConnectController.ConnectMDepos(userDepoListSql, user.DatabaseName);
                 if (userDepoList.Count > 0)
                 {
-                    foreach (var depo in userDepoList)
+                    foreach (var userDepo in userDepoList)
                     {
-                        var checkItem = editUser.DepoSelectList.FirstOrDefault(item => item.Value == Convert.ToString(depo.DepoID));
+                        var checkItem = editUser.DepoSelectList.FirstOrDefault(item => item.Value == Convert.ToString(userDepo.DepoID));
                         if (checkItem != null)
                         {
                             checkItem.Selected = true;
@@ -246,8 +257,9 @@ namespace mar_sumaken_web.Controllers
                     }
                 }
 
-                // IDでユーザー-ハンディメニュー中間リスト取得
-                var userMenuList = M_UserConnectController.GetUserMenuByUserId(editUser.UserID, user.DatabaseName);
+                // IDが一致するユーザー-ハンディメニュー中間リスト取得
+                var userHandyMenuSql = M_UserConnectController.CreateSQLToGetRUserHandyMenuList(userId);
+                var userMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(userHandyMenuSql, user.DatabaseName);
                 if (userMenuList.Count > 0)
                 {
                     foreach (var menu in userMenuList)
@@ -271,7 +283,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception)
             {
-                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
                 return View(editModel);
             }
         }
@@ -279,7 +291,7 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// ユーザーマスター更新
         /// </summary>
-        /// <param name="model">ユーザーマスターの更新情報</param>
+        /// <param name="model">更新情報</param>
         /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Edit(M_UserModel model)
@@ -288,12 +300,8 @@ namespace mar_sumaken_web.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-                if (user == null)
-                {
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
 
-                // メイン倉庫IDをチェック
+                // メイン倉庫IDチェック
                 bool isDepoSelected = false;
                 foreach (SelectListItem item in model.DepoSelectList)
                 {
@@ -302,6 +310,7 @@ namespace mar_sumaken_web.Controllers
                         isDepoSelected = true;
                     }
                 }
+
                 // 更新情報をチェック
                 bool isNotChangePassword = string.IsNullOrWhiteSpace(model.Password);
                 if (isNotChangePassword)
@@ -310,7 +319,8 @@ namespace mar_sumaken_web.Controllers
                 }
                 if (!ModelState.IsValid || !isDepoSelected)
                 {
-                    return NotFound(new { errorMessage = "入力情報が間違っています。" });
+                    var errorMessages = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
+                    return NotFound(new { errorMessage = errorMessages });
                 }
 
                 if (!isNotChangePassword)
@@ -331,11 +341,11 @@ namespace mar_sumaken_web.Controllers
 
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 
@@ -351,23 +361,18 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                if (user == null || userId == 0)
-                {
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
-
                 // ユーザーマスター削除
-                int deleteAffectedRows = M_UserConnectController.DeleteMUser(userId, user.DatabaseName);
+                int deleteAffectedRows = M_UserConnectController.DeleteMUser(userId, user);
 
                 return Ok();
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 

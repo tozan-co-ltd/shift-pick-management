@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
 
 namespace mar_sumaken_web.ConnectControllers
@@ -76,7 +75,7 @@ namespace mar_sumaken_web.ConnectControllers
                             string insertSql = CreateSQLToInsertDStoreIn(item, sysDate, user.UserName);
                             // 入庫実績登録
                             var insertCount = connection.Execute(insertSql, null, transaction);
-                            // 更件数が0の場合はエラーとする
+                            // 更新件数が0の場合はエラーとする
                             if (insertCount == 0)
                             {
                                 throw new Exception();
@@ -122,7 +121,7 @@ namespace mar_sumaken_web.ConnectControllers
                     string editSql = CreateSQLToEditDStoreIn(model, sysDate, user.UserName);
                     // 入庫実績更新
                     var editCount = connection.Execute(editSql);
-                    // 更件数が0の場合はエラーとする
+                    // 更新件数が0の場合はエラーとする
                     if (editCount == 0)
                     {
                         throw new Exception();
@@ -160,7 +159,6 @@ namespace mar_sumaken_web.ConnectControllers
                     // 更新件数が0の場合はエラーとする
                     if (affectedRows == 0)
                     {
-                        // エラーコード：E2011
                         throw new Exception();
                     }
 

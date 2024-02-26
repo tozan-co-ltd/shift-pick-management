@@ -195,7 +195,7 @@ namespace mar_sumaken_web.Controllers
                         if (!isContainSupplierProductNumber)
                         {
                             // 仕入先品番で品番チェック
-                            bool isExistProduct = M_ProductConnectController.CheckMProductExist(modelItem.SupplierProductNumber, user.DatabaseName);
+                            bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(modelItem.SupplierProductNumber, user.DatabaseName);
                             if (!isExistProduct)
                             {
                                 isValid = false;
@@ -273,7 +273,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 仕入先品番チェック
-                bool isExistProduct = M_ProductConnectController.CheckMProductExist(model.SupplierProductNumber, user.DatabaseName);
+                bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(model.SupplierProductNumber, user.DatabaseName);
                 if (!isExistProduct)
                 {
                     var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));

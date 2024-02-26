@@ -103,7 +103,7 @@
                             <label>@Html.DisplayName("LotQuantity")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <input class="form-control" type="text" asp-for="LotQuantity" value="" autocomplete="off" required>
+                            <input class="form-control" type="number" asp-for="LotQuantity" value="" autocomplete="off" required>
                             <span class="text-danger w-100" asp-validation-for="LotQuantity"></span>
                         </div>
                     </div>
@@ -135,7 +135,6 @@
 
 </div>
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript">
 
     $(document).ready(function () {
@@ -148,16 +147,10 @@
         }
     });
 
-    // 品番マスター登録
+    // 登録ボタン押下
     function OnRegister() {
         $('#mProductForm').submit(function (event) {
             $("#div-error-message").text("");
-
-            // フォーム情報を取得する
-            var formData = $('#mProductForm').serializeArray();
-
-            // 使用倉庫名チェック
-            CheckIsSelectedDepoProduct();
 
             // ページの更新を禁止する
             event.preventDefault();
@@ -165,27 +158,35 @@
             // 送信イベントが他のハンドラーに伝播するのを防ぐ
             event.stopImmediatePropagation();
 
+            // 使用倉庫名チェック
+            CheckIsSelectedDepoProduct();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Register", "M_Product")';
+            let method = 'POST';
+            let formId = 'mProductForm';
+            let data = $('#' + formId).serializeArray();
+
             // Ajax call
             $.ajax({
-                url: window.location.origin + '@Url.Action("Register", "M_Product")',
-                method: "POST",
-                data: formData
-            })
-                .done(function (response) {
-                    $('#mProductForm')[0].reset();
-                    // 完了モーダル表示
-                    AlertMessage('', '完了', '登録が完了しました。', null, null);
-                })
-                .fail(function (xhr) {
-                    if (xhr.status === 404) {
-                        // データが見つからなかった場合
-                        var errorMessage = xhr.responseJSON.errorMessage;
-                        $('#div-error-message').text(errorMessage);
-                    } else {
-                        // その他のエラーの場合
-                        $('#div-error-message').text(errorMessage);
-                    }
-                });
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#' + formId)[0].reset();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    // データが見つからなかった場合
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    // その他のエラーの場合
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
         });
     }
 
@@ -203,8 +204,6 @@
         if (!hasSelectedItem) {
             $('#depoProductErrorMsg').text('使用倉庫名は必須項目です。');
         }
-
     }
-
 </script>
 

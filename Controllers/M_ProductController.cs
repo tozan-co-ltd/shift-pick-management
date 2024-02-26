@@ -36,7 +36,7 @@ namespace mar_sumaken_web.Controllers
                 // 管理権限区分が1(管理者)でない場合はエラーとする
                 if (user == null || user.AuthorizedKubun != 1)
                 {
-                    ViewData["ErrorMessage"] = ErrorMessagesResources.E2001;
+                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
                     return View();
                 }
 
@@ -84,7 +84,7 @@ namespace mar_sumaken_web.Controllers
                 // 管理権限区分が1(管理者)でない場合はエラーとする
                 if (user == null || user.AuthorizedKubun != 1)
                 {
-                    ViewData["ErrorMessage"] = ErrorMessagesResources.E2001;
+                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
                     return View(model);
                 }
 
@@ -101,7 +101,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception)
             {
-                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
                 return View(model);
             }
         }
@@ -117,29 +117,27 @@ namespace mar_sumaken_web.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-                if (user == null || model.RDepoProductsRegister == null)
-                {
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
 
-                // 使用倉庫をチェック
+                // 使用倉庫名の選択チェック
                 bool isSelectedDepo = model.RDepoProductsRegister.Any(item => item.Selected);
                 if (!isSelectedDepo)
                 {
-                    ModelState.AddModelError("RDepoProductsRegister", ErrorMessagesResources.E1001); 
+                    ModelState.AddModelError("RDepoProductsRegister", "E1001: " + string.Format(ErrorMessagesResources.E1001, Utils.GetDisplayName<M_ProductModel>("RDepoProductsRegister"))); 
                 }
 
-                // 登録情報をチェック
+                // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
+                    var errorMessages = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
+                    return NotFound(new { errorMessage = errorMessages });
                 }
 
-                // 重複品番情報をチェック
-                bool isDuplicate = M_ProductConnectController.IsDuplicateMProduct(model, user.DatabaseName);
-                if (isDuplicate)
+                // 仕入先品番・納入先品番重複チェック
+                var sql = M_ProductConnectController.CreateSQLToSelectDuplicateMProduct(model);
+                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
+                if (isExisted)
                 {
-                    return NotFound(new { errorMessage = "品番が重複しています。" });
+                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_ProductModel>("SupplierProductNumber") + "または" + Utils.GetDisplayName<M_ProductModel>("DeliveryProductNumber")) });
                 }
 
                 // 品番マスター登録
@@ -149,11 +147,11 @@ namespace mar_sumaken_web.Controllers
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 
@@ -168,29 +166,27 @@ namespace mar_sumaken_web.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-                if (user == null || model.RDepoProductsRegister == null)
-                {
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
 
                 // 使用倉庫選択チェック
                 bool isSelectedDepo = model.RDepoProductsRegister.Any(item => item.Selected);
                 if (!isSelectedDepo)
                 {
-                    ModelState.AddModelError("RDepoProductsRegister", ErrorMessagesResources.E1001);
+                    ModelState.AddModelError("RDepoProductsRegister", "E1001: " + ErrorMessagesResources.E1001);
                 }
 
-                // 入力値チェック
+                // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
+                    var errorMessages = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
+                    return NotFound(new { errorMessage = errorMessages });
                 }
 
-                // 品番重複チェック
-                bool isDuplicate = M_ProductConnectController.IsDuplicateEditMProduct(model, user.DatabaseName);
-                if (isDuplicate)
+                // 異なるIDで仕入先品番・納入先品番重複チェック
+                var sql = M_ProductConnectController.CreateSQLToSelectDuplicateEditMProduct(model);
+                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
+                if (isExisted)
                 {
-                    return NotFound(new { errorMessage = "品番が重複しています。" });
+                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_ProductModel>("SupplierProductNumber") + "または" + Utils.GetDisplayName<M_ProductModel>("DeliveryProductNumber")) });
                 }
 
                 // 品番マスター更新
@@ -200,11 +196,11 @@ namespace mar_sumaken_web.Controllers
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 
@@ -220,23 +216,18 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                if (user == null || productId == 0)
-                {
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
-
                 // 品番マスター削除
-                M_ProductConnectController.DeleteMProduct(productId, user.DatabaseName);
+                M_ProductConnectController.DeleteMProduct(productId, user);
 
                 return Ok();
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 

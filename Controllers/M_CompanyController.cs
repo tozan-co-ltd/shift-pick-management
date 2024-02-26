@@ -1,11 +1,11 @@
 ﻿using mar_sumaken_web.Commons;
-using Microsoft.AspNetCore.Mvc;
+using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
+using Microsoft.AspNetCore.Mvc;
 using System.Data;
-using System.Reflection;
-using X.PagedList;
 using System.Data.SqlClient;
+using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -35,7 +35,7 @@ namespace mar_sumaken_web.Controllers
                 // 管理権限区分が1(管理者)でない場合はエラーとする
                 if (user == null || user.AuthorizedKubun != 1)
                 {
-                    ViewData["ErrorMessage"] = ErrorMessagesResources.E2001;
+                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
                     return View(model);
                 }
 
@@ -53,7 +53,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception)
             {
-                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
                 return View(model);
             }
         }
@@ -74,8 +74,7 @@ namespace mar_sumaken_web.Controllers
                 // 管理権限区分が1(管理者)でない場合はエラーとする
                 if (user == null || user.AuthorizedKubun != 1)
                 {
-                    // エラーコード：E2011
-                    ViewData["ErrorMessage"] = ErrorMessagesResources.E2001;
+                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
                     return View(model);
                 }
 
@@ -86,7 +85,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception)
             {
-                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
                 return View(model);
             }
         }
@@ -102,23 +101,20 @@ namespace mar_sumaken_web.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-                if (user == null)
-                {
-                    // エラーコード：E2011
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。"});
-                }
 
-                // 登録情報をチェック
+                // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "" });
+                    var errorMessages = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
+                    return NotFound(new { errorMessage = errorMessages });
                 }
 
-                // 重複会社情報取をチェック
-                bool isDuplicate = M_CompanyConnectController.IsDuplicateMCompanyByCompanyCode(model.CompanyCode, user.DatabaseName);
-                if (isDuplicate)
+                // 会社コード重複チェック
+                var sql = M_CompanyConnectController.CreateSQLToSelectDuplicateMCompany(model.CompanyCode);
+                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
+                if (isExisted)
                 {
-                    return NotFound(new { errorMessage = "会社コードが重複しています。" });
+                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_CompanyModel>("CompanyCode")) });
                 }
 
                 // 会社マスター登録
@@ -128,11 +124,11 @@ namespace mar_sumaken_web.Controllers
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 
@@ -147,37 +143,34 @@ namespace mar_sumaken_web.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-                if (user == null)
-                {
-                    // エラーコード：E2011
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
 
-                // 更新情報をチェック
+                // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "" });
+                    var errorMessages = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
+                    return NotFound(new { errorMessage = errorMessages });
                 }
 
-                // 重複会社情報取をチェック
-                bool isDuplicate = M_CompanyConnectController.IsDuplicateEditMCompanyByCompanyCode(model.CompanyCode, model.CompanyID, user.DatabaseName);
-                if (isDuplicate)
+                // 異なるIDで会社コード重複チェック
+                var sql = M_CompanyConnectController.CreateSQLToSelectDuplicateEditMCompany(model);
+                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
+                if (isExisted)
                 {
-                    return NotFound(new { errorMessage = "会社コードが重複しています。" });
+                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_CompanyModel>("CompanyCode")) });
                 }
 
                 // 会社マスター更新
-                int editedCount = M_CompanyConnectController.EditMCompany(model, user);
+                int editedCount = M_CompanyConnectController.UpdateMCompany(model, user);
 
                 return Ok();
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 
@@ -193,23 +186,18 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                if (user == null || companyId == 0)
-                {
-                    return NotFound(new { errorMessage = "データが見つかりませんでした。" });
-                }
-
                 // 会社マスター削除
-                int deleteAffectedRows = M_CompanyConnectController.DeleteMCompany(companyId, user.DatabaseName);
+                int deleteAffectedRows = M_CompanyConnectController.DeleteMCompany(companyId, user);
 
                 return Ok();
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E3004 });
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
-                return NotFound(new { errorMessage = ErrorMessagesResources.E9999 });
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 

@@ -71,6 +71,8 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 納入先ID
         /// </summary>
+        [Display(Name = "納入先ID")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int DeliveryID { get; set; }
 
         /// <summary>
@@ -101,9 +103,8 @@ namespace mar_sumaken_web.Models
         public int LotQuantity { get; set; }
 
         /// <summary>
-        /// 未使用フラグ
+        /// 削除フラグ
         /// </summary>
-        [Display(Name = "未使用フラグ")]
         public bool IsDeleted { get; set; }
 
         /// <summary>
