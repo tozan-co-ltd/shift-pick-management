@@ -45,31 +45,14 @@ namespace mar_sumaken_web.Models
         public int SelectedDepoID { get; set; }
 
         /// <summary>
-        /// 選択された倉庫名
-        /// </summary>
-        public string? SelectedDepoName { get; set; }
-
-        /// <summary>
         /// 検索会社リスト
         /// </summary>
-        public IEnumerable<SelectListItem> SearchCompanyList
-        {
-            get
-            {
-                return MCompanyList;
-            }
-        }
+        public IEnumerable<SelectListItem> SearchCompanyList { get; set; }
 
         /// <summary>
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
-
-        /// <summary>
-        /// 選択された会社名
-        /// </summary>
-        [Display(Name = "納入先名")]
-        public string? SelectedCompanyName { get; set; }
 
         /// <summary>
         /// 取込ファイル名

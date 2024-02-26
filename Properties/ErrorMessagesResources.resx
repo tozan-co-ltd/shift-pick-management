@@ -133,7 +133,7 @@
     <value>日付指定に不正な値があります。半角YYYYMMDD形式で正しい値を入力してください。</value>
   </data>
   <data name="E1006" xml:space="preserve">
-    <value>時間指定に不正な値があります。半角HH:MM形式で正しい値を入力してください。</value>
+    <value>時間指定に不正な値があります。半角HHMM形式で正しい値を入力してください。</value>
   </data>
   <data name="E1007" xml:space="preserve">
     <value>数値指定に不正な値があります。半角数字で正しい値を入力してください。</value>

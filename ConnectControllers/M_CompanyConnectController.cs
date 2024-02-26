@@ -1,10 +1,6 @@
 ﻿using Dapper;
 using mar_sumaken_web.Models;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Data.SqlClient;
-using System.Reflection;
-
 
 namespace mar_sumaken_web.Commons
 {
@@ -14,11 +10,10 @@ namespace mar_sumaken_web.Commons
     public static class M_CompanyConnectController
     {
         /// <summary>
-        /// データベースに接続し、SQL実行
-        /// </summary>
+        /// 会社情報取得
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
-        /// <returns>会社情報</returns>
+        /// <returns></returns>
         public static List<M_CompanyModel> ConnectMCompanys(string sql, string databaseName)
         {
             // 戻り値

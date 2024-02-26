@@ -6,40 +6,37 @@ using System.Data.SqlClient;
 
 namespace mar_sumaken_web.ConnectControllers
 {
+    /// <summary>
+    /// 入庫実績テーブルに関する関数
+    /// </summary>
     public class D_StoreInConnectionController
     {
         /// <summary>
-        /// データベースに接続し、SQL実行
+        /// 入庫実績情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
-        /// <returns>商品情報</returns>
+        /// <returns></returns>
         public static List<D_StoreInModel> ConnectDStoreIns(string sql, string databaseName)
         {
-            // 戻り値のリスト
-            List<D_StoreInModel> list = new List<D_StoreInModel>();
+            // 戻り値
+            List<D_StoreInModel> strList = new List<D_StoreInModel>();
 
             try
             {
-                // SQL Server接続文字列取得
+                // SQLServer接続文字列取得
                 var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
-
-                // SQL Serverに接続
+                // SQLServer接続
                 using (var connection = new SqlConnection(connectionString))
                 {
-                    // 接続を開く
                     connection.Open();
-
-                    // SQLを実行し、結果を取得
-                    list = connection.Query<D_StoreInModel>(sql).ToList();
+                    strList = connection.Query<D_StoreInModel>(sql).ToList();
                 }
 
-                // 商品情報のリストを返す
-                return list;
+                return strList;
             }
             catch (Exception)
             {
-                // 例外を処理する
                 throw;
             }
         }

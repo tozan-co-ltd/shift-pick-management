@@ -10,37 +10,34 @@ using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// 入庫実績照会・修正画面
+    /// </summary>
     public class D_StoreInController : BaseController
     {
         // 新規作成行数
         private const int InitRegisterRowCount = 5;
 
         /// <summary>
-        /// 入庫 - 入荷実績照会
+        /// 入庫実績照会画面表示
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public IActionResult Index(D_StoreInModel model)
+        public IActionResult Index()
         {
+            D_StoreInModel model = new();
             try
             {
-                if (model == null)
-                    model = new D_StoreInModel();
-
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    // エラーコード：E2011
-                    ViewData["ErrorMessage"] = ErrorMessagesResources.E2001;
-                    return View();
-                }
+                // 会社リスト取得
+                CommonModel commonModel = new();
+                model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_SupplierID);
 
                 return View(model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
                 return View(model);
@@ -54,20 +51,12 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult SearchData(D_StoreInModel searchModel)
         {
-            D_StoreInModel model = new D_StoreInModel();
+            D_StoreInModel model = new();
             var searchData = string.Empty;
             try
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    // エラーコード：E2011
-                    ViewData["ErrorMessage"] = ErrorMessagesResources.E2001;
-                    return View();
-                }
 
                 // 検索情報をチェック
                 ModelState.Remove("SupplierProductNumber");
@@ -78,7 +67,7 @@ namespace mar_sumaken_web.Controllers
 
                 // 入庫実績情報取得SQL作成
                 var sql = D_StoreInConnectionController.CreateSQLToGetDStoreIns(
-                    searchModel.DateSearchStart, searchModel.DateSearchEnd, searchModel.SelectedDepoID, searchModel.SelectedCompanyID);
+                    searchModel.DateSearchStart, searchModel.DateSearchEnd, searchModel.SelectedDepoID, 2);
                 // DB接続
                 List<D_StoreInModel> storeInList = D_StoreInConnectionController.ConnectDStoreIns(sql, user.DatabaseName);
 
@@ -119,13 +108,7 @@ namespace mar_sumaken_web.Controllers
                     }
                 }
 
-                var response = new
-                {
-                    HtmlContent = searchData,
-                    DataList = model.DStoreInList
-                };
-
-                return Json(response);
+                return Content(searchData);
             }
             catch (SqlException)
             {
@@ -165,6 +148,9 @@ namespace mar_sumaken_web.Controllers
 
                     model.RegisterList = storeInList;
                 }
+                // 会社リスト取得
+                CommonModel commonModel = new();
+                model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_SupplierID);
 
                 return View(model);
             }
@@ -369,8 +355,9 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// テーブルを作る
+        /// データテーブル作成
         /// </summary>
+        /// <returns></returns>
         private static DataTable CreateDataTable()
         {
             var table = new DataTable();

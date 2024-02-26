@@ -60,29 +60,13 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 検索会社リスト
         /// </summary>
-        public IEnumerable<SelectListItem>? SearchCompanyList
-        {
-            get
-            {
-                return MCompanyList;
-            }
-        }
+        public IEnumerable<SelectListItem>? SearchCompanyList { get; set; }
 
         /// <summary>
         /// 選択された会社ID
         /// </summary>
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int SelectedCompanyID { get; set; }
-
-        // <summary>
-        /// 初期値設定
-        /// </summary>
-        public D_StoreInModel()
-        {
-            var now = DateTime.Today.ToString("yyyy/MM/dd"); //　現在日
-            DateSearchStart = now;
-            DateSearchEnd = now;
-        }
 
         /// <summary>
         /// 入庫実績ID
@@ -208,5 +192,15 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "更新者")]
         public string? UpdatedBy { set; get; }
+
+        // <summary>
+        /// 初期値設定
+        /// </summary>
+        public D_StoreInModel()
+        {
+            var now = DateTime.Today.ToString("yyyy/MM/dd"); //　現在日
+            DateSearchStart = now;
+            DateSearchEnd = now;
+        }
     }
 }

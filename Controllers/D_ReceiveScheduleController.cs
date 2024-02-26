@@ -1,16 +1,39 @@
-﻿using mar_sumaken_web.Models;
+﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.ConnectControllers;
+using mar_sumaken_web.Models;
+using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 
 namespace mar_sumaken_web.Controllers
 {
+    /// <summary>
+    /// 入荷予定照会画面
+    /// </summary>
     public class D_ReceiveScheduleController : BaseController
     {
-         public IActionResult Index(D_ReceiveScheduleModel model)
+        /// <summary>
+        /// 入荷予定照会画面表示
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult Index()
         {
-            if (model == null)
-                model = new D_ReceiveScheduleModel();
+            D_ReceiveScheduleModel model = new();
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
 
-            return View(model);
+                // 会社リスト取得
+                CommonModel commonModel = new();
+                model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_SupplierID);
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
+                return View(model);
+            }
         }
     }
 }

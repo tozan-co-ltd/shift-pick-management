@@ -10,18 +10,6 @@
         @ViewData["Title"]
     </div>
     <div class="card-body">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card border-left-custom">
-                    <div class="card-body">
-                        <ul class="mb-0">
-                            <li>メッセージ内容</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="form-group col-sm-12">
             <p id="div-error-message" class="mt-1 text-danger"></p>
         </div>
@@ -82,7 +70,7 @@
             </div>
         </div>
         <div class="mt-3" id="div-table" style="display: none;">
-            <table class="table table-sm stripe hover nowrap datatable-normal" id="dStoreInTable">
+            <table class="table table-sm stripe hover nowrap datatable-normal" id="table-datatable">
                 <thead>
                     <tr>
                         <th></th>
@@ -206,87 +194,78 @@
 </div>
 
 <script>
-    $(document).ready(function () {
-    
-        // 検索ボタン押下
-        $('#search-btn').click(function () {
-            $('#searchForm').submit(function (e) {
-                // エラーメッセージ削除
-                DeleteErrorMessages();
-
-                // フォーム情報を取得する
-                var formData = $(this).serialize();
-
-                // ページの更新を禁止する
-                e.preventDefault();
-                // 送信イベントが他のハンドラーに伝播するのを防ぐ
-                e.stopImmediatePropagation();
-
-                // ajax
-                $.ajax({
-                    url: '@Url.Action("SearchData", "D_StoreIn")',
-                    method: "POST",
-                    data: formData
-                })
-                    .done(function (response) {
-                        $("#dStoreInTable tbody").empty();
-                        if (response.htmlContent) {
-                            // HTML更新
-                            $('#dStoreInTable').DataTable().destroy();
-                            $("#div-table").show();
-
-                            $("#dStoreInTable tbody").empty();
-                            $("#dStoreInTable tbody").html(response.htmlContent);
-                            $("#dStoreInTable").DataTable({
-                                "language": {           // 日本語表示
-                                    "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
-                                },
-                                lengthChange: true,     // 表示件数
-                                info: false,            // 総件数
-                                scrollX: true,          // 横スクロール可
-                                order: [[3, "asc"]],    // 仕入先品番昇順
-                            });
-                        }
-                    })
-                    .fail(function (xhr, textStatus, errorThrown) {
-                        if (xhr.status === 404) {
-                            var errorMessage = xhr.responseJSON.errorMessage;
-                            $("#div-error-message").text(errorMessage);
-                        } else {
-                            var errorMessage500 = "サーバーに接続できませんでした。" + '<br> ' + 'HttpRequest : ' + xhr.status + '<br> ' + 'textStatus : ' + textStatus;
-                            $("#div-error-message").text(errorMessage500);
-                        }
-                    });
-            });
-        });
-
-        // 出力ボタン押下
-        $('#export-file-btn').click(function (event) {
+    // 検索ボタン押下
+    $('#search-btn').click(function () {
+        $('#searchForm').submit(function (e) {
             // エラーメッセージ削除
             DeleteErrorMessages();
-            // ページの更新を禁止する
-            event.preventDefault();
-            // 送信イベントが他のハンドラーに伝播するのを防ぐ
-            event.stopImmediatePropagation();
-
-            var searchFormArr = $('#searchForm').serializeArray();
 
             // フォーム情報を取得する
-            var exportFormData = new FormData();
-            exportFormData.append("searchModel.DepoID", searchFormArr[0].value);
-            exportFormData.append("searchModel.DepoName", $('#SelectedDepoID option:selected').text().replace(/ /g, ""));
-            exportFormData.append("searchModel.CompanyID", searchFormArr[1].value);
-            exportFormData.append("searchModel.CompanyName", $('#SelectedCompanyID option:selected').text().replace(/ /g, ""));
-            exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
-            exportFormData.append("searchModel.SearchEndDate", searchFormArr[3].value);
+            var formData = $(this).serialize();
 
-            // 画面名
-            exportFormData.append("gamenName", $("#viewTitle").val());
+            // ページの更新を禁止する
+            e.preventDefault();
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            e.stopImmediatePropagation();
 
-            // CSV出力
-            onExportExcelByCondition("D_StoreIn", exportFormData);
+            // ajax
+            $.ajax({
+                url: '@Url.Action("SearchData", "D_StoreIn")',
+                method: "POST",
+                data: formData
+            })
+            .done(function (response) {
+                $("#table-datatable tbody").empty();
+                $('#table-datatable').DataTable().destroy();
+                $("#div-table").show();
+                $("#table-datatable tbody").html(response);
+                $("#table-datatable").DataTable({
+                    "language": {           // 日本語表示
+                        "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+                    },
+                    lengthChange: true,     // 表示件数
+                    info: false,            // 総件数
+                    scrollX: true,          // 横スクロール可
+                    order: [[3, "asc"]],    // 仕入先品番昇順
+                });
+            })
+            .fail(function (xhr, textStatus, errorThrown) {
+                if (xhr.status === 404) {
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                        var errorMessage500 = "E3002: サーバーに接続できませんでした。" + ' HttpRequest : ' + xhr.status + ', textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage500);
+                }
+            });
         });
+    });
 
+    // 出力ボタン押下
+    $('#export-file-btn').click(function (event) {
+        // エラーメッセージ削除
+        DeleteErrorMessages();
+        // ページの更新を禁止する
+        event.preventDefault();
+        // 送信イベントが他のハンドラーに伝播するのを防ぐ
+        event.stopImmediatePropagation();
+
+        var searchFormArr = $('#searchForm').serializeArray();
+
+        // フォーム情報を取得する
+        var exportFormData = new FormData();
+        exportFormData.append("searchModel.DepoID", searchFormArr[0].value);
+        exportFormData.append("searchModel.DepoName", $('#SelectedDepoID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.CompanyID", searchFormArr[1].value);
+        exportFormData.append("searchModel.CompanyName", $('#SelectedCompanyID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
+        exportFormData.append("searchModel.SearchEndDate", searchFormArr[3].value);
+
+        // 画面名
+        exportFormData.append("gamenName", $("#viewTitle").val());
+
+        // CSV出力
+        onExportExcelByCondition("D_StoreIn", exportFormData);
     });
 
     // 削除ボタン押下
@@ -311,15 +290,15 @@
         DeleteErrorMessages();
 
         // POSTするデータ
-        var storeInId = document.getElementById('deleteStoreInId').value;
+        var storeInId = $("#deleteStoreInId").val();
         formData = {
             "storeInId": storeInId
         };
 
         // ajax
         $.ajax({
-            url: window.location.origin + '@Url.Action("Delete", "D_StoreIn")',
             method: "POST",
+            url: window.location.origin + '@Url.Action("Delete", "D_StoreIn")',
             data: formData
         })
             .done(async function (data) {
@@ -328,7 +307,6 @@
                 $('#delete-modal').hide();
                 AlertMessage('', '完了', '登録完了しました。', null, null, true);
                 await WaitSeconds();
-                //$('#search-btn').click();
                 $('#search-btn').trigger('click');
             })
             .fail(function (xhr, textStatus, errorThrown) {

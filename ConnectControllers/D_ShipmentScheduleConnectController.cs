@@ -11,11 +11,11 @@ namespace mar_sumaken_web.Commons
     public static class D_ShipmentScheduleConnectController
     {
         /// <summary>
-        /// データベースに接続し、SQL実行
+        /// 出荷指示情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
-        /// <returns>出荷指示情報</returns>
+        /// <returns></returns>
         public static List<D_ShipmentScheduleModel> ConnectDShipmentSchedules(string sql, string databaseName)
         {
             // 戻り値

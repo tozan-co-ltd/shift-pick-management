@@ -97,7 +97,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="edit-modalLabel">修正</h5>
+                <h5 class="modal-title" id="edit-modal-label">修正</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -194,7 +194,7 @@
                                         <label class="form-check-label" id="label-depo-name-@i">@Model.RDepoProductsRegister[i].Text</label>
                                     </div>
                                 }
-                                <span class="text-danger w-100" id="depoProductErrorMsg"></span>
+                                <span class="text-danger w-100" id="depoProductErrorMessage"></span>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
@@ -218,7 +218,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="delete-modalLabel">削除</h5>
+                <h5 class="modal-title" id="delete-modal-label">削除</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -436,7 +436,7 @@
         }
     });
     function CheckIsSelectedDepoProduct() {
-        $('#depoProductErrorMsg').text('');
+        $('#depoProductErrorMessage').text('');
 
         var checkList = @Html.Raw(Json.Serialize(Model.RDepoProductsRegister));
         var hasSelectedItem = false;
@@ -448,7 +448,7 @@
             }
         }
         if (!hasSelectedItem) {
-            $('#depoProductErrorMsg').text('使用倉庫名は必須項目です。');
+            $('#depoProductErrorMessage').text('使用倉庫名は必須項目です。');
         }
     }
 
@@ -457,7 +457,7 @@
         $('#div-error-message').text('');
         $('#edit-modal-error-message').text('');
         $('#delete-modal-error-message').text('');
-        $('#depoProductErrorMsg').text('');
+        $('#depoProductErrorMessage').text('');
         $('.text-danger').text('');
         $('input').removeClass('input-validation-error');
     }
