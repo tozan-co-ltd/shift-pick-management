@@ -439,7 +439,6 @@
 
     // 削除ボタン押下
     function OnDeleteClick(trTag) {
-        // エラーメッセージ削除
         DeleteErrorMessages();
 
         var row = trTag.parentNode.parentNode;
@@ -537,6 +536,9 @@
     // エラーメッセージ削除
     function DeleteErrorMessages() {
         $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
         $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
     }
 </script>
