@@ -295,7 +295,7 @@ namespace mar_sumaken_web.Commons
                             // ユーザー倉庫中間テーブル登録SQL作成
                             string userDepoInsertSql = CreateSQLToInsertRUserDepo(userId, Convert.ToInt32(depo.Value), sysDate, loginUserModel.UserName);
                             int depoInsertCount = connection.Execute(userDepoInsertSql, null, transaction);
-                            // 更件数が0の場合はエラーとする
+                            // 更新件数が0の場合はエラーとする
                             if (depoInsertCount == 0)
                             {
                                 result = false;
@@ -312,7 +312,7 @@ namespace mar_sumaken_web.Commons
                             // ユーザーハンディメニュー中間テーブル登録SQL作成
                             string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(userId, Convert.ToInt32(menu.Value), sysDate, loginUserModel.UserName);
                             int menuInsertCount = connection.Execute(userMenuInsertSql, null, transaction);
-                            // 更件数が0の場合はエラーとする
+                            // 更新件数が0の場合はエラーとする
                             if (menuInsertCount == 0)
                             {
                                 result = false;
