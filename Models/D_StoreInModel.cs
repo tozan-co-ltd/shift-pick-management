@@ -1,4 +1,5 @@
-﻿using mar_sumaken_web.Properties;
+﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
@@ -21,9 +22,15 @@ namespace mar_sumaken_web.Models
         public IPagedList<D_StoreInModel>? DStoreInList { get; set; }
 
         /// <summary>
+        /// 入庫実績登録リスト
+        /// </summary>
+        public List<D_StoreInModel>? RegisterList { get; set; }
+
+        /// <summary>
         /// 検索入庫日(開始)
         /// </summary>
         [Display(Name = "入庫日")]
+        [RegularExpression(Utils.DateTimeSlashRegex, ErrorMessageResourceName = "E1004", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DateSearchStart { get; set; }
 
@@ -117,54 +124,65 @@ namespace mar_sumaken_web.Models
         /// 仕入先品番
         /// </summary>
         [Display(Name = "仕入先品番")]
+        [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? SupplierProductNumber { set; get; }
 
         /// <summary>
         /// ロット番号
         /// </summary>
         [Display(Name = "ロット番号")]
+        [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? LotNumber { set; get; }
 
         /// <summary>
         /// 収容数
         /// </summary>
         [Display(Name = "収容数")]
+        [RegularExpression(@"[0-9]{1,10}", ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int LotQuantity { set; get; }
 
         /// <summary>
         /// メインキー
         /// </summary>
         [Display(Name = "メインキー")]
+        [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? MainProductKey { set; get; }
 
         /// <summary>
         /// サブキー1
         /// </summary>
         [Display(Name = "サブキー1")]
+        [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? FirstSubProductKey { set; get; }
 
         /// <summary>
         /// サブキー2
         /// </summary>
         [Display(Name = "サブキー2")]
+        [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? SecondSubProductKey { set; get; }
 
         /// <summary>
         /// 箱数
         /// </summary>
         [Display(Name = "箱数")]
+        [RegularExpression(@"[0-9]{1,10}", ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int NumberOfBoxes { set; get; }
 
         /// <summary>
         /// 数量
         /// </summary>
         [Display(Name = "数量")]
+        [RegularExpression(@"[0-9]{1,10}", ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int Quantity { set; get; }
 
         /// <summary>
         /// 備考
         /// </summary>
         [Display(Name = "備考")]
+        [MaxLength(1000, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? Remarks { set; get; }
 
         /// <summary>

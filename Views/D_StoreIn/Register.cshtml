@@ -79,30 +79,30 @@
                         <tbody>
                             @{
                                 var i = 0;
-                                foreach (var item in Model.DStoreInList)
+                                foreach (var item in Model.RegisterList)
                                 {
                                     {
                                         <tr>
                                             <td>
-                                                <input type="text" class="form-control" id="DStoreInList[@i].SupplierProductNumber" value="@item.SupplierProductNumber" name="DStoreInList[@i].SupplierProductNumber" />
+                                                <input type="text" class="form-control" id="RegisterList[@i].SupplierProductNumber" value="@item.SupplierProductNumber" name="RegisterList[@i].SupplierProductNumber" />
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control" value="@item.LotNumber" name="DStoreInList[@i].LotNumber" />
+                                                <input type="text" class="form-control" value="@item.LotNumber" name="RegisterList[@i].LotNumber" />
                                             </td>
                                             <td>
-                                                <input type="number" class="form-control" value="@item.Quantity" name="DStoreInList[@i].Quantity" />
+                                                <input type="number" class="form-control" value="@item.Quantity" name="RegisterList[@i].Quantity" />
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control" value="@item.MainProductKey" name="DStoreInList[@i].MainProductKey" />
+                                                <input type="text" class="form-control" value="@item.MainProductKey" name="RegisterList[@i].MainProductKey" />
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control" value="@item.FirstSubProductKey" name="DStoreInList[@i].FirstSubProductKey" />
+                                                <input type="text" class="form-control" value="@item.FirstSubProductKey" name="RegisterList[@i].FirstSubProductKey" />
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control" value="@item.SecondSubProductKey" name="DStoreInList[@i].SecondSubProductKey" />
+                                                <input type="text" class="form-control" value="@item.SecondSubProductKey" name="RegisterList[@i].SecondSubProductKey" />
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control" value="@item.Remarks" name="DStoreInList[@i].Remarks" />
+                                                <input type="text" class="form-control" value="@item.Remarks" name="RegisterList[@i].Remarks" />
                                             </td>
                                         </tr>
                                     }
@@ -137,7 +137,6 @@
 
                 // フォーム情報を取得する
                 var formDataArray = form.serializeArray();
-
                 formDataArray = formDataArray.filter(function (item) {
                     return item.value.trim() !== '' && item.value.trim() !== '0';
                 });
@@ -145,21 +144,25 @@
                 // 編集された行数を取得
                 var editRow = [];
                 formDataArray.forEach(function (item) {
-                    if (item.name.includes("DStoreInList")) {
+                    if (item.name.includes("RegisterList")) {
                         var rowNumber = GetEditRowNumber(item.name);
                         editRow.push(rowNumber);
                     }
                 });
+                if (editRow.length == 0) return;
 
                 // 仕入先品番と数量チェック
-                var checkFlag = checkValue(editRow)
-                if (!checkFlag) return;
+                var checkFlag = checkValue(editRow);
+                if (!checkFlag) {
+                    $('#div-error-message').text("正しい入力値を入力してください。");
+                    return;
+                }
 
                 // Ajax call
                 $.ajax({
                     url: '@Url.Action("Register", "D_StoreIn")',
                     method: 'POST',
-                    data: JSON.stringify(formDataArray)
+                    data: formDataArray
                 })
                     .done(function (response) {
                         $('#DStoreInForm')[0].reset();
@@ -170,7 +173,8 @@
                         if (xhr.status === 404) {
                             // データが見つからなかった場合
                             var errorMessage = xhr.responseJSON.errorMessage;
-                            $('#div-error-message').text(errorMessage);
+                            //$('#div-error-message').text(errorMessage);
+                            $("#div-error-message").html(errorMessage);
                         } else {
                             // その他のエラーの場合
                             $('#div-error-message').text(errorMessage);
@@ -181,12 +185,11 @@
     });
 
     // 仕入先品番と数量チェック
-    function checkValue(dataArr) {
+    function checkValue(rowCheckArr) {
         var checkFlag = true;
-
-        dataArr.forEach(function (index) {
+        rowCheckArr.forEach(function (index) {
             // 仕入先品番
-            var productNumberName = "DStoreInList[" + index + "].SupplierProductNumber";
+            var productNumberName = "RegisterList[" + index + "].SupplierProductNumber";
             var productNumberElement = document.querySelector('[name="' + productNumberName + '"]');
             if ($(productNumberElement).val() == '') {
                 productNumberElement.style.borderColor = "red";
@@ -197,7 +200,7 @@
             }
 
             // 数量
-            var quantityName = "DStoreInList[" + index + "].Quantity";
+            var quantityName = "RegisterList[" + index + "].Quantity";
             var quantityNameElement = document.querySelector('[name="' + quantityName + '"]');
             if ($(quantityNameElement).val() <= 0) {
                 quantityNameElement.style.borderColor = "red";
@@ -206,14 +209,14 @@
             else {
                 quantityNameElement.style.borderColor = "#d1d3e2";
             }
-
-            return checkFlag;
         });
+        return checkFlag;
     }
+
 
     // 編集された行数を取得
     function GetEditRowNumber(fieldName) {
-        var match = fieldName.match(/\[(\d+)\]/); 
+        var match = fieldName.match(/\[(\d+)\]/);
         return match ? parseInt(match[1]) : null;
     }
 

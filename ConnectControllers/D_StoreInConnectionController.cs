@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
 
 namespace mar_sumaken_web.ConnectControllers
@@ -44,6 +45,60 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 入庫実績登録
+        /// </summary>
+        /// <param name="model">入庫実績モデル</param>
+        /// <param name="user">ログインユーザー</param>
+        public static void InsertDStoreIns(D_StoreInModel model, LoginUserModel user)
+        {
+            DateTime sysDate = DateTime.Now;
+
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(user.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
+                // DB接続
+                try
+                {
+                    if (model.RegisterList != null && model.RegisterList.Count > 0)
+                    {
+                        foreach(var item in model.RegisterList)
+                        {
+                            item.DepoID = model.SelectedDepoID;
+                            item.CompanyID = model.SelectedCompanyID;
+                            item.StoreInDate = Convert.ToDateTime(model.DateSearchStart);
+
+                            // 入庫実績登録SQL作成
+                            string insertSql = CreateSQLToInsertDStoreIn(item, sysDate, user.UserName);
+                            // 入庫実績登録
+                            var insertCount = connection.Execute(insertSql, null, transaction);
+                            // 更件数が0の場合はエラーとする
+                            if (insertCount == 0)
+                            {
+                                throw new Exception();
+                            }
+                        }
+                    }
+
+                    // トランザクションのコミット
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// 入庫実績削除
         /// </summary>
         /// <param name="storeInId">入庫実績ID</param>
@@ -82,6 +137,25 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 入庫実績登録SQL作成
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <param name="createdAt">システムタイム</param>
+        /// <param name="createdBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToInsertDStoreIn(D_StoreInModel model, DateTime createdAt, string createdBy)
+        {
+            var sql = $@"
+                INSERT INTO D_StoreIn
+                    (DepoID, CompanyID, StoreInDate, SupplierProductNumber, LotNumber, MainProductKey, FirstSubProductKey, SecondSubProductKey, NumberOfBoxes, Quantity, Remarks, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
+                VALUES (
+                    {model.DepoID}, {model.CompanyID}, '{model.StoreInDate}', '{model.SupplierProductNumber}', '{model.LotNumber}', '{model.MainProductKey}', '{model.FirstSubProductKey}', '{model.SecondSubProductKey}', {model.NumberOfBoxes}, {model.Quantity}, '{model.Remarks}', '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}'
+                )
+            ;";
+            return sql;
+        }
+
+        /// <summary>
         /// 入庫実績削除SQL作成
         /// </summary>
         /// <param name="storeInId">入庫実績ID</param>
@@ -115,7 +189,10 @@ namespace mar_sumaken_web.ConnectControllers
                     ,storeIn.StoreInDate
                     ,storeIn.SupplierProductNumber
                     ,storeIn.LotNumber
-                    ,ROUND(storeIn.Quantity / storeIn.NumberOfBoxes, -1, 0) AS LotQuantity
+                    ,CASE 
+						WHEN storeIn.NumberOfBoxes <> 0 THEN ROUND(storeIn.Quantity / storeIn.NumberOfBoxes, -1, 0)
+						ELSE 0
+					END AS LotQuantity
                     ,storeIn.MainProductKey
                     ,storeIn.FirstSubProductKey
                     ,storeIn.SecondSubProductKey

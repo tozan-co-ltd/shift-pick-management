@@ -3,6 +3,7 @@ using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
@@ -69,6 +70,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 検索情報をチェック
+                ModelState.Remove("SupplierProductNumber");
                 if (!ModelState.IsValid)
                 {
                     return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
@@ -161,7 +163,7 @@ namespace mar_sumaken_web.Controllers
                     viewModel.DepoID = user.MainDepoID;
                     storeInList.Add(viewModel);
 
-                    model.DStoreInList = storeInList.ToPagedList();
+                    model.RegisterList = storeInList;
                 }
 
                 return View(model);
@@ -177,7 +179,7 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         /// <param name="model">登録情報</param>
         [HttpPost]
-        public IActionResult Register(M_CompanyModel model)
+        public IActionResult Register(D_StoreInModel model)
         {
             try
             {
@@ -189,14 +191,64 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "データが見つかりませんでした。" });
                 }
 
-                // 登録情報をチェック
-                if (!ModelState.IsValid)
+                List<string> errorMessageList = new();
+                int readCount = 1;
+                // リストチェック
+                if (model.RegisterList != null && model.RegisterList.Count > 0)
                 {
-                    return NotFound(new { errorMessage = "" });
+                    foreach(var modelItem in model.RegisterList)
+                    {
+                        var validationContext = new ValidationContext(modelItem);
+                        var validationResults = new List<ValidationResult>();
+                        bool isValid = Validator.TryValidateObject(modelItem, validationContext, validationResults, true);
+                        List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
+
+                        // 仕入先品番チェック
+                        bool isContainSupplierProductNumber = errorMembers.Contains("SupplierProductNumber");
+                        if (!isContainSupplierProductNumber)
+                        {
+                            // 仕入先品番で品番チェック
+                            bool isExistProduct = M_ProductConnectController.CheckMProductExist(modelItem.SupplierProductNumber, user.DatabaseName);
+                            if (!isExistProduct)
+                            {
+                                isValid = false;
+                                var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
+                                validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
+                            }
+                        }
+
+                        // エラーメッセージ作成
+                        if (!isValid)
+                        {
+                            foreach (var err in validationResults)
+                            {
+                                // フォーマットエラーメッセージ
+                                List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ReceiveScheduleModel>(err);
+                                errorMessageItem.Insert(0, readCount + "行目");
+
+                                // HTMLに変換
+                                var errorHtml = string.Empty;
+                                foreach (var item in errorMessageItem)
+                                {
+                                    errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
+                                }
+                                errorHtml = "<tr>" + errorHtml + "</tr>";
+
+                                errorMessageList.Add(errorHtml);
+                            }
+                        }
+                    }
+
+                    // エラーが1件以上ある場合はreturn
+                    if (errorMessageList.Count > 0)
+                    {
+                        var errorMessage = string.Join("</br>", errorMessageList);
+                        return NotFound(new { errorMessage });
+                    }
                 }
 
                 // 入庫実績登録
-                //int insertedCount = M_CompanyConnectController.InsertMCompany(model, user);
+                D_StoreInConnectionController.InsertDStoreIns(model, user);
 
                 return Ok();
             }
