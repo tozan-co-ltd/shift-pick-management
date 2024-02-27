@@ -147,6 +147,67 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
+        /// 入荷予定情報取得SQL作成
+        /// </summary>
+        /// <param name="start">入庫日開始</param>
+        /// <param name="end">入庫日終了</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="supplierId">会社ID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToGetDReceiveSchedules(string start, string end, int depoId, int supplierId, bool checkFlg)
+        {
+            string differenceCheckCondition = string.Empty;
+            if (checkFlg)
+            {
+                differenceCheckCondition = " AND (schedule.Quantity / product.LotQuantity) <> storeIn.NumberOfBoxes";
+            }
+
+            var sql = $@"
+                SELECT
+                    schedule.ReceiveScheduleID
+                    ,schedule.DepoID
+                    ,schedule.CompanyID AS SupplierID
+                    ,company.CompanyName AS SupplierName
+                    ,schedule.ReceiveScheduleDate
+                    ,schedule.SupplierProductNumber
+                    ,schedule.LotNumber
+                    ,CASE 
+	                    WHEN product.LotQuantity <> 0 THEN ROUND(schedule.Quantity / product.LotQuantity, 0, 0)
+	                    ELSE 0
+                    END AS NumberOfBoxes    -- 予定箱数
+                    ,schedule.Quantity      --予定数量
+                    ,storeIn.NumberOfBoxes AS StoreInNumberOfBox    -- 入庫箱数
+                    ,storeIn.Quantity AS StoreInQuantity            -- 入庫数量
+                    ,schedule.CreatedAt
+                    ,schedule.CreatedBy
+                FROM D_ReceiveSchedule schedule
+                INNER JOIN M_Product AS product 
+                    ON schedule.SupplierProductNumber = product.SupplierProductNumber
+                INNER JOIN D_StoreIn AS storeIn
+                    ON schedule.DepoID = storeIn.DepoID
+	                AND schedule.CompanyID = storeIn.CompanyID
+	                AND schedule.ReceiveScheduleDate = storeIn.StoreInDate
+	                AND schedule.SupplierProductNumber = storeIn.SupplierProductNumber
+	                AND schedule.LotNumber = storeIn.LotNumber
+                INNER JOIN M_Company AS company 
+                    ON schedule.CompanyID = company.CompanyID
+                WHERE 
+                    schedule.DepoID = {depoId}
+                    AND schedule.CompanyID = {supplierId}
+                    AND schedule.ReceiveScheduleDate >= '{start}'
+                    AND schedule.ReceiveScheduleDate <= '{end}'
+                    {differenceCheckCondition}
+                    AND schedule.IsDeleted = 0
+                    AND product.IsDeleted = 0
+	                AND storeIn.IsDeleted = 0
+	                AND company.IsDeleted = 0
+                ORDER BY 
+	                schedule.SupplierProductNumber ASC     
+            ";
+            return sql;
+        }
+
+        /// <summary>
         /// 入荷予定データINSERT文SQL作成
         /// </summary>
         /// <param name="model">モデル</param>

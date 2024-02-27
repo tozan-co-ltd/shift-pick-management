@@ -53,6 +53,17 @@ namespace mar_sumaken_web.Commons
         };
 
         /// <summary>
+        /// 便リスト
+        /// </summary>
+        public readonly static List<SelectListItem> Const_BinList = new()
+        {
+            new() { Value = "1", Text = "1", Selected = false },
+            new() { Value = "2", Text = "2", Selected = false },
+            new() { Value = "3", Text = "3", Selected = false },
+            new() { Value = "4", Text = "4", Selected = false }
+        };
+
+        /// <summary>
         /// プロパティの表示名取得
         /// </summary>
         /// <typeparam name="T"></typeparam>

@@ -1,5 +1,5 @@
 ﻿@using mar_sumaken_web.Commons;
-@model mar_sumaken_web.Models.D_ShipmentScheduleModel;
+@model mar_sumaken_web.Models.D_ShipmentScheduleSearchModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
@@ -35,52 +35,47 @@
             <div class="col-16 sp-tablet mb-3">
                 <div class="row mt-10">
                     <div class="col-lg-12">
-                        <form id="import-receive-schedule-upload-form" method="post">
+                        <form id="searchForm" method="post">
                             <div class="col-16 d-flex justify-content-start align-items-center mb-3 col-11 unset-pdl">
                                 <span class="warehouse-name-drs">倉庫名</span>
                                 <div class="selectItem unset-pdl">
-                                    <select class="form-select" name="DepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
+                                    <select class="form-select" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
                                 </div>
                             </div>
                             <div class="col-16 d-flex justify-content-start align-items-center mb-3 col-11 unset-pdl">
                                 <span class="warehouse-name-drs">納入先名</span>
                                 <div class="selectItem unset-pdl">
-                                    <select class="form-select" name="CompanyID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
+                                    <select class="form-select" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
                                 </div>
                             </div>
                             <div class="col-12 d-flex justify-content-start align-items-center mb-3 unset-pdl">
                                 <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.SearchStartDate)</span>
-                                <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate"> <lable class="m-1">～</lable> <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
+                                <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate"> 
+                                <lable class="m-1">～</lable>
+                                <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
                             </div>
 
                             <div class="col-16 d-flex justify-content-start align-items-center">
                                 <p class="warehouse-name-drs">便</p>
                                 <div class="col-16 d-flex justify-content-start align-items-center sp-cs-dpl">
                                     <div class="col-16 d-flex justify-content-start align-items-center sp-cs-dpl">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="bin1" checked>
-                                            <label class="form-check-label ml-1 mr-3" for="bin1">1</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="bin2">
-                                            <label class="form-check-label ml-1 mr-3" for="bin2">2</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="bin3">
-                                            <label class="form-check-label ml-1 mr-3" for="bin3">3</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="bin4">
-                                            <label class="form-check-label ml-1 mr-3" for="bin4">4</label>
-                                        </div>
+                                        @for (var i = 0; i < @Model.BinList.Count; i++)
+                                        {
+                                            <div class="form-check">
+                                                <input type="hidden" asp-for="BinList[i].Value" value="@Model.BinList[i].Value" />
+                                                <input type="hidden" asp-for="BinList[i].Text" value="@Model.BinList[i].Value" />
+                                                <input class="form-check-input" asp-for="BinList[i].Selected" id="bin-@i" type="checkbox">
+                                                <label class="form-check-label ml-1 mr-3" id="label-bin-@i">@Model.BinList[i].Text</label>
+                                            </div>
+                                        }
                                         <div class="form-check ml-5">
-                                            <input class="form-check-input" type="checkbox" value="" id="actual-num-discrepancy-only">
-                                            <label class="form-check-label ml-1" for="actual-num-discrepancy-only">実績数不一致のみ</label>
+                                            <input class="form-check-input" asp-for="DiffenceCountCheck" type="checkbox">
+                                            <label class="form-check-label ml-1" asp-for="DiffenceCountCheck">実績数不一致のみ</label>
                                         </div>
                                     </div>
 
                                     <div class="custom-control custom-checkbox col-16 d-flex justify-content-start align-items-center sp-cs-dpl">
-                                        <button type="submit" class="btn btn-secondary btn-icon-split ml-3">
+                                        <button id="search-btn" type="submit" class="btn btn-secondary btn-icon-split ml-3">
                                             <span class="icon text-white-50">
                                                 <i class="fa-solid fa-magnifying-glass"></i>
                                             </span>
@@ -101,12 +96,13 @@
             </div>
         </div>
         <div class="mt-3" id="div-table" style="display: none;">
-            <table class="table table-sm stripe hover nowrap datatable-normal">
+            <table class="table table-sm stripe hover nowrap datatable-normal" id="table-datatable">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>ID</th>
                         <th>納入先名</th>
-                        <th>出荷指示日</th>
+                        <th>納入指示日</th>
                         <th>便</th>
                         <th>納入先品番</th>
                         <th>仕入先品番</th>
@@ -127,59 +123,81 @@
                         <th>納入場所</th>
                         <th>納入先名称</th>
                         <th>納入先工場名</th>
+                        <th>定期／不定期区分名称</th>
+                        <th>発行日</th>
+                        <th>納入指示時刻</th>
+                        <th>輸送識別</th>
+                        <th>納品書番号</th>
+                        <th>ページ数</th>
+                        <th>行No</th>
+                        <th>背番号</th>
+                        <th>品名</th>
+                        <th>枝番</th>
                         <th>更新日時</th>
                         <th>更新者</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if (@Model != null && @Model.D_ShipmentScheduleList != null && @Model.D_ShipmentScheduleList.Count > 0)
-                    {
-                        @foreach (var item in @Model.D_ShipmentScheduleList)
-                        {
-                            <tr>
-                                <td>
-                                    <button class="btn btn-secondary btn-icon-split"
-                                            onclick="OnDetailClick('@item.ShipmentScheduleID')" data-id="@item.ShipmentScheduleID" data-toggle="modal" data-target="#shipmentScheduleDetailModal">
-                                        <i class="fa-solid fa-list"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-icon-split"
-                                            onclick="OnDeleteClick('@item.ShipmentScheduleID')" data-id="@item.ShipmentScheduleID" data-toggle="modal" data-target="#shipmentScheduleDeleteModal">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </td>
-                                <td>@item.ShipmentScheduleID</td>
-                                <td>@item.OrdererCode</td>
-                                <td>@item.OrdererFactoryKubun</td>
-                                <td>@item.OrdererName</td>
-                                <td>@item.OrdererFactoryName</td>
-                                <td>@item.ShipperCode</td>
-                                <td>@item.ShipperFactoryKubun</td>
-                                <td>@item.ShipperName</td>
-                                <td>@item.DeliveryCode</td>
-                                <td>@item.DeliveryFactoryKubun</td>
-                                <td>@item.DeliveryLocation</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>@item.UpdatedAt</td>
-                                <td>@item.UpdatedBy</td>
-                            </tr>
-                        }
-                    }
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+<script>
+    // 検索ボタン押下
+    $('#search-btn').click(function () {
+        $('#searchForm').submit(function (e) {
+            DeleteErrorMessages();
+
+            // ページの更新を禁止する
+            e.preventDefault();
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            e.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("SearchData", "D_ShipmentSchedule")';
+            let method = 'POST';
+            var data = $(this).serialize();
+
+            console.log(data);
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $("#table-datatable tbody").empty();
+                $('#table-datatable').DataTable().destroy();
+                $("#div-table").show();
+                $("#table-datatable tbody").html(response);
+                $("#table-datatable").DataTable({
+                    "language": {           // 日本語表示
+                        "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+                    },
+                    lengthChange: true,     // 表示件数
+                    info: false,            // 総件数
+                    scrollX: true,          // 横スクロール可
+                    order: [[3, "asc"]],    // 仕入先品番昇順
+                });
+            }).fail(function (xhr, textStatus, errorThrown) {
+                if (xhr.status === 404) {
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage500);
+                }
+            });
+        });
+    });
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
+</script>

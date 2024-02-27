@@ -257,7 +257,7 @@ namespace mar_sumaken_web.ConnectControllers
                     ,storeIn.SupplierProductNumber
                     ,storeIn.LotNumber
                     ,CASE 
-						WHEN storeIn.NumberOfBoxes <> 0 THEN ROUND(storeIn.Quantity / storeIn.NumberOfBoxes, -1, 0)
+						WHEN storeIn.NumberOfBoxes <> 0 THEN ROUND(storeIn.Quantity / storeIn.NumberOfBoxes, 0, 0)
 						ELSE 0
 					END AS LotQuantity
                     ,storeIn.MainProductKey

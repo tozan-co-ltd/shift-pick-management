@@ -1,7 +1,6 @@
 ﻿using mar_sumaken_web.Commons;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
@@ -63,6 +62,18 @@ namespace mar_sumaken_web.Models
         /// 出荷指示実績ID
         /// </summary>
         public int ShipmentScheduleID { get; set; }
+
+        /// <summary>
+        /// 会社ID:仕入先の会社ID
+        /// </summary>
+        [Display(Name = "会社ID")]
+        public int SupplierID { set; get; }
+
+        /// <summary>
+        /// 仕入先名
+        /// </summary>
+        [Display(Name = "仕入先名")]
+        public string? SupplierName { set; get; }
 
         /// <summary>
         /// 発注元
@@ -143,6 +154,7 @@ namespace mar_sumaken_web.Models
         [MaxLength(5, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryLocation { get; set; }
+
 
         /// <summary>
         /// 納入先名称
@@ -281,6 +293,12 @@ namespace mar_sumaken_web.Models
         public string? Quantity { get; set; }
 
         /// <summary>
+        /// 出庫数量 
+        /// </summary>
+        [Display(Name = "出庫数量 ")]
+        public int StoreOutQuantity { get; set; }
+
+        /// <summary>
         /// 仕入先品番
         /// </summary>
         [Display(Name = "仕入先品番")]
@@ -292,6 +310,12 @@ namespace mar_sumaken_web.Models
         [Display(Name = "箱数")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int NumberOfBoxes { get; set; }
+
+        /// <summary>
+        /// 出庫箱数
+        /// </summary>
+        [Display(Name = "出庫箱数")]
+        public int StoreOutNumberOfBoxes { get; set; }
 
         /// <summary>
         /// 更新日時
