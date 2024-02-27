@@ -23,20 +23,20 @@
             </form>
         </div>
 
-        <div class="form-group col-sm-12">
+        <div class="form-group col-sm-12 pl-3">
             <p id="div-error-message" class="mt-1 text-danger"></p>
-        </div>
 
-        @if (ViewData["ErrorMessage"] != null)
-        {
-            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
-        }
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
                 <form class="col-md-12" id="mUserForm">
                     <div class="top-area">
-                        <div class="col-12 input-group div-input-group">
+                        <div class="col-12 input-group div-input-group p-1">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
                                 <label>@Html.DisplayName("LoginID")</label>
                             </div>
@@ -46,7 +46,7 @@
                                 <span class="text-danger w-100" asp-validation-for="LoginID"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
+                        <div class="col-12 input-group div-input-group p-1">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
                                 <label>@Html.DisplayName("UserName")<span style="color:red">*</span></label>
                             </div>
@@ -55,7 +55,7 @@
                                 <span class="text-danger w-100" asp-validation-for="UserName"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
+                        <div class="col-12 input-group div-input-group p-1">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
                                 <label>@Html.DisplayName("Password")</label>
                             </div>
@@ -65,7 +65,7 @@
                                 <span class="text-danger w-100" asp-validation-for="Password"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
+                        <div class="col-12 input-group div-input-group p-1">
                             <div class="col-12 col-sm-4 col-md-2 column-1st">
                                 <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                             </div>
@@ -81,7 +81,7 @@
                     </div>
                     <hr />
                     <div class="down-area">
-                        <div class="col-12 input-group div-input-group">
+                        <div class="col-12 input-group div-input-group p-1">
                             <div class="col-12 col-md-6 d-flex flex-wrap pl-0">
                                 <div class="col-12 col-sm-4 column-1st">
                                     <label>使用倉庫名<span style="color:red">*</span></label>
@@ -114,7 +114,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group mb-0">
+                        <div class="col-12 input-group div-input-group mb-0 p-1">
                             <div class="col-12 col-md-6 input-group pl-0">
                                 <div class="col-12 col-sm-4 column-1st">
                                     <label>使用ハンディメニュー名</label>
