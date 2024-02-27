@@ -147,10 +147,8 @@
             </div>
         </div>
     </div>
-
 </div>
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript">
 
     $(document).ready(function () {
@@ -163,49 +161,46 @@
         }
     });
 
-    // ユーザーマスター更新
+    // 更新ボタン押下
     function OnEdit() {
         $('#mUserForm').submit(function (event) {
-
             $("#div-error-message").text("");
-            $('#import-res').text("");
-
-            // フォーム情報を取得する
-            var formData = $('#mUserForm').serializeArray();
-
-            // 使用倉庫名チェック
-            CheckIsSelectedDepoProduct();
 
             // ページの更新を禁止する
             event.preventDefault();
 
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // 使用倉庫名チェック
+            CheckIsSelectedDepoProduct();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Edit", "M_User")';
+            let method = 'POST';
+            let formId = 'mUserForm';
+            let data = $('#' + formId).serializeArray();
+
             // Ajax call
             $.ajax({
-                url: window.location.origin + '@Url.Action("Edit", "M_User")',
-                method: "POST",
-                data: formData
-            })
-                .done(function (response) {
-                    $('#mUserForm')[0].reset();
-                    // 完了モーダル表示
-                    AlertMessage('', '完了', '更新が完了しました。', null, null);
-                })
-                .fail(function (xhr) {
-                    if (xhr.status === 404) {
-                        // データが見つからなかった場合
-                        var errorMessage = xhr.responseJSON.errorMessage;
-                        $("#div-error-message").hide();
-                        $("#import-res").show();
-                        $("#import-res").addClass('text-danger');
-                        $("#import-res").text("エラー: " + errorMessage);
-                    } else {
-                        // その他のエラーの場合
-                        $("#div-error-message").hide();
-                        $("#import-res").show();
-                        $("#import-res").addClass('text-danger');
-                        $("#import-res").text("更新を失敗しました。");
-                    }
-                });
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#' + formId)[0].reset();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    // データが見つからなかった場合
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    // その他のエラーの場合
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
         });
     }
 

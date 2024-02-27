@@ -106,36 +106,36 @@
 });
 
 
-//------------------- パスワード変更 ------------------//
-$("#changePasswordForm").submit(function () {
-    $(".changePassword .alert-success").css("display", "none");
-});
+////------------------- パスワード変更 ------------------//
+//$("#changePasswordForm").submit(function () {
+//    $(".changePassword .alert-success").css("display", "none");
+//});
 
-// パスワード表示アイコン
-$('#eye-change-pass').click(function () {
-    if ($(this).hasClass('fa-eye')) {
-        $(this).removeClass('fa-eye');
-        $(this).addClass('fa-eye-slash');
-        $('#password-field').attr('type', 'text');
-    } else {
-        $(this).removeClass('fa-eye-slash');
-        $(this).addClass('fa-eye');
-        $('#password-field').attr('type', 'password');
-    }
-});
+//// パスワード表示アイコン
+//$('#eye-change-pass').click(function () {
+//    if ($(this).hasClass('fa-eye')) {
+//        $(this).removeClass('fa-eye');
+//        $(this).addClass('fa-eye-slash');
+//        $('#password-field').attr('type', 'text');
+//    } else {
+//        $(this).removeClass('fa-eye-slash');
+//        $(this).addClass('fa-eye');
+//        $('#password-field').attr('type', 'password');
+//    }
+//});
 
-$('#eye-login').click(function () {
-    if ($(this).hasClass('fa-eye')) {
-        $(this).removeClass('fa-eye');
-        $(this).addClass('fa-eye-slash');
-        $('.login-text').attr('type', 'text');
-    } else {
-        $(this).removeClass('fa-eye-slash');
-        $(this).addClass('fa-eye');
-        $('.input-password .login-text').attr('type', 'password');
-    }
-});
-//--------------------------------------------------------//
+//$('#eye-login').click(function () {
+//    if ($(this).hasClass('fa-eye')) {
+//        $(this).removeClass('fa-eye');
+//        $(this).addClass('fa-eye-slash');
+//        $('.login-text').attr('type', 'text');
+//    } else {
+//        $(this).removeClass('fa-eye-slash');
+//        $(this).addClass('fa-eye');
+//        $('.input-password .login-text').attr('type', 'password');
+//    }
+//});
+////--------------------------------------------------------//
 
 
 //------------------- CSV取込 ------------------//

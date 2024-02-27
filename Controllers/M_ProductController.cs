@@ -141,7 +141,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 品番マスター登録
-                bool isInserted = M_ProductConnectController.InsertMProduct(model, user);
+                M_ProductConnectController.InsertMProduct(model, user);
 
                 return Ok();
             }
