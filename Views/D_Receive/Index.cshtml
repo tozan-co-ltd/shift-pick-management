@@ -3,7 +3,7 @@
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
- }
+}
 
 <div class="card shadow de-inspection d-receive-schedule m-4">
     <div class="card-header text-gray-800">
@@ -35,7 +35,7 @@
             <div class="col-16 sp-tablet mb-3">
                 <div class="row mt-10">
                     <div class="col-lg-12">
-                        <form id="import-receive-schedule-upload-form" method="post" enctype="multipart/form-data" name="form" onsubmit="return false;">
+                        <form id="searchForm" method="post" enctype="multipart/form-data" name="form" onsubmit="return false;">
                             <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
                                 <span class="warehouse-name-drs">倉庫名</span>
                                 <div class="selectItem unset-pdl">
@@ -54,7 +54,7 @@
                                     <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate"> <lable class="m-1">～</lable> <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
                                 </div>
                                 <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                                    <button type="submit" class="btn btn-secondary btn-icon-split ml-3">
+                                    <button type="submit" id="search-btn" class="btn btn-secondary btn-icon-split ml-3">
                                         <span class="icon text-white-50">
                                             <i class="fa-solid fa-magnifying-glass"></i>
                                         </span>
@@ -74,16 +74,20 @@
             </div>
         </div>
         <div class="mt-3" id="div-table" style="display: none;">
-            <table class="table table-sm stripe hover nowrap datatable-normal">
+            <table class="table table-sm stripe hover nowrap datatable-normal" id="table-datatable">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>ID</th>
                         <th>仕入先名</th>
                         <th>入荷日</th>
                         <th>仕入先品番</th>
-                        <th>キー</th>
+                        <th>ロット番号</th>
                         <th>箱数</th>
                         <th>数量</th>
+                        <th>メインキー</th>
+                        <th>サブキー1</th>
+                        <th>サブキー2</th>
                         <th>登録日時</th>
                         <th>読取日時</th>
                         <th>登録者</th>
@@ -95,3 +99,60 @@
         </div>
     </div>
 </div>
+
+<script>
+    // 検索ボタン押下
+    $('#search-btn').click(function () {
+        $('#searchForm').submit(function (e) {
+            DeleteErrorMessages();
+
+            // ページの更新を禁止する
+            e.preventDefault();
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            e.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("SearchData", "D_Receive")';
+            let method = 'POST';
+            var data = $(this).serialize();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $("#table-datatable tbody").empty();
+                $('#table-datatable').DataTable().destroy();
+                $("#div-table").show();
+                $("#table-datatable tbody").html(response);
+                $("#table-datatable").DataTable({
+                    "language": {           // 日本語表示
+                        "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+                    },
+                    lengthChange: true,     // 表示件数
+                    info: false,            // 総件数
+                    scrollX: true,          // 横スクロール可
+                    order: [[3, "asc"]],    // 仕入先品番昇順
+                });
+            }).fail(function (xhr, textStatus, errorThrown) {
+                if (xhr.status === 404) {
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage500);
+                }
+            });
+        });
+    });
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
+</script>
