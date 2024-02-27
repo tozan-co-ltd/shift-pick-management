@@ -41,7 +41,8 @@ namespace mar_sumaken_web.Controllers
                 // 管理権限区分が1(管理者)でない場合はエラーとする
                 if (user == null || user.AuthorizedKubun != 1)
                 {
-                    throw new Exception();
+                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
+                    return View(model);
                 }
 
                 // ユーザーマスター情報取得SQL作成
@@ -169,7 +170,7 @@ namespace mar_sumaken_web.Controllers
                 model.Salt= stringSalt;
 
                 // ユーザーマスター登録
-                bool isInsertMuser = M_UserConnectController.InsertMUser(model, user);
+                M_UserConnectController.InsertMUser(model, user);
 
                 return Ok();
             }
@@ -311,7 +312,7 @@ namespace mar_sumaken_web.Controllers
                     }
                 }
 
-                // 更新情報をチェック
+                // 入力規則チェック
                 bool isNotChangePassword = string.IsNullOrWhiteSpace(model.Password);
                 if (isNotChangePassword)
                 {
@@ -334,11 +335,10 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ユーザーマスター更新
-                bool isUpdateMuser = await M_UserConnectController.UpdateMUser(model, user);
+                await M_UserConnectController.UpdateMUser(model, user);
 
                 return Ok();
             }
-
             catch (SqlException)
             {
                 return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
@@ -362,7 +362,7 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // ユーザーマスター削除
-                int deleteAffectedRows = M_UserConnectController.DeleteMUser(userId, user);
+                M_UserConnectController.DeleteMUser(userId, user);
 
                 return Ok();
             }

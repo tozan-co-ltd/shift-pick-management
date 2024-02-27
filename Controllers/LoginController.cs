@@ -29,7 +29,7 @@ namespace mar_sumaken_web.Controllers
                 // 強制ログアウトの場合はエラーメッセージ表示
                 if (param == "autologout")
                 {
-                    ViewData["ErrorMessage"] = "異なるログインを検出したため自動ログアウトされました。";
+                    ViewData["ErrorMessage"] = "E1016: " + ErrorMessagesResources.E1016;
                 }
 
                 // 開発環境("_test"が含まれている)の場合はViewDataに"true"を代入し、
@@ -45,7 +45,8 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception ex)
             {
-                ViewData["ErrorMessage"] = ex;
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message;
+                ViewData["ErrorMessage"] = errorMessage;
                 return View();
             }
         }
@@ -61,13 +62,19 @@ namespace mar_sumaken_web.Controllers
         {
             try
             {
-                // ログインの入力値 チェック
+                // 入力規則チェック
                 LoginUserModel loginUserModel = CheckInputValuesForLogin(model);
-
-                // エラー入力の場合
                 if (loginUserModel == null)
                 {
-                    ViewData["ErrorMessage"] = "ログインIDまたはパスワードが正しくありません。";
+                    ViewData["ErrorMessage"] = "E1002: " + ErrorMessagesResources.E1002;
+
+                    // 開発環境("_test"が含まれている)の場合はViewDataに"true"を代入し、
+                    // _LayoutLogin.cshtmlで背景の色を変更(薄紫#EFEDFF)
+                    string companyWebPath = GetCompanyWebPathByURL();
+                    if (companyWebPath.Contains("_test"))
+                    {
+                        ViewData["IsDevelopment"] = "true";
+                    }
                     return View();
                 }
 
@@ -76,7 +83,7 @@ namespace mar_sumaken_web.Controllers
                 string timeStamp = dateTime.ToString();
 
                 // クレーム作成
-                // ユーザー情報をクレームに追加する
+                // ユーザー情報をクレームに追加
                 var claims = new[] {
                     new Claim("CompanyID", loginUserModel.CompanyID.ToString()),
                     new Claim("CompanyCode", loginUserModel.CompanyCode),

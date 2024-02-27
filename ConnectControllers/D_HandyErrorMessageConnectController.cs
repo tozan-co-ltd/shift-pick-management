@@ -49,11 +49,23 @@ namespace mar_sumaken_web.ConnectControllers
         public static string CreateSQLToSelectDHandyErrorMessages()
         {
             var sql = $@"
-                        SELECT *
-                        FROM 
-	                        D_HandyErrorMessage
-                        WHERE
-                            CreatedAt >= DATEADD(MONTH, -1, GETDATE());
+                SELECT 
+                    HandyErrorMessageID,
+                    DepoName,
+                    HandyMenuName,
+                    ErrorMessage,
+                    FirstScanedString,
+                    SecondScanedString,
+                    handyError.CreatedAt,
+                    handyError.CreatedBy,
+                    UnlockedBy
+                FROM D_HandyErrorMessage AS handyError
+                INNER JOIN M_Depo AS depo
+                    ON handyError.DepoID = depo.DepoID
+                INNER JOIN M_HandyMenu AS handyMenu
+                    ON handyError.HandyMenuID = handyMenu.HandyMenuID
+                WHERE
+                    handyError.CreatedAt >= DATEADD(WW, -1, GETDATE());
             ";
 
             return sql;

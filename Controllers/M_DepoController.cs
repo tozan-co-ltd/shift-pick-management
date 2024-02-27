@@ -107,7 +107,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 倉庫マスター登録
-                int insertedCount = M_DepoConnectController.InsertMDepo(model, user);
+                M_DepoConnectController.InsertMDepo(model, user);
 
                 return Ok();
             }
@@ -149,7 +149,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 倉庫マスター更新
-                int editedCount = M_DepoConnectController.UpdateMDepo(model, user);
+                M_DepoConnectController.UpdateMDepo(model, user);
 
                 return Ok();
             }

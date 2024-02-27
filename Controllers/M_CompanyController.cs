@@ -118,7 +118,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 会社マスター登録
-                int insertedCount = M_CompanyConnectController.InsertMCompany(model, user);
+                M_CompanyConnectController.InsertMCompany(model, user);
 
                 return Ok();
             }
@@ -160,7 +160,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 会社マスター更新
-                int editedCount = M_CompanyConnectController.UpdateMCompany(model, user);
+                M_CompanyConnectController.UpdateMCompany(model, user);
 
                 return Ok();
             }
@@ -187,7 +187,7 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 会社マスター削除
-                int deleteAffectedRows = M_CompanyConnectController.DeleteMCompany(companyId, user);
+                M_CompanyConnectController.DeleteMCompany(companyId, user);
 
                 return Ok();
             }

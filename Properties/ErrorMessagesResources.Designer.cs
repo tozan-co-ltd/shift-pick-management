@@ -70,7 +70,7 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
-        ///   {0}は{2}～{1}文字の間で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        ///   ログインIDまたはパスワードが正しくありません。正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1002 {
             get {
@@ -192,6 +192,15 @@ namespace mar_sumaken_web.Properties {
         internal static string E1015 {
             get {
                 return ResourceManager.GetString("E1015", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   異なるログインを検出したため自動ログアウトされました。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1016 {
+            get {
+                return ResourceManager.GetString("E1016", resourceCulture);
             }
         }
         

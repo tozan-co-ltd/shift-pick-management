@@ -421,6 +421,38 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
+        /// ユーザーマスターのパスワード更新
+        /// </summary>
+        /// <param name="model">更新ユーザー情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns></returns>
+        public static int UpdateMUserPassword(ChangePasswordModel model, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+                    string sql = CreateSQLToUpdateMUserPassword(model, sysDate, loginUser.UserName);
+                    var count = connection.Execute(sql);
+
+                    return count;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// 重複ユーザー情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
@@ -447,7 +479,7 @@ namespace mar_sumaken_web.Commons
         {
             var sql = $@"
                 SELECT
-                        m_user.UserID                                
+                    m_user.UserID                                
                     ,m_user.LoginID                              
                     ,m_user.UserName
                     ,m_user.DepoID
@@ -463,7 +495,8 @@ namespace mar_sumaken_web.Commons
                     ,m_user.UpdatedBy                            
                 FROM 
                     M_User AS m_user
-                INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
+                INNER JOIN M_Depo AS m_depo ON 
+                    m_user.DepoID = m_depo.DepoID
                 WHERE
                     m_user.IsDeleted = 0
                     AND m_depo.IsDeleted = 0
@@ -481,7 +514,7 @@ namespace mar_sumaken_web.Commons
         {
             var sql = $@"
                 SELECT
-                        m_user.UserID                                
+                    m_user.UserID                                
                     ,m_user.LoginID                              
                     ,m_user.UserName
                     ,m_user.DepoID
@@ -499,7 +532,8 @@ namespace mar_sumaken_web.Commons
                     ,m_user.UpdatedBy                            
                 FROM 
                     M_User AS m_user
-                INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
+                INNER JOIN M_Depo AS m_depo 
+                    ON m_user.DepoID = m_depo.DepoID
                 WHERE
                     m_user.UserId = {userId}
                     AND m_user.IsDeleted = 0
@@ -546,8 +580,7 @@ namespace mar_sumaken_web.Commons
                 FROM 
 	                R_UserHandyMenu AS userMenu
                 INNER JOIN M_HandyMenu AS menu 
-                ON 
-                    userMenu.HandyMenuID = menu.HandyMenuID
+                    ON userMenu.HandyMenuID = menu.HandyMenuID
                 WHERE 
 	                userMenu.UserID = {userId}
                     AND menu.IsDeleted = 0
@@ -598,13 +631,13 @@ namespace mar_sumaken_web.Commons
         /// <param name="createdAt">システムタイム</param>
         /// <param name="createdBy">ユーザーID</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToInsertMUser(M_UserModel mUser, DateTime createdAt, string createdBy)
+        public static string CreateSQLToInsertMUser(M_UserModel model, DateTime createdAt, string createdBy)
         {
             var sql = $@"
                 INSERT INTO M_User 
                     (LoginID, UserName, DepoID, AuthorizedKubun, Password, Salt, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
                 OUTPUT INSERTED.UserID
-                VALUES ('{mUser.LoginID}', '{mUser.UserName}', {mUser.DepoID}, {mUser.AuthorizedKubun}, '{mUser.Password}', '{mUser.Salt}', '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}');
+                VALUES ('{model.LoginID}', '{model.UserName}', {model.DepoID}, {model.AuthorizedKubun}, '{model.Password}', '{model.Salt}', '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}');
             ";
             return sql;
         }
@@ -612,25 +645,48 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// ユーザーマスター更新SQL作成
         /// </summary>
-        /// <param name="mUser">更新情報</param>
+        /// <param name="model">更新情報</param>
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザーID</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToUpdateMUser(M_UserModel mUser, DateTime updatedAt, string updatedBy)
+        public static string CreateSQLToUpdateMUser(M_UserModel model, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
 
                 UPDATE M_User
                 SET 
-                    UserName = '{mUser.UserName}',
-                    DepoID = {mUser.DepoID},
-                    AuthorizedKubun = {mUser.AuthorizedKubun},
-                    {(string.IsNullOrEmpty(mUser.Password) ? "" : $"Password = '{mUser.Password}',")}
-                    {(string.IsNullOrEmpty(mUser.Password) ? "" : $"Salt = '{mUser.Salt}',")}
+                    UserName = '{model.UserName}',
+                    DepoID = {model.DepoID},
+                    AuthorizedKubun = {model.AuthorizedKubun},
+                    {(string.IsNullOrEmpty(model.Password) ? "" : $"Password = '{model.Password}',")}
+                    {(string.IsNullOrEmpty(model.Password) ? "" : $"Salt = '{model.Salt}',")}
                     UpdatedAt = '{updatedAt}',
                     UpdatedBy = '{updatedBy}'
                 WHERE
-                    UserId = {mUser.UserID}; 
+                    UserId = {model.UserID}; 
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// ユーザーマスターパスワード更新SQL作成
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザーID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToUpdateMUserPassword(ChangePasswordModel model, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+
+                UPDATE M_User
+                SET 
+                    Password = '{model.Password}',
+                    Salt = '{model.Salt}',
+                    UpdatedAt = '{updatedAt}',
+                    UpdatedBy = '{updatedBy}'
+                WHERE
+                    UserId = {model.UserID}; 
             ";
             return sql;
         }

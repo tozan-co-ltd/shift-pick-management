@@ -26,12 +26,14 @@
         "language": {
             "url": language_url
         },
-        lengthChange: true,     // 表示件数
+        lengthChange: true,     // 件数切替
         info: false,            // 総件数
         scrollX: true,          // 横スクロール可
+        scrollCollapse: true,   // 縦スクロール表示
         order: [[1, "asc"]],    // ID昇順
-        fixedColumns: true,
-        scrollCollapse: true
+        columnDefs: [
+            { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
+        ]
     });
 
     // 作成日時(1列目)降順
@@ -39,12 +41,28 @@
         "language": {
             "url": language_url
         },
-        lengthChange: true,     // 表示件数
+        lengthChange: true,     // 件数切替
         info: false,            // 総件数
         scrollX: true,          // 横スクロール可
-        order: [[0, "desc"]],    // 取込日時降順
-        fixedColumns: true,
-        scrollCollapse: true
+        scrollCollapse: true,   // 縦スクロール表示
+        order: [[0, "desc"]],   // 作成日時降順
+    });
+
+    // ハンディエラーメッセージ用(作成日時(2列目)降順,縦スクロールあり,件数非表示,検索非表示)
+    $('.datatable-handyErrorMessage').DataTable({
+        "language": {
+            "url": language_url
+        },
+        lengthChange: false,    // 件数切替非表示
+        info: false,            // 総件数非表示
+        searching: false,       // 検索欄非表示
+        paging: false,          // ページング非表示
+        scrollCollapse: true,   // 縦スクロール表示
+        scrollY: '200px',       // 縦スクロールサイズ
+        order: [[1, "desc"]],   // 作成日時降順
+        columnDefs: [
+            { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
+        ]
     });
     //--------------------------------------------------------//
 
@@ -88,36 +106,36 @@
 });
 
 
-//------------------- パスワード変更 ------------------//
-$("#changePasswordForm").submit(function () {
-    $(".changePassword .alert-success").css("display", "none");
-});
+////------------------- パスワード変更 ------------------//
+//$("#changePasswordForm").submit(function () {
+//    $(".changePassword .alert-success").css("display", "none");
+//});
 
-// パスワード表示アイコン
-$('#eye-change-pass').click(function () {
-    if ($(this).hasClass('fa-eye')) {
-        $(this).removeClass('fa-eye');
-        $(this).addClass('fa-eye-slash');
-        $('#password-field').attr('type', 'text');
-    } else {
-        $(this).removeClass('fa-eye-slash');
-        $(this).addClass('fa-eye');
-        $('#password-field').attr('type', 'password');
-    }
-});
+//// パスワード表示アイコン
+//$('#eye-change-pass').click(function () {
+//    if ($(this).hasClass('fa-eye')) {
+//        $(this).removeClass('fa-eye');
+//        $(this).addClass('fa-eye-slash');
+//        $('#password-field').attr('type', 'text');
+//    } else {
+//        $(this).removeClass('fa-eye-slash');
+//        $(this).addClass('fa-eye');
+//        $('#password-field').attr('type', 'password');
+//    }
+//});
 
-$('#eye-login').click(function () {
-    if ($(this).hasClass('fa-eye')) {
-        $(this).removeClass('fa-eye');
-        $(this).addClass('fa-eye-slash');
-        $('.login-text').attr('type', 'text');
-    } else {
-        $(this).removeClass('fa-eye-slash');
-        $(this).addClass('fa-eye');
-        $('.input-password .login-text').attr('type', 'password');
-    }
-});
-//--------------------------------------------------------//
+//$('#eye-login').click(function () {
+//    if ($(this).hasClass('fa-eye')) {
+//        $(this).removeClass('fa-eye');
+//        $(this).addClass('fa-eye-slash');
+//        $('.login-text').attr('type', 'text');
+//    } else {
+//        $(this).removeClass('fa-eye-slash');
+//        $(this).addClass('fa-eye');
+//        $('.input-password .login-text').attr('type', 'password');
+//    }
+//});
+////--------------------------------------------------------//
 
 
 //------------------- CSV取込 ------------------//
