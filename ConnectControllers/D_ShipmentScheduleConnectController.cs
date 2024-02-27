@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
 
 namespace mar_sumaken_web.Commons
@@ -265,6 +266,69 @@ namespace mar_sumaken_web.Commons
             END
             ";
 
+            return sql;
+        }
+
+
+        /// <summary>
+        /// 出荷指示情報取得SQL作成
+        /// </summary>
+        /// <param name="start">入庫日開始</param>
+        /// <param name="end">入庫日終了</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="supplierId">会社ID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToGetDShipmentSchedules(D_ShipmentScheduleSearchModel searchModel)
+        {
+            // 実績数不一致のみ
+            string differenceCheckCondition = string.Empty;
+            if (searchModel.DiffenceCountCheck)
+            {
+                differenceCheckCondition = " AND shipment.NumberOfBoxes <> storeOut.NumberOfBoxes";
+            }
+
+            // 便
+            string binCondition = string.Empty;
+            if (searchModel.BinList != null && searchModel.BinList.Count > 0)
+            {
+                List<SelectListItem> selectedItems = searchModel.BinList.Where(item => item.Selected).ToList();
+                List<string> selectedValues = selectedItems.Select(item => item.Value).ToList();
+                binCondition = $@" AND shipment.DeliveryTimeClass in ({string.Join(",", selectedValues)})";
+            }
+            searchModel.SearchEndDate = string.Concat(searchModel.SearchEndDate, " 23:59:59");
+            var sql = $@"
+                SELECT
+	                shipment.CompanyID AS SupplierID
+	                ,company.CompanyName AS SupplierName
+	                ,depo.DepoName
+	                ,storeOut.NumberOfBoxes AS StoreOutNumberOfBoxes -- 出庫箱数
+	                ,storeOut.Quantity AS StoreOutQuantity --出庫数量
+                    ,shipment.*
+                    
+                FROM D_ShipmentSchedule shipment
+                INNER JOIN D_StoreOut AS storeOut 
+		                ON shipment.DepoID = storeOut.DepoID
+		                AND	shipment.CompanyID = storeOut.CompanyID
+		                AND	shipment.DeliveryDate = storeOut.DeliveryDate
+		                AND	shipment.DeliveryProductNumber = storeOut.DeliveryProductNumber
+                INNER JOIN M_Company AS company 
+                        ON shipment.CompanyID = company.CompanyID
+                INNER JOIN M_Depo AS depo 
+                    ON shipment.DepoID = depo.DepoID
+                WHERE 
+                    shipment.DepoID = {searchModel.SelectedDepoID}
+                    AND shipment.CompanyID = {searchModel.SelectedCompanyID}
+                    AND shipment.DeliveryDate >= '{searchModel.SearchStartDate}'
+                    AND shipment.DeliveryDate <= '{searchModel.SearchEndDate}'
+                    {binCondition}
+                    {differenceCheckCondition}
+	                AND shipment.IsDeleted = 0
+	                AND storeOut.IsDeleted = 0
+	                AND company.IsDeleted = 0
+                    AND depo.IsDeleted = 0
+                ORDER BY 
+	                shipment.DeliveryProductNumber ASC 
+            ";
             return sql;
         }
     }
