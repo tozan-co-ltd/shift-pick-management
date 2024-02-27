@@ -205,6 +205,15 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
+        ///   入力値に不正な値があります。正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1017 {
+            get {
+                return ResourceManager.GetString("E1017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   QRコードが正しくありません。正しいQRコードを読み取ってください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E2001 {

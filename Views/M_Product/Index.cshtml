@@ -11,14 +11,14 @@
     </div>
     <div class="card-body">
 
-        <div class="form-group col-sm-12">
+        <div class="form-group col-sm-12 pl-3">
             <p id="div-error-message" class="mt-1 text-danger"></p>
-        </div>
 
-        @if (ViewData["ErrorMessage"] != null)
-        {
-            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
-        }
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
 
         <div class="mg-bot-20">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">

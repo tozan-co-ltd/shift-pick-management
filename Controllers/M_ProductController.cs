@@ -128,8 +128,7 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    var errorMessages = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
-                    return NotFound(new { errorMessage = errorMessages });
+                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
                 }
 
                 // 仕入先品番・納入先品番重複チェック
@@ -177,8 +176,7 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    var errorMessages = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
-                    return NotFound(new { errorMessage = errorMessages });
+                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
                 }
 
                 // 異なるIDで仕入先品番・納入先品番重複チェック
