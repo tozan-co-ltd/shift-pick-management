@@ -45,12 +45,12 @@ namespace mar_sumaken_web.ConnectControllers
         /// </summary>
         /// <param name="model">入庫実績モデル</param>
         /// <param name="user">ログインユーザー</param>
-        public static void InsertDStoreIns(D_StoreInModel model, LoginUserModel user)
+        public static void InsertDStoreIns(D_StoreInModel model, LoginUserModel loginUser)
         {
             DateTime sysDate = DateTime.Now;
 
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(user.DatabaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -72,7 +72,7 @@ namespace mar_sumaken_web.ConnectControllers
                             item.StoreInDate = Convert.ToDateTime(model.DateSearchStart);
 
                             // 入庫実績登録SQL作成
-                            string insertSql = CreateSQLToInsertDStoreIn(item, sysDate, user.UserName);
+                            string insertSql = CreateSQLToInsertDStoreIn(item, sysDate, loginUser.UserName);
                             // 入庫実績登録
                             var insertCount = connection.Execute(insertSql, null, transaction);
                             // 更新件数が0の場合はエラーとする
@@ -99,12 +99,10 @@ namespace mar_sumaken_web.ConnectControllers
         /// </summary>
         /// <param name="model">入庫実績モデル</param>
         /// <param name="user">ログインユーザー</param>
-        public static void EditDStoreIn(D_StoreInModel model, LoginUserModel user)
+        public static void EditDStoreIn(D_StoreInModel model, LoginUserModel loginUser)
         {
-            DateTime sysDate = DateTime.Now;
-
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(user.DatabaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -115,10 +113,11 @@ namespace mar_sumaken_web.ConnectControllers
                 try
                 {
                     // 入庫実績更新SQL作成
+                    DateTime sysDate = DateTime.Now;
                     model.DepoID = model.SelectedDepoID;
                     model.CompanyID = model.SelectedCompanyID;
                     model.StoreInDate = Convert.ToDateTime(model.DateSearchStart);
-                    string editSql = CreateSQLToEditDStoreIn(model, sysDate, user.UserName);
+                    string editSql = CreateSQLToEditDStoreIn(model, sysDate, loginUser.UserName);
                     // 入庫実績更新
                     var editCount = connection.Execute(editSql);
                     // 更新件数が0の場合はエラーとする

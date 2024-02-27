@@ -4,6 +4,7 @@ using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Data.SqlClient;
 using System.Reflection;
 using X.PagedList;
 
@@ -45,14 +46,24 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public IActionResult SearchData(D_StoreOutModel model)
+        public IActionResult SearchData(D_StoreOutModel searchModel)
         {
+            D_StoreOutModel model = new();
             var searchData = string.Empty;
-
             try
             {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 入力規則チェック
+                ModelState.Remove("SupplierProductNumber");
+                if (!ModelState.IsValid)
+                {
+                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+                }
+
                 // SQL作成
-                var sql = D_StoreOutConnectController.CreateSQLToGetDStoreOuts(model);
+                var sql = D_StoreOutConnectController.CreateSQLToGetDStoreOuts(searchModel);
 
                 // DB接続
                 List<D_StoreOutModel> dStoreOutList = D_StoreOutConnectController.ConnectDStoreOuts(sql, ClaimsLoginUserData().DatabaseName);
@@ -63,7 +74,7 @@ namespace mar_sumaken_web.Controllers
                     IEnumerable<D_StoreOutModel> query = dStoreOutList.Select(s => s);
                     model.D_StoreOutList = query.ToPagedList();
 
-                    foreach (var item in model.D_StoreOutList)
+                    foreach (var item in searchModel.D_StoreOutList)
                     {
                         searchData += "<tr>" +
                             "<td>" + @item.StoreOutID + "</td>" +
@@ -82,10 +93,14 @@ namespace mar_sumaken_web.Controllers
                    
                 return Content(searchData);
             }
-            catch (Exception ex)
+            catch (SqlException)
             {
-                var exceptionMessage = ex.Message;
-                return Content(exceptionMessage);
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                return Content(errorMessage);
             }
         }
     }

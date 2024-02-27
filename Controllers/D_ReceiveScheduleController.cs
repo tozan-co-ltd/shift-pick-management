@@ -51,7 +51,7 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 検索情報をチェック
+                // 入力規則チェック
                 ModelState.Remove("CompanyCode");
                 ModelState.Remove("Quantity");
                 ModelState.Remove("LotNumber");
@@ -59,7 +59,7 @@ namespace mar_sumaken_web.Controllers
                 ModelState.Remove("ReceiveScheduleDate");
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "正しい入力値を入力してください。" });
+                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
                 }
 
                 // 入庫実績情報取得SQL作成
@@ -109,10 +109,10 @@ namespace mar_sumaken_web.Controllers
             {
                 return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                var exceptionMessage = ex.Message;
-                return Content(exceptionMessage);
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                return Content(errorMessage);
             }
         }
     }

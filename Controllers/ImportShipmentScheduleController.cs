@@ -40,8 +40,8 @@ namespace mar_sumaken_web.Controllers
                 // 管理権限区分が1(管理者)でない場合はエラーとする
                 if (user == null || user.AuthorizedKubun != 1)
                 {
-                    // エラーメッセージ取得
-                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
+                    return View(model);
                 }
 
                 string controllerName = ControllerContext.ActionDescriptor.ControllerName;
@@ -94,8 +94,7 @@ namespace mar_sumaken_web.Controllers
                 // 管理権限区分が1(管理者)でない場合はエラーとする
                 if (user == null || user.AuthorizedKubun != 1)
                 {
-                    // エラーメッセージ取得
-                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                    return NotFound(new { errorMessage = "E1015: " + ErrorMessagesResources.E1015 });
                 }
 
                 // モデルリスト取得
