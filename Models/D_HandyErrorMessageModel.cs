@@ -18,6 +18,11 @@ namespace mar_sumaken_web.Models
         public int HandyErrorMessageID { get; set; }
 
         /// <summary>
+        /// 倉庫名
+        /// </summary>
+        public string DepoName { get; set; }
+
+        /// <summary>
         /// ハンディメニュー名
         /// </summary>
         public string HandyMenuName { get; set; }
@@ -26,6 +31,16 @@ namespace mar_sumaken_web.Models
         /// エラーメッセージ
         /// </summary>
         public string? ErrorMessage { get; set; }
+
+        /// <summary>
+        /// 読取内容(1回目)
+        /// </summary>
+        public string FirstScanedString { get; set; }
+
+        /// <summary>
+        /// 読取内容(2回目)
+        /// </summary>
+        public string SecondScanedString { get; set; }
 
         // <summary>
         /// 読取日時
@@ -36,5 +51,10 @@ namespace mar_sumaken_web.Models
         /// 登録者
         /// </summary>
         public string? CreatedBy { get; set; }
+
+        /// <summary>
+        /// 解除者
+        /// </summary>
+        public string? UnlockedBy { get; set; }
     }
 }

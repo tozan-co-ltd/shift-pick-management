@@ -35,9 +35,9 @@ namespace mar_sumaken_web.Controllers
                 // SQL作成
                 var sql = D_HandyErrorMessageConnectController.CreateSQLToSelectDHandyErrorMessages();
                 // DB接続
-                List<D_HandyErrorMessageModel> DHandyErrorMessageList = D_HandyErrorMessageConnectController.ConnectDHandyErrorMessages(sql, user.DatabaseName);
-                model.D_HandyErrorMessageList = (IPagedList<D_HandyErrorMessageModel>)DHandyErrorMessageList;
-
+                IEnumerable<D_HandyErrorMessageModel> handyErrorMessageList = D_HandyErrorMessageConnectController.ConnectDHandyErrorMessages(sql, user.DatabaseName);
+                model.D_HandyErrorMessageList = handyErrorMessageList.ToPagedList();
+                
                 return View(model);
             }
             catch (Exception ex)

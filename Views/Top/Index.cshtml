@@ -16,71 +16,97 @@
     </div>
 
     <div class="card-body">
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+        }
         <p>作業進捗(2023-01-01)</p>
         <div class="chart-part p-2 col-12 d-flex">
             <div class="col-6 d-flex" id="donut-chart"></div>
         </div>
-
-        <div class="p-0">
-            <div class="row col-lg-12">
-                <div class="card-body pb-0">
-                    <p>ハンディエラーメッセージ履歴(直近1週間)</p>
-                    <div class="mt-10">
-                        <table class="table table-sm stripe hover nowrap datatable-normal">
-                            <thead>
+        <hr />
+        <p>ハンディエラーメッセージ履歴(直近1週間)</p>
+        <div class="row col-lg-12">
+            <div class="mt-10">
+                <table class="table table-sm stripe hover nowrap datatable-handyErrorMessage">
+                    <thead>
+                        <tr>
+                            <th width="5%"></th>
+                            <th width="10%" class="font-weight-bold">読取日時</th>
+                            <th width="20%" class="font-weight-bold">ハンディメニュー名</th>
+                            <th width="50%" class="font-weight-bold">エラーメッセージ</th>
+                            <th width="10%" class="font-weight-bold">登録者</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (@Model != null && @Model.D_HandyErrorMessageList != null && @Model.D_HandyErrorMessageList.Count > 0)
+                        {
+                            @foreach (var item in @Model.D_HandyErrorMessageList)
+                            {
                                 <tr>
-                                    <th width="5%"></th>
-                                    <th width="10%" class="font-weight-bold">読取日時</th>
-                                    <th width="20%" class="font-weight-bold">ハンディメニュー名</th>
-                                    <th width="50%" class="font-weight-bold">エラーメッセージ</th>
-                                    <th width="10%" class="font-weight-bold">登録者</th>
+                                    <td>
+                                        <button class="btn btn-secondary btn-icon-split" title="詳細"
+                                                onclick="OnDetailClick('@item.HandyErrorMessageID')" data-id="@item.UserID" data-toggle="modal" data-target="#detail-modal">
+                                            <i class="fa-solid fa-list"></i>
+                                        </button>
+                                    </td>
+                                    <td>@item.CreatedAt</td>
+                                    <td>@item.HandyMenuName</td>
+                                    <td>@item.ErrorMessage</td>
+                                    <td>@item.CreatedBy</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @if (@Model != null && @Model.D_HandyErrorMessageList != null && @Model.D_HandyErrorMessageList.Count > 0)
-                                {
-                                    @foreach (var item in @Model.D_HandyErrorMessageList)
-                                    {
-                                        <tr>
-                                            <td class="d-flex justify-content-center">
-                                                <button class="btn btn-secondary btn-icon-split" onclick="OnDetailClick('@item.HandyErrorMessageID')">
-                                                    <i class="fa-solid fa-list"></i>
-                                                </button>
-                                            </td>
-                                            <td>@item.CreatedAt</td>
-                                            <td>@item.HandyMenuName</td>
-                                            <td>@item.ErrorMessage</td>
-                                            <td>@item.CreatedBy</td>
-                                        </tr>
-                                    }
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                            }
+                        }
+                    </tbody>
+                </table>
             </div>
+        </div>
+        <hr />
+        <div id="pdf-list">
+            <p>システムマニュアル</p>
+            <ul>
+                <li>
+                    <a href="javascript:void(0);" onclick="navigate('')">
+                        <i class="fa-solid fa-file"></i> スマホDE検品ハンディアプリマニュアル.pdf
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0);" onclick="navigate('')">
+                        <i class="fa-solid fa-file"></i> スマホDE検品ハンディアプリマニュアル.pdf
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
 
-            <div class="card-body pt-0">
-                <div id="pdf-list">
-                    <p>システムマニュアル</p>
-                    <ul>
-                        <li>
-                            <a href="javascript:void(0);" onclick="navigate('')">
-                                <i class="fa-solid fa-file"></i> スマホDE検品ハンディアプリマニュアル.pdf
-                            </a>
-                        </li>
-                        <li>
-                            <a href="javascript:void(0);" onclick="navigate('')">
-                                <i class="fa-solid fa-file"></i> スマホDE検品ハンディアプリマニュアル.pdf
-                            </a>
-                        </li>
-                    </ul>
+<!-- Detail Modal-->
+<div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-labelledby="detail-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-modal-label">ハンディエラーメッセージ詳細</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12">
+                    <p>倉庫名：<span id="detailDepoName"></span></p>
+                    <p>読取日時：<span id="detailCreatedAt"></span></p>
+                    <p>ハンディメニュー名：<span id="detailHandyMenuName"></span></p>
+                    <p>エラーメッセージ：<span id="detailErrorMessage"></span></p>
+                    <p>読取内容(1回目)：<br><span class="text-break" id="detailFirstScanedString"></span></p>
+                    <p>読取内容(2回目)：<br><span class="text-break" id="detailSecondScanedString"></span></p>
+                    <p>登録者：<span id="detailCreatedBy"></span></p>
+                    <p>解除者：<span id="detailUnlockedBy"></span></p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+@* ドーナツグラフ *@
 <link rel="stylesheet" href="~/lib/billboard/billboard.css">
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="https://d3js.org/d3.v6.min.js"></script>
@@ -127,13 +153,29 @@
         var myDoughnutChart = new Chart(ctx, config);
     });
 
-    function OnDetailClick(id) {
-        alert(id);
+    // 詳細ボタン押下
+    function OnDetailClick(handyErrorMessageID) {
+        // D_HandyErrorMessageModel取得
+        var data = @Html.Raw(Json.Serialize(Model));
+        var handyErrorMessageModel = data.d_HandyErrorMessageList;
+        console.log("handyErrorMessageModel", handyErrorMessageModel)
+
+        handyErrorMessageModel.forEach(function (item) {
+            if (item.handyErrorMessageID == handyErrorMessageID) {
+                $("#detailDepoName").text(item.depoName);
+                $("#detailCreatedAt").text(item.createdAt);
+                $("#detailHandyMenuName").text(item.handyMenuName);
+                $("#detailErrorMessage").text(item.errorMessage);
+                $("#detailFirstScanedString").text(item.firstScanedString);
+                $("#detailSecondScanedString").text(item.secondScanedString);
+                $("#detailCreatedBy").text(item.createdBy);
+                $("#detailUnlockedBy").text(item.unlockedBy);
+            }
+        });
     }
 
+    // マニュアルボタン押下
     function navigate(url) {
         window.location.href = url;
     }
-
-
 </script>

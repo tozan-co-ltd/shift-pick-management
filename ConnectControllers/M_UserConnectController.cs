@@ -447,7 +447,7 @@ namespace mar_sumaken_web.Commons
         {
             var sql = $@"
                 SELECT
-                        m_user.UserID                                
+                    m_user.UserID                                
                     ,m_user.LoginID                              
                     ,m_user.UserName
                     ,m_user.DepoID
@@ -463,7 +463,8 @@ namespace mar_sumaken_web.Commons
                     ,m_user.UpdatedBy                            
                 FROM 
                     M_User AS m_user
-                INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
+                INNER JOIN M_Depo AS m_depo ON 
+                    m_user.DepoID = m_depo.DepoID
                 WHERE
                     m_user.IsDeleted = 0
                     AND m_depo.IsDeleted = 0
@@ -481,7 +482,7 @@ namespace mar_sumaken_web.Commons
         {
             var sql = $@"
                 SELECT
-                        m_user.UserID                                
+                    m_user.UserID                                
                     ,m_user.LoginID                              
                     ,m_user.UserName
                     ,m_user.DepoID
@@ -499,7 +500,8 @@ namespace mar_sumaken_web.Commons
                     ,m_user.UpdatedBy                            
                 FROM 
                     M_User AS m_user
-                INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
+                INNER JOIN M_Depo AS m_depo 
+                    ON m_user.DepoID = m_depo.DepoID
                 WHERE
                     m_user.UserId = {userId}
                     AND m_user.IsDeleted = 0
@@ -546,8 +548,7 @@ namespace mar_sumaken_web.Commons
                 FROM 
 	                R_UserHandyMenu AS userMenu
                 INNER JOIN M_HandyMenu AS menu 
-                ON 
-                    userMenu.HandyMenuID = menu.HandyMenuID
+                    ON userMenu.HandyMenuID = menu.HandyMenuID
                 WHERE 
 	                userMenu.UserID = {userId}
                     AND menu.IsDeleted = 0
