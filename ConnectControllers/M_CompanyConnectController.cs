@@ -95,7 +95,7 @@ namespace mar_sumaken_web.Commons
                 {
                     DateTime sysDate = DateTime.Now;
                     // 会社マスター更新SQL作成
-                    string companyRegisterSql = CreateSQLToEditMCompany(model, sysDate, loginUser.UserName);
+                    string companyRegisterSql = CreateSQLToUpdateMCompany(model, sysDate, loginUser.UserName);
                     // 会社マスター更新
                     var editedCount = connection.Execute(companyRegisterSql);
 
@@ -298,7 +298,7 @@ namespace mar_sumaken_web.Commons
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToEditMCompany(M_CompanyModel model, DateTime updatedAt, string updatedBy)
+        private static string CreateSQLToUpdateMCompany(M_CompanyModel model, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                 UPDATE M_Company

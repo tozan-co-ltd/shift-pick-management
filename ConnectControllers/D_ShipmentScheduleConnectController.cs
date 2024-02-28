@@ -273,29 +273,26 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// 出荷指示情報取得SQL作成
         /// </summary>
-        /// <param name="start">入庫日開始</param>
-        /// <param name="end">入庫日終了</param>
-        /// <param name="depoId">倉庫ID</param>
-        /// <param name="supplierId">会社ID</param>
+        /// <param name="model"></param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetDShipmentSchedules(D_ShipmentScheduleSearchModel searchModel)
+        public static string CreateSQLToSelectDShipmentSchedules(D_ShipmentScheduleSearchModel model)
         {
             // 実績数不一致のみ
             string differenceCheckCondition = string.Empty;
-            if (searchModel.DiffenceCountCheck)
+            if (model.DiffenceCountCheck)
             {
                 differenceCheckCondition = " AND shipment.NumberOfBoxes <> storeOut.NumberOfBoxes";
             }
 
             // 便
             string binCondition = string.Empty;
-            if (searchModel.BinList != null && searchModel.BinList.Count > 0)
+            if (model.BinList != null && model.BinList.Count > 0)
             {
-                List<SelectListItem> selectedItems = searchModel.BinList.Where(item => item.Selected).ToList();
+                List<SelectListItem> selectedItems = model.BinList.Where(item => item.Selected).ToList();
                 List<string> selectedValues = selectedItems.Select(item => item.Value).ToList();
                 binCondition = $@" AND shipment.DeliveryTimeClass in ({string.Join(",", selectedValues)})";
             }
-            searchModel.SearchEndDate = string.Concat(searchModel.SearchEndDate, " 23:59:59");
+            model.SearchEndDate = string.Concat(model.SearchEndDate, " 23:59:59");
             var sql = $@"
                 SELECT
 	                shipment.CompanyID AS SupplierID
@@ -316,10 +313,10 @@ namespace mar_sumaken_web.Commons
                 INNER JOIN M_Depo AS depo 
                     ON shipment.DepoID = depo.DepoID
                 WHERE 
-                    shipment.DepoID = {searchModel.SelectedDepoID}
-                    AND shipment.CompanyID = {searchModel.SelectedCompanyID}
-                    AND shipment.DeliveryDate >= '{searchModel.SearchStartDate}'
-                    AND shipment.DeliveryDate <= '{searchModel.SearchEndDate}'
+                    shipment.DepoID = {model.SelectedDepoID}
+                    AND shipment.CompanyID = {model.SelectedCompanyID}
+                    AND shipment.DeliveryDate >= '{model.SearchStartDate}'
+                    AND shipment.DeliveryDate <= '{model.SearchEndDate}'
                     {binCondition}
                     {differenceCheckCondition}
 	                AND shipment.IsDeleted = 0

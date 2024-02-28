@@ -63,7 +63,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // SQL作成
-                var sql = D_StoreOutConnectController.CreateSQLToGetDStoreOuts(searchModel);
+                var sql = D_StoreOutConnectController.CreateSQLToSelectDStoreOuts(searchModel);
 
                 // DB接続
                 List<D_StoreOutModel> dStoreOutList = D_StoreOutConnectController.ConnectDStoreOuts(sql, ClaimsLoginUserData().DatabaseName);

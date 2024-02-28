@@ -69,7 +69,7 @@ namespace mar_sumaken_web.ConnectControllers
                         {
                             item.DepoID = model.SelectedDepoID;
                             item.CompanyID = model.SelectedCompanyID;
-                            item.StoreInDate = Convert.ToDateTime(model.DateSearchStart);
+                            item.StoreInDate = Convert.ToDateTime(model.SearchStartDate);
 
                             // 入庫実績登録SQL作成
                             string insertSql = CreateSQLToInsertDStoreIn(item, sysDate, loginUser.UserName);
@@ -116,8 +116,8 @@ namespace mar_sumaken_web.ConnectControllers
                     DateTime sysDate = DateTime.Now;
                     model.DepoID = model.SelectedDepoID;
                     model.CompanyID = model.SelectedCompanyID;
-                    model.StoreInDate = Convert.ToDateTime(model.DateSearchStart);
-                    string editSql = CreateSQLToEditDStoreIn(model, sysDate, loginUser.UserName);
+                    model.StoreInDate = Convert.ToDateTime(model.SearchStartDate);
+                    string editSql = CreateSQLToUpdateDStoreIn(model, sysDate, loginUser.UserName);
                     // 入庫実績更新
                     var editCount = connection.Execute(editSql);
                     // 更新件数が0の場合はエラーとする
@@ -196,7 +196,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="createAt">システムタイム</param>
         /// <param name="createBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToEditDStoreIn(D_StoreInModel model, DateTime updatedAt, string updatedBy)
+        private static string CreateSQLToUpdateDStoreIn(D_StoreInModel model, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                 UPDATE D_StoreIn
@@ -239,12 +239,9 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 入庫実績情報取得SQL作成
         /// </summary>
-        /// <param name="start">入庫日開始</param>
-        /// <param name="end">入庫日終了</param>
-        /// <param name="depoId">倉庫ID</param>
-        /// <param name="supplierId">会社ID</param>
+        /// <param name="model"></param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetDStoreIns(string start, string end, int depoId, int supplierId)
+        public static string CreateSQLToSelectDStoreIns(D_StoreInModel model)
         {
             var sql = $@"
                 SELECT 
@@ -276,10 +273,10 @@ namespace mar_sumaken_web.ConnectControllers
                 INNER JOIN M_Depo AS depo 
                     ON storeIn.DepoID = depo.DepoID
                 WHERE 
-	                storeIn.DepoID = {depoId}
-                    AND storeIn.CompanyID = {supplierId}
-                    AND storeIn.StoreInDate >= '{start}'
-                    AND storeIn.StoreInDate <= '{end}'
+	                storeIn.DepoID = {model.SelectedDepoID}
+                    AND storeIn.CompanyID = {model.SelectedCompanyID}
+                    AND storeIn.StoreInDate >= '{model.SearchStartDate}'
+                    AND storeIn.StoreInDate <= '{model.SearchEndDate}'
                     AND storeIn.IsDeleted = 0
                     AND company.IsDeleted = 0
                     AND depo.IsDeleted = 0

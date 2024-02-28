@@ -64,7 +64,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 出荷指示報取得SQL作成
-                var sql = D_ShipmentScheduleConnectController.CreateSQLToGetDShipmentSchedules(searchModel);
+                var sql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedules(searchModel);
                 // DB接続
                 List<D_ShipmentScheduleModel> searchList = D_ShipmentScheduleConnectController.ConnectDShipmentSchedules(sql, user.DatabaseName);
 

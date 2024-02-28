@@ -4,6 +4,7 @@ using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.Design;
 using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
@@ -66,8 +67,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 入庫実績情報取得SQL作成
-                var sql = D_StoreInConnectionController.CreateSQLToGetDStoreIns(
-                    searchModel.DateSearchStart, searchModel.DateSearchEnd, searchModel.SelectedDepoID, searchModel.SelectedCompanyID);
+                var sql = D_StoreInConnectionController.CreateSQLToSelectDStoreIns(searchModel);
                 // DB接続
                 List<D_StoreInModel> storeInList = D_StoreInConnectionController.ConnectDStoreIns(sql, user.DatabaseName);
 
@@ -333,10 +333,18 @@ namespace mar_sumaken_web.Controllers
                     return Json(new { res = "NG", error = ErrorMessagesResources.E9999 });
                 }
 
-                // 検索情報取得SQL作成
-                var sql = D_StoreInConnectionController.CreateSQLToGetDStoreIns(
-                    searchModel.SearchStartDate, searchModel.SearchEndDate, searchModel.DepoID, searchModel.CompanyID);
-                // 検索情報取得
+                // 入庫実績情報取得
+                D_StoreInModel model = new()
+                {
+                    SelectedDepoID = searchModel.DepoID,
+                    SelectedCompanyID = searchModel.CompanyID,
+                    SearchStartDate = searchModel.SearchStartDate,
+                    SearchEndDate = searchModel.SearchEndDate,
+                };
+                var sql = D_StoreInConnectionController.CreateSQLToSelectDStoreIns(model);
+
+                //var sql = D_StoreInConnectionController.CreateSQLToSelectDStoreIns(
+                //    searchModel.SearchStartDate, searchModel.SearchEndDate, searchModel.DepoID, searchModel.CompanyID);
                 List<D_StoreInModel> searchList = D_StoreInConnectionController.ConnectDStoreIns(sql, user.DatabaseName);
                 if (searchList.Count > 0)
                 {

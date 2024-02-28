@@ -102,7 +102,7 @@ namespace mar_sumaken_web.Commons
                         foreach (M_UserModel user in userList)
                         {
                             // 倉庫マスター情報取得
-                            var userDepoSql = CreateSQLToGetRUserDepoList(user.UserID);
+                            var userDepoSql = CreateSQLToSelectRUserDepoList(user.UserID);
                             List<M_DepoModel> depoList = connection.Query<M_DepoModel>(userDepoSql).ToList();
                             if(depoList.Count > 0)
                             {
@@ -110,7 +110,7 @@ namespace mar_sumaken_web.Commons
                             }
 
                             // ハンディメニューマスター情報取得
-                            var userHandyMenuSql = CreateSQLToGetRUserHandyMenuList(user.UserID);
+                            var userHandyMenuSql = CreateSQLToSelectRUserHandyMenuList(user.UserID);
                             List<M_HandyMenuModel> handyMenuList = connection.Query<M_HandyMenuModel>(userHandyMenuSql).ToList();
                             if (handyMenuList.Count > 0)
                             {
@@ -146,7 +146,7 @@ namespace mar_sumaken_web.Commons
                     connection.Open();
 
                     // 倉庫マスター情報取得
-                    var userDepoSql = CreateSQLToGetRUserDepoList(userId);
+                    var userDepoSql = CreateSQLToSelectRUserDepoList(userId);
                     List<M_DepoModel> depoList = connection.Query<M_DepoModel>(userDepoSql).ToList();
                     return depoList; 
                 }
@@ -548,7 +548,7 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="userId">ユーザーID</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetRUserDepoList(int userId)
+        public static string CreateSQLToSelectRUserDepoList(int userId)
         {
             var sql = $@"
                 SELECT 
@@ -571,7 +571,7 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="userId">ユーザーID</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetRUserHandyMenuList(int userId)
+        public static string CreateSQLToSelectRUserHandyMenuList(int userId)
         {
             var sql = $@"
                 SELECT 

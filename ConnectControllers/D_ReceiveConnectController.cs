@@ -44,14 +44,11 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// 入荷実績情報取得SQL作成
         /// </summary>
-        /// <param name="start">入庫日開始</param>
-        /// <param name="end">入庫日終了</param>
-        /// <param name="depoId">倉庫ID</param>
-        /// <param name="supplierId">会社ID</param>
+        /// <param name="model"></param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetDReceives(string start, string end, int depoId, int supplierId)
+        public static string CreateSQLToSelectDReceives(D_ReceiveModel model)
         {
-            end = string.Concat(end, " 23:59:59");
+            var searchEndDate = string.Concat(model.SearchEndDate, " 23:59:59");
             var sql = $@"
                 SELECT
                     dReceive.ReceiveID
@@ -76,7 +73,7 @@ namespace mar_sumaken_web.Commons
                     ,scan.FirstScanedString
                     ,scan.SecondScanedString
                     ,scan.CreatedBy AS ScanCreatedBy
-                FROM D_Receive dReceive
+                FROM D_Receive AS dReceive
                 INNER JOIN D_ScanResult AS scan 
 	                ON dReceive.ScanResultID = scan.ScanResultID
                 INNER JOIN M_Company AS company 
@@ -84,10 +81,10 @@ namespace mar_sumaken_web.Commons
                 INNER JOIN M_Depo AS depo 
                     ON scan.DepoID = depo.DepoID
                 WHERE 
-                    scan.DepoID = {depoId}
-                    AND dReceive.CompanyID = {supplierId}
-                    AND dReceive.ReceiveDatetime >= '{start}'
-                    AND dReceive.ReceiveDatetime <= '{end}'
+                    scan.DepoID = {model.SelectedDepoID}
+                    AND dReceive.CompanyID = {model.SelectedCompanyID}
+                    AND dReceive.ReceiveDatetime >= '{model.SearchStartDate}'
+                    AND dReceive.ReceiveDatetime <= '{searchEndDate}'
 	                AND company.IsDeleted = 0
                     AND depo.IsDeleted = 0
                 ORDER BY 
