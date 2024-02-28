@@ -77,7 +77,7 @@ namespace mar_sumaken_web.Controllers
                     {
                         searchData += $@"<tr>
                         <td>
-                            <a class='btn btn-success btn-icon-split ml-1 mr-1'
+                            <a class='btn btn-secondary btn-icon-split ml-1 mr-1'
                             onclick='OnDetailClick(this)' data-id='{item.ShipmentScheduleID}' data-toggle='modal' data-target='#detail-modal'>
                                 <i class='fa-solid fa-list'></i>
                             </a>
