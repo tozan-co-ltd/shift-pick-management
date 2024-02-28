@@ -47,7 +47,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// 出庫実績情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetDStoreOuts(D_StoreOutModel model)
+        public static string CreateSQLToSelectDStoreOuts(D_StoreOutModel model)
         {
             string dateSearchStart = model.SearchStartDate + " " + "00:00:00.000";
             string dateSearchEnd = model.SearchEndDate + " " + "23:59:59.999";

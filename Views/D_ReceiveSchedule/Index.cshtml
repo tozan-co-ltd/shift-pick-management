@@ -121,6 +121,7 @@
             let url = window.location.origin + '@Url.Action("SearchData", "D_ReceiveSchedule")';
             let method = 'POST';
             var data = $(this).serialize();
+            console.log('data', data)
 
             // Ajax call
             $.ajax({

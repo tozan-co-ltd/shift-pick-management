@@ -33,13 +33,6 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
-                    return View();
-                }
-
                 // 品番マスター情報取得SQL作成
                 var sql = M_ProductConnectController.CreateSQLToSelectMProducts();
                 // DB接続
@@ -80,13 +73,6 @@ namespace mar_sumaken_web.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
-                    return View(model);
-                }
 
                 // 表示データをModelに格納
                 model = new()

@@ -38,13 +38,6 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
-                    return View(model);
-                }
-
                 // ユーザーマスター情報取得SQL作成
                 var sql = M_UserConnectController.CreateSQLToSelectMUsers();
 
@@ -100,7 +93,7 @@ namespace mar_sumaken_web.Controllers
 
                 // ハンディメニューマスター情報取得
                 // SQL作成
-                var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToGetMHandyMenuList();
+                var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToSelectMHandyMenuList();
                 // DB接続
                 List<M_HandyMenuModel> handyMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(handyMenuListSql, user.DatabaseName);
                 foreach (var handyMenu in handyMenuList)
@@ -227,7 +220,7 @@ namespace mar_sumaken_web.Controllers
 
                 // ハンディメニューマスター情報取得
                 // SQL作成
-                var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToGetMHandyMenuList();
+                var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToSelectMHandyMenuList();
                 // DB接続
                 List<M_HandyMenuModel> handyMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(handyMenuListSql, user.DatabaseName);
                 foreach (var handyMenu in handyMenuList)
@@ -243,7 +236,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // IDが一致するユーザー倉庫中間リスト取得
-                var userDepoListSql = M_UserConnectController.CreateSQLToGetRUserDepoList(editUser.UserID);
+                var userDepoListSql = M_UserConnectController.CreateSQLToSelectRUserDepoList(editUser.UserID);
                 var userDepoList = M_DepoConnectController.ConnectMDepos(userDepoListSql, user.DatabaseName);
                 if (userDepoList.Count > 0)
                 {
@@ -258,7 +251,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // IDが一致するユーザー-ハンディメニュー中間リスト取得
-                var userHandyMenuSql = M_UserConnectController.CreateSQLToGetRUserHandyMenuList(userId);
+                var userHandyMenuSql = M_UserConnectController.CreateSQLToSelectRUserHandyMenuList(userId);
                 var userMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(userHandyMenuSql, user.DatabaseName);
                 if (userMenuList.Count > 0)
                 {

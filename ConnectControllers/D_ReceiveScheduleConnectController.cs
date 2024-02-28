@@ -70,7 +70,7 @@ namespace mar_sumaken_web.Commons
         /// <returns></returns>
         public static bool InsertDReceiveSchedule(List<D_ReceiveScheduleModel> modelList, int depoId, string importFileName,　LoginUserModel user)
         {
-            bool insertFlg = true;
+            bool insertFlg = false;
 
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(user.DatabaseName);
@@ -97,8 +97,6 @@ namespace mar_sumaken_web.Commons
                         // 更新件数が0の場合はエラーとする
                         if (affectRows == 0)
                         {
-                            insertFlg = false;
-                            // エラーコード：E2011
                             throw new Exception();
                         }
                     }
@@ -119,29 +117,24 @@ namespace mar_sumaken_web.Commons
                     // 更新件数が0の場合はエラーとする
                     if (insertAffectRows == 0)
                     {
-                        insertFlg = false;
-                        // エラーコード：E2011
                         throw new Exception();
                     }
 
                     // トランザクションのコミット
                     transaction.Commit();
 
+                    insertFlg = true;
                     return insertFlg;
                 }
-                catch (SqlException ex)
+                catch (SqlException)
                 {
                     transaction.Rollback();
-                    insertFlg = false;
-                    // エラーコード：E2011
-                    throw ex;
+                    throw;
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
-                    insertFlg = false;
-                    // エラーコード：E2011
-                    throw ex;
+                    throw;
                 }
             }
         }
@@ -149,15 +142,12 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// 入荷予定情報取得SQL作成
         /// </summary>
-        /// <param name="start">入庫日開始</param>
-        /// <param name="end">入庫日終了</param>
-        /// <param name="depoId">倉庫ID</param>
-        /// <param name="supplierId">会社ID</param>
+        /// <param name="model"></param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetDReceiveSchedules(string start, string end, int depoId, int supplierId, bool checkFlg)
+        public static string CreateSQLToSelectDReceiveSchedules(D_ReceiveScheduleModel model)
         {
             string differenceCheckCondition = string.Empty;
-            if (checkFlg)
+            if (model.DiffenceCountCheck)
             {
                 differenceCheckCondition = " AND (schedule.Quantity / product.LotQuantity) <> storeIn.NumberOfBoxes";
             }
@@ -180,7 +170,7 @@ namespace mar_sumaken_web.Commons
                     ,storeIn.Quantity AS StoreInQuantity            -- 入庫数量
                     ,schedule.CreatedAt
                     ,schedule.CreatedBy
-                FROM D_ReceiveSchedule schedule
+                FROM D_ReceiveSchedule AS schedule
                 INNER JOIN M_Product AS product 
                     ON schedule.SupplierProductNumber = product.SupplierProductNumber
                 INNER JOIN D_StoreIn AS storeIn
@@ -192,10 +182,10 @@ namespace mar_sumaken_web.Commons
                 INNER JOIN M_Company AS company 
                     ON schedule.CompanyID = company.CompanyID
                 WHERE 
-                    schedule.DepoID = {depoId}
-                    AND schedule.CompanyID = {supplierId}
-                    AND schedule.ReceiveScheduleDate >= '{start}'
-                    AND schedule.ReceiveScheduleDate <= '{end}'
+                    schedule.DepoID = {model.SelectedDepoID}
+                    AND schedule.CompanyID = {model.SelectedCompanyID}
+                    AND schedule.ReceiveScheduleDate >= '{model.SearchStartDate}'
+                    AND schedule.ReceiveScheduleDate <= '{model.SearchEndDate}'
                     {differenceCheckCondition}
                     AND schedule.IsDeleted = 0
                     AND product.IsDeleted = 0

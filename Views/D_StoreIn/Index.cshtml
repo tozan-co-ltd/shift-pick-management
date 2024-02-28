@@ -38,10 +38,10 @@
                             </div>
                             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                                    <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.DateSearchStart)</span>
-                                    <input id="startDate" type="text" asp-for="DateSearchStart" class="form-control pickerDate">
+                                    <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.SearchStartDate)</span>
+                                    <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate">
                                     <lable class="m-1">～</lable>
-                                    <input id="endDate" type="text" asp-for="DateSearchEnd" class="form-control pickerDate">
+                                    <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
                                 </div>
                                 <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
                                     <button type="submit" class="btn btn-secondary btn-icon-split ml-3" id="search-btn">
@@ -146,11 +146,11 @@
                         </div>
                         <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st">
-                                <span>@Html.DisplayNameFor(model => model.DateSearchStart)<span style="color:red">*</span></span>
+                                <span>@Html.DisplayNameFor(model => model.SearchStartDate)<span style="color:red">*</span></span>
                             </div>
                             <div class="col-12 col-sm-8 col-md-8 column-2nd">
-                                <input id="startDate" type="text" id="DateStoreIn" asp-for="DateSearchStart" class="form-control pickerDate">
-                                <span class="text-danger w-100" asp-validation-for="DateSearchStart"></span>
+                                <input id="startDate" type="text" id="DateStoreIn" asp-for="SearchStartDate" class="form-control pickerDate">
+                                <span class="text-danger w-100" asp-validation-for="SearchStartDate"></span>
                             </div>
                         </div>
                         <div class="col-12 input-group div-input-group">
@@ -418,7 +418,7 @@
         var row = trTag.parentNode.parentNode;
         $("#editSelectedDepoID").val(row.getElementsByClassName("DepoID")[0].value);
         $("#editSelectedCompanyID").val(row.getElementsByClassName("SupplierID")[0].value);
-        $("#DateSearchStart").val(row.getElementsByClassName("StoreInDate")[0].textContent);
+        $("#SearchStartDate").val(row.getElementsByClassName("StoreInDate")[0].textContent);
         $("#StoreInID").val(row.getElementsByClassName("StoreInID")[0].textContent);
         $("#SupplierName").val(row.getElementsByClassName("SupplierName")[0].textContent);
         $("#SupplierProductNumber").val(row.getElementsByClassName("SupplierProductNumber")[0].textContent);

@@ -168,6 +168,9 @@
   <data name="E1017" xml:space="preserve">
     <value>入力値に不正な値があります。正しい値を入力してください。</value>
   </data>
+  <data name="E1018" xml:space="preserve">
+    <value>{0}が仕入先かんばんマスターに存在しません。</value>
+  </data>
   <data name="E2001" xml:space="preserve">
     <value>QRコードが正しくありません。正しいQRコードを読み取ってください。</value>
   </data>

@@ -32,13 +32,13 @@ namespace mar_sumaken_web.Models
         [Display(Name = "入庫日")]
         [RegularExpression(Utils.DateTimeSlashRegex, ErrorMessageResourceName = "E1004", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string? DateSearchStart { get; set; }
+        public string? SearchStartDate { get; set; }
 
         /// <summary>
         /// 検索入庫日(終了)
         /// </summary>
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string? DateSearchEnd { get; set; }
+        public string? SearchEndDate { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -198,9 +198,10 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public D_StoreInModel()
         {
-            var now = DateTime.Today.ToString("yyyy/MM/dd"); //　現在日
-            DateSearchStart = now;
-            DateSearchEnd = now;
+            // 現在日
+            var now = DateTime.Today.ToString("yyyy/MM/dd");
+            SearchStartDate = now;
+            SearchEndDate = now;
         }
     }
 }

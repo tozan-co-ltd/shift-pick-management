@@ -59,8 +59,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 入庫実績情報取得SQL作成
-                var sql = D_ReceiveConnectController.CreateSQLToGetDReceives(
-                    searchModel.SearchStartDate, searchModel.SearchEndDate, searchModel.SelectedDepoID, searchModel.SelectedCompanyID);
+                var sql = D_ReceiveConnectController.CreateSQLToSelectDReceives(searchModel);
                 // DB接続
                 List<D_ReceiveModel> searchList = D_ReceiveConnectController.ConnectDReceives(sql, user.DatabaseName);
 

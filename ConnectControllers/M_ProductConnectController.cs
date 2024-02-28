@@ -67,7 +67,7 @@ namespace mar_sumaken_web.ConnectControllers
                         foreach (M_ProductModel item in productList)
                         {
                             // 品番-品番中間テーブル情報取得
-                            var depoProductSql = CreateSQLToGetRDepoProducts(item.ProductID);
+                            var depoProductSql = CreateSQLToSelectRDepoProducts(item.ProductID);
                             List<M_DepoModel> depoList = connection.Query<M_DepoModel>(depoProductSql).ToList();
                             if (depoList.Count > 0)
                             {
@@ -481,7 +481,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// </summary>
         /// <param name="productId">品番ID</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetRDepoProducts(int productId)
+        public static string CreateSQLToSelectRDepoProducts(int productId)
         {
             var sql = $@"
                 SELECT 
@@ -567,7 +567,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="depoId">倉庫ID</param>
         /// <param name="productId">品番ID</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToCheckIsExistRDepoProduct(int depoId, int productId)
+        public static string CreateSQLToSelectCheckIsExistRDepoProduct(int depoId, int productId)
         {
             var sql = $@"
                 SELECT COUNT(*)  

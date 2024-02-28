@@ -46,7 +46,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// ハンディメニューマスター情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetMHandyMenuList()
+        public static string CreateSQLToSelectMHandyMenuList()
         {
             var sql = $@"
                         SELECT 

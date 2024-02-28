@@ -63,8 +63,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 入庫実績情報取得SQL作成
-                var sql = D_ReceiveScheduleConnectController.CreateSQLToGetDReceiveSchedules(
-                    searchModel.SearchStartDate, searchModel.SearchEndDate, searchModel.SelectedDepoID, searchModel.SelectedCompanyID, searchModel.DiffenceCountCheck);
+                var sql = D_ReceiveScheduleConnectController.CreateSQLToSelectDReceiveSchedules(searchModel);
                 // DB接続
                 List<D_ReceiveScheduleModel> searchList = D_ReceiveScheduleConnectController.ConnectDReceiveSchedules(sql, user.DatabaseName);
 
