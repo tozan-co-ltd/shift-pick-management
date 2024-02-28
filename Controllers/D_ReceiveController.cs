@@ -72,14 +72,10 @@ namespace mar_sumaken_web.Controllers
                     {
                         searchData += $@"<tr>
                         <td>
-                            <a class='btn btn-success btn-icon-split ml-1 mr-1'
-                            onclick='OnEditClick(this)' data-id='{item.ReceiveID}' data-toggle='modal' data-target='#edit-modal'>
-                                <i class='fa-solid fa-pen'></i>
+                            <a class='btn btn-secondary btn-icon-split ml-1 mr-1'
+                            onclick='OnDetailClick(this)' data-id='{item.ReceiveID}' data-toggle='modal' data-target='#detail-modal'>
+                                <i class='fa-solid fa-list'></i>
                             </a>
-                            <button class='btn btn-danger btn-icon-split'
-                            onclick='OnDeleteClick(this)' data-id='{item.ReceiveID}' data-toggle='modal' data-target='#delete-modal'>
-                                <i class='fa-solid fa-trash'></i>
-                            </button>
                         </td>
                         <td class='ReceiveID'>{@item.ReceiveID}</td>
                         <td class='SupplierName'>{@item.SupplierName}</td>

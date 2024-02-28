@@ -42,5 +42,12 @@ namespace mar_sumaken_web.Models
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
+
+        public D_ShipmentScheduleSearchModel() {
+            // 現在日
+            var now = DateTime.Today.AddDays(+1).ToString("yyyy/MM/dd");
+            SearchStartDate = now;
+            SearchEndDate = now;
+        }  
     }
 }

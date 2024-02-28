@@ -158,7 +158,6 @@
         // D_HandyErrorMessageModel取得
         var data = @Html.Raw(Json.Serialize(Model));
         var handyErrorMessageModel = data.d_HandyErrorMessageList;
-        console.log("handyErrorMessageModel", handyErrorMessageModel)
 
         handyErrorMessageModel.forEach(function (item) {
             if (item.handyErrorMessageID == handyErrorMessageID) {
