@@ -190,8 +190,8 @@ function onUploadFile(page) {
         '                <p>ファイル取込を行います。よろしいですか？</p > ' +
         '            </div>' +
         '            <div class="modal-footer">' +
-        '                <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>' +
-        '                <button type="button" class="btn btn-primary">OK</button>' +
+        '                <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">キャンセル</button>' +
+        '                <button type="button" class="btn btn-primary ok">OK</button>' +
         '            </div>' +
         '        </div>' +
         '    </div>' +
@@ -204,12 +204,12 @@ function onUploadFile(page) {
         //なし
     });
 
-    $('#import-modal .btn-secondary').click(function () {
+    $('#import-modal .cancel, #import-modal .close').click(function () {
         $('#import-modal').modal('hide');
         return false;
     });
 
-    $('#import-modal .btn-primary').click(function () {
+    $('#import-modal .ok').click(function () {
         $('#import-modal').modal('hide');
 
         var importUrl = document.getElementById('import_action_url').value;
