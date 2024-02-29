@@ -232,7 +232,7 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
-        ///   アプリのバージョンが正しくありません。最新バージョンをダウンロードしてください。 に類似しているローカライズされた文字列を検索します。
+        ///   {0}にデータがありません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E2002 {
             get {
@@ -241,7 +241,7 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
-        ///   {0}にデータがありません。 に類似しているローカライズされた文字列を検索します。
+        ///   ログインIDが正しくありません。正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E2003 {
             get {
@@ -250,11 +250,155 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
-        ///   ログインIDが正しくありません。正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        ///   接続先を入力してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E2004 {
             get {
                 return ResourceManager.GetString("E2004", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   接続先URLにアクセスできません。正しいURLを入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2005 {
+            get {
+                return ResourceManager.GetString("E2005", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   会社コード・会社パスワードはセットで入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2006 {
+            get {
+                return ResourceManager.GetString("E2006", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   使用ハンディメニューが登録されていません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2007 {
+            get {
+                return ResourceManager.GetString("E2007", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   「設定」から会社コードを登録してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2008 {
+            get {
+                return ResourceManager.GetString("E2008", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   アプリバージョンが取得できませんでした。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2009 {
+            get {
+                return ResourceManager.GetString("E2009", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   アプリのバージョンが正しくありません。最新バージョンをダウンロードしてください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2010 {
+            get {
+                return ResourceManager.GetString("E2010", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ログイン情報が切断されました。再度ログインしてください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2011 {
+            get {
+                return ResourceManager.GetString("E2011", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   接続がタイムアウトしました。再度お試しください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2012 {
+            get {
+                return ResourceManager.GetString("E2012", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   メニューが登録されていません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2013 {
+            get {
+                return ResourceManager.GetString("E2013", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ページが存在しません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2014 {
+            get {
+                return ResourceManager.GetString("E2014", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   QRコードの読取ができませんでした。再度スキャンしてください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2015 {
+            get {
+                return ResourceManager.GetString("E2015", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   読取データがありません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2016 {
+            get {
+                return ResourceManager.GetString("E2016", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   既にスキャン済みの仕入先かんばんです。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2017 {
+            get {
+                return ResourceManager.GetString("E2017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   既に実績データがあるため、登録できません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2018 {
+            get {
+                return ResourceManager.GetString("E2018", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   既に実績データがあるため、一部データのみ登録しました。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2019 {
+            get {
+                return ResourceManager.GetString("E2019", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   指定の条件に合致する出荷指示がありません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2020 {
+            get {
+                return ResourceManager.GetString("E2020", resourceCulture);
             }
         }
         
