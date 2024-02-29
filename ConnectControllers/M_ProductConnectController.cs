@@ -127,6 +127,48 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 納入先品番が品番マスターに存在するかチェック
+        /// </summary>
+        /// <param name="deliveryProductNumber">納入先品番</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static bool IsExistedDeliveryProductNumber(string? deliveryProductNumber, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    // SQL作成
+                    string sql = $@"
+                        SELECT COUNT(*) 
+                        FROM M_Product AS product
+                        WHERE 
+                            product.DeliveryProductNumber = '{deliveryProductNumber}'
+                            AND product.IsDeleted = 0
+                    ";
+
+                    var productCount = connection.ExecuteScalar<int>(sql);
+                    if (productCount == 0)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// 納入先品番から仕入先品番を取得
         /// </summary>
         /// <param name="deliveryId"></param>

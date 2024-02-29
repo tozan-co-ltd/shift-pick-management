@@ -53,19 +53,19 @@
                                     <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.SearchStartDate)</span>
                                     <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate"> <lable class="m-1">～</lable> <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
                                 </div>
-                                <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                                    <button type="submit" class="btn btn-secondary btn-icon-split ml-3 sp-mg-top-10 sp-mg-left-0" id="search-btn">
+                                <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl pt-2">
+                                    <button type="submit" class="btn btn-secondary btn-icon-split ml-3 sp-mg-top-10 sp-mg-left-0 mt-0" id="search-btn">
                                         <span class="icon text-white-50">
                                             <i class="fa-solid fa-magnifying-glass"></i>
                                         </span>
                                         <span class="text">検索</span>
                                     </button>
-                                    <button class="btn btn-primary btn-icon-split ml-3">
+                                    <a class="btn btn-primary btn-icon-split ml-3" formmethod="get" asp-action="Register" asp-controller="D_StoreOut">
                                         <span class="icon text-white-50">
                                             <i class="fas fa-plus"></i>
                                         </span>
                                         <span class="text">新規作成</span>
-                                    </button>
+                                    </a>
                                     <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3">
                                         <span class="icon text-white-50">
                                             <i class="fa-solid fa-file-export"></i>

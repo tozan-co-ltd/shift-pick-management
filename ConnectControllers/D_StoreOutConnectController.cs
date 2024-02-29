@@ -63,5 +63,80 @@ namespace mar_sumaken_web.ConnectControllers
 
             return sql;
         }
+
+        /// <summary>
+        /// 出庫実績登録
+        /// </summary>
+        /// <param name="model">出庫実績モデル</param>
+        /// <param name="user">ログインユーザー</param>
+        public static void InsertDStoreOuts(D_StoreOutModel model, LoginUserModel loginUser)
+        {
+            DateTime sysDate = DateTime.Now;
+
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
+                // DB接続
+                try
+                {
+                    if (model.RegisterList != null && model.RegisterList.Count > 0)
+                    {
+                        foreach (var item in model.RegisterList)
+                        {
+                            item.DepoID = model.SelectedDepoID;
+                            item.CompanyID = model.SelectedCompanyID;
+                            item.StoreOutDate = Convert.ToDateTime(model.SearchStartDate);
+                            item.DeliveryDate = Convert.ToDateTime(model.SearchDeliveryDate);
+                            item.DeliveryTimeClass = model.SelectedBin;
+                            item.DeliverySlipNumber = "Get from bin value";
+                            // 出庫実績登録SQL作成
+                            string insertSql = CreateSQLToInsertDStoreOut(item, sysDate, loginUser.UserName);
+                            // 出庫実績登録
+                            var insertCount = connection.Execute(insertSql, null, transaction);
+                            // 更新件数が0の場合はエラーとする
+                            if (insertCount == 0)
+                            {
+                                throw new Exception();
+                            }
+                        }
+                    }
+
+                    // トランザクションのコミット
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 出庫実績登録SQL作成
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <param name="createdAt">システムタイム</param>
+        /// <param name="createdBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToInsertDStoreOut(D_StoreOutModel model, DateTime createdAt, string createdBy)
+        {
+            var sql = $@"
+                INSERT INTO D_StoreOut
+                    (DepoID, CompanyID, StoreOutDate, DeliveryDate, DeliveryTimeClass, DeliverySlipNumber, DeliveryProductNumber, SupplierProductNumber, LotNumber, MainProductKey, FirstSubProductKey, SecondSubProductKey, NumberOfBoxes, Quantity, Remarks, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
+                VALUES (
+                    {model.DepoID}, {model.CompanyID}, '{model.StoreOutDate}', '{model.DeliveryDate}', {model.DeliveryTimeClass}, '{model.DeliverySlipNumber}', '{model.DeliveryProductNumber}', '{model.SupplierProductNumber}', '{model.LotNumber}', '{model.MainProductKey}', '{model.FirstSubProductKey}', '{model.SecondSubProductKey}', {model.NumberOfBoxes}, {model.Quantity}, '{model.Remarks}', '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}'
+                )
+            ;";
+            return sql;
+        }
     }
 }
