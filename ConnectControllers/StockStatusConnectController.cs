@@ -52,8 +52,8 @@ namespace mar_sumaken_web.Commons
                 DECLARE @SearchStartDate DATETIME = DATEADD(MONTH, DATEDIFF(MONTH, 0, @InputDate), 0);
                 DECLARE @SearchEndDate DATETIME = CONVERT(DATETIME, CONVERT(VARCHAR(10), @InputDate) + ' 23:59:59');
                 DECLARE @LastMonthDate DATETIME = DATEADD(DAY, -1, DATEADD(MONTH, DATEDIFF(MONTH, 0, @InputDate), 0));
-                DECLARE @CompanyId int = {depoId};
-                DECLARE @DepoId int = {supplierId};
+                DECLARE @CompanyId int = {supplierId};
+                DECLARE @DepoId int = {depoId};
                 --SELECT @SearchStartDate, @SearchEndDate, @LastMonthDate;
                 WITH 
                 SearchData AS 

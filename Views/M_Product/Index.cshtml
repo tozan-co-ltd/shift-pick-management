@@ -189,7 +189,7 @@
                                 {
                                     <div class="form-check">
                                         <input type="hidden" id="select-depo-value-@i" asp-for="RDepoProductsRegister[i].Value" value="@Model.RDepoProductsRegister[i].Value" />
-                                        <input type="hidden" id="select-depo-text-@i" asp-for="RDepoProductsRegister[i].Text" value="@Model.RDepoProductsRegister[i].Value" />
+                                        <input type="hidden" id="select-depo-text-@i" asp-for="RDepoProductsRegister[i].Text" value="@Model.RDepoProductsRegister[i].Text" />
                                         <input class="form-check-input checkbox" asp-for="RDepoProductsRegister[i].Selected" id="select-depo-@i" type="checkbox">
                                         <label class="form-check-label" id="label-depo-name-@i">@Model.RDepoProductsRegister[i].Text</label>
                                     </div>
@@ -354,6 +354,8 @@
             let url = window.location.origin + '@Url.Action("Edit", "M_Product")';
             let method = 'POST';
             var data = $('#mProductForm').serializeArray();
+
+            console.log(data);
 
             // Ajax call
             $.ajax({
