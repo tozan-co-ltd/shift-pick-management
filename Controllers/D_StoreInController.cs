@@ -194,7 +194,7 @@ namespace mar_sumaken_web.Controllers
                             if (!isExistProduct)
                             {
                                 isValid = false;
-                                var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
+                                var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreInModel>("SupplierProductNumber"));
                                 validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
                             }
                         }

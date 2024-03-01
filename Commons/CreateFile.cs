@@ -151,7 +151,14 @@ namespace mar_sumaken_web.Commons
 
                 // フォルダが存在しない場合は新規作成
                 if (!Directory.Exists(folderPath))
+                {
                     Directory.CreateDirectory(folderPath);
+                }
+                else
+                {
+                    // 削除するファイルの数を決定
+                    CleanFolder(folderPath, 4);
+                }
 
                 // 取込ファイルパス
                 return Path.Combine(folderPath, tmpFileName);
@@ -159,6 +166,32 @@ namespace mar_sumaken_web.Commons
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// 削除するファイルの数を決定
+        /// </summary>
+        /// <param name="folderPath">フォルダパス</param>
+        /// <param name="filesToKeep">保持するファイルの数</param>
+        static void CleanFolder(string folderPath, int filesToKeep)
+        {
+            // ディレクトリが存在するかどうかを確認
+            if (Directory.Exists(folderPath))
+            {
+                string[] files = Directory.GetFiles(folderPath);
+
+                // ファイルリストを作成日順に並べ替える
+                Array.Sort(files, (x, y) => new FileInfo(x).CreationTime.CompareTo(new FileInfo(y).CreationTime));
+
+                // 削除するファイルの数を決定
+                int filesToDelete = files.Length - filesToKeep;
+
+                // 最も古いファイルを削除
+                for (int i = 0; i < filesToDelete; i++)
+                {
+                    File.Delete(files[i]);
+                }
             }
         }
 

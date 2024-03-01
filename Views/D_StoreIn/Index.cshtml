@@ -10,14 +10,14 @@
         @ViewData["Title"]
     </div>
     <div class="card-body">
-        <div class="form-group col-sm-12">
+        <div class="form-group col-sm-12 pl-3">
             <p id="div-error-message" class="mt-1 text-danger"></p>
-        </div>
 
-        @if (ViewData["ErrorMessage"] != null)
-        {
-            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
-        }
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
@@ -149,7 +149,7 @@
                                 <span>@Html.DisplayNameFor(model => model.SearchStartDate)<span style="color:red">*</span></span>
                             </div>
                             <div class="col-12 col-sm-8 col-md-8 column-2nd">
-                                <input id="startDate" type="text" id="DateStoreIn" asp-for="SearchStartDate" class="form-control pickerDate">
+                                <input type="text" asp-for="SearchStartDate" class="form-control pickerDate">
                                 <span class="text-danger w-100" asp-validation-for="SearchStartDate"></span>
                             </div>
                         </div>

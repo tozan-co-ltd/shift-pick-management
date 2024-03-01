@@ -177,27 +177,15 @@ namespace mar_sumaken_web.Models
                 {
                     connection.Open();
                     string commandText = $@"
-                        SELECT *
+                        SELECT
+                            DepoID as Value,
+                            DepoName AS Text
                         FROM M_Depo
                         WHERE (1=1)
                             AND IsDeleted = 0
                         ";
-                    var param = new
-                    {
-                        UserID = UserID
-                    };
 
-                    var depoList = new List<M_DepoModel>();
-                    depoList = connection.Query<M_DepoModel>(commandText, param).ToList();
-
-                    foreach (var depo in depoList)
-                    {
-                        var item = new SelectListItem { 
-                            Value = depo.DepoID.ToString(), 
-                            Text = depo.DepoName.ToString() 
-                        };
-                        selectListItem.Add(item);
-                    }
+                    selectListItem = connection.Query<SelectListItem>(commandText).ToList();
                 }
                 return selectListItem;
             }

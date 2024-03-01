@@ -75,16 +75,6 @@ namespace mar_sumaken_web.Controllers
                     foreach (var item in model.D_ReceiveScheduleList)
                     {
                         searchData += $@"<tr>
-                        <td>
-                            <a class='btn btn-success btn-icon-split ml-1 mr-1'
-                            onclick='OnEditClick(this)' data-id='{item.ReceiveScheduleID}' data-toggle='modal' data-target='#edit-modal'>
-                                <i class='fa-solid fa-pen'></i>
-                            </a>
-                            <button class='btn btn-danger btn-icon-split'
-                            onclick='OnDeleteClick(this)' data-id='{item.ReceiveScheduleID}' data-toggle='modal' data-target='#delete-modal'>
-                                <i class='fa-solid fa-trash'></i>
-                            </button>
-                        </td>
                         <td class='ReceiveScheduleID'>{@item.ReceiveScheduleID}</td>
                         <td class='SupplierName'>{@item.SupplierName}</td>
                         <td class='ReceiveScheduleDate'>{@item.ReceiveScheduleDate}</td>

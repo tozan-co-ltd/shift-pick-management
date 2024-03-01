@@ -1,5 +1,5 @@
 ﻿@using mar_sumaken_web.Commons;
-@model mar_sumaken_web.Models.D_HandyErrorMessageModel;
+@model mar_sumaken_web.Models.TopModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.ViewTitle;
@@ -39,9 +39,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (@Model != null && @Model.D_HandyErrorMessageList != null && @Model.D_HandyErrorMessageList.Count > 0)
+                        @if (@Model != null && @Model.MyModel2 != null)
                         {
-                            @foreach (var item in @Model.D_HandyErrorMessageList)
+                            @foreach (var item in @Model.MyModel2)
                             {
                                 <tr>
                                     <td>
@@ -158,7 +158,6 @@
         // D_HandyErrorMessageModel取得
         var data = @Html.Raw(Json.Serialize(Model));
         var handyErrorMessageModel = data.d_HandyErrorMessageList;
-        console.log("handyErrorMessageModel", handyErrorMessageModel)
 
         handyErrorMessageModel.forEach(function (item) {
             if (item.handyErrorMessageID == handyErrorMessageID) {
