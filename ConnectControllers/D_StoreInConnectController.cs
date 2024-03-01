@@ -8,7 +8,7 @@ namespace mar_sumaken_web.ConnectControllers
     /// <summary>
     /// 入庫実績テーブルに関する関数
     /// </summary>
-    public class D_StoreInConnectionController
+    public class D_StoreInConnectController
     {
         /// <summary>
         /// 入庫実績情報取得

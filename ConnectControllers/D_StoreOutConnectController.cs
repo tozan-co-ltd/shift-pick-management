@@ -256,12 +256,12 @@ namespace mar_sumaken_web.ConnectControllers
         /// 出庫実績削除
         /// </summary>
         /// <param name="storeInId">出庫実績ID</param>
-        /// <param name="databaseName">データベース名</param>
+        /// <param name="user">ログインユーザー</param>
         /// <returns>更新件数</returns>
-        public static int DeleteDStoreOut(int id, string databaseName)
+        public static int DeleteDStoreOut(int id, LoginUserModel user)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(user.DatabaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -271,7 +271,7 @@ namespace mar_sumaken_web.ConnectControllers
                 try
                 {
                     // 出庫実績削除SQL作成
-                    string deleteSql = CreateSQLToDeleteDStoreOut(id);
+                    string deleteSql = CreateSQLToDeleteDStoreOut(id, DateTime.Now, user.UserName);
                     // 出庫実績削除
                     int affectedRows = connection.Execute(deleteSql);
                     // 更新件数が0の場合はエラーとする
@@ -369,12 +369,17 @@ namespace mar_sumaken_web.ConnectControllers
         /// 出庫実績削除SQL作成
         /// </summary>
         /// <param name="storeInId">出庫実績ID</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToDeleteDStoreOut(int id)
+        private static string CreateSQLToDeleteDStoreOut(int id, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                         UPDATE D_StoreOut
-                        SET IsDeleted = 1
+                        SET 
+                            IsDeleted = 1
+                            ,UpdatedAt = '{updatedAt}'
+                            ,UpdatedBy = '{updatedBy}'
                         WHERE StoreOutID = {id}
             ;";
             return sql;
