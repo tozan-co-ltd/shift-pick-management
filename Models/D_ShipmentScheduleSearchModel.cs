@@ -49,11 +49,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public D_ShipmentScheduleSearchModel()
         {
-            // 翌日(土日を除く)
-            DateTime currentDate = DateTime.Now;
-            var nextDay = currentDate.AddDays(currentDate.DayOfWeek == DayOfWeek.Friday ? 3 : 1).ToString("yyyy/MM/dd");
-            SearchStartDate = nextDay;
-            SearchEndDate = nextDay;
+
         }  
     }
 }

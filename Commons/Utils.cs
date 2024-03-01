@@ -111,7 +111,7 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 次の日に服用
+        /// 翌日(土日を除く)を取得
         /// </summary>
         /// <param name="date">日付</param>
         public static DateTime GetNextWeekday(DateTime date)

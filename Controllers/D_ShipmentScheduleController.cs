@@ -30,6 +30,11 @@ namespace mar_sumaken_web.Controllers
                 model.SearchDepoList = commonModel.GetMDepoList(user.DatabaseName);
                 model.BinList = Utils.Const_BinList;
                 model.BinList[0].Selected= true;
+                // 翌日(土日を除く)
+                DateTime currentDate = DateTime.Now;
+                var nextDay = Utils.GetNextWeekday(currentDate).ToString("yyyy/MM/dd");
+                model.SearchStartDate = nextDay;
+                model.SearchEndDate = nextDay;
 
                 return View(model);
             }
