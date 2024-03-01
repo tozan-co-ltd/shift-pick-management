@@ -298,7 +298,7 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 入庫実績削除
-                D_StoreInConnectionController.DeleteDStoreIn(storeInId, user.DatabaseName);
+                D_StoreInConnectionController.DeleteDStoreIn(storeInId, user);
 
                 return Ok();
             }
