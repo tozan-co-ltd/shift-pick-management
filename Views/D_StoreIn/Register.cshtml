@@ -12,8 +12,8 @@
     </div>
 
     <div class="card-body">
-        <div class="col-md-12 pl-3 pb-3">
-            <form method="GET" asp-controller="D_StoreIn" asp-action="Index">
+        <div class="col-md-12 pb-3">
+            <form method="get" asp-controller="D_StoreIn" asp-action="Index">
                 <button type="submit" class="btn btn-secondary btn-icon-split">
                     <span class="icon text-white-50">
                         <i class="fas fa-arrow-left-long"></i>
@@ -23,14 +23,14 @@
             </form>
         </div>
 
-        <div class="form-group col-sm-12">
+        <div class="form-group col-sm-12 pl-3">
             <p id="div-error-message" class="mt-1 text-danger"></p>
-        </div>
 
-        @if (ViewData["ErrorMessage"] != null)
-        {
-            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
-        }
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
@@ -121,68 +121,69 @@
 </div>
 
 <script>
-    $(document).ready(function () {
-        $('#register-btn').click(function () {
-            $('#DStoreInForm').submit(function (event) {
-                // エラーメッセージ削除
-                DeleteErrorMessages();
 
-                // ページの更新を禁止する
-                event.preventDefault();
+    // 登録ボタン押下
+    $('#register-btn').click(function () {
+        $('#DStoreInForm').submit(function (event) {
+            // エラーメッセージ削除
+            DeleteErrorMessages();
 
-                // 送信イベントが他のハンドラーに伝播するのを防ぐ
-                event.stopImmediatePropagation();
+            // ページの更新を禁止する
+            event.preventDefault();
 
-                var form = $('#DStoreInForm');
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
 
-                // フォーム情報を取得する
-                var formDataArray = form.serializeArray();
-                formDataArray = formDataArray.filter(function (item) {
-                    return item.value.trim() !== '' && item.value.trim() !== '0';
-                });
+            var form = $('#DStoreInForm');
 
-                // 編集された行数を取得
-                var editRow = [];
-                formDataArray.forEach(function (item) {
-                    if (item.name.includes("RegisterList")) {
-                        var rowNumber = GetEditRowNumber(item.name);
-                        editRow.push(rowNumber);
+            // フォーム情報を取得する
+            var formDataArray = form.serializeArray();
+            formDataArray = formDataArray.filter(function (item) {
+                return item.value.trim() !== '' && item.value.trim() !== '0';
+            });
+
+            // 編集された行数を取得
+            var editRow = [];
+            formDataArray.forEach(function (item) {
+                if (item.name.includes("RegisterList")) {
+                    var rowNumber = GetEditRowNumber(item.name);
+                    editRow.push(rowNumber);
+                }
+            });
+            if (editRow.length == 0) return;
+
+            // 仕入先品番と数量チェック
+            var checkFlag = checkValue(editRow);
+            if (!checkFlag) {
+                $('#div-error-message').text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
+                return;
+            }
+
+            // Ajax call
+            $.ajax({
+                url: '@Url.Action("Register", "D_StoreIn")',
+                method: 'POST',
+                data: formDataArray
+            })
+                .done(function (response) {
+                    $('#DStoreInForm')[0].reset();
+                    // 完了モーダル表示
+                    AlertMessage('', '完了', '登録が完了しました。', null, null);
+                })
+                .fail(function (xhr) {
+                    if (xhr.status === 404) {
+                        // データが見つからなかった場合
+                        var errorMessage = xhr.responseJSON.errorMessage;
+                        //$('#div-error-message').text(errorMessage);
+                        $("#div-error-message").html(errorMessage);
+                    } else {
+                        // その他のエラーの場合
+                        $('#div-error-message').text(errorMessage);
                     }
                 });
-                if (editRow.length == 0) return;
-
-                // 仕入先品番と数量チェック
-                var checkFlag = checkValue(editRow);
-                if (!checkFlag) {
-                    $('#div-error-message').text("正しい入力値を入力してください。");
-                    return;
-                }
-
-                // Ajax call
-                $.ajax({
-                    url: '@Url.Action("Register", "D_StoreIn")',
-                    method: 'POST',
-                    data: formDataArray
-                })
-                    .done(function (response) {
-                        $('#DStoreInForm')[0].reset();
-                        // 完了モーダル表示
-                        AlertMessage('', '完了', '登録が完了しました。', null, null);
-                    })
-                    .fail(function (xhr) {
-                        if (xhr.status === 404) {
-                            // データが見つからなかった場合
-                            var errorMessage = xhr.responseJSON.errorMessage;
-                            //$('#div-error-message').text(errorMessage);
-                            $("#div-error-message").html(errorMessage);
-                        } else {
-                            // その他のエラーの場合
-                            $('#div-error-message').text(errorMessage);
-                        }
-                    });
-            });
         });
     });
+
 
     // 仕入先品番と数量チェック
     function checkValue(rowCheckArr) {
