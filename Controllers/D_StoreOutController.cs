@@ -377,7 +377,7 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 出庫実績削除
-                D_StoreOutConnectController.DeleteDStoreOut(id, user.DatabaseName);
+                D_StoreOutConnectController.DeleteDStoreOut(id, user);
 
                 return Ok();
             }
