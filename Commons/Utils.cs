@@ -130,5 +130,21 @@ namespace mar_sumaken_web.Commons
             return date;
         }
 
+        /// <summary>
+        /// 日付に変換する
+        /// </summary>
+        public static string ConvertToYYYYMMDD(string inputDateString)
+        {
+            DateTime inputDate = DateTime.Parse(inputDateString);
+
+            int year = inputDate.Year;
+            int month = inputDate.Month;
+            int day = inputDate.Day;
+
+            string formattedDateString = $"{year}/{month:D2}/{day:D2}";
+
+            return formattedDateString;
+        }
+
     }
 }

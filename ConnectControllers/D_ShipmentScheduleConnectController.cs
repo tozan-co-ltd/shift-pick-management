@@ -287,7 +287,7 @@ namespace mar_sumaken_web.Commons
             string differenceCheckCondition = string.Empty;
             if (model.DiffenceCountCheck)
             {
-                differenceCheckCondition = " AND shipment.NumberOfBoxes <> storeOut.NumberOfBoxes";
+                differenceCheckCondition = " AND shipment.NumberOfBoxes <> COALESCE(storeOut.NumberOfBoxes, 0) ";
             }
 
             // 便
@@ -304,16 +304,16 @@ namespace mar_sumaken_web.Commons
 	                shipment.CompanyID AS SupplierID
 	                ,company.CompanyName AS SupplierName
 	                ,depo.DepoName
-	                ,storeOut.NumberOfBoxes AS StoreOutNumberOfBoxes -- 出庫箱数
-	                ,storeOut.Quantity AS StoreOutQuantity --出庫数量
+	                ,COALESCE(storeOut.NumberOfBoxes, 0) AS StoreOutNumberOfBoxes -- 出庫箱数
+	                ,COALESCE(storeOut.Quantity, 0) AS StoreOutQuantity --出庫数量
                     ,shipment.*
-                    
                 FROM D_ShipmentSchedule shipment
-                INNER JOIN D_StoreOut AS storeOut 
+                LEFT JOIN D_StoreOut AS storeOut 
 		                ON shipment.DepoID = storeOut.DepoID
 		                AND	shipment.CompanyID = storeOut.CompanyID
 		                AND	shipment.DeliveryDate = storeOut.DeliveryDate
 		                AND	shipment.DeliveryProductNumber = storeOut.DeliveryProductNumber
+                        AND storeOut.IsDeleted = 0
                 INNER JOIN M_Company AS company 
                         ON shipment.CompanyID = company.CompanyID
                 INNER JOIN M_Depo AS depo 
@@ -326,7 +326,6 @@ namespace mar_sumaken_web.Commons
                     {binCondition}
                     {differenceCheckCondition}
 	                AND shipment.IsDeleted = 0
-	                AND storeOut.IsDeleted = 0
 	                AND company.IsDeleted = 0
                     AND depo.IsDeleted = 0
                 ORDER BY 

@@ -85,7 +85,7 @@ namespace mar_sumaken_web.Controllers
                         </td>
                         <td class='ShipmentScheduleID'>{@item.ShipmentScheduleID}</td>
                         <td class='DeliveryName'>{@item.DeliveryName}</td>
-                        <td class='DeliveryDate'>{@item.DeliveryDate}</td>
+                        <td class='DeliveryDate'>{Utils.ConvertToYYYYMMDD(@item.DeliveryDate)}</td>
                         <td class='DeliveryTimeClass'>{@item.DeliveryTimeClass}</td>
                         <td class='DeliveryProductNumber'>{@item.DeliveryProductNumber}</td>
                         <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
@@ -107,7 +107,7 @@ namespace mar_sumaken_web.Controllers
                         <td class='DeliveryName'>{@item.DeliveryName}</td>
                         <td class='DeliveryFactoryName'>{@item.DeliveryFactoryName}</td>
                         <td class='RegularKubun'>{@item.RegularKubun}</td>
-                        <td class='IssuedDate'>{@item.IssuedDate}</td>
+                        <td class='IssuedDate'>{Utils.ConvertToYYYYMMDD(@item.IssuedDate)}</td>
                         <td class='DeliveryTime'>{@item.DeliveryTime}</td>
                         <td class='TranspotationIdentify'>{@item.TranspotationIdentify}</td>
                         <td class='DeliverySlipNumber'>{@item.DeliverySlipNumber}</td>

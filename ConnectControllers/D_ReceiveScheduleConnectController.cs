@@ -149,7 +149,7 @@ namespace mar_sumaken_web.Commons
             string differenceCheckCondition = string.Empty;
             if (model.DiffenceCountCheck)
             {
-                differenceCheckCondition = " AND (schedule.Quantity / product.LotQuantity) <> storeIn.NumberOfBoxes";
+                differenceCheckCondition = " AND (schedule.Quantity / product.LotQuantity) <> COALESCE(storeIn.NumberOfBoxes, 0) ";
             }
 
             var sql = $@"
@@ -166,19 +166,20 @@ namespace mar_sumaken_web.Commons
 	                    ELSE 0
                     END AS NumberOfBoxes    -- 予定箱数
                     ,schedule.Quantity      --予定数量
-                    ,storeIn.NumberOfBoxes AS StoreInNumberOfBox    -- 入庫箱数
-                    ,storeIn.Quantity AS StoreInQuantity            -- 入庫数量
+                    ,COALESCE(storeIn.NumberOfBoxes, 0) AS StoreInNumberOfBox    -- 入庫箱数
+                    ,COALESCE(storeIn.Quantity, 0) AS StoreInQuantity            -- 入庫数量
                     ,schedule.CreatedAt
                     ,schedule.CreatedBy
                 FROM D_ReceiveSchedule AS schedule
                 INNER JOIN M_Product AS product 
                     ON schedule.SupplierProductNumber = product.SupplierProductNumber
-                INNER JOIN D_StoreIn AS storeIn
+                LEFT JOIN D_StoreIn AS storeIn
                     ON schedule.DepoID = storeIn.DepoID
 	                AND schedule.CompanyID = storeIn.CompanyID
 	                AND schedule.ReceiveScheduleDate = storeIn.StoreInDate
 	                AND schedule.SupplierProductNumber = storeIn.SupplierProductNumber
 	                AND schedule.LotNumber = storeIn.LotNumber
+                    AND storeIn.IsDeleted = 0
                 INNER JOIN M_Company AS company 
                     ON schedule.CompanyID = company.CompanyID
                 WHERE 
@@ -189,7 +190,6 @@ namespace mar_sumaken_web.Commons
                     {differenceCheckCondition}
                     AND schedule.IsDeleted = 0
                     AND product.IsDeleted = 0
-	                AND storeIn.IsDeleted = 0
 	                AND company.IsDeleted = 0
                 ORDER BY 
 	                schedule.SupplierProductNumber ASC     

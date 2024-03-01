@@ -77,7 +77,7 @@ namespace mar_sumaken_web.Controllers
                         searchData += $@"<tr>
                         <td class='ReceiveScheduleID'>{@item.ReceiveScheduleID}</td>
                         <td class='SupplierName'>{@item.SupplierName}</td>
-                        <td class='ReceiveScheduleDate'>{@item.ReceiveScheduleDate}</td>
+                        <td class='ReceiveScheduleDate'>{Utils.ConvertToYYYYMMDD(@item.ReceiveScheduleDate)}</td>
                         <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
                         <td class='LotNumber'>{@item.LotNumber}</td>
                         <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>

@@ -79,7 +79,7 @@ namespace mar_sumaken_web.Controllers
                         </td>
                         <td class='ReceiveID'>{@item.ReceiveID}</td>
                         <td class='SupplierName'>{@item.SupplierName}</td>
-                        <td class='ReceiveDatetime'>{@item.ReceiveDatetime}</td>
+                        <td class='ReceiveDatetime'>{Utils.ConvertToYYYYMMDD(@item.ReceiveDatetime)}</td>
                         <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
                         <td class='LotNumber'>{@item.LotNumber}</td>
                         <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
