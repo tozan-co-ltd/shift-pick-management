@@ -58,6 +58,10 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public IEnumerable<SelectListItem>? MCompanyList { get; set; }
 
+        /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        public int SelectedDepoID { get; set; }
 
         /// <summary>
         /// ベースビュー作成
@@ -75,6 +79,7 @@ namespace mar_sumaken_web.Models
             CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();
             MDepoList = GetMDepoList(DataBaseName);
+            SelectedDepoID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_MainDepoID).First().Value);
         }
 
         /// <summary>

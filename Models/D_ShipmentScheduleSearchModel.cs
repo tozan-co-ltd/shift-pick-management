@@ -35,11 +35,6 @@ namespace mar_sumaken_web.Models
         public IEnumerable<SelectListItem>? SearchDepoList { get; set; }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem>? SearchCompanyList { get; set; }
