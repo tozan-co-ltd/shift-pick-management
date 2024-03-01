@@ -28,9 +28,6 @@ namespace mar_sumaken_web.Controllers
                 CommonModel commonModel = new();
                 model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_DeliveryID);
                 model.SearchDepoList = commonModel.GetMDepoList(user.DatabaseName);
-                string today = DateTime.Now.ToString("yyyy/MM/dd");
-                model.SearchStartDate = today;
-                model.SearchEndDate = today;
                 model.BinList = Utils.Const_BinList;
                 model.BinList[0].Selected= true;
 
@@ -77,7 +74,7 @@ namespace mar_sumaken_web.Controllers
                     {
                         searchData += $@"<tr>
                         <td>
-                            <a class='btn btn-success btn-icon-split ml-1 mr-1'
+                            <a class='btn btn-secondary btn-icon-split ml-1 mr-1'
                             onclick='OnDetailClick(this)' data-id='{item.ShipmentScheduleID}' data-toggle='modal' data-target='#detail-modal'>
                                 <i class='fa-solid fa-list'></i>
                             </a>

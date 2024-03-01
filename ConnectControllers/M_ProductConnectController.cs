@@ -127,6 +127,48 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 納入先品番が品番マスターに存在するかチェック
+        /// </summary>
+        /// <param name="deliveryProductNumber">納入先品番</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static bool IsExistedDeliveryProductNumber(string? deliveryProductNumber, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    // SQL作成
+                    string sql = $@"
+                        SELECT COUNT(*) 
+                        FROM M_Product AS product
+                        WHERE 
+                            product.DeliveryProductNumber = '{deliveryProductNumber}'
+                            AND product.IsDeleted = 0
+                    ";
+
+                    var productCount = connection.ExecuteScalar<int>(sql);
+                    if (productCount == 0)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// 納入先品番から仕入先品番を取得
         /// </summary>
         /// <param name="deliveryId"></param>
@@ -190,6 +232,15 @@ namespace mar_sumaken_web.ConnectControllers
                 {
                     DateTime sysDate = DateTime.Now;
 
+                    // 品番履歴テーブル登録SQL作成
+                    string logSql = CreateSQLToInsertDProductHistory(productId, "削除", sysDate, loginUser.UserName);
+                    var logAddedCount = connection.Execute(logSql, null, transaction);
+                    // 更新件数が0の場合はエラーとする
+                    if (logAddedCount == 0)
+                    {
+                        throw new Exception();
+                    }
+
                     // 品番マスター削除
                     string productDeleteSql = CreateSQLToDeleteMCompany(productId, sysDate, loginUser.UserName);
                     int productDeleteCount = connection.Execute(productDeleteSql, null, transaction);
@@ -203,7 +254,7 @@ namespace mar_sumaken_web.ConnectControllers
                     string depoProductDeleteSql = CreateSQLToDeleteRDepoProduct(productId);
                     // 品番-品番中間テーブル削除
                     int depoProductDelCount = connection.Execute(depoProductDeleteSql, null, transaction);
-                    
+
                     // トランザクションのコミット
                     transaction.Commit();
                 }
@@ -364,10 +415,8 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="model"></param>
         /// <param name="loginUser"></param>
         /// <returns>更新結果</returns>
-        public static bool UpdateMProduct(M_ProductModel model, LoginUserModel loginUser)
+        public static void UpdateMProduct(M_ProductModel model, LoginUserModel loginUser)
         {
-            bool result = false;
-
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
@@ -396,11 +445,6 @@ namespace mar_sumaken_web.ConnectControllers
                     // 品番-品番中間テーブル削除
                     string depoProductDeleteSql = CreateSQLToDeleteRDepoProduct(model.ProductID);
                     int depoProductDelCount = connection.Execute(depoProductDeleteSql, null, transaction);
-                    // 更新件数が0の場合はエラーとする
-                    if (depoProductDelCount == 0)
-                    {
-                        throw new Exception();
-                    }
 
                     // 品番-品番中間テーブル登録
                     foreach (SelectListItem item in model.RDepoProductsRegister)
@@ -417,12 +461,20 @@ namespace mar_sumaken_web.ConnectControllers
                         }
                     }
 
+                    List<SelectListItem> selectedItems = model.RDepoProductsRegister.Where(item => item.Selected).ToList();
+                    List<string> selectedValues = selectedItems.Select(item => item.Text).ToList();
+                    var depoName = string.Join(",", selectedValues);
+                    // 品番履歴テーブル登録SQL作成
+                    string logSql = CreateSQLToInsertDProductHistory(model.ProductID, "更新", sysDate, loginUser.UserName, depoName);
+                    var logAddedCount = connection.Execute(logSql, null, transaction);
+                    // 更新件数が0の場合はエラーとする
+                    if (logAddedCount == 0)
+                    {
+                        throw new Exception();
+                    }
+
                     // トランザクションのコミット
                     transaction.Commit();
-
-                    result = true;
-
-                    return result;
                 }
                 catch (Exception)
                 {
@@ -676,6 +728,82 @@ namespace mar_sumaken_web.ConnectControllers
                 DELETE 
                 FROM R_DepoProduct
                 WHERE ProductID = {productId}
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 品番履歴テーブル登録SQL作成
+        /// </summary>
+        /// <param name="product">登録情報</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToInsertDProductHistory(M_ProductModel product, string historyStatus, DateTime updatedAt, string updatedBy)
+        {
+            List<SelectListItem> selectedItems = product.RDepoProductsRegister.Where(item => item.Selected).ToList();
+            List<string> selectedValues = selectedItems.Select(item => item.Value).ToList();
+            var depoName = string.Join(",", selectedValues);
+
+            var sql = $@"
+                INSERT INTO D_ProductHistory
+                    (HistoryStatus, DepoName, SupplierName, SupplierProductNumber, DeliveryID, DeliveryProductNumber, ProductName, LotQuantity, UpdatedAt, UpdatedBy)
+                VALUES (
+                    {historyStatus}, {depoName}, {product.SupplierName}, '{product.SupplierProductNumber}', {product.DeliveryID}, '{product.DeliveryProductNumber}', '{product.ProductName}', {product.LotQuantity}, '{updatedAt}', '{updatedBy}'
+                )
+;
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 品番履歴テーブル登録SQL作成
+        /// </summary>
+        /// <param name="product">品番ID</param>
+        /// <param name="historyStatus">履歴ステータス</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <param name="depoName">デポー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToInsertDProductHistory(int productId, string historyStatus, DateTime updatedAt, string updatedBy, string depoName = "")
+        {
+            var depoNameStr = string.Empty;
+            if (string.Empty.Equals(depoName))
+            {
+                depoNameStr = "COALESCE(STRING_AGG(depo.DepoName,', '), '') AS DepoName";
+            }
+            else
+            {
+                depoNameStr = $@"'{depoName}' AS DepoName";
+            }
+            var sql = $@"
+                INSERT INTO D_ProductHistory
+                    (HistoryStatus, DepoName, SupplierName, SupplierProductNumber, DeliveryName, DeliveryProductNumber, ProductName, LotQuantity, UpdatedAt, UpdatedBy)
+                SELECT 
+                    '{historyStatus}', 
+                    {depoNameStr}
+                    ,supplier.CompanyName as SupplierName
+                    ,product.SupplierProductNumber
+                    ,delivery.CompanyName
+                    ,product.DeliveryProductNumber
+                    ,product.ProductName
+                    ,product.LotQuantity
+                    ,'{updatedAt}'
+                    ,'{updatedBy}'
+                FROM M_Product product
+                LEFT JOIN R_DepoProduct depoProduct ON product.ProductID = depoProduct.ProductID
+                LEFT JOIN M_Depo depo ON depoProduct.DepoID = depo.DepoID
+                INNER JOIN M_Company supplier ON product.SupplierID = supplier.CompanyID
+                INNER JOIN M_Company delivery ON product.DeliveryID = delivery.CompanyID
+                WHERE product.ProductID = {productId} AND product.IsDeleted = 0
+                GROUP BY 
+                    supplier.CompanyName
+                    ,product.SupplierProductNumber
+                    ,delivery.CompanyName
+                    ,product.DeliveryProductNumber
+                    ,product.ProductName
+                    ,product.LotQuantity
+                ;
             ";
             return sql;
         }

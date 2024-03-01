@@ -110,5 +110,25 @@ namespace mar_sumaken_web.Commons
             }
         }
 
+        /// <summary>
+        /// 次の日に服用
+        /// </summary>
+        /// <param name="date">日付</param>
+        public static DateTime GetNextWeekday(DateTime date)
+        {
+            date = date.AddDays(1);
+
+            if (date.DayOfWeek == DayOfWeek.Saturday)
+            {
+                date = date.AddDays(2);
+            }
+            else if (date.DayOfWeek == DayOfWeek.Sunday)
+            {
+                date = date.AddDays(1);
+            }
+
+            return date;
+        }
+
     }
 }

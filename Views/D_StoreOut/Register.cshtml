@@ -1,5 +1,5 @@
 ﻿@using mar_sumaken_web.Commons;
-@model mar_sumaken_web.Models.D_StoreInModel;
+@model mar_sumaken_web.Models.D_StoreOutModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "登録";
@@ -13,7 +13,7 @@
 
     <div class="card-body">
         <div class="col-md-12 pb-3">
-            <form method="get" asp-controller="D_StoreIn" asp-action="Index">
+            <form method="get" asp-controller="D_StoreOut" asp-action="Index">
                 <button type="submit" class="btn btn-secondary btn-icon-split">
                     <span class="icon text-white-50">
                         <i class="fas fa-arrow-left-long"></i>
@@ -34,39 +34,59 @@
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
-                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="DStoreInForm">
+                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="DStoreOutForm">
                     <div class="col-12 input-group div-input-group">
-                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                        <div class="col-12 col-sm-2 column-1st">
                             <label>@Html.DisplayNameFor(model => model.DepoName)<span style="color:red">*</span></label>
                         </div>
-                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                        <div class="col-12 col-sm-6 column-2nd">
                             <select class="form-select" name="SelectedDepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
                             <span class="text-danger w-100" asp-validation-for="SelectedDepoID"></span>
                         </div>
                     </div>
                     <div class="col-12 input-group div-input-group">
-                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                        <div class="col-12 col-sm-2 column-1st">
                             <label>@Html.DisplayNameFor(model => model.SupplierName)<span style="color:red">*</span></label>
                         </div>
 
-                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                        <div class="col-12 col-sm-6 column-2nd">
                             <select class="form-select" name="SelectedCompanyID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
                             <span class="text-danger w-100" asp-validation-for="SelectedCompanyID"></span>
                         </div>
                     </div>
                     <div class="col-12 input-group div-input-group">
-                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                        <div class="col-12 col-sm-2 column-1st">
                             <span>@Html.DisplayNameFor(model => model.SearchStartDate)<span style="color:red">*</span></span>
                         </div>
-                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate">
+                        <div class="col-12 col-sm-6 column-2nd">
+                            <input type="text" asp-for="SearchStartDate" class="form-control pickerDate">
                             <span class="text-danger w-100" asp-validation-for="SearchStartDate"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-md-6 input-group div-input-group pl-0">
+                            <div class="col-12 col-sm-2 col-md-4 column-1st">
+                                <span>@Html.DisplayNameFor(model => model.DeliveryDate)<span style="color:red">*</span></span>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-6 column-2nd ml-1">
+                                <input type="text" asp-for="SearchDeliveryDate" class="form-control pickerDate">
+                                <span class="text-danger w-100" asp-validation-for="SearchDeliveryDate"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 input-group div-input-group column-2nd pl-0">
+                            <div class="col-12 col-sm-4 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.BinSelectedList)</label>
+                            </div>
+                            <div class="col-12 col-sm-6 column-2nd">
+                                <select class="form-select" id="bin-select-list" asp-for="SelectedBin" asp-items="@Model.BinSelectedList"></select>
+                            </div>
                         </div>
                     </div>
                     <hr>
                     <table class="table table-responsive table-sm" style="width:100%">
                         <thead>
                             <tr>
+                                <th>@Html.DisplayNameFor(model => model.DeliveryProductNumber)<span style="color:red">*</span></th>
                                 <th>@Html.DisplayNameFor(model => model.SupplierProductNumber)<span style="color:red">*</span></th>
                                 <th>@Html.DisplayNameFor(model => model.LotNumber)</th>
                                 <th>@Html.DisplayNameFor(model => model.Quantity)<span style="color:red">*</span></th>
@@ -83,6 +103,9 @@
                                 {
                                     {
                                         <tr>
+                                            <td>
+                                                <input type="text" class="form-control" id="RegisterList[@i].DeliveryProductNumber" value="@item.DeliveryProductNumber" name="RegisterList[@i].DeliveryProductNumber" />
+                                            </td>
                                             <td>
                                                 <input type="text" class="form-control" id="RegisterList[@i].SupplierProductNumber" value="@item.SupplierProductNumber" name="RegisterList[@i].SupplierProductNumber" />
                                             </td>
@@ -122,9 +145,34 @@
 
 <script>
 
+    // 納入指示日が変更されたら便・納品書番号を更新する
+    $('#SearchDeliveryDate').on('change', function () {
+        var data = { "SearchDeliveryDate": $(this).val() };
+        $.ajax({
+        url: '@Url.Action("ChangDeliveryTimeClassList", "D_StoreOut")',
+            method: 'POST',
+            data: data
+        })
+        .done(function (response) {
+            $('#bin-select-list').empty();
+            $('#bin-select-list').html(response);
+        })
+        .fail(function (xhr) {
+            if (xhr.status === 404) {
+                // データが見つからなかった場合
+                var errorMessage = xhr.responseJSON.errorMessage;
+                //$('#div-error-message').text(errorMessage);
+                $("#div-error-message").html(errorMessage);
+            } else {
+                // その他のエラーの場合
+                $('#div-error-message').text(errorMessage);
+            }
+        });
+    });
+
     // 登録ボタン押下
     $('#register-btn').click(function () {
-        $('#DStoreInForm').submit(function (event) {
+        $('#DStoreOutForm').submit(function (event) {
             // エラーメッセージ削除
             DeleteErrorMessages();
 
@@ -134,7 +182,7 @@
             // 送信イベントが他のハンドラーに伝播するのを防ぐ
             event.stopImmediatePropagation();
 
-            var form = $('#DStoreInForm');
+            var form = $('#DStoreOutForm');
 
             // フォーム情報を取得する
             var formDataArray = form.serializeArray();
@@ -161,12 +209,12 @@
 
             // Ajax call
             $.ajax({
-                url: '@Url.Action("Register", "D_StoreIn")',
+                url: '@Url.Action("Register", "D_StoreOut")',
                 method: 'POST',
                 data: formDataArray
             })
                 .done(function (response) {
-                    $('#DStoreInForm')[0].reset();
+                    $('#DStoreOutForm')[0].reset();
                     // 完了モーダル表示
                     AlertMessage('', '完了', '登録が完了しました。', null, null);
                 })
@@ -183,7 +231,6 @@
                 });
         });
     });
-
 
     // 仕入先品番と数量チェック
     function checkValue(rowCheckArr) {
@@ -213,7 +260,6 @@
         });
         return checkFlag;
     }
-
 
     // 編集された行数を取得
     function GetEditRowNumber(fieldName) {

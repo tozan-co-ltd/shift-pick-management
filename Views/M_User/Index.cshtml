@@ -101,33 +101,31 @@
             </div>
             <div class="modal-body">
                 <div class="col-12">
-                    <p class="mb-0">ログインID：<span id="detailLoginId"></span></p>
+                    <p class="mb-1">ログインID：<span id="detailLoginId"></span></p>
                     <p>ユーザー名：<span id="detailUserName"></span></p>
+
                     <p class="mb-1">使用倉庫名</p>
-                    <div class="p-2">
-                        <table class="table table-sm table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-left border-top-0 font-weight-bold" scope="col">倉庫コード</th>
-                                    <th class="text-left border-top-0 font-weight-bold" scope="col">倉庫名</th>
-                                </tr>
-                            </thead>
-                            <tbody id="depo-contatiner">
-                            </tbody>
-                        </table>
-                    </div>
+                    <table class="table table-sm table-striped p-2">
+                        <thead>
+                            <tr>
+                                <th class="text-left border-top-0 font-weight-bold" scope="col">倉庫コード</th>
+                                <th class="text-left border-top-0 font-weight-bold" scope="col">倉庫名</th>
+                            </tr>
+                        </thead>
+                        <tbody id="depo-contatiner">
+                        </tbody>
+                    </table>
+
                     <p class="mb-1">使用ハンディメニュー名</p>
-                    <div class="col-12 p-2">
-                        <table class="col-6 table table-sm table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-left border-top-0 font-weight-bold" scope="col">ハンディメニュー名</th>
-                                </tr>
-                            </thead>
-                            <tbody id="menu-contatiner">
-                            </tbody>
-                        </table>
-                    </div>
+                    <table class="col-6 table table-sm table-striped p-2">
+                        <thead>
+                            <tr>
+                                <th class="text-left border-top-0 font-weight-bold" scope="col">ハンディメニュー名</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menu-contatiner">
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -209,8 +207,8 @@
                 listContainer.empty();
                 if (depoList != null) {
                     depoList.forEach(function (depo) {
-                        let th1 = "<th class='text-left' scope='row'>" + depo.depoCode + "</th>";
-                        let th2 = "<td class='text-left'>" + depo.depoName + "</td>";
+                        let th1 = "<td>" + depo.depoCode + "</td>";
+                        let th2 = "<td>" + depo.depoName + "</td>";
                         listContainer.append("<tr>" + th1 + th2 + "</tr>");
                     });
                 }
@@ -221,7 +219,7 @@
                 menuContainer.empty();
                 if (menuList != null) {
                     menuList.forEach(function (menu) {
-                        menuContainer.append("<tr><td class='text-left'>" + menu.handyMenuName + "</td></tr>");
+                        menuContainer.append("<tr><td>" + menu.handyMenuName + "</td></tr>");
                     });
                 }
             }
