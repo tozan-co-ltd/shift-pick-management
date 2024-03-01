@@ -45,6 +45,55 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
+        /// 出庫実績更新
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        [HttpPost]
+        public IActionResult Edit(D_StoreOutModel model)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 入力規則チェック
+                if (!ModelState.IsValid)
+                {
+                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+                }
+
+                // 納入先品番で品番チェック
+                bool isExistDeliveryProduct = M_ProductConnectController.IsExistedDeliveryProductNumber(model.DeliveryProductNumber, user.DatabaseName);
+                if (!isExistDeliveryProduct)
+                {
+                    var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
+                    return NotFound(new { errorMessage = message });
+                }
+
+                // 仕入先品番チェック
+                bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(model.SupplierProductNumber, user.DatabaseName);
+                if (!isExistProduct)
+                {
+                    var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("SupplierProductNumber"));
+                    return NotFound(new { errorMessage = message });
+                }
+
+                // 出庫実績更新
+                D_StoreOutConnectController.EditDStoreOut(model, user);
+
+                return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004 :" + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999 :" + ErrorMessagesResources.E9999 });
+            }
+        }
+
+        /// <summary>
         /// 検索ボタン押下
         /// </summary>
         /// <param name="model"></param>
@@ -61,6 +110,7 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 ModelState.Remove("SupplierProductNumber");
                 ModelState.Remove("DeliveryProductNumber");
+                ModelState.Remove("SearchDeliveryDate");
                 if (!ModelState.IsValid)
                 {
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
@@ -80,21 +130,81 @@ namespace mar_sumaken_web.Controllers
 
                     foreach (var item in model.D_StoreOutList)
                     {
-                        searchData += "<tr>" +
-                            "<td>" + @item.StoreOutID + "</td>" +
-                            "<td>" + @item.StoreOutID + "</td>" +
-                            "<td>" + @item.StoreOutDate + "</td>" +
-                            "<td>" + @item.StoreOutID + "</td>" +
-                            "<td>" + @item.StoreOutID + "</td>" +
-                            "<td>" + @item.StoreOutID + "</td>" +
-                            "<td>" + @item.StoreOutID + "</td>" +
-                            "<td>" + @item.StoreOutID + "</td>" +
-                            "<td>" + @item.StoreOutID + "</td>" +
-                            "<td>" + @item.StoreOutID + "</td>" +
-                            "</tr>";
+                        searchData += $@"<tr>
+                        <td>
+                            <a class='btn btn-success btn-icon-split ml-1 mr-1'
+                            onclick='OnEditClick(this)' data-id='{item.StoreOutID}' data-toggle='modal' data-target='#edit-modal'>
+                                <i class='fa-solid fa-pen'></i>
+                            </a>
+                            <button class='btn btn-danger btn-icon-split'
+                            onclick='OnDeleteClick(this)' data-id='{item.StoreOutID}' data-toggle='modal' data-target='#delete-modal'>
+                                <i class='fa-solid fa-trash'></i>
+                            </button>
+                        </td>
+                        <td class='StoreOutID'>{@item.StoreOutID}</td>
+                        <td class='SupplierName'>{@item.SupplierName}</td>
+                        <td class='StoreOutDate'>{@item.StoreOutDate.ToString("yyyy/MM/dd")}</td>
+                        <td class='DeliveryDate'>{@item.DeliveryDate.ToString("yyyy/MM/dd")}</td>
+                        <td class='DeliveryTimeClass'>{@item.DeliveryTimeClass}</td>
+                        <td class='DeliverySlipNumber'>{@item.DeliverySlipNumber}</td>
+                        <td class='DeliveryProductNumber'>{@item.DeliveryProductNumber}</td>
+                        <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
+                        <td class='LotNumber'>{@item.LotNumber}</td>
+                        <td class='LotQuantity'>{@item.LotQuantity}</td>
+                        <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
+                        <td class='Quantity'>{@item.Quantity}</td>
+                        <td class='MainProductKey'>{@item.MainProductKey}</td>
+                        <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
+                        <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
+                        <td class='Remarks'>{@item.Remarks}</td>
+                        <td class='CreatedAt'>{@item.CreatedAt}</td>
+                        <td class='CreatedBy'>{@item.CreatedBy}</td>                        
+                        <input type='hidden' class='DepoID' value='{item.DepoID}' />
+                        <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
+                        </tr>";
                     }
                 }
                    
+                return Content(searchData);
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                return Content(errorMessage);
+            }
+        }
+
+        /// <summary>
+        /// 便リスト取得
+        /// </summary>
+        /// <param name="searchDeliveryDate">納入指示日</param>
+        public IActionResult ChangDeliveryTimeClassList(string searchDeliveryDate)
+        {
+            var searchData = string.Empty;
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 便・納品書番号
+                List<SelectListItem> binSelectList = D_StoreOutConnectController.GetDeliveryTimeClassList(searchDeliveryDate, user.DatabaseName);
+
+                // 表示用のhtml作成
+                if (binSelectList.Count > 0)
+                {
+                    searchData = string.Empty;
+                    //searchData = "<select>";
+                    foreach (var item in binSelectList)
+                    {
+                        searchData += $@" <option value='{item.Text}'>{item.Text}</option>";
+                    }
+                    //searchData += "</select>";
+                }
+
                 return Content(searchData);
             }
             catch (SqlException)
@@ -135,13 +245,12 @@ namespace mar_sumaken_web.Controllers
 
                     model.RegisterList = storeInList;
                 }
+
+                // 納入指示日
+                model.SearchDeliveryDate = Utils.GetNextWeekday(DateTime.Today).ToString("yyyy/MM/dd");
+
                 // 便-納品書番号
-                List<SelectListItem> binSelectList = new()
-                {
-                    new() { Value = "1", Text = "1 - Y001", Selected = false },
-                    new() { Value = "2", Text = "2 - T001", Selected = false },
-                    new() { Value = "3", Text = "3 - Z001", Selected = false }
-                };
+                List<SelectListItem> binSelectList = D_StoreOutConnectController.GetDeliveryTimeClassList(model.SearchDeliveryDate, user.DatabaseName);
                 model.BinSelectedList = binSelectList;
 
                 // 会社リスト取得
@@ -175,6 +284,7 @@ namespace mar_sumaken_web.Controllers
                 {
                     foreach (var modelItem in model.RegisterList)
                     {
+                        modelItem.SearchDeliveryDate = model.SearchDeliveryDate;
                         var validationContext = new ValidationContext(modelItem);
                         var validationResults = new List<ValidationResult>();
                         bool isValid = Validator.TryValidateObject(modelItem, validationContext, validationResults, true);

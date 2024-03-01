@@ -59,7 +59,7 @@
                             <span>@Html.DisplayNameFor(model => model.SearchStartDate)<span style="color:red">*</span></span>
                         </div>
                         <div class="col-12 col-sm-6 column-2nd">
-                            <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate">
+                            <input type="text" asp-for="SearchStartDate" class="form-control pickerDate">
                             <span class="text-danger w-100" asp-validation-for="SearchStartDate"></span>
                         </div>
                     </div>
@@ -69,17 +69,16 @@
                                 <span>@Html.DisplayNameFor(model => model.DeliveryDate)<span style="color:red">*</span></span>
                             </div>
                             <div class="col-12 col-sm-6 col-md-6 column-2nd ml-1">
-                                <input id="startDate" type="text" asp-for="SearchDeliveryDate" class="form-control pickerDate">
+                                <input type="text" asp-for="SearchDeliveryDate" class="form-control pickerDate">
                                 <span class="text-danger w-100" asp-validation-for="SearchDeliveryDate"></span>
                             </div>
                         </div>
                         <div class="col-12 col-md-6 input-group div-input-group column-2nd pl-0">
                             <div class="col-12 col-sm-4 column-1st">
-                                <label>@Html.DisplayNameFor(model => model.BinSelectedList)<span style="color:red">*</span></label>
+                                <label>@Html.DisplayNameFor(model => model.BinSelectedList)</label>
                             </div>
                             <div class="col-12 col-sm-6 column-2nd">
                                 <select class="form-select" id="bin-select-list" asp-for="SelectedBin" asp-items="@Model.BinSelectedList"></select>
-                                <span class="text-danger w-100" asp-validation-for="SelectedBin"></span>
                             </div>
                         </div>
                     </div>
@@ -146,6 +145,32 @@
 
 <script>
     $(document).ready(function () {
+        // 納入指示日を変更
+        $('#SearchDeliveryDate').on('change', function () {
+            var data = { "SearchDeliveryDate": $(this).val() };
+            $.ajax({
+            url: '@Url.Action("ChangDeliveryTimeClassList", "D_StoreOut")',
+                method: 'POST',
+                data: data
+            })
+            .done(function (response) {
+                $('#bin-select-list').empty();
+                $('#bin-select-list').html(response);
+            })
+            .fail(function (xhr) {
+                if (xhr.status === 404) {
+                    // データが見つからなかった場合
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    //$('#div-error-message').text(errorMessage);
+                    $("#div-error-message").html(errorMessage);
+                } else {
+                    // その他のエラーの場合
+                    $('#div-error-message').text(errorMessage);
+                }
+            });
+        });
+
+        // 登録ボタン押下
         $('#register-btn').click(function () {
             $('#DStoreOutForm').submit(function (event) {
                 // エラーメッセージ削除
