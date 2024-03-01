@@ -2,6 +2,7 @@
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Data.SqlClient;
 
 namespace mar_sumaken_web.Commons
@@ -44,18 +45,23 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 会社マスターSELECT文SQL作成
+        /// 出荷指示に対する作業進捗情報
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectDShipmentSchedules()
+        public static string CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation()
         {
+            // 本日作業する出荷指示は納入指示日が翌日(土日を除く)
+            DateTime currentDate = DateTime.Now;
+            var nextDay = currentDate.AddDays(currentDate.DayOfWeek == DayOfWeek.Friday ? 3 : 1).ToString("yyyy/MM/dd");
+
             var sql = $@"
                     SELECT
                        *
                     FROM 
                         D_ShipmentSchedule
                     WHERE
-                        IsDeleted = 0
+                        DeliveryDate = '{nextDay}'
+                        AND IsDeleted = 0
                 ;";
 
             return sql;

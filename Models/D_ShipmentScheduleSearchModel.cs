@@ -3,10 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace mar_sumaken_web.Models
 {
+    /// <summary>
+    /// 出荷指示照会のModel
+    /// </summary>
     public class D_ShipmentScheduleSearchModel : CommonModel
     {
-        public List<SelectListItem>? BinList { get; set; }
-
         /// <summary>
         /// 検索納入指示日(開始)
         /// </summary>
@@ -17,6 +18,11 @@ namespace mar_sumaken_web.Models
         /// 検索納入指示日(終了)
         /// </summary>
         public string SearchEndDate { get; set; }
+
+        /// <summary>
+        /// 検索便リスト
+        /// </summary>
+        public List<SelectListItem>? BinList { get; set; }
 
         /// <summary>
         /// 実績数不一致のみ
@@ -43,11 +49,16 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public int SelectedCompanyID { get; set; }
 
-        public D_ShipmentScheduleSearchModel() {
-            // 現在日
-            var now = DateTime.Today.AddDays(+1).ToString("yyyy/MM/dd");
-            SearchStartDate = now;
-            SearchEndDate = now;
+        /// <summary>
+        /// 初期値設定
+        /// </summary>
+        public D_ShipmentScheduleSearchModel()
+        {
+            // 翌日(土日を除く)
+            DateTime currentDate = DateTime.Now;
+            var nextDay = currentDate.AddDays(currentDate.DayOfWeek == DayOfWeek.Friday ? 3 : 1).ToString("yyyy/MM/dd");
+            SearchStartDate = nextDay;
+            SearchEndDate = nextDay;
         }  
     }
 }
