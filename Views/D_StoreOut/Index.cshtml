@@ -285,30 +285,137 @@
     </div>
 </div>
 
+<!--  Delete Modal-->
+<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete-modal-label">削除</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-10">
+                    <p id="delete-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="col-12 col-md-10">
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayName("StoreOutID")</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteStoreOutId" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayName("SupplierName")</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteSupplierName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.StoreOutDate)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteStoreOutDate" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.DeliveryDate)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteDeliveryDate" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.DeliveryTimeClass)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteDeliveryTimeClass" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.DeliverySlipNumber)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteDeliverySlipNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.DeliveryProductNumber)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteDeliveryProductNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.SupplierProductNumber)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteSupplierProductNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.LotNumber)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteLotNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.LotQuantity)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteLotQuantity" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.NumberOfBoxes)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteNumberOfBoxes" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.Quantity)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteQuantity" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
+                            <button class="btn btn-danger btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteDelete()">
+                                <span class="text" style="min-width:84px">削除</span>
+                            </button>
+                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
+                                <span class="text">キャンセル</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // 納入指示日を変更
     $('#SearchDeliveryDate').on('change', function () {
-        var data = { "SearchDeliveryDate": $(this).val() };
-        $.ajax({
-            url: '@Url.Action("ChangDeliveryTimeClassList", "D_StoreOut")',
-            method: 'POST',
-            data: data
-        })
-            .done(function (response) {
-                $('#bin-select-list').empty();
-                $('#bin-select-list').html(response);
-            })
-            .fail(function (xhr) {
-                if (xhr.status === 404) {
-                    // データが見つからなかった場合
-                    var errorMessage = xhr.responseJSON.errorMessage;
-                    //$('#div-error-message').text(errorMessage);
-                    $("#div-error-message").html(errorMessage);
-                } else {
-                    // その他のエラーの場合
-                    $('#div-error-message').text(errorMessage);
-                }
-            });
+        ChangDeliveryTimeClassList($(this).val());
     });
 
     // 検索ボタン押下
@@ -347,50 +454,41 @@
         });
     });
 
-    // 更新
-    function OnExecuteEdit() {
-        $('#editForm').submit(function (event) {
-            DeleteErrorMessages();
-
-            // ページの更新を禁止する
-            event.preventDefault();
-
-            // 送信イベントが他のハンドラーに伝播するのを防ぐ
-            event.stopImmediatePropagation();
-
-            // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("Edit", "D_StoreOut")';
-            let method = 'POST';
-            var data = $('#editForm').serializeArray();
-
-            // Ajax call
-            $.ajax({
-                url: url,
-                method: method,
-                data: data
-            }).done(async function (data) {
-                $('#edit-modal').hide();
-                // 完了モーダル表示
-                AlertMessage('', '完了', '登録完了しました。', null, null, true);
-                await WaitSeconds();
-                // 再検索
-                $('#search-btn').trigger('click');
-            }).fail(function (xhr, textStatus, errorThrown) {
+    function ChangDeliveryTimeClassList(DeliveryDate, selectedItem) {
+        var data = { "SearchDeliveryDate": DeliveryDate };
+        $.ajax({
+            url: '@Url.Action("ChangDeliveryTimeClassList", "D_StoreOut")',
+            method: 'POST',
+            data: data
+        })
+            .done(function (response) {
+                $('#bin-select-list').empty();
+                $('#bin-select-list').html(response);
+                if(selectedItem) {
+                    $('#bin-select-list').val(selectedItem);
+                }
+            })
+            .fail(function (xhr) {
                 if (xhr.status === 404) {
+                    // データが見つからなかった場合
                     var errorMessage = xhr.responseJSON.errorMessage;
-                    $("#edit-modal-error-message").text(errorMessage);
+                    //$('#div-error-message').text(errorMessage);
+                    $("#div-error-message").html(errorMessage);
                 } else {
-                    var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#edit-modal-error-message").text(errorMessage500);
+                    // その他のエラーの場合
+                    $('#div-error-message').text(errorMessage);
                 }
             });
-        });
     }
 
     // 編集ボタン押下
     function OnEditClick(trTag) {
         DeleteErrorMessages();
         var row = trTag.parentNode.parentNode;
+
+        var DeliveryDate = row.getElementsByClassName("DeliveryDate")[0].textContent;
+        var SelectedBin = row.getElementsByClassName("SelectedBin")[0].value;
+        ChangDeliveryTimeClassList(DeliveryDate, SelectedBin);
         
         $("#editSelectedDepoID").val(row.getElementsByClassName("DepoID")[0].value);
         $("#editSelectedCompanyID").val(row.getElementsByClassName("SupplierID")[0].value);
@@ -399,8 +497,7 @@
         $("#SupplierName").val(row.getElementsByClassName("SupplierName")[0].textContent);
         $("#SearchStartDate").val(row.getElementsByClassName("StoreOutDate")[0].textContent);
         $("#SearchDeliveryDate").val(row.getElementsByClassName("DeliveryDate")[0].textContent);
-        $("#SelectedBin").val(row.getElementsByClassName("DeliveryTimeClass")[0].textContent);
-        //$("#DeliveryTimeClass").val(row.getElementsByClassName("DeliveryTimeClass")[0].textContent);
+        
         $("#DeliverySlipNumber").val(row.getElementsByClassName("DeliverySlipNumber")[0].textContent);
         $("#DeliveryProductNumber").val(row.getElementsByClassName("DeliveryProductNumber")[0].textContent);
         $("#SupplierProductNumber").val(row.getElementsByClassName("SupplierProductNumber")[0].textContent);
@@ -451,6 +548,58 @@
                     $("#edit-modal-error-message").text(errorMessage500);
                 }
             });
+        });
+    }
+
+    // 削除ボタン押下
+    function OnDeleteClick(trTag) {
+        DeleteErrorMessages();
+
+        var row = trTag.parentNode.parentNode;
+        $("#deleteStoreOutId").val(row.getElementsByClassName("StoreOutID")[0].textContent);
+        $("#deleteSupplierName").val(row.getElementsByClassName("SupplierName")[0].textContent);
+        $("#deleteStoreOutDate").val(row.getElementsByClassName("StoreOutDate")[0].textContent);
+        $("#deleteDeliveryDate").val(row.getElementsByClassName("DeliveryDate")[0].textContent);
+        $("#deleteDeliveryTimeClass").val(row.getElementsByClassName("DeliveryTimeClass")[0].textContent);
+        $("#deleteDeliverySlipNumber").val(row.getElementsByClassName("DeliverySlipNumber")[0].textContent);
+        $("#deleteDeliveryProductNumber").val(row.getElementsByClassName("DeliveryProductNumber")[0].textContent);
+        $("#deleteSupplierProductNumber").val(row.getElementsByClassName("SupplierProductNumber")[0].textContent);
+        $("#deleteLotNumber").val(row.getElementsByClassName("LotNumber")[0].textContent);
+        $("#deleteLotQuantity").val(row.getElementsByClassName("LotQuantity")[0].textContent);
+        $("#deleteQuantity").val(row.getElementsByClassName("Quantity")[0].textContent);
+        $("#deleteNumberOfBoxes").val(row.getElementsByClassName("NumberOfBoxes")[0].textContent);
+    }
+
+    // 削除
+    function OnExecuteDelete() {
+        DeleteErrorMessages();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("Delete", "D_StoreOut")';
+        let method = 'POST';
+        var data = { "id": $("#deleteStoreOutId").val() };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(async function (data) {
+            $('#delete-modal').removeClass('show');
+            $('#delete-modal').hide();
+            // 完了モーダル表示
+            AlertMessage('', '完了', '登録完了しました。', null, null, true);
+            await WaitSeconds();
+            // 再検索
+            $('#search-btn').trigger('click');
+        }).fail(function (xhr, textStatus, errorThrown) {
+            if (xhr.status === 404) {
+                var errorMessage = xhr.responseJSON.errorMessage;
+                $("#delete-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#delete-modal-error-message").text(errorMessage500);
+            }
         });
     }
 

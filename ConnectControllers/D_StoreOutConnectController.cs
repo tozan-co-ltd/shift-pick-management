@@ -112,6 +112,7 @@ namespace mar_sumaken_web.ConnectControllers
                     ,storeOut.CreatedBy
                     ,storeOut.UpdatedAt
                     ,storeOut.UpdatedBy
+                    ,CONCAT(storeOut.DeliveryTimeClass, '便・', storeOut.DeliverySlipNumber) AS SelectedBin
                 FROM 
 	                D_storeOut AS storeOut
                 INNER JOIN M_Company AS company 
@@ -162,7 +163,7 @@ namespace mar_sumaken_web.ConnectControllers
                         if (model.SelectedBin != null && model.SelectedBin.Length > 0)
                         {
                             string[] binArr = new string[2];
-                            binArr = model.SelectedBin.Split('・');
+                            binArr = model.SelectedBin.Split("便・");
                             deliveryTimeClass = binArr[0].Length > 0 ? Convert.ToInt32(binArr[0]) : 0;
                             deliverySlipNumber = binArr[1].Length > 0 ? binArr[1] : string.Empty;
                         }
@@ -228,7 +229,7 @@ namespace mar_sumaken_web.ConnectControllers
                     if (model.SelectedBin != null && model.SelectedBin.Length > 0)
                     {
                         string[] binArr = new string[2];
-                        binArr = model.SelectedBin.Split('・');
+                        binArr = model.SelectedBin.Split("便・");
                         deliveryTimeClass = binArr[0].Length > 0 ? Convert.ToInt32(binArr[0]) : 0;
                         deliverySlipNumber = binArr[1].Length > 0 ? binArr[1] : string.Empty;
                     }
@@ -243,6 +244,43 @@ namespace mar_sumaken_web.ConnectControllers
                     {
                         throw new Exception();
                     }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 出庫実績削除
+        /// </summary>
+        /// <param name="storeInId">出庫実績ID</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns>更新件数</returns>
+        public static int DeleteDStoreOut(int id, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                // DB接続
+                try
+                {
+                    // 出庫実績削除SQL作成
+                    string deleteSql = CreateSQLToDeleteDStoreOut(id);
+                    // 出庫実績削除
+                    int affectedRows = connection.Execute(deleteSql);
+                    // 更新件数が0の場合はエラーとする
+                    if (affectedRows == 0)
+                    {
+                        throw new Exception();
+                    }
+
+                    return affectedRows;
                 }
                 catch (Exception)
                 {
@@ -315,15 +353,30 @@ namespace mar_sumaken_web.ConnectControllers
         {
             var sql = $@"
                 SELECT 
-	                DISTINCT CONCAT(DeliveryTimeClass, '・', DeliverySlipNumber) AS Value, 
-	                CONCAT(DeliveryTimeClass, '・', DeliverySlipNumber) AS Text 
+	                DISTINCT CONCAT(DeliveryTimeClass, '便・', DeliverySlipNumber) AS Value, 
+	                CONCAT(DeliveryTimeClass, '便・', DeliverySlipNumber) AS Text 
                 FROM D_ShipmentSchedule
                 WHERE 
 	                DeliveryDate = '{deliveryDate}'
 	                AND IsDeleted = 0
                 ORDER BY 
-                    CONCAT(DeliveryTimeClass, '・', DeliverySlipNumber) ASC;
+                    CONCAT(DeliveryTimeClass, '便・', DeliverySlipNumber) ASC;
             ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 出庫実績削除SQL作成
+        /// </summary>
+        /// <param name="storeInId">出庫実績ID</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToDeleteDStoreOut(int id)
+        {
+            var sql = $@"
+                        UPDATE D_StoreOut
+                        SET IsDeleted = 1
+                        WHERE StoreOutID = {id}
+            ;";
             return sql;
         }
     }

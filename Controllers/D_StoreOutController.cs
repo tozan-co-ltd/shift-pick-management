@@ -161,6 +161,7 @@ namespace mar_sumaken_web.Controllers
                         <td class='CreatedBy'>{@item.CreatedBy}</td>                        
                         <input type='hidden' class='DepoID' value='{item.DepoID}' />
                         <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
+                        <input type='hidden' class='SelectedBin' value='{item.SelectedBin}' />
                         </tr>";
                     }
                 }
@@ -360,6 +361,33 @@ namespace mar_sumaken_web.Controllers
             catch (Exception)
             {
                 return NotFound(new { errorMessage = "E9999 :" + ErrorMessagesResources.E9999 });
+            }
+        }
+
+        /// <summary>
+        /// 出庫実績削除
+        /// </summary>
+        /// <param name="storeInId">出庫実績ID</param>
+        /// <returns></returns>
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 出庫実績削除
+                D_StoreOutConnectController.DeleteDStoreOut(id, user.DatabaseName);
+
+                return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
     }
