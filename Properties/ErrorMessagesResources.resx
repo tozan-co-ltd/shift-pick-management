@@ -231,6 +231,9 @@
   <data name="E2020" xml:space="preserve">
     <value>指定の条件に合致する出荷指示がありません。</value>
   </data>
+  <data name="E2021" xml:space="preserve">
+    <value>会社コードまたは会社パスワードが正しくありません。正しい値を入力してください。</value>
+  </data>
   <data name="E3001" xml:space="preserve">
     <value>データベースに接続できませんでした。</value>
   </data>
