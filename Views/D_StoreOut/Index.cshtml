@@ -51,7 +51,9 @@
                             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                                     <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.SearchStartDate)</span>
-                                    <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate"> <lable class="m-1">～</lable> <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
+                                    <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate">
+                                    <lable class="m-1">～</lable>
+                                    <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
                                 </div>
                                 <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl pt-2">
                                     <button type="submit" class="btn btn-secondary btn-icon-split ml-3 sp-mg-top-10 sp-mg-left-0 mt-0" id="search-btn">
@@ -84,15 +86,24 @@
             <table class="table table-sm stripe hover nowrap datatable-normal" id="table-datatable">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>ID</th>
                         <th>仕入先名</th>
-                        <th>入荷日</th>
+                        <th>出庫日</th>
+                        <th>納入指示日</th>
+                        <th>便</th>
+                        <th>納品書番号</th>
+                        <th>納入先品番</th>
                         <th>仕入先品番</th>
-                        <th>キー</th>
+                        <th>ロット番号</th>
+                        <th>収容数</th>
                         <th>箱数</th>
                         <th>数量</th>
+                        <th>メインキー</th>
+                        <th>サブキー1</th>
+                        <th>サブキー2</th>
+                        <th>備考</th>
                         <th>登録日時</th>
-                        <th>読取日時</th>
                         <th>登録者</th>
                     </tr>
                 </thead>
@@ -103,7 +114,310 @@
     </div>
 </div>
 
+<!--  Edit Modal-->
+<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="edit-modal-label">修正</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-10">
+                    <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <form class="col-md-12" id="editForm">
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayName("StoreOutID")</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="StoreOutID" autocomplete="off" readonly>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayName("DepoName")<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <div class="unset-pdl">
+                                    <select class="form-select" id="editSelectedDepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
+                                </div>
+                                <span class="text-danger w-100" asp-validation-for="SelectedDepoID"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayName("SupplierName")<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <div class="unset-pdl">
+                                    <select class="form-select" id="editSelectedCompanyID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
+                                </div>
+                                <span class="text-danger w-100" asp-validation-for="SelectedCompanyID"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <span>@Html.DisplayNameFor(model => model.SearchStartDate)<span style="color:red">*</span></span>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input id="startDate" type="text" id="SearchStartDate" asp-for="SearchStartDate" class="form-control pickerDate">
+                                <span class="text-danger w-100" asp-validation-for="SearchStartDate"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <span>@Html.DisplayNameFor(model => model.SearchDeliveryDate)<span style="color:red">*</span></span>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input type="text" asp-for="SearchDeliveryDate" class="form-control pickerDate">
+                                <span class="text-danger w-100" asp-validation-for="SearchDeliveryDate"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.BinSelectedList)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <div class="unset-pdl">
+                                    <select class="form-select" id="bin-select-list" asp-for="SelectedBin" asp-items="@Model.BinSelectedList"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.DeliveryProductNumber)<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="DeliveryProductNumber" autocomplete="off" required>
+                                <span class="text-danger w-100" asp-validation-for="DeliveryProductNumber"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.SupplierProductNumber)<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="SupplierProductNumber" autocomplete="off" required>
+                                <span class="text-danger w-100" asp-validation-for="SupplierProductNumber"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.LotNumber)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="LotNumber" autocomplete="off">
+                                <span class="text-danger w-100" asp-validation-for="LotNumber"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.NumberOfBoxes)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="NumberOfBoxes" autocomplete="off">
+                                <span class="text-danger w-100" asp-validation-for="NumberOfBoxes"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.Quantity)<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="Quantity" autocomplete="off">
+                                <span class="text-danger w-100" asp-validation-for="Quantity"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.MainProductKey)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" id="MainProductKey" asp-for="MainProductKey" autocomplete="off">
+                                <span class="text-danger w-100" asp-validation-for="MainProductKey"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.FirstSubProductKey)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="FirstSubProductKey" autocomplete="off">
+                                <span class="text-danger w-100" asp-validation-for="FirstSubProductKey"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.SecondSubProductKey)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="SecondSubProductKey" autocomplete="off">
+                                <span class="text-danger w-100" asp-validation-for="SecondSubProductKey"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.Remarks)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                                <input class="form-control" type="text" asp-for="Remarks" autocomplete="off">
+                                <span class="text-danger w-100" asp-validation-for="Remarks"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
+                            <button class="btn btn-success btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteEdit()">
+                                <span class="text" style="min-width:84px">更新</span>
+                            </button>
+                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
+                                <span class="text">キャンセル</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  Delete Modal-->
+<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete-modal-label">削除</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-10">
+                    <p id="delete-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="col-12 col-md-10">
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayName("StoreOutID")</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteStoreOutId" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayName("SupplierName")</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteSupplierName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.StoreOutDate)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteStoreOutDate" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.DeliveryDate)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteDeliveryDate" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.DeliveryTimeClass)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteDeliveryTimeClass" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.DeliverySlipNumber)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteDeliverySlipNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.DeliveryProductNumber)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteDeliveryProductNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.SupplierProductNumber)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteSupplierProductNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.LotNumber)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteLotNumber" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.LotQuantity)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteLotQuantity" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.NumberOfBoxes)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteNumberOfBoxes" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4">
+                                <label>@Html.DisplayNameFor(model => model.Quantity)</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteQuantity" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
+                            <button class="btn btn-danger btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteDelete()">
+                                <span class="text" style="min-width:84px">削除</span>
+                            </button>
+                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
+                                <span class="text">キャンセル</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    // 納入指示日を変更
+    $('#SearchDeliveryDate').on('change', function () {
+        ChangDeliveryTimeClassList($(this).val());
+    });
+
     // 検索ボタン押下
     $('#search-btn').click(function () {
         $('#DStoreOutForm').submit(function (e) {
@@ -119,6 +433,7 @@
                 url: '@Url.Action("SearchData", "D_StoreOut")',
                 data: formData,
                 success: function (result) {
+
                     $('#table-datatable').DataTable().destroy();
                     $("#div-table").show();
                     $("#table-datatable tbody").html(result);
@@ -138,4 +453,168 @@
             });
         });
     });
+
+    function ChangDeliveryTimeClassList(DeliveryDate, selectedItem) {
+        var data = { "SearchDeliveryDate": DeliveryDate };
+        $.ajax({
+            url: '@Url.Action("ChangDeliveryTimeClassList", "D_StoreOut")',
+            method: 'POST',
+            data: data
+        })
+            .done(function (response) {
+                $('#bin-select-list').empty();
+                $('#bin-select-list').html(response);
+                if(selectedItem) {
+                    $('#bin-select-list').val(selectedItem);
+                }
+            })
+            .fail(function (xhr) {
+                if (xhr.status === 404) {
+                    // データが見つからなかった場合
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    //$('#div-error-message').text(errorMessage);
+                    $("#div-error-message").html(errorMessage);
+                } else {
+                    // その他のエラーの場合
+                    $('#div-error-message').text(errorMessage);
+                }
+            });
+    }
+
+    // 編集ボタン押下
+    function OnEditClick(trTag) {
+        DeleteErrorMessages();
+        var row = trTag.parentNode.parentNode;
+
+        var DeliveryDate = row.getElementsByClassName("DeliveryDate")[0].textContent;
+        var SelectedBin = row.getElementsByClassName("SelectedBin")[0].value;
+        ChangDeliveryTimeClassList(DeliveryDate, SelectedBin);
+        
+        $("#editSelectedDepoID").val(row.getElementsByClassName("DepoID")[0].value);
+        $("#editSelectedCompanyID").val(row.getElementsByClassName("SupplierID")[0].value);
+        $("#StoreOutID").val(row.getElementsByClassName("StoreOutID")[0].textContent);
+
+        $("#SupplierName").val(row.getElementsByClassName("SupplierName")[0].textContent);
+        $("#SearchStartDate").val(row.getElementsByClassName("StoreOutDate")[0].textContent);
+        $("#SearchDeliveryDate").val(row.getElementsByClassName("DeliveryDate")[0].textContent);
+        
+        $("#DeliverySlipNumber").val(row.getElementsByClassName("DeliverySlipNumber")[0].textContent);
+        $("#DeliveryProductNumber").val(row.getElementsByClassName("DeliveryProductNumber")[0].textContent);
+        $("#SupplierProductNumber").val(row.getElementsByClassName("SupplierProductNumber")[0].textContent);
+        $("#LotNumber").val(row.getElementsByClassName("LotNumber")[0].textContent);
+        $("#LotQuantity").val(row.getElementsByClassName("LotQuantity")[0].textContent);
+        $("#Quantity").val(row.getElementsByClassName("Quantity")[0].textContent);
+        $("#NumberOfBoxes").val(row.getElementsByClassName("NumberOfBoxes")[0].textContent);
+        $("#MainProductKey").val(row.getElementsByClassName("MainProductKey")[0].textContent);
+        $("#FirstSubProductKey").val(row.getElementsByClassName("FirstSubProductKey")[0].textContent);
+        $("#SecondSubProductKey").val(row.getElementsByClassName("SecondSubProductKey")[0].textContent);
+        $("#Remarks").val(row.getElementsByClassName("Remarks")[0].textContent);
+    }
+
+    // 更新
+    function OnExecuteEdit() {
+        $('#editForm').submit(function (event) {
+            DeleteErrorMessages();
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Edit", "D_StoreOut")';
+            let method = 'POST';
+            var data = $('#editForm').serializeArray();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(async function (data) {
+                $('#edit-modal').hide();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録完了しました。', null, null, true);
+                await WaitSeconds();
+                // 再検索
+                $('#search-btn').trigger('click');
+            }).fail(function (xhr, textStatus, errorThrown) {
+                if (xhr.status === 404) {
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                } else {
+                    var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#edit-modal-error-message").text(errorMessage500);
+                }
+            });
+        });
+    }
+
+    // 削除ボタン押下
+    function OnDeleteClick(trTag) {
+        DeleteErrorMessages();
+
+        var row = trTag.parentNode.parentNode;
+        $("#deleteStoreOutId").val(row.getElementsByClassName("StoreOutID")[0].textContent);
+        $("#deleteSupplierName").val(row.getElementsByClassName("SupplierName")[0].textContent);
+        $("#deleteStoreOutDate").val(row.getElementsByClassName("StoreOutDate")[0].textContent);
+        $("#deleteDeliveryDate").val(row.getElementsByClassName("DeliveryDate")[0].textContent);
+        $("#deleteDeliveryTimeClass").val(row.getElementsByClassName("DeliveryTimeClass")[0].textContent);
+        $("#deleteDeliverySlipNumber").val(row.getElementsByClassName("DeliverySlipNumber")[0].textContent);
+        $("#deleteDeliveryProductNumber").val(row.getElementsByClassName("DeliveryProductNumber")[0].textContent);
+        $("#deleteSupplierProductNumber").val(row.getElementsByClassName("SupplierProductNumber")[0].textContent);
+        $("#deleteLotNumber").val(row.getElementsByClassName("LotNumber")[0].textContent);
+        $("#deleteLotQuantity").val(row.getElementsByClassName("LotQuantity")[0].textContent);
+        $("#deleteQuantity").val(row.getElementsByClassName("Quantity")[0].textContent);
+        $("#deleteNumberOfBoxes").val(row.getElementsByClassName("NumberOfBoxes")[0].textContent);
+    }
+
+    // 削除
+    function OnExecuteDelete() {
+        DeleteErrorMessages();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("Delete", "D_StoreOut")';
+        let method = 'POST';
+        var data = { "id": $("#deleteStoreOutId").val() };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(async function (data) {
+            $('#delete-modal').removeClass('show');
+            $('#delete-modal').hide();
+            // 完了モーダル表示
+            AlertMessage('', '完了', '登録完了しました。', null, null, true);
+            await WaitSeconds();
+            // 再検索
+            $('#search-btn').trigger('click');
+        }).fail(function (xhr, textStatus, errorThrown) {
+            if (xhr.status === 404) {
+                var errorMessage = xhr.responseJSON.errorMessage;
+                $("#delete-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#delete-modal-error-message").text(errorMessage500);
+            }
+        });
+    }
+
+    function WaitSeconds() {
+        return new Promise(resolve => {
+            setTimeout(() => resolve('Data fetched!'), 2000);
+        });
+    }
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
 </script>

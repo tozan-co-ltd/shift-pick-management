@@ -580,7 +580,7 @@ select[readonly] {
     box-shadow: 0 0 0 0.1rem #f0844b !important;
 }
 
-#startDate, #endDate{
+#startDate, #endDate, .pickerDate{
     max-width: 163px;
 }
 

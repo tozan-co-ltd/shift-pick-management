@@ -24,13 +24,13 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 便-納品書番号
         /// </summary>
-        [Display(Name = "便-納品書番号")]
+        [Display(Name = "便・納品書番号")]
         public List<SelectListItem>? BinSelectedList { get; set; }
 
         /// <summary>
         /// 便の選択
         /// </summary>
-        public int SelectedBin { get; set; }
+        public string? SelectedBin { get; set; }
 
         /// <summary>
         /// 検索出庫日(開始)
