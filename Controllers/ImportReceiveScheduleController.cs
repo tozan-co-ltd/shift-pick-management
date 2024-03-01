@@ -214,7 +214,7 @@ namespace mar_sumaken_web.Controllers
                         }
 
                         // 入荷予定データ書き込み
-                        bool insertResult = D_ReceiveScheduleConnectController.InsertDReceiveSchedule(importModelList, DepoID, fileName, user);
+                        bool insertResult = D_ReceiveScheduleConnectController.InsertDReceiveSchedule(user.DatabaseName, DepoID, importModelList, fileName, user.UserName);
                         if (!insertResult)
                         {
                             // ファイル削除

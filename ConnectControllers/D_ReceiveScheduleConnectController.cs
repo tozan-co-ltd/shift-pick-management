@@ -63,17 +63,17 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// 入荷予定データ書き込み
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="databaseName">データベース名</param>
         /// <param name="depoId">倉庫ID</param>
+        /// <param name="modelList">モデルリスト</param>
         /// <param name="importFileName">取込ファイル名</param>
-        /// <param name="user">ユーザー</param>
-        /// <returns></returns>
-        public static bool InsertDReceiveSchedule(List<D_ReceiveScheduleModel> modelList, int depoId, string importFileName,　LoginUserModel user)
+        /// <param name="userName">ログインユーザー名</param>
+        public static bool InsertDReceiveSchedule(string databaseName, int depoId, List<D_ReceiveScheduleModel> modelList, string importFileName, string userName)
         {
             bool insertFlg = false;
 
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(user.DatabaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -91,7 +91,7 @@ namespace mar_sumaken_web.Commons
                     foreach (var model in modelList) 
                     {
                         // 入荷予定取込SQL作成
-                        string insertSql = CreateSQLToInsertDReceiveSchedule(model, depoId, systemDate, user.UserName);
+                        string insertSql = CreateSQLToInsertDReceiveSchedule(model, depoId, systemDate, userName);
                         // 入荷予定取込
                         int affectRows = connection.Execute(insertSql, null, transaction);
                         // 更新件数が0の場合はエラーとする
@@ -108,11 +108,11 @@ namespace mar_sumaken_web.Commons
                         MenuName = "入荷予定取込",
                         ImportFileName = importFileName,
                         CreatedAt = systemDate,
-                        CreatedBy = user.UserName
+                        CreatedBy = userName
                     };
 
                     // SQL作成
-                    string dFileImportInserSql = D_FileImportConnectController.CreateSQLToInsertDFileImport(dFileImportModel, systemDate, user.UserName);
+                    string dFileImportInserSql = D_FileImportConnectController.CreateSQLToInsertDFileImport(dFileImportModel, systemDate, userName);
                     var insertAffectRows = connection.Execute(dFileImportInserSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
                     if (insertAffectRows == 0)
