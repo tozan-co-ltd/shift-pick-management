@@ -4,6 +4,7 @@ using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using System.Data.SqlClient;
@@ -58,6 +59,29 @@ namespace mar_sumaken_web.Controllers
             M_SupplierKanbanModel model = new();
             try
             {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // ハンディメニューマスター情報取得
+                // SQL作成
+                var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToSelectMHandyMenuList();
+                // DB接続
+                List<M_HandyMenuModel> handyMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(handyMenuListSql, user.DatabaseName);
+                foreach (var handyMenu in handyMenuList)
+                {
+                    SelectListItem menuItem = new()
+                    {
+                        Text = handyMenu.HandyMenuName,
+                        Value = Convert.ToString(handyMenu.HandyMenuID),
+                        Selected = false
+                    };
+
+                    model.HandyMenuSelectList.Add(menuItem);
+                }
+
+                // 会社マスター情報取得
+                model.SuplierSelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_SupplierID, user.DatabaseName);
+
                 return View(model);
             }
             catch (Exception)
