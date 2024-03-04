@@ -71,20 +71,20 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// CSV取込
         /// </summary>
-        /// <param name="FileUpload"></param>
-        /// <param name="DepoID"></param>
-        /// <param name="GamenName"></param>
+        /// <param name="uploadFileList"></param>
+        /// <param name="depoId"></param>
+        /// <param name="viewTitle"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> ImportCsv(List<IFormFile> FileUpload, int DepoID, string GamenName)
+        public async Task<IActionResult> ImportCsv(List<IFormFile> uploadFileList, int depoId, string viewTitle)
         {
             string tempFilePath = string.Empty;
             try
             {
                 // log取得
-                _logger.LogInformation($"Csv取込開始");
+                _logger.LogInformation($"CSV取込開始");
 
-                var files = FileUpload;
+                var files = uploadFileList;
 
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
@@ -116,7 +116,7 @@ namespace mar_sumaken_web.Controllers
                             };
 
                             // CSVファイルデータ読み取り
-                            var (readCsvErrorMsg, lines, newFilePath) = await CreateFile.ReadCsv(csvInputFile, GamenName);
+                            var (readCsvErrorMsg, lines, newFilePath) = await CreateFile.ReadCsv(csvInputFile, viewTitle);
                             tempFilePath = newFilePath;
 
                             if (!string.Empty.Equals(readCsvErrorMsg))
@@ -133,7 +133,7 @@ namespace mar_sumaken_web.Controllers
                                 D_ReceiveScheduleModel receiveSchedule = new()
                                 {
                                     ImportFileName = fileName,
-                                    SelectedDepoID = DepoID
+                                    SelectedDepoID = depoId
                                 };
 
                                 // データチェック
@@ -214,7 +214,7 @@ namespace mar_sumaken_web.Controllers
                         }
 
                         // 入荷予定データ書き込み
-                        bool insertResult = D_ReceiveScheduleConnectController.InsertDReceiveSchedule(user.DatabaseName, DepoID, importModelList, fileName, user.UserName);
+                        bool insertResult = D_ReceiveScheduleConnectController.InsertDReceiveSchedule(importModelList, depoId, fileName, viewTitle, user);
                         if (!insertResult)
                         {
                             // ファイル削除

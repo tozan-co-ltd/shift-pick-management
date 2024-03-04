@@ -27,13 +27,22 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         public IActionResult Index()
         {
-            TopModel topModel = new();
-            D_ShipmentScheduleModel shipmentScheduleModel = new();
-            D_HandyErrorMessageModel handyErrorMessageModel = new();
+            D_HandyErrorMessageModel model = new();
+            //TopModel topModel = new();
+            //D_ShipmentScheduleModel shipmentScheduleModel = new();
+            //D_HandyErrorMessageModel handyErrorMessageModel = new();
             try
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
+
+                // SQL作成
+                var sql = D_HandyErrorMessageConnectController.CreateSQLToSelectDHandyErrorMessages();
+                // DB接続
+                IEnumerable<D_HandyErrorMessageModel> handyErrorMessageList = D_HandyErrorMessageConnectController.ConnectDHandyErrorMessages(sql, user.DatabaseName);
+                model.D_HandyErrorMessageList = handyErrorMessageList.ToPagedList();
+
+                return View(model);
 
                 //// 出荷指示報取得SQL作成
                 //var shipmentSql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation();
@@ -52,13 +61,13 @@ namespace mar_sumaken_web.Controllers
                 //    MyModel2 = (IPagedList<D_HandyErrorMessageModel>)handyErrorMessageModel
                 //};
 
-                return View(topModel);
+                //return View(topModel);
             }
             catch (Exception ex)
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return View(topModel);
+                return View(model);
             }
         }
     }

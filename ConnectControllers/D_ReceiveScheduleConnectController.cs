@@ -61,19 +61,19 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 入荷予定データ書き込み
+        /// 入荷予定データ登録
         /// </summary>
-        /// <param name="databaseName">データベース名</param>
-        /// <param name="depoId">倉庫ID</param>
         /// <param name="modelList">モデルリスト</param>
+        /// <param name="depoId">倉庫ID</param>
         /// <param name="importFileName">取込ファイル名</param>
-        /// <param name="userName">ログインユーザー名</param>
-        public static bool InsertDReceiveSchedule(string databaseName, int depoId, List<D_ReceiveScheduleModel> modelList, string importFileName, string userName)
+        /// <param name="viewTitle">画面名</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        public static bool InsertDReceiveSchedule(List<D_ReceiveScheduleModel> modelList, int depoId, string importFileName, string viewTitle, LoginUserModel loginUser)
         {
             bool insertFlg = false;
 
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -90,9 +90,8 @@ namespace mar_sumaken_web.Commons
 
                     foreach (var model in modelList) 
                     {
-                        // 入荷予定取込SQL作成
-                        string insertSql = CreateSQLToInsertDReceiveSchedule(model, depoId, systemDate, userName);
-                        // 入荷予定取込
+                        // 入荷予定取込テーブル登録
+                        string insertSql = CreateSQLToInsertDReceiveSchedule(model, depoId, systemDate, loginUser.UserName);
                         int affectRows = connection.Execute(insertSql, null, transaction);
                         // 更新件数が0の場合はエラーとする
                         if (affectRows == 0)
@@ -101,18 +100,16 @@ namespace mar_sumaken_web.Commons
                         }
                     }
 
-                    //　ファイル取込実績テーブル
+                    // ファイル取込実績テーブル登録
                     D_FileImportModel dFileImportModel = new()
                     {
                         DepoID = depoId,
-                        MenuName = "入荷予定取込",
+                        MenuName = viewTitle,
                         ImportFileName = importFileName,
                         CreatedAt = systemDate,
-                        CreatedBy = userName
+                        CreatedBy = loginUser.UserName
                     };
-
-                    // SQL作成
-                    string dFileImportInserSql = D_FileImportConnectController.CreateSQLToInsertDFileImport(dFileImportModel, systemDate, userName);
+                    string dFileImportInserSql = D_FileImportConnectController.CreateSQLToInsertDFileImport(dFileImportModel, systemDate, loginUser.UserName);
                     var insertAffectRows = connection.Execute(dFileImportInserSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
                     if (insertAffectRows == 0)
@@ -131,7 +128,7 @@ namespace mar_sumaken_web.Commons
                     transaction.Rollback();
                     throw;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     transaction.Rollback();
                     throw;

@@ -16,13 +16,7 @@ namespace mar_sumaken_web.Models
         public IPagedList<M_SupplierKanbanModel>? M_SupplierKanbanList { get; set; }
 
         /// <summary>
-        /// 仕入先かんばんID
-        /// </summary>
-        [Display(Name = "ID")]
-        public int SupplierKanbanID { get; set; }
-
-        /// <summary>
-        /// 倉庫リスト
+        /// 検索倉庫リスト
         /// </summary>
         public IEnumerable<SelectListItem>? SearchDepoList
         {
@@ -33,27 +27,31 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 倉庫名
-        /// </summary>
-        [Display(Name = "倉庫名")]
-        public string? DepoName { get; set; }
-
-        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public List<SelectListItem>? SearchCompanyList { get; set; }
 
         /// <summary>
-        /// 選択された会社ID
+        /// 選択仕入先リスト
         /// </summary>
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public int SelectedCompanyID { get; set; }
+        public List<SelectListItem> SuplierSelectList { get; set; } = new List<SelectListItem>();
 
         /// <summary>
-        /// 仕入先名
+        /// 選択された仕入先ID
         /// </summary>
-        [Display(Name = "仕入先名")]
-        public string SupplierName { get; set; }
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public int SelectedSupplierID { get; set; }
+
+        /// <summary>
+        /// 選択倉庫リスト
+        /// </summary>
+        public List<SelectListItem> DepoSelectList { get; set; } = new List<SelectListItem>();
+
+        /// <summary>
+        /// 選択された倉庫ID
+        /// </summary>
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public int SelectedDepoID { get; set; }
 
         /// <summary>
         /// ハンディメニューリスト
@@ -64,6 +62,24 @@ namespace mar_sumaken_web.Models
         /// 選択ハンディメニューリスト
         /// </summary>
         public List<SelectListItem> HandyMenuSelectList { get; set; } = new List<SelectListItem>();
+
+        /// <summary>
+        /// 仕入先かんばんID
+        /// </summary>
+        [Display(Name = "ID")]
+        public int SupplierKanbanID { get; set; }
+
+        /// <summary>
+        /// 倉庫名
+        /// </summary>
+        [Display(Name = "倉庫名")]
+        public string? DepoName { get; set; }
+
+        /// <summary>
+        /// 仕入先名
+        /// </summary>
+        [Display(Name = "仕入先名")]
+        public string SupplierName { get; set; }
 
         /// <summary>
         /// 仕入先かんばん名
