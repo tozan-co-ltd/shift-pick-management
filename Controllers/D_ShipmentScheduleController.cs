@@ -80,8 +80,7 @@ namespace mar_sumaken_web.Controllers
                     {
                         searchData += $@"<tr>
                         <td>
-                            <a class='btn btn-secondary btn-icon-split ml-1 mr-1'
-                            onclick='OnDetailClick(this)' data-id='{item.ShipmentScheduleID}' data-toggle='modal' data-target='#detail-modal'>
+                            <a class='btn btn-secondary btn-icon-split ml-1 mr-1' onclick='OnDetailClick(this)'>
                                 <i class='fa-solid fa-list'></i>
                             </a>
                             <button class='btn btn-danger btn-icon-split'
@@ -125,6 +124,7 @@ namespace mar_sumaken_web.Controllers
                         <td class='UpdatedAt'>{@item.UpdatedAt}</td>
                         <td class='UpdatedBy'>{@item.UpdatedBy}</td>
                         <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
+                        <input type='hidden' class='DepoID' value='{item.DepoID}' />
                         </tr>";
                     }
                 }

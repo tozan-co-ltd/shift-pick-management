@@ -191,6 +191,22 @@
         });
     });
 
+    // 詳細
+    function OnDetailClick(trTag) {
+
+        var row = trTag.parentNode.parentNode;
+        var shipmentScheduleId = row.getElementsByClassName("ShipmentScheduleID")[0].textContent;
+        var depoId = row.getElementsByClassName("DepoID")[0].value;
+        var companyId = row.getElementsByClassName("SupplierID")[0].value;
+
+        var url = window.location.origin + '@Url.Action("Index", "D_Shipment")';
+        url += '?shipmentScheduleId=' + shipmentScheduleId;
+        url += '&depoId=' + depoId;
+        url += '&companyId=' + companyId;
+        
+        window.location.href = url;
+    }
+
     // 出力ボタン押下
     $('#export-file-btn').click(function (event) {
         DeleteErrorMessages();
