@@ -2,7 +2,7 @@
 @model mar_sumaken_web.Models.StockStatusModel
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = Model.ViewTitle;
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 
 <div class="card shadow de-inspection d-receive-schedule m-4">
@@ -22,14 +22,14 @@
             </div>
         </div>
 
-        <div class="form-group col-sm-12">
+        <div class="form-group col-sm-12 pl-3">
             <p id="div-error-message" class="mt-1 text-danger"></p>
-        </div>
 
-        @if (ViewData["ErrorMessage"] != null)
-        {
-            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
-        }
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
@@ -128,7 +128,7 @@
                     lengthChange: true,     // 表示件数
                     info: false,            // 総件数
                     scrollX: true,          // 横スクロール可
-                    order: [[3, "asc"]],    // 仕入先品番昇順
+                    order: [[2, "asc"]],    // 仕入先品番昇順
                 });
             }).fail(function (xhr, textStatus, errorThrown) {
                 if (xhr.status === 404) {
