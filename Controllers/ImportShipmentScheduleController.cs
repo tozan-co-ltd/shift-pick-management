@@ -78,7 +78,8 @@ namespace mar_sumaken_web.Controllers
         /// <param name="GamenName"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> ImportCsv(List<IFormFile> FileUpload, int DepoID, int CompanyID, string GamenName)
+        public async Task<IActionResult> ImportCsv(List<IFormFile> uploadFileList, int depoId, int companyId, string viewTitle)
+        //public async Task<IActionResult> ImportCsv(List<IFormFile> FileUpload, int DepoID, int CompanyID, string GamenName)
         {
             string tempFilePath = string.Empty;
             try
@@ -86,7 +87,7 @@ namespace mar_sumaken_web.Controllers
                 // log取得
                 _logger.LogInformation($"Csv取込開始");
 
-                var files = FileUpload;
+                var files = uploadFileList;
 
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
@@ -116,7 +117,7 @@ namespace mar_sumaken_web.Controllers
                             };
 
                             // CSVファイルデータ読み取り
-                            var (readCsvErrorMsg, lines, newFilePath) = await CreateFile.ReadCsv(csvInputFile, GamenName);
+                            var (readCsvErrorMsg, lines, newFilePath) = await CreateFile.ReadCsv(csvInputFile, viewTitle);
                             tempFilePath = newFilePath;
 
                             if (!string.Empty.Equals(readCsvErrorMsg))
@@ -133,8 +134,8 @@ namespace mar_sumaken_web.Controllers
                                 D_ShipmentScheduleModel shipmentSchedule = new()
                                 {
                                     ImportFileName = fileName,
-                                    SelectedDepoID = DepoID,
-                                    SelectedCompanyID = CompanyID
+                                    SelectedDepoID = depoId,
+                                    SelectedCompanyID = companyId
                                 };
                                 var validationContext = new ValidationContext(shipmentSchedule);
                                 var validationResults = new List<ValidationResult>();
@@ -163,7 +164,7 @@ namespace mar_sumaken_web.Controllers
                                     shipmentSchedule.SupplierProductNumber = product.SupplierProductNumber;
 
                                     // 倉庫-品番中間テーブルチェック
-                                    var sql = M_ProductConnectController.CreateSQLToSelectCheckIsExistRDepoProduct(DepoID, product.ProductID);
+                                    var sql = M_ProductConnectController.CreateSQLToSelectCheckIsExistRDepoProduct(depoId, product.ProductID);
                                     bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
                                     if (!isExisted)
                                     {
@@ -217,7 +218,7 @@ namespace mar_sumaken_web.Controllers
                         }
 
                         // 出荷指示データ書き込み
-                        bool insertResult = D_ShipmentScheduleConnectController.InsertDShipmentSchedule(importModelList, DepoID, CompanyID, fileName, user);
+                        bool insertResult = D_ShipmentScheduleConnectController.InsertDShipmentSchedule(importModelList, depoId, companyId, fileName, viewTitle, user);
                         if (!insertResult)
                         {
                             // ファイル削除

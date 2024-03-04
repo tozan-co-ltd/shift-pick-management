@@ -68,20 +68,21 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 出荷指示データ書き込み
+        /// 出荷指示データ登録
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="modelList">モデルリスト</param>
         /// <param name="depoId">倉庫ID</param>
         /// <param name="companyId">会社ID</param>
         /// <param name="importFileName">取込ファイル名</param>
-        /// <param name="user">ユーザー</param>
+        /// <param name="viewTitle">画面名</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns></returns>
-        public static bool InsertDShipmentSchedule(List<D_ShipmentScheduleModel> modelList, int depoId, int companyId, string importFileName,　LoginUserModel user)
+        public static bool InsertDShipmentSchedule(List<D_ShipmentScheduleModel> modelList, int depoId, int companyId, string importFileName, string viewTitle, LoginUserModel loginUser)
         {
-            bool insertFlg = true;
+            bool insertFlg = false;
 
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(user.DatabaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -98,57 +99,48 @@ namespace mar_sumaken_web.Commons
 
                     foreach (var model in modelList) 
                     {
-                        // 出荷指示取込SQL作成
-                        string insertSql = CreateSQLToInsertDShipmentSchedule(model, depoId, companyId, systemDate, user.UserName);
-                        // 出荷指示取込
+                        // 出荷指示取込テーブル登録
+                        string insertSql = CreateSQLToInsertDShipmentSchedule(model, depoId, companyId, systemDate, loginUser.UserName);
                         int affectRows = connection.Execute(insertSql, null, transaction);
                         // 更新件数が0の場合はエラーとする
                         if (affectRows == 0)
                         {
-                            insertFlg = false;
-                            // エラーコード：E2011
                             throw new Exception();
                         }
                     }
 
-                    //　ファイル取込実績テーブル
-                    D_FileImportModel dFileImportModel = new D_FileImportModel();
-                    dFileImportModel.DepoID = depoId;
-                    dFileImportModel.MenuName = "出荷指示取込";
-                    dFileImportModel.ImportFileName = importFileName;
-                    dFileImportModel.CreatedAt = systemDate;
-                    dFileImportModel.CreatedBy = user.UserName;
-
-                    // SQL作成
-                    string dFileImportInserSql = D_FileImportConnectController.CreateSQLToInsertDFileImport(dFileImportModel, systemDate, user.UserName);
+                    // ファイル取込実績テーブル登録
+                    D_FileImportModel dFileImportModel = new()
+                    {
+                        DepoID = depoId,
+                        MenuName = viewTitle,
+                        ImportFileName = importFileName,
+                        CreatedAt = systemDate,
+                        CreatedBy = loginUser.UserName
+                    };
+                    string dFileImportInserSql = D_FileImportConnectController.CreateSQLToInsertDFileImport(dFileImportModel, systemDate, loginUser.UserName);
                     var insertAffectRows = connection.Execute(dFileImportInserSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
                     if (insertAffectRows == 0)
                     {
-                        insertFlg = false;
-                        // エラーコード：E2011
                         throw new Exception();
                     }
 
                     // トランザクションのコミット
                     transaction.Commit();
 
+                    insertFlg = true;
                     return insertFlg;
                 }
-                catch (SqlException ex)
+                catch (SqlException)
                 {
                     transaction.Rollback();
-                    insertFlg = false;
-                    // エラーコード：E2011
-                    throw ex;
+                    throw;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-
                     transaction.Rollback();
-                    insertFlg = false;
-                    // エラーコード：E2011
-                    throw ex;
+                    throw;
                 }
             }
         }
@@ -161,7 +153,7 @@ namespace mar_sumaken_web.Commons
         /// <param name="companyId">会社ID</param>
         /// <param name="userName">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToInsertDShipmentSchedule(D_ShipmentScheduleModel model, int depoId, int companyId, DateTime createdAt,string userName)
+        private static string CreateSQLToInsertDShipmentSchedule(D_ShipmentScheduleModel model, int depoId, int companyId, DateTime createdAt, string userName)
         {
             var sql = $@"
 
