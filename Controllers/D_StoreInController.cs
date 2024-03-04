@@ -327,12 +327,6 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    return Json(new { res = "NG", error = ErrorMessagesResources.E9999 });
-                }
-
                 // 入庫実績情報取得
                 D_StoreInModel model = new()
                 {
@@ -343,8 +337,6 @@ namespace mar_sumaken_web.Controllers
                 };
                 var sql = D_StoreInConnectController.CreateSQLToSelectDStoreIns(model);
 
-                //var sql = D_StoreInConnectionController.CreateSQLToSelectDStoreIns(
-                //    searchModel.SearchStartDate, searchModel.SearchEndDate, searchModel.DepoID, searchModel.CompanyID);
                 List<D_StoreInModel> searchList = D_StoreInConnectController.ConnectDStoreIns(sql, user.DatabaseName);
                 if (searchList.Count > 0)
                 {

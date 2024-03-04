@@ -56,6 +56,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 出荷指示実績ID
         /// </summary>
+        [Display(Name = "ID")]
         public int ShipmentScheduleID { get; set; }
 
         /// <summary>
@@ -315,12 +316,14 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 更新日時
         /// </summary>
+        [Display(Name = "更新日時")]
         public DateTime UpdatedAt { get; set; }
 
         /// <summary>
         /// 更新者
         /// </summary>
-        public string UpdatedBy { get; set; } = string.Empty;
+        [Display(Name = "更新者")]
+        public string? UpdatedBy { get; set; }
 
         /// <summary>
         /// 初期値設定

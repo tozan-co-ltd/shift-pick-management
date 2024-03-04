@@ -2,6 +2,7 @@
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
 
@@ -103,6 +104,100 @@ namespace mar_sumaken_web.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 return Content(errorMessage);
             }
+        }
+
+        /// <summary>
+        /// ファイル出力
+        /// </summary>
+        /// <param name="searchModel">検索モデル</param>
+        /// <param name="gamenName">画面名</param>
+        public JsonResult ExportCsv(SearchConditionModel searchModel, string gamenName)
+        {
+            try
+            {
+                // DataTable作成
+                DataTable searchResult = CreateDataTable();
+
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 入荷予定情報取得
+                D_ReceiveScheduleModel model = new()
+                {
+                    SelectedDepoID = searchModel.DepoID,
+                    SelectedCompanyID = searchModel.CompanyID,
+                    SearchStartDate = searchModel.SearchStartDate,
+                    SearchEndDate = searchModel.SearchEndDate,
+                };
+                var sql = D_ReceiveScheduleConnectController.CreateSQLToSelectDReceiveSchedules(model);
+
+                List<D_ReceiveScheduleModel> searchList = D_ReceiveScheduleConnectController.ConnectDReceiveSchedules(sql, user.DatabaseName);
+                if (searchList.Count > 0)
+                {
+                    foreach (D_ReceiveScheduleModel item in searchList)
+                    {
+                        DataRow newRow = searchResult.NewRow();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleID")] = item.ReceiveScheduleID.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierName")] = item.SupplierName.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleDate")] = item.ReceiveScheduleDate.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("LotNumber")] = item.LotNumber.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("NumberOfBoxes")] = item.NumberOfBoxes.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("Quantity")] = item.Quantity.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("StoreInNumberOfBox")] = item.StoreInNumberOfBox.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("StoreInQuantity")] = item.StoreInQuantity.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("CreatedAt")] = item.CreatedAt.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("CreatedBy")] = item.CreatedBy.ToString();
+
+                        searchResult.Rows.Add(newRow);
+                    }
+                }
+
+                // ファイル名作成
+                string fileName = CreateFileController.CreateFileName(searchModel, gamenName);
+
+                // CSVファイルへのパスを作成する
+                string filePath = Path.Combine(Path.GetTempPath(), fileName);
+
+                // DataTableをCSV形式の文字列に変換
+                CreateFileController.ConvertDataTableToCsv(searchResult, filePath);
+
+                // ファイルの作成
+                var fileResult = System.IO.File.ReadAllBytes(filePath);
+
+                return Json(new { data = File(fileResult, System.Net.Mime.MediaTypeNames.Application.Octet, fileName) });
+            }
+            catch (SqlException)
+            {
+                return Json(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { errorMessage = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// データテーブル作成
+        /// </summary>
+        /// <returns></returns>
+        private static DataTable CreateDataTable()
+        {
+            var table = new DataTable();
+
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleID"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleDate"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("LotNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("NumberOfBoxes"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("Quantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("StoreInNumberOfBox"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("StoreInQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("CreatedAt"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveScheduleModel>("CreatedBy"), typeof(string));
+
+            return table;
         }
     }
 }
