@@ -204,6 +204,26 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 倉庫IDで倉庫情報を取得
+        /// </summary>
+        /// <param name="depoId">倉庫ID</param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectByDepoId(int depoId)
+        {
+            var sql = $@"
+                    SELECT
+                        *               
+                    FROM 
+                        M_Depo
+                    WHERE
+                        DepoId = {depoId}
+                        AND IsDeleted = 0
+            ";
+
+            return sql;
+        }
+
+        /// <summary>
         /// 倉庫マスター登録SQL作成
         /// </summary>
         /// <param name="model">登録情報</param>

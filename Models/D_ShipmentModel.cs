@@ -55,7 +55,7 @@ namespace mar_sumaken_web.Models
         /// 納入指示日
         /// </summary>
         [Display(Name = "納入指示日")]
-        public int DeliveryDate { get; set; }
+        public DateTime DeliveryDate { get; set; }
 
         /// <summary>
         /// 便
@@ -145,7 +145,7 @@ namespace mar_sumaken_web.Models
         /// 読取日時
         /// </summary>
         [Display(Name = "読取日時")]
-        public DateTime ScanedAt { get; set; }
+        public string ScanedAt { get; set; }
 
         /// <summary>
         /// 作成日時
@@ -158,5 +158,56 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "作成者")]
         public string? CreatedBy { get; set; }
+
+        //--------------------------------D_ScanResult--------------------------------
+
+        /// <summary>
+        /// ハンディメニューID
+        /// </summary>
+        [Display(Name = "ハンディメニューID")]
+        public int HandyMenuID { get; set; }
+
+
+        /// <summary>
+        /// ハンディメニュー名
+        /// </summary>
+        [Display(Name = "ハンディメニュー名")]
+        public string? HandyMenuName { get; set; }
+
+        /// <summary>
+        /// 仕入先かんばんID
+        /// </summary>
+        [Display(Name = "仕入先かんばんID")]
+        public int SupplierKanbanID { get; set; }
+
+        /// <summary>
+        /// 入力箱数
+        /// </summary>
+        [Display(Name = "入力箱数")]
+        public int NumberOfInputBoxes { get; set; }
+
+        /// <summary>
+        /// スキャン文字列1
+        /// </summary>
+        [Display(Name = "スキャン文字列1")]
+        public string? FirstScanedString { get; set; }
+
+        /// <summary>
+        /// スキャン文字列2
+        /// </summary>
+        [Display(Name = "スキャン文字列2")]
+        public string? SecondScanedString { get; set; }
+
+        /// <summary>
+        /// 作成日時
+        /// </summary>
+        [Display(Name = "作成日時")]
+        public DateTime ScanCreatedAt { get; set; }
+
+        /// <summary>
+        /// 作成者
+        /// </summary>
+        [Display(Name = "作成者")]
+        public string? ScanCreatedBy { get; set; }
     }
 }

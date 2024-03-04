@@ -256,6 +256,26 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
+        /// 会社IDで会社情報を取得
+        /// </summary>
+        /// <param name="companyId">会社ID</param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectByCompanyId(int companyId)
+        {
+            var sql = $@"
+                    SELECT
+                        *               
+                    FROM 
+                        M_Company
+                    WHERE
+                        CompanyID = {companyId}
+                        AND IsDeleted = 0
+            ";
+
+            return sql;
+        }
+
+        /// <summary>
         /// 会社マスター登録SQL作成
         /// </summary>
         /// <param name="model">登録情報</param>

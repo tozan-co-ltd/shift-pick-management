@@ -59,17 +59,46 @@ namespace mar_sumaken_web.Commons
                 SELECT
                     schedule.DeliveryDate
                     ,schedule.DeliveryTimeClass
+                    ,schedule.DeliveryProductNumber
+					,schedule.DeliveryProductAbbreviation
                     ,company.CompanyID as DeliveryID
                     ,company.CompanyName as DeliveryName
                     ,depo.DepoID
                     ,depo.DepoName
-                    ,shipment.*
-                    ,scanResult.*
+
+                    ,shipment.ShipmentID
+                    ,shipment.ShipmentScheduleID
+                    ,shipment.ScanResultID
+                    ,shipment.ShipmentDatetime
+                    ,shipment.KanbanSerialNumber
+                    ,shipment.SupplierProductNumber
+                    ,shipment.LotNumber
+                    ,shipment.MainProductKey
+                    ,shipment.FirstSubProductKey
+                    ,shipment.SecondSubProductKey
+                    ,shipment.NumberOfBoxes
+                    ,shipment.Quantity
+                    --,shipment.ScanedAt
+                    ,shipment.CreatedAt
+                    ,shipment.CreatedBy
+
+                    ,scanResult.HandyMenuID
+                    ,menu.HandyMenuName
+                    ,scanResult.SupplierKanbanID
+                    ,scanResult.NumberOfInputBoxes
+                    ,scanResult.FirstScanedString
+                    ,scanResult.SecondScanedString
+                    ,FORMAT(scanResult.ScanedAt, 'yyyy/MM/dd HH:mm:ss') AS ScanedAt
+                    ,scanResult.CreatedAt AS ScanCreatedAt
+                    ,scanResult.CreatedBy AS ScanCreatedBy
+                    
                 FROM D_Shipment shipment
                 LEFT JOIN D_ShipmentSchedule schedule
 	                ON shipment.ShipmentScheduleID = schedule.ShipmentScheduleID AND schedule.IsDeleted = 0
                 INNER JOIN D_ScanResult scanResult
                     ON shipment.ScanResultID = scanResult.ScanResultID
+                INNER JOIN M_HandyMenu menu 
+					ON scanResult.HandyMenuID = menu.HandyMenuID
                 INNER JOIN M_Company company
                     ON schedule.CompanyID = company.CompanyID 
                 INNER JOIN M_Depo depo
@@ -78,6 +107,7 @@ namespace mar_sumaken_web.Commons
 	                shipment.ShipmentScheduleID = {shipmentScheduleId}
 	                AND schedule.DepoID = {depoId}
 	                AND schedule.CompanyID = {deliveryId}
+                    AND menu.IsDeleted = 0
 	                AND company.IsDeleted = 0
 	                AND depo.IsDeleted = 0
                 ORDER BY 
