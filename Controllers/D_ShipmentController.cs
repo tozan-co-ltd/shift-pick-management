@@ -25,13 +25,6 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
-                    return View(model);
-                }
-
                 // 出荷実績情報取得SQL作成
                 string sql = D_ShipmentConnectController.CreateSQLToSelectDShipments(
                     shipmentScheduleId, depoId, companyId);
