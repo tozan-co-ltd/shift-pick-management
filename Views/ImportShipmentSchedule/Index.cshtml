@@ -56,7 +56,7 @@
                                         <label class="input-group-btn my-0">
                                             <span class="btn btn-secondary btn-icon-split btn-pd20" id="browse">
                                                 ファイル選択
-                                                <input class="excel-input" id="FileUpload" name="FileUpload" type="file" accept=".csv" multiple>
+                                                <input class="excel-input" id="UploadFileList" name="UploadFileList" type="file" accept=".csv" multiple>
                                             </span>
                                         </label>
                                         <input type="text" class="form-control rounded-0" readonly placeholder="CSVファイルを選択してください">
@@ -71,7 +71,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <input type="hidden" name="GamenName" value="@Model.ViewTitle">
+                            <input type="hidden" name="viewTitle" value="@Model.ViewTitle">
                         </form>
                     </div>
                 </div>

@@ -46,11 +46,16 @@
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayNameFor(model => model.SupplierName)<span style="color:red">*</span></label>
+                            <label>@Html.DisplayName("SupplierName")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <select class="form-select" name="SelectedCompanyID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
-                            <span class="text-danger w-100" asp-validation-for="SelectedCompanyID"></span>
+                            <select class="form-select" asp-for="SelectedSupplierID" required>
+                                @for (var i = 0; i < Model.SuplierSelectList.Count; i++)
+                                {
+                                    <option value="@Model.SuplierSelectList[i].Value">@Model.SuplierSelectList[i].Text</option>
+                                }
+                            </select>
+                            <span class="text-danger w-100" asp-validation-for="SelectedSupplierID"></span>
                         </div>
                     </div>
                     <div class="col-12 input-group div-input-group">
@@ -58,7 +63,7 @@
                             <span>@Html.DisplayNameFor(model => model.SupplierKanbanName)<span style="color:red">*</span></span>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <input id="startDate" type="text" asp-for="SupplierKanbanName" class="form-control pickerDate">
+                            <input type="text" asp-for="SupplierKanbanName" class="form-control">
                             <span class="text-danger w-100" asp-validation-for="SupplierKanbanName"></span>
                         </div>
                     </div>
@@ -66,10 +71,10 @@
                     <table class="table table-responsive table-sm" style="width:100%">
                         <thead>
                             <tr>
-                                <th>項目名</th>
-                                <th>桁数</th>
-                                <th>開始位置</th>
-                                <th>識別文字列</th>
+                                <th class="border-top-0">項目名</th>
+                                <th class="border-top-0">桁数</th>
+                                <th class="border-top-0">開始位置</th>
+                                <th class="border-top-0">識別文字列</th>
                             </tr>
                         </thead>
                         <tbody>

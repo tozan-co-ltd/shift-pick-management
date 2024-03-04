@@ -35,11 +35,6 @@ namespace mar_sumaken_web.Models
         public IEnumerable<SelectListItem>? SearchDepoList { get; set; }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem>? SearchCompanyList { get; set; }
@@ -54,11 +49,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         public D_ShipmentScheduleSearchModel()
         {
-            // 翌日(土日を除く)
-            DateTime currentDate = DateTime.Now;
-            var nextDay = currentDate.AddDays(currentDate.DayOfWeek == DayOfWeek.Friday ? 3 : 1).ToString("yyyy/MM/dd");
-            SearchStartDate = nextDay;
-            SearchEndDate = nextDay;
+
         }  
     }
 }

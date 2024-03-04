@@ -48,7 +48,7 @@
                                         </span>
                                         <span class="text">検索</span>
                                     </button>
-                                    <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3">
+                                    <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3" id="export-file-btn">
                                         <span class="icon text-white-50">
                                             <i class="fa-solid fa-file-export"></i>
                                         </span>
@@ -85,6 +85,7 @@
                 </tbody>
             </table>
         </div>
+        <input type="hidden" id="viewTitle" value="@Model.ViewTitle" />
     </div>
 </div>
 
@@ -133,6 +134,34 @@
                 }
             });
         });
+    });
+
+    // 出力ボタン押下
+    $('#export-file-btn').click(function (event) {
+        DeleteErrorMessages();
+
+        // ページの更新を禁止する
+        event.preventDefault();
+
+        // 送信イベントが他のハンドラーに伝播するのを防ぐ
+        event.stopImmediatePropagation();
+
+        var searchFormArr = $('#searchForm').serializeArray();
+
+        // フォーム情報取得
+        var exportFormData = new FormData();
+        exportFormData.append("searchModel.DepoID", searchFormArr[0].value);
+        exportFormData.append("searchModel.DepoName", $('#SelectedDepoID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.CompanyID", searchFormArr[1].value);
+        exportFormData.append("searchModel.CompanyName", $('#SelectedCompanyID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
+        exportFormData.append("searchModel.SearchEndDate", searchFormArr[3].value);
+
+        // 画面名取得
+        exportFormData.append("gamenName", $("#viewTitle").val());
+
+        // CSV出力
+        onExportExcelByCondition("D_Receive", exportFormData);
     });
 
     // エラーメッセージ削除

@@ -8,7 +8,7 @@ namespace mar_sumaken_web.ConnectControllers
     /// <summary>
     /// 入庫実績テーブルに関する関数
     /// </summary>
-    public class D_StoreInConnectionController
+    public class D_StoreInConnectController
     {
         /// <summary>
         /// 入庫実績情報取得
@@ -137,12 +137,12 @@ namespace mar_sumaken_web.ConnectControllers
         /// 入庫実績削除
         /// </summary>
         /// <param name="storeInId">入庫実績ID</param>
-        /// <param name="databaseName">データベース名</param>
+        /// <param name="user">ログインユーザー</param>
         /// <returns>更新件数</returns>
-        public static int DeleteDStoreIn(int storeInId, string databaseName)
+        public static int DeleteDStoreIn(int storeInId, LoginUserModel user)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(user.DatabaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -152,7 +152,7 @@ namespace mar_sumaken_web.ConnectControllers
                 try
                 {
                     // 入庫実績削除SQL作成
-                    string deleteSql = CreateSQLToDeleteDStoreIn(storeInId);
+                    string deleteSql = CreateSQLToDeleteDStoreIn(storeInId, DateTime.Now, user.UserName);
                     // 入庫実績削除
                     int affectedRows = connection.Execute(deleteSql);
                     // 更新件数が0の場合はエラーとする
@@ -225,12 +225,17 @@ namespace mar_sumaken_web.ConnectControllers
         /// 入庫実績削除SQL作成
         /// </summary>
         /// <param name="storeInId">入庫実績ID</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToDeleteDStoreIn(int storeInId)
+        private static string CreateSQLToDeleteDStoreIn(int storeInId, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                         UPDATE D_StoreIn
-                        SET IsDeleted = 1
+                        SET 
+                            IsDeleted = 1
+                            ,UpdatedAt = '{updatedAt}'
+                            ,UpdatedBy = '{updatedBy}'
                         WHERE StoreInID = {storeInId}
             ;";
             return sql;

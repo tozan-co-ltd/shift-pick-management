@@ -111,7 +111,7 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 次の日に服用
+        /// 翌日(土日を除く)を取得
         /// </summary>
         /// <param name="date">日付</param>
         public static DateTime GetNextWeekday(DateTime date)
@@ -128,6 +128,22 @@ namespace mar_sumaken_web.Commons
             }
 
             return date;
+        }
+
+        /// <summary>
+        /// 日付に変換する
+        /// </summary>
+        public static string ConvertToYYYYMMDD(string inputDateString)
+        {
+            DateTime inputDate = DateTime.Parse(inputDateString);
+
+            int year = inputDate.Year;
+            int month = inputDate.Month;
+            int day = inputDate.Day;
+
+            string formattedDateString = $"{year}/{month:D2}/{day:D2}";
+
+            return formattedDateString;
         }
 
     }

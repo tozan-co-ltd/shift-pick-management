@@ -5,6 +5,7 @@ using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
 
@@ -180,6 +181,114 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
+        /// ファイル出力
+        /// </summary>
+        /// <param name="searchModel">検索モデル</param>
+        /// <param name="gamenName">画面名</param>
+        public JsonResult ExportCsv(SearchConditionModel searchModel, string gamenName)
+        {
+            try
+            {
+                // DataTable作成
+                DataTable searchResult = CreateDataTable();
+
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 出庫実績情報取得
+                D_StoreOutModel model = new()
+                {
+                    SelectedDepoID = searchModel.DepoID,
+                    SelectedCompanyID = searchModel.CompanyID,
+                    SearchStartDate = searchModel.SearchStartDate,
+                    SearchEndDate = searchModel.SearchEndDate,
+                };
+                var sql = D_StoreOutConnectController.CreateSQLToSelectDStoreOuts(model);
+
+                List<D_StoreOutModel> searchList = D_StoreOutConnectController.ConnectDStoreOuts(sql, user.DatabaseName);
+                if (searchList.Count > 0)
+                {
+                    foreach (D_StoreOutModel item in searchList)
+                    {
+                        DataRow newRow = searchResult.NewRow();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("StoreOutID")] = item.StoreOutID.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("SupplierName")] = item.SupplierName.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("StoreOutDate")] = item.StoreOutDate.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliveryDate")] = item.DeliveryDate.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliveryTimeClass")] = item.DeliveryTimeClass.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliverySlipNumber")] = item.DeliverySlipNumber.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber")] = item.DeliveryProductNumber.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("LotNumber")] = item.LotNumber.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("LotQuantity")] = item.LotQuantity.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("NumberOfBoxes")] = item.NumberOfBoxes.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("Quantity")] = item.Quantity.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("MainProductKey")] = item.MainProductKey.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("FirstSubProductKey")] = item.FirstSubProductKey.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("SecondSubProductKey")] = item.SecondSubProductKey.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("Remarks")] = item.Remarks.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("CreatedAt")] = item.CreatedAt.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("CreatedBy")] = item.CreatedBy.ToString();
+
+                        searchResult.Rows.Add(newRow);
+                    }
+                }
+
+                // ファイル名作成
+                string fileName = CreateFileController.CreateFileName(searchModel, gamenName);
+
+                // CSVファイルへのパスを作成する
+                string filePath = Path.Combine(Path.GetTempPath(), fileName);
+
+                // DataTableをCSV形式の文字列に変換
+                CreateFileController.ConvertDataTableToCsv(searchResult, filePath);
+
+                // ファイルの作成
+                var fileResult = System.IO.File.ReadAllBytes(filePath);
+
+                return Json(new { data = File(fileResult, System.Net.Mime.MediaTypeNames.Application.Octet, fileName) });
+            }
+            catch (SqlException)
+            {
+                return Json(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { errorMessage = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// データテーブル作成
+        /// </summary>
+        /// <returns></returns>
+        private static DataTable CreateDataTable()
+        {
+            var table = new DataTable();
+
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("StoreOutID"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("SupplierName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("StoreOutDate"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("DeliveryDate"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("DeliveryTimeClass"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("DeliverySlipNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("SupplierProductNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("LotNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("LotQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("NumberOfBoxes"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("Quantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("MainProductKey"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("FirstSubProductKey"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("SecondSubProductKey"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("Remarks"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("CreatedAt"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("CreatedBy"), typeof(string));
+
+            return table;
+        }
+
+        /// <summary>
         /// 便リスト取得
         /// </summary>
         /// <param name="searchDeliveryDate">納入指示日</param>
@@ -325,7 +434,7 @@ namespace mar_sumaken_web.Controllers
                             foreach (var err in validationResults)
                             {
                                 // フォーマットエラーメッセージ
-                                List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ReceiveScheduleModel>(err);
+                                List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_StoreOutModel>(err);
                                 errorMessageItem.Insert(0, readCount + "行目");
 
                                 // HTMLに変換
@@ -377,7 +486,7 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 出庫実績削除
-                D_StoreOutConnectController.DeleteDStoreOut(id, user.DatabaseName);
+                D_StoreOutConnectController.DeleteDStoreOut(id, user);
 
                 return Ok();
             }

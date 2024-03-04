@@ -39,11 +39,6 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem> SearchCompanyList { get; set; }
@@ -61,6 +56,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 出荷指示実績ID
         /// </summary>
+        [Display(Name = "ID")]
         public int ShipmentScheduleID { get; set; }
 
         /// <summary>
@@ -70,9 +66,9 @@ namespace mar_sumaken_web.Models
         public int SupplierID { set; get; }
 
         /// <summary>
-        /// 仕入先名
+        /// 納入先名
         /// </summary>
-        [Display(Name = "仕入先名")]
+        [Display(Name = "納入先名")]
         public string? SupplierName { set; get; }
 
         /// <summary>
@@ -247,7 +243,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 納入先品番(表示用品番)
         /// </summary>
-        [Display(Name = "表示用品番")]
+        [Display(Name = "納入先品番")]
         [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryProductNumber { get; set; }
@@ -320,12 +316,14 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 更新日時
         /// </summary>
+        [Display(Name = "更新日時")]
         public DateTime UpdatedAt { get; set; }
 
         /// <summary>
         /// 更新者
         /// </summary>
-        public string UpdatedBy { get; set; } = string.Empty;
+        [Display(Name = "更新者")]
+        public string? UpdatedBy { get; set; }
 
         /// <summary>
         /// 初期値設定

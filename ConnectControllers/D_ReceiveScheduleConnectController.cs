@@ -61,19 +61,19 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 入荷予定データ書き込み
+        /// 入荷予定データ登録
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="modelList">モデルリスト</param>
         /// <param name="depoId">倉庫ID</param>
         /// <param name="importFileName">取込ファイル名</param>
-        /// <param name="user">ユーザー</param>
-        /// <returns></returns>
-        public static bool InsertDReceiveSchedule(List<D_ReceiveScheduleModel> modelList, int depoId, string importFileName,　LoginUserModel user)
+        /// <param name="viewTitle">画面名</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        public static bool InsertDReceiveSchedule(List<D_ReceiveScheduleModel> modelList, int depoId, string importFileName, string viewTitle, LoginUserModel loginUser)
         {
             bool insertFlg = false;
 
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(user.DatabaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -90,9 +90,8 @@ namespace mar_sumaken_web.Commons
 
                     foreach (var model in modelList) 
                     {
-                        // 入荷予定取込SQL作成
-                        string insertSql = CreateSQLToInsertDReceiveSchedule(model, depoId, systemDate, user.UserName);
-                        // 入荷予定取込
+                        // 入荷予定取込テーブル登録
+                        string insertSql = CreateSQLToInsertDReceiveSchedule(model, depoId, systemDate, loginUser.UserName);
                         int affectRows = connection.Execute(insertSql, null, transaction);
                         // 更新件数が0の場合はエラーとする
                         if (affectRows == 0)
@@ -101,18 +100,16 @@ namespace mar_sumaken_web.Commons
                         }
                     }
 
-                    //　ファイル取込実績テーブル
+                    // ファイル取込実績テーブル登録
                     D_FileImportModel dFileImportModel = new()
                     {
                         DepoID = depoId,
-                        MenuName = "入荷予定取込",
+                        MenuName = viewTitle,
                         ImportFileName = importFileName,
                         CreatedAt = systemDate,
-                        CreatedBy = user.UserName
+                        CreatedBy = loginUser.UserName
                     };
-
-                    // SQL作成
-                    string dFileImportInserSql = D_FileImportConnectController.CreateSQLToInsertDFileImport(dFileImportModel, systemDate, user.UserName);
+                    string dFileImportInserSql = D_FileImportConnectController.CreateSQLToInsertDFileImport(dFileImportModel, systemDate, loginUser.UserName);
                     var insertAffectRows = connection.Execute(dFileImportInserSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
                     if (insertAffectRows == 0)
@@ -131,7 +128,7 @@ namespace mar_sumaken_web.Commons
                     transaction.Rollback();
                     throw;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     transaction.Rollback();
                     throw;
@@ -149,7 +146,7 @@ namespace mar_sumaken_web.Commons
             string differenceCheckCondition = string.Empty;
             if (model.DiffenceCountCheck)
             {
-                differenceCheckCondition = " AND (schedule.Quantity / product.LotQuantity) <> storeIn.NumberOfBoxes";
+                differenceCheckCondition = " AND (schedule.Quantity / product.LotQuantity) <> COALESCE(storeIn.NumberOfBoxes, 0) ";
             }
 
             var sql = $@"
@@ -166,19 +163,20 @@ namespace mar_sumaken_web.Commons
 	                    ELSE 0
                     END AS NumberOfBoxes    -- 予定箱数
                     ,schedule.Quantity      --予定数量
-                    ,storeIn.NumberOfBoxes AS StoreInNumberOfBox    -- 入庫箱数
-                    ,storeIn.Quantity AS StoreInQuantity            -- 入庫数量
+                    ,COALESCE(storeIn.NumberOfBoxes, 0) AS StoreInNumberOfBox    -- 入庫箱数
+                    ,COALESCE(storeIn.Quantity, 0) AS StoreInQuantity            -- 入庫数量
                     ,schedule.CreatedAt
                     ,schedule.CreatedBy
                 FROM D_ReceiveSchedule AS schedule
                 INNER JOIN M_Product AS product 
                     ON schedule.SupplierProductNumber = product.SupplierProductNumber
-                INNER JOIN D_StoreIn AS storeIn
+                LEFT JOIN D_StoreIn AS storeIn
                     ON schedule.DepoID = storeIn.DepoID
 	                AND schedule.CompanyID = storeIn.CompanyID
 	                AND schedule.ReceiveScheduleDate = storeIn.StoreInDate
 	                AND schedule.SupplierProductNumber = storeIn.SupplierProductNumber
 	                AND schedule.LotNumber = storeIn.LotNumber
+                    AND storeIn.IsDeleted = 0
                 INNER JOIN M_Company AS company 
                     ON schedule.CompanyID = company.CompanyID
                 WHERE 
@@ -189,7 +187,6 @@ namespace mar_sumaken_web.Commons
                     {differenceCheckCondition}
                     AND schedule.IsDeleted = 0
                     AND product.IsDeleted = 0
-	                AND storeIn.IsDeleted = 0
 	                AND company.IsDeleted = 0
                 ORDER BY 
 	                schedule.SupplierProductNumber ASC     

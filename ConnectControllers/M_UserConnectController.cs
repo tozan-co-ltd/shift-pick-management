@@ -182,7 +182,7 @@ namespace mar_sumaken_web.Commons
                 try
                 {
                     // ユーザーマスター削除
-                    string userDeleteSql = CreateSQLToDeleteMUser(userId);
+                    string userDeleteSql = CreateSQLToDeleteMUser(userId, DateTime.Now, loginUser.UserName);
                     deleteAffectedRows = connection.Execute(userDeleteSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
                     if(deleteAffectedRows == 0)
@@ -695,12 +695,17 @@ namespace mar_sumaken_web.Commons
         /// ユーザーマスター削除SQL作成
         /// </summary>
         /// <param name="userId">ユーザーID</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToDeleteMUser(int userId)
+        public static string CreateSQLToDeleteMUser(int userId, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                          UPDATE M_User
-                         SET    IsDeleted = 1
+                         SET
+                            IsDeleted = 1
+                            ,UpdatedAt = '{updatedAt}'
+                            ,UpdatedBy = '{updatedBy}'
                          WHERE 
 	                            UserID = {userId}
             ";

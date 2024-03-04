@@ -67,9 +67,9 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 入庫実績情報取得SQL作成
-                var sql = D_StoreInConnectionController.CreateSQLToSelectDStoreIns(searchModel);
+                var sql = D_StoreInConnectController.CreateSQLToSelectDStoreIns(searchModel);
                 // DB接続
-                List<D_StoreInModel> storeInList = D_StoreInConnectionController.ConnectDStoreIns(sql, user.DatabaseName);
+                List<D_StoreInModel> storeInList = D_StoreInConnectController.ConnectDStoreIns(sql, user.DatabaseName);
 
                 // 表示用のhtml作成
                 if (storeInList.Count > 0)
@@ -230,7 +230,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 入庫実績登録
-                D_StoreInConnectionController.InsertDStoreIns(model, user);
+                D_StoreInConnectController.InsertDStoreIns(model, user);
 
                 return Ok();
             }
@@ -271,7 +271,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 入庫実績更新
-                D_StoreInConnectionController.EditDStoreIn(model, user);
+                D_StoreInConnectController.EditDStoreIn(model, user);
 
                 return Ok();
             }
@@ -298,7 +298,7 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 入庫実績削除
-                D_StoreInConnectionController.DeleteDStoreIn(storeInId, user.DatabaseName);
+                D_StoreInConnectController.DeleteDStoreIn(storeInId, user);
 
                 return Ok();
             }
@@ -327,12 +327,6 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    return Json(new { res = "NG", error = ErrorMessagesResources.E9999 });
-                }
-
                 // 入庫実績情報取得
                 D_StoreInModel model = new()
                 {
@@ -341,11 +335,9 @@ namespace mar_sumaken_web.Controllers
                     SearchStartDate = searchModel.SearchStartDate,
                     SearchEndDate = searchModel.SearchEndDate,
                 };
-                var sql = D_StoreInConnectionController.CreateSQLToSelectDStoreIns(model);
+                var sql = D_StoreInConnectController.CreateSQLToSelectDStoreIns(model);
 
-                //var sql = D_StoreInConnectionController.CreateSQLToSelectDStoreIns(
-                //    searchModel.SearchStartDate, searchModel.SearchEndDate, searchModel.DepoID, searchModel.CompanyID);
-                List<D_StoreInModel> searchList = D_StoreInConnectionController.ConnectDStoreIns(sql, user.DatabaseName);
+                List<D_StoreInModel> searchList = D_StoreInConnectController.ConnectDStoreIns(sql, user.DatabaseName);
                 if (searchList.Count > 0)
                 {
                     foreach (D_StoreInModel item in searchList)

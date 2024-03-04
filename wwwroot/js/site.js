@@ -104,38 +104,7 @@
         }
     });
 });
-
-
-////------------------- パスワード変更 ------------------//
-//$("#changePasswordForm").submit(function () {
-//    $(".changePassword .alert-success").css("display", "none");
-//});
-
-//// パスワード表示アイコン
-//$('#eye-change-pass').click(function () {
-//    if ($(this).hasClass('fa-eye')) {
-//        $(this).removeClass('fa-eye');
-//        $(this).addClass('fa-eye-slash');
-//        $('#password-field').attr('type', 'text');
-//    } else {
-//        $(this).removeClass('fa-eye-slash');
-//        $(this).addClass('fa-eye');
-//        $('#password-field').attr('type', 'password');
-//    }
-//});
-
-//$('#eye-login').click(function () {
-//    if ($(this).hasClass('fa-eye')) {
-//        $(this).removeClass('fa-eye');
-//        $(this).addClass('fa-eye-slash');
-//        $('.login-text').attr('type', 'text');
-//    } else {
-//        $(this).removeClass('fa-eye-slash');
-//        $(this).addClass('fa-eye');
-//        $('.input-password .login-text').attr('type', 'password');
-//    }
-//});
-////--------------------------------------------------------//
+//--------------------------------------------------------//
 
 
 //------------------- CSV取込 ------------------//
@@ -148,7 +117,7 @@ function onUploadFile(page) {
 
     var formData = new FormData(document.querySelector('#' + page + ''));
 
-    var fileUpload = document.getElementById('FileUpload');
+    var fileUpload = document.getElementById('UploadFileList');
     if (fileUpload.files.length <= 0) {
         $('#div-error-message').text('ファイルが選択されていません。');
         $("#div-error-message").show();
@@ -200,10 +169,6 @@ function onUploadFile(page) {
 
     $('#import-modal').modal('show');
 
-    $('#import-modal').on('hidden.bs.modal', function (e) {
-        //なし
-    });
-
     $('#import-modal .cancel, #import-modal .close').click(function () {
         $('#import-modal').modal('hide');
         return false;
@@ -229,12 +194,12 @@ function onUploadFile(page) {
             if (jqXHR.status === 404) {
                 // データが見つからなかった場合
                 var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#div-error-message").show();
-                $("#div-error-message").html(errorMessage);
+                $("#div-error-message").text(errorMessage);
             } else {
                 // その他のエラーの場合
                 $("#div-error-message").show();
-                AlertMessage('bg-danger', 'エラー', 'E3003 サーバーに接続できませんでした。<br> ' + 'HttpRequest : ' + jqXHR.status + '<br> ' + 'textStatus : ' + textStatus, null, null);
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
             }
             $('#' + page + '')[0].reset();
         });
@@ -255,14 +220,14 @@ function hideLoading() {
     $("#file-upload i").removeClass('fas fa-spinner fa-pulse')
 }
 
-// データエラー表示
-function RenderErrorBlock(data) {
-    let html = "";
-    for (let i = 0; i < data.length; i++) {
-        html += '<span class="text-danger">' + data[i] + '</span>';
-    }
-    document.getElementById('ErrorBlock').innerHTML = html;
-}
+//// データエラー表示
+//function RenderErrorBlock(data) {
+//    let html = "";
+//    for (let i = 0; i < data.length; i++) {
+//        html += '<span class="text-danger">' + data[i] + '</span>';
+//    }
+//    document.getElementById('ErrorBlock').innerHTML = html;
+//}
 //--------------------------------------------------------//
 
 

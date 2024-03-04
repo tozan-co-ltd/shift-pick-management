@@ -1,5 +1,5 @@
 ﻿@using mar_sumaken_web.Commons;
-@model mar_sumaken_web.Models.TopModel;
+@model mar_sumaken_web.Models.D_HandyErrorMessageModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.ViewTitle;
@@ -39,9 +39,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (@Model != null && @Model.MyModel2 != null)
+                        @if (@Model != null && @Model.D_HandyErrorMessageList != null)
                         {
-                            @foreach (var item in @Model.MyModel2)
+                            @foreach (var item in @Model.D_HandyErrorMessageList)
                             {
                                 <tr>
                                     <td>

@@ -52,12 +52,6 @@ namespace mar_sumaken_web.Models
         }
 
         /// <summary>
-        /// 選択された倉庫ID
-        /// </summary>
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public int SelectedDepoID { get; set; }
-
-        /// <summary>
         /// 検索会社リスト
         /// </summary>
         public IEnumerable<SelectListItem>? SearchCompanyList { get; set; }
