@@ -84,7 +84,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 入荷実績ID
         /// </summary>
-        [Display(Name = "入荷実績ID")]
+        [Display(Name = "ID")]
         public int ReceiveID { get; set; }
 
         /// <summary>

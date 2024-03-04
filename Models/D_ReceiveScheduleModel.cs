@@ -93,7 +93,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 入荷予定ID
         /// </summary>
-        [Display(Name = "入荷予定ID")]
+        [Display(Name = "ID")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int ReceiveScheduleID { get; set; }
 
