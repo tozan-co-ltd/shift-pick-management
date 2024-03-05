@@ -29,12 +29,17 @@ namespace mar_sumaken_web.Models
         public int Role { get; set; }
 
         /// <summary>
+        /// 管理権限区分
+        /// </summary>
+        public int AuthorizedKubun { get; set; }
+
+        /// <summary>
         /// ユーザーID
         /// </summary>
         public int UserID { get; set; }
 
         /// <summary>
-        /// 
+        /// Controller名
         /// </summary>
         public string? ControllerName { get; set; }
 
@@ -73,8 +78,9 @@ namespace mar_sumaken_web.Models
         {
             CompanyID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_CampanyID).First().Value);
             DataBaseName = claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
-            UserID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value);
-            Role = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_Role).First().Value);          
+            UserID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value); 
+            Role = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_Role).First().Value);
+            AuthorizedKubun = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_AuthorizedKubun).First().Value);
             ControllerName = viewContext.RouteData.Values["controller"].ToString();
             CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();

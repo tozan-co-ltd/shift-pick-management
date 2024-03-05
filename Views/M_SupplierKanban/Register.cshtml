@@ -34,7 +34,7 @@
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
-                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="DStoreInForm">
+                <form class="col-md-12" id="mSupplierKanbanForm">
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
                             <label>@Html.DisplayNameFor(model => model.DepoName)<span style="color:red">*</span></label>
@@ -67,6 +67,43 @@
                             <span class="text-danger w-100" asp-validation-for="SupplierKanbanName"></span>
                         </div>
                     </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-md-6 d-flex flex-wrap pl-0">
+                            <div class="col-12 col-sm-4 column-1st">
+                                <label>@Html.DisplayNameFor(model => model.AllowedDuplicatesFlag)<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 column-2nd">
+                                <div class="form-check">
+                                    <input type="radio" asp-for="AllowedDuplicatesFlag" name="AllowedDuplicatesFlag" value="0" id="flexRadioDefault1" class="form-check-input" checked>
+                                    <label class="form-check-label" for="flexRadioDefault1">
+                                        0(なし)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" asp-for="AllowedDuplicatesFlag" name="AllowedDuplicatesFlag" value="1" id="flexRadioDefault2" class="form-check-input">
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        1(あり)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 input-group div-input-group pl-0">
+                            <div class="col-12 col-sm-4 column-1st">
+                                <label>使用ハンディメニュー名</label>
+                            </div>
+                            <div class="col-12 col-sm-8 column-2nd">
+                                @for (var i = 0; i < Model.HandyMenuSelectList.Count; i++)
+                                {
+                                    <div class="form-check">
+                                        <input type="hidden" asp-for="HandyMenuSelectList[i].Value" value="@Model.HandyMenuSelectList[i].Value" />
+                                        <input type="hidden" asp-for="HandyMenuSelectList[i].Text" value="@Model.HandyMenuSelectList[i].Text" />
+                                        <input class="form-check-input" asp-for="HandyMenuSelectList[i].Selected" type="checkbox">
+                                        <label class="form-check-label" asp-for="HandyMenuSelectList[i].Selected">@Model.HandyMenuSelectList[i].Text</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
                     <hr>
                     <table class="table table-responsive table-sm" style="width:100%">
                         <thead>
@@ -74,31 +111,119 @@
                                 <th class="border-top-0">項目名</th>
                                 <th class="border-top-0">桁数</th>
                                 <th class="border-top-0">開始位置</th>
-                                <th class="border-top-0">識別文字列</th>
+                                <th class="border-top-0">識別文字</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>
-                                    識別文字
+                                    識別文字<span style="color:red">*</span>
                                 </td>
                                 <td></td>
                                 <td>
-                                    <input type="number" class="form-control" id="" value="@Model.IdentifyString" name="" />
+                                    <input class="form-control" type="number" asp-for="IdentifyStringStartIndex" value="" required>
+                                    <span class="text-danger w-100" asp-validation-for="IdentifyStringStartIndex"></span>
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control" id="" value="@Model.IdentifyStringStartIndex" name="" />
+                                    <input class="form-control" type="text" asp-for="IdentifyString" value="" required>
+                                    <span class="text-danger w-100" asp-validation-for="IdentifyString"></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    品番
+                                    品番<span style="color:red">*</span>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" id="" value="@Model.ProductNumberLength" name="" />
+                                    <input class="form-control" type="number" asp-for="ProductNumberStartIndex" value="" required>
+                                    <span class="text-danger w-100" asp-validation-for="ProductNumberStartIndex"></span>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" id="" value="@Model.ProductNumberStartIndex" name="" />
+                                    <input class="form-control" type="number" asp-for="ProductNumberLength" value="" required>
+                                    <span class="text-danger w-100" asp-validation-for="ProductNumberLength"></span>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    数量
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.QuantityLength" name="" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.QuantityStartIndex" name="" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    ロット番号
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.LotLength" name="" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.LotStartIndex" name="" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    メインキー
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.MainProductKeyLength" name="" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.MainProductKeyStartIndex" name="" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    サブキー1
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.FirstSubProductKeyLength" name="" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.FirstSubProductKeyStartIndex" name="" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    サブキー2
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.SecondSubProductKeyLength" name="" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.SecondSubProductKeyStartIndex" name="" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    枝番
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.ProductBranchNumberLength" name="" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.ProductBranchNumberStartIndex" name="" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    注文番号
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.OrderNumberLength" name="" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" id="" value="@Model.OrderNumberStartIndex" name="" />
                                 </td>
                                 <td></td>
                             </tr>
@@ -136,7 +261,7 @@
                             } *@
                         </tbody>
                     </table>
-                    <button class="btn btn-primary btn-icon-split" id="register-btn" style="min-width: 80px">
+                    <button class="btn btn-primary btn-icon-split" id="register-btn" style="min-width: 80px" onclick="OnRegister()">
                         <span class="text">登録</span>
                     </button>
                 </form>
@@ -162,7 +287,7 @@
             let method = 'POST';
             let formId = 'mSupplierKanbanForm';
             let data = $('#' + formId).serializeArray();
-
+            console.log("data", data)
             // Ajax call
             $.ajax({
                 url: url,

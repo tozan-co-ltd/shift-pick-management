@@ -275,7 +275,7 @@ namespace mar_sumaken_web.Controllers
             headerSettings[30] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipNumber");
             headerSettings[31] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipPageNumber");
             headerSettings[32] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipRowNumber");
-            headerSettings[34] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductNumber");
+            headerSettings[34] = "表示用品番";
             headerSettings[35] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductAbbreviation");
             headerSettings[36] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductName");
             headerSettings[37] = Utils.GetDisplayName<D_ShipmentScheduleModel>("LotQuantity");

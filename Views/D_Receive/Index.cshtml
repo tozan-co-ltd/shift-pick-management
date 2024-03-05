@@ -85,31 +85,32 @@
                 </tbody>
             </table>
         </div>
-        <!-- Detail Modal-->
-        <div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-labelledby="detail-modal-label" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="detail-modal-label">読取実績</h5>
-                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="col-12">
-                            <p>倉庫名：<span id="detailDepoName"></span></p>
-                            <p>読取日時：<span id="detailCreatedAt"></span></p>
-                            <p>ハンディメニュー名：<span id="detailHandyMenuName"></span></p>
-                            <p>仕入先品番：<span id="detailSupplierProductNumber"></span></p>
-                            <p>読取内容(1回目)：<br><span class="text-break" id="detailFirstScanedString"></span></p>
-                            <p>読取内容(2回目)：<br><span class="text-break" id="detailSecondScanedString"></span></p>
-                            <p>登録者：<span id="detailCreatedBy"></span></p>
-                        </div>
-                    </div>
+        <input type="hidden" id="viewTitle" value="@Model.ViewTitle" />
+    </div>
+</div>
+
+<!-- Detail Modal-->
+<div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-labelledby="detail-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-modal-label">読取実績</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12">
+                    <p>倉庫名：<span id="detailDepoName"></span></p>
+                    <p>読取日時：<span id="detailCreatedAt"></span></p>
+                    <p>ハンディメニュー名：<span id="detailHandyMenuName"></span></p>
+                    <p>仕入先品番：<span id="detailSupplierProductNumber"></span></p>
+                    <p>読取内容(1回目)：<br><span class="text-break" id="detailFirstScanedString"></span></p>
+                    <p>読取内容(2回目)：<br><span class="text-break" id="detailSecondScanedString"></span></p>
+                    <p>登録者：<span id="detailCreatedBy"></span></p>
                 </div>
             </div>
         </div>
-        <input type="hidden" id="viewTitle" value="@Model.ViewTitle" />
     </div>
 </div>
 

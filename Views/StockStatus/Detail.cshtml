@@ -1,0 +1,137 @@
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.StockStatusModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+}
+
+<div class="card shadow de-inspection d-receive-schedule m-4">
+    <div class="card-header text-gray-800">
+        @ViewData["Title"]
+    </div>
+    <div class="card-body">
+        <div class="col-md-12 pb-0 pl-0">
+            <form method="get" asp-controller="StockStatus" asp-action="Index">
+                <button type="submit" class="btn btn-secondary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-arrow-left-long"></i>
+                    </span>
+                    <span class="text">戻る</span>
+                </button>
+            </form>
+        </div>
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <div class="row mt-10">
+                    <div class="col-lg-12">
+                        <form id="searchForm" method="post" enctype="multipart/form-data" name="form" onsubmit="return false;">
+                            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                <span class="warehouse-name-drs">倉庫名</span>
+                                <div class="unset-pdl">
+                                    <input type="hidden" asp-for="DepoID" />
+                                    <input class="form-control" asp-for="DepoName" readonly />
+                                </div>
+                            </div>
+                            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                <span class="warehouse-name-drs">仕入先名</span>
+                                <div class="unset-pdl">
+                                    <input type="hidden" asp-for="SupplierID" />
+                                    <input class="form-control" asp-for="SupplierName" readonly />
+                                </div>
+                            </div>
+                            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl">
+                                <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.DateSearchStart)</span>
+                                <div class="unset-pdl">
+                                    <input id="searchDate" type="text" asp-for="DateSearchStart" class="form-control" readonly>
+                                </div>
+                                <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3">
+                                    <span class="icon text-white-50">
+                                        <i class="fa-solid fa-file-export"></i>
+                                    </span>
+                                    <span class="text">出力</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3" id="div-table">
+            <table class="table table-sm stripe hover nowrap">
+                <thead>
+                    <tr>
+                        <th>仕入先品番</th>
+                        <th>収容数</th>
+                        <th>月初在庫数</th>
+                        <th>入庫箱数</th>
+                        <th>入庫数</th>
+                        <th>出庫箱数</th>
+                        <th>出庫数</th>
+                        <th>在庫数</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@Model.SupplierProductNumber</td>
+                        <td>@Model.LotQuantity</td>
+                        <td>@Model.StockQuantityAtBeginningMonth</td>
+                        <td>@Model.StoreInNumberOfBoxes</td>
+                        <td>@Model.StoreInQuantity</td>
+                        <td>@Model.StoreOutNumberOfBoxes</td>
+                        <td>@Model.StoreOutQuantity</td>
+                        <td>@Model.StockRemainQuantity</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <input type="hidden" id="viewTitle" value="@Model.ViewTitle" />
+    </div>
+</div>
+
+<script>
+    // 出力ボタン押下
+    $('#export-file-btn').click(function (event) {
+        DeleteErrorMessages();
+
+        // ページの更新を禁止する
+        event.preventDefault();
+
+        // 送信イベントが他のハンドラーに伝播するのを防ぐ
+        event.stopImmediatePropagation();
+
+        var searchFormArr = $('#searchForm').serializeArray();
+
+        // フォーム情報取得
+        var exportFormData = new FormData();
+        exportFormData.append("searchModel.DepoID", searchFormArr[0].value);
+        exportFormData.append("searchModel.DepoName", $('#SelectedDepoID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.CompanyID", searchFormArr[1].value);
+        exportFormData.append("searchModel.CompanyName", $('#SelectedCompanyID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
+        exportFormData.append("searchModel.SearchEndDate", searchFormArr[3].value);
+
+        // 画面名取得
+        exportFormData.append("gamenName", $("#viewTitle").val());
+
+        // CSV出力
+        onExportExcelByCondition("D_Receive", exportFormData);
+    });
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
+</script>

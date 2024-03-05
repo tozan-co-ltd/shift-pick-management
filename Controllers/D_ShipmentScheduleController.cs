@@ -79,54 +79,74 @@ namespace mar_sumaken_web.Controllers
 
                     foreach (var item in model.D_ShipmentScheduleList)
                     {
-                        searchData += $@"<tr>
-                        <td>
-                            <a class='btn btn-secondary btn-icon-split ml-1 mr-1' onclick='OnDetailClick(this)'>
-                                <i class='fa-solid fa-list'></i>
-                            </a>
-                            <button class='btn btn-danger btn-icon-split'
-                            onclick='OnDeleteClick(this)' data-id='{item.ShipmentScheduleID}' data-toggle='modal' data-target='#delete-modal'>
-                                <i class='fa-solid fa-trash'></i>
-                            </button>
-                        </td>
-                        <td class='ShipmentScheduleID'>{@item.ShipmentScheduleID}</td>
-                        <td class='SupplierName'>{@item.SupplierName}</td>
-                        <td class='DeliveryDate'>{Utils.ConvertToYYYYMMDD(@item.DeliveryDate)}</td>
-                        <td class='DeliveryTimeClass'>{@item.DeliveryTimeClass}</td>
-                        <td class='DeliveryProductNumber'>{@item.DeliveryProductNumber}</td>
-                        <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
-                        <td class='LotQuantity'>{@item.LotQuantity}</td>
-                        <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
-                        <td class='Quantity'>{@item.Quantity}</td>
-                        <td class='StoreOutNumberOfBoxes'>{@item.StoreOutNumberOfBoxes}</td>
-                        <td class='StoreOutQuantity'>{@item.StoreOutQuantity}</td>
-                        <td class='OrdererCode'>{@item.OrdererCode}</td>
-                        <td class='OrdererFactoryKubun'>{@item.OrdererFactoryKubun}</td>
-                        <td class='OrdererName'>{@item.OrdererName}</td>
-                        <td class='OrdererFactoryName'>{@item.OrdererFactoryName}</td>
-                        <td class='ShipperCode'>{@item.ShipperCode}</td>
-                        <td class='ShipperFactoryKubun'>{@item.ShipperFactoryKubun}</td>
-                        <td class='ShipperName'>{@item.ShipperName}</td>
-                        <td class='DeliveryCode'>{@item.DeliveryCode}</td>
-                        <td class='DeliveryFactoryKubun'>{@item.DeliveryFactoryKubun}</td>
-                        <td class='DeliveryLocation'>{@item.DeliveryLocation}</td>
-                        <td class='DeliveryName'>{@item.DeliveryName}</td>
-                        <td class='DeliveryFactoryName'>{@item.DeliveryFactoryName}</td>
-                        <td class='RegularKubun'>{@item.RegularKubun}</td>
-                        <td class='IssuedDate'>{Utils.ConvertToYYYYMMDD(@item.IssuedDate)}</td>
-                        <td class='DeliveryTime'>{@item.DeliveryTime}</td>
-                        <td class='TranspotationIdentify'>{@item.TranspotationIdentify}</td>
-                        <td class='DeliverySlipNumber'>{@item.DeliverySlipNumber}</td>
-                        <td class='DeliverySlipPageNumber'>{@item.DeliverySlipPageNumber}</td>
-                        <td class='DeliverySlipRowNumber'>{@item.DeliverySlipRowNumber}</td>
-                        <td class='DeliveryProductAbbreviation'>{@item.DeliveryProductAbbreviation}</td>
-                        <td class='DeliveryProductName'>{@item.DeliveryProductName}</td>
-                        <td class='BranchNumber'>{@item.BranchNumber}</td>
-                        <td class='UpdatedAt'>{@item.UpdatedAt}</td>
-                        <td class='UpdatedBy'>{@item.UpdatedBy}</td>
-                        <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
-                        <input type='hidden' class='DepoID' value='{item.DepoID}' />
-                        </tr>";
+                        // 管理権限区分が1(管理者)のみ削除ボタン表示
+                        if (user.AuthorizedKubun == 1)
+                        {
+                            searchData += $@"
+                                <tr>
+                                    <td>
+                                        <a class='btn btn-secondary btn-icon-split ml-1 mr-1' onclick='OnDetailClick(this)'>
+                                            <i class='fa-solid fa-list'></i>
+                                        </a>
+                                        <button class='btn btn-danger btn-icon-split btn-delete'
+                                        onclick='OnDeleteClick(this)' data-id='{item.ShipmentScheduleID}' data-toggle='modal' data-target='#delete-modal'>
+                                            <i class='fa-solid fa-trash'></i>
+                                        </button>
+                                    </td>
+                            ";
+                        }
+                        else
+                        {
+                            searchData += $@"
+                                <tr>
+                                    <td>
+                                        <a class='btn btn-secondary btn-icon-split ml-1 mr-1' onclick='OnDetailClick(this)'>
+                                            <i class='fa-solid fa-list'></i>
+                                        </a>
+                                </td>
+                            ";
+                        }
+
+                        searchData += $@"
+                            <td class='ShipmentScheduleID'>{@item.ShipmentScheduleID}</td>
+                            <td class='SupplierName'>{@item.SupplierName}</td>
+                            <td class='DeliveryDate'>{Utils.ConvertToYYYYMMDD(@item.DeliveryDate)}</td>
+                            <td class='DeliveryTimeClass'>{@item.DeliveryTimeClass}</td>
+                            <td class='DeliveryProductNumber'>{@item.DeliveryProductNumber}</td>
+                            <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
+                            <td class='LotQuantity'>{@item.LotQuantity}</td>
+                            <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
+                            <td class='Quantity'>{@item.Quantity}</td>
+                            <td class='StoreOutNumberOfBoxes'>{@item.StoreOutNumberOfBoxes}</td>
+                            <td class='StoreOutQuantity'>{@item.StoreOutQuantity}</td>
+                            <td class='OrdererCode'>{@item.OrdererCode}</td>
+                            <td class='OrdererFactoryKubun'>{@item.OrdererFactoryKubun}</td>
+                            <td class='OrdererName'>{@item.OrdererName}</td>
+                            <td class='OrdererFactoryName'>{@item.OrdererFactoryName}</td>
+                            <td class='ShipperCode'>{@item.ShipperCode}</td>
+                            <td class='ShipperFactoryKubun'>{@item.ShipperFactoryKubun}</td>
+                            <td class='ShipperName'>{@item.ShipperName}</td>
+                            <td class='DeliveryCode'>{@item.DeliveryCode}</td>
+                            <td class='DeliveryFactoryKubun'>{@item.DeliveryFactoryKubun}</td>
+                            <td class='DeliveryLocation'>{@item.DeliveryLocation}</td>
+                            <td class='DeliveryName'>{@item.DeliveryName}</td>
+                            <td class='DeliveryFactoryName'>{@item.DeliveryFactoryName}</td>
+                            <td class='RegularKubun'>{@item.RegularKubun}</td>
+                            <td class='IssuedDate'>{Utils.ConvertToYYYYMMDD(@item.IssuedDate)}</td>
+                            <td class='DeliveryTime'>{@item.DeliveryTime}</td>
+                            <td class='TranspotationIdentify'>{@item.TranspotationIdentify}</td>
+                            <td class='DeliverySlipNumber'>{@item.DeliverySlipNumber}</td>
+                            <td class='DeliverySlipPageNumber'>{@item.DeliverySlipPageNumber}</td>
+                            <td class='DeliverySlipRowNumber'>{@item.DeliverySlipRowNumber}</td>
+                            <td class='DeliveryProductAbbreviation'>{@item.DeliveryProductAbbreviation}</td>
+                            <td class='DeliveryProductName'>{@item.DeliveryProductName}</td>
+                            <td class='BranchNumber'>{@item.BranchNumber}</td>
+                            <td class='UpdatedAt'>{@item.UpdatedAt}</td>
+                            <td class='UpdatedBy'>{@item.UpdatedBy}</td>
+                            <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
+                            <input type='hidden' class='DepoID' value='{item.DepoID}' />
+                            </tr>
+                        ";
                     }
                 }
 

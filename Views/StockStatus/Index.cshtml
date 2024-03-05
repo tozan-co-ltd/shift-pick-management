@@ -142,6 +142,24 @@
         });
     });
 
+    // 詳細
+    function OnDetailClick(trTag) {
+        var row = trTag.parentNode.parentNode;
+        
+        var searchDate = row.getElementsByClassName("SearchDate")[0].value;
+        var depoId = row.getElementsByClassName("DepoID")[0].value;
+        var companyId = row.getElementsByClassName("SupplierID")[0].value;
+        var supplierProductNumber = row.getElementsByClassName("SupplierProductNumber")[0].textContent;
+
+        var url = window.location.origin + '@Url.Action("Detail", "StockStatus")';
+        url += '?searchDate=' + searchDate;
+        url += '&depoId=' + depoId;
+        url += '&companyId=' + companyId;
+        url += '&supplierProductNumber=' + supplierProductNumber;
+        
+        window.location.href = url;
+    }
+
     // エラーメッセージ削除
     function DeleteErrorMessages() {
         $('#div-error-message').text('');
