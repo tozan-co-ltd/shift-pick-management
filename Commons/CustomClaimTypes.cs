@@ -36,6 +36,11 @@ namespace mar_sumaken_web.Commons
         public const string ClaimType_Role = "Role";
 
         /// <summary>
+        /// 管理権限区分
+        /// </summary>
+        public const string ClaimType_AuthorizedKubun = "AuthorizedKubun";
+
+        /// <summary>
         /// タイムスタンプ(ログイン日時)
         /// </summary>
         public const string ClaimType_TimeStamp = "TimeStamp";

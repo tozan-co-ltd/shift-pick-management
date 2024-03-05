@@ -35,6 +35,7 @@ namespace mar_sumaken_web.Controllers
                 // 会社リスト取得
                 CommonModel commonModel = new();
                 model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_SupplierID);
+                model.AuthorizedKubun = user.AuthorizedKubun;
 
                 return View(model);
             }
@@ -79,34 +80,47 @@ namespace mar_sumaken_web.Controllers
 
                     foreach (var item in model.DStoreInList)
                     {
-                        searchData += $@"<tr>
-                        <td>
-                            <a class='btn btn-success btn-icon-split ml-1 mr-1'
-                            onclick='OnEditClick(this)' data-id='{item.StoreInID}' data-toggle='modal' data-target='#edit-modal'>
-                                <i class='fa-solid fa-pen'></i>
-                            </a>
-                            <button class='btn btn-danger btn-icon-split'
-                            onclick='OnDeleteClick(this)' data-id='{item.StoreInID}' data-toggle='modal' data-target='#delete-modal'>
-                                <i class='fa-solid fa-trash'></i>
-                            </button>
-                        </td>
-                        <td class='StoreInID'>{@item.StoreInID}</td>
-                        <td class='SupplierName'>{@item.SupplierName}</td>
-                        <td class='StoreInDate'>{@item.StoreInDate.ToString("yyyy/MM/dd")}</td>
-                        <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
-                        <td class='LotNumber'>{@item.LotNumber}</td>
-                        <td class='LotQuantity'>{@item.LotQuantity}</td>
-                        <td class='Quantity'>{@item.Quantity}</td>
-                        <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
-                        <td class='MainProductKey'>{@item.MainProductKey}</td>
-                        <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
-                        <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
-                        <td class='Remarks'>{@item.Remarks}</td>
-                        <td class='CreatedAt'>{@item.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")}</td>
-                        <td class='CreatedBy'>{@item.CreatedBy}</td>
-                        <input type='hidden' class='DepoID' value='{item.DepoID}' />
-                        <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
-                        </tr>";
+                        // 管理権限区分が1(管理者)のみ削除ボタン表示
+                        if (user.AuthorizedKubun == 1)
+                        {
+                            searchData += $@"
+                                <tr>
+                                    <td>
+                                        <a class='btn btn-success btn-icon-split ml-1 mr-1'
+                                        onclick='OnEditClick(this)' data-id='{item.StoreInID}' data-toggle='modal' data-target='#edit-modal'>
+                                            <i class='fa-solid fa-pen'></i>
+                                        </a>
+                                        <button class='btn btn-danger btn-icon-split'
+                                        onclick='OnDeleteClick(this)' data-id='{item.StoreInID}' data-toggle='modal' data-target='#delete-modal'>
+                                            <i class='fa-solid fa-trash'></i>
+                                        </button>
+                                </td>
+                            ";
+                        }
+                        else
+                        {
+                            searchData += $@"<tr><td></td>";
+                        }
+
+                        searchData += $@"
+                            <td class='StoreInID'>{@item.StoreInID}</td>
+                            <td class='SupplierName'>{@item.SupplierName}</td>
+                            <td class='StoreInDate'>{@item.StoreInDate.ToString("yyyy/MM/dd")}</td>
+                            <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
+                            <td class='LotNumber'>{@item.LotNumber}</td>
+                            <td class='LotQuantity'>{@item.LotQuantity}</td>
+                            <td class='Quantity'>{@item.Quantity}</td>
+                            <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
+                            <td class='MainProductKey'>{@item.MainProductKey}</td>
+                            <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
+                            <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
+                            <td class='Remarks'>{@item.Remarks}</td>
+                            <td class='CreatedAt'>{@item.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")}</td>
+                            <td class='CreatedBy'>{@item.CreatedBy}</td>
+                            <input type='hidden' class='DepoID' value='{item.DepoID}' />
+                            <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
+                            </tr>
+                        ";
                     }
                 }
 
