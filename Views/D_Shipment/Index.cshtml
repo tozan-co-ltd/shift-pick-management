@@ -43,7 +43,7 @@
                                 </div>
                             </div>
                             <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                                <span class="warehouse-name-drs">仕入先名</span>
+                                <span class="warehouse-name-drs">納入先名</span>
                                 <div class="unset-pdl">
                                     <input type="hidden" asp-for="DeliveryID" />
                                     <input class="form-control" asp-for="DeliveryName" readonly />
@@ -158,7 +158,7 @@
         dShipmentList.forEach(function (item) {
             if (item.shipmentID == shipmentId) {
                 $("#detailDepoName").text(item.depoName);
-                $("#detailCreatedAt ").text(item.scanedAt);
+                $("#detailCreatedAt").text(item.scanedAt);
                 $("#detailHandyMenuName").text(item.handyMenuName);
                 $("#detailSupplierProductNumber").text(item.supplierProductNumber);
                 $("#detailFirstScanedString").text(item.firstScanedString);
