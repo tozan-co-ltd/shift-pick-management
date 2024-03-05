@@ -83,11 +83,11 @@ namespace mar_sumaken_web.Commons
                 }
 
                 // 日付
-                string start = searchModel.SearchStartDate.Replace("/", "");
-                string end = searchModel.SearchEndDate.Replace("/", "");
+                string start = searchModel.SearchStartDate != null ? searchModel.SearchStartDate.Replace("/", "") : string.Empty;
+                string end = searchModel.SearchEndDate != null ? searchModel.SearchEndDate.Replace("/", "") : string.Empty;
 
                 string seachDate = start; //入庫日
-                if (!gamenName.Equals("日別在庫照会"))
+                if (!gamenName.Contains("在庫照会"))
                 {
                     seachDate = string.Concat(start, "_", end); //入庫日開始_入庫日終了
                 }

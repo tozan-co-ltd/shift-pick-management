@@ -2,9 +2,14 @@
 @model mar_sumaken_web.Models.StockStatusModel;
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "日別在庫照会";
 }
-
+<style>
+    .scrollable-table {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+</style>
 <div class="card shadow de-inspection d-receive-schedule m-4">
     <div class="card-header text-gray-800">
         @ViewData["Title"]
@@ -90,6 +95,37 @@
                         <td>@Model.StoreOutQuantity</td>
                         <td>@Model.StockRemainQuantity</td>
                     </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Detail List-->
+        <div class="col-8 mt-3 pl-0 scrollable-table" id="div-table">
+            <table class="table table-container table-sm stripe hover nowrap" id="table-datatable">
+                <thead>
+                    <tr>
+                        <th>日付</th>
+                        <th>入庫箱数</th>
+                        <th>入庫数</th>
+                        <th>出庫箱数</th>
+                        <th>出庫数</th>
+                        <th>在庫数</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (@Model != null && @Model.DetailList != null && @Model.DetailList.Count > 0)
+                    {
+                        @foreach (var item in @Model.DetailList)
+                        {
+                             <tr>
+                                <td>@item.WorkedDate</td>
+                                <td>@item.StoreInNumberOfBoxes</td>
+                                <td>@item.StoreInQuantity</td>
+                                <td>@item.StoreOutNumberOfBoxes</td>
+                                <td>@item.StoreOutQuantity</td>
+                                <td>@item.StockRemainQuantity</td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>
