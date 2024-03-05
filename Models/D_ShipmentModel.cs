@@ -145,7 +145,7 @@ namespace mar_sumaken_web.Models
         /// 読取日時
         /// </summary>
         [Display(Name = "読取日時")]
-        public string ScanedAt { get; set; }
+        public string? ScanedAt { get; set; }
 
         /// <summary>
         /// 作成日時
