@@ -22,7 +22,6 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// 出庫実績照会・修正画面表示
         /// </summary>
-        /// <param name="model"></param>
         /// <returns></returns>
         public IActionResult Index()
         {
