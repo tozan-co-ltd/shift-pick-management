@@ -79,12 +79,13 @@ namespace mar_sumaken_web.Models
         /// 仕入先名
         /// </summary>
         [Display(Name = "仕入先名")]
-        public string SupplierName { get; set; }
+        public string? SupplierName { get; set; }
 
         /// <summary>
         /// 仕入先かんばん名
         /// </summary>
         [Display(Name = "仕入先かんばん名")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string SupplierKanbanName { get; set; }
 
         /// <summary>
@@ -97,6 +98,7 @@ namespace mar_sumaken_web.Models
         /// 識別文字
         /// </summary>
         [Display(Name = "識別文字")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string IdentifyString { get; set; }
 
         /// <summary>
@@ -106,16 +108,16 @@ namespace mar_sumaken_web.Models
         public int IdentifyStringStartIndex { get; set; }
 
         /// <summary>
-        /// 品番桁数
-        /// </summary>
-        [Display(Name = "品番桁数")]
-        public int ProductNumberStartIndex { get; set; }
-
-        /// <summary>
         /// 品番開始位置
         /// </summary>
         [Display(Name = "品番開始位置")]
         public int ProductNumberLength { get; set; }
+
+        /// <summary>
+        /// 品番桁数
+        /// </summary>
+        [Display(Name = "品番桁数")]
+        public int ProductNumberStartIndex { get; set; }
 
         /// <summary>
         /// 数量桁数
@@ -163,7 +165,7 @@ namespace mar_sumaken_web.Models
         /// サブキー1開始位置
         /// </summary>
         [Display(Name = "サブキー1開始位置")]
-        public int FirstSubProductKeyIndex { get; set; }
+        public int FirstSubProductKeyStartIndex { get; set; }
 
         /// <summary>
         /// サブキー2桁数
@@ -175,7 +177,7 @@ namespace mar_sumaken_web.Models
         /// サブキー2開始位置
         /// </summary>
         [Display(Name = "サブキー2開始位置")]
-        public int SecondSubProductKeyIndex { get; set; }
+        public int SecondSubProductKeyStartIndex { get; set; }
 
         /// <summary>
         /// 枝番桁数

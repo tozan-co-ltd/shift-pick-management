@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
+using System.Reflection;
 
 namespace mar_sumaken_web.ConnectControllers
 {
@@ -83,13 +85,14 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
-        /// 仕入先かんばん情報登録
+        /// 仕入先かんばんマスター登録
         /// </summary>
-        /// <param name="model">登録情報</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>インサート数</returns>
-        public static int InsertMSupplierKanban(M_SupplierKanbanModel model, LoginUserModel loginUser)
+        /// <param name="model"></param>
+        /// <param name="loginUser"></param>
+        /// <returns>登録結果</returns>
+        public static bool InsertMSupplierKanban(M_SupplierKanbanModel model, LoginUserModel loginUser)
         {
+            bool result = false;
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
@@ -98,17 +101,48 @@ namespace mar_sumaken_web.ConnectControllers
                 connection.ConnectionString = connectionString;
                 connection.Open();
 
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
                 // DB接続
                 try
                 {
                     DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToInsertMSupplierKanban(model, sysDate, loginUser.UserName);
-                    var insertedCount = connection.Execute(sql);
 
-                    return insertedCount;
+                    // 仕入先かんばんマスター登録
+                    string supplierKanbanRegisterSql = CreateSQLToInsertMSupplierKanban(model, sysDate, loginUser.UserName);
+                    var insertedSupplierKanbanId = connection.ExecuteScalar(supplierKanbanRegisterSql, null, transaction);
+                    // 更新件数が0の場合はエラーとする
+                    if (insertedSupplierKanbanId == null)
+                    {
+                        throw new Exception();
+                    }
+                    int supplierKanbanId = (int)insertedSupplierKanbanId;
+
+                    foreach (SelectListItem menu in model.HandyMenuSelectList)
+                    {
+                        if (menu.Selected)
+                        {
+                            // ハンディメニュー-仕入先かんばん中間テーブル登録
+                            string handyMenuInsertSql = CreateSQLToInsertRHandyMenuSupplierKanban(Convert.ToInt32(menu.Value), supplierKanbanId, sysDate, loginUser.UserName);
+                            int menuInsertCount = connection.Execute(handyMenuInsertSql, null, transaction);
+                            // 更新件数が0の場合はエラーとする
+                            if (menuInsertCount == 0)
+                            {
+                                throw new Exception();
+                            }
+                        }
+                    }
+
+                    // トランザクションのコミット
+                    transaction.Commit();
+
+                    result = true;
+                    return result;
                 }
                 catch (Exception)
                 {
+                    transaction.Rollback();
                     throw;
                 }
             }
@@ -147,13 +181,15 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
-        /// 仕入先かんばん情報削除
+        /// 仕入先かんばんマスター削除
         /// </summary>
         /// <param name="spplierKanbanId">仕入先かんばんID</param>
         /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>更新件数</returns>
         public static int DeleteMSupplierKanban(int spplierKanbanId, LoginUserModel loginUser)
         {
+            int deleteAffectedRows = 0;
+
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
@@ -162,17 +198,34 @@ namespace mar_sumaken_web.ConnectControllers
                 connection.ConnectionString = connectionString;
                 connection.Open();
 
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
                 // DB接続
                 try
                 {
                     DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToDeleteMSupplierKanban(spplierKanbanId, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
+                    // 仕入先かんばんマスター削除
+                    string spplierKanbanDeleteSql = CreateSQLToDeleteMSupplierKanban(spplierKanbanId, sysDate, loginUser.UserName);
+                    deleteAffectedRows = connection.Execute(spplierKanbanDeleteSql, null, transaction);
+                    // 更新件数が0の場合はエラーとする
+                    if (deleteAffectedRows == 0)
+                    {
+                        throw new Exception();
+                    }
 
-                    return count;
+                    // ハンディメニュー-仕入先かんばん中間テーブル削除
+                    string handyMenuDeleteSql = CreateSQLToDeleteRHandyMenuSupplierKanban(spplierKanbanId);
+                    connection.Execute(handyMenuDeleteSql, null, transaction);
+
+                    // トランザクションのコミット
+                    transaction.Commit();
+
+                    return deleteAffectedRows;
                 }
                 catch (Exception)
                 {
+                    transaction.Rollback();
                     throw;
                 }
             }
@@ -206,9 +259,9 @@ namespace mar_sumaken_web.ConnectControllers
                     ,MainProductKeyLength
                     ,MainProductKeyStartIndex
                     ,FirstSubProductKeyLength
-                    ,FirstSubProductKeyIndex
+                    ,FirstSubProductKeyStartIndex
                     ,SecondSubProductKeyLength
-                    ,SecondSubProductKeyIndex
+                    ,SecondSubProductKeyStartIndex
                     ,ProductBranchNumberLength
                     ,ProductBranchNumberStartIndex
                     ,OrderNumberLength
@@ -254,17 +307,20 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 重複仕入先かんばん情報取得SQL作成
         /// </summary>
-        /// <param name="depoCode">仕入先かんばんコード</param>
+        /// <param name="model">登録情報</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectDuplicateMSupplierKanban(int depoCode)
+        public static string CreateSQLToSelectDuplicateMSupplierKanban(M_SupplierKanbanModel model)
         {
+            // 倉庫ID・識別文字・識別文字開始位置が重複していたらエラー
             var sql = $@"
                 SELECT
                     COUNT(*)                      
                 FROM 
                     M_SupplierKanban
                 WHERE
-                    DepoCode = {depoCode}
+                    DepoID = {model.SelectedDepoID}
+                    AND IdentifyString = '{model.IdentifyString}'
+                    AND IdentifyStringStartIndex = {model.IdentifyStringStartIndex}
                     AND IsDeleted = 0
             ";
 
@@ -305,17 +361,90 @@ namespace mar_sumaken_web.ConnectControllers
 
             var sql = $@"
                 INSERT INTO M_SupplierKanban(
-                    DepoCode, 
-                    DepoName, 
+                    DepoID, 
+                    CompanyID, 
+                    SupplierKanbanName, 
+                    AllowedDuplicatesFlag, 
+                    IdentifyString, 
+                    IdentifyStringStartIndex, 
+                    ProductNumberLength, 
+                    ProductNumberStartIndex, 
+                    QuantityLength, 
+                    QuantityStartIndex, 
+                    LotLength, 
+                    LotStartIndex, 
+                    MainProductKeyLength, 
+                    MainProductKeyStartIndex, 
+                    FirstSubProductKeyLength, 
+                    FirstSubProductKeyStartIndex, 
+                    SecondSubProductKeyLength, 
+                    SecondSubProductKeyStartIndex, 
+                    ProductBranchNumberLength, 
+                    ProductBranchNumberStartIndex, 
+                    OrderNumberLength, 
+                    OrderNumberStartIndex, 
                     CreatedAt, 
                     CreatedBy, 
                     UpdatedAt, 
                     UpdatedBy
                 )
                 VALUES (
+                    {model.SelectedDepoID},
+                    {model.SelectedSupplierID},
+                    '{model.SupplierKanbanName}',
+                    {model.AllowedDuplicatesFlag},
+                    '{model.IdentifyString}',
+                    {model.IdentifyStringStartIndex},
+                    {model.ProductNumberLength},
+                    {model.ProductNumberStartIndex},
+                    {model.QuantityLength},
+                    {model.QuantityStartIndex},
+                    {model.LotLength},
+                    {model.LotStartIndex},
+                    {model.MainProductKeyLength},
+                    {model.MainProductKeyStartIndex},
+                    {model.FirstSubProductKeyLength},
+                    {model.FirstSubProductKeyStartIndex},
+                    {model.SecondSubProductKeyLength},
+                    {model.SecondSubProductKeyStartIndex},
+                    {model.ProductBranchNumberLength},
+                    {model.ProductBranchNumberStartIndex},
+                    {model.OrderNumberLength},
+                    {model.OrderNumberStartIndex},
                     '{formatCreatedAt}',
                     '{createdBy}',
                     '{formatCreatedAt}',
+                    '{createdBy}'
+                );
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// ハンディ-仕入先かんばん中間テーブル登録SQL作成
+        /// </summary>
+        /// <param name="handyMenuId">登録ハンディメニューID</param>
+        /// <param name="supplierKanbanId">登録ユーザーI</param>
+        /// <param name="createdAt">システムタイム</param>
+        /// <param name="createdBy">ユーザーID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToInsertRHandyMenuSupplierKanban(int handyMenuId, int supplierKanbanId, DateTime createdAt, string createdBy)
+        {
+            var sql = $@"
+                INSERT INTO M_SupplierKanban(
+                    HandyMenuID, 
+                    SupplierKanbanID, 
+                    CreatedAt, 
+                    CreatedBy, 
+                    UpdatedAt, 
+                    UpdatedBy
+                )
+                VALUES (
+                    '{handyMenuId}',
+                    '{supplierKanbanId}',
+                    '{createdAt}',
+                    '{createdBy}',
+                    '{createdAt}',
                     '{createdBy}'
                 );
             ";
@@ -358,8 +487,24 @@ namespace mar_sumaken_web.ConnectControllers
                     UpdatedAt = '{updatedAt}',
                     UpdatedBy = '{updatedBy}'
                 WHERE 
-                    spplierKanbanId = {spplierKanbanId}
+                    SupplierKanbanID = {spplierKanbanId}
             ;";
+            return sql;
+        }
+
+        /// <summary>
+        /// ハンディメニュー-仕入先かんばん中間テーブル削除SQL作成
+        /// </summary>
+        /// <param name="spplierKanbanId">仕入先かんばんID</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToDeleteRHandyMenuSupplierKanban(int spplierKanbanId)
+        {
+            var sql = $@"
+                DELETE 
+                FROM    R_HandyMenuSupplierKanban
+                WHERE 
+	                    SupplierKanbanID = {spplierKanbanId}
+            ";
             return sql;
         }
     }

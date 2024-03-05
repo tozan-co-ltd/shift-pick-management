@@ -29,9 +29,8 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 仕入先かんばんマスター情報取得SQL作成
+                // 仕入先かんばんマスター情報取得
                 var sql = M_SupplierKanbanConnectController.CreateSQLToSelectMSupplierKanbans();
-                // DB接続
                 var supplierKanbanList = M_SupplierKanbanConnectController.ConnectMSupplierKanbans(sql, user.DatabaseName);
 
                 if (supplierKanbanList.Count > 0)
@@ -64,9 +63,7 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // ハンディメニューマスター情報取得
-                // SQL作成
                 var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToSelectMHandyMenuList();
-                // DB接続
                 List<M_HandyMenuModel> handyMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(handyMenuListSql, user.DatabaseName);
                 foreach (var handyMenu in handyMenuList)
                 {
@@ -104,6 +101,10 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
+                // メインキーチェック
+                // 重複許容フラグ=0の場合はメインキー必須
+
+
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
@@ -111,12 +112,12 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 仕入先かんばんコード重複チェック
-                //var sql = M_SupplierKanbanConnectController.CreateSQLToSelectDuplicateMSupplierKanban(model.IdentifyString);
-                //bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
-                //if (isExisted)
-                //{
-                //    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_SupplierKanbanModel>("DepoCode")) });
-                //}
+                var sql = M_SupplierKanbanConnectController.CreateSQLToSelectDuplicateMSupplierKanban(model);
+                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
+                if (isExisted)
+                {
+                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_SupplierKanbanModel>("DepoName") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyString") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyStringStartIndex")) });
+                }
 
                 // 仕入先かんばんマスター登録
                 M_SupplierKanbanConnectController.InsertMSupplierKanban(model, user);

@@ -113,9 +113,9 @@
                                 <td>@item.MainProductKeyLength</td>
                                 <td>@item.MainProductKeyStartIndex</td>
                                 <td>@item.FirstSubProductKeyLength</td>
-                                <td>@item.FirstSubProductKeyIndex</td>
+                                <td>@item.FirstSubProductKeyStartIndex</td>
                                 <td>@item.SecondSubProductKeyLength</td>
-                                <td>@item.SecondSubProductKeyIndex</td>
+                                <td>@item.SecondSubProductKeyStartIndex</td>
                                 <td>@item.ProductBranchNumberLength</td>
                                 <td>@item.ProductBranchNumberStartIndex</td>
                                 <td>@item.OrderNumberLength</td>
@@ -186,7 +186,7 @@
             </div>
             <div class="modal-body">
                 <div class="col-12 col-md-10">
-                    <p id="delete-modal-error-message" class="mt-1"></p>
+                    <p id="delete-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
                     <div class="col-12 col-md-10">
@@ -269,11 +269,11 @@
                     + "</tr><tr>"
                     + "<td>サブキー1</td>"
                     + "<td>" + item.firstSubProductKeyLength + "</td>"
-                    + "<td>" + item.firstSubProductKeyIndex + "</td>"
+                    + "<td>" + item.firstSubProductKeyStartIndex + "</td>"
                     + "</tr><tr>"
                     + "<td>サブキー2</td>"
                     + "<td>" + item.secondSubProductKeyLength + "</td>"
-                    + "<td>" + item.secondSubProductKeyIndex + "</td>"
+                    + "<td>" + item.secondSubProductKeyStartIndex + "</td>"
                     + "</tr><tr>"
                     + "<td>枝番</td>"
                     + "<td>" + item.productBranchNumberLength + "</td>"

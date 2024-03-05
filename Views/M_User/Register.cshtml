@@ -86,7 +86,7 @@
                                 <div class="col-12 col-sm-4 column-1st">
                                     <label>使用倉庫名<span style="color:red">*</span></label>
                                 </div>
-                                <div class="col-12 col-sm-8 column-2nd warehouse-checkbox">
+                                <div class="col-12 col-sm-8 column-2nd">
                                     <input type="hidden" id="select-depo-count" value="@Model.DepoSelectList.Count">
                                     @for (var i = 0; i < Model.DepoSelectList.Count; i++)
                                     {
@@ -252,7 +252,6 @@
                 option.disabled = true;
                 option.selected = true;
             }
-            console.log(option);
             selectBox.add(option);
         }
     });

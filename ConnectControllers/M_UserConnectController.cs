@@ -181,8 +181,9 @@ namespace mar_sumaken_web.Commons
                 // DB接続
                 try
                 {
+                    DateTime sysDate = DateTime.Now;
                     // ユーザーマスター削除
-                    string userDeleteSql = CreateSQLToDeleteMUser(userId, DateTime.Now, loginUser.UserName);
+                    string userDeleteSql = CreateSQLToDeleteMUser(userId, sysDate, loginUser.UserName);
                     deleteAffectedRows = connection.Execute(userDeleteSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
                     if(deleteAffectedRows == 0)
@@ -212,55 +213,16 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 重複ユーザー情報取得をチェック
-        /// </summary>
-        /// <param name="loginId">ログインID</param>
-        /// <param name="databaseName">データベース名</param>
-        /// <returns>重複結果</returns>
-        public static bool CheckIsDuplicateMUserByLoginId(string loginId, string databaseName)
-        {
-            // 戻り値
-            bool isDuplicateValid = false;
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-
-                    var sql = CreateSQLToSelectDuplicateMUser(loginId);
-
-                    int result = Convert.ToInt32(connection.ExecuteScalar(sql));
-
-                    if (result > 0)
-                    {
-                        isDuplicateValid = true;
-                    }
-                }
-                return isDuplicateValid;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// ユーザーマスター登録
         /// </summary>
-        /// <param name="mUserModel"></param>
-        /// <param name="loginUserModel"></param>
+        /// <param name="model"></param>
+        /// <param name="loginUser"></param>
         /// <returns>登録結果</returns>
-        public static bool InsertMUser(M_UserModel mUserModel, LoginUserModel loginUserModel)
+        public static bool InsertMUser(M_UserModel model, LoginUserModel loginUser)
         {
-            bool result = true;
+            bool result = false;
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUserModel.DatabaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -275,47 +237,41 @@ namespace mar_sumaken_web.Commons
                 {
                     DateTime sysDate = DateTime.Now;
 
-                    // ユーザーマスター登録SQL作成
-                    string userRegisterSql = CreateSQLToInsertMUser(mUserModel, sysDate, loginUserModel.UserName);
                     // ユーザーマスター登録
+                    string userRegisterSql = CreateSQLToInsertMUser(model, sysDate, loginUser.UserName);
                     var insertedUserId = connection.ExecuteScalar(userRegisterSql, null, transaction);
-                    // 更件数が0の場合はエラーとする
+                    // 更新件数が0の場合はエラーとする
                     if (insertedUserId == null)
                     {
-                        result = false;
                         throw new Exception();
                     }
-
                     int userId = (int) insertedUserId;
-                    // ユーザー倉庫中間テーブル登録
-                    foreach (SelectListItem depo in mUserModel.DepoSelectList)
+
+                    foreach (SelectListItem depo in model.DepoSelectList)
                     {
                         if (depo.Selected)
                         {
-                            // ユーザー倉庫中間テーブル登録SQL作成
-                            string userDepoInsertSql = CreateSQLToInsertRUserDepo(userId, Convert.ToInt32(depo.Value), sysDate, loginUserModel.UserName);
+                            // ユーザー倉庫中間テーブル登録
+                            string userDepoInsertSql = CreateSQLToInsertRUserDepo(userId, Convert.ToInt32(depo.Value), sysDate, loginUser.UserName);
                             int depoInsertCount = connection.Execute(userDepoInsertSql, null, transaction);
                             // 更新件数が0の場合はエラーとする
                             if (depoInsertCount == 0)
                             {
-                                result = false;
                                 throw new Exception();
                             }
                         }
                     }
 
-                    // ユーザーハンディメニュー中間テーブル登録
-                    foreach (SelectListItem menu in mUserModel.HandyMenuSelectList)
+                    foreach (SelectListItem menu in model.HandyMenuSelectList)
                     {
                         if(menu.Selected)
                         {
-                            // ユーザーハンディメニュー中間テーブル登録SQL作成
-                            string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(userId, Convert.ToInt32(menu.Value), sysDate, loginUserModel.UserName);
+                            // ユーザーハンディメニュー中間テーブル登録
+                            string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(userId, Convert.ToInt32(menu.Value), sysDate, loginUser.UserName);
                             int menuInsertCount = connection.Execute(userMenuInsertSql, null, transaction);
                             // 更新件数が0の場合はエラーとする
                             if (menuInsertCount == 0)
                             {
-                                result = false;
                                 throw new Exception();
                             }
                         }
@@ -324,6 +280,7 @@ namespace mar_sumaken_web.Commons
                     // トランザクションのコミット
                     transaction.Commit();
 
+                    result = true;
                     return result;
                 }
                 catch (Exception)
@@ -335,16 +292,16 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// ユーザーマスターを更新
+        /// ユーザーマスター更新
         /// </summary>
-        /// <param name="mUserModel">更新ユーザー情報</param>
-        /// <param name="loginUserModel">ログインユーザー情報</param>
+        /// <param name="model">更新ユーザー情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns></returns>
-        public static async Task<bool> UpdateMUser(M_UserModel mUserModel, LoginUserModel loginUserModel)
+        public static async Task<bool> UpdateMUser(M_UserModel model, LoginUserModel loginUser)
         {
-            bool result = true;
+            bool result = false;
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUserModel.DatabaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -360,29 +317,27 @@ namespace mar_sumaken_web.Commons
                     DateTime sysDate = DateTime.Now;
 
                     // ユーザーマスター更新
-                    string userUpdateSql = CreateSQLToUpdateMUser(mUserModel, sysDate, loginUserModel.UserName);
+                    string userUpdateSql = CreateSQLToUpdateMUser(model, sysDate, loginUser.UserName);
                     var updatedRows = connection.Execute(userUpdateSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
                     if (updatedRows == 0)
                     {
-                        result = false;
                         throw new Exception();
                     }
 
                     // ユーザー倉庫中間テーブル登録
                     // 削除してから新規作成
-                    string userDepoDeleteSql = CreateSQLToDeleteRUserDepoByUserId(mUserModel.UserID);
+                    string userDepoDeleteSql = CreateSQLToDeleteRUserDepoByUserId(model.UserID);
                     await connection.ExecuteAsync(userDepoDeleteSql, null, transaction);
-                    foreach (SelectListItem depo in mUserModel.DepoSelectList)
+                    foreach (SelectListItem depo in model.DepoSelectList)
                     {
                         if (depo.Selected)
                         {
-                            string userDepoInsertSql = CreateSQLToInsertRUserDepo(mUserModel.UserID, Convert.ToInt32(depo.Value), sysDate, loginUserModel.UserName);
+                            string userDepoInsertSql = CreateSQLToInsertRUserDepo(model.UserID, Convert.ToInt32(depo.Value), sysDate, loginUser.UserName);
                             int depoInsertCount = connection.Execute(userDepoInsertSql, null, transaction);
                             // 更新件数が0の場合はエラーとする
                             if (depoInsertCount == 0)
                             {
-                                result = false;
                                 throw new Exception();
                             }
                         }
@@ -390,18 +345,17 @@ namespace mar_sumaken_web.Commons
 
                     // ユーザーハンディメニュー中間テーブル登録
                     // 削除してから新規作成
-                    string userHandyMenuDeleteSql = CreateSQLToDeleteRHandyMenuByUserId(mUserModel.UserID);
+                    string userHandyMenuDeleteSql = CreateSQLToDeleteRHandyMenuByUserId(model.UserID);
                     await connection.ExecuteAsync(userHandyMenuDeleteSql, null, transaction);
-                    foreach (SelectListItem menu in mUserModel.HandyMenuSelectList)
+                    foreach (SelectListItem menu in model.HandyMenuSelectList)
                     {
                         if (menu.Selected)
                         {
-                            string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(mUserModel.UserID, Convert.ToInt32(menu.Value), sysDate, loginUserModel.UserName);
+                            string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(model.UserID, Convert.ToInt32(menu.Value), sysDate, loginUser.UserName);
                             int menuInsertCount = connection.Execute(userMenuInsertSql, null, transaction);
                             // 更新件数が0の場合はエラーとする
                             if (menuInsertCount == 0)
                             {
-                                result = false;
                                 throw new Exception();
                             }
                         }
@@ -410,6 +364,7 @@ namespace mar_sumaken_web.Commons
                     // トランザクションのコミット
                     transaction.Commit();
 
+                    result = true;
                     return result;
                 }
                 catch (Exception)
@@ -589,10 +544,10 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// ユーザーハンディメニュー中間テーブル登録SQL作成
+        /// ユーザー-倉庫中間テーブル登録SQL作成
         /// </summary>
-        /// <param name="userId">登録ユーザーID</param>
-        /// <param name="depoId">登録倉庫ID</param>
+        /// <param name="userId">ユーザーID</param>
+        /// <param name="depoId">倉庫ID</param>
         /// <param name="createdAt">システムタイム</param>
         /// <param name="createdBy">ユーザーID</param>
         /// <returns>SQL文</returns>
@@ -607,10 +562,10 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// ユーザー-倉庫中間テーブル登録SQL作成
+        /// ユーザーハンディメニュー中間テーブル登録SQL作成
         /// </summary>
-        /// <param name="userId">登録ユーザーI</param>
-        /// <param name="handyMenuId">登録ハンディメニューID</param>
+        /// <param name="userId">ユーザーID</param>
+        /// <param name="handyMenuId">ハンディメニューID</param>
         /// <param name="createdAt">システムタイム</param>
         /// <param name="createdBy">ユーザーID</param>
         /// <returns>SQL文</returns>
@@ -713,7 +668,7 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// ユーザー-倉庫中間テーブル削除SQL作成
+        /// ユーザー-ハンディメニュー中間テーブル削除SQL作成
         /// </summary>
         /// <param name="userId">ユーザーID</param>
         /// <returns>SQL文</returns>
@@ -729,7 +684,7 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// ユーザー-ハンディメニュー中間テーブル削除SQL作成
+        /// ユーザー-倉庫中間テーブル削除SQL作成
         /// </summary>
         /// <param name="userId">ユーザーID</param>
         /// <returns>SQL文</returns>
