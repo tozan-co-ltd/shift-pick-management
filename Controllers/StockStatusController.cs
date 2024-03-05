@@ -111,11 +111,14 @@ namespace mar_sumaken_web.Controllers
             }
         }
 
+
         /// <summary>
         /// 仕入先品番で在庫照会情報取得
         /// </summary>
-        /// <param name="searchModel">検索モデル</param>
-        /// <returns></returns>
+        /// <param name="searchDate">年月日</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="companyId">会社ID</param>
+        /// <param name="supplierProductNumber">仕入先品番</param>
         public IActionResult Detail(string searchDate, int depoId, int companyId, string supplierProductNumber)
         {
             StockStatusModel model = new();
@@ -167,6 +170,35 @@ namespace mar_sumaken_web.Controllers
                     // 在庫数=月初在庫数+当月入庫数総計-当月出庫数総計
                     model.StockRemainQuantity = searchResult.StockQuantityAtBeginningMonth + (searchResult.StoreInQuantity - searchResult.StoreOutQuantity);
                 }
+
+                // 仕入先品番で在庫情報取得SQL作成
+                var productSearchSql = StockStatusConnectController.CreateSQLToGetStockStatusByProductNumber(
+                    searchDate, depoId, companyId, supplierProductNumber);
+                // DB接続
+                List<StockStatusModel> searchProductResult = StockStatusConnectController.ConnectStockStatus(productSearchSql, user.DatabaseName);
+                List<StockStatusModel> detailList = new();
+                DateTime date = Convert.ToDateTime(searchDate);
+                int remainQuantity = model.StockQuantityAtBeginningMonth;
+                for (int i = 1; i <= date.Day; i++)
+                {
+                    DateTime checkDate = new DateTime(date.Year, date.Month, i);
+                    StockStatusModel newItem = new();
+
+                    newItem.WorkedDate = checkDate.ToString("yyyy/MM/dd");
+                    var checkItem = searchProductResult.Where(item => Convert.ToDateTime(item.WorkedDate) == checkDate).FirstOrDefault();
+                    if (checkItem != null)
+                    {
+                        newItem.StoreInNumberOfBoxes = checkItem.StoreInNumberOfBoxes;
+                        newItem.StoreInQuantity = checkItem.StoreInNumberOfBoxes * model.LotQuantity;
+                        newItem.StoreOutNumberOfBoxes = checkItem.StoreOutNumberOfBoxes;
+                        newItem.StoreOutQuantity = checkItem.StoreOutNumberOfBoxes * model.LotQuantity;
+                    }
+                    remainQuantity = remainQuantity + (newItem.StoreInQuantity - newItem.StoreOutQuantity);
+                    newItem.StockRemainQuantity = remainQuantity;
+
+                    detailList.Add(newItem);
+                }
+                model.DetailList = detailList;
 
                 return View(model);
             }

@@ -17,6 +17,11 @@ namespace mar_sumaken_web.Models
         public IPagedList<StockStatusModel>? StockStatusList { get; set; }
 
         /// <summary>
+        /// 在庫詳細
+        /// </summary>
+        public List<StockStatusModel>? DetailList { get; set; }
+
+        /// <summary>
         /// 年月日
         /// </summary>
         [Display(Name = "年月日")]
@@ -84,6 +89,11 @@ namespace mar_sumaken_web.Models
         /// 仕入先品番
         /// </summary>
         public string? SupplierProductNumber { get; set; }
+
+        /// <summary>
+        /// 輸出入日
+        /// </summary>
+        public string? WorkedDate { get; set; }
 
         /// <summary>
         /// 収容数
