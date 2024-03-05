@@ -1,4 +1,5 @@
 ﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
@@ -91,7 +92,8 @@ namespace mar_sumaken_web.Controllers
                         <td class='StockRemainQuantity'>{@item.StockRemainQuantity}</td>                        
                         <input type='hidden' class='ProductID' value='{item.ProductID}' />
                         <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
-    
+                        <input type='hidden' class='DepoID' value='{item.DepoID}' />
+                        <input type='hidden' class='SearchDate' value='{searchModel.DateSearchStart}' />
                         </tr>";
                     }
                 }
@@ -106,6 +108,77 @@ namespace mar_sumaken_web.Controllers
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 return Content(errorMessage);
+            }
+        }
+
+        /// <summary>
+        /// 仕入先品番で在庫照会情報取得
+        /// </summary>
+        /// <param name="searchModel">検索モデル</param>
+        /// <returns></returns>
+        public IActionResult Detail(string searchDate, int depoId, int companyId, string supplierProductNumber)
+        {
+            StockStatusModel model = new();
+            //var searchData = string.Empty;
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                model.DateSearchStart = searchDate;
+                // 倉庫IDで倉庫情報を取得
+                var searchDepoSql = M_DepoConnectController.CreateSQLToSelectByDepoId(depoId);
+                List<M_DepoModel> depoSearchList = M_DepoConnectController.ConnectMDepos(searchDepoSql, user.DatabaseName);
+                if (depoSearchList.Count != 1)
+                {
+                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
+                    return View(model);
+                }
+                model.DepoID = depoSearchList[0].DepoID;
+                model.DepoName = depoSearchList[0].DepoName;
+
+                // 会社IDで会社情報を取得
+                var searchCompanySql = M_CompanyConnectController.CreateSQLToSelectByCompanyId(companyId);
+                List<M_CompanyModel> companySearchList = M_CompanyConnectController.ConnectMCompanys(searchCompanySql, user.DatabaseName);
+                if (companySearchList.Count != 1)
+                {
+                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
+                    return View(model);
+                }
+                model.SupplierID = companySearchList[0].CompanyID;
+                model.SupplierName = companySearchList[0].CompanyName;
+
+                // 在庫情報取得SQL作成
+                var sql = StockStatusConnectController.CreateSQLToGetStockStatus(
+                    searchDate, depoId, companyId, supplierProductNumber);
+                // DB接続
+                StockStatusModel searchResult = StockStatusConnectController.ConnectStockStatus(sql, user.DatabaseName).FirstOrDefault();
+
+                // 表示用のhtml作成
+                if (searchResult != null)
+                {
+                    model.SupplierProductNumber = searchResult.SupplierProductNumber;
+                    model.LotQuantity = searchResult.LotQuantity;
+                    model.StockQuantityAtBeginningMonth = searchResult.StockQuantityAtBeginningMonth;
+                    model.StoreInNumberOfBoxes = searchResult.StoreInNumberOfBoxes;
+                    model.StoreInQuantity = searchResult.StoreInQuantity;
+                    model.StoreOutNumberOfBoxes = searchResult.StoreOutNumberOfBoxes;
+                    model.StoreOutQuantity = searchResult.StoreOutQuantity;
+                    // 在庫数=月初在庫数+当月入庫数総計-当月出庫数総計
+                    model.StockRemainQuantity = searchResult.StockQuantityAtBeginningMonth + (searchResult.StoreInQuantity - searchResult.StoreOutQuantity);
+                }
+
+                return View(model);
+            }
+            catch (SqlException)
+            {
+                ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
+                return View(model);
             }
         }
     }

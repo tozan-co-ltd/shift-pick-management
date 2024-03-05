@@ -61,6 +61,16 @@ namespace mar_sumaken_web.Models
         public int ProductID { get; set; }
 
         /// <summary>
+        ///倉庫ID
+        /// </summary>
+        public int DepoID { get; set; }
+
+        /// <summary>
+        ///倉庫名
+        /// </summary>
+        public string? DepoName { get; set; }
+
+        /// <summary>
         /// 仕入先ID
         /// </summary>
         public int SupplierID { get; set; }

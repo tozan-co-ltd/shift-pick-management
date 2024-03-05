@@ -45,8 +45,13 @@ namespace mar_sumaken_web.Commons
         /// <param name="depoId">倉庫ID</param>
         /// <param name="supplierId">会社ID</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetStockStatus(string searchDate, int depoId, int supplierId)
+        public static string CreateSQLToGetStockStatus(string searchDate, int depoId, int supplierId, string productNumber = "")
         {
+            var productNumberCondition = string.Empty;
+            if(!string.Empty.Equals(productNumber))
+            {
+                productNumberCondition = $@" AND product.SupplierProductNumber = '{productNumber}' ";
+            }
             var sql = $@"
                 DECLARE @InputDate DATE = '{searchDate}'; 
                 DECLARE @SearchStartDate DATETIME = DATEADD(MONTH, DATEDIFF(MONTH, 0, @InputDate), 0);
@@ -108,6 +113,7 @@ namespace mar_sumaken_web.Commons
                 ) 
                 SELECT
                 product.ProductID -- 品番ID
+                ,@DepoId as DepoID -- 倉庫ID
                 ,product.SupplierID -- 仕入先ID
                 ,company.CompanyName AS SupplierName -- 仕入先名
                 ,product.SupplierProductNumber  -- 仕入先品番
@@ -124,6 +130,7 @@ namespace mar_sumaken_web.Commons
                 WHERE
 	                product.IsDeleted = 0
                     AND product.SupplierID = @CompanyId
+                    {productNumberCondition}
                 Order by 
 	                product.SupplierProductNumber ASC
             ";
