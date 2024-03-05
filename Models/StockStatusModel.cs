@@ -83,53 +83,61 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 仕入先名
         /// </summary>
+        [Display(Name = "仕入先名")]
         public string? SupplierName { get; set; }
 
         /// <summary>
         /// 仕入先品番
         /// </summary>
+        [Display(Name = "仕入先品番")]
         public string? SupplierProductNumber { get; set; }
 
         /// <summary>
         /// 輸出入日
         /// </summary>
+        [Display(Name = "日付")]
         public string? WorkedDate { get; set; }
 
         /// <summary>
         /// 収容数
         /// </summary>
+        [Display(Name = "収容数")]
         public int LotQuantity { get; set; }
 
         /// <summary>
         /// 月初在庫数
         /// </summary>
+        [Display(Name = "月初在庫数")]
         public int StockQuantityAtBeginningMonth { get; set; }
 
         /// <summary>
         /// 入庫箱数
         /// </summary>
+        [Display(Name = "入庫箱数")]
         public int StoreInNumberOfBoxes { get; set; }
 
         /// <summary>
         /// 入庫数
         /// </summary>
+        [Display(Name = "入庫数")]
         public int StoreInQuantity { get; set; }
 
         /// <summary>
         /// 出庫箱数
         /// </summary>
+        [Display(Name = "出庫箱数")]
         public int StoreOutNumberOfBoxes { get; set; }
 
         /// <summary>
         /// 出庫数
         /// </summary>
+        [Display(Name = "出庫数")]
         public int StoreOutQuantity { get; set; }
 
         /// <summary>
         /// 在庫数
         /// </summary>
+        [Display(Name = "在庫数")]
         public int StockRemainQuantity { get; set; }
-
-
     }
 }

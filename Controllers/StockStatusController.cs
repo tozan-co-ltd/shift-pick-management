@@ -3,6 +3,7 @@ using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
 
@@ -212,6 +213,91 @@ namespace mar_sumaken_web.Controllers
                 ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
                 return View(model);
             }
+        }
+
+        /// <summary>
+        /// ファイル出力
+        /// </summary>
+        /// <param name="searchModel">検索モデル</param>
+        /// <param name="gamenName">画面名</param>
+        public JsonResult ExportCsv(SearchConditionModel searchModel, string gamenName)
+        {
+            try
+            {
+                // DataTable作成
+                DataTable searchResult = CreateDataTable();
+
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 在庫照会情報取得
+                var sql = StockStatusConnectController.CreateSQLToGetStockStatus(
+                    searchModel.SearchStartDate, searchModel.DepoID, searchModel.CompanyID);
+
+                List<StockStatusModel> searchList = StockStatusConnectController.ConnectStockStatus(sql, user.DatabaseName);
+                if (searchList.Count > 0)
+                {
+                    foreach (StockStatusModel item in searchList)
+                    {
+                        var stockRemainQuantity = item.StockQuantityAtBeginningMonth + (item.StoreInQuantity - item.StoreOutQuantity);
+                        DataRow newRow = searchResult.NewRow();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("SupplierName")] = item.SupplierName.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("LotQuantity")] = item.LotQuantity.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StockQuantityAtBeginningMonth")] = item.StockQuantityAtBeginningMonth.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StoreInNumberOfBoxes")] = item.StoreInNumberOfBoxes.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StoreInQuantity")] = item.StoreInQuantity.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes")] = item.StoreOutNumberOfBoxes.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutQuantity")] = item.StoreOutQuantity.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StockRemainQuantity")] = stockRemainQuantity.ToString();
+                        
+                        searchResult.Rows.Add(newRow);
+                    }
+                }
+
+                // ファイル名作成
+                string fileName = CreateFileController.CreateFileName(searchModel, gamenName);
+
+                // CSVファイルへのパスを作成する
+                string filePath = Path.Combine(Path.GetTempPath(), fileName);
+
+                // DataTableをCSV形式の文字列に変換
+                CreateFileController.ConvertDataTableToCsv(searchResult, filePath);
+
+                // ファイルの作成
+                var fileResult = System.IO.File.ReadAllBytes(filePath);
+
+                return Json(new { data = File(fileResult, System.Net.Mime.MediaTypeNames.Application.Octet, fileName) });
+            }
+            catch (SqlException)
+            {
+                return Json(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { errorMessage = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// データテーブル作成
+        /// </summary>
+        /// <returns></returns>
+        private static DataTable CreateDataTable()
+        {
+            var table = new DataTable();
+
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("SupplierName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("SupplierProductNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("LotQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StockQuantityAtBeginningMonth"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreInNumberOfBoxes"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreInQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreOutQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StockRemainQuantity"), typeof(string));
+
+            return table;
         }
     }
 }
