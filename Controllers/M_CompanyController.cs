@@ -44,9 +44,10 @@ namespace mar_sumaken_web.Controllers
 
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
             }
         }

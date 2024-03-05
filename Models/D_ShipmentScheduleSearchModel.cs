@@ -43,13 +43,5 @@ namespace mar_sumaken_web.Models
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
-
-        /// <summary>
-        /// 初期値設定
-        /// </summary>
-        public D_ShipmentScheduleSearchModel()
-        {
-
-        }  
     }
 }

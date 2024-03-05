@@ -1,0 +1,170 @@
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.D_ShipmentModel
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.ViewTitle;
+}
+
+<div class="card shadow de-inspection d-receive-schedule m-4">
+    <div class="card-header text-gray-800">
+        @ViewData["Title"]
+    </div>
+    <div class="card-body">
+        <div class="col-md-12 pb-3">
+            <form method="get" asp-controller="D_ShipmentSchedule" asp-action="Index">
+                <button type="submit" class="btn btn-secondary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-arrow-left-long"></i>
+                    </span>
+                    <span class="text">戻る</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <div class="row mt-10">
+                    <div class="col-lg-12">
+                        <form id="searchForm" method="post" enctype="multipart/form-data" name="form" onsubmit="return false;">
+                            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                <span class="warehouse-name-drs">倉庫名</span>
+                                <div class="unset-pdl">
+                                    <input type="hidden" asp-for="DepoID" />
+                                    <input class="form-control" asp-for="DepoName" readonly />
+                                </div>
+                            </div>
+                            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                <span class="warehouse-name-drs">納入先名</span>
+                                <div class="unset-pdl">
+                                    <input type="hidden" asp-for="DeliveryID" />
+                                    <input class="form-control" asp-for="DeliveryName" readonly />
+                                </div>
+                                <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3">
+                                    <span class="icon text-white-50">
+                                        <i class="fa-solid fa-file-export"></i>
+                                    </span>
+                                    <span class="text">出力</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- List-->
+        <div class="mt-3" id="div-table">
+            <table class="table table-sm stripe hover nowrap datatable-normal" id="table-datatable">
+                <thead>
+                    <tr>
+                        <th width="40"></th>
+                        <th class="font-weight-bold">ID</th>
+                        <th class="font-weight-bold">納入先名</th>
+                        <th class="font-weight-bold">納入指示日</th>
+                        <th class="font-weight-bold">便</th>
+                        <th class="font-weight-bold">出荷日時</th>
+                        <th class="font-weight-bold">納入先品番</th>
+                        <th class="font-weight-bold">背番号</th>
+                        <th class="font-weight-bold">シリアル番号</th>
+                        <th class="font-weight-bold">仕入先品番</th>
+                        <th class="font-weight-bold">ロット番号</th>
+                        <th class="font-weight-bold">箱数</th>
+                        <th class="font-weight-bold">数量</th>
+                        <th class="font-weight-bold">メインキー</th>
+                        <th class="font-weight-bold">サブキー1</th>
+                        <th class="font-weight-bold">サブキー2</th>
+                        <th class="font-weight-bold">読取日時</th>
+                        <th class="font-weight-bold">登録日時</th>
+                        <th class="font-weight-bold">登録者</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (@Model != null && @Model.DShipmentList?.Count > 0)
+                    {
+                        @foreach (var item in @Model.DShipmentList)
+                        {
+                            <tr>
+                                <td>
+                                    <a class="btn btn-secondary btn-icon-split ml-1 mr-1"
+                               onclick="OnDetailClick('@item.ShipmentID')" data-id="@item.ShipmentID" data-toggle="modal" data-target="#detail-modal">
+                                        <i class="fa-solid fa-list"></i>
+                                    </a>
+                                </td>
+                                <td>@item.ShipmentID</td>
+                                <td>@item.DeliveryName</td>
+                                <td>@item.DeliveryDate.ToString("yyyy/MM/dd")</td>
+                                <td>@item.DeliveryTimeClass</td>
+                                <td>@item.ShipmentDatetime.ToString("yyyy/MM/dd")</td>
+                                <td>@item.DeliveryProductNumber</td>
+                                <td>@item.DeliveryProductAbbreviation</td>
+                                <td>@item.KanbanSerialNumber</td>
+                                <td>@item.SupplierProductNumber</td>
+                                <td>@item.LotNumber</td>
+                                <td>@item.NumberOfBoxes</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.MainProductKey</td>
+                                <td>@item.FirstSubProductKey</td>
+                                <td>@item.SecondSubProductKey</td>
+                                <td>@item.ScanedAt</td>
+                                <td>@item.CreatedAt</td>
+                                <td>@item.CreatedBy</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <!-- Detail Modal-->
+        <div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-labelledby="detail-modal-label" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detail-modal-label">読取実績</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-12">
+                            <p>倉庫名：<span id="detailDepoName"></span></p>
+                            <p>読取日時：<span id="detailCreatedAt"></span></p>
+                            <p>ハンディメニュー名：<span id="detailHandyMenuName"></span></p>
+                            <p>仕入先品番：<span id="detailSupplierProductNumber"></span></p>
+                            <p>読取内容(1回目)：<br><span class="text-break" id="detailFirstScanedString"></span></p>
+                            <p>読取内容(2回目)：<br><span class="text-break" id="detailSecondScanedString"></span></p>
+                            <p>登録者：<span id="detailCreatedBy"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="viewTitle" value="@Model.ViewTitle" />
+    </div>
+</div>
+<script>
+    // 詳細ボタン押下
+    function OnDetailClick(shipmentId) {
+        var data = @Html.Raw(Json.Serialize(Model));
+        var dShipmentList = data.dShipmentList;
+
+        dShipmentList.forEach(function (item) {
+            if (item.shipmentID == shipmentId) {
+                $("#detailDepoName").text(item.depoName);
+                $("#detailCreatedAt").text(item.scanedAt);
+                $("#detailHandyMenuName").text(item.handyMenuName);
+                $("#detailSupplierProductNumber").text(item.supplierProductNumber);
+                $("#detailFirstScanedString").text(item.firstScanedString);
+                $("#detailSecondScanedString").text(item.secondScanedString);
+                $("#detailCreatedBy").text(item.scanCreatedBy);
+            }
+        });
+    }
+</script>

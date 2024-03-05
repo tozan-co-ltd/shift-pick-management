@@ -32,9 +32,10 @@ namespace mar_sumaken_web.Controllers
 
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
             }
         }
@@ -67,9 +68,9 @@ namespace mar_sumaken_web.Controllers
                 // 表示用のhtml作成
                 if (searchList.Count > 0)
                 {
-                    model.D_ReceiveModelList = searchList.ToPagedList();
+                    model.DReceiveModelList = searchList.ToPagedList();
 
-                    foreach (var item in model.D_ReceiveModelList)
+                    foreach (var item in model.DReceiveModelList)
                     {
                         searchData += $@"<tr>
                         <td>
@@ -89,20 +90,19 @@ namespace mar_sumaken_web.Controllers
                         <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                         <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
                         <td class='CreatedAt'>{@item.CreatedAt.ToString("yyyy/MM/dd")}</td>
-                        <td class='ScanedAt'>{@item.ScanedAt.ToString("yyyy/MM/dd")}</td>
+                        <td class='ScanedAt'>{@item.ScanedAt}</td>
                         <td class='CreatedBy'>{@item.CreatedBy}</td>
                         <input type='hidden' class='DepoID' value='{item.DepoID}' />
+                        <input type='hidden' class='DepoName' value='{item.DepoName}'/>                            
                         <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
                         <input type='hidden' class='ScanResultID' value='{item.ScanResultID}'/>
-    
                         <input type='hidden' class='HandyMenuID' value='{item.HandyMenuID}'/>
+                        <input type='hidden' class='HandyMenuName' value='{item.HandyMenuName}'/>
                         <input type='hidden' class='SupplierKanbanID' value='{item.SupplierKanbanID}'/>
                         <input type='hidden' class='NumberOfInputBoxes' value='{item.NumberOfInputBoxes}'/>
                         <input type='hidden' class='FirstScanedString' value='{item.FirstScanedString}'/>
                         <input type='hidden' class='SecondScanedString' value='{item.SecondScanedString}'/>
-                        <input type='hidden' class='NumberOfInputBoxes' value='{item.NumberOfInputBoxes}'/>
-                        <input type='hidden' class='FirstScanedString' value='{item.FirstScanedString}'/>
-                        <input type='hidden' class='SecondScanedString' value='{item.SecondScanedString}'/>
+                        <input type='hidden' class='ScanCreatedBy' value='{item.ScanCreatedBy}'/>
                         </tr>";
                     }
                 }

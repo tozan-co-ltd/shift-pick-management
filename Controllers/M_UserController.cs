@@ -53,9 +53,10 @@ namespace mar_sumaken_web.Controllers
 
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View();
             }
         }
@@ -181,7 +182,7 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult Edit(int userId)
+        public IActionResult Edit(int id)
         {
             M_UserEditModel editModel = new();
             try
@@ -191,7 +192,7 @@ namespace mar_sumaken_web.Controllers
 
                 // IDが一致するユーザー情報取得
                 // SQL作成
-                var userListSql = M_UserConnectController.CreateSQLToSelectMUserByUserId(userId);
+                var userListSql = M_UserConnectController.CreateSQLToSelectMUserByUserId(id);
                 // DB接続
                 List<M_UserModel> userList = M_UserConnectController.ConnectMUsers(userListSql, user.DatabaseName);
                 if (userList.Count != 1)
@@ -251,7 +252,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // IDが一致するユーザー-ハンディメニュー中間リスト取得
-                var userHandyMenuSql = M_UserConnectController.CreateSQLToSelectRUserHandyMenuList(userId);
+                var userHandyMenuSql = M_UserConnectController.CreateSQLToSelectRUserHandyMenuList(id);
                 var userMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(userHandyMenuSql, user.DatabaseName);
                 if (userMenuList.Count > 0)
                 {

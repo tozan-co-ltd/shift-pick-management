@@ -63,19 +63,23 @@ namespace mar_sumaken_web.Commons
                     ,dReceive.SecondSubProductKey
                     ,dReceive.NumberOfBoxes
                     ,dReceive.Quantity
-                    ,dReceive.ScanedAt
+                    --,dReceive.ScanedAt
                     ,dReceive.CreatedAt
                     ,dReceive.CreatedBy
                     ,depo.DepoName AS DepoName
                     ,scan.HandyMenuID
+                    ,menu.HandyMenuName
                     ,scan.SupplierKanbanID
                     ,scan.NumberOfInputBoxes
                     ,scan.FirstScanedString
                     ,scan.SecondScanedString
+                    ,FORMAT(scan.ScanedAt, 'yyyy/MM/dd HH:mm:ss') AS ScanedAt
                     ,scan.CreatedBy AS ScanCreatedBy
                 FROM D_Receive AS dReceive
                 INNER JOIN D_ScanResult AS scan 
 	                ON dReceive.ScanResultID = scan.ScanResultID
+                INNER JOIN M_HandyMenu menu 
+					ON scan.HandyMenuID = menu.HandyMenuID
                 INNER JOIN M_Company AS company 
                         ON dReceive.CompanyID = company.CompanyID
                 INNER JOIN M_Depo AS depo 
@@ -85,6 +89,7 @@ namespace mar_sumaken_web.Commons
                     AND dReceive.CompanyID = {model.SelectedCompanyID}
                     AND dReceive.ReceiveDatetime >= '{model.SearchStartDate}'
                     AND dReceive.ReceiveDatetime <= '{searchEndDate}'
+                    AND menu.IsDeleted = 0
 	                AND company.IsDeleted = 0
                     AND depo.IsDeleted = 0
                 ORDER BY 

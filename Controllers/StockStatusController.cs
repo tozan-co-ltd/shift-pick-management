@@ -30,9 +30,10 @@ namespace mar_sumaken_web.Controllers
 
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ViewData["ErrorMessage"] = ErrorMessagesResources.E9999;
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
             }
         }
@@ -88,7 +89,7 @@ namespace mar_sumaken_web.Controllers
                         <td class='StoreOutNumberOfBoxes'>{@item.StoreOutNumberOfBoxes}</td>
                         <td class='StoreOutQuantity'>{@item.StoreOutQuantity}</td>
                         <td class='StockRemainQuantity'>{@item.StockRemainQuantity}</td>                        
-                        <input type='hidden' class='DepoID' value='{item.ProductID}' />
+                        <input type='hidden' class='ProductID' value='{item.ProductID}' />
                         <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
     
                         </tr>";

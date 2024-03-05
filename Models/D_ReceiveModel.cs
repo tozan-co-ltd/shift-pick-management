@@ -12,7 +12,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 入荷予定照会リスト
         /// </summary>
-        public IPagedList<D_ReceiveModel>? D_ReceiveModelList { get; set; }
+        public IPagedList<D_ReceiveModel>? DReceiveModelList { get; set; }
 
         /// <summary>
         /// 検索入荷日(開始)
@@ -151,7 +151,7 @@ namespace mar_sumaken_web.Models
         /// 読取日時
         /// </summary>
         [Display(Name = "読取日時")]
-        public DateTime ScanedAt { get; set; }
+        public string? ScanedAt { get; set; }
 
         /// <summary>
         /// 登録者
@@ -164,6 +164,12 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "ハンディメニューID")]
         public int HandyMenuID { set; get; }
+
+        /// <summary>
+        /// ハンディメニュー名
+        /// </summary>
+        [Display(Name = "ハンディメニュー名")]
+        public string? HandyMenuName { set; get; }
 
         /// <summary>
         /// 仕入先かんばんID

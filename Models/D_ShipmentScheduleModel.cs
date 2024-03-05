@@ -72,6 +72,12 @@ namespace mar_sumaken_web.Models
         public string? SupplierName { set; get; }
 
         /// <summary>
+        /// 倉庫ID
+        /// </summary>
+        [Display(Name = "倉庫ID")]
+        public int DepoID { set; get; }
+
+        /// <summary>
         /// 発注元
         /// </summary>
         [Display(Name = "発注元")]
