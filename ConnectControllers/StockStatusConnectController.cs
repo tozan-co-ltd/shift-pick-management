@@ -138,7 +138,7 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 仕入先品番で在庫情報取得SQL作成
+        /// 仕入先品番が一致する在庫情報取得SQL作成
         /// </summary>
         /// <param name="searchDate">年月日</param>
         /// <param name="depoId">倉庫ID</param>

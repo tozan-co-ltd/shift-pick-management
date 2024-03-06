@@ -149,7 +149,7 @@
     $('#SearchDeliveryDate').on('change', function () {
         var data = { "SearchDeliveryDate": $(this).val() };
         $.ajax({
-        url: '@Url.Action("ChangDeliveryTimeClassList", "D_StoreOut")',
+        url: '@Url.Action("ChangeDeliveryTimeClassList", "D_StoreOut")',
             method: 'POST',
             data: data
         })
@@ -198,7 +198,10 @@
                     editRow.push(rowNumber);
                 }
             });
-            if (editRow.length == 0) return;
+            if (editRow.length == 0) {
+                $('#div-error-message').text("E1001: 納入先品番・仕入先品番は必須項目です。");
+                return;
+            }
 
             // 仕入先品番と数量チェック
             var checkFlag = checkValue(editRow);

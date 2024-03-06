@@ -3,7 +3,9 @@ using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.ComponentModel.Design;
 using System.Data.SqlClient;
+using System.Reflection;
 
 namespace mar_sumaken_web.Commons
 {
@@ -48,21 +50,41 @@ namespace mar_sumaken_web.Commons
         /// 出荷指示に対する作業進捗情報
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation()
+        public static string CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation(int depoId, int companyId)
         {
             // 本日作業する出荷指示は納入指示日が翌日(土日を除く)
             DateTime currentDate = DateTime.Now;
             var nextDay = currentDate.AddDays(currentDate.DayOfWeek == DayOfWeek.Friday ? 3 : 1).ToString("yyyy/MM/dd");
 
             var sql = $@"
-                    SELECT
-                       *
-                    FROM 
-                        D_ShipmentSchedule
-                    WHERE
-                        DeliveryDate = '{nextDay}'
-                        AND IsDeleted = 0
-                ;";
+                SELECT  
+                    depo.DepoName
+	                ,company.CompanyName AS SupplierName
+	                ,COALESCE(storeOut.NumberOfBoxes, 0) AS StoreOutNumberOfBoxes --出庫箱数
+	                ,COALESCE(storeOut.Quantity, 0) AS StoreOutQuantity --出庫数量
+					,ROUND(shipment.Quantity / shipment.LotQuantity, 0, 0) AS ScheduleNumberOfBoxes --指示箱数
+					,shipment.Quantity AS ScheduleQuantity --納入指示数
+                    ,shipment.*
+                FROM D_ShipmentSchedule AS shipment
+                LEFT JOIN D_StoreOut AS storeOut
+                    ON shipment.DepoID = storeOut.DepoID
+                    AND shipment.DeliveryDate = storeOut.DeliveryDate
+                    AND shipment.DeliveryTimeClass = storeOut.DeliveryTimeClass
+                    AND shipment.DeliverySlipNumber = storeOut.DeliverySlipNumber
+                    AND shipment.DeliveryProductNumber = storeOut.DeliveryProductNumber
+                    AND storeOut.IsDeleted = 0
+                INNER JOIN M_Company AS company
+                    ON shipment.CompanyID = company.CompanyID
+                INNER JOIN M_Depo AS depo
+                    ON shipment.DepoID = depo.DepoID
+                WHERE
+                    shipment.DepoID = {depoId}
+                    AND shipment.CompanyID = {companyId}
+                    AND shipment.DeliveryDate = '{nextDay}'
+                    AND shipment.IsDeleted = 0
+                    AND company.IsDeleted = 0
+                    AND depo.IsDeleted = 0
+            ";
 
             return sql;
         }

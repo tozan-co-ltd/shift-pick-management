@@ -44,15 +44,15 @@ namespace mar_sumaken_web.Controllers
 
                 return View(model);
 
-                //// 出荷指示報取得SQL作成
-                //var shipmentSql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation();
-                //// DB接続
+                //// 出荷指示情報取得
+                //会社コード=10001　固定で、会社マスターから10001のIDを取得する
+                //var companyId = 4;
+                //var shipmentSql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation(user.MainDepoID, companyId);
                 //IEnumerable<D_ShipmentScheduleModel> searchList = D_ShipmentScheduleConnectController.ConnectDShipmentSchedules(shipmentSql, user.DatabaseName);
                 //shipmentScheduleModel.D_ShipmentScheduleList = searchList.ToPagedList();
 
-                //// SQL作成
+                //// ハンディエラーメッセージ履歴情報取得
                 //var sql = D_HandyErrorMessageConnectController.CreateSQLToSelectDHandyErrorMessages();
-                //// DB接続
                 //IEnumerable<D_HandyErrorMessageModel> handyErrorMessageList = D_HandyErrorMessageConnectController.ConnectDHandyErrorMessages(sql, user.DatabaseName);
                 //handyErrorMessageModel.D_HandyErrorMessageList = handyErrorMessageList.ToPagedList();
                 //topModel = new TopModel

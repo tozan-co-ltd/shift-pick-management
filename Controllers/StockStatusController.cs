@@ -60,10 +60,9 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
                 }
 
-                // 在庫情報取得SQL作成
+                // 在庫情報取得
                 var sql = StockStatusConnectController.CreateSQLToGetStockStatus(
                     searchModel.DateSearchStart, searchModel.SelectedDepoID, searchModel.SelectedCompanyID);
-                // DB接続
                 List<StockStatusModel> searchList = StockStatusConnectController.ConnectStockStatus(sql, user.DatabaseName);
 
                 // 表示用のhtml作成
@@ -114,7 +113,7 @@ namespace mar_sumaken_web.Controllers
 
 
         /// <summary>
-        /// 仕入先品番で在庫照会情報取得
+        /// 日別在庫照会画面表示
         /// </summary>
         /// <param name="searchDate">年月日</param>
         /// <param name="depoId">倉庫ID</param>
@@ -123,39 +122,26 @@ namespace mar_sumaken_web.Controllers
         public IActionResult Detail(string searchDate, int depoId, int companyId, string supplierProductNumber)
         {
             StockStatusModel model = new();
-            //var searchData = string.Empty;
             try
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                model.DateSearchStart = searchDate;
-                // 倉庫IDで倉庫情報を取得
+                // 倉庫IDから倉庫情報を取得
                 var searchDepoSql = M_DepoConnectController.CreateSQLToSelectByDepoId(depoId);
                 List<M_DepoModel> depoSearchList = M_DepoConnectController.ConnectMDepos(searchDepoSql, user.DatabaseName);
-                if (depoSearchList.Count != 1)
-                {
-                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
-                    return View(model);
-                }
-                model.DepoID = depoSearchList[0].DepoID;
-                model.DepoName = depoSearchList[0].DepoName;
 
-                // 会社IDで会社情報を取得
+                // 会社IDから会社情報を取得
                 var searchCompanySql = M_CompanyConnectController.CreateSQLToSelectByCompanyId(companyId);
                 List<M_CompanyModel> companySearchList = M_CompanyConnectController.ConnectMCompanys(searchCompanySql, user.DatabaseName);
-                if (companySearchList.Count != 1)
-                {
-                    ViewData["ErrorMessage"] = "E1015: " + ErrorMessagesResources.E1015;
-                    return View(model);
-                }
-                model.SupplierID = companySearchList[0].CompanyID;
-                model.SupplierName = companySearchList[0].CompanyName;
 
-                // 在庫情報取得SQL作成
+                model.DateSearchStart = searchDate;
+                model.DepoName = depoSearchList[0].DepoName;
+                model.SupplierName = string.Concat(companySearchList[0].CompanyName, " - ", companySearchList[0].ClientName);
+
+                // 在庫情報取得
                 var sql = StockStatusConnectController.CreateSQLToGetStockStatus(
                     searchDate, depoId, companyId, supplierProductNumber);
-                // DB接続
                 StockStatusModel searchResult = StockStatusConnectController.ConnectStockStatus(sql, user.DatabaseName).FirstOrDefault();
 
                 // 表示用のhtml作成
@@ -172,21 +158,30 @@ namespace mar_sumaken_web.Controllers
                     model.StockRemainQuantity = searchResult.StockQuantityAtBeginningMonth + (searchResult.StoreInQuantity - searchResult.StoreOutQuantity);
                 }
 
-                // 仕入先品番で在庫情報取得SQL作成
+                // 仕入先品番が一致する在庫情報取得(日毎の入庫数・出庫数)
                 var productSearchSql = StockStatusConnectController.CreateSQLToGetStockStatusByProductNumber(
                     searchDate, depoId, companyId, supplierProductNumber);
-                // DB接続
                 List<StockStatusModel> searchProductResult = StockStatusConnectController.ConnectStockStatus(productSearchSql, user.DatabaseName);
+
                 List<StockStatusModel> detailList = new();
+
+                // ○月1日の在庫数＝月初在庫数
                 DateTime date = Convert.ToDateTime(searchDate);
-                int remainQuantity = model.StockQuantityAtBeginningMonth;
+                int remainQuantityPreviousDay = model.StockQuantityAtBeginningMonth;
+
+                // ○月1日から検索日まで順に計算
                 for (int i = 1; i <= date.Day; i++)
                 {
-                    DateTime checkDate = new DateTime(date.Year, date.Month, i);
-                    StockStatusModel newItem = new();
+                    DateTime checkDate = new(date.Year, date.Month, i);
+                    StockStatusModel newItem = new()
+                    {
+                        WorkedDate = checkDate.ToString("yyyy/MM/dd")
+                    };
 
-                    newItem.WorkedDate = checkDate.ToString("yyyy/MM/dd");
+                    // 仕入先品番が一致する在庫情報に日付が一致する入庫または出庫データがあるかチェック
                     var checkItem = searchProductResult.Where(item => Convert.ToDateTime(item.WorkedDate) == checkDate).FirstOrDefault();
+
+                    // ある場合は入庫箱数・入庫数量・出庫箱数・出庫数量を格納
                     if (checkItem != null)
                     {
                         newItem.StoreInNumberOfBoxes = checkItem.StoreInNumberOfBoxes;
@@ -194,8 +189,9 @@ namespace mar_sumaken_web.Controllers
                         newItem.StoreOutNumberOfBoxes = checkItem.StoreOutNumberOfBoxes;
                         newItem.StoreOutQuantity = checkItem.StoreOutNumberOfBoxes * model.LotQuantity;
                     }
-                    remainQuantity = remainQuantity + (newItem.StoreInQuantity - newItem.StoreOutQuantity);
-                    newItem.StockRemainQuantity = remainQuantity;
+                    // その日の在庫数を計算
+                    remainQuantityPreviousDay += (newItem.StoreInQuantity - newItem.StoreOutQuantity);
+                    newItem.StockRemainQuantity = remainQuantityPreviousDay;
 
                     detailList.Add(newItem);
                 }
