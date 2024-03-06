@@ -35,6 +35,7 @@
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
                 <form class="col-md-12" id="mSupplierKanbanForm">
+                    <input type="hidden" asp-for="SupplierKanbanID" value="@Model.SupplierKanbanID" />
                     <div class="d-flex flex-row">
                         <div class="col-7">
                             <div class="col-12 input-group div-input-group">
@@ -265,8 +266,8 @@
                             } *@
                         </tbody>
                     </table>
-                    <button class="btn btn-primary btn-icon-split" id="register-btn" style="min-width: 80px" onclick="OnRegister()">
-                        <span class="text">登録</span>
+                    <button class="btn btn-success btn-icon-split" id="register-btn" style="min-width: 80px" onclick="OnEdit()">
+                        <span class="text">更新</span>
                     </button>
                 </form>
             </div>
@@ -292,7 +293,7 @@
     });
 
     // 登録ボタン押下
-    function OnRegister() {
+    function OnEdit() {
         $('#mSupplierKanbanForm').submit(function (event) {
             $("#div-error-message").text("");
 

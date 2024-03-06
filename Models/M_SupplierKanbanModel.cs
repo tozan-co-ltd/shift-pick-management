@@ -70,10 +70,22 @@ namespace mar_sumaken_web.Models
         public int SupplierKanbanID { get; set; }
 
         /// <summary>
+        /// 倉庫ID
+        /// </summary>
+        [Display(Name = "倉庫ID")]
+        public int DepoID { set; get; }
+
+        /// <summary>
         /// 倉庫名
         /// </summary>
         [Display(Name = "倉庫名")]
         public string? DepoName { get; set; }
+
+        /// <summary>
+        /// 会社ID:仕入先の会社ID
+        /// </summary>
+        [Display(Name = "会社ID")]
+        public int SupplierID { set; get; }
 
         /// <summary>
         /// 仕入先名
@@ -117,6 +129,7 @@ namespace mar_sumaken_web.Models
         /// 品番桁数
         /// </summary>
         [Display(Name = "品番桁数")]
+        [Range(0, int.MaxValue, ErrorMessage = "Giá trị phải lớn hơn hoặc bằng 0.")]
         public int ProductNumberStartIndex { get; set; }
 
         /// <summary>
