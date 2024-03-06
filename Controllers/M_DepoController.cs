@@ -175,53 +175,56 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// ファイル出力
         /// </summary>
-        /// <param name="searchModel">検索モデル</param>
         /// <param name="gamenName">画面名</param>
-        public JsonResult ExportCsv(SearchConditionModel searchModel, string gamenName)
+        public JsonResult ExportFile(string gamenName)
         {
+            string? errorMessage;
             try
             {
-                // DataTable作成
-                DataTable dataTable = CreateDataTable();
-
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 検索情報取得
+                // テーブルデータ取得
+                DataTable dataTable = CreateDataTable();
+
+                // 倉庫マスター情報取得
                 var sql = M_DepoConnectController.CreateSQLToSelectMDepos();
-                List<M_DepoModel> searchList = M_DepoConnectController.ConnectMDepos(sql, user.DatabaseName);
-                if (searchList.Count > 0)
+                List<M_DepoModel> selectedList = M_DepoConnectController.ConnectMDepos(sql, user.DatabaseName);
+
+                // DataRowに格納
+                if (selectedList.Count > 0)
                 {
-                    foreach (M_DepoModel item in searchList)
+                    foreach (M_DepoModel item in selectedList)
                     {
                         DataRow newRow = dataTable.NewRow();
                         newRow[Utils.GetDisplayName<M_DepoModel>("DepoID")] = item.DepoID.ToString();
                         newRow[Utils.GetDisplayName<M_DepoModel>("DepoCode")] = item.DepoCode;
                         newRow[Utils.GetDisplayName<M_DepoModel>("DepoName")] = item.DepoName;
-                        newRow[Utils.GetDisplayName<M_DepoModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm:ss");
+                        newRow[Utils.GetDisplayName<M_DepoModel>("UpdatedAt")] = item.UpdatedAt.ToString();
                         newRow[Utils.GetDisplayName<M_DepoModel>("UpdatedBy")] = item.UpdatedBy;
 
                         dataTable.Rows.Add(newRow);
                     }
                 }
 
-                // ファイル名作成
-                string fileName = CreateFileController.CreateFileName(searchModel, gamenName);
-
-                // CSVファイルパス作成
-                string filePath = Path.Combine(Path.GetTempPath(), fileName);
-
-                // DataTableをCSV形式の文字列に変換
-                CreateFileController.ConvertDataTableToCsv(dataTable, filePath);
-
+                // ファイル名
+                var tmpFilename = CreateFileController.CreateFileName(null, gamenName);
+                // CSVファイルへのパスを作成
+                string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
+                // DataTableをCSVに変換
+                CreateFile.ConvertDataTableToCsv(dataTable, filePath);
                 // ファイル作成
-                var fileResult = System.IO.File.ReadAllBytes(filePath);
+                var file = System.IO.File.ReadAllBytes(filePath);
 
-                return Json(new { data = File(fileResult, System.Net.Mime.MediaTypeNames.Application.Octet, fileName) });
+                return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+            }
+            catch (SqlException)
+            {
+                return Json(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception ex)
             {
-                return Json(new { errorMessage = ex.Message });
+                return Json(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message });
             }
         }
 

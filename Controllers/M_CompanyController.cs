@@ -195,19 +195,17 @@ namespace mar_sumaken_web.Controllers
             string? errorMessage;
             try
             {
-                // log取得
-                _logger.LogInformation($"Excel出力開始");
-
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
                 // テーブルデータ取得
                 DataTable dataTable = CreateDataTable();
 
-                // 会社マスター情報取得SQL作成
+                // 会社マスター情報取得
                 var sql = M_CompanyConnectController.CreateSQLToSelectMCompanys();
-                // DB接続
                 List<M_CompanyModel> selectedList = M_CompanyConnectController.ConnectMCompanys(sql, user.DatabaseName);
+
+                // DataRowに格納
                 if (selectedList.Count > 0)
                 {
                     foreach (M_CompanyModel item in selectedList)
@@ -227,11 +225,11 @@ namespace mar_sumaken_web.Controllers
 
                 // ファイル名
                 var tmpFilename = CreateFileController.CreateFileName(null, gamenName);
-                // CSVファイルへのパスを作成する
+                // CSVファイルへのパスを作成
                 string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
-                // DataTableをCSVに変換する
+                // DataTableをCSVに変換
                 CreateFile.ConvertDataTableToCsv(dataTable, filePath);
-                // ファイルの作成
+                // ファイル作成
                 var file = System.IO.File.ReadAllBytes(filePath);
 
                 return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
@@ -242,7 +240,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { errorMessage = ex.Message });
+                return Json(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message });
             }
         }
 

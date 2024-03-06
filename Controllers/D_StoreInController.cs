@@ -350,8 +350,9 @@ namespace mar_sumaken_web.Controllers
                     SearchEndDate = searchModel.SearchEndDate,
                 };
                 var sql = D_StoreInConnectController.CreateSQLToSelectDStoreIns(model);
-
                 List<D_StoreInModel> searchList = D_StoreInConnectController.ConnectDStoreIns(sql, user.DatabaseName);
+
+                // DataRowに格納
                 if (searchList.Count > 0)
                 {
                     foreach (D_StoreInModel item in searchList)
@@ -396,7 +397,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { errorMessage = ex.Message });
+                return Json(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message });
             }
         }
 
