@@ -141,7 +141,7 @@ namespace mar_sumaken_web.Controllers
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleID")] = item.ReceiveScheduleID.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierName")] = item.SupplierName.ToString();
-                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleDate")] = item.ReceiveScheduleDate.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleDate")] = Utils.ConvertToYYYYMMDD(item.ReceiveScheduleDate);
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("LotNumber")] = item.LotNumber.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("NumberOfBoxes")] = item.NumberOfBoxes.ToString();

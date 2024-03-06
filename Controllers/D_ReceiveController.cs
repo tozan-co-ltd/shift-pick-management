@@ -154,7 +154,7 @@ namespace mar_sumaken_web.Controllers
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("ReceiveID")] = item.ReceiveID.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("SupplierName")] = item.SupplierName.ToString();
-                        newRow[Utils.GetDisplayName<D_ReceiveModel>("ReceiveDatetime")] = item.ReceiveDatetime.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveModel>("ReceiveDatetime")] = Utils.ConvertToYYYYMMDD(item.ReceiveDatetime);
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("LotNumber")] = item.LotNumber.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("NumberOfBoxes")] = item.NumberOfBoxes.ToString();

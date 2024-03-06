@@ -227,8 +227,8 @@ namespace mar_sumaken_web.Controllers
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("StoreOutID")] = item.StoreOutID.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("SupplierName")] = item.SupplierName.ToString();
-                        newRow[Utils.GetDisplayName<D_StoreOutModel>("StoreOutDate")] = item.StoreOutDate.ToString();
-                        newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliveryDate")] = item.DeliveryDate.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("StoreOutDate")] = item.StoreOutDate.ToString("yyyy/MM/dd");
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliveryDate")] = item.DeliveryDate.ToString("yyyy/MM/dd");
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliveryTimeClass")] = item.DeliveryTimeClass.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliverySlipNumber")] = item.DeliverySlipNumber.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber")] = item.DeliveryProductNumber.ToString();
