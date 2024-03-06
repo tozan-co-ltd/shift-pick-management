@@ -171,6 +171,12 @@
   <data name="E1018" xml:space="preserve">
     <value>{0}が仕入先かんばんマスターに存在しません。</value>
   </data>
+  <data name="E1019" xml:space="preserve">
+    <value>ファイルが選択されていません。</value>
+  </data>
+  <data name="E1020" xml:space="preserve">
+    <value>既に実績データがあるため、上書きできません。</value>
+  </data>
   <data name="E2001" xml:space="preserve">
     <value>QRコードが正しくありません。正しいQRコードを読み取ってください。</value>
   </data>
@@ -233,6 +239,18 @@
   </data>
   <data name="E2021" xml:space="preserve">
     <value>会社コードまたは会社パスワードが正しくありません。正しい値を入力してください。</value>
+  </data>
+  <data name="E2022" xml:space="preserve">
+    <value>既にスキャン済みの納入先かんばんです。</value>
+  </data>
+  <data name="E2023" xml:space="preserve">
+    <value>納入先かんばんの品番・収容数と一致しません。</value>
+  </data>
+  <data name="E2024" xml:space="preserve">
+    <value>出荷指示リストに一致するデータがありません。</value>
+  </data>
+  <data name="E2025" xml:space="preserve">
+    <value>未検品の出荷指示がないためスキャンできません。</value>
   </data>
   <data name="E3001" xml:space="preserve">
     <value>データベースに接続できませんでした。</value>
