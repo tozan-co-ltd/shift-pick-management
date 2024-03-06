@@ -1,0 +1,265 @@
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.M_SupplierKanbanModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "プレビュー";
+}
+
+<div class="card shadow masterInfo m-4">
+
+    <div class="card-header text-gray-800">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+        <div class="col-md-12 pb-3">
+            <form method="get" asp-controller="M_SupplierKanban" asp-action="Index">
+                <button type="submit" class="btn btn-secondary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-arrow-left-long"></i>
+                    </span>
+                    <span class="text">戻る</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="mSupplierKanbanForm">
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayNameFor(model => model.QRCodeString)</label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <textarea class="form-control" name="QRCodeString" cols="50" rows="5" asp-for="QRCodeString"></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary btn-icon-split" id="register-btn" style="min-width: 80px" onclick="OnPreview()">
+                        <span class="text">プレビュー</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <hr />
+        <p>結果</p>
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3" id="div-preview-result" style="display: none;">
+                <div class="col-12 input-group div-input-group">
+                    <div class="col-12 col-sm-4 col-md-2 column-1st">
+                        <label>@Html.DisplayNameFor(model => model.SupplierKanbanName)</label>
+                        <label id="resultSupplierKanbanName"></label>
+                    </div>
+                    @* <div class="col-12 col-sm-4 col-md-2 column-1st">
+                        <label>@Html.DisplayNameFor(model => model.AllowedDuplicatesFlag)</label>
+                        <label>0(なし)</label>
+                    </div> *@
+                    <p>@Html.DisplayNameFor(model => model.AllowedDuplicatesFlag)：<span id="detailAllowedDuplicatesFlag"></span></p>
+                </div>
+                <table class="table table-responsive table-sm table-striped p-2" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="border-top-0" style="width: 30%">項目名</th>
+                            <th class="border-top-0" style="width: 15%">桁数</th>
+                            <th class="border-top-0" style="width: 15%">開始位置</th>
+                            <th class="border-top-0" style="width: 40%">QRコード文字列</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                識別文字
+                            </td>
+                            <td id="resultIdentifyStringLength">
+                                ...
+                            </td>
+                            <td id="resultIdentifyStringStartIndex">
+                                ...
+                            </td>
+                            <td id="resultQrIdentify">
+                                ...
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                品番
+                            </td>
+                            <td id="resultProductNumberLength">
+                                ...
+                            </td>
+                            <td id="resultProductNumberStartIndex">
+                                ...
+                            </td>
+                            <td id="resultQrProductNumber">
+                                ...
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                数量
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                ロット番号
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                メインキー
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                サブキー1
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                サブキー2
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                枝番
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                注文番号
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                            <td>
+                                ...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // プレビューボタン押下
+    function OnPreview() {
+        $('#mSupplierKanbanForm').submit(function (event) {
+            $("#div-error-message").text("");
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("PreviewResult", "M_SupplierKanban")';
+            let method = 'POST';
+            let formId = 'mSupplierKanbanForm';
+            let data = $('#' + formId).serializeArray();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                // tableリセット
+
+                // QRコード文字列をトリム
+                // 開始,終了
+                let productNumber = response.qRCodeString.slice(response.productNumberStartIndex, response.productNumberLength.length())
+
+                console.log('productNumber', productNumber)
+                // 結果表示
+                // 識別文字の桁数欄はLength
+                console.log('response', response)
+                if (response.identifyString != null) {
+                    $("#div-preview-result").show();
+                    $("#resultSupplierKanbanName").text(response.supplierKanbanName);
+                    $("#resultAllowedDuplicatesFlag").text(response.allowedDuplicatesFlag);
+                    $("#resultQrProductNumber").text(productNumber);
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    // データが見つからなかった場合
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    // その他のエラーの場合
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
+        });
+    }
+
+</script>
+

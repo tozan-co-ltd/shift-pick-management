@@ -203,6 +203,75 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
+        /// 仕入先かんばんマスタープレビュー画面表示
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult Preview()
+        {
+            M_SupplierKanbanModel model = new();
+            try
+            {
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
+                return View(model);
+            }
+        }
+
+        /// <summary>
+        /// プレビュー結果取得
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public IActionResult PreviewResult(M_SupplierKanbanModel searchModel)
+        {
+            M_SupplierKanbanModel model = new();
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 仕入先かんばんマスター情報取得
+                var sql = M_SupplierKanbanConnectController.CreateSQLToSelectMSupplierKanbans();
+                var supplierKanbanList = M_SupplierKanbanConnectController.ConnectMSupplierKanbans(sql, user.DatabaseName);
+
+                // QRコード文字列チェック
+                string qrCodeString = searchModel.QRCodeString;
+                // 仕入先かんばんマスターの識別文字・識別文字開始位置でトリムし、一致するレコードを取得
+                var matchSupplierKanban = supplierKanbanList.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, qrCodeString)).ToList().FirstOrDefault();
+
+                model = matchSupplierKanban;
+                model.QRCodeString = qrCodeString;
+
+                return Ok(model);
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+            }
+        }
+
+        /// <summary>
+        /// Qrコードの部分文字列
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="stringLength"></param>
+        /// <param name="qr"></param>
+        /// <returns></returns>
+        public static string QrcodeValueSubstring(int index, int stringLength, string qr)
+        {
+            var value = qr.Substring(index - 1, stringLength).Replace(" ", "");
+            return value;
+        }
+
+        /// <summary>
         /// ファイル出力
         /// </summary>
         /// <param name="searchModel">検索モデル</param>

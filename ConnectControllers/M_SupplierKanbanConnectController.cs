@@ -349,6 +349,50 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// QRコードから仕入先かんばんマスター情報取得SQL作成
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToSelectMSupplierKanbansForQRCode(M_SupplierKanbanModel model)
+        {
+            var sql = $@"
+                SELECT 
+                    SupplierKanbanID
+                    ,SupplierKanbanName
+                    ,CASE 
+                        WHEN AllowedDuplicatesFlag = 0 THEN '0(なし)'
+                        WHEN AllowedDuplicatesFlag = 1 THEN '1(あり)'
+                        ELSE''
+                        END AS AllowedDuplicatesFlag
+                    ,IdentifyString
+                    ,IdentifyStringStartIndex
+                    ,ProductNumberStartIndex
+                    ,ProductNumberLength
+                    ,QuantityLength
+                    ,QuantityStartIndex
+                    ,LotLength
+                    ,LotStartIndex
+                    ,MainProductKeyLength
+                    ,MainProductKeyStartIndex
+                    ,FirstSubProductKeyLength
+                    ,FirstSubProductKeyStartIndex
+                    ,SecondSubProductKeyLength
+                    ,SecondSubProductKeyStartIndex
+                    ,ProductBranchNumberLength
+                    ,ProductBranchNumberStartIndex
+                    ,OrderNumberLength
+                    ,OrderNumberStartIndex
+                FROM 
+                    M_SupplierKanban AS supplierKanban
+                WHERE 
+                    supplierKanban.IsDeleted = 0
+                    AND IdentifyString = '{model.IdentifyString}'
+                    AND company.IsDeleted = 0
+            ";
+            return sql;
+        }
+
+        /// <summary>
         /// 仕入先かんばんマスター登録SQL作成
         /// </summary>
         /// <param name="model">登録情報</param>

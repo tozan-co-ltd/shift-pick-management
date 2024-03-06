@@ -229,5 +229,11 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "更新者")]
         public string? UpdatedBy { get; set; }
+
+        /// <summary>
+        /// QRコード文字列
+        /// </summary>
+        [Display(Name = "QRコード文字列")]
+        public string? QRCodeString { get; set; }
     }
 }
