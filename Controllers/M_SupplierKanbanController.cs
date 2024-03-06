@@ -303,13 +303,13 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ファイル名作成
-                string fileName = CreateFileController.CreateFileName(searchModel, gamenName);
+                string fileName = CreateFile.CreateFileName(searchModel, gamenName);
 
                 // CSVファイルパス作成
                 string filePath = Path.Combine(Path.GetTempPath(), fileName);
 
                 // DataTableをCSV形式の文字列に変換
-                CreateFileController.ConvertDataTableToCsv(dataTable, filePath);
+                CreateFile.ConvertDataTableToCsv(dataTable, filePath);
 
                 // ファイル作成
                 var fileResult = System.IO.File.ReadAllBytes(filePath);

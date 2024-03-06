@@ -405,7 +405,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ファイル名
-                var tmpFilename = CreateFileController.CreateFileName(null, gamenName);
+                var tmpFilename = CreateFile.CreateFileName(null, gamenName);
                 // CSVファイルへのパスを作成
                 string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
                 // DataTableをCSVに変換
