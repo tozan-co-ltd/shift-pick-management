@@ -217,7 +217,9 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// ファイル出力
         /// </summary>
-        public JsonResult ExportFile()
+        /// <param name="gamenName">画面名</param>
+        /// <returns></returns>
+        public JsonResult ExportFile(string gamenName)
         {
             string? errorMessage;
             try
@@ -227,13 +229,6 @@ namespace mar_sumaken_web.Controllers
 
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    // エラーコード：E2011
-                    throw new Exception();
-                }
 
                 // テーブルデータ取得
                 DataTable dataTable = CreateDataTable();
@@ -264,7 +259,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ファイル名
-                var tmpFilename = "品番マスター.csv";
+                var tmpFilename = CreateFileController.CreateFileName(null, gamenName);
                 // CSVファイルへのパスを作成する
                 string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
                 // DataTableをCSVに変換する
@@ -274,9 +269,13 @@ namespace mar_sumaken_web.Controllers
 
                 return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
             }
-            catch (Exception)
+            catch (SqlException)
             {
-                return Json(new { res = "NG", error = "予期せぬエラーが発⽣しました。" });
+                return Json(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { errorMessage = ex.Message });
             }
         }
 
