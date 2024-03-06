@@ -89,7 +89,7 @@ namespace mar_sumaken_web.Controllers
                         <td class='MainProductKey'>{@item.MainProductKey}</td>
                         <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                         <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
-                        <td class='CreatedAt'>{@item.CreatedAt.ToString("yyyy/MM/dd")}</td>
+                        <td class='CreatedAt'>{@item.CreatedAt}</td>
                         <td class='ScanedAt'>{@item.ScanedAt}</td>
                         <td class='CreatedBy'>{@item.CreatedBy}</td>
                         <input type='hidden' class='DepoID' value='{item.DepoID}' />

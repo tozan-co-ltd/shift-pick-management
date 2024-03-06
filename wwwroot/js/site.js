@@ -259,7 +259,7 @@ async function onExportFile(page, gamenName) {
 }
 
 // 条件あり
-function onExportExcelByCondition(page, formData,) {
+function onExportCsvByCondition(page, formData) {
 
     $.ajax({
         url: '' + page + '/ExportCsv',
