@@ -64,9 +64,9 @@ namespace mar_sumaken_web.Models
         public int DeliveryTimeClass { get; set; }
 
         /// <summary>
-        /// 出荷日時
+        /// 出荷日
         /// </summary>
-        [Display(Name = "出荷日時")]
+        [Display(Name = "出荷日")]
         public DateTime ShipmentDatetime { get; set; }
 
         /// <summary>
