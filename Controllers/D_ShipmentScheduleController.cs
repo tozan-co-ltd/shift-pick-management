@@ -197,7 +197,7 @@ namespace mar_sumaken_web.Controllers
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipmentScheduleID")] = item.ShipmentScheduleID.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("SupplierName")] = item.SupplierName.ToString();
-                        newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryDate")] = item.DeliveryDate.ToString();
+                        newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryDate")] = Utils.ConvertToYYYYMMDD(item.DeliveryDate);
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryTimeClass")] = item.DeliveryTimeClass.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductNumber")] = item.DeliveryProductNumber.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
@@ -219,7 +219,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryName")] = item.DeliveryName.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryName")] = item.DeliveryFactoryName.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("RegularKubun")] = item.RegularKubun.ToString();
-                        newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("IssuedDate")] = item.IssuedDate.ToString();
+                        newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("IssuedDate")] = Utils.ConvertToYYYYMMDD(item.IssuedDate);
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryTime")] = item.DeliveryTime.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("TranspotationIdentify")] = item.TranspotationIdentify.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipNumber")] = item.DeliverySlipNumber.ToString();
@@ -236,13 +236,13 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ファイル名作成
-                string fileName = CreateFileController.CreateFileName(searchModel, gamenName);
+                string fileName = CreateFile.CreateFileName(searchModel, gamenName);
 
                 // CSVファイルへのパスを作成する
                 string filePath = Path.Combine(Path.GetTempPath(), fileName);
 
                 // DataTableをCSV形式の文字列に変換
-                CreateFileController.ConvertDataTableToCsv(searchResult, filePath);
+                CreateFile.ConvertDataTableToCsv(searchResult, filePath);
 
                 // ファイルの作成
                 var fileResult = System.IO.File.ReadAllBytes(filePath);

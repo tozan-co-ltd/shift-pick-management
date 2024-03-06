@@ -97,8 +97,16 @@ namespace mar_sumaken_web.Commons
                 {
                     DateTime systemDate = DateTime.Now;
 
-                    foreach (var model in modelList) 
+                    foreach (var model in modelList)
                     {
+                        // 出荷指示取込時、出荷実績がある場合はエラー
+                        string checkExistSql = CreateSQLToIsExistDShipment(model, depoId, companyId);
+                        int checkedCount = (int)connection.ExecuteScalar(checkExistSql, null, transaction);
+                        if(checkedCount > 0)
+                        {
+                            throw new Exception();
+                        }
+
                         // 出荷指示取込テーブル登録
                         string insertSql = CreateSQLToInsertDShipmentSchedule(model, depoId, companyId, systemDate, loginUser.UserName);
                         int affectRows = connection.Execute(insertSql, null, transaction);
@@ -263,6 +271,38 @@ namespace mar_sumaken_web.Commons
 
             END
             ";
+
+            return sql;
+        }
+
+        /// <summary>
+        /// 出荷実績重複チェック文SQL作成
+        /// </summary>
+        /// <param name="model">モデル</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="companyId">会社ID</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToIsExistDShipment(D_ShipmentScheduleModel model, int depoId, int companyId)
+        {
+            var sql = $@"
+		        Declare @ShipmentScheduleID int;
+                SET @ShipmentScheduleID = (
+                    SELECT 
+                        TOP 1 schedule.ShipmentScheduleID
+		            FROM D_ShipmentSchedule AS schedule
+		            WHERE 
+                        DepoID = {depoId} 
+                        AND schedule.CompanyID = {companyId}
+                        AND schedule.DeliveryDate = '{model.DeliveryDate}'
+                        AND schedule.DeliveryTimeClass = {model.DeliveryTimeClass}
+                        AND schedule.DeliverySlipNumber = '{model.DeliverySlipNumber}'
+                        AND schedule.DeliveryProductNumber = '{model.DeliveryProductNumber}'
+                        AND schedule.IsDeleted = 0
+                );
+                SELECT count(*)
+                FROM D_Shipment shipment
+                WHERE shipment.ShipmentScheduleID = @ShipmentScheduleID
+            ;";
 
             return sql;
         }

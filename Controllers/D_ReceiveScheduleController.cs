@@ -141,7 +141,7 @@ namespace mar_sumaken_web.Controllers
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleID")] = item.ReceiveScheduleID.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierName")] = item.SupplierName.ToString();
-                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleDate")] = item.ReceiveScheduleDate.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("ReceiveScheduleDate")] = Utils.ConvertToYYYYMMDD(item.ReceiveScheduleDate);
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("LotNumber")] = item.LotNumber.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("NumberOfBoxes")] = item.NumberOfBoxes.ToString();
@@ -156,13 +156,13 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ファイル名作成
-                string fileName = CreateFileController.CreateFileName(searchModel, gamenName);
+                string fileName = CreateFile.CreateFileName(searchModel, gamenName);
 
                 // CSVファイルへのパスを作成する
                 string filePath = Path.Combine(Path.GetTempPath(), fileName);
 
                 // DataTableをCSV形式の文字列に変換
-                CreateFileController.ConvertDataTableToCsv(searchResult, filePath);
+                CreateFile.ConvertDataTableToCsv(searchResult, filePath);
 
                 // ファイルの作成
                 var fileResult = System.IO.File.ReadAllBytes(filePath);

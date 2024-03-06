@@ -89,7 +89,7 @@ namespace mar_sumaken_web.Controllers
                         <td class='MainProductKey'>{@item.MainProductKey}</td>
                         <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                         <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
-                        <td class='CreatedAt'>{@item.CreatedAt.ToString("yyyy/MM/dd")}</td>
+                        <td class='CreatedAt'>{@item.CreatedAt}</td>
                         <td class='ScanedAt'>{@item.ScanedAt}</td>
                         <td class='CreatedBy'>{@item.CreatedBy}</td>
                         <input type='hidden' class='DepoID' value='{item.DepoID}' />
@@ -154,7 +154,7 @@ namespace mar_sumaken_web.Controllers
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("ReceiveID")] = item.ReceiveID.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("SupplierName")] = item.SupplierName.ToString();
-                        newRow[Utils.GetDisplayName<D_ReceiveModel>("ReceiveDatetime")] = item.ReceiveDatetime.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveModel>("ReceiveDatetime")] = Utils.ConvertToYYYYMMDD(item.ReceiveDatetime);
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("LotNumber")] = item.LotNumber.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("NumberOfBoxes")] = item.NumberOfBoxes.ToString();
@@ -170,13 +170,13 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ファイル名作成
-                string fileName = CreateFileController.CreateFileName(searchModel, gamenName);
+                string fileName = CreateFile.CreateFileName(searchModel, gamenName);
 
                 // CSVファイルへのパスを作成する
                 string filePath = Path.Combine(Path.GetTempPath(), fileName);
 
                 // DataTableをCSV形式の文字列に変換
-                CreateFileController.ConvertDataTableToCsv(searchResult, filePath);
+                CreateFile.ConvertDataTableToCsv(searchResult, filePath);
 
                 // ファイルの作成
                 var fileResult = System.IO.File.ReadAllBytes(filePath);

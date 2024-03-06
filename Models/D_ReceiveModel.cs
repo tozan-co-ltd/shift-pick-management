@@ -94,9 +94,9 @@ namespace mar_sumaken_web.Models
         public int ScanResultID { get; set; }
 
         /// <summary>
-        /// 入荷日時
+        /// 入荷日
         /// </summary>
-        [Display(Name = "入荷日時")]
+        [Display(Name = "入荷日")]
         public string? ReceiveDatetime { get; set; }
 
         /// <summary>

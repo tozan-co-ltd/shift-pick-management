@@ -170,6 +170,55 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
+        /// ファイル名作成
+        /// </summary>
+        /// <param name="searchModel">検索モデル</param>
+        /// <param name="gamenName">画面名</param>
+        /// <returns></returns>
+        public static string CreateFileName(SearchConditionModel? searchModel, string gamenName)
+        {
+            string fileName = string.Empty;
+            try
+            {
+                // SearchConditionListがnullの場合
+                if (searchModel == null)
+                {
+                    return string.Concat(fileName, gamenName, ".csv");
+                }
+
+                // 日付
+                string start = searchModel.SearchStartDate != null ? searchModel.SearchStartDate.Replace("/", "") : string.Empty;
+                string end = searchModel.SearchEndDate != null ? searchModel.SearchEndDate.Replace("/", "") : string.Empty;
+
+                string seachDate = start; //入庫日
+                if (!gamenName.Contains("在庫照会"))
+                {
+                    seachDate = string.Concat(start, "_", end); //入庫日開始_入庫日終了
+                }
+                fileName = string.Concat(gamenName, "_", searchModel.DepoName, "_", searchModel.CompanyName, "_", seachDate);
+
+                // 仕入先品番
+                if (searchModel.SupplierProductNumber != null)
+                {
+                    fileName = string.Concat(fileName, "_", searchModel.SupplierProductNumber);
+                }
+
+                // 便
+                if (searchModel.BinList != null)
+                {
+
+                    fileName = string.Concat(fileName, string.Join("_", searchModel.BinList));
+                }
+
+                return string.Concat(fileName, ".csv"); ;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
         /// 削除するファイルの数を決定
         /// </summary>
         /// <param name="folderPath">フォルダパス</param>

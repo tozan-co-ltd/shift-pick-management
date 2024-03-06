@@ -223,6 +223,24 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
+        ///   ファイルが選択されていません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1019 {
+            get {
+                return ResourceManager.GetString("E1019", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   既に実績データがあるため、上書きできません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1020 {
+            get {
+                return ResourceManager.GetString("E1020", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   QRコードが正しくありません。正しいQRコードを読み取ってください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E2001 {
@@ -408,6 +426,42 @@ namespace mar_sumaken_web.Properties {
         internal static string E2021 {
             get {
                 return ResourceManager.GetString("E2021", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   既にスキャン済みの納入先かんばんです。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2022 {
+            get {
+                return ResourceManager.GetString("E2022", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   納入先かんばんの品番・収容数と一致しません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2023 {
+            get {
+                return ResourceManager.GetString("E2023", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   出荷指示リストに一致するデータがありません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2024 {
+            get {
+                return ResourceManager.GetString("E2024", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   未検品の出荷指示がないためスキャンできません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2025 {
+            get {
+                return ResourceManager.GetString("E2025", resourceCulture);
             }
         }
         
