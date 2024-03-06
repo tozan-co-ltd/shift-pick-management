@@ -371,29 +371,22 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// ファイル出力
         /// </summary>
-        public JsonResult ExportFile()
+        /// <param name="gamenName">画面名</param>
+        public JsonResult ExportFile(string gamenName)
         {
             try
             {
-                // log取得
-                _logger.LogInformation($"Excel出力開始");
-
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    throw new Exception();
-                }
 
                 // テーブルデータ取得
                 DataTable mUserDataTable = CreateDataTable();
 
-                // ユーザーマスター情報取得SQL作成
+                // ユーザーマスター情報取得
                 var sql = M_UserConnectController.CreateSQLToSelectMUsers();
-                // DB接続
                 List<M_UserModel> userList = M_UserConnectController.ConnectMUsers(sql, user.DatabaseName);
+
+                // DataRowに格納
                 if (userList.Count > 0)
                 {
                     foreach (M_UserModel userItem in userList)
@@ -412,19 +405,23 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ファイル名
-                var tmpFilename = "ユーザーマスター.csv";
-                // CSVファイルへのパスを作成する
+                var tmpFilename = CreateFileController.CreateFileName(null, gamenName);
+                // CSVファイルへのパスを作成
                 string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
-                // DataTableをCSVに変換する
+                // DataTableをCSVに変換
                 CreateFile.ConvertDataTableToCsv(mUserDataTable, filePath);
-                // ファイルの作成
+                // ファイル作成
                 var file = System.IO.File.ReadAllBytes(filePath);
 
                 return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
             }
-            catch (Exception)
+            catch (SqlException)
             {
-                return Json(new { res = "NG", error = "予期せぬエラーが発⽣しました。" });
+                return Json(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message });
             }
         }
 

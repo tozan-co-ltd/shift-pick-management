@@ -131,8 +131,9 @@ namespace mar_sumaken_web.Controllers
                     SearchEndDate = searchModel.SearchEndDate,
                 };
                 var sql = D_ReceiveScheduleConnectController.CreateSQLToSelectDReceiveSchedules(model);
-
                 List<D_ReceiveScheduleModel> searchList = D_ReceiveScheduleConnectController.ConnectDReceiveSchedules(sql, user.DatabaseName);
+
+                // DataRowに格納
                 if (searchList.Count > 0)
                 {
                     foreach (D_ReceiveScheduleModel item in searchList)
@@ -174,7 +175,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { errorMessage = ex.Message });
+                return Json(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message });
             }
         }
 

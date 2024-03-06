@@ -232,11 +232,11 @@ function hideLoading() {
 
 
 //------------------- CSV出力 ------------------//
-async function onExportFile(page) {
+async function onExportFile(page, gamenName) {
     event.preventDefault();
     $('#div-error-message').text("");
 
-    const response = await fetch('' + page + '/ExportFile', {
+    const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

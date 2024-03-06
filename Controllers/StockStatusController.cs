@@ -233,8 +233,9 @@ namespace mar_sumaken_web.Controllers
                 // 在庫照会情報取得
                 var sql = StockStatusConnectController.CreateSQLToGetStockStatus(
                     searchModel.SearchStartDate, searchModel.DepoID, searchModel.CompanyID);
-
                 List<StockStatusModel> searchList = StockStatusConnectController.ConnectStockStatus(sql, user.DatabaseName);
+
+                // DataRowに格納
                 if (searchList.Count > 0)
                 {
                     foreach (StockStatusModel item in searchList)
@@ -275,7 +276,7 @@ namespace mar_sumaken_web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { errorMessage = ex.Message });
+                return Json(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message });
             }
         }
 
