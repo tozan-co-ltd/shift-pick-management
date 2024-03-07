@@ -1,5 +1,5 @@
 ﻿@using mar_sumaken_web.Commons;
-@model mar_sumaken_web.Models.D_HandyErrorMessageModel;
+@model mar_sumaken_web.Models.TopModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.ViewTitle;
@@ -20,7 +20,7 @@
         {
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
-        <p>作業進捗(2023-01-01)</p>
+        <p class="mb-0">出荷作業進捗(@Model.DepoName)</p>
         <div class="chart-part p-2 col-12 d-flex">
             <div class="col-6 d-flex" id="donut-chart"></div>
         </div>
@@ -115,26 +115,42 @@
 <script>
 
     document.addEventListener("DOMContentLoaded", function () {
+        var total = @Model.ShipmentScheduleTotal;
+        var process = @Model.StoreOutTotal;
+
+        var data = @Html.Raw(Json.Serialize(Model));
+        LoadGraph(process, total - process, data.graphTitle);
+    });
+
+    function LoadGraph(checked, uncheck, title) {
         // 作業進捗表示
-        let shipmentList = [
-            ["検品済数", 240],
-            ["未検品数", 60],
+        var shipmentList = [
+            ["検品済数", checked],
+            ["未検品数", uncheck],
         ];
 
-        let percentage = 240 / (60 + 240) * 100;
-        let donutTitle = percentage + "%";
+        var percentage = 0;
+        var total = checked + uncheck;
+        if (total > 0) {
+            percentage = Math.round(checked / (checked + uncheck) * 100);
+        }
 
-        let chart = bb.generate({
+        var donutTitle = percentage + "%";
+        if (percentage == 0) {
+            donutTitle = "該当データがありません。";
+        }
+
+        var chart = bb.generate({
             data: {
                 columns: shipmentList,
                 type: "donut"
             },
             title: {
-                text: "出荷検品数"
+                text: title
             },
             size: {
-                width: 300,
-                height: 180
+                width: 400,
+                height: 150
             },
             donut: {
                 title: donutTitle,
@@ -149,9 +165,9 @@
             bindto: "#donut-chart",
         });
 
-        var ctx = document.getElementById("myDoughnutChart").getContext("2d");
+        var ctx = document.getElementById("donut-chart").getContext("2d");
         var myDoughnutChart = new Chart(ctx, config);
-    });
+    }
 
     // 詳細ボタン押下
     function OnDetailClick(handyErrorMessageID) {

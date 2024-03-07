@@ -50,12 +50,8 @@ namespace mar_sumaken_web.Commons
         /// 出荷指示に対する作業進捗情報
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation(int depoId, int companyId)
+        public static string CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation(int depoId, int companyId, string nextDay)
         {
-            // 本日作業する出荷指示は納入指示日が翌日(土日を除く)
-            DateTime currentDate = DateTime.Now;
-            var nextDay = currentDate.AddDays(currentDate.DayOfWeek == DayOfWeek.Friday ? 3 : 1).ToString("yyyy/MM/dd");
-
             var sql = $@"
                 SELECT  
                     depo.DepoName

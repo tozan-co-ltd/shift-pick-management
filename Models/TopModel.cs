@@ -1,6 +1,4 @@
-﻿using mar_sumaken_web.Properties;
-using System.ComponentModel.DataAnnotations;
-using X.PagedList;
+﻿using X.PagedList;
 
 namespace mar_sumaken_web.Models
 {
@@ -10,9 +8,33 @@ namespace mar_sumaken_web.Models
     public class TopModel : CommonModel
     {
         /// <summary>
-        /// 倉庫リスト
+        /// 出荷指示リスト
         /// </summary>
-        public IPagedList<D_ShipmentScheduleModel> MyModel1 { get; set; }
-        public IPagedList<D_HandyErrorMessageModel> MyModel2 { get; set; }
+        public IPagedList<D_ShipmentScheduleModel> ShipmentScheduleList { get; set; }
+
+        /// <summary>
+        /// ハンディエラーメッセージリスト
+        /// </summary>
+        public IPagedList<D_HandyErrorMessageModel> D_HandyErrorMessageList { get; set; }
+
+        /// <summary>
+        /// 指示箱数
+        /// </summary>
+        public int ShipmentScheduleTotal { get; set; } = 0;
+
+        /// <summary>
+        /// 出庫箱数
+        /// </summary>
+        public int StoreOutTotal { get; set; } = 0;
+
+        /// <summary>
+        /// グラフのタイトル
+        /// </summary>
+        public string? GraphTitle { get; set; } = "";
+
+        /// <summary>
+        /// 倉庫名
+        /// </summary>
+        public string? DepoName { get; set; }
     }
 }

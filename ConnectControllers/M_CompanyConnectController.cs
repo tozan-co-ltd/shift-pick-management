@@ -180,6 +180,46 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
+        /// 会社コードで会社を取得
+        /// </summary>
+        /// <param name="companyCode">会社コード</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static M_CompanyModel GetMCompanyByCompanyCode(string? companyCode, string databaseName)
+        {
+            var result = -1;
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    // SQL作成
+                    string sql = $@"
+                        SELECT * FROM M_Company WHERE CompanyCode = {companyCode}
+                    ";
+                    // 会社コード取得
+                    var mCompany = connection.Query<M_CompanyModel>(sql);
+                    if (mCompany != null && mCompany.Count() > 0)
+                    {
+                        return mCompany.ToList().FirstOrDefault();
+                    }
+
+                    return null;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// 会社マスターSELECT文SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
