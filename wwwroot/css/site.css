@@ -38,6 +38,7 @@ html {
 body {
     margin-bottom: 60px;
     font-family: 'main-font' !important;
+    color: #3a3b45;
 }
 
 #login-title, #home-title {

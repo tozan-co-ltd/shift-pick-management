@@ -241,6 +241,15 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
+        ///   {0}は{2}～{1}文字の間で入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1023 {
+            get {
+                return ResourceManager.GetString("E1023", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   QRコードが正しくありません。正しいQRコードを読み取ってください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E2001 {

@@ -47,7 +47,7 @@ namespace mar_sumaken_web.Models
         [Display(Name = "ログインID")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [RegularExpression(@"[a-zA-Z0-9]+", ErrorMessageResourceName = "E1003", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [StringLength(12, MinimumLength = 4, ErrorMessage = "Item must be 4 to 12 characters long.")]
+        [StringLength(12, MinimumLength = 4, ErrorMessageResourceName = "E1023", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string LoginID { get; set; }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace mar_sumaken_web.Models
         [Display(Name = "パスワード")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [RegularExpression(@"[a-zA-Z0-9]+", ErrorMessageResourceName = "E1003", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [StringLength(12, MinimumLength = 4, ErrorMessage = "Item must be 4 to 12 characters long.")]
+        [StringLength(12, MinimumLength = 4, ErrorMessageResourceName = "E1023", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string Password { get; set; }
 
         /// <summary>
