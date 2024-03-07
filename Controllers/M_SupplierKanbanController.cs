@@ -279,7 +279,7 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// プレビュー結果取得
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="searchModel"></param>
         /// <returns></returns>
         [HttpPost]
         public IActionResult PreviewResult(M_SupplierKanbanModel searchModel)
@@ -299,10 +299,16 @@ namespace mar_sumaken_web.Controllers
                 // 仕入先かんばんマスターの識別文字・識別文字開始位置でトリムし、一致するレコードを取得
                 var matchSupplierKanban = supplierKanbanList.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, qrCodeString)).ToList().FirstOrDefault();
 
-                model = matchSupplierKanban;
-                model.QRCodeString = qrCodeString;
-
-                return Ok(model);
+                if(matchSupplierKanban != null)
+                {
+                    model = matchSupplierKanban;
+                    model.QRCodeString = qrCodeString;
+                    return Ok(model);
+                }
+                else
+                {
+                    return NotFound(new { errorMessage = "E1022: " + ErrorMessagesResources.E1022 });
+                }
             }
             catch (SqlException)
             {
@@ -315,16 +321,23 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// Qrコードの部分文字列
+        /// QRコードの部分文字列
         /// </summary>
         /// <param name="index"></param>
         /// <param name="stringLength"></param>
         /// <param name="qr"></param>
-        /// <returns></returns>
+        /// <returns>抜き出した文字列</returns>
         public static string QrcodeValueSubstring(int index, int stringLength, string qr)
         {
-            var value = qr.Substring(index - 1, stringLength).Replace(" ", "");
-            return value;
+            var substr = "";
+
+            // 文字列を取得するための最小桁数
+            int minLength = index - 1 + stringLength;
+            if (qr.Length >= minLength)
+            {
+                substr = qr.Substring(index - 1, stringLength).Replace(" ", "");
+            }
+            return substr;
         }
 
         /// <summary>

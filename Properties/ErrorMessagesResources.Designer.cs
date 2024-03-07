@@ -241,6 +241,15 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
+        ///   仕入先かんばんマスターに一致するデータがありません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1022 {
+            get {
+                return ResourceManager.GetString("E1022", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   QRコードが正しくありません。正しいQRコードを読み取ってください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E2001 {

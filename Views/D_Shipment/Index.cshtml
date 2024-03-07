@@ -2,7 +2,7 @@
 @model mar_sumaken_web.Models.D_ShipmentModel
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = Model.ViewTitle;
+    ViewData["Title"] = Model.CategoryTitle + " - 出荷指示照会 - " + Model.ViewTitle;
 }
 
 <div class="card shadow de-inspection d-receive-schedule m-4">
