@@ -248,6 +248,7 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage });
                 }
 
+                model.RegisterList = model.RegisterList.Where(x => !x.SupplierProductNumber.Equals("0")).ToList();
                 // 入庫実績登録
                 D_StoreInConnectController.InsertDStoreIns(model, user);
 
