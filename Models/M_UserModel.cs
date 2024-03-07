@@ -46,7 +46,8 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "ログインID")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [RegularExpression(@"[a-zA-Z0-9]+", ErrorMessage = "ログインIDは半角英数字のみ入力できます")]
+        [RegularExpression(@"[a-zA-Z0-9]+", ErrorMessageResourceName = "E1003", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [StringLength(12, MinimumLength = 4, ErrorMessage = "Item must be 4 to 12 characters long.")]
         public string LoginID { get; set; }
 
         /// <summary>
@@ -65,7 +66,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// メイン倉庫ID
         /// </summary>
-        [Display(Name = "メイン倉庫ID")]
+        [Display(Name = "メイン倉庫名")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int DepoID { get; set; }
 
@@ -92,7 +93,8 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "パスワード")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [RegularExpression(@"[a-zA-Z0-9]{4,10}", ErrorMessage = "パスワードは4～10文字で入力してください。")]
+        [RegularExpression(@"[a-zA-Z0-9]+", ErrorMessageResourceName = "E1003", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [StringLength(12, MinimumLength = 4, ErrorMessage = "Item must be 4 to 12 characters long.")]
         public string Password { get; set; }
 
         /// <summary>

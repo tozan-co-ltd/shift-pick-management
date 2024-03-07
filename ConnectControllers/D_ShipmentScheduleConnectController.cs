@@ -2,10 +2,7 @@
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.ComponentModel.Design;
 using System.Data.SqlClient;
-using System.Reflection;
 
 namespace mar_sumaken_web.Commons
 {
@@ -124,7 +121,7 @@ namespace mar_sumaken_web.Commons
                         // 出荷指示取込時、出荷実績がある場合はエラー
                         string checkExistSql = CreateSQLToIsExistDShipment(model, depoId, companyId);
                         int checkedCount = (int)connection.ExecuteScalar(checkExistSql, null, transaction);
-                        if(checkedCount > 0)
+                        if (checkedCount > 0)
                         {
                             throw new Exception();
                         }
@@ -172,6 +169,39 @@ namespace mar_sumaken_web.Commons
                     transaction.Rollback();
                     throw;
                 }
+            }
+        }
+
+        /// <summary>
+        /// 出荷実績がある場合はエラー
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="databaseName"></param>
+        /// <returns></returns>
+        public static bool IsExistDShipment(string sql, string databaseName)
+        {
+            // 戻り値
+            List<D_ShipmentScheduleModel> strList = new();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    // 出荷指示取込時、出荷実績がある場合はエラー
+                    int checkedCount = (int)connection.ExecuteScalar(sql);
+                    return checkedCount > 0;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
@@ -304,7 +334,7 @@ namespace mar_sumaken_web.Commons
         /// <param name="depoId">倉庫ID</param>
         /// <param name="companyId">会社ID</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToIsExistDShipment(D_ShipmentScheduleModel model, int depoId, int companyId)
+        public static string CreateSQLToIsExistDShipment(D_ShipmentScheduleModel model, int depoId, int companyId)
         {
             var sql = $@"
 		        Declare @ShipmentScheduleID int;
