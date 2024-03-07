@@ -185,66 +185,74 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 List<string> errorMessageList = new();
-                int readCount = 1;
+
+                int registerCount = 0;
+                for (int i = 0; i < model.RegisterList.Count; i++)
+                {
+                    var modelItem = model.RegisterList[i];
+                    if (modelItem.SupplierProductNumber.Equals("0")) continue;
+                    registerCount++;
+
+                    var validationContext = new ValidationContext(modelItem);
+                    var validationResults = new List<ValidationResult>();
+                    bool isValid = Validator.TryValidateObject(modelItem, validationContext, validationResults, true);
+                    List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
+
+                    // 仕入先品番チェック
+                    bool isContainSupplierProductNumber = errorMembers.Contains("SupplierProductNumber");
+                    if (!isContainSupplierProductNumber)
+                    {
+                        // 仕入先品番で品番チェック
+                        bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(modelItem.SupplierProductNumber, user.DatabaseName);
+                        if (!isExistProduct)
+                        {
+                            isValid = false;
+                            var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreInModel>("SupplierProductNumber"));
+                            validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
+                        }
+                    }
+
+                    // エラーメッセージ作成
+                    if (!isValid)
+                    {
+                        var lineCount = i + 1;
+                        foreach (var err in validationResults)
+                        {
+                            // フォーマットエラーメッセージ
+                            List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ReceiveScheduleModel>(err);
+                            errorMessageItem.Insert(0, lineCount + "行目");
+
+                            // HTMLに変換
+                            var errorHtml = string.Empty;
+                            foreach (var item in errorMessageItem)
+                            {
+                                errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
+                            }
+                            errorHtml = "<tr>" + errorHtml + "</tr>";
+
+                            errorMessageList.Add(errorHtml);
+                        }
+                    }
+                }
 
                 // リストチェック
-                if (model.RegisterList != null && model.RegisterList.Count > 0)
+                if (registerCount == 0)
                 {
-                    foreach(var modelItem in model.RegisterList)
-                    {
-                        var validationContext = new ValidationContext(modelItem);
-                        var validationResults = new List<ValidationResult>();
-                        bool isValid = Validator.TryValidateObject(modelItem, validationContext, validationResults, true);
-                        List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
+                    throw new Exception();
+                }
 
-                        // 仕入先品番チェック
-                        bool isContainSupplierProductNumber = errorMembers.Contains("SupplierProductNumber");
-                        if (!isContainSupplierProductNumber)
-                        {
-                            // 仕入先品番で品番チェック
-                            bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(modelItem.SupplierProductNumber, user.DatabaseName);
-                            if (!isExistProduct)
-                            {
-                                isValid = false;
-                                var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreInModel>("SupplierProductNumber"));
-                                validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
-                            }
-                        }
-
-                        // エラーメッセージ作成
-                        if (!isValid)
-                        {
-                            foreach (var err in validationResults)
-                            {
-                                // フォーマットエラーメッセージ
-                                List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ReceiveScheduleModel>(err);
-                                errorMessageItem.Insert(0, readCount + "行目");
-
-                                // HTMLに変換
-                                var errorHtml = string.Empty;
-                                foreach (var item in errorMessageItem)
-                                {
-                                    errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
-                                }
-                                errorHtml = "<tr>" + errorHtml + "</tr>";
-
-                                errorMessageList.Add(errorHtml);
-                            }
-                        }
-                    }
-
-                    // エラーが1件以上ある場合はreturn
-                    if (errorMessageList.Count > 0)
-                    {
-                        var errorMessage = string.Join("</br>", errorMessageList);
-                        return NotFound(new { errorMessage });
-                    }
+                // エラーが1件以上ある場合はreturn
+                if (errorMessageList.Count > 0)
+                {
+                    var errorMessage = string.Join("</br>", errorMessageList);
+                    return NotFound(new { errorMessage });
                 }
 
                 // 入庫実績登録
                 D_StoreInConnectController.InsertDStoreIns(model, user);
 
                 return Ok();
+
             }
             catch (SqlException)
             {

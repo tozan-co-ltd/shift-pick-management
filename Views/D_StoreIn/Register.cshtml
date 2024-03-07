@@ -150,13 +150,24 @@
                     editRow.push(rowNumber);
                 }
             });
-            if (editRow.length == 0) return;
+            if (editRow.length == 0) {
+                $('#div-error-message').text("E1001: 仕入先品番は必須項目です。");
+                return;
+            }
 
             // 仕入先品番と数量チェック
             var checkFlag = checkValue(editRow);
             if (!checkFlag) {
                 $('#div-error-message').text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
                 return;
+            }
+
+            for(var i = 0; i < 5; i++) {
+                var id = "RegisterList[" + i + "].SupplierProductNumber";
+                var productItem = document.getElementById(id);
+                if (productItem.value == 0) {
+                    formDataArray.push({ name: id, value: 0 });
+                }
             }
 
             // Ajax call
