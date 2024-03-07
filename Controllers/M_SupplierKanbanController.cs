@@ -216,14 +216,6 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
                 }
 
-                // 異なるIDで仕入先かんばんコード重複チェック
-                var sql = M_SupplierKanbanConnectController.CreateSQLToSelectDuplicateEditMSupplierKanban(model);
-                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
-                if (isExisted)
-                {
-                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyString") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyStringStartIndex")) });
-                }
-
                 // 仕入先かんばんマスター更新
                 M_SupplierKanbanConnectController.UpdateMSupplierKanban(model, user);
 

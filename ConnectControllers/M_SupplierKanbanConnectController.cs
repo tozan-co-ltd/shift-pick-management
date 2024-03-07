@@ -170,7 +170,7 @@ namespace mar_sumaken_web.ConnectControllers
 
                     // 仕入先かんばんマスター更新
                     string sql = CreateSQLToUpdateMSupplierKanban(model, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
+                    connection.Execute(sql, null, transaction);
 
                     // ハンディメニュー-仕入先かんばん中間テーブル削除
                     string handyMenuDeleteSql = CreateSQLToDeleteRHandyMenuSupplierKanban(model.SupplierKanbanID);
@@ -194,7 +194,7 @@ namespace mar_sumaken_web.ConnectControllers
 
                     // 仕入先かんばん履歴テーブル登録
                     string logSql = CreateSQLToInsertMSupplierKanbanHistory(model, sysDate, loginUser.UserName);
-                    connection.Execute(handyMenuDeleteSql, null, transaction);
+                    connection.Execute(logSql, null, transaction);
 
                     // トランザクションのコミット
                     transaction.Commit();
@@ -543,7 +543,7 @@ namespace mar_sumaken_web.ConnectControllers
             var sql = $@"
                 UPDATE M_SupplierKanban
                 SET 
-                    CompanyID = '{model.CompanyID}',
+                    CompanyID = '{model.SelectedSupplierID}',
                     SupplierKanbanName = '{model.SupplierKanbanName}',
                     AllowedDuplicatesFlag = '{model.AllowedDuplicatesFlag}',
                     IdentifyString = '{model.IdentifyString}',
@@ -567,7 +567,7 @@ namespace mar_sumaken_web.ConnectControllers
                     UpdatedAt = '{updatedAt}',
                     UpdatedBy = '{updatedBy}'
                 WHERE
-                    DepoID = {model.DepoID}
+                    SupplierKanbanID = {model.SupplierKanbanID}
                     AND IsDeleted = 0
             ";
             return sql;
@@ -622,9 +622,9 @@ namespace mar_sumaken_web.ConnectControllers
                 INSERT INTO D_SupplierKanbanHistory
                     (HistoryStatus, DepoName, SupplierName, SupplierKanbanName, AllowedDuplicatesFlag, 
                      IdentifyString, IdentifyStringStartIndex, ProductNumberStartIndex, ProductNumberLength, 
-                     QuantityLength, QuantityStartIndex, LotLength, LotStartIndex, ProductKeyLength, 
-                     ProductKeyStartIndex, FirstSubProductKeyLength, FirstSubProductKeyIndex, SecondSubProductKeyLength, 
-                     SecondSubProductKeyIndex, ProductBranchNumberLength, ProductBranchNumberStartIndex, OrderNumberLength, 
+                     QuantityLength, QuantityStartIndex, LotLength, LotStartIndex, MainProductKeyLength, 
+                     MainProductKeyStartIndex, FirstSubProductKeyLength, FirstSubProductKeyStartIndex, SecondSubProductKeyLength, 
+                     SecondSubProductKeyStartIndex, ProductBranchNumberLength, ProductBranchNumberStartIndex, OrderNumberLength, 
                      OrderNumberStartIndex, UpdatedAt, UpdatedBy)
                 VALUES (
                     '更新', '{model.DepoName}', '{model.SupplierName}', '{model.SupplierKanbanName}', 
