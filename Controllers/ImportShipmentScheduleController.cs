@@ -5,6 +5,7 @@ using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
+using System.Transactions;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -79,7 +80,6 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> ImportCsv(List<IFormFile> uploadFileList, int depoId, int companyId, string viewTitle)
-        //public async Task<IActionResult> ImportCsv(List<IFormFile> FileUpload, int DepoID, int CompanyID, string GamenName)
         {
             string tempFilePath = string.Empty;
             try
@@ -101,6 +101,7 @@ namespace mar_sumaken_web.Controllers
                 // モデルリスト取得
                 if (files != null && files.Count > 0)
                 {
+                    int insertCount = 0;
                     foreach (var file in files)
                     {
                         List<D_ShipmentScheduleModel> importModelList = new();
@@ -173,6 +174,16 @@ namespace mar_sumaken_web.Controllers
                                     }
                                 }
 
+                                insertCount++;
+                                // 出荷指示取込時、出荷実績がある場合はエラー
+                                string checkExistSql = D_ShipmentScheduleConnectController.CreateSQLToIsExistDShipment(shipmentSchedule, depoId, companyId);
+                                bool isExist = D_ShipmentScheduleConnectController.IsExistDShipment(checkExistSql, user.DatabaseName);
+                                if (isExist)
+                                {
+                                    isValid = false;
+                                    validationResults.Add(new ValidationResult(ErrorMessagesResources.E1020, new List<string> { "ShipmentScheduleID" }));
+                                }
+
                                 // エラーメッセージ作成
                                 if (!isValid)
                                 {
@@ -225,6 +236,11 @@ namespace mar_sumaken_web.Controllers
                             CreateFile.DeleteFile(tempFilePath);
                             return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
                         }
+                    }
+
+                    if (insertCount == 0)
+                    {
+                        throw new Exception();
                     }
                 }
                 else

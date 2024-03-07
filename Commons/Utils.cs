@@ -95,9 +95,9 @@ namespace mar_sumaken_web.Commons
                 List<string> errorItem = new();
 
                 // 列名取得
-                string memberName = validationResult.MemberNames.FirstOrDefault();
-                string checkitemName = GetDisplayName<T>(memberName);
-                errorItem.Add(checkitemName);
+                //string memberName = validationResult.MemberNames.FirstOrDefault();
+                //string checkitemName = GetDisplayName<T>(memberName);
+                //errorItem.Add(checkitemName);
 
                 // エラーメッセージ取得
                 string errorMessage = validationResult.ErrorMessage;

@@ -71,14 +71,7 @@ namespace mar_sumaken_web.Controllers
                     var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
                     return NotFound(new { errorMessage = message });
                 }
-
-                // 仕入先品番チェック
-                bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(model.SupplierProductNumber, user.DatabaseName);
-                if (!isExistProduct)
-                {
-                    var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("SupplierProductNumber"));
-                    return NotFound(new { errorMessage = message });
-                }
+                model.SupplierProductNumber = model.DeliveryProductNumber;
 
                 // 出庫実績更新
                 D_StoreOutConnectController.EditDStoreOut(model, user);
@@ -110,7 +103,6 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 入力規則チェック
-                ModelState.Remove("SupplierProductNumber");
                 ModelState.Remove("DeliveryProductNumber");
                 ModelState.Remove("SearchDeliveryDate");
                 if (!ModelState.IsValid)
@@ -157,7 +149,7 @@ namespace mar_sumaken_web.Controllers
                             <td class='SupplierName'>{@item.SupplierName}</td>
                             <td class='StoreOutDate'>{@item.StoreOutDate.ToString("yyyy/MM/dd")}</td>
                             <td class='DeliveryDate'>{@item.DeliveryDate.ToString("yyyy/MM/dd")}</td>
-                            <td class='DeliveryTimeClass'>{@item.DeliveryTimeClass}</td>
+                            <td class='DeliveryTimeClass'>{DisplayBin(@item.DeliveryTimeClass)}</td>
                             <td class='DeliverySlipNumber'>{@item.DeliverySlipNumber}</td>
                             <td class='DeliveryProductNumber'>{@item.DeliveryProductNumber}</td>
                             <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
@@ -178,7 +170,7 @@ namespace mar_sumaken_web.Controllers
                         ";
                     }
                 }
-                   
+
                 return Content(searchData);
             }
             catch (SqlException)
@@ -190,6 +182,18 @@ namespace mar_sumaken_web.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 return Content(errorMessage);
             }
+        }
+
+        /// <summary>
+        /// 便を表示
+        /// </summary>
+        public string DisplayBin(int bin)
+        {
+            if (bin == 0)
+            {
+                return string.Empty;
+            }
+            return bin.ToString();
         }
 
         /// <summary>
@@ -394,77 +398,71 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 List<string> errorMessageList = new();
-                int readCount = 1;
-
-                // リストチェック
-                if (model.RegisterList != null && model.RegisterList.Count > 0)
+                int registerCount = 0;
+                for (int i = 0; i< model.RegisterList.Count; i++)
                 {
-                    foreach (var modelItem in model.RegisterList)
+                    var modelItem = model.RegisterList[i];
+                    if (modelItem.DeliveryProductNumber.Equals("0")) continue;
+                    registerCount++;
+
+                    modelItem.SearchDeliveryDate = model.SearchDeliveryDate;
+                    var validationContext = new ValidationContext(modelItem);
+                    var validationResults = new List<ValidationResult>();
+                    bool isValid = Validator.TryValidateObject(modelItem, validationContext, validationResults, true);
+                    List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
+
+                    // 納入先品番チェック
+                    bool isContainDeliveryProductNumber = errorMembers.Contains("DeliveryProductNumber");
+                    if (!isContainDeliveryProductNumber)
                     {
-                        modelItem.SearchDeliveryDate = model.SearchDeliveryDate;
-                        var validationContext = new ValidationContext(modelItem);
-                        var validationResults = new List<ValidationResult>();
-                        bool isValid = Validator.TryValidateObject(modelItem, validationContext, validationResults, true);
-                        List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
-
-                        // 納入先品番チェック
-                        bool isContainDeliveryProductNumber = errorMembers.Contains("DeliveryProductNumber");
-                        if (!isContainDeliveryProductNumber)
+                        // 納入先品番で品番チェック
+                        bool isExistProduct = M_ProductConnectController.IsExistedDeliveryProductNumber(modelItem.DeliveryProductNumber, user.DatabaseName);
+                        if (!isExistProduct)
                         {
-                            // 納入先品番で品番チェック
-                            bool isExistProduct = M_ProductConnectController.IsExistedDeliveryProductNumber(modelItem.DeliveryProductNumber, user.DatabaseName);
-                            if (!isExistProduct)
-                            {
-                                isValid = false;
-                                var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
-                                validationResults.Add(new ValidationResult(message, new List<string> { "DeliveryProductNumber" }));
-                            }
-                        }
-
-                        // 仕入先品番チェック
-                        bool isContainSupplierProductNumber = errorMembers.Contains("SupplierProductNumber");
-                        if (!isContainSupplierProductNumber)
-                        {
-                            // 仕入先品番で品番チェック
-                            bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(modelItem.SupplierProductNumber, user.DatabaseName);
-                            if (!isExistProduct)
-                            {
-                                isValid = false;
-                                var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("SupplierProductNumber"));
-                                validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
-                            }
-                        }
-
-                        // エラーメッセージ作成
-                        if (!isValid)
-                        {
-                            foreach (var err in validationResults)
-                            {
-                                // フォーマットエラーメッセージ
-                                List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_StoreOutModel>(err);
-                                errorMessageItem.Insert(0, readCount + "行目");
-
-                                // HTMLに変換
-                                var errorHtml = string.Empty;
-                                foreach (var item in errorMessageItem)
-                                {
-                                    errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
-                                }
-                                errorHtml = "<tr>" + errorHtml + "</tr>";
-
-                                errorMessageList.Add(errorHtml);
-                            }
+                            isValid = false;
+                            var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
+                            validationResults.Add(new ValidationResult(message, new List<string> { "DeliveryProductNumber" }));
                         }
                     }
+                    modelItem.SupplierProductNumber = modelItem.DeliveryProductNumber;
 
-                    // エラーが1件以上ある場合はreturn
-                    if (errorMessageList.Count > 0)
+                    // エラーメッセージ作成
+                    if (!isValid)
                     {
-                        var errorMessage = string.Join("</br>", errorMessageList);
-                        return NotFound(new { errorMessage });
+                        var lineCount = i + 1;
+                        foreach (var err in validationResults)
+                        {
+                            // フォーマットエラーメッセージ
+                            List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_StoreOutModel>(err);
+                            errorMessageItem.Insert(0, lineCount + "行目");
+
+                            // HTMLに変換
+                            var errorHtml = string.Empty;
+                            foreach (var item in errorMessageItem)
+                            {
+                                errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
+                            }
+                            errorHtml = "<tr>" + errorHtml + "</tr>";
+
+                            errorMessageList.Add(errorHtml);
+                        }
                     }
                 }
 
+                // リストチェック
+                if (registerCount == 0)
+                {
+                    throw new Exception();
+                }
+
+                // エラーが1件以上ある場合はreturn
+                if (errorMessageList.Count > 0)
+                {
+                    var errorMessage = string.Join("</br>", errorMessageList);
+                    return NotFound(new { errorMessage });
+                }
+
+                model.RegisterList = model.RegisterList.Where(x => !x.DeliveryProductNumber.Equals("0")).ToList();
                 // 出庫実績登録
                 D_StoreOutConnectController.InsertDStoreOuts(model, user);
 

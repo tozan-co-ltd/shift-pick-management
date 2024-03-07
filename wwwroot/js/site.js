@@ -194,11 +194,11 @@ function onUploadFile(page) {
             if (jqXHR.status === 404) {
                 // データが見つからなかった場合
                 var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#div-error-message").text(errorMessage);
+                $("#div-error-message").html(errorMessage);
             } else {
                 // その他のエラーの場合
                 var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#div-error-message").text(errorMessage);
+                $("#div-error-message").html(errorMessage);
             }
             $("#div-error-message").show();
             $('#' + page + '')[0].reset();
