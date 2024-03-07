@@ -177,6 +177,9 @@
   <data name="E1020" xml:space="preserve">
     <value>既に実績データがあるため、上書きできません。</value>
   </data>
+  <data name="E1022" xml:space="preserve">
+    <value>仕入先かんばんマスターに一致するデータがありません。</value>
+  </data>
   <data name="E2001" xml:space="preserve">
     <value>QRコードが正しくありません。正しいQRコードを読み取ってください。</value>
   </data>

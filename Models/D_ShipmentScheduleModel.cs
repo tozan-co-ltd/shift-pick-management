@@ -314,6 +314,11 @@ namespace mar_sumaken_web.Models
         public int NumberOfBoxes { get; set; }
 
         /// <summary>
+        /// 指示箱数
+        /// </summary>
+        public int ScheduleNumberOfBoxes { get; set; }
+
+        /// <summary>
         /// 出庫箱数
         /// </summary>
         [Display(Name = "出庫箱数")]

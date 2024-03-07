@@ -53,18 +53,11 @@
         <p>結果</p>
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3" id="div-preview-result" style="display: none;">
-                <div class="col-12 input-group div-input-group">
-                    <div class="col-12 col-sm-4 col-md-2 column-1st">
-                        <label>@Html.DisplayNameFor(model => model.SupplierKanbanName)</label>
-                        <label id="resultSupplierKanbanName"></label>
-                    </div>
-                    @* <div class="col-12 col-sm-4 col-md-2 column-1st">
-                        <label>@Html.DisplayNameFor(model => model.AllowedDuplicatesFlag)</label>
-                        <label>0(なし)</label>
-                    </div> *@
-                    <p>@Html.DisplayNameFor(model => model.AllowedDuplicatesFlag)：<span id="detailAllowedDuplicatesFlag"></span></p>
+                <div class="col-12">
+                    <p>@Html.DisplayNameFor(model => model.SupplierKanbanName)：<span id="resultSupplierKanbanName"></span></p>
+                    <p>@Html.DisplayNameFor(model => model.AllowedDuplicatesFlag)：<span id="resultAllowedDuplicatesFlag"></span></p>
                 </div>
-                <table class="table table-responsive table-sm table-striped p-2" style="width:100%">
+                <table class="table table-responsive table-sm table-striped p-2" id="table-result-qr" style="width:100%">
                     <thead>
                         <tr>
                             <th class="border-top-0" style="width: 30%">項目名</th>
@@ -78,127 +71,73 @@
                             <td>
                                 識別文字
                             </td>
-                            <td id="resultIdentifyStringLength">
-                                ...
-                            </td>
-                            <td id="resultIdentifyStringStartIndex">
-                                ...
-                            </td>
-                            <td id="resultQrIdentify">
-                                ...
-                            </td>
+                            <td id="resultIdentifyStringLength"></td>
+                            <td id="resultIdentifyStringStartIndex"></td>
+                            <td id="resultQrIdentifyString"></td>
                         </tr>
                         <tr>
                             <td>
                                 品番
                             </td>
-                            <td id="resultProductNumberLength">
-                                ...
-                            </td>
-                            <td id="resultProductNumberStartIndex">
-                                ...
-                            </td>
-                            <td id="resultQrProductNumber">
-                                ...
-                            </td>
+                            <td id="resultProductNumberLength"></td>
+                            <td id="resultProductNumberStartIndex"></td>
+                            <td id="resultQrProductNumber"></td>
                         </tr>
                         <tr>
                             <td>
                                 数量
                             </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
+                            <td id="resultQuantityLength"></td>
+                            <td id="resultQuantityStartIndex"></td>
+                            <td id="resultQrQuantity"></td>
                         </tr>
                         <tr>
                             <td>
                                 ロット番号
                             </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
+                            <td id="resultLotLength"></td>
+                            <td id="resultLotStartIndex"></td>
+                            <td id="resultQrLot"></td>
                         </tr>
                         <tr>
                             <td>
                                 メインキー
                             </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
+                            <td id="resultMainProductKeyLength"></td>
+                            <td id="resultMainProductKeyStartIndex"></td>
+                            <td id="resultQrMainProductKey"></td>
                         </tr>
                         <tr>
                             <td>
                                 サブキー1
                             </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
+                            <td id="resultFirstSubProductKeyLength"></td>
+                            <td id="resultFirstSubProductKeyStartIndex"></td>
+                            <td id="resultQrFirstSubProductKey"></td>
                         </tr>
                         <tr>
                             <td>
                                 サブキー2
                             </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
+                            <td id="resultSecondSubProductKeyLength"></td>
+                            <td id="resultSecondSubProductKeyStartIndex"></td>
+                            <td id="resultQrSecondSubProductKey"></td>
                         </tr>
                         <tr>
                             <td>
                                 枝番
                             </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
+                            <td id="resultProductBranchNumberLength"></td>
+                            <td id="resultProductBranchNumberStartIndex"></td>
+                            <td id="resultQrProductBranchNumber"></td>
                         </tr>
                         <tr>
                             <td>
                                 注文番号
                             </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
-                            <td>
-                                ...
-                            </td>
+                            <td id="resultOrderNumberLength"></td>
+                            <td id="resultOrderNumberStartIndex"></td>
+                            <td id="resultQrOrderNumber"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -213,6 +152,8 @@
         $('#mSupplierKanbanForm').submit(function (event) {
             $("#div-error-message").text("");
 
+            $("#div-preview-result").hide();
+
             // ページの更新を禁止する
             event.preventDefault();
 
@@ -225,6 +166,12 @@
             let formId = 'mSupplierKanbanForm';
             let data = $('#' + formId).serializeArray();
 
+            var len = data[0]["value"].replace(/[\n\s　]/g, "").length;
+            if (len == 0) {
+                $('#div-error-message').text("E1001: QRコード文字列は必須項目です。");
+                return;
+            }
+
             // Ajax call
             $.ajax({
                 url: url,
@@ -232,28 +179,33 @@
                 data: data
             }).done(function (response) {
                 // tableリセット
+                $("#table-result-qr").children().find("td").text();
+                // table内のすべてのtd要素のテキストをリセット(一番左のtdは除く)
+                $('#table-result-qr td:not(:first-child)').text('');
 
-                // QRコード文字列をトリム
-                // 開始,終了
-                let productNumber = response.qRCodeString.slice(response.productNumberStartIndex, response.productNumberLength.length())
-
-                console.log('productNumber', productNumber)
                 // 結果表示
-                // 識別文字の桁数欄はLength
-                console.log('response', response)
                 if (response.identifyString != null) {
-                    $("#div-preview-result").show();
                     $("#resultSupplierKanbanName").text(response.supplierKanbanName);
-                    $("#resultAllowedDuplicatesFlag").text(response.allowedDuplicatesFlag);
-                    $("#resultQrProductNumber").text(productNumber);
+
+                    if(response.allowedDuplicatesFlag = "0") {
+                        $("#resultAllowedDuplicatesFlag").text("0(なし)");
+                    } else {
+                        $("#resultAllowedDuplicatesFlag").text("1(あり)");
+                    }
+                    
+                    // QRコード文字列をトリム
+                    CreatePreviewResult(response);
+                    $("#div-preview-result").show();
                 }
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
                     // データが見つからなかった場合
+                    $("#div-preview-result").hide();
                     var errorMessage = jqXHR.responseJSON.errorMessage;
                     $("#div-error-message").text(errorMessage);
                 } else {
                     // その他のエラーの場合
+                    $("#div-preview-result").hide();
                     var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
                     $("#div-error-message").text(errorMessage);
                 }
@@ -261,5 +213,101 @@
         });
     }
 
+    function CreatePreviewResult(response) {
+        let qrCodeString = response.qrCodeString;
+        let qrCodeStringLength = qrCodeString.length;
+
+        // 識別文字
+        // 開始位置
+        let identifyStringStartIndex = response.identifyStringStartIndex - 1;
+        // 文字列を取得するための最小桁数
+        let identifyStringMinLength = identifyStringStartIndex + response.identifyString.length;
+        $("#resultIdentifyStringLength").text(response.identifyString.length);
+        $("#resultIdentifyStringStartIndex").text(response.identifyStringStartIndex);
+        if (qrCodeStringLength >= identifyStringMinLength) {
+            let resultQrIdentifyString = qrCodeString.slice(identifyStringStartIndex, identifyStringStartIndex + response.identifyString.length);
+            $("#resultQrIdentifyString").text(resultQrIdentifyString);
+        }
+
+        // 品番
+        let productNumberStartIndex = response.productNumberStartIndex - 1;
+        let productNumberMinLength = productNumberStartIndex + response.productNumberLength;
+        $("#resultProductNumberLength").text(response.productNumberLength);
+        $("#resultProductNumberStartIndex").text(response.productNumberStartIndex);
+        if (qrCodeStringLength >= productNumberMinLength) {
+            let resultQrProductNumber = qrCodeString.slice(productNumberStartIndex, productNumberStartIndex + response.productNumberLength);
+            $("#resultQrProductNumber").text(resultQrProductNumber);
+        }
+
+        // 数量
+        let quantityStartIndex = response.quantityStartIndex - 1;
+        let quantityMinLength = quantityStartIndex + response.quantityLength;
+        $("#resultQuantityLength").text(response.quantityLength);
+        $("#resultQuantityStartIndex").text(response.quantityStartIndex);
+        if (qrCodeStringLength >= quantityMinLength) {
+            let resultQrQuantity = qrCodeString.slice(quantityStartIndex, quantityStartIndex + response.quantityLength);
+            $("#resultQrQuantity").text(resultQrQuantity);
+        }
+
+        // ロット番号
+        let lotStartIndex = response.lotStartIndex - 1;
+        let lotMinLength = lotStartIndex + response.lotLength;
+        $("#resultLotLength").text(response.lotLength);
+        $("#resultLotStartIndex").text(response.lotStartIndex);
+        if (qrCodeStringLength >= lotMinLength) {
+            let resultQrLot = qrCodeString.slice(lotStartIndex, lotStartIndex + response.lotLength);
+            $("#resultQrLot").text(resultQrLot);
+        }
+
+        // メインキー
+        let mainProductKeyStartIndex = response.mainProductKeyStartIndex - 1;
+        let mainProductKeyMinLength = mainProductKeyStartIndex + response.mainProductKeyLength;
+        $("#resultMainProductKeyLength").text(response.mainProductKeyLength);
+        $("#resultMainProductKeyStartIndex").text(response.mainProductKeyStartIndex);
+        if (qrCodeStringLength >= mainProductKeyMinLength) {
+            let resultQrMainProductKey = qrCodeString.slice(mainProductKeyStartIndex, mainProductKeyStartIndex + response.mainProductKeyLength);
+            $("#resultQrMainProductKey").text(resultQrMainProductKey);
+        }
+
+        // サブキー1
+        let firstSubProductKeyStartIndex = response.firstSubProductKeyStartIndex - 1;
+        let firstSubProductKeyMinLength = firstSubProductKeyStartIndex + response.firstSubProductKeyLength;
+        $("#resultFirstSubProductKeyLength").text(response.firstSubProductKeyLength);
+        $("#resultFirstSubProductKeyStartIndex").text(response.firstSubProductKeyStartIndex);
+        if (qrCodeStringLength >= firstSubProductKeyMinLength) {
+            let resultQrFirstSubProductKey = qrCodeString.slice(firstSubProductKeyStartIndex, firstSubProductKeyStartIndex + response.firstSubProductKeyLength);
+            $("#resultQrFirstSubProductKey").text(resultQrFirstSubProductKey);
+        }
+
+        // サブキー2
+        let secondSubProductKeyStartIndex = response.secondSubProductKeyStartIndex - 1;
+        let secondSubProductKeyMinLength = secondSubProductKeyStartIndex + response.secondSubProductKeyLength;
+        $("#resultSecondSubProductKeyLength").text(response.secondSubProductKeyLength);
+        $("#resultSecondSubProductKeyStartIndex").text(response.secondSubProductKeyStartIndex);
+        if (qrCodeStringLength >= firstSubProductKeyMinLength) {
+            let resultQrSecondSubProductKey = qrCodeString.slice(secondSubProductKeyStartIndex, secondSubProductKeyStartIndex + response.secondSubProductKeyLength);
+            $("#resultQrSecondSubProductKey").text(resultQrSecondSubProductKey);
+        }
+
+        // 枝番
+        let productBranchNumberStartIndex = response.productBranchNumberStartIndex - 1;
+        let productBranchNumberMinLength = productBranchNumberStartIndex + response.productBranchNumberLength;
+        $("#resultProductBranchNumberLength").text(response.productBranchNumberLength);
+        $("#resultProductBranchNumberStartIndex").text(response.productBranchNumberStartIndex);
+        if (qrCodeStringLength >= productBranchNumberMinLength) {
+            let resultQrProductBranchNumber = qrCodeString.slice(productBranchNumberStartIndex, productBranchNumberStartIndex + response.productBranchNumberLength);
+            $("#resultQrProductBranchNumber").text(resultQrProductBranchNumber);
+        }
+
+        // 注文番号
+        let orderNumberStartIndex = response.orderNumberStartIndex - 1;
+        let orderNumberMinLength = orderNumberStartIndex + response.orderNumberLength;
+        $("#resultOrderNumberLength").text(response.orderNumberLength);
+        $("#resultOrderNumberStartIndex").text(response.orderNumberStartIndex);
+        if (qrCodeStringLength >= orderNumberMinLength) {
+            let resultQrOrderNumber = qrCodeString.slice(orderNumberStartIndex, orderNumberStartIndex + response.orderNumberLength);
+            $("#resultQrOrderNumber").text(resultQrOrderNumber);
+        }
+    }
 </script>
 

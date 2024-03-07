@@ -27,10 +27,10 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         public IActionResult Index()
         {
-            D_HandyErrorMessageModel model = new();
-            //TopModel topModel = new();
-            //D_ShipmentScheduleModel shipmentScheduleModel = new();
-            //D_HandyErrorMessageModel handyErrorMessageModel = new();
+            
+            TopModel topModel = new();
+            D_ShipmentScheduleModel shipmentScheduleModel = new();
+            D_HandyErrorMessageModel handyErrorMessageModel = new();
             try
             {
                 // ログイン中ユーザー情報取得
@@ -40,34 +40,44 @@ namespace mar_sumaken_web.Controllers
                 var sql = D_HandyErrorMessageConnectController.CreateSQLToSelectDHandyErrorMessages();
                 // DB接続
                 IEnumerable<D_HandyErrorMessageModel> handyErrorMessageList = D_HandyErrorMessageConnectController.ConnectDHandyErrorMessages(sql, user.DatabaseName);
-                model.D_HandyErrorMessageList = handyErrorMessageList.ToPagedList();
+                topModel.D_HandyErrorMessageList = handyErrorMessageList.ToPagedList();
 
-                return View(model);
+                // 会社コード = 10001 固定で、会社マスターから10001のIDを取得する
+                var mCompany = M_CompanyConnectController.GetMCompanyByCompanyCode("10001", user.DatabaseName);
 
-                //// 出荷指示情報取得
-                //会社コード=10001　固定で、会社マスターから10001のIDを取得する
-                //var companyId = 4;
-                //var shipmentSql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation(user.MainDepoID, companyId);
-                //IEnumerable<D_ShipmentScheduleModel> searchList = D_ShipmentScheduleConnectController.ConnectDShipmentSchedules(shipmentSql, user.DatabaseName);
-                //shipmentScheduleModel.D_ShipmentScheduleList = searchList.ToPagedList();
+                // 本日作業する出荷指示は納入指示日が翌日(土日を除く)
+                var nextDay = Utils.GetNextWeekday(DateTime.Now).ToString("yyyy/MM/dd");
 
-                //// ハンディエラーメッセージ履歴情報取得
-                //var sql = D_HandyErrorMessageConnectController.CreateSQLToSelectDHandyErrorMessages();
-                //IEnumerable<D_HandyErrorMessageModel> handyErrorMessageList = D_HandyErrorMessageConnectController.ConnectDHandyErrorMessages(sql, user.DatabaseName);
-                //handyErrorMessageModel.D_HandyErrorMessageList = handyErrorMessageList.ToPagedList();
-                //topModel = new TopModel
-                //{
-                //    MyModel1 = (IPagedList<D_ShipmentScheduleModel>)shipmentScheduleModel,
-                //    MyModel2 = (IPagedList<D_HandyErrorMessageModel>)handyErrorMessageModel
-                //};
+                // 出荷指示情報取得
+                var shipmentSql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation(user.MainDepoID, mCompany.CompanyID, nextDay);
+                IEnumerable<D_ShipmentScheduleModel> searchList = D_ShipmentScheduleConnectController.ConnectDShipmentSchedules(shipmentSql, user.DatabaseName);
+                topModel.ShipmentScheduleList = searchList.ToPagedList();
 
-                //return View(topModel);
+                if (topModel.ShipmentScheduleList.Count > 0)
+                {
+                    // 検品済数と未検品数を取得
+                    int scheduleTotal = 0;
+                    int storeOutTotal = 0;
+                    // 計算
+                    foreach (var item in topModel.ShipmentScheduleList)
+                    {
+                        scheduleTotal += item.ScheduleNumberOfBoxes;
+                        storeOutTotal += item.StoreOutNumberOfBoxes;
+                    }
+                    topModel.ShipmentScheduleTotal = scheduleTotal;
+                    topModel.StoreOutTotal = storeOutTotal;
+                }
+                // 項目設定
+                topModel.DepoName = user.MainDepoName;
+                topModel.GraphTitle = string.Concat(nextDay, "分　", mCompany.CompanyName, "向け", "　出荷検品数");
+
+                return View(topModel);
             }
             catch (Exception ex)
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return View(model);
+                return View(topModel);
             }
         }
     }
