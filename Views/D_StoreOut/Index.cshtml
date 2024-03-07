@@ -191,15 +191,6 @@
                         </div>
                         <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st">
-                                <label>@Html.DisplayNameFor(model => model.SupplierProductNumber)<span style="color:red">*</span></label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
-                                <input class="form-control" type="text" asp-for="SupplierProductNumber" autocomplete="off" required>
-                                <span class="text-danger w-100" asp-validation-for="SupplierProductNumber"></span>
-                            </div>
-                        </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
                                 <label>@Html.DisplayNameFor(model => model.LotNumber)</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-8 column-2nd">
@@ -363,22 +354,6 @@
                             </div>
                             <div class="col-12 col-sm-8 col-md-8 mb-2">
                                 <input class="form-control" id="deleteLotNumber" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4">
-                                <label>@Html.DisplayNameFor(model => model.LotQuantity)</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteLotQuantity" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4">
-                                <label>@Html.DisplayNameFor(model => model.NumberOfBoxes)</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteNumberOfBoxes" type="text" disabled>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap">
@@ -552,14 +527,18 @@
         $("#deleteSupplierName").val(row.getElementsByClassName("SupplierName")[0].textContent);
         $("#deleteStoreOutDate").val(row.getElementsByClassName("StoreOutDate")[0].textContent);
         $("#deleteDeliveryDate").val(row.getElementsByClassName("DeliveryDate")[0].textContent);
-        $("#deleteDeliveryTimeClass").val(row.getElementsByClassName("DeliveryTimeClass")[0].textContent);
-        $("#deleteDeliverySlipNumber").val(row.getElementsByClassName("DeliverySlipNumber")[0].textContent);
+        
+        var deliveryTimeClass = row.getElementsByClassName("DeliveryTimeClass")[0].textContent;
+        var deliverySlipNumber = row.getElementsByClassName("DeliverySlipNumber")[0].textContent;
+        if (deliveryTimeClass == "") {
+            $("#deleteDeliveryTimeClass").val("");
+        } else {
+            $("#deleteDeliveryTimeClass").val(deliveryTimeClass + "・" + deliverySlipNumber);
+        }
+        
         $("#deleteDeliveryProductNumber").val(row.getElementsByClassName("DeliveryProductNumber")[0].textContent);
-        $("#deleteSupplierProductNumber").val(row.getElementsByClassName("SupplierProductNumber")[0].textContent);
         $("#deleteLotNumber").val(row.getElementsByClassName("LotNumber")[0].textContent);
-        $("#deleteLotQuantity").val(row.getElementsByClassName("LotQuantity")[0].textContent);
         $("#deleteQuantity").val(row.getElementsByClassName("Quantity")[0].textContent);
-        $("#deleteNumberOfBoxes").val(row.getElementsByClassName("NumberOfBoxes")[0].textContent);
     }
 
     // 削除

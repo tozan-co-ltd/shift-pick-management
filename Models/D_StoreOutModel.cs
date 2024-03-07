@@ -48,8 +48,7 @@ namespace mar_sumaken_web.Models
         /// 検索納入指示日
         /// </summary>
         [Display(Name = "納入指示日")]
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string SearchDeliveryDate { set; get; }
+        public string? SearchDeliveryDate { set; get; }
 
         /// <summary>
         /// 検索倉庫リスト
@@ -140,7 +139,6 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "仕入先品番")]
         [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? SupplierProductNumber { set; get; }
 
         /// <summary>
