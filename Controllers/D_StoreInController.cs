@@ -67,9 +67,8 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
                 }
 
-                // 入庫実績情報取得SQL作成
+                // 入庫実績情報取得
                 var sql = D_StoreInConnectController.CreateSQLToSelectDStoreIns(searchModel);
-                // DB接続
                 List<D_StoreInModel> storeInList = D_StoreInConnectController.ConnectDStoreIns(sql, user.DatabaseName);
 
                 // 表示用のhtml作成
@@ -143,22 +142,20 @@ namespace mar_sumaken_web.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            D_StoreInModel model = new();
             try
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                if (user == null)
-                {
-                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
-                }
-
-                var model = new D_StoreInModel();
+                // メイン倉庫を初期選択
                 List<D_StoreInModel> storeInList = new();
                 for (int i = 0; i < InitRegisterRowCount; i++)
                 {
-                    var viewModel = new D_StoreInModel();
-                    viewModel.DepoID = user.MainDepoID;
+                    D_StoreInModel viewModel = new()
+                    {
+                        DepoID = user.MainDepoID
+                    };
                     storeInList.Add(viewModel);
 
                     model.RegisterList = storeInList;
@@ -189,6 +186,7 @@ namespace mar_sumaken_web.Controllers
 
                 List<string> errorMessageList = new();
                 int readCount = 1;
+
                 // リストチェック
                 if (model.RegisterList != null && model.RegisterList.Count > 0)
                 {

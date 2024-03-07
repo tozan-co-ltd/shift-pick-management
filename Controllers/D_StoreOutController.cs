@@ -98,7 +98,7 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// 検索ボタン押下
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="searchModel"></param>
         /// <returns></returns>
         public IActionResult SearchData(D_StoreOutModel searchModel)
         {
@@ -118,10 +118,8 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
                 }
 
-                // SQL作成
+                // 出庫実績情報取得
                 var sql = D_StoreOutConnectController.CreateSQLToSelectDStoreOuts(searchModel);
-
-                // DB接続
                 List<D_StoreOutModel> dStoreOutList = D_StoreOutConnectController.ConnectDStoreOuts(sql, ClaimsLoginUserData().DatabaseName);
 
                 // 表示用のhtml作成
@@ -306,7 +304,7 @@ namespace mar_sumaken_web.Controllers
         /// 便リスト取得
         /// </summary>
         /// <param name="searchDeliveryDate">納入指示日</param>
-        public IActionResult ChangDeliveryTimeClassList(string searchDeliveryDate)
+        public IActionResult ChangeDeliveryTimeClassList(string searchDeliveryDate)
         {
             var searchData = string.Empty;
             try
@@ -321,12 +319,10 @@ namespace mar_sumaken_web.Controllers
                 if (binSelectList.Count > 0)
                 {
                     searchData = string.Empty;
-                    //searchData = "<select>";
                     foreach (var item in binSelectList)
                     {
                         searchData += $@" <option value='{item.Text}'>{item.Text}</option>";
                     }
-                    //searchData += "</select>";
                 }
 
                 return Content(searchData);
@@ -349,17 +345,13 @@ namespace mar_sumaken_web.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            var model = new D_StoreOutModel();
             try
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                if (user == null)
-                {
-                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
-                }
-
-                var model = new D_StoreOutModel();
+                // メイン倉庫を初期選択
                 List<D_StoreOutModel> storeInList = new();
                 for (int i = 0; i < InitRegisterRowCount; i++)
                 {
@@ -403,6 +395,7 @@ namespace mar_sumaken_web.Controllers
 
                 List<string> errorMessageList = new();
                 int readCount = 1;
+
                 // リストチェック
                 if (model.RegisterList != null && model.RegisterList.Count > 0)
                 {

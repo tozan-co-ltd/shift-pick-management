@@ -449,7 +449,7 @@
     function ChangDeliveryTimeClassList(DeliveryDate, selectedItem) {
         var data = { "SearchDeliveryDate": DeliveryDate };
         $.ajax({
-            url: '@Url.Action("ChangDeliveryTimeClassList", "D_StoreOut")',
+            url: '@Url.Action("ChangeDeliveryTimeClassList", "D_StoreOut")',
             method: 'POST',
             data: data
         })
