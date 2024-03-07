@@ -342,7 +342,7 @@ namespace mar_sumaken_web.Commons
                 FROM D_ShipmentSchedule shipment
                 LEFT JOIN D_StoreOut AS storeOut 
 		                ON shipment.DepoID = storeOut.DepoID
-		                AND	shipment.CompanyID = storeOut.CompanyID
+		                --AND shipment.CompanyID = storeOut.CompanyID
 		                AND	shipment.DeliveryDate = storeOut.DeliveryDate
 		                AND	shipment.DeliveryProductNumber = storeOut.DeliveryProductNumber
                         AND storeOut.IsDeleted = 0

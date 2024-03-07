@@ -89,6 +89,70 @@ namespace mar_sumaken_web.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            M_SupplierKanbanModel model = new();
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 仕入先かんばんマスター情報取得
+                var sql = M_SupplierKanbanConnectController.CreateSQLToSelectMSupplierKanbans(id);
+                var supplierKanbanList = M_SupplierKanbanConnectController.ConnectMSupplierKanbans(sql, user.DatabaseName);
+
+                if (supplierKanbanList.Count == 1)
+                {
+                    // ユーザーマスターの詳細を取得
+                    IEnumerable<M_SupplierKanbanModel> mSupplierKanbanList = M_SupplierKanbanConnectController.GetMSupplierKanbanDetailList(supplierKanbanList, user.DatabaseName);
+                    model = mSupplierKanbanList.FirstOrDefault();
+                }
+
+                // 会社マスター情報取得
+                model.SuplierSelectList = M_ProductConnectController.GetCompanysByCompanyKubun(Utils.Const_SupplierID, user.DatabaseName);
+                model.SelectedSupplierID = model.SupplierID;
+
+                // 倉庫
+                model.SelectedDepoID = model.DepoID;
+
+                // ハンディメニューマスター情報取得
+                var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToSelectMHandyMenuList();
+                List<M_HandyMenuModel> handyMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(handyMenuListSql, user.DatabaseName);
+                foreach (var handyMenu in handyMenuList)
+                {
+                    SelectListItem menuItem = new()
+                    {
+                        Text = handyMenu.HandyMenuName,
+                        Value = Convert.ToString(handyMenu.HandyMenuID),
+                        Selected = false
+                    };
+
+                    model.HandyMenuSelectList.Add(menuItem);
+                }
+
+                // 使用ハンディメニュー名
+                foreach (var item in model.M_HandyMenuList)
+                {
+                    foreach (var menuItem in model.HandyMenuSelectList)
+                    {
+                        if (item.HandyMenuID.ToString().Equals(menuItem.Value))
+                        {
+                            menuItem.Selected = true;
+                        }
+                    }
+                }
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return View(model);
+            }
+        }
+
         /// <summary>
         /// 仕入先かんばんマスター登録
         /// </summary>
@@ -152,14 +216,6 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
                 }
 
-                // 異なるIDで仕入先かんばんコード重複チェック
-                var sql = M_SupplierKanbanConnectController.CreateSQLToSelectDuplicateEditMSupplierKanban(model);
-                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
-                if (isExisted)
-                {
-                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyString") + "・" +  Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyStringStartIndex")) });
-                }
-
                 // 仕入先かんばんマスター更新
                 M_SupplierKanbanConnectController.UpdateMSupplierKanban(model, user);
 
@@ -188,7 +244,7 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 仕入先かんばんマスター削除
-                M_SupplierKanbanConnectController.DeleteMSupplierKanban(supplierKanbanId, user) ;
+                M_SupplierKanbanConnectController.DeleteMSupplierKanban(supplierKanbanId, user);
 
                 return Ok();
             }

@@ -90,9 +90,8 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="model"></param>
         /// <param name="loginUser"></param>
         /// <returns>登録結果</returns>
-        public static bool InsertMSupplierKanban(M_SupplierKanbanModel model, LoginUserModel loginUser)
+        public static void InsertMSupplierKanban(M_SupplierKanbanModel model, LoginUserModel loginUser)
         {
-            bool result = false;
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
@@ -136,9 +135,6 @@ namespace mar_sumaken_web.ConnectControllers
 
                     // トランザクションのコミット
                     transaction.Commit();
-
-                    result = true;
-                    return result;
                 }
                 catch (Exception)
                 {
@@ -154,7 +150,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="model">登録情報</param>
         /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>更新件数</returns>
-        public static int UpdateMSupplierKanban(M_SupplierKanbanModel model, LoginUserModel loginUser)
+        public static void UpdateMSupplierKanban(M_SupplierKanbanModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
@@ -164,17 +160,48 @@ namespace mar_sumaken_web.ConnectControllers
                 connection.ConnectionString = connectionString;
                 connection.Open();
 
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
                 // DB接続
                 try
                 {
                     DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToUpdateMSupplierKanban(model, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
 
-                    return count;
+                    // 仕入先かんばんマスター更新
+                    string sql = CreateSQLToUpdateMSupplierKanban(model, sysDate, loginUser.UserName);
+                    connection.Execute(sql, null, transaction);
+
+                    // ハンディメニュー-仕入先かんばん中間テーブル削除
+                    string handyMenuDeleteSql = CreateSQLToDeleteRHandyMenuSupplierKanban(model.SupplierKanbanID);
+                    connection.Execute(handyMenuDeleteSql, null, transaction);
+
+                    // ハンディメニュー-仕入先かんばん中間テーブル登録
+                    foreach (SelectListItem menu in model.HandyMenuSelectList)
+                    {
+                        if (menu.Selected)
+                        {
+                            // ハンディメニュー-仕入先かんばん中間テーブル登録
+                            string handyMenuInsertSql = CreateSQLToInsertRHandyMenuSupplierKanban(Convert.ToInt32(menu.Value), model.SupplierKanbanID, sysDate, loginUser.UserName);
+                            int menuInsertCount = connection.Execute(handyMenuInsertSql, null, transaction);
+                            // 更新件数が0の場合はエラーとする
+                            if (menuInsertCount == 0)
+                            {
+                                throw new Exception();
+                            }
+                        }
+                    }
+
+                    // 仕入先かんばん履歴テーブル登録
+                    string logSql = CreateSQLToInsertMSupplierKanbanHistory(model, sysDate, loginUser.UserName);
+                    connection.Execute(logSql, null, transaction);
+
+                    // トランザクションのコミット
+                    transaction.Commit();
                 }
                 catch (Exception)
                 {
+                    transaction.Rollback();
                     throw;
                 }
             }
@@ -235,18 +262,25 @@ namespace mar_sumaken_web.ConnectControllers
         /// 仕入先かんばんマスター情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMSupplierKanbans()
+        public static string CreateSQLToSelectMSupplierKanbans(int supplierKanbanId = 0)
         {
+            string searchCondition = string.Empty;
+            if(supplierKanbanId > 0)
+            {
+                searchCondition = $@" AND SupplierKanbanID = {supplierKanbanId}";
+            }
             var sql = $@"
                 SELECT 
                     SupplierKanbanID
+                    ,supplierKanban.DepoId
                     ,DepoName
+                    ,supplierKanban.CompanyId AS SupplierId
                     ,CompanyName AS SupplierName
                     ,SupplierKanbanName
                     ,CASE 
-                        WHEN AllowedDuplicatesFlag = 0 THEN '0(なし)'
-                        WHEN AllowedDuplicatesFlag = 1 THEN '1(あり)'
-                        ELSE''
+                        WHEN AllowedDuplicatesFlag = 0 THEN 0
+                        WHEN AllowedDuplicatesFlag = 1 THEN 1
+                        ELSE ''
                         END AS AllowedDuplicatesFlag
                     ,IdentifyString
                     ,IdentifyStringStartIndex
@@ -276,6 +310,7 @@ namespace mar_sumaken_web.ConnectControllers
                     ON supplierKanban.CompanyID = company.CompanyID
                 WHERE 
                     supplierKanban.IsDeleted = 0
+                    {searchCondition}
                     AND depo.IsDeleted = 0
                     AND company.IsDeleted = 0
             ";
@@ -432,6 +467,7 @@ namespace mar_sumaken_web.ConnectControllers
                     UpdatedAt, 
                     UpdatedBy
                 )
+                OUTPUT INSERTED.SupplierKanbanID
                 VALUES (
                     {model.SelectedDepoID},
                     {model.SelectedSupplierID},
@@ -475,7 +511,7 @@ namespace mar_sumaken_web.ConnectControllers
         public static string CreateSQLToInsertRHandyMenuSupplierKanban(int handyMenuId, int supplierKanbanId, DateTime createdAt, string createdBy)
         {
             var sql = $@"
-                INSERT INTO M_SupplierKanban(
+                INSERT INTO R_HandyMenuSupplierKanban(
                     HandyMenuID, 
                     SupplierKanbanID, 
                     CreatedAt, 
@@ -507,10 +543,32 @@ namespace mar_sumaken_web.ConnectControllers
             var sql = $@"
                 UPDATE M_SupplierKanban
                 SET 
+                    CompanyID = '{model.SelectedSupplierID}',
+                    SupplierKanbanName = '{model.SupplierKanbanName}',
+                    AllowedDuplicatesFlag = '{model.AllowedDuplicatesFlag}',
+                    IdentifyString = '{model.IdentifyString}',
+                    IdentifyStringStartIndex = {model.IdentifyStringStartIndex},
+                    ProductNumberStartIndex = {model.ProductNumberStartIndex},
+                    ProductNumberLength = {model.ProductNumberLength},
+                    QuantityLength = {model.QuantityLength},
+                    QuantityStartIndex = {model.QuantityStartIndex},
+                    LotLength = {model.LotLength},
+                    LotStartIndex = {model.LotStartIndex},
+                    MainProductKeyLength = {model.MainProductKeyLength},
+                    MainProductKeyStartIndex = {model.MainProductKeyStartIndex},
+                    FirstSubProductKeyLength = {model.FirstSubProductKeyLength},
+                    FirstSubProductKeyStartIndex = {model.FirstSubProductKeyStartIndex},
+                    SecondSubProductKeyLength = {model.SecondSubProductKeyLength},
+                    SecondSubProductKeyStartIndex = {model.SecondSubProductKeyStartIndex},
+                    ProductBranchNumberLength = {model.ProductBranchNumberLength},
+                    ProductBranchNumberStartIndex = {model.ProductBranchNumberStartIndex},
+                    OrderNumberLength = {model.OrderNumberLength},
+                    OrderNumberStartIndex = {model.OrderNumberStartIndex},
                     UpdatedAt = '{updatedAt}',
                     UpdatedBy = '{updatedBy}'
                 WHERE
-                    IsDeleted = 0
+                    SupplierKanbanID = {model.SupplierKanbanID}
+                    AND IsDeleted = 0
             ";
             return sql;
         }
@@ -539,15 +597,45 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// ハンディメニュー-仕入先かんばん中間テーブル削除SQL作成
         /// </summary>
-        /// <param name="spplierKanbanId">仕入先かんばんID</param>
+        /// <param name="supplierKanbanId">仕入先かんばんID</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToDeleteRHandyMenuSupplierKanban(int spplierKanbanId)
+        private static string CreateSQLToDeleteRHandyMenuSupplierKanban(int supplierKanbanId)
         {
             var sql = $@"
                 DELETE 
-                FROM    R_HandyMenuSupplierKanban
-                WHERE 
-	                    SupplierKanbanID = {spplierKanbanId}
+                FROM R_HandyMenuSupplierKanban
+                WHERE SupplierKanbanID = {supplierKanbanId}
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 仕入先かんばん履歴テーブル登録SQL作成
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToInsertMSupplierKanbanHistory(M_SupplierKanbanModel model, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+                INSERT INTO D_SupplierKanbanHistory
+                    (HistoryStatus, DepoName, SupplierName, SupplierKanbanName, AllowedDuplicatesFlag, 
+                     IdentifyString, IdentifyStringStartIndex, ProductNumberStartIndex, ProductNumberLength, 
+                     QuantityLength, QuantityStartIndex, LotLength, LotStartIndex, MainProductKeyLength, 
+                     MainProductKeyStartIndex, FirstSubProductKeyLength, FirstSubProductKeyStartIndex, SecondSubProductKeyLength, 
+                     SecondSubProductKeyStartIndex, ProductBranchNumberLength, ProductBranchNumberStartIndex, OrderNumberLength, 
+                     OrderNumberStartIndex, UpdatedAt, UpdatedBy)
+                VALUES (
+                    '更新', '{model.DepoName}', '{model.SupplierName}', '{model.SupplierKanbanName}', 
+                    '{model.AllowedDuplicatesFlag}', '{model.IdentifyString}', {model.IdentifyStringStartIndex}, 
+                    {model.ProductNumberStartIndex}, {model.ProductNumberLength}, {model.QuantityLength}, 
+                    {model.QuantityStartIndex}, {model.LotLength}, {model.LotStartIndex}, {model.MainProductKeyLength}, 
+                    {model.MainProductKeyStartIndex}, {model.FirstSubProductKeyLength}, {model.FirstSubProductKeyStartIndex}, 
+                    {model.SecondSubProductKeyLength}, {model.SecondSubProductKeyStartIndex}, {model.ProductBranchNumberLength}, 
+                    {model.ProductBranchNumberStartIndex}, {model.OrderNumberLength}, {model.OrderNumberStartIndex}, 
+                    '{updatedAt}', '{updatedBy}'
+                );
             ";
             return sql;
         }

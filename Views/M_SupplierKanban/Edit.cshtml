@@ -2,7 +2,7 @@
 @model mar_sumaken_web.Models.M_SupplierKanbanModel;
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "登録";
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "修正";
 }
 
 <div class="card shadow masterInfo m-4">
@@ -35,6 +35,7 @@
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
                 <form class="col-md-12" id="mSupplierKanbanForm">
+                    <input type="hidden" asp-for="SupplierKanbanID" value="@Model.SupplierKanbanID" />
                     <div class="d-flex flex-row">
                         <div class="col-7">
                             <div class="col-12 input-group div-input-group">
@@ -42,7 +43,9 @@
                                     <label>@Html.DisplayNameFor(model => model.DepoName)<span style="color:red">*</span></label>
                                 </div>
                                 <div class="col-12 col-sm-8 column-2nd">
-                                    <select class="form-select" name="SelectedDepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
+                                    <input type="hidden" asp-for="DepoName" />
+                                    <select class="form-select" name="SelectedDepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList" 
+                                        onchange="UpdateSelectedValue(this, 'DepoName')"></select>
                                     <span class="text-danger w-100" asp-validation-for="SelectedDepoID"></span>
                                 </div>
                             </div>
@@ -51,7 +54,8 @@
                                     <label>@Html.DisplayName("SupplierName")<span style="color:red">*</span></label>
                                 </div>
                                 <div class="col-12 col-sm-8 column-2nd">
-                                    <select class="form-select" asp-for="SelectedSupplierID" required>
+                                    <input type="hidden" asp-for="SupplierName" />
+                                    <select class="form-select" asp-for="SelectedSupplierID" onchange="UpdateSelectedValue(this, 'SupplierName')" required>
                                         @for (var i = 0; i < Model.SuplierSelectList.Count; i++)
                                         {
                                             <option value="@Model.SuplierSelectList[i].Value">@Model.SuplierSelectList[i].Text</option>
@@ -265,8 +269,8 @@
                             } *@
                         </tbody>
                     </table>
-                    <button class="btn btn-primary btn-icon-split" id="register-btn" style="min-width: 80px" onclick="OnRegister()">
-                        <span class="text">登録</span>
+                    <button class="btn btn-success btn-icon-split" id="register-btn" style="min-width: 80px" onclick="OnEdit()">
+                        <span class="text">更新</span>
                     </button>
                 </form>
             </div>
@@ -291,8 +295,15 @@
         });
     });
 
+    //デポー名を変更
+    function UpdateSelectedValue(select, itemId) {
+        var selectedIndex = select.selectedIndex;
+        var selectedDepoText = select.options[selectedIndex].text;
+        document.getElementById(itemId).value = selectedDepoText;
+    }
+
     // 登録ボタン押下
-    function OnRegister() {
+    function OnEdit() {
         $('#mSupplierKanbanForm').submit(function (event) {
             $("#div-error-message").text("");
 
@@ -307,7 +318,7 @@
             if (!checkFlg) return false;
 
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("Register", "M_SupplierKanban")';
+            let url = window.location.origin + '@Url.Action("Edit", "M_SupplierKanban")';
             let method = 'POST';
             let formId = 'mSupplierKanbanForm';
             let data = $('#' + formId).serializeArray();

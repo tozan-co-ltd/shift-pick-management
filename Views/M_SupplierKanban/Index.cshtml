@@ -350,6 +350,15 @@
         });
     }
 
+    // 詳細
+    function OnEditClick(supplierKanbanId) {
+
+            var url = window.location.origin + '@Url.Action("Edit", "M_SupplierKanban")';
+            url += '?id=' + supplierKanbanId;
+
+            window.location.href = url;
+        }
+
     // エラーメッセージ削除
     function DeleteErrorMessages() {
         $('#div-error-message').text('');
