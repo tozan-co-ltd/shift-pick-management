@@ -612,9 +612,9 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 仕入先かんばん履歴テーブル登録SQL作成
         /// </summary>
-        /// <param name="product">登録情報</param>
-        /// <param name="createdAt">システムタイム</param>
-        /// <param name="createdBy">ユーザー名</param>
+        /// <param name="model">登録情報</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
         private static string CreateSQLToInsertMSupplierKanbanHistory(M_SupplierKanbanModel model, DateTime updatedAt, string updatedBy)
         {
