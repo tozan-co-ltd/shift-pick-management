@@ -107,108 +107,112 @@ namespace mar_sumaken_web.Controllers
                         List<D_ShipmentScheduleModel> importModelList = new();
                         List<string> errorMessageList = new();
                         var fileName = file.FileName;
-                        if (file.Length > 0)
+
+                        // ファイル内にデータがない場合はエラー
+                        if (file.Length == 0)
                         {
-                            var csvInputFile = new CsvFileInputModel()
+                            return NotFound(new { errorMessage = "E1014: " + ErrorMessagesResources.E1014 });
+                        }
+
+                        CsvFileInputModel csvInputFile = new ()
+                        {
+                            FileName = file.FileName,
+                            ImportFile = file,
+                            HeaderColumnCount = Header_Column_Count,
+                            HeaderSettings = GetModelHeaderCheck()
+                        };
+
+                        // CSVファイルデータ読み取り
+                        var (readCsvErrorMsg, lines, newFilePath) = await CreateFile.ReadCsv(csvInputFile, viewTitle);
+                        tempFilePath = newFilePath;
+
+                        if (!string.Empty.Equals(readCsvErrorMsg))
+                        {
+                            // ファイル削除
+                            CreateFile.DeleteFile(tempFilePath);
+                            return NotFound(new { errorMessage = readCsvErrorMsg });
+                        }
+
+                        // 読み取りデータを更新
+                        int readCount = 1;
+                        while (readCount < lines.Count)
+                        {
+                            D_ShipmentScheduleModel shipmentSchedule = new()
                             {
-                                FileName = file.FileName,
-                                ImportFile = file,
-                                HeaderColumnCount = Header_Column_Count,
-                                HeaderSettings = GetModelHeaderCheck()
+                                ImportFileName = fileName,
+                                SelectedDepoID = depoId,
+                                SelectedCompanyID = companyId
                             };
+                            var validationContext = new ValidationContext(shipmentSchedule);
+                            var validationResults = new List<ValidationResult>();
 
-                            // CSVファイルデータ読み取り
-                            var (readCsvErrorMsg, lines, newFilePath) = await CreateFile.ReadCsv(csvInputFile, viewTitle);
-                            tempFilePath = newFilePath;
+                            // 読み取りデータをモデルに設定
+                            shipmentSchedule = SetReadDataInModel(shipmentSchedule, lines, readCount);
 
-                            if (!string.Empty.Equals(readCsvErrorMsg))
+                            // 出荷指示データチェック
+                            bool isValid = Validator.TryValidateObject(shipmentSchedule, validationContext, validationResults, true);
+                            List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
+
+                            // 納入先品番チェック
+                            bool isContainDeliveryProductNumber = errorMembers.Contains("DeliveryProductNumber");
+                            if (!isContainDeliveryProductNumber)
                             {
-                                // ファイル削除
-                                CreateFile.DeleteFile(tempFilePath);
-                                return NotFound(new { errorMessage = readCsvErrorMsg });
+                                // 納入先品番で仕入先品番を取得
+                                // 品番マスターに登録されている品番の行のみ取り込まれます。登録されていない品番の行はスキップします。
+                                var product = M_ProductConnectController.GetProductByDeliveryProductNumber(
+                                    shipmentSchedule.SelectedCompanyID, shipmentSchedule.DeliveryProductNumber, user.DatabaseName
+                                );
+                                if (product == null)
+                                {
+                                    readCount++;
+                                    continue;
+                                }
+                                shipmentSchedule.SupplierProductNumber = product.SupplierProductNumber;
+
+                                // 倉庫-品番中間テーブルチェック
+                                var sql = M_ProductConnectController.CreateSQLToSelectCheckIsExistRDepoProduct(depoId, product.ProductID);
+                                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
+                                if (!isExisted)
+                                {
+                                    readCount++;
+                                    continue;
+                                }
                             }
 
-                            // 読み取りデータを更新
-                            int readCount = 1;
-                            while (readCount < lines.Count)
+                            insertCount++;
+                            // 出荷指示取込時、出荷実績がある場合はエラー
+                            string checkExistSql = D_ShipmentScheduleConnectController.CreateSQLToIsExistDShipment(shipmentSchedule, depoId, companyId);
+                            bool isExist = D_ShipmentScheduleConnectController.IsExistDShipment(checkExistSql, user.DatabaseName);
+                            if (isExist)
                             {
-                                D_ShipmentScheduleModel shipmentSchedule = new()
+                                isValid = false;
+                                validationResults.Add(new ValidationResult(ErrorMessagesResources.E1020, new List<string> { "ShipmentScheduleID" }));
+                            }
+
+                            // エラーメッセージ作成
+                            if (!isValid)
+                            {
+                                foreach (var error in validationResults)
                                 {
-                                    ImportFileName = fileName,
-                                    SelectedDepoID = depoId,
-                                    SelectedCompanyID = companyId
-                                };
-                                var validationContext = new ValidationContext(shipmentSchedule);
-                                var validationResults = new List<ValidationResult>();
+                                    // フォーマットエラーメッセージ
+                                    List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ShipmentScheduleModel>(error);
+                                    errorMessageItem.Insert(0, readCount + "行目");
 
-                                // 読み取りデータをモデルに設定
-                                shipmentSchedule = SetReadDataInModel(shipmentSchedule, lines, readCount);
-
-                                // 出荷指示データチェック
-                                bool isValid = Validator.TryValidateObject(shipmentSchedule, validationContext, validationResults, true);
-                                List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
-
-                                // 納入先品番チェック
-                                bool isContainDeliveryProductNumber = errorMembers.Contains("DeliveryProductNumber");
-                                if (!isContainDeliveryProductNumber)
-                                {
-                                    // 納入先品番で仕入先品番を取得
-                                    // 品番マスターに登録されている品番の行のみ取り込まれます。登録されていない品番の行はスキップします。
-                                    var product = M_ProductConnectController.GetProductByDeliveryProductNumber(
-                                        shipmentSchedule.SelectedCompanyID, shipmentSchedule.DeliveryProductNumber, user.DatabaseName
-                                    );
-                                    if (product == null)
+                                    // HTMLに変換
+                                    var errorHtml = string.Empty;
+                                    foreach (var item in errorMessageItem)
                                     {
-                                        readCount++;
-                                        continue;
+                                        errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
                                     }
-                                    shipmentSchedule.SupplierProductNumber = product.SupplierProductNumber;
-
-                                    // 倉庫-品番中間テーブルチェック
-                                    var sql = M_ProductConnectController.CreateSQLToSelectCheckIsExistRDepoProduct(depoId, product.ProductID);
-                                    bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
-                                    if (!isExisted)
-                                    {
-                                        readCount++;
-                                        continue;
-                                    }
-                                }
-
-                                insertCount++;
-                                // 出荷指示取込時、出荷実績がある場合はエラー
-                                string checkExistSql = D_ShipmentScheduleConnectController.CreateSQLToIsExistDShipment(shipmentSchedule, depoId, companyId);
-                                bool isExist = D_ShipmentScheduleConnectController.IsExistDShipment(checkExistSql, user.DatabaseName);
-                                if (isExist)
-                                {
-                                    isValid = false;
-                                    validationResults.Add(new ValidationResult(ErrorMessagesResources.E1020, new List<string> { "ShipmentScheduleID" }));
-                                }
-
-                                // エラーメッセージ作成
-                                if (!isValid)
-                                {
-                                    foreach (var error in validationResults)
-                                    {
-                                        // フォーマットエラーメッセージ
-                                        List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ShipmentScheduleModel>(error);
-                                        errorMessageItem.Insert(0, readCount + "行目");
-
-                                        // HTMLに変換
-                                        var errorHtml = string.Empty;
-                                        foreach (var item in errorMessageItem)
-                                        {
-                                            errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
-                                        }
-                                        errorHtml = "<tr>" + errorHtml + "</tr>";
+                                    errorHtml = "<tr>" + errorHtml + "</tr>";
                                         
-                                        errorMessageList.Add(errorHtml);
-                                    }
+                                    errorMessageList.Add(errorHtml);
                                 }
-                                // リストに項目を追加
-                                importModelList.Add(shipmentSchedule);
-
-                                readCount++;
                             }
+                            // リストに項目を追加
+                            importModelList.Add(shipmentSchedule);
+
+                            readCount++;
                         }
 
                         // エラーが1件以上ある場合はreturn

@@ -98,10 +98,7 @@ namespace mar_sumaken_web.ConnectControllers
                     ,storeOut.DeliveryProductNumber
                     ,storeOut.SupplierProductNumber
                     ,storeOut.LotNumber
-                    ,CASE 
-						WHEN storeOut.NumberOfBoxes <> 0 THEN ROUND(storeOut.Quantity / storeOut.NumberOfBoxes, 0, 0)
-						ELSE 0
-					END AS LotQuantity
+                    ,product.LotQuantity
                     ,storeOut.NumberOfBoxes
                     ,storeOut.Quantity
                     ,storeOut.MainProductKey
@@ -119,6 +116,8 @@ namespace mar_sumaken_web.ConnectControllers
                     ON storeOut.CompanyID = company.CompanyID
                 INNER JOIN M_Depo AS depo 
                     ON storeOut.DepoID = depo.DepoID
+                INNER JOIN M_Product AS product 
+                    ON storeOut.SupplierProductNumber = product.SupplierProductNumber
                 WHERE 
 	                storeOut.DepoID = {model.SelectedDepoID}
                     AND storeOut.CompanyID = {model.SelectedCompanyID}
@@ -127,6 +126,7 @@ namespace mar_sumaken_web.ConnectControllers
                     AND storeOut.IsDeleted = 0
                     AND company.IsDeleted = 0
                     AND depo.IsDeleted = 0
+                    AND product.IsDeleted = 0
                 ORDER BY storeOut.SupplierProductNumber
             ";
             return sql;

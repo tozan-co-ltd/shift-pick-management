@@ -160,7 +160,6 @@ namespace mar_sumaken_web.Models
         public string? CreatedBy { get; set; }
 
         //--------------------------------D_ScanResult--------------------------------
-
         /// <summary>
         /// ハンディメニューID
         /// </summary>

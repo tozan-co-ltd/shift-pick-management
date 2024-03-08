@@ -277,6 +277,71 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
+        /// 詳細ファイル出力
+        /// </summary>
+        /// <param name="searchModel">詳細モデル</param>
+        /// <param name="gamenName">画面名</param>
+        public JsonResult ExportCsvDetail(SearchConditionModel searchModel, string gamenName)
+        {
+            try
+            {
+                // DataTable作成
+                DataTable searchResult = CreateDetailDataTable();
+
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 日別在庫情報取得
+                var sql = StockStatusConnectController.CreateSQLToGetStockStatus(
+                    searchModel.SearchStartDate, searchModel.DepoID, searchModel.CompanyID);
+                List<StockStatusModel> searchList = StockStatusConnectController.ConnectStockStatus(sql, user.DatabaseName);
+
+                // DataRowに格納
+                if (searchList.Count > 0)
+                {
+                    foreach (StockStatusModel item in searchList)
+                    {
+                        var stockRemainQuantity = item.StockQuantityAtBeginningMonth + (item.StoreInQuantity - item.StoreOutQuantity);
+                        DataRow newRow = searchResult.NewRow();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("LotQuantity")] = item.LotQuantity.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StockQuantityAtBeginningMonth")] = item.StockQuantityAtBeginningMonth.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StoreInNumberOfBoxes")] = item.StoreInNumberOfBoxes.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StoreInQuantity")] = item.StoreInQuantity.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes")] = item.StoreOutNumberOfBoxes.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutQuantity")] = item.StoreOutQuantity.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StockRemainQuantity")] = item.StockRemainQuantity.ToString();
+
+
+                        searchResult.Rows.Add(newRow);
+                    }
+                }
+
+                // ファイル名作成
+                string fileName = CreateFile.CreateFileName(searchModel, gamenName);
+
+                // CSVファイルへのパスを作成する
+                string filePath = Path.Combine(Path.GetTempPath(), fileName);
+
+                // DataTableをCSV形式の文字列に変換
+                CreateFile.ConvertDataTableToCsv(searchResult, filePath);
+
+                // ファイルの作成
+                var fileResult = System.IO.File.ReadAllBytes(filePath);
+
+                return Json(new { data = File(fileResult, System.Net.Mime.MediaTypeNames.Application.Octet, fileName) });
+            }
+            catch (SqlException)
+            {
+                return Json(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message });
+            }
+        }
+
+        /// <summary>
         /// データテーブル作成
         /// </summary>
         /// <returns></returns>
@@ -285,6 +350,26 @@ namespace mar_sumaken_web.Controllers
             var table = new DataTable();
 
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("SupplierName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("SupplierProductNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("LotQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StockQuantityAtBeginningMonth"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreInNumberOfBoxes"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreInQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreOutQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StockRemainQuantity"), typeof(string));
+
+            return table;
+        }
+
+        /// <summary>
+        /// データテーブル作成
+        /// </summary>
+        /// <returns></returns>
+        private static DataTable CreateDetailDataTable()
+        {
+            var table = new DataTable();
+
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("SupplierProductNumber"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("LotQuantity"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StockQuantityAtBeginningMonth"), typeof(string));

@@ -94,11 +94,6 @@ namespace mar_sumaken_web.Commons
             {
                 List<string> errorItem = new();
 
-                // 列名取得
-                //string memberName = validationResult.MemberNames.FirstOrDefault();
-                //string checkitemName = GetDisplayName<T>(memberName);
-                //errorItem.Add(checkitemName);
-
                 // エラーメッセージ取得
                 string errorMessage = validationResult.ErrorMessage;
                 errorItem.Add(errorMessage);
@@ -111,30 +106,30 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 翌日(土日を除く)を取得
+        /// 翌日(土日を除く)の日付を取得
         /// </summary>
-        /// <param name="date">日付</param>
-        public static DateTime GetNextWeekday(DateTime date)
+        /// <param name="today">本日</param>
+        public static DateTime GetNextWeekday(DateTime today)
         {
-            date = date.AddDays(1);
+            var nextday = today.AddDays(1);
 
-            if (date.DayOfWeek == DayOfWeek.Saturday)
+            if (nextday.DayOfWeek == DayOfWeek.Saturday)
             {
-                date = date.AddDays(2);
+                nextday = nextday.AddDays(2);
             }
-            else if (date.DayOfWeek == DayOfWeek.Sunday)
+            else if (nextday.DayOfWeek == DayOfWeek.Sunday)
             {
-                date = date.AddDays(1);
+                nextday = nextday.AddDays(1);
             }
-
-            return date;
+            return nextday;
         }
 
         /// <summary>
-        /// 日付に変換する
+        /// 日付に変換
         /// </summary>
         public static string ConvertToYYYYMMDD(string inputDateString)
         {
+            if(inputDateString == null) { return string.Empty; }
             DateTime inputDate = DateTime.Parse(inputDateString);
 
             int year = inputDate.Year;
