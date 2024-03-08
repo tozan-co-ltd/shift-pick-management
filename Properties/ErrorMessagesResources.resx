@@ -179,6 +179,7 @@
   </data>
   <data name="E1023" xml:space="preserve">
     <value>{0}は{2}～{1}文字の間で入力してください。</value>
+  </data>
   <data name="E1022" xml:space="preserve">
     <value>仕入先かんばんマスターに一致するデータがありません。</value>
   </data>

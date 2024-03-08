@@ -241,17 +241,20 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
-        ///   {0}は{2}～{1}文字の間で入力してください。 に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string E1023 {
-            get {
-                return ResourceManager.GetString("E1023", resourceCulture);
-
         ///   仕入先かんばんマスターに一致するデータがありません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1022 {
             get {
                 return ResourceManager.GetString("E1022", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   {0}は{2}～{1}文字の間で入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1023 {
+            get {
+                return ResourceManager.GetString("E1023", resourceCulture);
             }
         }
         
