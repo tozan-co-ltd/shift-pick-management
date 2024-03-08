@@ -33,7 +33,7 @@ namespace mar_sumaken_web.Controllers
                 model.BinList[0].Selected= true;
                 // 翌日(土日を除く)
                 DateTime currentDate = DateTime.Now;
-                var nextDay = Utils.GetNextWeekday(currentDate).ToString("yyyy/MM/dd");
+                var nextDay = Utils.GetNextday(currentDate).ToString("yyyy/MM/dd");
                 model.SearchStartDate = nextDay;
                 model.SearchEndDate = nextDay;
 

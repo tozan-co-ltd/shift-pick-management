@@ -46,7 +46,7 @@ namespace mar_sumaken_web.Controllers
                 var mCompany = M_CompanyConnectController.GetMCompanyByCompanyCode("10001", user.DatabaseName);
 
                 // 本日作業する出荷指示は納入指示日が翌日(土日を除く)
-                var nextDay = Utils.GetNextWeekday(DateTime.Now).ToString("yyyy/MM/dd");
+                var nextDay = Utils.GetNextday(DateTime.Now).ToString("yyyy/MM/dd");
 
                 // 出荷指示情報取得
                 var shipmentSql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation(user.MainDepoID, mCompany.CompanyID, nextDay);

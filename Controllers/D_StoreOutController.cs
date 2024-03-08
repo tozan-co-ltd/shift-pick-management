@@ -161,8 +161,8 @@ namespace mar_sumaken_web.Controllers
                             <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                             <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
                             <td class='Remarks'>{@item.Remarks}</td>
-                            <td class='UpdatedAt'>{@item.UpdatedAt}</td>
-                            <td class='UpdatedBy'>{@item.UpdatedBy}</td>                        
+                            <td class='CreatedAt'>{@item.CreatedAt}</td>
+                            <td class='CreatedBy'>{@item.CreatedBy}</td>                        
                             <input type='hidden' class='DepoID' value='{item.DepoID}' />
                             <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
                             <input type='hidden' class='SelectedBin' value='{item.SelectedBin}' />
@@ -243,8 +243,8 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("FirstSubProductKey")] = item.FirstSubProductKey.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("SecondSubProductKey")] = item.SecondSubProductKey.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("Remarks")] = item.Remarks.ToString();
-                        newRow[Utils.GetDisplayName<D_StoreOutModel>("UpdatedAt")] = item.UpdatedAt.ToString();
-                        newRow[Utils.GetDisplayName<D_StoreOutModel>("UpdatedBy")] = item.UpdatedBy.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("CreatedAt")] = item.CreatedAt.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("CreatedBy")] = item.CreatedBy.ToString();
 
                         searchResult.Rows.Add(newRow);
                     }
@@ -298,8 +298,8 @@ namespace mar_sumaken_web.Controllers
             table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("FirstSubProductKey"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("SecondSubProductKey"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("Remarks"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("UpdatedAt"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("UpdatedBy"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("CreatedAt"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("CreatedBy"), typeof(string));
 
             return table;
         }
@@ -359,17 +359,15 @@ namespace mar_sumaken_web.Controllers
                 List<D_StoreOutModel> storeInList = new();
                 for (int i = 0; i < InitRegisterRowCount; i++)
                 {
-                    D_StoreOutModel viewModel = new()
-                    {
-                        SelectedDepoID = user.MainDepoID
-                    };
+                    var viewModel = new D_StoreOutModel();
+                    viewModel.SelectedDepoID = user.MainDepoID;
                     storeInList.Add(viewModel);
 
                     model.RegisterList = storeInList;
                 }
 
                 // 納入指示日
-                model.SearchDeliveryDate = Utils.GetNextWeekday(DateTime.Today).ToString("yyyy/MM/dd");
+                model.SearchDeliveryDate = Utils.GetNextday(DateTime.Today).ToString("yyyy/MM/dd");
 
                 // 便-納品書番号
                 List<SelectListItem> binSelectList = D_StoreOutConnectController.GetDeliveryTimeClassList(model.SearchDeliveryDate, user.DatabaseName);
@@ -415,20 +413,18 @@ namespace mar_sumaken_web.Controllers
 
                     // 納入先品番チェック
                     bool isContainDeliveryProductNumber = errorMembers.Contains("DeliveryProductNumber");
-                    M_ProductModel product = null;
                     if (!isContainDeliveryProductNumber)
                     {
                         // 納入先品番で品番チェック
-                        product = M_ProductConnectController.GetProductByDeliverProductNUmber(modelItem.DeliveryProductNumber, user.DatabaseName);
-                        if (product == null)
+                        bool isExistProduct = M_ProductConnectController.IsExistedDeliveryProductNumber(modelItem.DeliveryProductNumber, user.DatabaseName);
+                        if (!isExistProduct)
                         {
                             isValid = false;
                             var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
                             validationResults.Add(new ValidationResult(message, new List<string> { "DeliveryProductNumber" }));
                         }
                     }
-                    modelItem.SupplierProductNumber = product.SupplierProductNumber;
-                    modelItem.NumberOfBoxes = (int)Math.Ceiling((double)modelItem.Quantity / product.LotQuantity);
+                    modelItem.SupplierProductNumber = modelItem.DeliveryProductNumber;
 
                     // エラーメッセージ作成
                     if (!isValid)
