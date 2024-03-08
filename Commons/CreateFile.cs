@@ -180,6 +180,15 @@ namespace mar_sumaken_web.Commons
             string fileName = string.Empty;
             try
             {
+                // Trim object
+                gamenName = gamenName == null ? string.Empty : gamenName.Trim();
+                if (searchModel != null)
+                {
+                    searchModel.DepoName = searchModel.DepoName == null ? string.Empty : searchModel.DepoName.Trim().Replace(" ", "");
+                    searchModel.CompanyName = searchModel.CompanyName == null ? string.Empty : searchModel.CompanyName.Trim().Replace(" ", "");
+                    searchModel.SupplierProductNumber = searchModel.SupplierProductNumber == null ? string.Empty : searchModel.SupplierProductNumber.Trim().Replace(" ", "");
+                }
+
                 // SearchConditionListがnullの場合
                 if (searchModel == null)
                 {
@@ -187,8 +196,8 @@ namespace mar_sumaken_web.Commons
                 }
 
                 // 日付
-                string start = searchModel.SearchStartDate != null ? searchModel.SearchStartDate.Replace("/", "") : string.Empty;
-                string end = searchModel.SearchEndDate != null ? searchModel.SearchEndDate.Replace("/", "") : string.Empty;
+                string start = Utils.ConvertToYYYYMMDD(searchModel.SearchStartDate).Replace("/", "");
+                string end = Utils.ConvertToYYYYMMDD(searchModel.SearchEndDate).Replace("/", "");
 
                 string seachDate = start; //入庫日
                 if (!gamenName.Contains("在庫照会"))
@@ -198,7 +207,7 @@ namespace mar_sumaken_web.Commons
                 fileName = string.Concat(gamenName, "_", searchModel.DepoName, "_", searchModel.CompanyName, "_", seachDate);
 
                 // 仕入先品番
-                if (searchModel.SupplierProductNumber != null)
+                if (searchModel.SupplierProductNumber != string.Empty)
                 {
                     fileName = string.Concat(fileName, "_", searchModel.SupplierProductNumber);
                 }

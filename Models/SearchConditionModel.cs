@@ -6,6 +6,11 @@
     public class SearchConditionModel
     {
         /// <summary>
+        /// 出荷指示ID
+        /// </summary>
+        public int ShipmentScheduleID { get; set; }
+
+        /// <summary>
         /// 倉庫ID
         /// </summary>
         public int DepoID { get; set; }
