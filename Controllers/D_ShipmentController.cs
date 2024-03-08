@@ -19,8 +19,9 @@ namespace mar_sumaken_web.Controllers
         /// <param name="shipmentScheduleId">出荷指示ID</param>
         /// <param name="depoId">倉庫ID</param>
         /// <param name="companyId">会社ID</param>
+        /// <param name="categoryTitle">カテゴリータイトル</param>
         /// <returns></returns>
-        public IActionResult Index(int shipmentScheduleId, int depoId, int companyId)
+        public IActionResult Index(int shipmentScheduleId, int depoId, int companyId, string categoryTitle)
         {
             D_ShipmentModel model = new();
             try
@@ -41,6 +42,7 @@ namespace mar_sumaken_web.Controllers
                     shipmentScheduleId, depoId, companyId);
                 List<D_ShipmentModel> dShipmentList = D_ShipmentConnectController.ConnectDShipments(sql, user.DatabaseName);
 
+                model.CategoryTitle = categoryTitle;
                 model.DeliveryID = companyId;
                 model.DepoID = depoId;
                 model.ShipmentScheduleID = shipmentScheduleId;
