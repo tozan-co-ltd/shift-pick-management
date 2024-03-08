@@ -305,6 +305,44 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
+        /// 納入先品番ごとに会社リストを取得
+        /// </summary>
+        /// <returns></returns>
+        public static M_ProductModel GetProductByDeliverProductNUmber(string deliverProductNumber, string databaseName)
+        {
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string commandText = $@"
+                        SELECT  
+	                        *
+                        FROM M_Product
+                        WHERE (1=1)
+                            AND DeliveryProductNumber = '{deliverProductNumber}'
+                            AND IsDeleted = 0
+                        ";
+
+                    var productList = connection.Query<M_ProductModel>(commandText).ToList();
+                    if (productList.Count != 1)
+                    {
+                        throw new Exception();
+                    }
+
+                    return productList[0];
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
         /// 品番重複チェック
         /// </summary>
         /// <param name="product"></param>

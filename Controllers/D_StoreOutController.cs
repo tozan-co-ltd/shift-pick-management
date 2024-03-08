@@ -413,18 +413,20 @@ namespace mar_sumaken_web.Controllers
 
                     // 納入先品番チェック
                     bool isContainDeliveryProductNumber = errorMembers.Contains("DeliveryProductNumber");
+                    M_ProductModel product = null;
                     if (!isContainDeliveryProductNumber)
                     {
                         // 納入先品番で品番チェック
-                        bool isExistProduct = M_ProductConnectController.IsExistedDeliveryProductNumber(modelItem.DeliveryProductNumber, user.DatabaseName);
-                        if (!isExistProduct)
+                        product = M_ProductConnectController.GetProductByDeliverProductNUmber(modelItem.DeliveryProductNumber, user.DatabaseName);
+                        if (product == null)
                         {
                             isValid = false;
                             var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
                             validationResults.Add(new ValidationResult(message, new List<string> { "DeliveryProductNumber" }));
                         }
                     }
-                    modelItem.SupplierProductNumber = modelItem.DeliveryProductNumber;
+                    modelItem.SupplierProductNumber = product.SupplierProductNumber;
+                    modelItem.NumberOfBoxes = (int)Math.Ceiling((double)modelItem.Quantity / product.LotQuantity);
 
                     // エラーメッセージ作成
                     if (!isValid)
