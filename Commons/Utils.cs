@@ -100,7 +100,8 @@ namespace mar_sumaken_web.Commons
 
                 return errorItem;
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 throw;
             }
         }
@@ -109,7 +110,7 @@ namespace mar_sumaken_web.Commons
         /// 翌日(土日を除く)の日付を取得
         /// </summary>
         /// <param name="today">本日</param>
-        public static DateTime GetNextWeekday(DateTime today)
+        public static DateTime GetNextday(DateTime today)
         {
             var nextday = today.AddDays(1);
 
