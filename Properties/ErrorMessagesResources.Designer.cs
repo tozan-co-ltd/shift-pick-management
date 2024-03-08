@@ -484,6 +484,15 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
+        ///   パスワードが正しくありません。正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2026 {
+            get {
+                return ResourceManager.GetString("E2026", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   データベースに接続できませんでした。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E3001 {
