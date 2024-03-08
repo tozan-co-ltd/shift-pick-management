@@ -348,8 +348,9 @@ namespace mar_sumaken_web.Commons
                         AND schedule.IsDeleted = 0
                 );
                 SELECT count(*)
-                FROM D_Shipment shipment
-                WHERE shipment.ShipmentScheduleID = @ShipmentScheduleID
+                FROM D_Shipment AS shipment
+                WHERE 
+                    shipment.ShipmentScheduleID = @ShipmentScheduleID
             ;";
 
             return sql;

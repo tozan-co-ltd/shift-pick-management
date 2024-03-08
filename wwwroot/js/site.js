@@ -134,7 +134,7 @@ function onUploadFile(page) {
 
     var fileUpload = document.getElementById('UploadFileList');
     if (fileUpload.files.length <= 0) {
-        $('#div-error-message').text('ファイルが選択されていません。');
+        $('#div-error-message').text('E1019: ファイルが選択されていません。');
         $("#div-error-message").show();
         return false;
     }
@@ -143,7 +143,7 @@ function onUploadFile(page) {
     for (var file of formData) {
         if (IsFirst) {
             if (file[1]["size"] <= 0) {
-                $('#div-error-message').text('ファイルが選択されていません。');
+                $('#div-error-message').text('E1019: ファイルが選択されていません。');
                 $("#div-error-message").show();
                 return false;
             }

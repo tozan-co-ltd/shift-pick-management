@@ -102,106 +102,108 @@ namespace mar_sumaken_web.Controllers
                     {
                         List<D_ReceiveScheduleModel> importModelList = new();
                         List<string> errorMessageList = new();
-
                         var fileName = file.FileName;
 
-                        if (file.Length > 0)
+                        // ファイル内にデータがない場合はエラー
+                        if (file.Length == 0)
                         {
-                            var csvInputFile = new CsvFileInputModel()
+                            return NotFound(new { errorMessage = "E1014: " + ErrorMessagesResources.E1014 });
+                        }
+
+                        CsvFileInputModel csvInputFile = new ()
+                        {
+                            FileName = file.FileName,
+                            ImportFile = file,
+                            HeaderColumnCount = Header_Column_Count,
+                            HeaderSettings = GetModelHeaderCheck()
+                        };
+
+                        // CSVファイルデータ読み取り
+                        var (readCsvErrorMsg, lines, newFilePath) = await CreateFile.ReadCsv(csvInputFile, viewTitle);
+                        tempFilePath = newFilePath;
+
+                        if (!string.Empty.Equals(readCsvErrorMsg))
+                        {
+                            // ファイル削除
+                            CreateFile.DeleteFile(tempFilePath);
+                            return NotFound(new { errorMessage = readCsvErrorMsg });
+                        }
+
+                        // 読み取りデータを更新
+                        int readCount = 0;
+                        while (readCount < lines.Count)
+                        {
+                            D_ReceiveScheduleModel receiveSchedule = new()
                             {
-                                FileName = file.FileName,
-                                ImportFile = file,
-                                HeaderColumnCount = Header_Column_Count,
-                                HeaderSettings = GetModelHeaderCheck()
+                                ImportFileName = fileName,
+                                SelectedDepoID = depoId
                             };
 
-                            // CSVファイルデータ読み取り
-                            var (readCsvErrorMsg, lines, newFilePath) = await CreateFile.ReadCsv(csvInputFile, viewTitle);
-                            tempFilePath = newFilePath;
-
-                            if (!string.Empty.Equals(readCsvErrorMsg))
+                            // データチェック
+                            if (readCount > 0)
                             {
-                                // ファイル削除
-                                CreateFile.DeleteFile(tempFilePath);
-                                return NotFound(new { errorMessage = readCsvErrorMsg });
-                            }
+                                // 読み取りデータをモデルに設定
+                                receiveSchedule = SetReadDataInModel(receiveSchedule, lines, readCount);
 
-                            // 読み取りデータを更新
-                            int readCount = 0;
-                            while (readCount < lines.Count)
-                            {
-                                D_ReceiveScheduleModel receiveSchedule = new()
-                                {
-                                    ImportFileName = fileName,
-                                    SelectedDepoID = depoId
-                                };
-
-                                // データチェック
-                                if (readCount > 0)
-                                {
-                                    // 読み取りデータをモデルに設定
-                                    receiveSchedule = SetReadDataInModel(receiveSchedule, lines, readCount);
-
-                                    // 入荷予定データチェック
-                                    var validationContext = new ValidationContext(receiveSchedule);
-                                    var validationResults = new List<ValidationResult>();
-                                    bool isValid = Validator.TryValidateObject(receiveSchedule, validationContext, validationResults, true);
-                                    List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
+                                // 入荷予定データチェック
+                                var validationContext = new ValidationContext(receiveSchedule);
+                                var validationResults = new List<ValidationResult>();
+                                bool isValid = Validator.TryValidateObject(receiveSchedule, validationContext, validationResults, true);
+                                List<string> errorMembers = validationResults.SelectMany(result => result.MemberNames).Distinct().ToList();
                                     
-                                    // 会社コードチェック
-                                    bool isContainCompanyCode = errorMembers.Contains("CompanyCode");
-                                    if (!isContainCompanyCode)
+                                // 会社コードチェック
+                                bool isContainCompanyCode = errorMembers.Contains("CompanyCode");
+                                if (!isContainCompanyCode)
+                                {
+                                    // 会社コードで会社IDを取得
+                                    var companyId = M_CompanyConnectController.GetCompanyIdByCompanyCode(receiveSchedule.CompanyCode, user.DatabaseName);
+                                    if (companyId == -1)
                                     {
-                                        // 会社コードで会社IDを取得
-                                        var companyId = M_CompanyConnectController.GetCompanyIdByCompanyCode(receiveSchedule.CompanyCode, user.DatabaseName);
-                                        if (companyId == -1)
-                                        {
-                                            isValid = false;
-                                            var message = string.Format(ErrorMessagesResources.E1011, Utils.GetDisplayName<D_ReceiveScheduleModel>("CompanyCode"));
-                                            validationResults.Add(new ValidationResult(message, new List<string> { "CompanyCode" }));
-                                        }
-                                        receiveSchedule.CompanyID = companyId;
+                                        isValid = false;
+                                        var message = string.Format(ErrorMessagesResources.E1011, Utils.GetDisplayName<D_ReceiveScheduleModel>("CompanyCode"));
+                                        validationResults.Add(new ValidationResult(message, new List<string> { "CompanyCode" }));
                                     }
-
-                                    // 仕入先品番チェック
-                                    bool isContainSupplierProductNumber = errorMembers.Contains("SupplierProductNumber");
-                                    if (!isContainSupplierProductNumber)
-                                    {
-                                        // 仕入先品番で品番チェック
-                                        bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(receiveSchedule.SupplierProductNumber, user.DatabaseName);
-                                        if (!isExistProduct)
-                                        {
-                                            isValid = false;
-                                            var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
-                                            validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
-                                        }
-                                    }
-
-                                    // エラーメッセージ作成
-                                    if (!isValid)
-                                    {
-                                        foreach(var err in validationResults)
-                                        {
-                                            // フォーマットエラーメッセージ
-                                            List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ReceiveScheduleModel>(err);
-                                            errorMessageItem.Insert(0, readCount + "行目");
-                                            
-                                            // HTMLに変換
-                                            var errorHtml = string.Empty;
-                                            foreach(var item in errorMessageItem)
-                                            {
-                                                errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
-                                            }
-                                            errorHtml = "<tr>" + errorHtml + "</tr>";
-
-                                            errorMessageList.Add(errorHtml);
-                                        }
-                                    }
-                                    // リストに項目を追加
-                                    importModelList.Add(receiveSchedule);
+                                    receiveSchedule.CompanyID = companyId;
                                 }
-                                readCount++;
+
+                                // 仕入先品番チェック
+                                bool isContainSupplierProductNumber = errorMembers.Contains("SupplierProductNumber");
+                                if (!isContainSupplierProductNumber)
+                                {
+                                    // 仕入先品番で品番チェック
+                                    bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(receiveSchedule.SupplierProductNumber, user.DatabaseName);
+                                    if (!isExistProduct)
+                                    {
+                                        isValid = false;
+                                        var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
+                                        validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
+                                    }
+                                }
+
+                                // エラーメッセージ作成
+                                if (!isValid)
+                                {
+                                    foreach(var err in validationResults)
+                                    {
+                                        // フォーマットエラーメッセージ
+                                        List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ReceiveScheduleModel>(err);
+                                        errorMessageItem.Insert(0, readCount + "行目");
+                                            
+                                        // HTMLに変換
+                                        var errorHtml = string.Empty;
+                                        foreach(var item in errorMessageItem)
+                                        {
+                                            errorHtml += "<td class='pl-2 pr-2'>" + item.ToString() + "</td>";
+                                        }
+                                        errorHtml = "<tr>" + errorHtml + "</tr>";
+
+                                        errorMessageList.Add(errorHtml);
+                                    }
+                                }
+                                // リストに項目を追加
+                                importModelList.Add(receiveSchedule);
                             }
+                            readCount++;
                         }
 
                         // エラーが1件以上ある場合はreturn
