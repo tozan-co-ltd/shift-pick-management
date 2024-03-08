@@ -161,8 +161,8 @@ namespace mar_sumaken_web.Controllers
                             <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                             <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
                             <td class='Remarks'>{@item.Remarks}</td>
-                            <td class='CreatedAt'>{@item.CreatedAt}</td>
-                            <td class='CreatedBy'>{@item.CreatedBy}</td>                        
+                            <td class='UpdatedAt'>{@item.UpdatedAt}</td>
+                            <td class='UpdatedBy'>{@item.UpdatedBy}</td>                        
                             <input type='hidden' class='DepoID' value='{item.DepoID}' />
                             <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
                             <input type='hidden' class='SelectedBin' value='{item.SelectedBin}' />
@@ -243,8 +243,8 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("FirstSubProductKey")] = item.FirstSubProductKey.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("SecondSubProductKey")] = item.SecondSubProductKey.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("Remarks")] = item.Remarks.ToString();
-                        newRow[Utils.GetDisplayName<D_StoreOutModel>("CreatedAt")] = item.CreatedAt.ToString();
-                        newRow[Utils.GetDisplayName<D_StoreOutModel>("CreatedBy")] = item.CreatedBy.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("UpdatedAt")] = item.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("UpdatedBy")] = item.UpdatedBy.ToString();
 
                         searchResult.Rows.Add(newRow);
                     }
@@ -298,8 +298,8 @@ namespace mar_sumaken_web.Controllers
             table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("FirstSubProductKey"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("SecondSubProductKey"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("Remarks"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("CreatedAt"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("CreatedBy"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("UpdatedAt"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_StoreOutModel>("UpdatedBy"), typeof(string));
 
             return table;
         }
@@ -359,8 +359,10 @@ namespace mar_sumaken_web.Controllers
                 List<D_StoreOutModel> storeInList = new();
                 for (int i = 0; i < InitRegisterRowCount; i++)
                 {
-                    var viewModel = new D_StoreOutModel();
-                    viewModel.SelectedDepoID = user.MainDepoID;
+                    D_StoreOutModel viewModel = new()
+                    {
+                        SelectedDepoID = user.MainDepoID
+                    };
                     storeInList.Add(viewModel);
 
                     model.RegisterList = storeInList;

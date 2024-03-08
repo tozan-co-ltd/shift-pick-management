@@ -57,15 +57,18 @@ namespace mar_sumaken_web.Commons
           
             var sql = $@"
                 SELECT
-                    schedule.DeliveryDate
-                    ,schedule.DeliveryTimeClass
-                    ,schedule.DeliveryProductNumber
-					,schedule.DeliveryProductAbbreviation
-                    ,company.CompanyID as DeliveryID
+                    company.CompanyID as DeliveryID
                     ,company.CompanyName as DeliveryName
                     ,depo.DepoID
                     ,depo.DepoName
 
+                    --出荷計画
+                    ,schedule.DeliveryDate
+                    ,schedule.DeliveryTimeClass
+                    ,schedule.DeliveryProductNumber
+					,schedule.DeliveryProductAbbreviation
+
+                    --出荷実績
                     ,shipment.ShipmentID
                     ,shipment.ShipmentScheduleID
                     ,shipment.ScanResultID
@@ -78,10 +81,10 @@ namespace mar_sumaken_web.Commons
                     ,shipment.SecondSubProductKey
                     ,shipment.NumberOfBoxes
                     ,shipment.Quantity
-                    --,shipment.ScanedAt
                     ,shipment.CreatedAt
                     ,shipment.CreatedBy
 
+                    --読取実績
                     ,scanResult.HandyMenuID
                     ,menu.HandyMenuName
                     ,scanResult.SupplierKanbanID

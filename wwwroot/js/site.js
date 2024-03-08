@@ -64,6 +64,21 @@
             { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
         ]
     });
+
+    // 出荷実績照会用(仕入先品番(10列目)昇順)
+    $('.datatable-shipment').DataTable({
+        "language": {
+            "url": language_url
+        },
+        lengthChange: true,     // 件数切替
+        info: false,            // 総件数
+        scrollX: true,          // 横スクロール可
+        scrollCollapse: true,   // 縦スクロール表示
+        order: [[9, "asc"]],    // 仕入先品番日時昇順
+        columnDefs: [
+            { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
+        ]
+    });
     //--------------------------------------------------------//
 
     // ページ上のすべてのファイル入力にfileselectイベント付与
