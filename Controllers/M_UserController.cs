@@ -313,6 +313,7 @@ namespace mar_sumaken_web.Controllers
                 }
                 if (!ModelState.IsValid || !isDepoSelected)
                 {
+                    var errormsgs = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
                 }
 
@@ -395,7 +396,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<M_UserModel>("UserID")] = userItem.UserID.ToString();
                         newRow[Utils.GetDisplayName<M_UserModel>("LoginID")] = userItem.LoginID.ToString();
                         newRow[Utils.GetDisplayName<M_UserModel>("UserName")] = userItem.UserName;
-                        newRow[Utils.GetDisplayName<M_UserModel>("DepoName")] = userItem.DepoName;
+                        newRow[Utils.GetDisplayName<M_UserModel>("MainDepoName")] = userItem.MainDepoName;
                         newRow[Utils.GetDisplayName<M_UserModel>("AuthorizedKubun")] = userItem.AuthorizedKubun;
                         newRow[Utils.GetDisplayName<M_UserModel>("UpdatedAt")] = userItem.UpdatedAt.ToString();
                         newRow[Utils.GetDisplayName<M_UserModel>("UpdatedBy")] = userItem.UpdatedBy;
@@ -436,7 +437,7 @@ namespace mar_sumaken_web.Controllers
             table.Columns.Add(Utils.GetDisplayName<M_UserModel>("UserID"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<M_UserModel>("LoginID"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<M_UserModel>("UserName"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<M_UserModel>("DepoName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_UserModel>("MainDepoName"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<M_UserModel>("AuthorizedKubun"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<M_UserModel>("UpdatedAt"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<M_UserModel>("UpdatedBy"), typeof(string));

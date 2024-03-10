@@ -176,15 +176,6 @@
                         </div>
                         <div class="col-12 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st">
-                                <label>@Html.DisplayName("NumberOfBoxes")</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
-                                <input class="form-control" type="text" asp-for="NumberOfBoxes" autocomplete="off">
-                                <span class="text-danger w-100" asp-validation-for="NumberOfBoxes"></span>
-                            </div>
-                        </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
                                 <label>@Html.DisplayName("Quantity")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-8 column-2nd">
@@ -428,7 +419,6 @@
         $("#LotNumber").val(row.getElementsByClassName("LotNumber")[0].textContent);
         $("#LotQuantity").val(row.getElementsByClassName("LotQuantity")[0].textContent);
         $("#Quantity").val(row.getElementsByClassName("Quantity")[0].textContent);
-        $("#NumberOfBoxes").val(row.getElementsByClassName("NumberOfBoxes")[0].textContent);
         $("#MainProductKey").val(row.getElementsByClassName("MainProductKey")[0].textContent);
         $("#FirstSubProductKey").val(row.getElementsByClassName("FirstSubProductKey")[0].textContent);
         $("#SecondSubProductKey").val(row.getElementsByClassName("SecondSubProductKey")[0].textContent);

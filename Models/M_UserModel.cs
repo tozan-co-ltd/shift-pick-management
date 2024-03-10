@@ -66,15 +66,20 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// メイン倉庫ID
         /// </summary>
-        [Display(Name = "メイン倉庫名")]
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public int DepoID { get; set; }
+        public int MainDepoID { get; set; }
 
         /// <summary>
-        /// 倉庫名
+        /// メイン倉庫名
         /// </summary>
-        [Display(Name = "倉庫名")]
-        public string? DepoName { get; set; }
+        [Display(Name = "メイン倉庫名")]
+        public string MainDepoName { get; set; }
+
+        /// <summary>
+        /// 選択されたメイン倉庫ID
+        /// </summary>
+        [Display(Name = "メイン倉庫名")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public int SelectedMainDepoID { get; set; }
 
         /// <summary>
         /// 管理権限区分

@@ -145,7 +145,6 @@ namespace mar_sumaken_web.Models
         /// 箱数
         /// </summary>
         [Display(Name = "箱数")]
-        [RegularExpression(@"[0-9]{1,10}", ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int NumberOfBoxes { set; get; }
 
         /// <summary>
