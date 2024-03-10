@@ -438,7 +438,7 @@ namespace mar_sumaken_web.Commons
                     ,m_user.LoginID                              
                     ,m_user.UserName
                     ,m_user.DepoID
-	                ,m_depo.DepoName
+	                ,m_depo.DepoName AS MainDepoName
                     ,m_user.AuthorizedKubun
                     ,CASE 
                         WHEN m_user.AuthorizedKubun = 1 THEN '管理者'
@@ -473,7 +473,7 @@ namespace mar_sumaken_web.Commons
                     ,m_user.LoginID                              
                     ,m_user.UserName
                     ,m_user.DepoID
-	                ,m_depo.DepoName
+	                ,m_depo.DepoName AS MainDepoName
                     ,m_user.AuthorizedKubun
                     ,CASE 
                         WHEN m_user.AuthorizedKubun = 1 THEN '管理者'
@@ -582,7 +582,7 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// ユーザーマスター登録SQL作成
         /// </summary>
-        /// <param name="mUser">登録情報</param>
+        /// <param name="model">登録情報</param>
         /// <param name="createdAt">システムタイム</param>
         /// <param name="createdBy">ユーザーID</param>
         /// <returns>SQL文</returns>
@@ -592,7 +592,7 @@ namespace mar_sumaken_web.Commons
                 INSERT INTO M_User 
                     (LoginID, UserName, DepoID, AuthorizedKubun, Password, Salt, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
                 OUTPUT INSERTED.UserID
-                VALUES ('{model.LoginID}', '{model.UserName}', {model.DepoID}, {model.AuthorizedKubun}, '{model.Password}', '{model.Salt}', '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}');
+                VALUES ('{model.LoginID}', '{model.UserName}', {model.SelectedMainDepoID}, {model.AuthorizedKubun}, '{model.Password}', '{model.Salt}', '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}');
             ";
             return sql;
         }
@@ -611,7 +611,7 @@ namespace mar_sumaken_web.Commons
                 UPDATE M_User
                 SET 
                     UserName = '{model.UserName}',
-                    DepoID = {model.DepoID},
+                    DepoID = {model.SelectedMainDepoID},
                     AuthorizedKubun = {model.AuthorizedKubun},
                     {(string.IsNullOrEmpty(model.Password) ? "" : $"Password = '{model.Password}',")}
                     {(string.IsNullOrEmpty(model.Password) ? "" : $"Salt = '{model.Salt}',")}
@@ -704,10 +704,10 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="userID">更新ユーザーID</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToDeleteRUserDepoByUserId(int userID)
+        private static string CreateSQLToDeleteRUserDepoByUserId(int userId)
         {
             var sql = $@"
-               DELETE FROM R_UserDepo WHERE UserID = {userID};
+               DELETE FROM R_UserDepo WHERE UserID = {userId};
             ";
             return sql;
         }
@@ -717,10 +717,10 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="userID">更新ユーザーID</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToDeleteRHandyMenuByUserId(int userID)
+        private static string CreateSQLToDeleteRHandyMenuByUserId(int userId)
         {
             var sql = $@"
-               DELETE FROM R_UserHandyMenu WHERE UserID = {userID};
+               DELETE FROM R_UserHandyMenu WHERE UserID = {userId};
             ";
             return sql;
         }

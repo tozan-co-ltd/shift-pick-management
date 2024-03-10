@@ -107,8 +107,8 @@ namespace mar_sumaken_web.Controllers
                             <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
                             <td class='LotNumber'>{@item.LotNumber}</td>
                             <td class='LotQuantity'>{@item.LotQuantity}</td>
-                            <td class='Quantity'>{@item.Quantity}</td>
                             <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
+                            <td class='Quantity'>{@item.Quantity}</td>
                             <td class='MainProductKey'>{@item.MainProductKey}</td>
                             <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                             <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
@@ -290,6 +290,10 @@ namespace mar_sumaken_web.Controllers
                     var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
                     return NotFound(new { errorMessage = message });
                 }
+
+                model.DepoID = model.SelectedDepoID;
+                model.CompanyID = model.SelectedCompanyID;
+                model.StoreInDate = Convert.ToDateTime(model.SearchStartDate);
 
                 // 入庫実績更新
                 D_StoreInConnectController.EditDStoreIn(model, user);

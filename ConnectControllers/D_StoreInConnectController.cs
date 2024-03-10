@@ -44,7 +44,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// 入庫実績登録
         /// </summary>
         /// <param name="model">入庫実績モデル</param>
-        /// <param name="user">ログインユーザー</param>
+        /// <param name="loginUser">ログインユーザー</param>
         public static void InsertDStoreIns(D_StoreInModel model, LoginUserModel loginUser)
         {
             DateTime sysDate = DateTime.Now;
@@ -71,9 +71,8 @@ namespace mar_sumaken_web.ConnectControllers
                             item.CompanyID = model.SelectedCompanyID;
                             item.StoreInDate = Convert.ToDateTime(model.SearchStartDate);
 
-                            // 入庫実績登録SQL作成
-                            string insertSql = CreateSQLToInsertDStoreIn(item, sysDate, loginUser.UserName);
                             // 入庫実績登録
+                            string insertSql = CreateSQLToInsertDStoreIn(item, sysDate, loginUser.UserName);
                             var insertCount = connection.Execute(insertSql, null, transaction);
                             // 更新件数が0の場合はエラーとする
                             if (insertCount == 0)
@@ -98,7 +97,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// 入庫実績更新
         /// </summary>
         /// <param name="model">入庫実績モデル</param>
-        /// <param name="user">ログインユーザー</param>
+        /// <param name="loginUser">ログインユーザー</param>
         public static void EditDStoreIn(D_StoreInModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
@@ -112,13 +111,10 @@ namespace mar_sumaken_web.ConnectControllers
                 // DB接続
                 try
                 {
-                    // 入庫実績更新SQL作成
                     DateTime sysDate = DateTime.Now;
-                    model.DepoID = model.SelectedDepoID;
-                    model.CompanyID = model.SelectedCompanyID;
-                    model.StoreInDate = Convert.ToDateTime(model.SearchStartDate);
-                    string editSql = CreateSQLToUpdateDStoreIn(model, sysDate, loginUser.UserName);
+
                     // 入庫実績更新
+                    string editSql = CreateSQLToUpdateDStoreIn(model, sysDate, loginUser.UserName);
                     var editCount = connection.Execute(editSql);
                     // 更新件数が0の場合はエラーとする
                     if (editCount == 0)
@@ -137,12 +133,12 @@ namespace mar_sumaken_web.ConnectControllers
         /// 入庫実績削除
         /// </summary>
         /// <param name="storeInId">入庫実績ID</param>
-        /// <param name="user">ログインユーザー</param>
+        /// <param name="loginUser">ログインユーザー</param>
         /// <returns>更新件数</returns>
-        public static int DeleteDStoreIn(int storeInId, LoginUserModel user)
+        public static int DeleteDStoreIn(int storeInId, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(user.DatabaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -152,7 +148,7 @@ namespace mar_sumaken_web.ConnectControllers
                 try
                 {
                     // 入庫実績削除SQL作成
-                    string deleteSql = CreateSQLToDeleteDStoreIn(storeInId, DateTime.Now, user.UserName);
+                    string deleteSql = CreateSQLToDeleteDStoreIn(storeInId, DateTime.Now, loginUser.UserName);
                     // 入庫実績削除
                     int affectedRows = connection.Execute(deleteSql);
                     // 更新件数が0の場合はエラーとする
@@ -168,77 +164,6 @@ namespace mar_sumaken_web.ConnectControllers
                     throw;
                 }
             }
-        }
-
-        /// <summary>
-        /// 入庫実績登録SQL作成
-        /// </summary>
-        /// <param name="model">登録情報</param>
-        /// <param name="createdAt">システムタイム</param>
-        /// <param name="createdBy">ユーザー名</param>
-        /// <returns>SQL文</returns>
-        private static string CreateSQLToInsertDStoreIn(D_StoreInModel model, DateTime createdAt, string createdBy)
-        {
-            var sql = $@"
-                INSERT INTO D_StoreIn
-                    (DepoID, CompanyID, StoreInDate, SupplierProductNumber, LotNumber, MainProductKey, FirstSubProductKey, SecondSubProductKey, NumberOfBoxes, Quantity, Remarks, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
-                VALUES (
-                    {model.DepoID}, {model.CompanyID}, '{model.StoreInDate}', '{model.SupplierProductNumber}', '{model.LotNumber}', '{model.MainProductKey}', '{model.FirstSubProductKey}', '{model.SecondSubProductKey}', {model.NumberOfBoxes}, {model.Quantity}, '{model.Remarks}', '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}'
-                )
-            ;";
-            return sql;
-        }
-
-        /// <summary>
-        /// 入庫実績更新SQL作成
-        /// </summary>
-        /// <param name="model">更新情報</param>
-        /// <param name="createAt">システムタイム</param>
-        /// <param name="createBy">ユーザー名</param>
-        /// <returns>SQL文</returns>
-        private static string CreateSQLToUpdateDStoreIn(D_StoreInModel model, DateTime updatedAt, string updatedBy)
-        {
-            var sql = $@"
-                UPDATE D_StoreIn
-                SET 
-                    DepoID = {model.DepoID},
-                    CompanyID = {model.CompanyID},
-                    StoreInDate = '{model.StoreInDate}',
-                    SupplierProductNumber = '{model.SupplierProductNumber}',
-                    LotNumber = '{model.LotNumber}',
-                    MainProductKey = '{model.MainProductKey}',
-                    FirstSubProductKey = '{model.FirstSubProductKey}',
-                    SecondSubProductKey = '{model.SecondSubProductKey}',
-                    NumberOfBoxes = {model.NumberOfBoxes},
-                    Quantity = {model.Quantity},
-                    Remarks = '{model.Remarks}',
-                    UpdatedAt = '{updatedAt}',
-                    UpdatedBy = '{updatedBy}'
-                WHERE
-                    StoreInID = {model.StoreInID}
-                    AND IsDeleted = 0
-            ";
-            return sql;
-        }
-
-        /// <summary>
-        /// 入庫実績削除SQL作成
-        /// </summary>
-        /// <param name="storeInId">入庫実績ID</param>
-        /// <param name="updatedAt">システムタイム</param>
-        /// <param name="updatedBy">ユーザー名</param>
-        /// <returns>SQL文</returns>
-        private static string CreateSQLToDeleteDStoreIn(int storeInId, DateTime updatedAt, string updatedBy)
-        {
-            var sql = $@"
-                        UPDATE D_StoreIn
-                        SET 
-                            IsDeleted = 1
-                            ,UpdatedAt = '{updatedAt}'
-                            ,UpdatedBy = '{updatedBy}'
-                        WHERE StoreInID = {storeInId}
-            ;";
-            return sql;
         }
 
         /// <summary>
@@ -286,6 +211,105 @@ namespace mar_sumaken_web.ConnectControllers
                     AND company.IsDeleted = 0
                     AND depo.IsDeleted = 0
             ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 入庫実績登録SQL作成
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <param name="createdAt">システムタイム</param>
+        /// <param name="createdBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToInsertDStoreIn(D_StoreInModel model, DateTime createdAt, string createdBy)
+        {
+            var sql = $@"
+                INSERT INTO D_StoreIn
+                    (DepoID, 
+                    CompanyID, 
+                    StoreInDate, 
+                    SupplierProductNumber, 
+                    LotNumber, 
+                    MainProductKey, 
+                    FirstSubProductKey, 
+                    SecondSubProductKey, 
+                    NumberOfBoxes, 
+                    Quantity, 
+                    Remarks, 
+                    CreatedAt, 
+                    CreatedBy, 
+                    UpdatedAt, 
+                    UpdatedBy
+                )
+                VALUES (
+                    {model.DepoID}, 
+                    {model.CompanyID}, 
+                    '{model.StoreInDate}', 
+                    '{model.SupplierProductNumber}', 
+                    '{model.LotNumber}', 
+                    '{model.MainProductKey}', 
+                    '{model.FirstSubProductKey}', 
+                    '{model.SecondSubProductKey}', 
+                    {model.NumberOfBoxes}, 
+                    {model.Quantity}, 
+                    '{model.Remarks}', 
+                    '{createdAt}', 
+                    '{createdBy}', 
+                    '{createdAt}', 
+                    '{createdBy}')
+            ;";
+            return sql;
+        }
+
+        /// <summary>
+        /// 入庫実績更新SQL作成
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToUpdateDStoreIn(D_StoreInModel model, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+                UPDATE D_StoreIn
+                SET 
+                    DepoID = {model.DepoID},
+                    CompanyID = {model.CompanyID},
+                    StoreInDate = '{model.StoreInDate}',
+                    SupplierProductNumber = '{model.SupplierProductNumber}',
+                    LotNumber = '{model.LotNumber}',
+                    MainProductKey = '{model.MainProductKey}',
+                    FirstSubProductKey = '{model.FirstSubProductKey}',
+                    SecondSubProductKey = '{model.SecondSubProductKey}',
+                    NumberOfBoxes = {model.NumberOfBoxes},
+                    Quantity = {model.Quantity},
+                    Remarks = '{model.Remarks}',
+                    UpdatedAt = '{updatedAt}',
+                    UpdatedBy = '{updatedBy}'
+                WHERE
+                    StoreInID = {model.StoreInID}
+                    AND IsDeleted = 0
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 入庫実績削除SQL作成
+        /// </summary>
+        /// <param name="storeInId">入庫実績ID</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToDeleteDStoreIn(int storeInId, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+                        UPDATE D_StoreIn
+                        SET 
+                            IsDeleted = 1
+                            ,UpdatedAt = '{updatedAt}'
+                            ,UpdatedBy = '{updatedBy}'
+                        WHERE StoreInID = {storeInId}
+            ;";
             return sql;
         }
     }

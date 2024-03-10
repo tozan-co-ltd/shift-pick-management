@@ -12,7 +12,8 @@ namespace mar_sumaken_web.Models
         /// パスワード
         /// </summary>
         [Display(Name = "パスワード")]
-        [RegularExpression(@"[a-zA-Z0-9]{4,10}", ErrorMessage = "パスワードは4～10文字で入力してください。")]
+        [RegularExpression(@"[a-zA-Z0-9]+", ErrorMessageResourceName = "E1003", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [StringLength(12, MinimumLength = 4, ErrorMessageResourceName = "E1023", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? Password { get; set; }
     }
 }

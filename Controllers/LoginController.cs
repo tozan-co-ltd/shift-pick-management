@@ -267,8 +267,8 @@ namespace mar_sumaken_web.Controllers
                     UserID = mUser.UserID,
                     UserName = mUser.UserName,
                     Role = mUser.Role,
-                    MainDepoID = mUser.DepoID,
-                    MainDepoName = mUser.DepoName,
+                    MainDepoID = mUser.MainDepoID,
+                    MainDepoName = mUser.MainDepoName,
                     AuthorizedKubun = mUser.AuthorizedKubun
                 };
 
