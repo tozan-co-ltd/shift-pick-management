@@ -23,14 +23,14 @@ namespace mar_sumaken_web.Commons
                          m_user.UserID
                         ,m_user.LoginID
                         ,m_user.UserName
-                        ,m_user.DepoID
+                        ,m_user.DepoID AS MainDepoID
+                        ,m_depo.DepoName AS MainDepoName
                         ,m_user.AuthorizedKubun
                         ,m_user.Password
                         ,m_user.Salt
                         ,m_user.LastLoginDatetime
                         ,m_user.IsLogin
                         ,m_user.Role
-                        ,m_depo.DepoName
                     FROM 
                         M_User AS m_user
                     INNER JOIN M_Depo AS m_depo ON m_user.DepoID = m_depo.DepoID
