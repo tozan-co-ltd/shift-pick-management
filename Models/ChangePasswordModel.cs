@@ -26,8 +26,9 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "パスワード")]
         [DataType(DataType.Password)]
-        [Required]
-        [RegularExpression(@"[a-zA-Z0-9]{4,10}")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [RegularExpression(@"[a-zA-Z0-9]+", ErrorMessageResourceName = "E1003", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [StringLength(12, MinimumLength = 4, ErrorMessageResourceName = "E1023", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? Password { get; set; }
 
         /// <summary>
