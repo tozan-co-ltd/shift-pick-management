@@ -26,6 +26,11 @@ namespace mar_sumaken_web.Commons
         public const string ClaimType_MainDepoID = "MainDepoID";
 
         /// <summary>
+        /// メイン倉庫名
+        /// </summary>
+        public const string ClaimType_MainDepoName = "MainDepoName";
+
+        /// <summary>
         /// ユーザーID
         /// </summary>
         public const string ClaimType_UserID = "UserID";

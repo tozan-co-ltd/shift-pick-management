@@ -23,7 +23,7 @@ namespace mar_sumaken_web.Commons
                          m_user.UserID
                         ,m_user.LoginID
                         ,m_user.UserName
-                        ,m_user.DepoID
+                        ,m_user.DepoID AS MainDepoID
                         ,m_depo.DepoName AS MainDepoName
                         ,m_user.AuthorizedKubun
                         ,m_user.Password
