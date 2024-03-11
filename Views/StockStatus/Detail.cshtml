@@ -58,7 +58,8 @@
                                 <div class="unset-pdl">
                                     <input id="searchDate" type="text" asp-for="DateSearchStart" class="form-control" readonly>
                                 </div>
-                                <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3">
+                                <input type="hidden" asp-for="SupplierProductNumber" />
+                                <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3" id="export-file-btn">
                                     <span class="icon text-white-50">
                                         <i class="fa-solid fa-file-export"></i>
                                     </span>
@@ -149,17 +150,18 @@
         // フォーム情報取得
         var exportFormData = new FormData();
         exportFormData.append("searchModel.DepoID", searchFormArr[0].value);
-        exportFormData.append("searchModel.DepoName", $('#SelectedDepoID option:selected').text().replace(/ /g, ""));
-        exportFormData.append("searchModel.CompanyID", searchFormArr[1].value);
-        exportFormData.append("searchModel.CompanyName", $('#SelectedCompanyID option:selected').text().replace(/ /g, ""));
-        exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
-        exportFormData.append("searchModel.SearchEndDate", searchFormArr[3].value);
+        exportFormData.append("searchModel.DepoName", searchFormArr[1].value);
+        exportFormData.append("searchModel.CompanyID", searchFormArr[2].value);
+        exportFormData.append("searchModel.CompanyName", searchFormArr[3].value);
+        exportFormData.append("searchModel.SearchStartDate", searchFormArr[4].value);
+        exportFormData.append("searchModel.SearchEndDate", searchFormArr[4].value);
+        exportFormData.append("searchModel.SupplierProductNumber", searchFormArr[5].value);
 
         // 画面名取得
         exportFormData.append("gamenName", $("#viewTitle").val());
 
         // CSV出力
-        onExportCsvByCondition("D_Receive", exportFormData);
+        onExportCsvByCondition("Detail", exportFormData);
     });
 
     // エラーメッセージ削除

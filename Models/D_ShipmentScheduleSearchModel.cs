@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.Properties;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace mar_sumaken_web.Models
@@ -43,5 +45,59 @@ namespace mar_sumaken_web.Models
         /// 選択された会社ID
         /// </summary>
         public int SelectedCompanyID { get; set; }
+
+        /// <summary>
+        /// 出荷指示ID
+        /// </summary>
+        [Display(Name = "ID")]
+        public int ShipmentScheduleID { get; set; }
+
+        /// <summary>
+        /// 納入先名
+        /// </summary>
+        [Display(Name = "納入先名")]
+        public string? DeliveryName { set; get; }
+
+        /// <summary>
+        /// 納入指示日
+        /// </summary>
+        [Display(Name = "納入指示日")]
+        public string? DeliveryDate { get; set; }
+
+        /// <summary>
+        /// 便
+        /// </summary>
+        [Display(Name = "便")]
+        public string? DeliveryTimeClass { get; set; }
+
+        /// <summary>
+        /// 納入先品番
+        /// </summary>
+        [Display(Name = "納入先品番")]
+        public string? DeliveryProductNumber { get; set; }
+
+        /// <summary>
+        /// 仕入先品番
+        /// </summary>
+        [Display(Name = "仕入先品番")]
+        public string? SupplierProductNumber { get; set; }
+
+        /// <summary>
+        /// 収容数
+        /// </summary>
+        [Display(Name = "収容数")]
+        public string? LotQuantity { get; set; }
+
+        /// <summary>
+        /// 箱数
+        /// </summary>
+        [Display(Name = "箱数")]
+        public int NumberOfBoxes { get; set; }
+
+        /// <summary>
+        /// 納入指示数
+        /// </summary>
+        [Display(Name = "納入指示数")]
+        public string? Quantity { get; set; }
     }
 }

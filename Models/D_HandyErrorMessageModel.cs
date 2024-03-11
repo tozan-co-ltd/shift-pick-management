@@ -45,7 +45,7 @@ namespace mar_sumaken_web.Models
         // <summary>
         /// 読取日時
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public string? CreatedAt { get; set; }
 
         /// <summary>
         /// 登録者

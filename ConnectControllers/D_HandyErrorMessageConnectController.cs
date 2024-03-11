@@ -56,7 +56,7 @@ namespace mar_sumaken_web.ConnectControllers
                     ErrorMessage,
                     FirstScanedString,
                     SecondScanedString,
-                    handyError.CreatedAt,
+                    FORMAT(handyError.CreatedAt, 'yyyy/MM/dd HH:mm:ss') AS CreatedAt,
                     handyError.CreatedBy,
                     UnlockedBy
                 FROM D_HandyErrorMessage AS handyError

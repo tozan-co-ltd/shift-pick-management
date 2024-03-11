@@ -284,7 +284,7 @@ namespace mar_sumaken_web.Controllers
             headerSettings[16] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryCode");
             headerSettings[17] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryKubun");
             headerSettings[18] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryLocation");
-            headerSettings[19] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryName");
+            headerSettings[19] = Utils.GetDisplayName<D_ShipmentScheduleModel>("NameOfDelivery");
             headerSettings[20] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryName");
             headerSettings[22] = Utils.GetDisplayName<D_ShipmentScheduleModel>("RegularKubun");
             headerSettings[24] = Utils.GetDisplayName<D_ShipmentScheduleModel>("IssuedDate");
@@ -321,7 +321,7 @@ namespace mar_sumaken_web.Controllers
             model.DeliveryCode = lines[readCount][16];
             model.DeliveryFactoryKubun = lines[readCount][17];
             model.DeliveryLocation = lines[readCount][18];
-            model.DeliveryName = lines[readCount][19];
+            model.NameOfDelivery = lines[readCount][19];
             model.DeliveryFactoryName = lines[readCount][20];
 
             model.RegularKubun = lines[readCount][22];
