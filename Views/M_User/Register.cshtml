@@ -86,30 +86,29 @@
                                 <div class="col-12 col-sm-4 column-1st">
                                     <label>使用倉庫名<span style="color:red">*</span></label>
                                 </div>
-                                <div class="col-12 col-sm-8 column-2nd">
-                                    <input type="hidden" id="select-depo-count" value="@Model.DepoSelectList.Count">
+                                <div class="col-12 col-sm-8 column-2nd" id="checkbox-depo">
                                     @for (var i = 0; i < Model.DepoSelectList.Count; i++)
                                     {
                                         <div class="form-check">
                                             <input type="hidden" asp-for="DepoSelectList[i].Value" value="@Model.DepoSelectList[i].Value" />
-                                            <input type="hidden" asp-for="DepoSelectList[i].Text" value="@Model.DepoSelectList[i].Value"/>
-                                            <input class="form-check-input checkbox" asp-for="DepoSelectList[i].Selected" id="select-depo-@i" type="checkbox">
-                                            <label class="form-check-label" id="label-depo-name-@i" for="home-center">@Model.DepoSelectList[i].Text</label>
+                                            <input type="hidden" asp-for="DepoSelectList[i].Text" value="@Model.DepoSelectList[i].Value" />
+                                            <input class="form-check-input checkbox" asp-for="DepoSelectList[i].Selected" id="@Model.DepoSelectList[i].Value" type="checkbox">
+                                            <label class="form-check-label" for="@Model.DepoSelectList[i].Value">@Model.DepoSelectList[i].Text</label>
                                         </div>
                                     }
-                                    <span class="text-danger w-100" id="selectedDepoErrorMsg"></span>
+                                    <span class="text-danger w-100" id="error-message-checked-depo"></span>
                                 </div>
                             </div>
 
-                            <div class="col-12 col-md-6 input-group div-input-group pl-0">
+                            <div class="col-12 col-md-6 input-group pl-0">
                                 <div class="col-12 col-sm-4 column-1st">
                                     <label>メイン倉庫名<span style="color:red">*</span></label>
                                 </div>
                                 <div class="col-12 col-sm-8 column-2nd">
-                                    <select class="form-select" asp-for="MainDepoID" id="warehouse-select" required>
-                                        <option value="0" disabled selected>--使用倉庫名を選択してください--</option>
+                                    <select class="form-select" name="SelectedMainDepoID" asp-for="MainDepoName" id="select-main-depo" required>
+                                        <option value="0" selected>--使用倉庫名を選択してください--</option>
                                     </select>
-                                    <span class="text-danger w-100" asp-validation-for="MainDepoName"></span>
+                                    <span class="text-danger w-100" id="error-message-selected-depo"></span>
                                 </div>
                             </div>
                         </div>
@@ -171,9 +170,12 @@
 
             // 送信イベントが他のハンドラーに伝播するのを防ぐ
             event.stopImmediatePropagation();
-            
-            // 使用倉庫名チェック
-            CheckIsSelectedDepoProduct();
+
+            // 使用倉庫名が選択されていない場合はエラー
+            if (!CheckIsCheckedDepo()) return;
+
+            // メイン倉庫名が選択されていない場合はエラー
+            if (!CheckIsSelectedMainDepo()) return;
 
             // フォーム情報取得
             let url = window.location.origin + '@Url.Action("Register", "M_User")';
@@ -203,74 +205,73 @@
             });
         });
     }
-
-    // メイン倉庫区分の値を更新
+    // 使用倉庫名・メイン倉庫名の制御
     $(document).ready(function () {
-        const depoSelectCount = $('#select-depo-count').val();
-        const checkbox1 = document.getElementById('select-depo-0');
-        const checkbox2 = document.getElementById('select-depo-1');
-        const selectBox = document.getElementById('warehouse-select');
+        // 初期状態で選択されているチェックボックスをセレクトボックスに反映する
+        $('#checkbox-depo input[type="checkbox"]:checked').each(function () {
+            let selectBox = $('#select-main-depo');
+            let checkboxDepoId = $(this).attr('id');
+            let checkboxLabel = $(this).next('label').text();
 
-        var selectItems = ["--使用倉庫名を選択してください--"];
-        for(var i = 0; i < depoSelectCount; i++) 
-        {
-            let depoName = $("#label-depo-name-" + i).text();
-            selectItems.push(depoName);
-        }
+            // セレクトボックスにオプションを追加
+            selectBox.append($('<option>', {
+                value: checkboxDepoId,
+                text: checkboxLabel
+            }));
+        });
 
-        // Listen change event
-        checkbox1.addEventListener('change', updateSelectBox);
-        checkbox2.addEventListener('change', updateSelectBox);
+        // チェックボックスが変更されたらセレクトボックスに反映する
+        $('#checkbox-depo input[type="checkbox"]').change(function () {
+            let selectBox = $('#select-main-depo');
+            let checkboxDepoId = $(this).attr('id');
+            let checkboxLabel = $(this).next('label').text();
 
-        // Update select box
-        function updateSelectBox() {
-            const checkbox1Checked = checkbox1.checked;
-            const checkbox2Checked = checkbox2.checked;
-
-            // Remove all option
-            selectBox.innerHTML = '';
-
-            // Check checkbox selection
-            if (!checkbox1Checked && !checkbox2Checked) {
-                addOption(selectBox, 0, selectItems[0]);
-            } else if (checkbox1Checked && !checkbox2Checked) {
-                addOption(selectBox, 1, selectItems[1]);
-            } else if (!checkbox1Checked && checkbox2Checked) {
-                addOption(selectBox, 2, selectItems[2]);
-            } else {
-                addOption(selectBox, 1, selectItems[1]);;
-                addOption(selectBox, 2, selectItems[2]);
+            // チェックボックスがチェックされた場合
+            if ($(this).is(':checked')) {
+                // セレクトボックスにオプションを追加
+                selectBox.append($('<option>', {
+                    value: checkboxDepoId,
+                    text: checkboxLabel
+                }));
+            } else { // チェックボックスがチェックされていない場合
+                // セレクトボックスから対応するオプションを削除
+                selectBox.find('option[value="' + checkboxDepoId + '"]').remove();
             }
-        }
 
-        // Add select option
-        function addOption(selectBox, value, text) {
-            const option = document.createElement("option");
-            option.value = value;
-            option.text = text;
-            if (value == 0) {
-                option.disabled = true;
-                option.selected = true;
-            }
-            selectBox.add(option);
-        }
+            // オプションをチェックボックスのvalueの昇順に並び替える
+            let options = selectBox.find('option');
+            options.detach().sort(function (a, b) {
+                return $(a).val() - $(b).val();
+            });
+            selectBox.append(options);
+        });
     });
 
     // 使用倉庫名チェック
-    function CheckIsSelectedDepoProduct() {
-        $('#selectedDepoErrorMsg').text('');
-        var checkList = @Html.Raw(Json.Serialize(Model.DepoSelectList));
-        var hasSelectedItem = false;
-        for (var i = 0; i < checkList.length; i++) {
-            var item = "#select-depo-" + i;
-            if ($(item).is(":checked")) {
-                hasSelectedItem = true;
-            }
+    function CheckIsCheckedDepo() {
+        $('#error-message-checked-depo').text('');
+        // 選択されているチェックボックスの数を数える
+        let checkedCount = $('#checkbox-depo input[type="checkbox"]:checked').length;
+
+        // 選択されているチェックボックスが0個の場合
+        if (checkedCount === 0) {
+            $('#error-message-checked-depo').text('使用倉庫名は必須項目です。');
+            return false;
         }
-        if (!hasSelectedItem) {
-            $('#selectedDepoErrorMsg').text('使用倉庫名は必須項目です。');
-        }
+        return true;
     }
 
+    // メイン倉庫名チェック
+    function CheckIsSelectedMainDepo() {
+        $('#error-message-selected-depo').text('');
+        let selectedMainDepoID = $("#select-main-depo option:selected").val();
+
+        // 選択されているメイン倉庫名のIDが0の場合
+        if (selectedMainDepoID == 0) {
+            $('#error-message-selected-depo').text('メイン倉庫名は必須項目です。');
+            return false;
+        }
+        return true;
+    }
 </script>
 
