@@ -382,12 +382,46 @@ namespace mar_sumaken_web.Commons
             model.SearchEndDate = string.Concat(model.SearchEndDate, " 23:59:59");
             var sql = $@"
                 SELECT
-	                shipment.CompanyID AS SupplierID
+	                shipment.ShipmentScheduleID
+	                ,shipment.CompanyID AS SupplierID
 	                ,company.CompanyName AS SupplierName
+                    ,depo.DepoID
 	                ,depo.DepoName
-	                ,COALESCE(storeOut.NumberOfBoxes, 0) AS StoreOutNumberOfBoxes -- 出庫箱数
-	                ,COALESCE(storeOut.Quantity, 0) AS StoreOutQuantity --出庫数量
-                    ,shipment.*
+					,shipment.ShipmentScheduleID
+					,shipment.DeliveryName
+					,shipment.DeliveryDate
+					,shipment.DeliveryTimeClass
+					,shipment.DeliveryProductNumber
+					,shipment.SupplierProductNumber
+					,shipment.LotQuantity
+					,shipment.OrdererCode
+					,shipment.OrdererFactoryKubun
+					,shipment.OrdererName
+					,shipment.OrdererFactoryName
+					,shipment.ShipperCode
+					,shipment.ShipperFactoryKubun
+					,shipment.ShipperName
+					,shipment.DeliveryCode
+					,shipment.DeliveryFactoryKubun
+					,shipment.DeliveryLocation
+					,shipment.DeliveryName
+					,shipment.DeliveryFactoryName
+					,shipment.RegularKubun
+					,shipment.IssuedDate
+					,shipment.DeliveryTime
+					,shipment.TranspotationIdentify
+					,shipment.DeliverySlipNumber
+					,shipment.DeliverySlipPageNumber
+					,shipment.DeliverySlipRowNumber
+					,shipment.DeliveryProductAbbreviation
+					,shipment.DeliveryProductName
+					,shipment.BranchNumber
+					,shipment.UpdatedAt
+					,shipment.UpdatedBy
+					,SUM(COALESCE(shipment.NumberOfBoxes, 0)) AS NumberOfBoxes
+					,SUM(COALESCE(shipment.Quantity, 0)) AS Quantity
+	                ,SUM(COALESCE(storeOut.NumberOfBoxes, 0)) AS StoreOutNumberOfBoxes -- 出庫箱数
+	                ,SUM(COALESCE(storeOut.Quantity, 0)) AS StoreOutQuantity --出庫数量
                 FROM D_ShipmentSchedule shipment
                 LEFT JOIN D_StoreOut AS storeOut 
 		                ON shipment.DepoID = storeOut.DepoID
@@ -409,6 +443,43 @@ namespace mar_sumaken_web.Commons
 	                AND shipment.IsDeleted = 0
 	                AND company.IsDeleted = 0
                     AND depo.IsDeleted = 0
+                GROUP BY
+					shipment.ShipmentScheduleID
+	                ,shipment.CompanyID
+	                ,company.CompanyName
+                    ,depo.DepoID
+	                ,depo.DepoName
+					,shipment.ShipmentScheduleID
+					,shipment.DeliveryName
+					,shipment.DeliveryDate
+					,shipment.DeliveryTimeClass
+					,shipment.DeliveryProductNumber
+					,shipment.SupplierProductNumber
+					,shipment.LotQuantity
+					,shipment.OrdererCode
+					,shipment.OrdererFactoryKubun
+					,shipment.OrdererName
+					,shipment.OrdererFactoryName
+					,shipment.ShipperCode
+					,shipment.ShipperFactoryKubun
+					,shipment.ShipperName
+					,shipment.DeliveryCode
+					,shipment.DeliveryFactoryKubun
+					,shipment.DeliveryLocation
+					,shipment.DeliveryName
+					,shipment.DeliveryFactoryName
+					,shipment.RegularKubun
+					,shipment.IssuedDate
+					,shipment.DeliveryTime
+					,shipment.TranspotationIdentify
+					,shipment.DeliverySlipNumber
+					,shipment.DeliverySlipPageNumber
+					,shipment.DeliverySlipRowNumber
+					,shipment.DeliveryProductAbbreviation
+					,shipment.DeliveryProductName
+					,shipment.BranchNumber
+					,shipment.UpdatedAt
+					,shipment.UpdatedBy
                 ORDER BY 
 	                shipment.DeliveryProductNumber ASC 
             ";
