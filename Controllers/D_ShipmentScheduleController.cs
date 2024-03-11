@@ -1,4 +1,5 @@
 ﻿using mar_sumaken_web.Commons;
+using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
@@ -88,7 +89,7 @@ namespace mar_sumaken_web.Controllers
                                         <a class='btn btn-secondary btn-icon-split ml-1 mr-1' onclick='OnDetailClick(this)'>
                                             <i class='fa-solid fa-list'></i>
                                         </a>
-                                        <button class='btn btn-danger btn-icon-split btn-delete'
+                                        <button class='btn btn-danger btn-icon-split'
                                         onclick='OnDeleteClick(this)' data-id='{item.ShipmentScheduleID}' data-toggle='modal' data-target='#delete-modal'>
                                             <i class='fa-solid fa-trash'></i>
                                         </button>
@@ -109,7 +110,7 @@ namespace mar_sumaken_web.Controllers
 
                         searchData += $@"
                             <td class='ShipmentScheduleID'>{@item.ShipmentScheduleID}</td>
-                            <td class='SupplierName'>{@item.SupplierName}</td>
+                            <td class='DeliveryName'>{@item.DeliveryName}</td>
                             <td class='DeliveryDate'>{Utils.ConvertToYYYYMMDD(@item.DeliveryDate)}</td>
                             <td class='DeliveryTimeClass'>{@item.DeliveryTimeClass}</td>
                             <td class='DeliveryProductNumber'>{@item.DeliveryProductNumber}</td>
@@ -129,7 +130,7 @@ namespace mar_sumaken_web.Controllers
                             <td class='DeliveryCode'>{@item.DeliveryCode}</td>
                             <td class='DeliveryFactoryKubun'>{@item.DeliveryFactoryKubun}</td>
                             <td class='DeliveryLocation'>{@item.DeliveryLocation}</td>
-                            <td class='DeliveryName'>{@item.DeliveryName}</td>
+                            <td class='NameOfDelivery'>{@item.NameOfDelivery}</td>
                             <td class='DeliveryFactoryName'>{@item.DeliveryFactoryName}</td>
                             <td class='RegularKubun'>{@item.RegularKubun}</td>
                             <td class='IssuedDate'>{Utils.ConvertToYYYYMMDD(@item.IssuedDate)}</td>
@@ -143,7 +144,7 @@ namespace mar_sumaken_web.Controllers
                             <td class='BranchNumber'>{@item.BranchNumber}</td>
                             <td class='UpdatedAt'>{@item.UpdatedAt}</td>
                             <td class='UpdatedBy'>{@item.UpdatedBy}</td>
-                            <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
+                            <input type='hidden' class='CompanyID' value='{item.CompanyID}' />
                             <input type='hidden' class='DepoID' value='{item.DepoID}' />
                             </tr>
                         ";
@@ -160,6 +161,33 @@ namespace mar_sumaken_web.Controllers
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 return Content(errorMessage);
+            }
+        }
+
+        /// <summary>
+        /// 出荷指示削除
+        /// </summary>
+        /// <param name="shipmentScheduleId">出荷指示ID</param>
+        /// <returns></returns>
+        public IActionResult Delete(int shipmentScheduleId)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 出荷指示削除
+                //D_ShipmentScheduleConnectController.DeleteDShipmentSchedule(shipmentScheduleId, user);
+
+                return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 
@@ -196,7 +224,7 @@ namespace mar_sumaken_web.Controllers
                     {
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipmentScheduleID")] = item.ShipmentScheduleID.ToString();
-                        newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("SupplierName")] = item.SupplierName.ToString();
+                        newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryName")] = item.DeliveryName.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryDate")] = Utils.ConvertToYYYYMMDD(item.DeliveryDate);
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryTimeClass")] = item.DeliveryTimeClass.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductNumber")] = item.DeliveryProductNumber.ToString();
@@ -216,7 +244,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryCode")] = item.DeliveryCode.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryKubun")] = item.DeliveryFactoryKubun.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryLocation")] = item.DeliveryLocation.ToString();
-                        newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryName")] = item.DeliveryName.ToString();
+                        newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("NameOfDelivery")] = item.NameOfDelivery.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryName")] = item.DeliveryFactoryName.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("RegularKubun")] = item.RegularKubun.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("IssuedDate")] = Utils.ConvertToYYYYMMDD(item.IssuedDate);
@@ -268,7 +296,7 @@ namespace mar_sumaken_web.Controllers
             var table = new DataTable();
 
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipmentScheduleID"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("SupplierName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryName"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryDate"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryTimeClass"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductNumber"), typeof(string));
@@ -288,7 +316,7 @@ namespace mar_sumaken_web.Controllers
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryCode"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryKubun"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryLocation"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("NameOfDelivery"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryName"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("RegularKubun"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentScheduleModel>("IssuedDate"), typeof(string));

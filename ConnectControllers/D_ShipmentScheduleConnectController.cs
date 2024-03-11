@@ -169,16 +169,13 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 出荷実績がある場合はエラー
+        /// 出荷実績があるかチェック
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="databaseName"></param>
         /// <returns></returns>
         public static bool IsExistDShipment(string sql, string databaseName)
         {
-            // 戻り値
-            List<D_ShipmentScheduleModel> strList = new();
-
             // DB接続
             try
             {
@@ -198,6 +195,42 @@ namespace mar_sumaken_web.Commons
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// 出荷指示削除
+        /// </summary>
+        /// <param name="shipmentScheduleId">出荷指示ID</param>
+        /// <param name="loginUser">ログインユーザー</param>
+        /// <returns>更新件数</returns>
+        public static int DeleteDShipmentSchedule(int shipmentScheduleId, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                // DB接続
+                try
+                {
+                    // 出荷指示削除
+                    string deleteSql = CreateSQLToDeleteDShipmentSchedule(shipmentScheduleId, DateTime.Now, loginUser.UserName);
+                    int affectedRows = connection.Execute(deleteSql);
+                    // 更新件数が0の場合はエラーとする
+                    if (affectedRows == 0)
+                    {
+                        throw new Exception();
+                    }
+
+                    return affectedRows;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
         }
 
@@ -291,7 +324,7 @@ namespace mar_sumaken_web.Commons
                         '{model.DeliveryCode}',
                         '{model.DeliveryFactoryKubun}',
                         '{model.DeliveryLocation}',
-                        '{model.DeliveryName}',
+                        '{model.NameOfDelivery}',
                         '{model.DeliveryFactoryName}',
                         '{model.RegularKubun}',
                         '{model.IssuedDate}',
@@ -383,12 +416,10 @@ namespace mar_sumaken_web.Commons
             var sql = $@"
                 SELECT
 	                shipment.ShipmentScheduleID
-	                ,shipment.CompanyID AS SupplierID
-	                ,company.CompanyName AS SupplierName
+	                ,shipment.CompanyID AS CompanyID
+	                ,company.CompanyName AS DeliveryName
                     ,depo.DepoID
 	                ,depo.DepoName
-					,shipment.ShipmentScheduleID
-					,shipment.DeliveryName
 					,shipment.DeliveryDate
 					,shipment.DeliveryTimeClass
 					,shipment.DeliveryProductNumber
@@ -404,7 +435,7 @@ namespace mar_sumaken_web.Commons
 					,shipment.DeliveryCode
 					,shipment.DeliveryFactoryKubun
 					,shipment.DeliveryLocation
-					,shipment.DeliveryName
+					,shipment.DeliveryName AS NameOfDelivery
 					,shipment.DeliveryFactoryName
 					,shipment.RegularKubun
 					,shipment.IssuedDate
@@ -425,7 +456,6 @@ namespace mar_sumaken_web.Commons
                 FROM D_ShipmentSchedule shipment
                 LEFT JOIN D_StoreOut AS storeOut 
 		                ON shipment.DepoID = storeOut.DepoID
-		                --AND shipment.CompanyID = storeOut.CompanyID
 		                AND	shipment.DeliveryDate = storeOut.DeliveryDate
 		                AND	shipment.DeliveryProductNumber = storeOut.DeliveryProductNumber
                         AND storeOut.IsDeleted = 0
@@ -483,6 +513,27 @@ namespace mar_sumaken_web.Commons
                 ORDER BY 
 	                shipment.DeliveryProductNumber ASC 
             ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 出荷指示削除SQL作成
+        /// </summary>
+        /// <param name="storeInId">出荷指示ID</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToDeleteDShipmentSchedule(int shipmentScheduleId, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+                        UPDATE D_ShipmentSchedule
+                        SET 
+                            IsDeleted = 1
+                            ,UpdatedAt = '{updatedAt}'
+                            ,UpdatedBy = '{updatedBy}'
+                        WHERE 
+                            ShipmentScheduleID = {shipmentScheduleId}
+            ;";
             return sql;
         }
     }

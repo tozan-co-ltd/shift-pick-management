@@ -50,9 +50,9 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="shipmentScheduleId">出荷指示ID</param>
         /// <param name="depoId">倉庫ID</param>
-        /// <param name="deliveryId">会社ID</param>
+        /// <param name="companyId">会社ID</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectDShipments(int shipmentScheduleId, int depoId, int deliveryId)
+        public static string CreateSQLToSelectDShipments(int shipmentScheduleId, int depoId, int companyId)
         {
           
             var sql = $@"
@@ -109,7 +109,7 @@ namespace mar_sumaken_web.Commons
                 WHERE 
 	                shipment.ShipmentScheduleID = {shipmentScheduleId}
 	                AND schedule.DepoID = {depoId}
-	                AND schedule.CompanyID = {deliveryId}
+	                AND schedule.CompanyID = {companyId}
                     AND menu.IsDeleted = 0
 	                AND company.IsDeleted = 0
 	                AND depo.IsDeleted = 0

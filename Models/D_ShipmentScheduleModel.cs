@@ -54,7 +54,7 @@ namespace mar_sumaken_web.Models
         public string? ImportFileName { get; set; }
 
         /// <summary>
-        /// 出荷指示実績ID
+        /// 出荷指示ID
         /// </summary>
         [Display(Name = "ID")]
         public int ShipmentScheduleID { get; set; }
@@ -69,7 +69,7 @@ namespace mar_sumaken_web.Models
         /// 納入先名
         /// </summary>
         [Display(Name = "納入先名")]
-        public string? SupplierName { set; get; }
+        public string? DeliveryName { set; get; }
 
         /// <summary>
         /// 倉庫ID
@@ -164,7 +164,7 @@ namespace mar_sumaken_web.Models
         [Display(Name = "納入先名称")]
         [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string? DeliveryName { get; set; }
+        public string? NameOfDelivery { get; set; }
 
         /// <summary>
         /// 納入先工場名
