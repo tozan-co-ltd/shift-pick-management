@@ -70,6 +70,7 @@ namespace mar_sumaken_web.ConnectControllers
                             item.DepoID = model.SelectedDepoID;
                             item.CompanyID = model.SelectedCompanyID;
                             item.StoreInDate = Convert.ToDateTime(model.SearchStartDate);
+                            item.NumberOfBoxes = (int)Math.Ceiling((double)item.Quantity / item.LotQuantity);
 
                             // 入庫実績登録
                             string insertSql = CreateSQLToInsertDStoreIn(item, sysDate, loginUser.UserName);

@@ -416,15 +416,21 @@ namespace mar_sumaken_web.Controllers
                     if (!isContainDeliveryProductNumber)
                     {
                         // 納入先品番で品番チェック
-                        bool isExistProduct = M_ProductConnectController.IsExistedDeliveryProductNumber(modelItem.DeliveryProductNumber, user.DatabaseName);
-                        if (!isExistProduct)
+                        var product = M_ProductConnectController.GetProductByDeliveryProductNumber(
+                            model.SelectedCompanyID, modelItem.DeliveryProductNumber, user.DatabaseName
+                        );
+                        if (product == null)
                         {
                             isValid = false;
                             var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
                             validationResults.Add(new ValidationResult(message, new List<string> { "DeliveryProductNumber" }));
                         }
+                        else
+                        {
+                            model.RegisterList[i].LotQuantity = product.LotQuantity;
+                            model.RegisterList[i].SupplierProductNumber = product.SupplierProductNumber;
+                        }
                     }
-                    modelItem.SupplierProductNumber = modelItem.DeliveryProductNumber;
 
                     // エラーメッセージ作成
                     if (!isValid)
