@@ -175,7 +175,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="deliveryProductNumber"></param>
         /// <param name="databaseName"></param>
         /// <returns></returns>
-        public static M_ProductModel? GetProductByDeliveryProductNumber(int supplierId, string? deliveryProductNumber, string databaseName)
+        public static M_ProductModel? GetProductByDeliveryProductNumber(int supplierId, int depoId, string? deliveryProductNumber, string databaseName)
         {
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
@@ -193,10 +193,11 @@ namespace mar_sumaken_web.ConnectControllers
                         SELECT TOP 1 *
                         FROM M_Product AS product
                         INNER JOIN R_DepoProduct AS depoProduct 
-                            ON product.ProductID = depoProduct.ProductID
+                            ON product.ProductID = depoProduct.ProductID 
                         WHERE 
                             product.SupplierID = {supplierId}
                             AND product.DeliveryProductNumber = '{deliveryProductNumber}'
+                            AND depoProduct.DepoId = {depoId}
                             AND product.IsDeleted = 0
                     ";
 

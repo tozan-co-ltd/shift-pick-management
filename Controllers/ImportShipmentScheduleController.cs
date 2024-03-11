@@ -160,7 +160,7 @@ namespace mar_sumaken_web.Controllers
                                 // 納入先品番で仕入先品番を取得
                                 // 品番マスターに登録されている品番の行のみ取り込まれます。登録されていない品番の行はスキップします。
                                 var product = M_ProductConnectController.GetProductByDeliveryProductNumber(
-                                    shipmentSchedule.SelectedCompanyID, shipmentSchedule.DeliveryProductNumber, user.DatabaseName
+                                    shipmentSchedule.SelectedCompanyID, shipmentSchedule.SelectedDepoID, shipmentSchedule.DeliveryProductNumber, user.DatabaseName
                                 );
                                 if (product == null)
                                 {

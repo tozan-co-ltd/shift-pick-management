@@ -210,14 +210,18 @@ namespace mar_sumaken_web.Commons
 		            searchInfo.SupplierProductNumber
 		            ,searchInfo.LotNumber
 					,FORMAT(WorkedDate, 'yyyy/MM/dd') AS WorkedDate
-		            ,COALESCE(SUM(searchInfo.InNumberOfBoxes), 0)  AS StoreInNumberOfBoxes -- 入庫箱数
-		            ,COALESCE(SUM(searchInfo.OutNUmberOfBoxes), 0) AS StoreOutNumberOfBoxes -- 出庫箱数
+		            ,searchInfo.InNumberOfBoxes AS StoreInNumberOfBoxes -- 入庫箱数
+		            ,searchInfo.OutNUmberOfBoxes AS StoreOutNumberOfBoxes -- 出庫箱数
+					,searchInfo.InQuantity AS StoreInQuantity -- 入庫数量
+		            ,searchInfo.OutQuantity AS StoreOutQuantity -- 出庫箱数
+					,(searchInfo.InQuantity - searchInfo.OutQuantity) AS StockRemainQuantity
 	            FROM 
 	            (
 			        SELECT
 						storeIn.LotNumber AS LotNumber
-			            ,storeIn.StoreInDate AS WorkedDate, storeIn.SupplierProductNumber 
-			            ,SUM(storeIn.NumberOfBoxes) AS InNumberOfBoxes , NULL AS OutNUmberOfBoxes
+			            ,storeIn.StoreInDate AS WorkedDate,storeIn.SupplierProductNumber 
+			            ,COALESCE(SUM(storeIn.NumberOfBoxes), 0) AS InNumberOfBoxes, 0 AS OutNUmberOfBoxes
+						,COALESCE(SUM(storeIn.Quantity), 0) AS InQuantity , 0 AS OutQuantity
 		            FROM D_StoreIn AS storeIn 
 		            WHERE 
 			            storeIn.StoreInDate >= @SearchStartDate AND storeIn.StoreInDate <= @SearchEndDate 
@@ -228,7 +232,8 @@ namespace mar_sumaken_web.Commons
 		            SELECT
 						storeOut.LotNumber AS LotNumber
 			            ,storeOut.StoreOutDate AS WorkedDate ,storeOut.SupplierProductNumber, 
-			            NULL AS InNumberOfBoxes, SUM(storeOut.NumberOfBoxes) AS OutNUmberOfBoxes
+			            0 AS InNumberOfBoxes, COALESCE(SUM(storeOut.NumberOfBoxes), 0) AS OutNUmberOfBoxes,
+						0 AS InQuantity, COALESCE(SUM(storeOut.Quantity), 0) AS OutQuantity
 		            FROM D_StoreOut AS storeOut
 		            WHERE 
 			            storeOut.StoreOutDate >= @SearchStartDate AND storeOut.StoreOutDate <= @SearchEndDate
@@ -236,8 +241,8 @@ namespace mar_sumaken_web.Commons
 			            AND storeOut.SupplierProductNumber = @ProductNumber
 		            GROUP BY storeOut.SupplierProductNumber, storeOut.StoreOutDate, storeOut.LotNumber
 	            ) AS searchInfo
-	            GROUP BY searchInfo.SupplierProductNumber, WorkedDate, searchInfo.LotNumber
-                ORDER BY WorkedDate ASC
+	            --GROUP BY searchInfo.SupplierProductNumber, WorkedDate, searchInfo.LotNumber
+                ORDER BY searchInfo.LotNumber ASC
             ";
             return sql;
         }

@@ -417,7 +417,7 @@ namespace mar_sumaken_web.Controllers
                     {
                         // 納入先品番で品番チェック
                         var product = M_ProductConnectController.GetProductByDeliveryProductNumber(
-                            model.SelectedCompanyID, modelItem.DeliveryProductNumber, user.DatabaseName
+                            model.SelectedCompanyID, model.SelectedDepoID, modelItem.DeliveryProductNumber, user.DatabaseName
                         );
                         if (product == null)
                         {

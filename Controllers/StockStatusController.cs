@@ -215,23 +215,7 @@ namespace mar_sumaken_web.Controllers
 
                 // 日別在庫照会画面表示
                 List<StockStatusModel> searchProductResult = GetLotNumberDetail(searchDate, depoId, companyId, supplierProductNumber, user.DatabaseName);
-                foreach (var item in searchProductResult)
-                {
-                    StockStatusModel newItem = new()
-                    {
-                        WorkedDate = item.WorkedDate
-                    };
-
-                    newItem.LotNumber = item.LotNumber;
-                    newItem.StoreInNumberOfBoxes = item.StoreInNumberOfBoxes;
-                    newItem.StoreInQuantity = item.StoreInNumberOfBoxes * model.LotQuantity;
-                    newItem.StoreOutNumberOfBoxes = item.StoreOutNumberOfBoxes;
-                    newItem.StoreOutQuantity = item.StoreOutNumberOfBoxes * model.LotQuantity;
-                    // その日の在庫数を計算
-                    newItem.StockRemainQuantity = newItem.StoreInQuantity - newItem.StoreOutQuantity;
-
-                    detailList.Add(newItem);
-                }
+                detailList = searchProductResult.Where(item => item.StockRemainQuantity > 0).ToList();
 
                 var searchData = string.Empty;
                 // 表示用のhtml作成
