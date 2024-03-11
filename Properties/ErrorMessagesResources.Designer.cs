@@ -241,6 +241,15 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
+        ///   {1}以上で入力してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1021 {
+            get {
+                return ResourceManager.GetString("E1021", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   仕入先かんばんマスターに一致するデータがありません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1022 {
@@ -255,6 +264,15 @@ namespace mar_sumaken_web.Properties {
         internal static string E1023 {
             get {
                 return ResourceManager.GetString("E1023", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   重複許容フラグが0の場合、メインキーは必須項目です。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1024 {
+            get {
+                return ResourceManager.GetString("E1024", resourceCulture);
             }
         }
         
