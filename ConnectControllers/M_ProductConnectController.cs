@@ -209,64 +209,6 @@ namespace mar_sumaken_web.ConnectControllers
         }
 
         /// <summary>
-        /// 品番マスター削除
-        /// </summary>
-        /// <param name="productId">品番ID</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>更新件数</returns>
-        public static void DeleteMProduct(int productId, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-
-                SqlTransaction transaction = null;
-                transaction = connection.BeginTransaction();
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-
-                    // 品番履歴テーブル登録SQL作成
-                    string logSql = CreateSQLToInsertDProductHistory(productId, "削除", sysDate, loginUser.UserName);
-                    var logAddedCount = connection.Execute(logSql, null, transaction);
-                    // 更新件数が0の場合はエラーとする
-                    if (logAddedCount == 0)
-                    {
-                        throw new Exception();
-                    }
-
-                    // 品番マスター削除
-                    string productDeleteSql = CreateSQLToDeleteMCompany(productId, sysDate, loginUser.UserName);
-                    int productDeleteCount = connection.Execute(productDeleteSql, null, transaction);
-                    // 更新件数が0の場合はエラーとする
-                    if (productDeleteCount == 0)
-                    {
-                        throw new Exception();
-                    }
-
-                    // 品番-品番中間テーブル削除SQL作成
-                    string depoProductDeleteSql = CreateSQLToDeleteRDepoProduct(productId);
-                    // 品番-品番中間テーブル削除
-                    int depoProductDelCount = connection.Execute(depoProductDeleteSql, null, transaction);
-
-                    // トランザクションのコミット
-                    transaction.Commit();
-                }
-                catch (Exception)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
         /// 会社区分ごとに会社リストを取得
         /// </summary>
         /// <returns></returns>
@@ -502,7 +444,7 @@ namespace mar_sumaken_web.ConnectControllers
                     List<SelectListItem> selectedItems = model.RDepoProductsRegister.Where(item => item.Selected).ToList();
                     List<string> selectedValues = selectedItems.Select(item => item.Text).ToList();
                     var depoName = string.Join(",", selectedValues);
-                    // 品番履歴テーブル登録SQL作成
+                    // 品番履歴テーブル登録
                     string logSql = CreateSQLToInsertDProductHistory(model.ProductID, "更新", sysDate, loginUser.UserName, depoName);
                     var logAddedCount = connection.Execute(logSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
@@ -522,6 +464,62 @@ namespace mar_sumaken_web.ConnectControllers
             }
         }
 
+        /// <summary>
+        /// 品番マスター削除
+        /// </summary>
+        /// <param name="productId">品番ID</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns>更新件数</returns>
+        public static void DeleteMProduct(int productId, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                SqlTransaction transaction = null;
+                transaction = connection.BeginTransaction();
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+
+                    // 品番マスター削除
+                    string productDeleteSql = CreateSQLToDeleteMCompany(productId, sysDate, loginUser.UserName);
+                    int productDeleteCount = connection.Execute(productDeleteSql, null, transaction);
+                    // 更新件数が0の場合はエラーとする
+                    if (productDeleteCount == 0)
+                    {
+                        throw new Exception();
+                    }
+
+                    // 品番-品番中間テーブル削除
+                    string depoProductDeleteSql = CreateSQLToDeleteRDepoProduct(productId);
+                    int depoProductDelCount = connection.Execute(depoProductDeleteSql, null, transaction);
+
+                    // 品番履歴テーブル登録
+                    string logSql = CreateSQLToInsertDProductHistory(productId, "削除", sysDate, loginUser.UserName);
+                    var logAddedCount = connection.Execute(logSql, null, transaction);
+                    // 更新件数が0の場合はエラーとする
+                    if (logAddedCount == 0)
+                    {
+                        throw new Exception();
+                    }
+
+                    // トランザクションのコミット
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
 
         /// <summary>
         /// 品番情報取得SQL作成
@@ -797,11 +795,11 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番履歴テーブル登録SQL作成
         /// </summary>
-        /// <param name="product">品番ID</param>
-        /// <param name="historyStatus">履歴ステータス</param>
+        /// <param name="productId">品番ID</param>
+        /// <param name="historyStatus">履歴状態</param>
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
-        /// <param name="depoName">デポー名</param>
+        /// <param name="depoName">倉庫名</param>
         /// <returns>SQL文</returns>
         private static string CreateSQLToInsertDProductHistory(int productId, string historyStatus, DateTime updatedAt, string updatedBy, string depoName = "")
         {
@@ -820,7 +818,7 @@ namespace mar_sumaken_web.ConnectControllers
                 SELECT 
                     '{historyStatus}', 
                     {depoNameStr}
-                    ,supplier.CompanyName as SupplierName
+                    ,supplier.CompanyName AS SupplierName
                     ,product.SupplierProductNumber
                     ,delivery.CompanyName
                     ,product.DeliveryProductNumber
@@ -828,12 +826,12 @@ namespace mar_sumaken_web.ConnectControllers
                     ,product.LotQuantity
                     ,'{updatedAt}'
                     ,'{updatedBy}'
-                FROM M_Product product
+                FROM M_Product AS product
                 LEFT JOIN R_DepoProduct depoProduct ON product.ProductID = depoProduct.ProductID
                 LEFT JOIN M_Depo depo ON depoProduct.DepoID = depo.DepoID
                 INNER JOIN M_Company supplier ON product.SupplierID = supplier.CompanyID
                 INNER JOIN M_Company delivery ON product.DeliveryID = delivery.CompanyID
-                WHERE product.ProductID = {productId} AND product.IsDeleted = 0
+                WHERE product.ProductID = {productId}
                 GROUP BY 
                     supplier.CompanyName
                     ,product.SupplierProductNumber
@@ -841,7 +839,6 @@ namespace mar_sumaken_web.ConnectControllers
                     ,product.DeliveryProductNumber
                     ,product.ProductName
                     ,product.LotQuantity
-                ;
             ";
             return sql;
         }
