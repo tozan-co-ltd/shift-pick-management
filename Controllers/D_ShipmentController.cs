@@ -5,6 +5,7 @@ using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Data;
+using System.Reflection;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -42,7 +43,11 @@ namespace mar_sumaken_web.Controllers
                     shipmentScheduleId, depoId, companyId);
                 List<D_ShipmentModel> dShipmentList = D_ShipmentConnectController.ConnectDShipments(sql, user.DatabaseName);
 
-                model.CategoryTitle = categoryTitle;
+                CommonModel commonModel = new();
+                commonModel.CompanyID= companyId;
+                commonModel.ControllerName = "D_Shipment";
+
+                model.Title = categoryTitle + " - 出荷指示照会 - " + commonModel.GetViewTitle();
                 model.DeliveryID = companyId;
                 model.DepoID = depoId;
                 model.ShipmentScheduleID = shipmentScheduleId;

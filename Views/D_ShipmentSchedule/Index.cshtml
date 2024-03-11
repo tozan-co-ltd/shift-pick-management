@@ -199,7 +199,7 @@
         var shipmentScheduleId = row.getElementsByClassName("ShipmentScheduleID")[0].textContent;
         var depoId = row.getElementsByClassName("DepoID")[0].value;
         var companyId = row.getElementsByClassName("SupplierID")[0].value;
-        var categoryTitle = $("#CategoryTitle").val();
+        var categoryTitle = document.getElementById("categoryTitle").value;
 
         var url = window.location.origin + '@Url.Action("Index", "D_Shipment")';
         url += '?shipmentScheduleId=' + shipmentScheduleId;

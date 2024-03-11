@@ -4,6 +4,12 @@ namespace mar_sumaken_web.Models
 {
     public class D_ShipmentModel : CommonModel
     {
+
+        /// <summary>
+        /// タイトル
+        /// </summary>
+        public string? Title { get; set; }
+
         /// <summary>
         /// 出荷実績リスト
         /// </summary>
