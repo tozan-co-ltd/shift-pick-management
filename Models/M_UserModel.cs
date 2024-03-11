@@ -72,7 +72,7 @@ namespace mar_sumaken_web.Models
         /// メイン倉庫名
         /// </summary>
         [Display(Name = "メイン倉庫名")]
-        public string MainDepoName { get; set; }
+        public string? MainDepoName { get; set; }
 
         /// <summary>
         /// 選択されたメイン倉庫ID
