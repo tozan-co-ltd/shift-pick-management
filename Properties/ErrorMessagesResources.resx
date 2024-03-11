@@ -276,4 +276,10 @@
   <data name="E2026" xml:space="preserve">
     <value>パスワードが正しくありません。正しい値を入力してください。</value>
   </data>
+  <data name="E1021" xml:space="preserve">
+    <value>{1}以上で入力してください。</value>
+  </data>
+  <data name="E1024" xml:space="preserve">
+    <value>重複許容フラグが0の場合、メインキーは必須項目です。</value>
+  </data>
 </root>

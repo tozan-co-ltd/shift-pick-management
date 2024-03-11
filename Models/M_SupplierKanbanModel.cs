@@ -118,103 +118,122 @@ namespace mar_sumaken_web.Models
         /// 識別文字開始位置
         /// </summary>
         [Display(Name = "識別文字開始位置")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [Range(1, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int IdentifyStringStartIndex { get; set; }
 
         /// <summary>
         /// 品番開始位置
         /// </summary>
         [Display(Name = "品番開始位置")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [Range(1, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int ProductNumberLength { get; set; }
 
         /// <summary>
         /// 品番桁数
         /// </summary>
         [Display(Name = "品番桁数")]
-        [Range(0, int.MaxValue, ErrorMessage = "Giá trị phải lớn hơn hoặc bằng 0.")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [Range(1, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int ProductNumberStartIndex { get; set; }
 
         /// <summary>
         /// 数量桁数
         /// </summary>
         [Display(Name = "数量桁数")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int QuantityLength { get; set; }
 
         /// <summary>
         /// 数量開始位置
         /// </summary>
         [Display(Name = "数量開始位置")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int QuantityStartIndex { get; set; }
 
         /// <summary>
         /// ロット番号桁数
         /// </summary>
         [Display(Name = "ロット番号桁数")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int LotLength { get; set; }
 
         /// <summary>
         /// ロット番号開始位置
         /// </summary>
         [Display(Name = "ロット番号開始位置")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int LotStartIndex { get; set; }
 
         /// <summary>
         /// メインキー桁数
         /// </summary>
         [Display(Name = "メインキー桁数")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int MainProductKeyLength { get; set; }
 
         /// <summary>
         /// メインキー開始位置
         /// </summary>
         [Display(Name = "メインキー開始位置")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int MainProductKeyStartIndex { get; set; }
 
         /// <summary>
         /// サブキー1桁数
         /// </summary>
         [Display(Name = "サブキー1桁数")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int FirstSubProductKeyLength { get; set; }
 
         /// <summary>
         /// サブキー1開始位置
         /// </summary>
         [Display(Name = "サブキー1開始位置")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int FirstSubProductKeyStartIndex { get; set; }
 
         /// <summary>
         /// サブキー2桁数
         /// </summary>
         [Display(Name = "サブキー2桁数")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int SecondSubProductKeyLength { get; set; }
 
         /// <summary>
         /// サブキー2開始位置
         /// </summary>
         [Display(Name = "サブキー2開始位置")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int SecondSubProductKeyStartIndex { get; set; }
 
         /// <summary>
         /// 枝番桁数
         /// </summary>
         [Display(Name = "枝番桁数")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int ProductBranchNumberLength { get; set; }
 
         /// <summary>
         /// 枝番開始位置
         /// </summary>
         [Display(Name = "枝番開始位置")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int ProductBranchNumberStartIndex { get; set; }
 
         /// <summary>
         /// 注文番号桁数
         /// </summary>
         [Display(Name = "注文番号桁数")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int OrderNumberLength { get; set; }
 
         /// <summary>
         /// 注文番号開始位置
         /// </summary>
         [Display(Name = "注文番号開始位置")]
+        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int OrderNumberStartIndex { get; set; }
 
         /// <summary>

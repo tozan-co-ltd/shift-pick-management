@@ -234,15 +234,6 @@ function hideLoading() {
     $("#file-upload i").addClass('fa-solid fa-file-export')
     $("#file-upload i").removeClass('fas fa-spinner fa-pulse')
 }
-
-//// データエラー表示
-//function RenderErrorBlock(data) {
-//    let html = "";
-//    for (let i = 0; i < data.length; i++) {
-//        html += '<span class="text-danger">' + data[i] + '</span>';
-//    }
-//    document.getElementById('ErrorBlock').innerHTML = html;
-//}
 //--------------------------------------------------------//
 
 
@@ -353,5 +344,82 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect, isNotReload
         else
             location.reload();
     });
+}
+//--------------------------------------------------------//
+
+// 仕入先かんばんマスターバリデーションチェック
+function CheckValidationMSupplierKanban() {
+    // 識別文字
+    var IdentifyString = $("IdentifyStringStartIndex");
+    if (parseInt(IdentifyString.val(), 10) <= 0) {
+        IdentifyString.addClass("input-validation-error");
+        return false;
+    }
+
+    // 重複許容フラグ
+    var selectedValue = $('input[name="AllowedDuplicatesFlag"]:checked').val();
+    var requiredCheck = false;
+    if (selectedValue == '0') {
+        requiredCheck = true;
+    }
+
+    // 桁数・開始位置
+    var checkProductNumber = CheckPairValueMSupplierKanban("ProductNumberLength", "ProductNumberStartIndex", true);
+    var checkQuantity = CheckPairValueMSupplierKanban("QuantityLength", "QuantityStartIndex");
+    var checkLot = CheckPairValueMSupplierKanban("LotLength", "LotStartIndex");
+    var checkMainProductKey = CheckPairValueMSupplierKanban("MainProductKeyLength", "MainProductKeyStartIndex", requiredCheck);
+    var checkFirstSubProductKey = CheckPairValueMSupplierKanban("FirstSubProductKeyLength", "FirstSubProductKeyStartIndex");
+    var checkSecondSubProductKey = CheckPairValueMSupplierKanban("SecondSubProductKeyLength", "SecondSubProductKeyStartIndex");
+    var checkProductBranchNumber = CheckPairValueMSupplierKanban("ProductBranchNumberLength", "ProductBranchNumberStartIndex");
+    var checkOrderNumber = CheckPairValueMSupplierKanban("OrderNumberLength", "OrderNumberStartIndex");
+
+    if (!checkProductNumber || !checkQuantity || !checkLot || !checkMainProductKey || !checkFirstSubProductKey
+        || !checkSecondSubProductKey || !checkProductBranchNumber || !checkOrderNumber) {
+        if (!checkMainProductKey) {
+            $(".MainProductKey").text("重複許容フラグが0の場合、メインキーは必須項目です。");
+        }
+        return false;
+    }
+
+    return true;
+}
+
+// 入力必須項目チェック
+function CheckPairValueMSupplierKanban(id1, id2, required = false) {
+    var checkFlag = true;
+    var length = $("#" + id1);
+    var startIndex = $("#" + id2);
+    var lengthValue = parseInt(length.val(), 10);
+    var startIndexValue = parseInt(startIndex.val(), 10);
+
+    // どちらかが数値でない(空欄)の場合はエラー
+    if (Number.isNaN(lengthValue) || Number.isNaN(startIndexValue)) {
+        startIndex.addClass("input-validation-error");
+        checkFlag = false;
+    }
+
+    // どちらかが0の場合はエラー
+    if (lengthValue > 0 && startIndexValue <= 0) {
+        startIndex.addClass("input-validation-error");
+        checkFlag = false;
+    }
+    if (lengthValue <= 0 && startIndexValue > 0) {
+        length.addClass("input-validation-error");
+        checkFlag = false;
+    }
+
+    // 必須項目が0未満の場合はエラー
+    if (required) {
+        if (lengthValue <= 0) {
+            length.addClass("input-validation-error");
+            checkFlag = false;
+        }
+        if (startIndexValue <= 0) {
+            startIndex.addClass("input-validation-error");
+            checkFlag = false;
+        }
+    }
+
+    return checkFlag;
 }
 //--------------------------------------------------------//

@@ -193,7 +193,7 @@ namespace mar_sumaken_web.ConnectControllers
                     }
 
                     // 仕入先かんばん履歴テーブル登録
-                    string logSql = CreateSQLToInsertMSupplierKanbanHistory(model, sysDate, loginUser.UserName);
+                    string logSql = CreateSQLToInsertMSupplierKanbanHistory(model.SupplierKanbanID, "更新", sysDate, loginUser.UserName);
                     connection.Execute(logSql, null, transaction);
 
                     // トランザクションのコミット
@@ -244,6 +244,10 @@ namespace mar_sumaken_web.ConnectControllers
                     // ハンディメニュー-仕入先かんばん中間テーブル削除
                     string handyMenuDeleteSql = CreateSQLToDeleteRHandyMenuSupplierKanban(spplierKanbanId);
                     connection.Execute(handyMenuDeleteSql, null, transaction);
+
+                    // 仕入先かんばん履歴テーブル登録
+                    string logSql = CreateSQLToInsertMSupplierKanbanHistory(spplierKanbanId, "削除", sysDate, loginUser.UserName);
+                    connection.Execute(logSql, null, transaction);
 
                     // トランザクションのコミット
                     transaction.Commit();
@@ -383,49 +387,49 @@ namespace mar_sumaken_web.ConnectControllers
             return sql;
         }
 
-        /// <summary>
-        /// QRコードから仕入先かんばんマスター情報取得SQL作成
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns>SQL文</returns>
-        private static string CreateSQLToSelectMSupplierKanbansForQRCode(M_SupplierKanbanModel model)
-        {
-            var sql = $@"
-                SELECT 
-                    SupplierKanbanID
-                    ,SupplierKanbanName
-                    ,CASE 
-                        WHEN AllowedDuplicatesFlag = 0 THEN '0(なし)'
-                        WHEN AllowedDuplicatesFlag = 1 THEN '1(あり)'
-                        ELSE''
-                        END AS AllowedDuplicatesFlag
-                    ,IdentifyString
-                    ,IdentifyStringStartIndex
-                    ,ProductNumberStartIndex
-                    ,ProductNumberLength
-                    ,QuantityLength
-                    ,QuantityStartIndex
-                    ,LotLength
-                    ,LotStartIndex
-                    ,MainProductKeyLength
-                    ,MainProductKeyStartIndex
-                    ,FirstSubProductKeyLength
-                    ,FirstSubProductKeyStartIndex
-                    ,SecondSubProductKeyLength
-                    ,SecondSubProductKeyStartIndex
-                    ,ProductBranchNumberLength
-                    ,ProductBranchNumberStartIndex
-                    ,OrderNumberLength
-                    ,OrderNumberStartIndex
-                FROM 
-                    M_SupplierKanban AS supplierKanban
-                WHERE 
-                    supplierKanban.IsDeleted = 0
-                    AND IdentifyString = '{model.IdentifyString}'
-                    AND company.IsDeleted = 0
-            ";
-            return sql;
-        }
+        ///// <summary>
+        ///// QRコードから仕入先かんばんマスター情報取得SQL作成
+        ///// </summary>
+        ///// <param name="model"></param>
+        ///// <returns>SQL文</returns>
+        //private static string CreateSQLToSelectMSupplierKanbansForQRCode(M_SupplierKanbanModel model)
+        //{
+        //    var sql = $@"
+        //        SELECT 
+        //            SupplierKanbanID
+        //            ,SupplierKanbanName
+        //            ,CASE 
+        //                WHEN AllowedDuplicatesFlag = 0 THEN '0(なし)'
+        //                WHEN AllowedDuplicatesFlag = 1 THEN '1(あり)'
+        //                ELSE''
+        //                END AS AllowedDuplicatesFlag
+        //            ,IdentifyString
+        //            ,IdentifyStringStartIndex
+        //            ,ProductNumberStartIndex
+        //            ,ProductNumberLength
+        //            ,QuantityLength
+        //            ,QuantityStartIndex
+        //            ,LotLength
+        //            ,LotStartIndex
+        //            ,MainProductKeyLength
+        //            ,MainProductKeyStartIndex
+        //            ,FirstSubProductKeyLength
+        //            ,FirstSubProductKeyStartIndex
+        //            ,SecondSubProductKeyLength
+        //            ,SecondSubProductKeyStartIndex
+        //            ,ProductBranchNumberLength
+        //            ,ProductBranchNumberStartIndex
+        //            ,OrderNumberLength
+        //            ,OrderNumberStartIndex
+        //        FROM 
+        //            M_SupplierKanban AS supplierKanban
+        //        WHERE 
+        //            supplierKanban.IsDeleted = 0
+        //            AND IdentifyString = '{model.IdentifyString}'
+        //            AND company.IsDeleted = 0
+        //    ";
+        //    return sql;
+        //}
 
         /// <summary>
         /// 仕入先かんばんマスター登録SQL作成
@@ -590,7 +594,7 @@ namespace mar_sumaken_web.ConnectControllers
                     UpdatedBy = '{updatedBy}'
                 WHERE 
                     SupplierKanbanID = {spplierKanbanId}
-            ;";
+            ";
             return sql;
         }
 
@@ -612,11 +616,12 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 仕入先かんばん履歴テーブル登録SQL作成
         /// </summary>
-        /// <param name="model">登録情報</param>
+        /// <param name="supplierKanbanId">仕入先かんばんID</param>
+        /// <param name="historyStatus">履歴状態</param>
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToInsertMSupplierKanbanHistory(M_SupplierKanbanModel model, DateTime updatedAt, string updatedBy)
+        private static string CreateSQLToInsertMSupplierKanbanHistory(int supplierKanbanId, string historyStatus, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                 INSERT INTO D_SupplierKanbanHistory
@@ -626,16 +631,39 @@ namespace mar_sumaken_web.ConnectControllers
                      MainProductKeyStartIndex, FirstSubProductKeyLength, FirstSubProductKeyStartIndex, SecondSubProductKeyLength, 
                      SecondSubProductKeyStartIndex, ProductBranchNumberLength, ProductBranchNumberStartIndex, OrderNumberLength, 
                      OrderNumberStartIndex, UpdatedAt, UpdatedBy)
-                VALUES (
-                    '更新', '{model.DepoName}', '{model.SupplierName}', '{model.SupplierKanbanName}', 
-                    '{model.AllowedDuplicatesFlag}', '{model.IdentifyString}', {model.IdentifyStringStartIndex}, 
-                    {model.ProductNumberStartIndex}, {model.ProductNumberLength}, {model.QuantityLength}, 
-                    {model.QuantityStartIndex}, {model.LotLength}, {model.LotStartIndex}, {model.MainProductKeyLength}, 
-                    {model.MainProductKeyStartIndex}, {model.FirstSubProductKeyLength}, {model.FirstSubProductKeyStartIndex}, 
-                    {model.SecondSubProductKeyLength}, {model.SecondSubProductKeyStartIndex}, {model.ProductBranchNumberLength}, 
-                    {model.ProductBranchNumberStartIndex}, {model.OrderNumberLength}, {model.OrderNumberStartIndex}, 
-                    '{updatedAt}', '{updatedBy}'
-                );
+                SELECT 
+                    '{historyStatus}', 
+                    depo.DepoName,
+                    supplier.CompanyName AS SupplierName,
+                    supplierKanban.SupplierKanbanName,
+                    supplierKanban.AllowedDuplicatesFlag,
+                    supplierKanban.IdentifyString,
+                    supplierKanban.IdentifyStringStartIndex,
+                    supplierKanban.ProductNumberStartIndex,
+                    supplierKanban.ProductNumberLength,
+                    supplierKanban.QuantityLength,
+                    supplierKanban.QuantityStartIndex,
+                    supplierKanban.LotLength,
+                    supplierKanban.LotStartIndex,
+                    supplierKanban.MainProductKeyLength,
+                    supplierKanban.MainProductKeyStartIndex,
+                    supplierKanban.FirstSubProductKeyLength,
+                    supplierKanban.FirstSubProductKeyStartIndex,
+                    supplierKanban.SecondSubProductKeyLength,
+                    supplierKanban.SecondSubProductKeyStartIndex,
+                    supplierKanban.ProductBranchNumberLength,
+                    supplierKanban.ProductBranchNumberStartIndex,
+                    supplierKanban.OrderNumberLength,
+                    supplierKanban.OrderNumberStartIndex,
+                    '{updatedAt}',
+                    '{updatedBy}'
+                FROM M_SupplierKanban AS supplierKanban
+                LEFT JOIN 
+                    M_Depo AS depo ON supplierKanban.DepoID = depo.DepoID
+                INNER JOIN 
+                    M_Company AS supplier ON supplierKanban.CompanyID = supplier.CompanyID
+                WHERE 
+                    supplierKanban.SupplierKanbanID = {supplierKanbanId}
             ";
             return sql;
         }
