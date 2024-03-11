@@ -96,6 +96,48 @@
         <input type="hidden" id="viewTitle" value="@Model.ViewTitle" />
     </div>
 </div>
+
+<!--  Detail Modal-->
+<div class="modal fade" id="detail-by-link-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-by-link-modal-label">品番別ロット番号一覧</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-10">
+                    <p id="detail-by-link-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <div class="">
+                    <div class="col-12">
+                        <p><label>年月日 : <span id="detailDeliveryDate"></span></label></p>
+                        <p><label>仕入先品番 : <span id="detailSupplierProductNumber"></span></label></p>
+                    </div>
+                    <div class="col-12" id="detail-div-table">
+                        <table class="table table-sm stripe hover nowrap" id="detail-table-datatable">
+                            <thead>
+                                <tr>
+                                    <th class="text-nowrap">ロット番号</th>
+                                    <th class="text-nowrap">入庫箱数</th>
+                                    <th class="text-nowrap">入庫数</th>
+                                    <th class="text-nowrap">出庫箱数</th>
+                                    <th class="text-nowrap">出庫数</th>
+                                    <th class="text-nowrap">在庫数</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // 検索ボタン押下
     $('#search-btn').click(function () {
@@ -150,7 +192,7 @@
         var searchDate = row.getElementsByClassName("SearchDate")[0].value;
         var depoId = row.getElementsByClassName("DepoID")[0].value;
         var companyId = row.getElementsByClassName("SupplierID")[0].value;
-        var supplierProductNumber = row.getElementsByClassName("SupplierProductNumber")[0].textContent;
+        var supplierProductNumber = row.getElementsByClassName("SupplierProductNumber")[0].value;
 
         var url = window.location.origin + '@Url.Action("Detail", "StockStatus")';
         url += '?searchDate=' + searchDate;
@@ -159,6 +201,48 @@
         url += '&supplierProductNumber=' + supplierProductNumber;
         
         window.location.href = url;
+    }
+
+    // 検索ボタン押下
+    function OnLinkDetailClick(trTag) {
+
+        var row = trTag.parentNode.parentNode;
+        var searchDate = row.getElementsByClassName("SearchDate")[0].value;
+        var depoId = row.getElementsByClassName("DepoID")[0].value;
+        var companyId = row.getElementsByClassName("SupplierID")[0].value;
+        var supplierProductNumber = row.getElementsByClassName("SupplierProductNumber")[0].value;
+
+        $("#detailDeliveryDate").text(searchDate);
+        $("#detailSupplierProductNumber").text(supplierProductNumber);
+
+        var data = {
+            searchDate: searchDate,
+            depoId: depoId,
+            companyId: companyId,
+            supplierProductNumber: supplierProductNumber
+        };
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetLotNumberDetail", "StockStatus")';
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: data
+        }).done(function (response) {
+            $("#detail-table-datatable tbody").empty();
+            $('#detail-table-datatable').DataTable().destroy();
+            $("#detail-div-table").show();
+            $("#detail-table-datatable tbody").html(response);
+        }).fail(function (xhr, textStatus, errorThrown) {
+            if (xhr.status === 404) {
+                var errorMessage = xhr.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage500);
+            }
+        });
     }
 
     // 出力ボタン押下

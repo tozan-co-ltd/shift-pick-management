@@ -72,6 +72,17 @@ namespace mar_sumaken_web.Controllers
 
                     foreach (var item in model.StockStatusList)
                     {
+                        // ロット番号チェック
+                        string supplierProductNumberTag = $@"<td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>";
+                        if (item.StoreInQuantity > 0 || item.StoreOutQuantity > 0)
+                        {
+                            supplierProductNumberTag = $@"<td>
+                                <a href='#' onclick='OnLinkDetailClick(this)' data-toggle='modal' data-target='#detail-by-link-modal'>
+                                {item.SupplierProductNumber}
+                                </a>
+                            </td>";
+                        }
+
                         // 在庫数=月初在庫数+当月入庫数総計-当月出庫数総計
                         item.StockRemainQuantity = @item.StockQuantityAtBeginningMonth + (item.StoreInQuantity - item.StoreOutQuantity);
                         searchData += $@"<tr>
@@ -82,7 +93,7 @@ namespace mar_sumaken_web.Controllers
                             </a>
                         </td>
                         <td class='SupplierName'>{@item.SupplierName}</td>
-                        <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
+                        {supplierProductNumberTag}
                         <td class='LotQuantity'>{@item.LotQuantity}</td>
                         <td class='StockQuantityAtBeginningMonth'>{@item.StockQuantityAtBeginningMonth}</td>
                         <td class='StoreInNumberOfBoxes'>{@item.StoreInNumberOfBoxes}</td>
@@ -94,6 +105,7 @@ namespace mar_sumaken_web.Controllers
                         <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
                         <input type='hidden' class='DepoID' value='{item.DepoID}' />
                         <input type='hidden' class='SearchDate' value='{searchModel.DateSearchStart}' />
+                        <input type='hidden' class='SupplierProductNumber' value='{item.SupplierProductNumber}' />
                         </tr>";
                     }
                 }
@@ -178,6 +190,80 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
+        /// 日別在庫照会画面表示
+        /// </summary>
+        /// <param name="searchDate">年月日</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="companyId">会社ID</param>
+        /// <param name="supplierProductNumber">仕入先品番</param>
+        public IActionResult GetLotNumberDetail(string searchDate, int depoId, int companyId, string supplierProductNumber)
+        {
+            StockStatusModel model = new();
+            List<StockStatusModel> detailList = new();
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 仕入先品番で品番取得
+                var product = M_ProductConnectController.GetProductBySupplierProductNumber(supplierProductNumber, user.DatabaseName);
+                if (product == null)
+                {
+                    throw new Exception();
+                }
+                model.LotQuantity = product.LotQuantity;
+
+                // 日別在庫照会画面表示
+                List<StockStatusModel> searchProductResult = GetLotNumberDetail(searchDate, depoId, companyId, supplierProductNumber, user.DatabaseName);
+                foreach (var item in searchProductResult)
+                {
+                    StockStatusModel newItem = new()
+                    {
+                        WorkedDate = item.WorkedDate
+                    };
+
+                    newItem.LotNumber = item.LotNumber;
+                    newItem.StoreInNumberOfBoxes = item.StoreInNumberOfBoxes;
+                    newItem.StoreInQuantity = item.StoreInNumberOfBoxes * model.LotQuantity;
+                    newItem.StoreOutNumberOfBoxes = item.StoreOutNumberOfBoxes;
+                    newItem.StoreOutQuantity = item.StoreOutNumberOfBoxes * model.LotQuantity;
+                    // その日の在庫数を計算
+                    newItem.StockRemainQuantity = newItem.StoreInQuantity - newItem.StoreOutQuantity;
+
+                    detailList.Add(newItem);
+                }
+
+                var searchData = string.Empty;
+                // 表示用のhtml作成
+                if (detailList.Count > 0)
+                {
+                    foreach (var item in detailList)
+                    {
+                        searchData += $@"<tr>
+                            <td class='SupplierName'>{@item.LotNumber}</td>
+                            <td class='SupplierName'>{@item.StoreInNumberOfBoxes}</td>
+                            <td class='SupplierName'>{@item.StoreInQuantity}</td>
+                            <td class='SupplierName'>{@item.StoreOutNumberOfBoxes}</td>
+                            <td class='SupplierName'>{@item.StoreOutQuantity}</td>
+                            <td class='SupplierName'>{@item.StockRemainQuantity}</td>
+                        </tr>";
+                    }
+                }
+
+                return Content(searchData);
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                return Content(errorMessage);
+            }
+        }
+
+        /// <summary>
         /// 仕入先品番が一致する在庫情報取得(日毎の入庫数・出庫数)
         /// </summary>
         /// <param name="searchDate">年月日</param>
@@ -186,8 +272,49 @@ namespace mar_sumaken_web.Controllers
         /// <param name="supplierProductNumber">仕入先品番</param>
         /// <param name="model">モデル</param>
         /// <param name="user">ログインユーザー</param>
-        /// <returns></returns>
         private static List<StockStatusModel> GetSearchProductResult(string searchDate, int depoId, int companyId, string supplierProductNumber, StockStatusModel model, LoginUserModel? user)
+        {
+            // 在庫情報取得
+            GetTotalProductResult(searchDate, depoId, companyId, supplierProductNumber, model, user);
+
+            // 仕入先品番が一致する在庫情報取得(日毎の入庫数・出庫数)
+            var productSearchSql = StockStatusConnectController.CreateSQLToGetStockStatusByProductNumber(
+                searchDate, depoId, companyId, supplierProductNumber);
+            List<StockStatusModel> searchProductResult = StockStatusConnectController.ConnectStockStatus(productSearchSql, user.DatabaseName);
+            return searchProductResult;
+        }
+
+        /// <summary>
+        /// 品番別ロット番号一覧取得
+        /// </summary>
+        /// <param name="searchDate">年月日</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="companyId">会社ID</param>
+        /// <param name="supplierProductNumber">仕入先品番</param>
+        /// <param name="model">モデル</param>
+        /// <param name="databaseName">データベース名</param>
+        private static List<StockStatusModel> GetLotNumberDetail(string searchDate, int depoId, int companyId, string supplierProductNumber, string databaseName)
+        {
+            // 在庫情報取得
+            //GetTotalProductResult(searchDate, depoId, companyId, supplierProductNumber, model, user);
+
+            // 品番別ロット番号一覧取得
+            var productSearchSql = StockStatusConnectController.CreateSQLToGetLotNumberDetailByProductNumber(
+                searchDate, depoId, companyId, supplierProductNumber);
+            List<StockStatusModel> searchProductResult = StockStatusConnectController.ConnectStockStatus(productSearchSql, databaseName);
+            return searchProductResult;
+        }
+
+        /// <summary>
+        /// 在庫情報取得
+        /// </summary>
+        /// <param name="searchDate">年月日</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="companyId">会社ID</param>
+        /// <param name="supplierProductNumber">仕入先品番</param>
+        /// <param name="model">モデル</param>
+        /// <param name="user">ログインユーザー</param>
+        private static void GetTotalProductResult(string searchDate, int depoId, int companyId, string supplierProductNumber, StockStatusModel model, LoginUserModel? user)
         {
             // 倉庫IDから倉庫情報を取得
             var searchDepoSql = M_DepoConnectController.CreateSQLToSelectByDepoId(depoId);
@@ -222,12 +349,6 @@ namespace mar_sumaken_web.Controllers
                 // 在庫数=月初在庫数+当月入庫数総計-当月出庫数総計
                 model.StockRemainQuantity = searchResult.StockQuantityAtBeginningMonth + (searchResult.StoreInQuantity - searchResult.StoreOutQuantity);
             }
-
-            // 仕入先品番が一致する在庫情報取得(日毎の入庫数・出庫数)
-            var productSearchSql = StockStatusConnectController.CreateSQLToGetStockStatusByProductNumber(
-                searchDate, depoId, companyId, supplierProductNumber);
-            List<StockStatusModel> searchProductResult = StockStatusConnectController.ConnectStockStatus(productSearchSql, user.DatabaseName);
-            return searchProductResult;
         }
 
         /// <summary>
@@ -266,7 +387,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes")] = item.StoreOutNumberOfBoxes.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutQuantity")] = item.StoreOutQuantity.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StockRemainQuantity")] = stockRemainQuantity.ToString();
-                        
+
                         searchResult.Rows.Add(newRow);
                     }
                 }
@@ -358,9 +479,7 @@ namespace mar_sumaken_web.Controllers
                     {
                         var stockRemainQuantity = item.StockQuantityAtBeginningMonth + (item.StoreInQuantity - item.StoreOutQuantity);
                         DataRow newRow = searchResult.NewRow();
-                        newRow[Utils.GetDisplayName<StockStatusModel>("SupplierProductNumber")] = searchModel.SupplierProductNumber;
-                        newRow[Utils.GetDisplayName<StockStatusModel>("LotQuantity")] = item.LotQuantity.ToString();
-                        newRow[Utils.GetDisplayName<StockStatusModel>("StockQuantityAtBeginningMonth")] = item.StockQuantityAtBeginningMonth.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("WorkedDate")] = item.WorkedDate;
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreInNumberOfBoxes")] = item.StoreInNumberOfBoxes.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreInQuantity")] = item.StoreInQuantity.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes")] = item.StoreOutNumberOfBoxes.ToString();
@@ -424,9 +543,7 @@ namespace mar_sumaken_web.Controllers
         {
             var table = new DataTable();
 
-            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("SupplierProductNumber"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("LotQuantity"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StockQuantityAtBeginningMonth"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("WorkedDate"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreInNumberOfBoxes"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreInQuantity"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes"), typeof(string));

@@ -93,6 +93,12 @@ namespace mar_sumaken_web.Models
         public string? SupplierProductNumber { get; set; }
 
         /// <summary>
+        /// ロット番号
+        /// </summary>
+        [Display(Name = "ロット番号")]
+        public string? LotNumber { get; set; }
+
+        /// <summary>
         /// 輸出入日
         /// </summary>
         [Display(Name = "日付")]
