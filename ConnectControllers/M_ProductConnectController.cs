@@ -690,18 +690,18 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番マスター登録SQL作成
         /// </summary>
-        /// <param name="product">登録情報</param>
+        /// <param name="model">登録情報</param>
         /// <param name="createdAt">システムタイム</param>
         /// <param name="createdBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToInsertMProduct(M_ProductModel product, DateTime createdAt, string createdBy)
+        private static string CreateSQLToInsertMProduct(M_ProductModel model, DateTime createdAt, string createdBy)
         {
             var sql = $@"
                 INSERT INTO M_Product
                     (SupplierID, SupplierProductNumber, DeliveryID, DeliveryProductNumber, ProductName, LotQuantity, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
                 OUTPUT INSERTED.ProductID
                 VALUES (
-                    {product.SupplierID}, '{product.SupplierProductNumber}', {product.DeliveryID}, '{product.DeliveryProductNumber}', '{product.ProductName}', {product.LotQuantity}, '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}'
+                    {model.SupplierID}, '{model.SupplierProductNumber}', {model.DeliveryID}, '{model.DeliveryProductNumber}', '{model.ProductName}', {model.LotQuantity}, '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}'
                 )
 ;
             ";
@@ -711,25 +711,25 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番マスター更新SQL作成
         /// </summary>
-        /// <param name="product">登録情報</param>
+        /// <param name="model">登録情報</param>
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToUpdateMProduct(M_ProductModel product, DateTime updatedAt, string updatedBy)
+        private static string CreateSQLToUpdateMProduct(M_ProductModel model, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                 UPDATE M_Product
                 SET 
-                    SupplierID = {product.SupplierID},
-                    SupplierProductNumber = '{product.SupplierProductNumber}',
-                    DeliveryID = {product.DeliveryID},
-                    DeliveryProductNumber = '{product.DeliveryProductNumber}',
-                    ProductName = '{product.ProductName}',
-                    LotQuantity = {product.LotQuantity},
+                    SupplierID = {model.SupplierID},
+                    SupplierProductNumber = '{model.SupplierProductNumber}',
+                    DeliveryID = {model.DeliveryID},
+                    DeliveryProductNumber = '{model.DeliveryProductNumber}',
+                    ProductName = '{model.ProductName}',
+                    LotQuantity = {model.LotQuantity},
                     UpdatedAt = '{updatedAt}',
                     UpdatedBy = '{updatedBy}'
                 WHERE
-                    ProductID = {product.ProductID}
+                    ProductID = {model.ProductID}
             ;";
             return sql;
         }
