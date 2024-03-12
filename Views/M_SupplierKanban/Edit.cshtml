@@ -101,10 +101,10 @@
                                 <div class="col-12 col-sm-7 column-2nd">
                                     @for (var i = 0; i < Model.HandyMenuSelectList.Count; i++)
                                     {
-                                        <div class="form-check">
+                                        <div class="form-check checkboxHandyMenu">
                                             <input type="hidden" asp-for="HandyMenuSelectList[i].Value" value="@Model.HandyMenuSelectList[i].Value" />
                                             <input type="hidden" asp-for="HandyMenuSelectList[i].Text" value="@Model.HandyMenuSelectList[i].Text" />
-                                            <input class="form-check-input" asp-for="HandyMenuSelectList[i].Selected" type="checkbox">
+                                            <input class="form-check-input HandyMenuNames" asp-for="HandyMenuSelectList[i].Selected" type="checkbox">
                                             <label class="form-check-label" asp-for="HandyMenuSelectList[i].Selected">@Model.HandyMenuSelectList[i].Text</label>
                                         </div>
                                     }
@@ -239,7 +239,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <button class="btn btn-success btn-icon-split" id="register-btn" style="min-width: 80px" onclick="OnEdit()">
+                    <button class="btn btn-success btn-icon-split" id="edit-btn" style="min-width: 80px">
                         <span class="text">更新</span>
                     </button>
                 </form>
@@ -249,20 +249,22 @@
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function () {
-        // 重複許容フラグ0の場合はメインキー必須
-        $('input[type="radio"]').change(function () {
-            var groupName = $(this).attr('name');
-            var radioValue = $(this).val();
 
-            if (groupName === 'AllowedDuplicatesFlag') {
-                if (radioValue === '0') {
-                    $('#MainProductKeyLength').prop('required', true);
-                } else {
-                    $('#MainProductKeyLength').prop('required', false);
-                }
+    // 重複許容フラグ0の場合はメインキー必須
+    $('input[type="radio"]').change(function () {
+        var groupName = $(this).attr('name');
+        var radioValue = $(this).val();
+        var allowedDuplicatesFlag = false;
+
+        if (groupName === 'AllowedDuplicatesFlag') {
+            if (radioValue === '0') {
+                $('#MainProductKeyLength').prop('required', true);
+            } else {
+                // 重複許容
+                allowedDuplicatesFlag = true;
+                $('#MainProductKeyLength').prop('required', false);
             }
-        });
+        }
     });
 
     // 倉庫名反映
@@ -272,51 +274,91 @@
         document.getElementById(itemId).value = selectedDepoText;
     }
 
-    // 登録ボタン押下
-    function OnEdit() {
-        $('#mSupplierKanbanForm').submit(function (event) {
-            $("#div-error-message").text("");
+    // 更新ボタン押下
+    $("#edit-btn").on("click", function () {
+        $("#div-error-message").text("");
 
-            // ページの更新を禁止する
-            event.preventDefault();
+        // ページの更新を禁止する
+        event.preventDefault();
 
-            // 送信イベントが他のハンドラーに伝播するのを防ぐ
-            event.stopImmediatePropagation();
+        // 送信イベントが他のハンドラーに伝播するのを防ぐ
+        event.stopImmediatePropagation();
+
+        // 入力値チェック
+        let isCheckInput = checkInput();
+        if (isCheckInput == false) return false;
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("Edit", "M_SupplierKanban")';
+        let method = 'POST';
+        let formId = 'mSupplierKanbanForm';
+        let data = $('#' + formId).serializeArray();
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            $('#' + formId)[0].reset();
+            // 完了モーダル表示
+            AlertMessage('', '完了', '登録が完了しました。', null, null);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                // データが見つからなかった場合
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                // その他のエラーの場合
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
+            }
+        });
+
+        // 入力値チェック
+        function checkInput() {
+            let result = false;
+            let isCheck = true;
+
+            // 重複許容フラグ
+            var selectedAllowedDuplicatesFlagValue = $('input[name="AllowedDuplicatesFlag"]:checked').val();
+            var requiredCheck = false;
+            if (selectedAllowedDuplicatesFlagValue == '0') {
+                requiredCheck = true;
+            }
+
+            // 使用ハンディメニューチェック
+            $(".checkboxHandyMenu").children("input:checked").each(function () {
+                let checkboxLabel = $(this).next('label').text();
+                
+                if (requiredCheck) {
+                    // 重複許容フラグ=0の場合「まとめ入庫」は選択不可
+                    if (checkboxLabel == "まとめ入庫") {
+                        $("#div-error-message").text("E1025: 重複許容フラグが0の場合、「まとめ入庫」は選択できません。");
+                        isCheck = false;
+                        return result;
+                    }
+                } else {
+                    // 重複許容フラグ=1の場合「入庫」は選択不可
+                    if (checkboxLabel == "入庫") {
+                        $("#div-error-message").text("E1026: 重複許容フラグが1の場合、「入庫」は選択できません。");
+                        isCheck = false;
+                        return result;
+                    }
+                }
+            });
 
             // バリデーションチェック
             var checkFlg = CheckValidationMSupplierKanban();
             if (!checkFlg) {
                 $("#div-error-message").text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
-                return false;
+                isCheck = false;
+                return result;
             }
 
-            // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("Edit", "M_SupplierKanban")';
-            let method = 'POST';
-            let formId = 'mSupplierKanbanForm';
-            let data = $('#' + formId).serializeArray();
-
-            // Ajax call
-            $.ajax({
-                url: url,
-                method: method,
-                data: data
-            }).done(function (response) {
-                $('#' + formId)[0].reset();
-                // 完了モーダル表示
-                AlertMessage('', '完了', '登録が完了しました。', null, null);
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 404) {
-                    // データが見つからなかった場合
-                    var errorMessage = jqXHR.responseJSON.errorMessage;
-                    $("#div-error-message").text(errorMessage);
-                } else {
-                    // その他のエラーの場合
-                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#div-error-message").text(errorMessage);
-                }
-            });
-        });
-    }
+            if (isCheck) result = true;
+            return result;
+        }
+    });
 </script>
 
