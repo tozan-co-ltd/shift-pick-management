@@ -94,6 +94,19 @@ namespace mar_sumaken_web.Commons
             {
                 List<string> errorItem = new();
 
+                // 列名取得
+                string memberName = validationResult.MemberNames.FirstOrDefault();
+                string checkitemName = GetDisplayName<T>(memberName);
+                // ID場合はスキップ
+                if (checkitemName.Equals("ID"))
+                {
+                    errorItem.Add(string.Empty);
+                }
+                else
+                {
+                    errorItem.Add(checkitemName);
+                }
+
                 // エラーメッセージ取得
                 string errorMessage = validationResult.ErrorMessage;
                 errorItem.Add(errorMessage);
