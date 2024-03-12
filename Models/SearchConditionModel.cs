@@ -46,6 +46,11 @@
         public List<int>? BinList { get; set; }
 
         /// <summary>
+        /// 実績数不一致のみ
+        /// </summary>
+        public bool DiffenceCountCheck { get; set; }
+
+        /// <summary>
         /// 仕入先品番
         /// </summary>
         public string SupplierProductNumber { get; set; }

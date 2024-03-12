@@ -385,7 +385,7 @@ namespace mar_sumaken_web.Controllers
                 }
                 else
                 {
-                    model.NumberOfBoxes = quantity / lotQuantity;
+                    model.NumberOfBoxes = (int)Math.Ceiling((double)quantity / lotQuantity);
                 }
             }
 

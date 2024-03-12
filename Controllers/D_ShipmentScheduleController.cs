@@ -1,13 +1,11 @@
 ﻿using mar_sumaken_web.Commons;
-using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.Design;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 using System.Data.SqlClient;
-using System.Reflection;
-using System.Transactions;
 using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
@@ -65,7 +63,19 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
+                // 便
+                string binCondition = string.Empty;
+                if (searchModel.BinList != null && searchModel.BinList.Count > 0)
+                {
+                    List<SelectListItem> selectedItems = searchModel.BinList.Where(item => item.Selected).ToList();
+                    searchModel.BinListInt = selectedItems.Select(item => Convert.ToInt32(item.Value)).ToList();
+                }
+
                 // 入力規則チェック
+                ModelState.Remove("BinList[0].Selected");
+                ModelState.Remove("BinList[1].Selected");
+                ModelState.Remove("BinList[2].Selected");
+                ModelState.Remove("BinList[3].Selected");
                 if (!ModelState.IsValid)
                 {
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
@@ -228,6 +238,8 @@ namespace mar_sumaken_web.Controllers
                     SelectedCompanyID = searchModel.CompanyID,
                     SearchStartDate = searchModel.SearchStartDate,
                     SearchEndDate = searchModel.SearchEndDate,
+                    DiffenceCountCheck = searchModel.DiffenceCountCheck,
+                    BinListInt = searchModel.BinList,
                 };
                 var sql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedules(model);
                 List<D_ShipmentScheduleModel> searchList = D_ShipmentScheduleConnectController.ConnectDShipmentSchedules(sql, user.DatabaseName);
