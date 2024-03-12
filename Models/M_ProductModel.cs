@@ -66,6 +66,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "仕入先品番")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string SupplierProductNumber { get; set; }
 
         /// <summary>
@@ -86,6 +87,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "納入先品番")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DeliveryProductNumber { get; set; }
 
         /// <summary>
@@ -93,6 +95,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "品名")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [MaxLength(100, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? ProductName { get; set; }
 
         /// <summary>

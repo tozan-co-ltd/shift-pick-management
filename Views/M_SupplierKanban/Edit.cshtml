@@ -142,12 +142,12 @@
                                     品番<span style="color:red">*</span>
                                 </td>
                                 <td>
-                                    <input class="form-control" type="number" asp-for="ProductNumberStartIndex" value="@Model.ProductNumberStartIndex" required>
-                                    <span class="text-danger w-100" asp-validation-for="ProductNumberStartIndex"></span>
-                                </td>
-                                <td>
                                     <input class="form-control" type="number" asp-for="ProductNumberLength" value="@Model.ProductNumberLength" required>
                                     <span class="text-danger w-100" asp-validation-for="ProductNumberLength"></span>
+                                </td>
+                                <td>
+                                    <input class="form-control" type="number" asp-for="ProductNumberStartIndex" value="@Model.ProductNumberStartIndex" required>
+                                    <span class="text-danger w-100" asp-validation-for="ProductNumberStartIndex"></span>
                                 </td>
                                 <td></td>
                             </tr>
@@ -181,9 +181,11 @@
                                 </td>
                                 <td>
                                     <input type="number" class="form-control" asp-for="MainProductKeyLength" value="@Model.MainProductKeyLength" />
+                                    <span class="text-danger w-100 MainProductKey" asp-validation-for="MainProductKeyLength"></span>
                                 </td>
                                 <td>
                                     <input type="number" class="form-control" asp-for="MainProductKeyStartIndex" value="@Model.MainProductKeyStartIndex" />
+                                    <span class="text-danger w-100 MainProductKey" asp-validation-for="MainProductKeyStartIndex"></span>
                                 </td>
                                 <td></td>
                             </tr>
@@ -235,38 +237,6 @@
                                 </td>
                                 <td></td>
                             </tr>
-                            @* @{
-                            var i = 0;
-                            foreach (var item in Model.RegisterList)
-                            {
-                            {
-                            <tr>
-                            <td>
-                            <input type="text" class="form-control" id="RegisterList[@i].SupplierProductNumber" value="@item.SupplierProductNumber" name="RegisterList[@i].SupplierProductNumber" />
-                            </td>
-                            <td>
-                            <input type="text" class="form-control" value="@item.LotNumber" name="RegisterList[@i].LotNumber" />
-                            </td>
-                            <td>
-                            <input type="number" class="form-control" value="@item.Quantity" name="RegisterList[@i].Quantity" />
-                            </td>
-                            <td>
-                            <input type="text" class="form-control" value="@item.MainProductKey" name="RegisterList[@i].MainProductKey" />
-                            </td>
-                            <td>
-                            <input type="text" class="form-control" value="@item.FirstSubProductKey" name="RegisterList[@i].FirstSubProductKey" />
-                            </td>
-                            <td>
-                            <input type="text" class="form-control" value="@item.SecondSubProductKey" name="RegisterList[@i].SecondSubProductKey" />
-                            </td>
-                            <td>
-                            <input type="text" class="form-control" value="@item.Remarks" name="RegisterList[@i].Remarks" />
-                            </td>
-                            </tr>
-                            }
-                            ++i;
-                            }
-                            } *@
                         </tbody>
                     </table>
                     <button class="btn btn-success btn-icon-split" id="register-btn" style="min-width: 80px" onclick="OnEdit()">
@@ -280,12 +250,12 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+        // 重複許容フラグ0の場合はメインキー必須
         $('input[type="radio"]').change(function () {
             var groupName = $(this).attr('name');
             var radioValue = $(this).val();
 
             if (groupName === 'AllowedDuplicatesFlag') {
-                console.log('Group 1 Radio Selected: ' + radioValue);
                 if (radioValue === '0') {
                     $('#MainProductKeyLength').prop('required', true);
                 } else {
@@ -295,7 +265,7 @@
         });
     });
 
-    //デポー名を変更
+    // 倉庫名反映
     function UpdateSelectedValue(select, itemId) {
         var selectedIndex = select.selectedIndex;
         var selectedDepoText = select.options[selectedIndex].text;
@@ -313,9 +283,12 @@
             // 送信イベントが他のハンドラーに伝播するのを防ぐ
             event.stopImmediatePropagation();
 
-            // Validation
-            var checkFlg = Validate();
-            if (!checkFlg) return false;
+            // バリデーションチェック
+            var checkFlg = CheckValidationMSupplierKanban();
+            if (!checkFlg) {
+                $("#div-error-message").text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
+                return false;
+            }
 
             // フォーム情報取得
             let url = window.location.origin + '@Url.Action("Edit", "M_SupplierKanban")';
@@ -345,69 +318,5 @@
             });
         });
     }
-
-    function Validate() {
-
-        // 識別文字
-        var IdentifyString = $("IdentifyStringStartIndex");
-        if (parseInt(IdentifyString.val(), 10) <= 0) {
-            IdentifyString.addClass("input-validation-error");
-            return false;
-        }
-
-        // 重複許容フラグ
-        var selectedValue = $('input[name="AllowedDuplicatesFlag"]:checked').val();
-        var requiredCheck = false;
-        if (selectedValue == '0') {
-            requiredCheck = true;
-        }
-
-        var checkProductNumber = CheckPairValue("ProductNumberLength", "ProductNumberStartIndex", true);
-        var checkQuantity = CheckPairValue("QuantityLength", "QuantityStartIndex");
-        var checkLot = CheckPairValue("LotLength", "LotStartIndex");
-        var checkMainProductKey = CheckPairValue("MainProductKeyLength", "MainProductKeyStartIndex", requiredCheck);
-        var checkFirstSubProductKey = CheckPairValue("FirstSubProductKeyLength", "FirstSubProductKeyStartIndex");
-        var checkSecondSubProductKey = CheckPairValue("SecondSubProductKeyLength", "SecondSubProductKeyStartIndex");
-        var checkProductBranchNumber = CheckPairValue("ProductBranchNumberLength", "ProductBranchNumberStartIndex");
-        var checkOrderNumber = CheckPairValue("OrderNumberLength", "OrderNumberStartIndex");
-
-        if (!checkProductNumber || !checkQuantity || !checkLot || !checkMainProductKey || !checkFirstSubProductKey
-            || !checkSecondSubProductKey || !checkProductBranchNumber || !checkOrderNumber) {
-            return false;
-        }
-
-        return true;
-    }
-
-    function CheckPairValue(id1, id2, required = false) {
-        var checkFlg = true;
-        var item1 = $("#" + id1);
-        var item2 = $("#" + id2);
-        var value1 = parseInt(item1.val(), 10);
-        var value2 = parseInt(item2.val(), 10);
-
-        if (value1 > 0 && value2 <= 0) {
-            item2.addClass("input-validation-error");
-            checkFlg = false;
-        }
-        if (value1 <= 0 && value2 > 0) {
-            item1.addClass("input-validation-error");
-            checkFlg = false;
-        }
-
-        if (required) {
-            if (value1 <= 0) {
-                item1.addClass("input-validation-error");
-                checkFlg = false;
-            }
-            if (value2 <= 0) {
-                item2.addClass("input-validation-error");
-                checkFlg = false;
-            }
-        }
-
-        return checkFlg;
-    }
-
 </script>
 

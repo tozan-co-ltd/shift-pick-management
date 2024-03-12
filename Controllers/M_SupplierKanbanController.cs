@@ -89,6 +89,52 @@ namespace mar_sumaken_web.Controllers
             }
         }
 
+        /// <summary>
+        /// 仕入先かんばんマスター登録
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        [HttpPost]
+        public IActionResult Register(M_SupplierKanbanModel model)
+        {
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 入力規則チェック
+                if (!ModelState.IsValid)
+                {
+                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+                }
+
+                // 仕入先かんばんコード重複チェック
+                var sql = M_SupplierKanbanConnectController.CreateSQLToSelectDuplicateMSupplierKanban(model);
+                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
+                if (isExisted)
+                {
+                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_SupplierKanbanModel>("DepoName") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyString") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyStringStartIndex")) });
+                }
+
+                // 仕入先かんばんマスター登録
+                M_SupplierKanbanConnectController.InsertMSupplierKanban(model, user);
+
+                return Ok();
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+            }
+        }
+
+        /// <summary>
+        /// 仕入先かんばんマスター更新画面表示
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -150,51 +196,6 @@ namespace mar_sumaken_web.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
-            }
-        }
-
-        /// <summary>
-        /// 仕入先かんばんマスター登録
-        /// </summary>
-        /// <param name="model">登録情報</param>
-        [HttpPost]
-        public IActionResult Register(M_SupplierKanbanModel model)
-        {
-            try
-            {
-                // ログイン中ユーザー情報取得
-                var user = ClaimsLoginUserData();
-
-                // メインキーチェック
-                // 重複許容フラグ=0の場合はメインキー必須
-
-
-                // 入力規則チェック
-                if (!ModelState.IsValid)
-                {
-                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
-                }
-
-                // 仕入先かんばんコード重複チェック
-                var sql = M_SupplierKanbanConnectController.CreateSQLToSelectDuplicateMSupplierKanban(model);
-                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
-                if (isExisted)
-                {
-                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_SupplierKanbanModel>("DepoName") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyString") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyStringStartIndex")) });
-                }
-
-                // 仕入先かんばんマスター登録
-                M_SupplierKanbanConnectController.InsertMSupplierKanban(model, user);
-
-                return Ok();
-            }
-            catch (SqlException)
-            {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
-            }
-            catch (Exception)
-            {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
             }
         }
 
@@ -343,51 +344,75 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// ファイル出力
         /// </summary>
-        /// <param name="searchModel">検索モデル</param>
         /// <param name="gamenName">画面名</param>
-        public JsonResult ExportCsv(SearchConditionModel searchModel, string gamenName)
+        public JsonResult ExportFile(string gamenName)
         {
             try
             {
-                // DataTable作成
-                DataTable dataTable = CreateDataTable();
-
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 検索情報取得
-                var sql = M_SupplierKanbanConnectController.CreateSQLToSelectMSupplierKanbans();
-                List<M_SupplierKanbanModel> searchList = M_SupplierKanbanConnectController.ConnectMSupplierKanbans(sql, user.DatabaseName);
-                if (searchList.Count > 0)
-                {
-                    foreach (M_SupplierKanbanModel item in searchList)
-                    {
-                        DataRow newRow = dataTable.NewRow();
-                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("SupplierKanbanID")] = item.SupplierKanbanID.ToString();
-                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm:ss");
-                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("UpdatedBy")] = item.UpdatedBy;
+                // テーブルデータ取得
+                DataTable mSupplierKanbanDataTable = CreateDataTable();
 
-                        dataTable.Rows.Add(newRow);
+                // ユーザーマスター情報取得
+                var sql = M_SupplierKanbanConnectController.CreateSQLToSelectMSupplierKanbans();
+                List<M_SupplierKanbanModel> supplierKanbanList = M_SupplierKanbanConnectController.ConnectMSupplierKanbans(sql, user.DatabaseName);
+
+                // DataRowに格納
+                if (supplierKanbanList.Count > 0)
+                {
+                    foreach (M_SupplierKanbanModel supplierKanbanItem in supplierKanbanList)
+                    {
+                        DataRow newRow = mSupplierKanbanDataTable.NewRow();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("SupplierKanbanID")] = supplierKanbanItem.SupplierKanbanID.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("DepoName")] = supplierKanbanItem.DepoName;
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("SupplierName")] = supplierKanbanItem.SupplierName;
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("SupplierKanbanName")] = supplierKanbanItem.SupplierKanbanName;
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("AllowedDuplicatesFlag")] = supplierKanbanItem.AllowedDuplicatesFlag.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyString")] = supplierKanbanItem.IdentifyString.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyStringStartIndex")] = supplierKanbanItem.IdentifyStringStartIndex.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("ProductNumberLength")] = supplierKanbanItem.ProductNumberLength;
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("ProductNumberStartIndex")] = supplierKanbanItem.ProductNumberStartIndex.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("QuantityLength")] = supplierKanbanItem.QuantityLength.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("QuantityStartIndex")] = supplierKanbanItem.QuantityStartIndex.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("LotLength")] = supplierKanbanItem.LotLength.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("LotStartIndex")] = supplierKanbanItem.LotStartIndex.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("MainProductKeyLength")] = supplierKanbanItem.MainProductKeyLength.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("MainProductKeyStartIndex")] = supplierKanbanItem.MainProductKeyStartIndex.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("FirstSubProductKeyLength")] = supplierKanbanItem.FirstSubProductKeyLength.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("FirstSubProductKeyStartIndex")] = supplierKanbanItem.FirstSubProductKeyStartIndex.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("SecondSubProductKeyLength")] = supplierKanbanItem.SecondSubProductKeyLength.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("SecondSubProductKeyStartIndex")] = supplierKanbanItem.SecondSubProductKeyStartIndex.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("ProductBranchNumberLength")] = supplierKanbanItem.ProductBranchNumberLength.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("ProductBranchNumberStartIndex")] = supplierKanbanItem.ProductBranchNumberStartIndex.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("OrderNumberLength")] = supplierKanbanItem.OrderNumberLength.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("OrderNumberStartIndex")] = supplierKanbanItem.OrderNumberStartIndex.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("UpdatedAt")] = supplierKanbanItem.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("UpdatedBy")] = supplierKanbanItem.UpdatedBy;
+
+                        mSupplierKanbanDataTable.Rows.Add(newRow);
                     }
                 }
 
-                // ファイル名作成
-                string fileName = CreateFile.CreateFileName(searchModel, gamenName);
-
-                // CSVファイルパス作成
-                string filePath = Path.Combine(Path.GetTempPath(), fileName);
-
-                // DataTableをCSV形式の文字列に変換
-                CreateFile.ConvertDataTableToCsv(dataTable, filePath);
-
+                // ファイル名
+                var tmpFilename = CreateFile.CreateFileName(null, gamenName);
+                // CSVファイルへのパスを作成
+                string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
+                // DataTableをCSVに変換
+                CreateFile.ConvertDataTableToCsv(mSupplierKanbanDataTable, filePath);
                 // ファイル作成
-                var fileResult = System.IO.File.ReadAllBytes(filePath);
+                var file = System.IO.File.ReadAllBytes(filePath);
 
-                return Json(new { data = File(fileResult, System.Net.Mime.MediaTypeNames.Application.Octet, fileName) });
+                return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+            }
+            catch (SqlException)
+            {
+                return Json(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception ex)
             {
-                return Json(new { errorMessage = ex.Message });
+                return Json(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message });
             }
         }
 
@@ -400,6 +425,28 @@ namespace mar_sumaken_web.Controllers
             var table = new DataTable();
 
             table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("SupplierKanbanID"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("DepoName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("SupplierName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("SupplierKanbanName"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("AllowedDuplicatesFlag"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyString"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyStringStartIndex"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("ProductNumberLength"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("ProductNumberStartIndex"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("QuantityLength"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("QuantityStartIndex"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("LotLength"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("LotStartIndex"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("MainProductKeyLength"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("MainProductKeyStartIndex"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("FirstSubProductKeyLength"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("FirstSubProductKeyStartIndex"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("SecondSubProductKeyLength"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("SecondSubProductKeyStartIndex"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("ProductBranchNumberLength"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("ProductBranchNumberStartIndex"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("OrderNumberLength"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("OrderNumberStartIndex"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("UpdatedAt"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<M_SupplierKanbanModel>("UpdatedBy"), typeof(string));
 

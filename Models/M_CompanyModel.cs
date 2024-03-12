@@ -51,6 +51,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "会社名")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? CompanyName { get; set; }
 
         /// <summary>

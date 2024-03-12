@@ -55,6 +55,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "ユーザー名")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string UserName { get; set; }
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace mar_sumaken_web.Models
         /// メイン倉庫名
         /// </summary>
         [Display(Name = "メイン倉庫名")]
-        public string MainDepoName { get; set; }
+        public string? MainDepoName { get; set; }
 
         /// <summary>
         /// 選択されたメイン倉庫ID
