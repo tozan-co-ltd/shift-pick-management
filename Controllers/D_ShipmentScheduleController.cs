@@ -179,8 +179,19 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
+                // 出荷実績がある場合はエラー
+                string checkShipmentSql = D_ShipmentScheduleConnectController.CreateSQLToCheckExistDShipmentByShipmentScheduleId(id);
+                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(checkShipmentSql, user.DatabaseName);
+                if (isExisted)
+                {
+                    return NotFound(new { errorMessage = "E1027: " + ErrorMessagesResources.E1027 });
+                }
+
+                // 出庫実績がある場合はエラー
+                //.....
+
                 // 出荷指示削除
-                D_ShipmentScheduleConnectController.DeleteDShipmentSchedule(id, user);
+                //D_ShipmentScheduleConnectController.DeleteDShipmentSchedule(id, user);
 
                 return Ok();
             }
@@ -188,16 +199,10 @@ namespace mar_sumaken_web.Controllers
             {
                 return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                if (e.Message.Equals(ErrorMessagesResources.E1020))
-                {
-                    return NotFound(new { errorMessage = "E1020: " + ErrorMessagesResources.E1020 });
-                }
-                else
-                {
-                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
-                }
+                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+
             }
         }
 

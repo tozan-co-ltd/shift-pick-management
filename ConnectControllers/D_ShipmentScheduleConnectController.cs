@@ -173,36 +173,6 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 出荷実績があるかチェック
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="databaseName"></param>
-        /// <returns></returns>
-        public static bool IsExistDShipment(string sql, string databaseName)
-        {
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-
-                    // 出荷指示取込時、出荷実績がある場合はエラー
-                    int checkedCount = (int)connection.ExecuteScalar(sql);
-                    return checkedCount > 0;
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// 出荷指示削除
         /// </summary>
         /// <param name="shipmentScheduleId">出荷指示ID</param>
@@ -220,14 +190,6 @@ namespace mar_sumaken_web.Commons
                 // DB接続
                 try
                 {
-                    // 出荷実績がある場合はエラー
-                    string checkExistSql = CreateSQLToCheckExistDShipmentByShipmentScheduleId(shipmentScheduleId);
-                    int checkedCount = (int)connection.ExecuteScalar(checkExistSql);
-                    if (checkedCount > 0)
-                    {
-                        throw new Exception(ErrorMessagesResources.E1020);
-                    }
-
                     // 出荷指示削除
                     string deleteSql = CreateSQLToDeleteDShipmentSchedule(shipmentScheduleId, DateTime.Now, loginUser.UserName);
                     int affectedRows = connection.Execute(deleteSql);

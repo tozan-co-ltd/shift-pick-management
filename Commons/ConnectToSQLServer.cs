@@ -39,7 +39,7 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 重複チェック
+        /// 同じレコードが存在するかチェック
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
