@@ -354,9 +354,12 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect, isNotReload
             location.reload();
     });
 }
-//--------------------リロードまで数秒待ちます。------------------------------------//
+//--------------------------------------------------------//
+
+//------------------- 数秒待機 ------------------//
 function WaitSeconds() {
     return new Promise(resolve => {
         setTimeout(() => resolve(), 2000);
     });
 }
+//--------------------------------------------------------//
