@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
+using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.Design;
 using System.Data.SqlClient;
@@ -224,7 +225,7 @@ namespace mar_sumaken_web.Commons
                     int checkedCount = (int)connection.ExecuteScalar(checkExistSql);
                     if (checkedCount > 0)
                     {
-                        throw new Exception();
+                        throw new Exception(ErrorMessagesResources.E1020);
                     }
 
                     // 出荷指示削除

@@ -188,9 +188,16 @@ namespace mar_sumaken_web.Controllers
             {
                 return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                if (e.Message.Equals(ErrorMessagesResources.E1020))
+                {
+                    return NotFound(new { errorMessage = "E1020: " + ErrorMessagesResources.E1020 });
+                }
+                else
+                {
+                    return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                }
             }
         }
 
