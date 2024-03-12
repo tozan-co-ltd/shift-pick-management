@@ -214,7 +214,8 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 出荷の納入先品番から仕入先品番を取得
         /// </summary>
-        /// <param name="deliveryId">倉庫ID</param>
+        /// <param name="deliveryId">納入先ID</param>
+        /// <param name="depoId">倉庫ID</param>
         /// <param name="deliveryProductNumber">納入先品番</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
