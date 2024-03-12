@@ -123,7 +123,6 @@ namespace mar_sumaken_web.Controllers
             }
         }
 
-
         /// <summary>
         /// 日別在庫照会画面表示
         /// </summary>
@@ -279,9 +278,6 @@ namespace mar_sumaken_web.Controllers
         /// <param name="databaseName">データベース名</param>
         private static List<StockStatusModel> GetLotNumberDetail(string searchDate, int depoId, int companyId, string supplierProductNumber, string databaseName)
         {
-            // 在庫情報取得
-            //GetTotalProductResult(searchDate, depoId, companyId, supplierProductNumber, model, user);
-
             // 品番別ロット番号一覧取得
             var productSearchSql = StockStatusConnectController.CreateSQLToGetLotNumberDetailByProductNumber(
                 searchDate, depoId, companyId, supplierProductNumber);
@@ -401,7 +397,7 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// 詳細ファイル出力
+        /// ファイル出力(日別在庫照会)
         /// </summary>
         /// <param name="searchModel">詳細モデル</param>
         /// <param name="gamenName">画面名</param>
@@ -412,7 +408,7 @@ namespace mar_sumaken_web.Controllers
             try
             {
                 // DataTable作成
-                DataTable searchResult = CreateDetailDataTable();
+                DataTable searchResult = CreateDataTableForDetail();
 
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
@@ -520,10 +516,10 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// データテーブル作成
+        /// データテーブル作成(日別在庫照会用)
         /// </summary>
         /// <returns></returns>
-        private static DataTable CreateDetailDataTable()
+        private static DataTable CreateDataTableForDetail()
         {
             var table = new DataTable();
 
