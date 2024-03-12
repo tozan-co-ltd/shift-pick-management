@@ -210,11 +210,11 @@ namespace mar_sumaken_web.Commons
 		            searchInfo.SupplierProductNumber
 		            ,searchInfo.LotNumber
 					,FORMAT(WorkedDate, 'yyyy/MM/dd') AS WorkedDate
-		            ,searchInfo.InNumberOfBoxes AS StoreInNumberOfBoxes -- 入庫箱数
-		            ,searchInfo.OutNUmberOfBoxes AS StoreOutNumberOfBoxes -- 出庫箱数
-					,searchInfo.InQuantity AS StoreInQuantity -- 入庫数量
-		            ,searchInfo.OutQuantity AS StoreOutQuantity -- 出庫箱数
-					,(searchInfo.InQuantity - searchInfo.OutQuantity) AS StockRemainQuantity
+		            ,SUM(searchInfo.InNumberOfBoxes) AS StoreInNumberOfBoxes -- 入庫箱数
+		            ,SUM(searchInfo.OutNUmberOfBoxes) AS StoreOutNumberOfBoxes -- 出庫箱数
+					,SUM(searchInfo.InQuantity) AS StoreInQuantity -- 入庫数量
+		            ,SUM(searchInfo.OutQuantity) AS StoreOutQuantity -- 出庫箱数
+					,(SUM(searchInfo.InQuantity) - SUM(searchInfo.OutQuantity)) AS StockRemainQuantity
 	            FROM 
 	            (
 			        SELECT
@@ -241,7 +241,7 @@ namespace mar_sumaken_web.Commons
 			            AND storeOut.SupplierProductNumber = @ProductNumber
 		            GROUP BY storeOut.SupplierProductNumber, storeOut.StoreOutDate, storeOut.LotNumber
 	            ) AS searchInfo
-	            --GROUP BY searchInfo.SupplierProductNumber, WorkedDate, searchInfo.LotNumber
+	            GROUP BY searchInfo.SupplierProductNumber, WorkedDate, searchInfo.LotNumber
                 ORDER BY searchInfo.LotNumber ASC
             ";
             return sql;

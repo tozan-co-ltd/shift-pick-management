@@ -215,7 +215,7 @@ namespace mar_sumaken_web.Controllers
 
                 // 日別在庫照会画面表示
                 List<StockStatusModel> searchProductResult = GetLotNumberDetail(searchDate, depoId, companyId, supplierProductNumber, user.DatabaseName);
-                detailList = searchProductResult.Where(item => item.StockRemainQuantity > 0).ToList();
+                detailList = searchProductResult.Where(item => item.StockRemainQuantity != 0).ToList();
 
                 var searchData = string.Empty;
                 // 表示用のhtml作成
