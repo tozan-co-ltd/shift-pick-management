@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
+using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.Design;
 using System.Data.SqlClient;
@@ -172,36 +173,6 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
-        /// 出荷実績があるかチェック
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="databaseName"></param>
-        /// <returns></returns>
-        public static bool IsExistDShipment(string sql, string databaseName)
-        {
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-
-                    // 出荷指示取込時、出荷実績がある場合はエラー
-                    int checkedCount = (int)connection.ExecuteScalar(sql);
-                    return checkedCount > 0;
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// 出荷指示削除
         /// </summary>
         /// <param name="shipmentScheduleId">出荷指示ID</param>
@@ -219,14 +190,6 @@ namespace mar_sumaken_web.Commons
                 // DB接続
                 try
                 {
-                    // 出荷実績がある場合はエラー
-                    string checkExistSql = CreateSQLToCheckExistDShipmentByShipmentScheduleId(shipmentScheduleId);
-                    int checkedCount = (int)connection.ExecuteScalar(checkExistSql);
-                    if (checkedCount > 0)
-                    {
-                        throw new Exception();
-                    }
-
                     // 出荷指示削除
                     string deleteSql = CreateSQLToDeleteDShipmentSchedule(shipmentScheduleId, DateTime.Now, loginUser.UserName);
                     int affectedRows = connection.Execute(deleteSql);
@@ -438,11 +401,9 @@ namespace mar_sumaken_web.Commons
 
             // 便
             string binCondition = string.Empty;
-            if (model.BinList != null && model.BinList.Count > 0)
+            if (model.BinListInt != null && model.BinListInt.Count > 0)
             {
-                List<SelectListItem> selectedItems = model.BinList.Where(item => item.Selected).ToList();
-                List<string> selectedValues = selectedItems.Select(item => item.Value).ToList();
-                binCondition = $@" AND shipment.DeliveryTimeClass in ({string.Join(",", selectedValues)})";
+                binCondition = $@" AND shipment.DeliveryTimeClass in ({string.Join(",", model.BinListInt)})";
             }
             model.SearchEndDate = string.Concat(model.SearchEndDate, " 23:59:59");
             var sql = $@"
@@ -481,15 +442,16 @@ namespace mar_sumaken_web.Commons
 					,shipment.BranchNumber
 					,shipment.UpdatedAt
 					,shipment.UpdatedBy
-					,SUM(COALESCE(shipment.NumberOfBoxes, 0)) AS NumberOfBoxes
-					,SUM(COALESCE(shipment.Quantity, 0)) AS Quantity
+					,COALESCE(shipment.NumberOfBoxes, 0) AS NumberOfBoxes
+					,COALESCE(shipment.Quantity, 0) AS Quantity
 	                ,SUM(COALESCE(storeOut.NumberOfBoxes, 0)) AS StoreOutNumberOfBoxes -- 出庫箱数
 	                ,SUM(COALESCE(storeOut.Quantity, 0)) AS StoreOutQuantity --出庫数量
                 FROM D_ShipmentSchedule shipment
                 LEFT JOIN D_StoreOut AS storeOut 
 		                ON shipment.DepoID = storeOut.DepoID
 		                AND	shipment.DeliveryDate = storeOut.DeliveryDate
-		                AND	shipment.DeliveryProductNumber = storeOut.DeliveryProductNumber
+                        AND shipment.DeliverySlipNumber = storeOut.DeliverySlipNumber
+                        AND shipment.DeliveryProductNumber = storeOut.DeliveryProductNumber
                         AND storeOut.IsDeleted = 0
                 INNER JOIN M_Company AS company 
                         ON shipment.CompanyID = company.CompanyID
@@ -542,6 +504,8 @@ namespace mar_sumaken_web.Commons
 					,shipment.BranchNumber
 					,shipment.UpdatedAt
 					,shipment.UpdatedBy
+                    ,shipment.NumberOfBoxes
+					,shipment.Quantity
                 ORDER BY 
 	                shipment.DeliveryProductNumber ASC 
             ";

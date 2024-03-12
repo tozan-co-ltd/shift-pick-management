@@ -129,6 +129,7 @@ namespace mar_sumaken_web.Controllers
                     SelectedCompanyID = searchModel.CompanyID,
                     SearchStartDate = searchModel.SearchStartDate,
                     SearchEndDate = searchModel.SearchEndDate,
+                    DiffenceCountCheck = searchModel.DiffenceCountCheck,
                 };
                 var sql = D_ReceiveScheduleConnectController.CreateSQLToSelectDReceiveSchedules(model);
                 List<D_ReceiveScheduleModel> searchList = D_ReceiveScheduleConnectController.ConnectDReceiveSchedules(sql, user.DatabaseName);

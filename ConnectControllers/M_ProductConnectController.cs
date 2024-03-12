@@ -574,6 +574,15 @@ namespace mar_sumaken_web.ConnectControllers
                 {
                     DateTime sysDate = DateTime.Now;
 
+                    // 品番履歴テーブル登録
+                    string logSql = CreateSQLToInsertDProductHistory(productId, "削除", sysDate, loginUser.UserName);
+                    var logAddedCount = connection.Execute(logSql, null, transaction);
+                    // 更新件数が0の場合はエラーとする
+                    if (logAddedCount == 0)
+                    {
+                        throw new Exception();
+                    }
+
                     // 品番マスター削除
                     string productDeleteSql = CreateSQLToDeleteMCompany(productId, sysDate, loginUser.UserName);
                     int productDeleteCount = connection.Execute(productDeleteSql, null, transaction);
@@ -586,15 +595,6 @@ namespace mar_sumaken_web.ConnectControllers
                     // 品番-品番中間テーブル削除
                     string depoProductDeleteSql = CreateSQLToDeleteRDepoProduct(productId);
                     int depoProductDelCount = connection.Execute(depoProductDeleteSql, null, transaction);
-
-                    // 品番履歴テーブル登録
-                    string logSql = CreateSQLToInsertDProductHistory(productId, "削除", sysDate, loginUser.UserName);
-                    var logAddedCount = connection.Execute(logSql, null, transaction);
-                    // 更新件数が0の場合はエラーとする
-                    if (logAddedCount == 0)
-                    {
-                        throw new Exception();
-                    }
 
                     // トランザクションのコミット
                     transaction.Commit();

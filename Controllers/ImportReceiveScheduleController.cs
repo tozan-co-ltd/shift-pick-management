@@ -15,17 +15,12 @@ namespace mar_sumaken_web.Controllers
     /// </summary>
     public class ImportReceiveScheduleController : BaseController
     {
-        private readonly ILogger<ImportReceiveScheduleController> _logger;  
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// ヘッダー列数取得
         /// </summary>
         public readonly int Header_Column_Count = 5;
-
-        public ImportReceiveScheduleController(ILogger<ImportReceiveScheduleController> logger)
-        {
-            _logger = logger;
-        }
 
         /// <summary>
         /// 入荷予定取込画面表示
@@ -52,9 +47,9 @@ namespace mar_sumaken_web.Controllers
                     ControllerName = controllerName,
                     CompanyID = user.CompanyID
                 };
-                // SQL作成
+
+                // 入荷予定情報取得
                 var sql = D_FileImportConnectController.CreateSQLToSelectDFileImports(commonModel.GetViewTitle());
-                // DB接続
                 List<D_FileImportModel> dFileImportList = D_FileImportConnectController.ConnectDFileImports(sql, user.DatabaseName);
                 model.D_FileImportList = dFileImportList;
 
@@ -78,12 +73,10 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public async Task<IActionResult> ImportCsv(List<IFormFile> uploadFileList, int depoId, string viewTitle)
         {
+            string? errorMessage;
             string tempFilePath = string.Empty;
             try
             {
-                // log取得
-                _logger.LogInformation($"CSV取込開始");
-
                 var files = uploadFileList;
 
                 // ログイン中ユーザー情報取得
@@ -95,11 +88,17 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = "E1015: " + ErrorMessagesResources.E1015 });
                 }
 
+                // log取得
+                _logger.Info($"出荷指示取込開始 ログインユーザー名:{user.UserName}");
+
                 // モデルリスト取得
                 if (files != null && files.Count > 0)
                 {
                     foreach (var file in files)
                     {
+                        // log取得
+                        _logger.Info($"ファイル名:{file}");
+
                         List<D_ReceiveScheduleModel> importModelList = new();
                         List<string> errorMessageList = new();
                         var fileName = file.FileName;
@@ -107,7 +106,10 @@ namespace mar_sumaken_web.Controllers
                         // ファイル内にデータがない場合はエラー
                         if (file.Length == 0)
                         {
-                            return NotFound(new { errorMessage = "E1014: " + ErrorMessagesResources.E1014 });
+                            // log取得
+                            errorMessage = "E1014: " + ErrorMessagesResources.E1014;
+                            _logger.Error($"取込失敗 {errorMessage}");
+                            return NotFound(new { errorMessage });
                         }
 
                         CsvFileInputModel csvInputFile = new ()
@@ -126,6 +128,9 @@ namespace mar_sumaken_web.Controllers
                         {
                             // ファイル削除
                             CreateFile.DeleteFile(tempFilePath);
+
+                            // log取得
+                            _logger.Error($"データ読み取り失敗 {readCsvErrorMsg}");
                             return NotFound(new { errorMessage = readCsvErrorMsg });
                         }
 
@@ -211,7 +216,11 @@ namespace mar_sumaken_web.Controllers
                         {
                             // ファイル削除
                             CreateFile.DeleteFile(tempFilePath);
-                            var errorMessage = string.Join("</br>", errorMessageList);
+                            errorMessage = string.Join("</br>", errorMessageList);
+
+                            // log取得
+                            _logger.Error($"取込失敗 {errorMessage}");
+
                             return NotFound(new { errorMessage });
                         }
 
@@ -221,28 +230,49 @@ namespace mar_sumaken_web.Controllers
                         {
                             // ファイル削除
                             CreateFile.DeleteFile(tempFilePath);
-                            return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+
+                            // log取得
+                            errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                            _logger.Error($"データ書き込み失敗 {errorMessage}");
+
+                            return NotFound(new { errorMessage });
                         }
                     }
                 }
                 else
                 {
+                    // log取得
+                    errorMessage = "E1012: " + ErrorMessagesResources.E1012;
+                    _logger.Error($"ファイルなし {errorMessage}");
+
                     return NotFound(new { errorMessage = "E1012: " + ErrorMessagesResources.E1012 });
                 }
 
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
                 // ファイル削除
                 CreateFile.DeleteFile(tempFilePath);
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // ファイル削除
                 CreateFile.DeleteFile(tempFilePath);
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
@@ -277,7 +307,6 @@ namespace mar_sumaken_web.Controllers
             return model;
         }
 
-
         /// <summary>
         /// ファイル出力
         /// </summary>
@@ -285,29 +314,20 @@ namespace mar_sumaken_web.Controllers
         {
             try
             {
-                // log取得
-                _logger.LogInformation($"Excel出力開始");
-
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-
-                // 管理権限区分が1(管理者)でない場合はエラーとする
-                if (user == null || user.AuthorizedKubun != 1)
-                {
-                    // エラーコード：E2011
-                    throw new Exception();
-                }
 
                 // テーブルデータ取得
                 DataTable dataTable = CreateDataTable();
 
                 // ファイル名
                 var tmpFilename = "入荷予定.csv";
-                // CSVファイルへのパスを作成する
+
+                // CSVファイルへのパスを作成
                 string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
-                // DataTableをCSVに変換する
+                // DataTableをCSVに変換
                 CreateFile.ConvertDataTableToCsv(dataTable, filePath);
-                // ファイルの作成
+                // ファイル作成
                 var file = System.IO.File.ReadAllBytes(filePath);
 
                 return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });

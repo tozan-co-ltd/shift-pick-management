@@ -150,7 +150,7 @@
         }
 
         var donutTitle = percentage + "%";
-        if (percentage == 0) {
+        if (total == 0) {
             donutTitle = "データが\nありません";
         }
 
@@ -178,9 +178,6 @@
             },
             bindto: "#donut-chart",
         });
-
-        var ctx = document.getElementById("donut-chart").getContext("2d");
-        var myDoughnutChart = new Chart(ctx, config);
     }
 
     // 詳細ボタン押下

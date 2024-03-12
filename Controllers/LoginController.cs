@@ -16,7 +16,7 @@ namespace mar_sumaken_web.Controllers
     /// </summary>
     public class LoginController : Controller
     {
-        //private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// ログイン画面表示
@@ -60,6 +60,9 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(LoginModel model)
         {
+            string? errorMessage;
+            string? errorCause;
+
             try
             {
                 // 入力規則チェック
@@ -75,6 +78,12 @@ namespace mar_sumaken_web.Controllers
                     {
                         ViewData["IsDevelopment"] = "true";
                     }
+
+                    // log取得
+                    errorMessage = "E1002: " + ErrorMessagesResources.E1002;
+                    errorCause = "入力規則エラー";
+                    _logger.Error($"{errorMessage} {errorCause} 入力値:{model.LoginId}, {model.Password}");
+
                     return View();
                 }
 
@@ -116,24 +125,22 @@ namespace mar_sumaken_web.Controllers
                 );
 
                 // ログインフラグ=1,最終ログイン日時更新
-                // SQL作成
                 var sql = LoginConnectController.CreateSQLToUpdateMUserByLogin(loginUserModel.UserID, dateTime);
-                // DB接続
                 M_UserConnectController.ConnectMUsers(sql, loginUserModel.DatabaseName);
 
                 // log取得
-                //Logger.Info($"ログイン成功 ログインユーザー名:{mUsersModel.UserName}");
+                _logger.Info($"ログイン成功 ログインユーザー名:{loginUserModel.UserName}");
 
                 return RedirectToAction("Index", "Top");
             }
             catch (Exception ex)
             {
-                var errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message;
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message;
                 ViewData["ErrorMessage"] = errorMessage;
 
                 // log取得
-                //var exceptionMessage = ex.Message;
-                //Logger.Error($"{exceptionMessage} {errorMessage}");
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
 
                 return View();
             }
@@ -157,9 +164,8 @@ namespace mar_sumaken_web.Controllers
                     int userID = Convert.ToInt32(User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value);
                     string databaseName = User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
 
-                    // SQL作成
+                    // ユーザーマスター更新
                     var sql = LoginConnectController.CreateSQLToUpdateMUserByLogout(userID);
-                    // DB接続
                     M_UserConnectController.ConnectMUsers(sql, databaseName);
                 }
 
