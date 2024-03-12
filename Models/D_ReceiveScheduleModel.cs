@@ -118,7 +118,6 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "ロット番号")]
         [MaxLength(50, ErrorMessageResourceName = "E1008", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? LotNumber { get; set; }
 
         /// <summary>
