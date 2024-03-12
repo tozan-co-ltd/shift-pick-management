@@ -27,25 +27,21 @@ namespace mar_sumaken_web.Controllers
         /// </summary>
         public IActionResult Index()
         {
-            
             TopModel topModel = new();
-            D_ShipmentScheduleModel shipmentScheduleModel = new();
-            D_HandyErrorMessageModel handyErrorMessageModel = new();
             try
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // SQL作成
+                // ハンディエラーメッセージ取得
                 var sql = D_HandyErrorMessageConnectController.CreateSQLToSelectDHandyErrorMessages();
-                // DB接続
                 IEnumerable<D_HandyErrorMessageModel> handyErrorMessageList = D_HandyErrorMessageConnectController.ConnectDHandyErrorMessages(sql, user.DatabaseName);
                 topModel.D_HandyErrorMessageList = handyErrorMessageList.ToPagedList();
 
-                // 会社コード = 10001 固定で、会社マスターから10001のIDを取得する
+                // 表示する出荷作業進捗は、会社コード=10001(豊田自動織機)固定
                 var mCompany = M_CompanyConnectController.GetMCompanyByCompanyCode("10001", user.DatabaseName);
 
-                // 本日作業する出荷指示は納入指示日が翌日(土日を除く)
+                // 納入指示日は翌日(土日を除く)
                 var nextDay = Utils.GetNextday(DateTime.Now).ToString("yyyy/MM/dd");
 
                 // 出荷指示情報取得
