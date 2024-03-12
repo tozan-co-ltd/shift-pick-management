@@ -482,15 +482,16 @@ namespace mar_sumaken_web.Commons
 					,shipment.BranchNumber
 					,shipment.UpdatedAt
 					,shipment.UpdatedBy
-					,SUM(COALESCE(shipment.NumberOfBoxes, 0)) AS NumberOfBoxes
-					,SUM(COALESCE(shipment.Quantity, 0)) AS Quantity
+					,COALESCE(shipment.NumberOfBoxes, 0) AS NumberOfBoxes
+					,COALESCE(shipment.Quantity, 0) AS Quantity
 	                ,SUM(COALESCE(storeOut.NumberOfBoxes, 0)) AS StoreOutNumberOfBoxes -- 出庫箱数
 	                ,SUM(COALESCE(storeOut.Quantity, 0)) AS StoreOutQuantity --出庫数量
                 FROM D_ShipmentSchedule shipment
                 LEFT JOIN D_StoreOut AS storeOut 
 		                ON shipment.DepoID = storeOut.DepoID
 		                AND	shipment.DeliveryDate = storeOut.DeliveryDate
-		                AND	shipment.DeliveryProductNumber = storeOut.DeliveryProductNumber
+                        AND shipment.DeliverySlipNumber = storeOut.DeliverySlipNumber
+                        AND shipment.DeliveryProductNumber = storeOut.DeliveryProductNumber
                         AND storeOut.IsDeleted = 0
                 INNER JOIN M_Company AS company 
                         ON shipment.CompanyID = company.CompanyID
@@ -543,6 +544,8 @@ namespace mar_sumaken_web.Commons
 					,shipment.BranchNumber
 					,shipment.UpdatedAt
 					,shipment.UpdatedBy
+                    ,shipment.NumberOfBoxes
+					,shipment.Quantity
                 ORDER BY 
 	                shipment.DeliveryProductNumber ASC 
             ";
