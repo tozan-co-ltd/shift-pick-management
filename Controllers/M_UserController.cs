@@ -76,9 +76,7 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 倉庫マスター情報取得
-                // SQL作成
                 var depoListSql = M_DepoConnectController.CreateSQLToSelectMDepos();
-                // DB接続
                 List<M_DepoModel> depoList = M_DepoConnectController.ConnectMDepos(depoListSql, user.DatabaseName);
                 foreach (var depo in depoList)
                 {
@@ -93,9 +91,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // ハンディメニューマスター情報取得
-                // SQL作成
                 var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToSelectMHandyMenuList();
-                // DB接続
                 List<M_HandyMenuModel> handyMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(handyMenuListSql, user.DatabaseName);
                 foreach (var handyMenu in handyMenuList)
                 {
@@ -161,6 +157,16 @@ namespace mar_sumaken_web.Controllers
                 var stringSalt = Hashing.ConvertByteToString(salt);
                 model.Password = hashedPassword;
                 model.Salt= stringSalt;
+
+                // 管理権限区分=1の場合はRole=1、それ以外はRole=2
+                if (model.AuthorizedKubun == 1)
+                {
+                    model.Role = 1;
+                }
+                else
+                {
+                    model.Role = 2;
+                }
 
                 // ユーザーマスター登録
                 M_UserConnectController.InsertMUser(model, user);
@@ -325,6 +331,16 @@ namespace mar_sumaken_web.Controllers
                     var stringSalt = Hashing.ConvertByteToString(salt);
                     model.Password = hashedPassword;
                     model.Salt = stringSalt;
+                }
+
+                // 管理権限区分=1の場合はRole=1、それ以外はRole=2
+                if (model.AuthorizedKubun == 1)
+                {
+                    model.Role = 1;
+                }
+                else
+                {
+                    model.Role = 2;
                 }
 
                 // ユーザーマスター更新
