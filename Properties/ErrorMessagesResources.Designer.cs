@@ -277,6 +277,33 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
+        ///   重複許容フラグが0の場合、「まとめ入庫」は選択できません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1025 {
+            get {
+                return ResourceManager.GetString("E1025", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   重複許容フラグが1の場合、「入庫」は選択できません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1026 {
+            get {
+                return ResourceManager.GetString("E1026", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   既に実績データがあるため、削除できません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1027 {
+            get {
+                return ResourceManager.GetString("E1027", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   QRコードが正しくありません。正しいQRコードを読み取ってください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E2001 {

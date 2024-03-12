@@ -282,4 +282,13 @@
   <data name="E1024" xml:space="preserve">
     <value>重複許容フラグが0の場合、メインキーは必須項目です。</value>
   </data>
+  <data name="E1025" xml:space="preserve">
+    <value>重複許容フラグが0の場合、「まとめ入庫」は選択できません。</value>
+  </data>
+  <data name="E1026" xml:space="preserve">
+    <value>重複許容フラグが1の場合、「入庫」は選択できません。</value>
+  </data>
+  <data name="E1027" xml:space="preserve">
+    <value>既に実績データがあるため、削除できません。</value>
+  </data>
 </root>

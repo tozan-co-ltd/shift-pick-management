@@ -356,7 +356,7 @@ namespace mar_sumaken_web.Controllers
                 // テーブルデータ取得
                 DataTable mSupplierKanbanDataTable = CreateDataTable();
 
-                // ユーザーマスター情報取得
+                // 仕入先マスター情報取得
                 var sql = M_SupplierKanbanConnectController.CreateSQLToSelectMSupplierKanbans();
                 List<M_SupplierKanbanModel> supplierKanbanList = M_SupplierKanbanConnectController.ConnectMSupplierKanbans(sql, user.DatabaseName);
 
@@ -373,7 +373,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("AllowedDuplicatesFlag")] = supplierKanbanItem.AllowedDuplicatesFlag.ToString();
                         newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyString")] = supplierKanbanItem.IdentifyString.ToString();
                         newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyStringStartIndex")] = supplierKanbanItem.IdentifyStringStartIndex.ToString();
-                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("ProductNumberLength")] = supplierKanbanItem.ProductNumberLength;
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("ProductNumberLength")] = supplierKanbanItem.ProductNumberLength.ToString();
                         newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("ProductNumberStartIndex")] = supplierKanbanItem.ProductNumberStartIndex.ToString();
                         newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("QuantityLength")] = supplierKanbanItem.QuantityLength.ToString();
                         newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("QuantityStartIndex")] = supplierKanbanItem.QuantityStartIndex.ToString();
