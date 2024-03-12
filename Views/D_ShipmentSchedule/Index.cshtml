@@ -63,8 +63,8 @@
                                         {
                                             <div class="form-check">
                                                 <input type="hidden" asp-for="BinList[i].Value" value="@Model.BinList[i].Value" />
-                                                <input type="hidden" asp-for="BinList[i].Text" value="@Model.BinList[i].Value" />
-                                                <input class="form-check-input" asp-for="BinList[i].Selected" id="bin-@i" type="checkbox">
+                                                <input type="hidden" asp-for="BinList[i].Text" value="@Model.BinList[i].Text" />
+                                                <input class="form-check-input bin-checkbox" asp-for="BinList[i].Selected" id="bin-@i" data="@Model.BinList[i].Text" type="checkbox">
                                                 <label class="form-check-label ml-1 mr-3" id="label-bin-@i">@Model.BinList[i].Text</label>
                                             </div>
                                         }
@@ -384,12 +384,36 @@
         exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
         exportFormData.append("searchModel.SearchEndDate", searchFormArr[3].value);
 
+        // 便
+        var binList = GetSelectedValues();
+        for (var i = 0; i < binList.length; i++) {
+            exportFormData.append("searchModel.BinList[" + i + "]", binList[i]);
+        }
+
+        // 実績数不一致のみ
+        var checkFlg = $("#DiffenceCountCheck").is(":checked");
+        exportFormData.append("searchModel.DiffenceCountCheck", checkFlg);
+
         // 画面名取得
         exportFormData.append("gamenName", $("#viewTitle").val());
 
         // CSV出力
         onExportCsvByCondition("D_ShipmentSchedule", exportFormData);
     });
+
+    function GetSelectedValues() {
+        var selectedValues = [];
+        var checkboxes = document.querySelectorAll('.bin-checkbox');
+
+        checkboxes.forEach(function (checkbox) {
+            if (checkbox.checked) {
+                var customData = checkbox.getAttribute('data');
+                selectedValues.push(parseInt(customData));
+            }
+        });
+
+        return selectedValues;
+    }
 
     // エラーメッセージ削除
     function DeleteErrorMessages() {

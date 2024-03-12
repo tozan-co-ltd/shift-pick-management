@@ -439,11 +439,9 @@ namespace mar_sumaken_web.Commons
 
             // 便
             string binCondition = string.Empty;
-            if (model.BinList != null && model.BinList.Count > 0)
+            if (model.BinListInt != null && model.BinListInt.Count > 0)
             {
-                List<SelectListItem> selectedItems = model.BinList.Where(item => item.Selected).ToList();
-                List<string> selectedValues = selectedItems.Select(item => item.Value).ToList();
-                binCondition = $@" AND shipment.DeliveryTimeClass in ({string.Join(",", selectedValues)})";
+                binCondition = $@" AND shipment.DeliveryTimeClass in ({string.Join(",", model.BinListInt)})";
             }
             model.SearchEndDate = string.Concat(model.SearchEndDate, " 23:59:59");
             var sql = $@"

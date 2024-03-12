@@ -162,9 +162,9 @@ namespace mar_sumaken_web.Commons
 	                    WHEN product.LotQuantity <> 0 THEN ROUND(schedule.Quantity / product.LotQuantity, 0, 0)
 	                    ELSE 0
                     END AS NumberOfBoxes    -- 予定箱数
-                    ,schedule.Quantity      --予定数量
-                    ,COALESCE(storeIn.NumberOfBoxes, 0) AS StoreInNumberOfBox    -- 入庫箱数
-                    ,COALESCE(storeIn.Quantity, 0) AS StoreInQuantity            -- 入庫数量
+                    ,COALESCE(schedule.Quantity, 0) AS Quantity      --予定数量
+                    ,SUM(COALESCE(storeIn.NumberOfBoxes, 0)) AS StoreInNumberOfBox    -- 入庫箱数
+                    ,SUM(COALESCE(storeIn.Quantity, 0)) AS StoreInQuantity            -- 入庫数量
                     ,schedule.CreatedAt
                     ,schedule.CreatedBy
                 FROM D_ReceiveSchedule AS schedule
@@ -188,6 +188,18 @@ namespace mar_sumaken_web.Commons
                     AND schedule.IsDeleted = 0
                     AND product.IsDeleted = 0
 	                AND company.IsDeleted = 0
+                GROUP BY 
+					schedule.ReceiveScheduleID
+                    ,schedule.DepoID
+                    ,schedule.CompanyID
+                    ,company.CompanyName
+                    ,schedule.ReceiveScheduleDate
+                    ,schedule.SupplierProductNumber
+                    ,schedule.LotNumber
+					,product.LotQuantity
+					,schedule.Quantity
+					,schedule.CreatedAt
+                    ,schedule.CreatedBy
                 ORDER BY 
 	                schedule.SupplierProductNumber ASC     
             ";

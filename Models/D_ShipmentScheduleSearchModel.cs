@@ -1,6 +1,4 @@
-﻿using mar_sumaken_web.Commons;
-using mar_sumaken_web.Properties;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace mar_sumaken_web.Models
@@ -25,6 +23,11 @@ namespace mar_sumaken_web.Models
         /// 検索便リスト
         /// </summary>
         public List<SelectListItem>? BinList { get; set; }
+
+        /// <summary>
+        /// 便リスト
+        /// </summary>
+        public List<int>? BinListInt { get; set; }
 
         /// <summary>
         /// 実績数不一致のみ
