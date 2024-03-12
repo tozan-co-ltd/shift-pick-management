@@ -176,6 +176,7 @@ namespace mar_sumaken_web.ConnectControllers
                             item.DeliveryDate = Convert.ToDateTime(model.SearchDeliveryDate);
                             item.DeliveryTimeClass = deliveryTimeClass;
                             item.DeliverySlipNumber = deliverySlipNumber;
+                            item.NumberOfBoxes = (int)Math.Ceiling((double)item.Quantity / item.LotQuantity);
                             // 出庫実績登録SQL作成
                             string insertSql = CreateSQLToInsertDStoreOut(item, sysDate, loginUser.UserName);
                             // 出庫実績登録

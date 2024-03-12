@@ -203,12 +203,17 @@ namespace mar_sumaken_web.Controllers
                     if (!isContainSupplierProductNumber)
                     {
                         // 仕入先品番で品番チェック
-                        bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(modelItem.SupplierProductNumber, user.DatabaseName);
-                        if (!isExistProduct)
+                        var product = M_ProductConnectController.GetProductBySupplierProductNumber(modelItem.SupplierProductNumber, user.DatabaseName);
+                        if (product == null)
                         {
                             isValid = false;
                             var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreInModel>("SupplierProductNumber"));
                             validationResults.Add(new ValidationResult(message, new List<string> { "SupplierProductNumber" }));
+                        }
+                        else
+                        {
+                            model.RegisterList[i].LotQuantity = product.LotQuantity;
+                            model.RegisterList[i].SupplierProductNumber = product.SupplierProductNumber;
                         }
                     }
 

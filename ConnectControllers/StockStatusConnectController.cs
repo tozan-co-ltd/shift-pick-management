@@ -183,7 +183,66 @@ namespace mar_sumaken_web.Commons
 		            GROUP BY storeOut.SupplierProductNumber, storeOut.StoreOutDate
 	            ) AS searchInfo
 	            GROUP BY searchInfo.SupplierProductNumber, WorkedDate
-                Order BY WorkedDate ASC
+                ORDER BY WorkedDate ASC
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 品番別ロット番号一覧取得SQL作成
+        /// </summary>
+        /// <param name="searchDate">年月日</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="supplierId">会社ID</param>
+        /// <param name="productNumber">仕入先品番</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToGetLotNumberDetailByProductNumber(string searchDate, int depoId, int supplierId, string productNumber)
+        {
+            var sql = $@"
+                DECLARE @InputDate DATE = '{searchDate}'; 
+                DECLARE @SearchStartDate DATETIME = DATEADD(MONTH, DATEDIFF(MONTH, 0, @InputDate), 0);
+                DECLARE @SearchEndDate DATETIME = CONVERT(DATETIME, CONVERT(VARCHAR(10), @InputDate) + ' 23:59:59');
+                DECLARE @LastMonthDate DATETIME = DATEADD(DAY, -1, DATEADD(MONTH, DATEDIFF(MONTH, 0, @InputDate), 0));
+                DECLARE @CompanyId int = {supplierId};
+                DECLARE @DepoId int = {depoId};
+                DECLARE @ProductNumber nvarchar(50) = '{productNumber}';
+                SELECT
+		            searchInfo.SupplierProductNumber
+		            ,searchInfo.LotNumber
+					,FORMAT(WorkedDate, 'yyyy/MM/dd') AS WorkedDate
+		            ,SUM(searchInfo.InNumberOfBoxes) AS StoreInNumberOfBoxes -- 入庫箱数
+		            ,SUM(searchInfo.OutNUmberOfBoxes) AS StoreOutNumberOfBoxes -- 出庫箱数
+					,SUM(searchInfo.InQuantity) AS StoreInQuantity -- 入庫数量
+		            ,SUM(searchInfo.OutQuantity) AS StoreOutQuantity -- 出庫箱数
+					,(SUM(searchInfo.InQuantity) - SUM(searchInfo.OutQuantity)) AS StockRemainQuantity
+	            FROM 
+	            (
+			        SELECT
+						storeIn.LotNumber AS LotNumber
+			            ,storeIn.StoreInDate AS WorkedDate,storeIn.SupplierProductNumber 
+			            ,COALESCE(SUM(storeIn.NumberOfBoxes), 0) AS InNumberOfBoxes, 0 AS OutNUmberOfBoxes
+						,COALESCE(SUM(storeIn.Quantity), 0) AS InQuantity , 0 AS OutQuantity
+		            FROM D_StoreIn AS storeIn 
+		            WHERE 
+			            storeIn.StoreInDate >= @SearchStartDate AND storeIn.StoreInDate <= @SearchEndDate 
+			            AND storeIn.CompanyID = @CompanyId AND storeIn.DepoID = @DepoId AND storeIn.IsDeleted = 0
+			            AND storeIn.SupplierProductNumber = @ProductNumber
+		            GROUP BY storeIn.SupplierProductNumber, storeIn.StoreInDate, storeIn.LotNumber
+		            UNION ALL
+		            SELECT
+						storeOut.LotNumber AS LotNumber
+			            ,storeOut.StoreOutDate AS WorkedDate ,storeOut.SupplierProductNumber, 
+			            0 AS InNumberOfBoxes, COALESCE(SUM(storeOut.NumberOfBoxes), 0) AS OutNUmberOfBoxes,
+						0 AS InQuantity, COALESCE(SUM(storeOut.Quantity), 0) AS OutQuantity
+		            FROM D_StoreOut AS storeOut
+		            WHERE 
+			            storeOut.StoreOutDate >= @SearchStartDate AND storeOut.StoreOutDate <= @SearchEndDate
+			            AND storeOut.CompanyID = @CompanyId AND storeOut.DepoID = @DepoId AND storeOut.IsDeleted = 0
+			            AND storeOut.SupplierProductNumber = @ProductNumber
+		            GROUP BY storeOut.SupplierProductNumber, storeOut.StoreOutDate, storeOut.LotNumber
+	            ) AS searchInfo
+	            GROUP BY searchInfo.SupplierProductNumber, WorkedDate, searchInfo.LotNumber
+                ORDER BY searchInfo.LotNumber ASC
             ";
             return sql;
         }

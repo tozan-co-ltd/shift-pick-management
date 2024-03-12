@@ -2,7 +2,10 @@
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.Design;
 using System.Data.SqlClient;
+using System.Reflection;
+using System.Transactions;
 
 namespace mar_sumaken_web.Commons
 {
@@ -216,6 +219,14 @@ namespace mar_sumaken_web.Commons
                 // DB接続
                 try
                 {
+                    // 出荷実績がある場合はエラー
+                    string checkExistSql = CreateSQLToCheckExistDShipmentByShipmentScheduleId(shipmentScheduleId);
+                    int checkedCount = (int)connection.ExecuteScalar(checkExistSql);
+                    if (checkedCount > 0)
+                    {
+                        throw new Exception();
+                    }
+
                     // 出荷指示削除
                     string deleteSql = CreateSQLToDeleteDShipmentSchedule(shipmentScheduleId, DateTime.Now, loginUser.UserName);
                     int affectedRows = connection.Execute(deleteSql);
@@ -384,6 +395,27 @@ namespace mar_sumaken_web.Commons
                 FROM D_Shipment AS shipment
                 WHERE 
                     shipment.ShipmentScheduleID = @ShipmentScheduleID
+            ;";
+
+            return sql;
+        }
+
+        /// <summary>
+        /// 出荷指示IDで出荷実績重複チェック文SQL作成
+        /// </summary>
+        /// <param name="shipmentScheduleId">出荷指示ID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToCheckExistDShipmentByShipmentScheduleId(int shipmentScheduleId)
+        {
+            var sql = $@"
+		        SELECT
+                    count(schedule.ShipmentScheduleID) AS count
+                FROM 
+                    D_ShipmentSchedule AS schedule
+                INNER JOIN D_Shipment AS shipment
+                    ON schedule.ShipmentScheduleID = shipment.ShipmentScheduleID 
+                WHERE
+                    shipment.ShipmentScheduleID = {shipmentScheduleId}
             ;";
 
             return sql;

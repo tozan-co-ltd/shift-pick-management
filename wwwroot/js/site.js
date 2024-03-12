@@ -347,7 +347,14 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect, isNotReload
 }
 //--------------------------------------------------------//
 
-// 仕入先かんばんマスターバリデーションチェック
+//------------------- 数秒待機 ------------------//
+function WaitSeconds() {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(), 2000);
+    });
+//--------------------------------------------------------//
+
+//------------------- 仕入先かんばんマスターバリデーションチェック ------------------//
 function CheckValidationMSupplierKanban() {
     // 識別文字
     var IdentifyString = $("IdentifyStringStartIndex");
@@ -421,5 +428,4 @@ function CheckPairValueMSupplierKanban(id1, id2, required = false) {
     }
 
     return checkFlag;
-}
 //--------------------------------------------------------//

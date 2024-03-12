@@ -83,7 +83,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// WEBメニューリストを取得
         /// <param name="userRoleName"></param>
-        /// <param name="mCategory"></param>
+        /// <param name="mWebMenuCategory"></param>
         /// </summary>
         /// <returns>WEBメニューリスト</returns>
         public List<M_WebMenu> GetWebMenuList(string userRoleName, M_WebMenuCategory mWebMenuCategory)

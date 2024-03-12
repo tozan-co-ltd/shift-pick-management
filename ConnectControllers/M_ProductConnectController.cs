@@ -171,11 +171,98 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 納入先品番から仕入先品番を取得
         /// </summary>
+        /// <param name="supplierId">仕入先品番</param>
+        /// <param name="deliveryProductNumber">納入先品番</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static M_ProductModel? GetProductByDeliveryProductNumber(int supplierId, int depoId, string? deliveryProductNumber, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    // SQL作成
+                    string sql = $@"
+                        SELECT TOP 1 *
+                        FROM M_Product AS product
+                        INNER JOIN R_DepoProduct AS depoProduct 
+                            ON product.ProductID = depoProduct.ProductID 
+                        WHERE 
+                            product.SupplierID = {supplierId}
+                            AND product.DeliveryProductNumber = '{deliveryProductNumber}'
+                            AND depoProduct.DepoId = {depoId}
+                            AND product.IsDeleted = 0
+                    ";
+
+                    var product = connection.QueryFirstOrDefault<M_ProductModel>(sql);
+                    return product;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 出荷の納入先品番から仕入先品番を取得
+        /// </summary>
+        /// <param name="deliveryId">納入先ID</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="deliveryProductNumber">納入先品番</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static M_ProductModel? GetProductByShipmentDeliveryProductNumber(int deliveryId, int depoId, string? deliveryProductNumber, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                // DB接続
+                try
+                {
+                    // SQL作成
+                    string sql = $@"
+                        SELECT TOP 1 *
+                        FROM M_Product AS product
+                        INNER JOIN R_DepoProduct AS depoProduct 
+                            ON product.ProductID = depoProduct.ProductID 
+                        WHERE 
+                            product.DeliveryID = {deliveryId}
+                            AND product.DeliveryProductNumber = '{deliveryProductNumber}'
+                            AND depoProduct.DepoId = {depoId}
+                            AND product.IsDeleted = 0
+                    ";
+
+                    var product = connection.QueryFirstOrDefault<M_ProductModel>(sql);
+                    return product;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 仕入先品番から仕入先品番を取得
+        /// </summary>
         /// <param name="deliveryId"></param>
-        /// <param name="deliveryProductNumber"></param>
+        /// <param name="supplierProductNumber"></param>
         /// <param name="databaseName"></param>
         /// <returns></returns>
-        public static M_ProductModel? GetProductByDeliveryProductNumber(int deliveryId, string? deliveryProductNumber, string databaseName)
+        public static M_ProductModel? GetProductBySupplierProductNumber(string supplierProductNumber, string databaseName)
         {
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
@@ -193,8 +280,7 @@ namespace mar_sumaken_web.ConnectControllers
                         SELECT TOP 1 *
                         FROM M_Product
                         WHERE 
-                            DeliveryID = {deliveryId}
-                            AND DeliveryProductNumber = '{deliveryProductNumber}'
+                            SupplierProductNumber = '{supplierProductNumber}'
                             AND IsDeleted = 0
                     ";
 

@@ -73,10 +73,10 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// CSV取込
         /// </summary>
-        /// <param name="FileUpload"></param>
-        /// <param name="DepoID"></param>
-        /// <param name="CompanyID"></param>
-        /// <param name="GamenName"></param>
+        /// <param name="uploadFileList"></param>
+        /// <param name="depoId"></param>
+        /// <param name="companyId"></param>
+        /// <param name="viewTitle"></param>
         /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> ImportCsv(List<IFormFile> uploadFileList, int depoId, int companyId, string viewTitle)
@@ -158,9 +158,10 @@ namespace mar_sumaken_web.Controllers
                             if (!isContainDeliveryProductNumber)
                             {
                                 // 納入先品番で仕入先品番を取得
-                                // 品番マスターに登録されている品番の行のみ取り込まれます。登録されていない品番の行はスキップします。
-                                var product = M_ProductConnectController.GetProductByDeliveryProductNumber(
-                                    shipmentSchedule.SelectedCompanyID, shipmentSchedule.DeliveryProductNumber, user.DatabaseName
+                                // 品番マスター・倉庫-品番中間テーブルに登録されている品番の行のみ取り込む
+                                // 登録されていない品番の行はスキップする
+                                var product = M_ProductConnectController.GetProductByShipmentDeliveryProductNumber(
+                                    shipmentSchedule.SelectedCompanyID, shipmentSchedule.SelectedDepoID, shipmentSchedule.DeliveryProductNumber, user.DatabaseName
                                 );
                                 if (product == null)
                                 {
