@@ -235,7 +235,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <button class="btn btn-primary btn-icon-split" id="register-btn" style="min-width: 80px" onclick="OnRegister()">
+                    <button class="btn btn-primary btn-icon-split" id="register-btn" style="min-width: 80px">
                         <span class="text">登録</span>
                     </button>
                 </form>
@@ -262,50 +262,137 @@
     });
 
     // 登録ボタン押下
-    function OnRegister() {
-        $('#mSupplierKanbanForm').submit(function (event) {
-            $("#div-error-message").text("");
+    $("#register-btn").on("click", function () {
+        $("#div-error-message").text("");
 
-            // ページの更新を禁止する
-            event.preventDefault();
+        // ページの更新を禁止する
+        event.preventDefault();
 
-            // 送信イベントが他のハンドラーに伝播するのを防ぐ
-            event.stopImmediatePropagation();
+        // 送信イベントが他のハンドラーに伝播するのを防ぐ
+        event.stopImmediatePropagation();
+
+        // 入力値チェック
+        let result = checkInput();
+        if (result == false) return false;
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("Register", "M_SupplierKanban")';
+        let method = 'POST';
+        let formId = 'mSupplierKanbanForm';
+        let data = $('#' + formId).serializeArray();
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            $('#' + formId)[0].reset();
+            // 完了モーダル表示
+            AlertMessage('', '完了', '登録が完了しました。', null, null);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                // データが見つからなかった場合
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                // その他のエラーの場合
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
+            }
+        });
+
+        // 入力値チェック
+        function checkInput() {
+            let result = false;
+            let isCheck = true;
+
+            // 重複許容フラグ
+            var selectedAllowedDuplicatesFlagValue = $('input[name="AllowedDuplicatesFlag"]:checked').val();
+            var requiredCheck = false;
+            if (selectedAllowedDuplicatesFlagValue == '0') {
+                requiredCheck = true;
+            }
+
+            // 使用ハンディメニューチェック
+            $(".checkboxHandyMenu").children("input:checked").each(function () {
+                let checkboxLabel = $(this).next('label').text();
+
+                if (requiredCheck) {
+                    // 重複許容フラグ=0の場合「まとめ入庫」は選択不可
+                    if (checkboxLabel == "まとめ入庫") {
+                        $("#div-error-message").text("E1025: 重複許容フラグが0の場合、「まとめ入庫」は選択できません。");
+                        isCheck = false;
+                        return result;
+                    }
+                } else {
+                    // 重複許容フラグ=1の場合「入庫」は選択不可
+                    if (checkboxLabel == "入庫") {
+                        $("#div-error-message").text("E1026: 重複許容フラグが1の場合、「入庫」は選択できません。");
+                        isCheck = false;
+                        return result;
+                    }
+                }
+            });
 
             // バリデーションチェック
             var checkFlg = CheckValidationMSupplierKanban();
             if (!checkFlg) {
                 $("#div-error-message").text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
-                return false;
+                isCheck = false;
+                return result;
             }
 
-            // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("Register", "M_SupplierKanban")';
-            let method = 'POST';
-            let formId = 'mSupplierKanbanForm';
-            let data = $('#' + formId).serializeArray();
+            if (isCheck) result = true;
+            return result;
+        }
+    });
 
-            // Ajax call
-            $.ajax({
-                url: url,
-                method: method,
-                data: data
-            }).done(function (response) {
-                $('#' + formId)[0].reset();
-                // 完了モーダル表示
-                AlertMessage('', '完了', '登録が完了しました。', null, null);
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 404) {
-                    // データが見つからなかった場合
-                    var errorMessage = jqXHR.responseJSON.errorMessage;
-                    $("#div-error-message").text(errorMessage);
-                } else {
-                    // その他のエラーの場合
-                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#div-error-message").text(errorMessage);
-                }
-            });
-        });
-    }
+    // 登録ボタン押下
+    // function OnRegister() {
+    //     $('#mSupplierKanbanForm').submit(function (event) {
+    //         $("#div-error-message").text("");
+
+    //         // ページの更新を禁止する
+    //         event.preventDefault();
+
+    //         // 送信イベントが他のハンドラーに伝播するのを防ぐ
+    //         event.stopImmediatePropagation();
+
+    //         // バリデーションチェック
+    //         var checkFlg = CheckValidationMSupplierKanban();
+    //         if (!checkFlg) {
+    //             $("#div-error-message").text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
+    //             return false;
+    //         }
+
+    //         // フォーム情報取得
+    //         let url = window.location.origin + '@Url.Action("Register", "M_SupplierKanban")';
+    //         let method = 'POST';
+    //         let formId = 'mSupplierKanbanForm';
+    //         let data = $('#' + formId).serializeArray();
+
+    //         // Ajax call
+    //         $.ajax({
+    //             url: url,
+    //             method: method,
+    //             data: data
+    //         }).done(function (response) {
+    //             $('#' + formId)[0].reset();
+    //             // 完了モーダル表示
+    //             AlertMessage('', '完了', '登録が完了しました。', null, null);
+    //         }).fail(function (jqXHR, textStatus, errorThrown) {
+    //             if (jqXHR.status === 404) {
+    //                 // データが見つからなかった場合
+    //                 var errorMessage = jqXHR.responseJSON.errorMessage;
+    //                 $("#div-error-message").text(errorMessage);
+    //             } else {
+    //                 // その他のエラーの場合
+    //                 var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+    //                 $("#div-error-message").text(errorMessage);
+    //             }
+    //         });
+    //     });
+    // }
 </script>
 

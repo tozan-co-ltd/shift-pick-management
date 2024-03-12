@@ -123,17 +123,17 @@ namespace mar_sumaken_web.Models
         public int IdentifyStringStartIndex { get; set; }
 
         /// <summary>
-        /// 品番開始位置
+        /// 品番桁数
         /// </summary>
-        [Display(Name = "品番開始位置")]
+        [Display(Name = "品番桁数")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Range(1, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int ProductNumberLength { get; set; }
 
         /// <summary>
-        /// 品番桁数
+        /// 品番開始位置
         /// </summary>
-        [Display(Name = "品番桁数")]
+        [Display(Name = "品番開始位置")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Range(1, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int ProductNumberStartIndex { get; set; }
