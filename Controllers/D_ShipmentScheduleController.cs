@@ -3,8 +3,11 @@ using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.Design;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection;
+using System.Transactions;
 using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
@@ -167,9 +170,9 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// 出荷指示削除
         /// </summary>
-        /// <param name="shipmentScheduleId">出荷指示ID</param>
+        /// <param name="id">出荷指示ID</param>
         /// <returns></returns>
-        public IActionResult Delete(int shipmentScheduleId)
+        public IActionResult Delete(int id)
         {
             try
             {
@@ -177,7 +180,7 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 出荷指示削除
-                //D_ShipmentScheduleConnectController.DeleteDShipmentSchedule(shipmentScheduleId, user);
+                D_ShipmentScheduleConnectController.DeleteDShipmentSchedule(id, user);
 
                 return Ok();
             }
