@@ -104,7 +104,7 @@ namespace mar_sumaken_web.Commons
                             // 倉庫マスター情報取得
                             var userDepoSql = CreateSQLToSelectRUserDepoList(user.UserID);
                             List<M_DepoModel> depoList = connection.Query<M_DepoModel>(userDepoSql).ToList();
-                            if(depoList.Count > 0)
+                            if (depoList.Count > 0)
                             {
                                 user.M_DepoList = depoList;
                             }
@@ -148,7 +148,7 @@ namespace mar_sumaken_web.Commons
                     // 倉庫マスター情報取得
                     var userDepoSql = CreateSQLToSelectRUserDepoList(userId);
                     List<M_DepoModel> depoList = connection.Query<M_DepoModel>(userDepoSql).ToList();
-                    return depoList; 
+                    return depoList;
                 }
             }
             catch (Exception)
@@ -186,7 +186,7 @@ namespace mar_sumaken_web.Commons
                     string userDeleteSql = CreateSQLToDeleteMUser(userId, sysDate, loginUser.UserName);
                     deleteAffectedRows = connection.Execute(userDeleteSql, null, transaction);
                     // 更新件数が0の場合はエラーとする
-                    if(deleteAffectedRows == 0)
+                    if (deleteAffectedRows == 0)
                     {
                         throw new Exception();
                     }
@@ -245,7 +245,7 @@ namespace mar_sumaken_web.Commons
                     {
                         throw new Exception();
                     }
-                    int userId = (int) insertedUserId;
+                    int userId = (int)insertedUserId;
 
                     foreach (SelectListItem depo in model.DepoSelectList)
                     {
@@ -264,7 +264,7 @@ namespace mar_sumaken_web.Commons
 
                     foreach (SelectListItem menu in model.HandyMenuSelectList)
                     {
-                        if(menu.Selected)
+                        if (menu.Selected)
                         {
                             // ユーザーハンディメニュー中間テーブル登録
                             string userMenuInsertSql = CreateSQLToInsertRUserHandyMenu(userId, Convert.ToInt32(menu.Value), sysDate, loginUser.UserName);
@@ -590,9 +590,30 @@ namespace mar_sumaken_web.Commons
         {
             var sql = $@"
                 INSERT INTO M_User 
-                    (LoginID, UserName, DepoID, AuthorizedKubun, Password, Salt, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy)
+                    (LoginID, 
+                    UserName, 
+                    Role, 
+                    DepoID, 
+                    AuthorizedKubun, 
+                    Password, 
+                    Salt, 
+                    CreatedAt, 
+                    CreatedBy, 
+                    UpdatedAt, 
+                    UpdatedBy)
                 OUTPUT INSERTED.UserID
-                VALUES ('{model.LoginID}', '{model.UserName}', {model.SelectedMainDepoID}, {model.AuthorizedKubun}, '{model.Password}', '{model.Salt}', '{createdAt}', '{createdBy}', '{createdAt}', '{createdBy}');
+                VALUES 
+                    ('{model.LoginID}', 
+                    '{model.UserName}', 
+                    {model.Role}, 
+                    {model.SelectedMainDepoID}, 
+                    {model.AuthorizedKubun}, 
+                    '{model.Password}', 
+                    '{model.Salt}', 
+                    '{createdAt}', 
+                    '{createdBy}', 
+                    '{createdAt}', 
+                    '{createdBy}');
             ";
             return sql;
         }
@@ -611,6 +632,7 @@ namespace mar_sumaken_web.Commons
                 UPDATE M_User
                 SET 
                     UserName = '{model.UserName}',
+                    Role = {model.Role},
                     DepoID = {model.SelectedMainDepoID},
                     AuthorizedKubun = {model.AuthorizedKubun},
                     {(string.IsNullOrEmpty(model.Password) ? "" : $"Password = '{model.Password}',")}
@@ -656,13 +678,13 @@ namespace mar_sumaken_web.Commons
         public static string CreateSQLToDeleteMUser(int userId, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
-                         UPDATE M_User
-                         SET
-                            IsDeleted = 1
-                            ,UpdatedAt = '{updatedAt}'
-                            ,UpdatedBy = '{updatedBy}'
-                         WHERE 
-	                            UserID = {userId}
+                UPDATE M_User
+                SET
+                    IsDeleted = 1
+                    ,UpdatedAt = '{updatedAt}'
+                    ,UpdatedBy = '{updatedBy}'
+                WHERE 
+	                UserID = {userId}
             ";
             return sql;
         }
@@ -675,10 +697,10 @@ namespace mar_sumaken_web.Commons
         public static string CreateSQLToDeleteRUserHandyMenu(int userId)
         {
             var sql = $@"
-                         DELETE 
-                            FROM    R_UserHandyMenu
-                            WHERE 
-	                                UserID = {userId}
+                DELETE 
+                FROM    R_UserHandyMenu
+                WHERE 
+	                    UserID = {userId}
             ";
             return sql;
         }
@@ -691,10 +713,10 @@ namespace mar_sumaken_web.Commons
         public static string CreateSQLToDeleteRUserDepo(int userId)
         {
             var sql = $@"
-                         DELETE 
-                            FROM    R_UserDepo
-                            WHERE 
-	                                UserID = {userId}
+                DELETE 
+                FROM    R_UserDepo
+                WHERE 
+	                    UserID = {userId}
             ";
             return sql;
         }
@@ -707,7 +729,10 @@ namespace mar_sumaken_web.Commons
         private static string CreateSQLToDeleteRUserDepoByUserId(int userId)
         {
             var sql = $@"
-               DELETE FROM R_UserDepo WHERE UserID = {userId};
+                DELETE 
+                FROM    R_UserDepo 
+                WHERE 
+                        UserID = {userId};
             ";
             return sql;
         }
@@ -720,7 +745,10 @@ namespace mar_sumaken_web.Commons
         private static string CreateSQLToDeleteRHandyMenuByUserId(int userId)
         {
             var sql = $@"
-               DELETE FROM R_UserHandyMenu WHERE UserID = {userId};
+                DELETE 
+                FROM    R_UserHandyMenu 
+                WHERE 
+                        UserID = {userId};
             ";
             return sql;
         }
