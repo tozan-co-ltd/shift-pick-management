@@ -352,6 +352,7 @@ function WaitSeconds() {
     return new Promise(resolve => {
         setTimeout(() => resolve(), 2000);
     });
+}
 //--------------------------------------------------------//
 
 //------------------- 仕入先かんばんマスターバリデーションチェック ------------------//
@@ -428,4 +429,5 @@ function CheckPairValueMSupplierKanban(id1, id2, required = false) {
     }
 
     return checkFlag;
+}
 //--------------------------------------------------------//
