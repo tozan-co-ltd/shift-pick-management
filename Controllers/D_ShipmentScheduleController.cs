@@ -205,7 +205,7 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 出庫実績がある場合はエラー
-                string checkDStoreOutSql = D_ShipmentScheduleConnectController.CreateSQLToCheckExistDStoreOutByShipmentScheduleId(shipmentSchedule);
+                string checkDStoreOutSql = D_ShipmentScheduleConnectController.CreateSQLToCheckExistDStoreOutByShipmentSchedule(shipmentSchedule);
                 bool isExistedStoreOut = ConnectToSQLServer.IsExistedSameRecord(checkDStoreOutSql, user.DatabaseName);
                 if (isExistedStoreOut)
                 {

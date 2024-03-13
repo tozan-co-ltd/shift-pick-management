@@ -389,7 +389,7 @@ namespace mar_sumaken_web.Commons
         /// </summary>
         /// <param name="model">モデル</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToCheckExistDStoreOutByShipmentScheduleId(D_ShipmentScheduleModel model)
+        public static string CreateSQLToCheckExistDStoreOutByShipmentSchedule(D_ShipmentScheduleModel model)
         {
             var sql = $@"
 		            SELECT
