@@ -4,7 +4,11 @@
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
-
+<style>
+    a {
+        text-decoration: underline;
+    }
+</style>
 <div class="card shadow de-inspection d-receive-schedule m-4">
     <div class="card-header text-gray-800">
         @ViewData["Title"]
@@ -97,27 +101,27 @@
     </div>
 </div>
 
-<!--  Detail Modal-->
-<div class="modal fade" id="detail-by-link-modal" tabindex="-1" role="dialog" aria-hidden="true">
+<!--  Lot Number Modal-->
+<div class="modal fade" id="detail-lot-number-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="detail-by-link-modal-label">品番別ロット番号一覧</h5>
+                <h5 class="modal-title" id="detail-lot-number-modal-label">品番別ロット番号一覧</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="col-12 col-md-10">
-                    <p id="detail-by-link-modal-error-message" class="mt-1 text-danger"></p>
+                    <p id="detail-lot-number-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="">
                     <div class="col-12">
                         <p class="mb-0"><label>年月日 : <span id="detailDeliveryDate"></span></label></p>
                         <p><label>仕入先品番 : <span id="detailSupplierProductNumber"></span></label></p>
                     </div>
-                    <div class="col-12" id="detail-div-table">
-                        <table class="table table-sm stripe hover nowrap" id="detail-table-datatable">
+                    <div class="col-12">
+                        <table class="table table-sm stripe hover nowrap" id="detail-table">
                             <thead>
                                 <tr>
                                     <th class="text-nowrap">ロット番号</th>
@@ -185,7 +189,7 @@
         });
     });
 
-    // 詳細
+    // 詳細ボタン押下(日別在庫照会画面へ遷移)
     function OnDetailClick(trTag) {
         var row = trTag.parentNode.parentNode;
         
@@ -203,8 +207,9 @@
         window.location.href = url;
     }
 
-    // 検索ボタン押下
-    function OnLinkDetailClick(trTag) {
+    // ロット番号押下(品番別ロット番号一覧モーダル表示)
+    function OnLotNumberDetailClick(trTag) {
+        $("#detail-table tbody").empty();
 
         var row = trTag.parentNode.parentNode;
         var searchDate = row.getElementsByClassName("SearchDate")[0].value;
@@ -212,9 +217,9 @@
         var companyId = row.getElementsByClassName("SupplierID")[0].value;
         var supplierProductNumber = row.getElementsByClassName("SupplierProductNumber")[0].value;
 
-        $("#detailDeliveryDate").text(searchDate);
-        $("#detailSupplierProductNumber").text(supplierProductNumber);
-
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetLotNumberDetail", "StockStatus")';
+        let method = 'GET';
         var data = {
             searchDate: searchDate,
             depoId: depoId,
@@ -222,25 +227,22 @@
             supplierProductNumber: supplierProductNumber
         };
 
-        // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetLotNumberDetail", "StockStatus")';
         // Ajax call
         $.ajax({
             url: url,
-            method: 'GET',
+            method: method,
             data: data
         }).done(function (response) {
-            $("#detail-table-datatable tbody").empty();
-            $('#detail-table-datatable').DataTable().destroy();
-            $("#detail-div-table").show();
-            $("#detail-table-datatable tbody").html(response);
+            $("#detail-table tbody").html(response);
+            $("#detailDeliveryDate").text(searchDate);
+            $("#detailSupplierProductNumber").text(supplierProductNumber);
         }).fail(function (xhr, textStatus, errorThrown) {
             if (xhr.status === 404) {
                 var errorMessage = xhr.responseJSON.errorMessage;
-                $("#div-error-message").text(errorMessage);
+                $("#detail-lot-number-modal-error-message").text(errorMessage);
             } else {
                 var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#div-error-message").text(errorMessage500);
+                $("#detail-lot-number-modal-error-message").text(errorMessage500);
             }
         });
     }

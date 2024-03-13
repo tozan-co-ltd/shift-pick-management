@@ -127,6 +127,7 @@ namespace mar_sumaken_web.Commons
                 LEFT JOIN TotalData total on product.SupplierProductNumber = total.SupplierProductNumber
                 LEFT JOIN SearchData AS search on product.SupplierProductNumber = search.SupplierProductNumber
                 INNER JOIN M_Company AS company on product.SupplierID = company.CompanyID
+                INNER JOIN R_DepoProduct AS depoProduct ON product.ProductID = depoProduct.ProductID AND depoProduct.DepoID = @DepoId
                 WHERE
 	                product.IsDeleted = 0
                     AND product.SupplierID = @CompanyId

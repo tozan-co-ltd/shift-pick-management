@@ -77,7 +77,7 @@ namespace mar_sumaken_web.Controllers
                         if (item.StoreInQuantity > 0 || item.StoreOutQuantity > 0)
                         {
                             supplierProductNumberTag = $@"<td>
-                                <a href='#' onclick='OnLinkDetailClick(this)' data-toggle='modal' data-target='#detail-by-link-modal'>
+                                <a href='#' onclick='OnLotNumberDetailClick(this)' data-toggle='modal' data-target='#detail-lot-number-modal'>
                                 {item.SupplierProductNumber}
                                 </a>
                             </td>";
@@ -189,7 +189,7 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// 日別在庫照会画面表示
+        /// 品番別ロット番号一覧情報取得
         /// </summary>
         /// <param name="searchDate">年月日</param>
         /// <param name="depoId">倉庫ID</param>
@@ -223,12 +223,12 @@ namespace mar_sumaken_web.Controllers
                     foreach (var item in detailList)
                     {
                         searchData += $@"<tr>
-                            <td class='SupplierName'>{@item.LotNumber}</td>
-                            <td class='SupplierName'>{@item.StoreInNumberOfBoxes}</td>
-                            <td class='SupplierName'>{@item.StoreInQuantity}</td>
-                            <td class='SupplierName'>{@item.StoreOutNumberOfBoxes}</td>
-                            <td class='SupplierName'>{@item.StoreOutQuantity}</td>
-                            <td class='SupplierName'>{@item.StockRemainQuantity}</td>
+                            <td>{@item.LotNumber}</td>
+                            <td>{@item.StoreInNumberOfBoxes}</td>
+                            <td>{@item.StoreInQuantity}</td>
+                            <td>{@item.StoreOutNumberOfBoxes}</td>
+                            <td>{@item.StoreOutQuantity}</td>
+                            <td>{@item.StockRemainQuantity}</td>
                         </tr>";
                     }
                 }
