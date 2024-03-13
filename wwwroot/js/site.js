@@ -57,6 +57,7 @@
         info: false,            // 総件数非表示
         searching: false,       // 検索欄非表示
         paging: false,          // ページング非表示
+        scrollX: true,          // 横スクロール可
         scrollCollapse: true,   // 縦スクロール表示
         scrollY: '200px',       // 縦スクロールサイズ
         order: [[1, "desc"]],   // 作成日時降順
