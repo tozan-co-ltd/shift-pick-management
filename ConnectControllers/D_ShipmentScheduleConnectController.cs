@@ -384,6 +384,69 @@ namespace mar_sumaken_web.Commons
             return sql;
         }
 
+        /// <summary>
+        /// 出庫実績の存在チェック文SQL作成
+        /// </summary>
+        /// <param name="model">モデル</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToCheckExistDStoreOutByShipmentScheduleId(D_ShipmentScheduleModel model)
+        {
+            var sql = $@"
+		            SELECT
+                        count(StoreOutID) AS count
+                    FROM D_StoreOut
+		            WHERE 
+                        DepoID = {model.DepoID} 
+                        AND DeliveryDate = '{model.DeliveryDate}'
+                        AND DeliveryTimeClass = {model.DeliveryTimeClass}
+                        AND DeliverySlipNumber = '{model.DeliverySlipNumber}'
+                        AND DeliveryProductNumber = '{model.DeliveryProductNumber}'
+                        AND IsDeleted = 0
+            ;";
+
+            return sql;
+        }
+
+        /// <summary>
+        /// 出荷指示IDで出荷指示照会取得
+        /// </summary>
+        /// <param name="id">出荷指示ID</param>
+        /// <param name="databaseName">データベース名</param>
+        public static D_ShipmentScheduleModel? GetDShipmentScheduleByShipmentScheduleId(int id, string databaseName)
+        {
+            // 戻り値
+            D_ShipmentScheduleModel? result = new();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    var sql = $@"
+                        SELECT * 
+                        FROM D_ShipmentSchedule 
+                        WHERE 
+                            ShipmentScheduleID = {id}
+                            AND IsDeleted = 0
+                    ";
+
+                    result = connection.Query<D_ShipmentScheduleModel>(sql).FirstOrDefault();
+                }
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+        }
 
         /// <summary>
         /// 出荷指示情報取得SQL作成

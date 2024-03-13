@@ -191,17 +191,29 @@ namespace mar_sumaken_web.Controllers
 
                 // 出荷実績がある場合はエラー
                 string checkShipmentSql = D_ShipmentScheduleConnectController.CreateSQLToCheckExistDShipmentByShipmentScheduleId(id);
-                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(checkShipmentSql, user.DatabaseName);
-                if (isExisted)
+                bool isExistedShipment = ConnectToSQLServer.IsExistedSameRecord(checkShipmentSql, user.DatabaseName);
+                if (isExistedShipment)
                 {
                     return NotFound(new { errorMessage = "E1027: " + ErrorMessagesResources.E1027 });
                 }
 
+                // 出荷指示IDで出荷指示照会取得
+                var shipmentSchedule = D_ShipmentScheduleConnectController.GetDShipmentScheduleByShipmentScheduleId(id, user.DatabaseName);
+                if (shipmentSchedule == null)
+                {
+                    return NotFound(new { errorMessage = "E1027: " + ErrorMessagesResources.E3004 });
+                }
+
                 // 出庫実績がある場合はエラー
-                //.....
+                string checkDStoreOutSql = D_ShipmentScheduleConnectController.CreateSQLToCheckExistDStoreOutByShipmentScheduleId(shipmentSchedule);
+                bool isExistedStoreOut = ConnectToSQLServer.IsExistedSameRecord(checkDStoreOutSql, user.DatabaseName);
+                if (isExistedStoreOut)
+                {
+                    return NotFound(new { errorMessage = "E1027: " + ErrorMessagesResources.E1027 });
+                }
 
                 // 出荷指示削除
-                //D_ShipmentScheduleConnectController.DeleteDShipmentSchedule(id, user);
+                D_ShipmentScheduleConnectController.DeleteDShipmentSchedule(id, user);
 
                 return Ok();
             }
