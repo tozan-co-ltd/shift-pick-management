@@ -144,8 +144,8 @@ namespace mar_sumaken_web.Controllers
                             D_ShipmentScheduleModel shipmentSchedule = new()
                             {
                                 ImportFileName = fileName,
-                                SelectedDepoID = depoId,
-                                SelectedCompanyID = companyId
+                                DepoID = depoId,
+                                CompanyID= companyId,
                             };
                             var validationContext = new ValidationContext(shipmentSchedule);
                             var validationResults = new List<ValidationResult>();
@@ -165,14 +165,14 @@ namespace mar_sumaken_web.Controllers
                                 // 品番マスター・倉庫-品番中間テーブルに登録されている品番の行のみ取り込む
                                 // 登録されていない品番の行はスキップする
                                 var product = M_ProductConnectController.GetProductByShipmentDeliveryProductNumber(
-                                    shipmentSchedule.SelectedCompanyID, shipmentSchedule.SelectedDepoID, shipmentSchedule.DeliveryProductNumber, user.DatabaseName
+                                    shipmentSchedule.CompanyID, shipmentSchedule.DepoID, shipmentSchedule.DeliveryProductNumber, user.DatabaseName
                                 );
                                 if (product == null)
                                 {
                                     readCount++;
 
                                     // log取得
-                                    _logger.Info($"登録されていない品番の行はスキップ 納入先ID:{shipmentSchedule.SelectedCompanyID}, 倉庫ID{shipmentSchedule.SelectedDepoID}, 納入先品番:{shipmentSchedule.DeliveryProductNumber}");
+                                    _logger.Info($"登録されていない品番の行はスキップ 納入先ID:{shipmentSchedule.CompanyID}, 倉庫ID{shipmentSchedule.DepoID}, 納入先品番:{shipmentSchedule.DeliveryProductNumber}");
 
                                     continue;
                                 }
@@ -189,7 +189,12 @@ namespace mar_sumaken_web.Controllers
                             }
 
                             // 出庫実績がある場合はエラー
-                            //.....
+                            string checkDStoreOutSql = D_ShipmentScheduleConnectController.CreateSQLToCheckExistDStoreOutByShipmentSchedule(shipmentSchedule);
+                            bool isExistedStoreOut = ConnectToSQLServer.IsExistedSameRecord(checkDStoreOutSql, user.DatabaseName);
+                            if (isExistedStoreOut)
+                            {
+                                return NotFound(new { errorMessage = "E1027: " + ErrorMessagesResources.E1027 });
+                            }
 
                             // エラーメッセージ作成
                             if (!isValid)
