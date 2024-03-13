@@ -89,19 +89,19 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // log取得
-                _logger.Info($"出荷指示取込開始 ログインユーザー名:{user.UserName}");
+                _logger.Info($"入荷予定取込開始 ログインユーザー名:{user.UserName}");
 
                 // モデルリスト取得
                 if (files != null && files.Count > 0)
                 {
                     foreach (var file in files)
                     {
-                        // log取得
-                        _logger.Info($"ファイル名:{file}");
-
                         List<D_ReceiveScheduleModel> importModelList = new();
                         List<string> errorMessageList = new();
                         var fileName = file.FileName;
+
+                        // log取得
+                        _logger.Info($"ファイル名:{fileName}");
 
                         // ファイル内にデータがない場合はエラー
                         if (file.Length == 0)

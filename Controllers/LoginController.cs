@@ -129,7 +129,7 @@ namespace mar_sumaken_web.Controllers
                 M_UserConnectController.ConnectMUsers(sql, loginUserModel.DatabaseName);
 
                 // log取得
-                _logger.Info($"ログイン成功 ログインユーザー名:{loginUserModel.UserName}");
+                _logger.Info($"ログイン成功 ログインID:{model.LoginId}, ログインユーザー名:{loginUserModel.UserName}");
 
                 return RedirectToAction("Index", "Top");
             }

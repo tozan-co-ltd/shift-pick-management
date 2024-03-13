@@ -99,12 +99,12 @@ namespace mar_sumaken_web.Controllers
                 {
                     foreach (var file in files)
                     {
-                        // log取得
-                        _logger.Info($"ファイル名:{file}");
-
                         List<D_ShipmentScheduleModel> importModelList = new();
                         List<string> errorMessageList = new();
                         var fileName = file.FileName;
+
+                        // log取得
+                        _logger.Info($"ファイル名:{fileName}");
 
                         // ファイル内にデータがない場合はエラー
                         if (file.Length == 0)
