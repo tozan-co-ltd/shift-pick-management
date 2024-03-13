@@ -538,6 +538,24 @@ namespace mar_sumaken_web.Properties {
         }
         
         /// <summary>
+        ///   在庫がマイナスになった品番があります。管理者に確認してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2027 {
+            get {
+                return ResourceManager.GetString("E2027", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   既に実績データがあるため、一部データのみ登録しました。また、在庫がマイナスになった品番があります。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E2028 {
+            get {
+                return ResourceManager.GetString("E2028", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   データベースに接続できませんでした。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E3001 {

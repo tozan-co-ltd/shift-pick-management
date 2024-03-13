@@ -291,4 +291,10 @@
   <data name="E1027" xml:space="preserve">
     <value>既に実績データがあるため、削除できません。</value>
   </data>
+  <data name="E2027" xml:space="preserve">
+    <value>在庫がマイナスになった品番があります。管理者に確認してください。</value>
+  </data>
+  <data name="E2028" xml:space="preserve">
+    <value>既に実績データがあるため、一部データのみ登録しました。また、在庫がマイナスになった品番があります。</value>
+  </data>
 </root>
