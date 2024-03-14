@@ -1,4 +1,5 @@
 ﻿$(document).ready(function () {
+    //------------------- サイドメニュー ------------------//
     // #sidebarToggleがクリックされたときに、サイドバーの表示/非表示の状態をトグルし、クッキーに保存する
     $("#sidebarToggle").click(function () {
         // Sidebar クッキーを削除し、パスをルートに設定
@@ -16,6 +17,7 @@
         // Sidebar クッキーに body 要素のクラスを保存し、パスをルートに設定
         $.cookie("Sidebar", $className, { path: '/' });
     });
+    //--------------------------------------------------------//
 
     //------------------- DataTables ------------------//
     // 日本語表示
@@ -124,6 +126,27 @@
 });
 //--------------------------------------------------------//
 
+//------------------- サイドメニュー ------------------//
+// スマホ用のSidebarを開いている時は、画面遷移時に自動でSidebarを閉じるようカスタマイズ
+function toggleSidebar() {
+    if (window.innerWidth < 1200) {
+        // Sidebar クッキーを削除し、パスをルートに設定
+        $.removeCookie("Sidebar", { path: '/' });
+
+        // body 要素に sb-sidenav-toggled クラスをトグルする
+        $("body").toggleClass("sb-sidenav-toggled");
+
+        // #sidebarToggle 要素に rotateBtn クラスをトグルする
+        $("#sidebarToggle").toggleClass("rotateBtn");
+
+        // body 要素のクラスを取得
+        let $className = $("body").attr("class");
+
+        // Sidebar クッキーに body 要素のクラスを保存し、パスをルートに設定
+        $.cookie("Sidebar", $className, { path: '/' });
+    }
+}
+//--------------------------------------------------------//
 
 //------------------- CSV取込 ------------------//
 function onUploadFile(page) {
@@ -427,12 +450,6 @@ function CheckPairValueMSupplierKanban(id1, id2, required = false) {
         startIndex.val(0);
     }
 
-    // どちらかが数値でない(空欄)の場合はエラー
-    //if (Number.isNaN(lengthValue) || Number.isNaN(startIndexValue)) {
-    //    startIndex.addClass("input-validation-error");
-    //    checkFlag = false;
-    //}
-
     // どちらかが0の場合はエラー
     if (lengthValue > 0 && (startIndexValue <= 0 || Number.isNaN(startIndexValue))) {
         startIndex.addClass("input-validation-error");
@@ -457,25 +474,4 @@ function CheckPairValueMSupplierKanban(id1, id2, required = false) {
 
     return checkFlag;
 }
-
-// スマホでSidebarカスタマイズ
-function toggleSidebar() {
-    if (window.innerWidth < 1200) {
-        // Sidebar クッキーを削除し、パスをルートに設定
-        $.removeCookie("Sidebar", { path: '/' });
-
-        // body 要素に sb-sidenav-toggled クラスをトグルする
-        $("body").toggleClass("sb-sidenav-toggled");
-
-        // #sidebarToggle 要素に rotateBtn クラスをトグルする
-        $("#sidebarToggle").toggleClass("rotateBtn");
-
-        // body 要素のクラスを取得
-        let $className = $("body").attr("class");
-
-        // Sidebar クッキーに body 要素のクラスを保存し、パスをルートに設定
-        $.cookie("Sidebar", $className, { path: '/' });
-    } 
-}
-
 //--------------------------------------------------------//
