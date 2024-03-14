@@ -74,7 +74,7 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage = message });
                 }
                 model.LotQuantity = product.LotQuantity;
-                model.SupplierProductNumber = model.DeliveryProductNumber;
+                model.DeliveryProductNumber = product.DeliveryProductNumber;
                 model.SupplierProductNumber = product.SupplierProductNumber;
                 model.NumberOfBoxes = (int)Math.Ceiling((double)model.Quantity / model.LotQuantity);
 
