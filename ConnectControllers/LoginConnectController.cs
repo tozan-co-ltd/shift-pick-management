@@ -46,13 +46,13 @@ namespace mar_sumaken_web.Commons
         /// 最終ログイン日時が一致するユーザー情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMUserByLastLoginDatetime(int userID, DateTime lastLoginDatetime)
+        public static string CreateSQLToSelectMUserByLastLoginDatetime(int userId, DateTime lastLoginDatetime)
         {
             var sql = $@"
                         SELECT *
                         FROM M_User
                         WHERE (1=1)
-                            AND UserID = {userID}
+                            AND UserID = {userId}
                             AND LastLoginDatetime = '{lastLoginDatetime}'
                             AND IsDeleted = 0
             ;";

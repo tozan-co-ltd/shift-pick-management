@@ -104,7 +104,7 @@ namespace mar_sumaken_web.Controllers
                         searchData += $@"
                             <td class='StoreInID'>{@item.StoreInID}</td>
                             <td class='SupplierName'>{@item.SupplierName}</td>
-                            <td class='StoreInDate'>{@item.StoreInDate.ToString("yyyy/MM/dd")}</td>
+                            <td class='StoreInDate'>{@item.StoreInDate:yyyy/MM/dd}</td>
                             <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
                             <td class='LotNumber'>{@item.LotNumber}</td>
                             <td class='LotQuantity'>{@item.LotQuantity}</td>
@@ -114,7 +114,7 @@ namespace mar_sumaken_web.Controllers
                             <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                             <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
                             <td class='Remarks'>{@item.Remarks}</td>
-                            <td class='UpdatedAt'>{@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm:ss")}</td>
+                            <td class='UpdatedAt'>{@item.UpdatedAt:yyyy/MM/dd HH:mm:ss}</td>
                             <td class='UpdatedBy'>{@item.UpdatedBy}</td>
                             <input type='hidden' class='DepoID' value='{item.DepoID}' />
                             <input type='hidden' class='SupplierID' value='{item.SupplierID}' />

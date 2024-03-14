@@ -70,8 +70,6 @@ namespace mar_sumaken_web.Commons
         /// <param name="loginUser">ログインユーザー情報</param>
         public static bool InsertDReceiveSchedule(List<D_ReceiveScheduleModel> modelList, int depoId, string importFileName, string viewTitle, LoginUserModel loginUser)
         {
-            bool insertFlg = false;
-
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
@@ -120,7 +118,7 @@ namespace mar_sumaken_web.Commons
                     // トランザクションのコミット
                     transaction.Commit();
 
-                    insertFlg = true;
+                    bool insertFlg = true;
                     return insertFlg;
                 }
                 catch (SqlException)

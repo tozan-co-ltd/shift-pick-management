@@ -44,13 +44,14 @@ namespace mar_sumaken_web.Commons
         /// <param name="searchDate">年月日</param>
         /// <param name="depoId">倉庫ID</param>
         /// <param name="supplierId">会社ID</param>
+        /// <param name="supplierProductNumber">仕入先品番</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetStockStatus(string searchDate, int depoId, int supplierId, string productNumber = "")
+        public static string CreateSQLToGetStockStatus(string searchDate, int depoId, int supplierId, string supplierProductNumber = "")
         {
-            var productNumberCondition = string.Empty;
-            if(!string.Empty.Equals(productNumber))
+            var supplierProductNumberCondition = string.Empty;
+            if(!string.Empty.Equals(supplierProductNumber))
             {
-                productNumberCondition = $@" AND product.SupplierProductNumber = '{productNumber}' ";
+                supplierProductNumberCondition = $@" AND product.SupplierProductNumber = '{supplierProductNumber}' ";
             }
             var sql = $@"
                 DECLARE @InputDate DATE = '{searchDate}'; 
@@ -131,7 +132,7 @@ namespace mar_sumaken_web.Commons
                 WHERE
 	                product.IsDeleted = 0
                     AND product.SupplierID = @CompanyId
-                    {productNumberCondition}
+                    {supplierProductNumberCondition}
                 Order by 
 	                product.SupplierProductNumber ASC
             ";
@@ -144,9 +145,9 @@ namespace mar_sumaken_web.Commons
         /// <param name="searchDate">年月日</param>
         /// <param name="depoId">倉庫ID</param>
         /// <param name="supplierId">会社ID</param>
-        /// <param name="productNumber">仕入先品番</param>
+        /// <param name="supplierProductNumber">仕入先品番</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetStockStatusByProductNumber(string searchDate, int depoId, int supplierId, string productNumber)
+        public static string CreateSQLToGetStockStatusByProductNumber(string searchDate, int depoId, int supplierId, string supplierProductNumber)
         {
             var sql = $@"
                 DECLARE @InputDate DATE = '{searchDate}'; 
@@ -155,7 +156,7 @@ namespace mar_sumaken_web.Commons
                 DECLARE @LastMonthDate DATETIME = DATEADD(DAY, -1, DATEADD(MONTH, DATEDIFF(MONTH, 0, @InputDate), 0));
                 DECLARE @CompanyId int = {supplierId};
                 DECLARE @DepoId int = {depoId};
-                DECLARE @ProductNumber nvarchar(50) = '{productNumber}';
+                DECLARE @ProductNumber nvarchar(50) = '{supplierProductNumber}';
                 SELECT
 		            searchInfo.SupplierProductNumber
 		            ,WorkedDate
@@ -195,9 +196,9 @@ namespace mar_sumaken_web.Commons
         /// <param name="searchDate">年月日</param>
         /// <param name="depoId">倉庫ID</param>
         /// <param name="supplierId">会社ID</param>
-        /// <param name="productNumber">仕入先品番</param>
+        /// <param name="supplierProductNumber">仕入先品番</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToGetLotNumberDetailByProductNumber(string searchDate, int depoId, int supplierId, string productNumber)
+        public static string CreateSQLToGetLotNumberDetailByProductNumber(string searchDate, int depoId, int supplierId, string supplierProductNumber)
         {
             var sql = $@"
                 DECLARE @InputDate DATE = '{searchDate}'; 
@@ -206,7 +207,7 @@ namespace mar_sumaken_web.Commons
                 DECLARE @LastMonthDate DATETIME = DATEADD(DAY, -1, DATEADD(MONTH, DATEDIFF(MONTH, 0, @InputDate), 0));
                 DECLARE @CompanyId int = {supplierId};
                 DECLARE @DepoId int = {depoId};
-                DECLARE @ProductNumber nvarchar(50) = '{productNumber}';
+                DECLARE @ProductNumber nvarchar(50) = '{supplierProductNumber}';
                 SELECT
 		            searchInfo.SupplierProductNumber
 		            ,searchInfo.LotNumber

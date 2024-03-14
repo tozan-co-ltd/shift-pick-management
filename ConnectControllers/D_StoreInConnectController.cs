@@ -19,7 +19,7 @@ namespace mar_sumaken_web.ConnectControllers
         public static List<D_StoreInModel> ConnectDStoreIns(string sql, string databaseName)
         {
             // 戻り値
-            List<D_StoreInModel> strList = new List<D_StoreInModel>();
+            List<D_StoreInModel> strList = new();
 
             try
             {

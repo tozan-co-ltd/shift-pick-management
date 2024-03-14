@@ -14,7 +14,7 @@ namespace mar_sumaken_web.Controllers
     /// </summary>
     public class ImportShipmentScheduleController : BaseController
     {
-        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// ヘッダー列数取得
@@ -300,36 +300,38 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// モデルヘッダー名リスト取得
         /// </summary>
-        private Dictionary<int, string> GetModelHeaderCheck()
+        private static Dictionary<int, string> GetModelHeaderCheck()
         {
-            Dictionary<int, string> headerSettings = new Dictionary<int, string>();
-            headerSettings[6] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererCode");
-            headerSettings[7] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererFactoryKubun");
-            headerSettings[8] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererName");
-            headerSettings[9] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererFactoryName");
-            headerSettings[10] = Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipperCode");
-            headerSettings[11] = Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipperFactoryKubun");
-            headerSettings[13] = Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipperName");
-            headerSettings[16] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryCode");
-            headerSettings[17] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryKubun");
-            headerSettings[18] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryLocation");
-            headerSettings[19] = Utils.GetDisplayName<D_ShipmentScheduleModel>("NameOfDelivery");
-            headerSettings[20] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryName");
-            headerSettings[22] = Utils.GetDisplayName<D_ShipmentScheduleModel>("RegularKubun");
-            headerSettings[24] = Utils.GetDisplayName<D_ShipmentScheduleModel>("IssuedDate");
-            headerSettings[25] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryDate");
-            headerSettings[26] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryTime");
-            headerSettings[27] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryTimeClass");
-            headerSettings[28] = Utils.GetDisplayName<D_ShipmentScheduleModel>("TranspotationIdentify");
-            headerSettings[30] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipNumber");
-            headerSettings[31] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipPageNumber");
-            headerSettings[32] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipRowNumber");
-            headerSettings[34] = "表示用品番";
-            headerSettings[35] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductAbbreviation");
-            headerSettings[36] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductName");
-            headerSettings[37] = Utils.GetDisplayName<D_ShipmentScheduleModel>("LotQuantity");
-            headerSettings[43] = Utils.GetDisplayName<D_ShipmentScheduleModel>("BranchNumber");
-            headerSettings[44] = Utils.GetDisplayName<D_ShipmentScheduleModel>("Quantity");
+            Dictionary<int, string> headerSettings = new()
+            {
+                [6] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererCode"),
+                [7] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererFactoryKubun"),
+                [8] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererName"),
+                [9] = Utils.GetDisplayName<D_ShipmentScheduleModel>("OrdererFactoryName"),
+                [10] = Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipperCode"),
+                [11] = Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipperFactoryKubun"),
+                [13] = Utils.GetDisplayName<D_ShipmentScheduleModel>("ShipperName"),
+                [16] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryCode"),
+                [17] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryKubun"),
+                [18] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryLocation"),
+                [19] = Utils.GetDisplayName<D_ShipmentScheduleModel>("NameOfDelivery"),
+                [20] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryFactoryName"),
+                [22] = Utils.GetDisplayName<D_ShipmentScheduleModel>("RegularKubun"),
+                [24] = Utils.GetDisplayName<D_ShipmentScheduleModel>("IssuedDate"),
+                [25] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryDate"),
+                [26] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryTime"),
+                [27] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryTimeClass"),
+                [28] = Utils.GetDisplayName<D_ShipmentScheduleModel>("TranspotationIdentify"),
+                [30] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipNumber"),
+                [31] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipPageNumber"),
+                [32] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliverySlipRowNumber"),
+                [34] = "表示用品番",
+                [35] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductAbbreviation"),
+                [36] = Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductName"),
+                [37] = Utils.GetDisplayName<D_ShipmentScheduleModel>("LotQuantity"),
+                [43] = Utils.GetDisplayName<D_ShipmentScheduleModel>("BranchNumber"),
+                [44] = Utils.GetDisplayName<D_ShipmentScheduleModel>("Quantity")
+            };
 
             return headerSettings;
         }
@@ -337,7 +339,7 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// 読み取りデータをモデルに設定
         /// </summary>
-        private D_ShipmentScheduleModel SetReadDataInModel(D_ShipmentScheduleModel model, List<string[]> lines, int readCount)
+        private static D_ShipmentScheduleModel SetReadDataInModel(D_ShipmentScheduleModel model, List<string[]> lines, int readCount)
         {
             model.OrdererCode = lines[readCount][6];
             model.OrdererFactoryKubun = lines[readCount][7];

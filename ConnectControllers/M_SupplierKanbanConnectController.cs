@@ -87,8 +87,8 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 仕入先かんばんマスター登録
         /// </summary>
-        /// <param name="model"></param>
-        /// <param name="loginUser"></param>
+        /// <param name="model">登録情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>登録結果</returns>
         public static void InsertMSupplierKanban(M_SupplierKanbanModel model, LoginUserModel loginUser)
         {
@@ -387,50 +387,6 @@ namespace mar_sumaken_web.ConnectControllers
             return sql;
         }
 
-        ///// <summary>
-        ///// QRコードから仕入先かんばんマスター情報取得SQL作成
-        ///// </summary>
-        ///// <param name="model"></param>
-        ///// <returns>SQL文</returns>
-        //private static string CreateSQLToSelectMSupplierKanbansForQRCode(M_SupplierKanbanModel model)
-        //{
-        //    var sql = $@"
-        //        SELECT 
-        //            SupplierKanbanID
-        //            ,SupplierKanbanName
-        //            ,CASE 
-        //                WHEN AllowedDuplicatesFlag = 0 THEN '0(なし)'
-        //                WHEN AllowedDuplicatesFlag = 1 THEN '1(あり)'
-        //                ELSE''
-        //                END AS AllowedDuplicatesFlag
-        //            ,IdentifyString
-        //            ,IdentifyStringStartIndex
-        //            ,ProductNumberStartIndex
-        //            ,ProductNumberLength
-        //            ,QuantityLength
-        //            ,QuantityStartIndex
-        //            ,LotLength
-        //            ,LotStartIndex
-        //            ,MainProductKeyLength
-        //            ,MainProductKeyStartIndex
-        //            ,FirstSubProductKeyLength
-        //            ,FirstSubProductKeyStartIndex
-        //            ,SecondSubProductKeyLength
-        //            ,SecondSubProductKeyStartIndex
-        //            ,ProductBranchNumberLength
-        //            ,ProductBranchNumberStartIndex
-        //            ,OrderNumberLength
-        //            ,OrderNumberStartIndex
-        //        FROM 
-        //            M_SupplierKanban AS supplierKanban
-        //        WHERE 
-        //            supplierKanban.IsDeleted = 0
-        //            AND IdentifyString = '{model.IdentifyString}'
-        //            AND company.IsDeleted = 0
-        //    ";
-        //    return sql;
-        //}
-
         /// <summary>
         /// 仕入先かんばんマスター登録SQL作成
         /// </summary>
@@ -508,7 +464,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// ハンディ-仕入先かんばん中間テーブル登録SQL作成
         /// </summary>
         /// <param name="handyMenuId">登録ハンディメニューID</param>
-        /// <param name="supplierKanbanId">登録ユーザーI</param>
+        /// <param name="supplierKanbanId">仕入先かんばんID</param>
         /// <param name="createdAt">システムタイム</param>
         /// <param name="createdBy">ユーザーID</param>
         /// <returns>SQL文</returns>
@@ -538,7 +494,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 仕入先かんばんマスター更新SQL作成
         /// </summary>
-        /// <param name="model">更新情報</param>
+        /// <param name="model">登録情報</param>
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
@@ -580,9 +536,9 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 仕入先かんばんマスター削除SQL作成
         /// </summary>
-        /// <param name="spplierKanbanId"></param>
-        /// <param name="updatedAt"></param>
-        /// <param name="updatedBy"></param>
+        /// <param name="spplierKanbanId">仕入先かんばんID</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
         private static string CreateSQLToDeleteMSupplierKanban(int spplierKanbanId, DateTime updatedAt, string updatedBy)
         {

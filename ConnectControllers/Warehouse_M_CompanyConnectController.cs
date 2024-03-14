@@ -48,7 +48,8 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// 会社URLで会社取得SQL作成
         /// </summary>
-        /// <returns>SQL</returns>
+        /// <param name="companyWebPath">会社webパス</param>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToSelectMCompanyByWebPath(string companyWebPath)
         {
             var sql = $@"
