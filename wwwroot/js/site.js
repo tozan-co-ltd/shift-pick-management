@@ -452,10 +452,4 @@ function toggleSidebar() {
     } 
 }
 
-window.addEventListener('resize', function () {
-    var sidenav = document.querySelector('.sb-nav-fixed');
-    if (sidenav.classList.contains('sb-sidenav-toggled')) {
-        sidenav.classList.remove('sb-sidenav-toggled');
-    }
-});
 //--------------------------------------------------------//
