@@ -331,6 +331,7 @@ body {
 .sb-topnav .navbar-brand {
     width: 175px !important;
 }
+
 .fa-angles-left{
     font-size: 20px;
 }
@@ -466,14 +467,19 @@ table .btn-primary.btn-icon-split {
 }
 
 .de-inspection .paginate_button {
-    border: 1px solid #f0844b !important;
+    border: 1px solid #f8f9fa !important;
+    background: #f8f9fa !important;
     border-radius: 7px !important;
     margin-right: 7px !important;
 }
 
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    color: black !important;
+}
+
 .paginate_button:hover {
-    background: #001E64 !important;
-    border: 1px solid #001E64 !important;
+    background: #DDE2F1 !important;
+    border: 1px solid #DDE2F1 !important;
 }
 
 .de-inspection .dataTables_wrapper .dataTables_paginate {
@@ -595,8 +601,25 @@ select[readonly] {
     .sp-cs-dpl{
         display: block !important;
     }
-    .custom-checkbox{
+    .align-items-custom {
+        align-items: unset !important;
+    }
+    .sp-cs-dpl-fix {
+        display: flex;
+    }
+    .diffence-count-check {
+        margin-left: 0 !important;
+        margin-top: 10px;
+    }
+    .warehouse-name-drs {
+        margin-bottom: 20px;
+    }
+    .custom-checkbox {
         padding-left: 0;
+        margin-top: 20px;
+    }
+    #search-btn{
+        margin: 0 !important;
     }
     .sp-unset-ml {
         margin-left: 0 !important;
@@ -651,6 +674,12 @@ select[readonly] {
     }
 }
 
+@media (max-width: 1024px) {
+    #sidebarToggle{
+        position: absolute;
+        left: 140px;
+    }
+}
 
 @media (max-width: 768px) {
     .sidebar {
@@ -699,9 +728,9 @@ select[readonly] {
     }
 
     .de-inspection .btn-info.btn-icon-split {
-/*        width: 92px !important;
-        min-width: 92px !important;
-        display: block;*/
+        /*        width: 92px !important;
+    min-width: 92px !important;
+    display: block;*/
     }
 
     .de-inspection .btn-primary.btn-icon-split {
@@ -740,6 +769,7 @@ select[readonly] {
 .div-input-group {
     margin-bottom: 10px;
 }
+
 .column-1st {
     padding-left: 0 !important;
     margin-bottom: 0.25rem !important;

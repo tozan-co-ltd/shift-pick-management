@@ -133,7 +133,7 @@
                                             <div class="bg-white py-2 collapse-inner rounded">
                                                 @foreach (var obj in menuList)
                                                 {
-                                                    <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action">@obj.MenuName</a>
+                                                    <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
                                                 }
                                             </div>
                                         </div>
