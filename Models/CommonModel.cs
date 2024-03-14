@@ -78,7 +78,7 @@ namespace mar_sumaken_web.Models
         {
             CompanyID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_CampanyID).First().Value);
             DataBaseName = claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
-            UserID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value); 
+            UserID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value);
             Role = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_Role).First().Value);
             AuthorizedKubun = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_AuthorizedKubun).First().Value);
             ControllerName = viewContext.RouteData.Values["controller"].ToString();
@@ -115,7 +115,7 @@ namespace mar_sumaken_web.Models
                                   AND B.Controller  = @Controller
                         ";
 
-                     var param = new
+                    var param = new
                     {
                         CompanyID = CompanyID,
                         Controller = ControllerName
@@ -212,7 +212,7 @@ namespace mar_sumaken_web.Models
         /// <returns></returns>
         public IEnumerable<SelectListItem> GetMCompanyList(string databaseName, int companyKubun)
         {
-            var selectListItem = new List<SelectListItem>();
+            var companyList = new List<SelectListItem>();
 
             try
             {
@@ -223,28 +223,24 @@ namespace mar_sumaken_web.Models
                 {
                     connection.Open();
                     var sql = $@"
-                        SELECT *
+                        SELECT 
+                            CompanyID AS Value
+                            ,CASE 
+	                            WHEN TRIM(ClientName) = '' THEN CompanyName
+	                            WHEN ClientName IS NULL THEN CompanyName
+                                ELSE concat(CompanyName, ' - ', ClientName) 
+                            END AS Text
                         FROM M_Company
                         WHERE (1=1)
                             AND CompanyKubun = {companyKubun}
                             AND IsDeleted = 0
-                        ";
-
-                    var companyList = new List<M_CompanyModel>();
-                    companyList = connection.Query<M_CompanyModel>(sql).ToList();
+                     ";
 
                     // 会社名(仕入先名/納入先名)のセレクトボックスに「会社名 - 得意先名」と表示させる
-                    foreach (var company in companyList)
-                    {
-                        var item = new SelectListItem
-                        {
-                            Value = company.CompanyID.ToString(),
-                            Text = company.CompanyName.ToString() + " - " + company.ClientName.ToString()
-                        };
-                        selectListItem.Add(item);
-                    }
+                    companyList = connection.Query<SelectListItem>(sql).ToList();
                 }
-                return selectListItem;
+
+                return companyList;
             }
             catch (Exception)
             {

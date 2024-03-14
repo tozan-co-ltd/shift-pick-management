@@ -146,62 +146,85 @@ namespace mar_sumaken_web.Commons
             string differenceCheckCondition = string.Empty;
             if (model.DiffenceCountCheck)
             {
-                differenceCheckCondition = " AND (schedule.Quantity / product.LotQuantity) <> COALESCE(storeIn.NumberOfBoxes, 0) ";
+                differenceCheckCondition = " AND (receive_schedule.Quantity / product.LotQuantity) <> COALESCE(storein_sum.StoreInNumberOfBox, 0) ";
             }
 
-            var sql = $@"
+            var sql = $@" 
+                -- 入荷予定の条件絞り込み
+                WITH receive_schedule AS (
+                    SELECT 
+                        *
+                    FROM 
+                        D_ReceiveSchedule
+                    WHERE 
+                        DepoID = {model.SelectedDepoID}
+                        AND CompanyID ={model.SelectedCompanyID}
+                        AND ReceiveScheduleDate >= '{model.SearchStartDate}'
+                        AND ReceiveScheduleDate <= '{model.SearchEndDate}'
+                        AND IsDeleted = 0
+                ),
+                -- 出庫実績の条件絞り込み
+                storein_sum AS (
+                    SELECT 
+                        DepoID,
+                        CompanyID,
+                        StoreInDate,
+                        SupplierProductNumber,
+                        LotNumber,
+                        SUM(COALESCE(NumberOfBoxes, 0)) AS StoreInNumberOfBox, -- 入庫箱数
+                        SUM(COALESCE(Quantity, 0)) AS StoreInQuantity
+                    FROM 
+                        D_StoreIn
+                    WHERE 
+                        DepoID ={model.SelectedDepoID}
+                        AND StoreInDate >= '{model.SearchStartDate}'
+                        AND StoreInDate <= '{model.SearchEndDate}'
+                        AND IsDeleted = 0
+                    GROUP BY 
+                        DepoID,
+                        CompanyID,
+                        StoreInDate,
+                        SupplierProductNumber,
+                        LotNumber
+                )
+
                 SELECT
-                    schedule.ReceiveScheduleID
-                    ,schedule.DepoID
-                    ,schedule.CompanyID AS SupplierID
-                    ,company.CompanyName AS SupplierName
-                    ,schedule.ReceiveScheduleDate
-                    ,schedule.SupplierProductNumber
-                    ,schedule.LotNumber
-                    ,CASE 
-	                    WHEN product.LotQuantity <> 0 THEN ROUND(schedule.Quantity / product.LotQuantity, 0, 0)
-	                    ELSE 0
-                    END AS NumberOfBoxes    -- 予定箱数
-                    ,COALESCE(schedule.Quantity, 0) AS Quantity      --予定数量
-                    ,SUM(COALESCE(storeIn.NumberOfBoxes, 0)) AS StoreInNumberOfBox    -- 入庫箱数
-                    ,SUM(COALESCE(storeIn.Quantity, 0)) AS StoreInQuantity            -- 入庫数量
-                    ,schedule.CreatedAt
-                    ,schedule.CreatedBy
-                FROM D_ReceiveSchedule AS schedule
-                INNER JOIN M_Product AS product 
-                    ON schedule.SupplierProductNumber = product.SupplierProductNumber
-                LEFT JOIN D_StoreIn AS storeIn
-                    ON schedule.DepoID = storeIn.DepoID
-	                AND schedule.CompanyID = storeIn.CompanyID
-	                AND schedule.ReceiveScheduleDate = storeIn.StoreInDate
-	                AND schedule.SupplierProductNumber = storeIn.SupplierProductNumber
-	                AND schedule.LotNumber = storeIn.LotNumber
-                    AND storeIn.IsDeleted = 0
-                INNER JOIN M_Company AS company 
-                    ON schedule.CompanyID = company.CompanyID
-                WHERE 
-                    schedule.DepoID = {model.SelectedDepoID}
-                    AND schedule.CompanyID = {model.SelectedCompanyID}
-                    AND schedule.ReceiveScheduleDate >= '{model.SearchStartDate}'
-                    AND schedule.ReceiveScheduleDate <= '{model.SearchEndDate}'
-                    {differenceCheckCondition}
-                    AND schedule.IsDeleted = 0
+                    receive_schedule.ReceiveScheduleID,
+                    receive_schedule.DepoID,
+                    receive_schedule.CompanyID AS SupplierID,
+                    company.CompanyName AS SupplierName,
+                    receive_schedule.ReceiveScheduleDate,
+                    receive_schedule.SupplierProductNumber,
+                    receive_schedule.LotNumber,
+                    CASE 
+                        WHEN product.LotQuantity <> 0 THEN ROUND(receive_schedule.Quantity / product.LotQuantity, 0)
+                        ELSE 0
+                    END AS NumberOfBoxes, -- 予定箱数
+                    COALESCE(receive_schedule.Quantity, 0) AS Quantity, --予定数量
+                    COALESCE(storein_sum.StoreInNumberOfBox, 0) AS StoreInNumberOfBox, -- 入庫箱数
+                    COALESCE(storein_sum.StoreInQuantity, 0) AS StoreInQuantity, -- 入庫数量
+                    receive_schedule.CreatedAt,
+                    receive_schedule.CreatedBy
+                FROM 
+                    receive_schedule 
+                INNER JOIN 
+                    M_Product AS product ON receive_schedule.SupplierProductNumber = product.SupplierProductNumber
+                LEFT JOIN 
+                    storein_sum 
+                    ON receive_schedule.DepoID = storein_sum.DepoID
+                    AND receive_schedule.CompanyID = storein_sum.CompanyID
+                    AND receive_schedule.ReceiveScheduleDate = storein_sum.StoreInDate
+                    AND receive_schedule.SupplierProductNumber = storein_sum.SupplierProductNumber
+                    AND receive_schedule.LotNumber = storein_sum.LotNumber                    
+                INNER JOIN 
+                    M_Company AS company ON receive_schedule.CompanyID = company.CompanyID
+                WHERE   
+                    receive_schedule.IsDeleted = 0
                     AND product.IsDeleted = 0
-	                AND company.IsDeleted = 0
-                GROUP BY 
-					schedule.ReceiveScheduleID
-                    ,schedule.DepoID
-                    ,schedule.CompanyID
-                    ,company.CompanyName
-                    ,schedule.ReceiveScheduleDate
-                    ,schedule.SupplierProductNumber
-                    ,schedule.LotNumber
-					,product.LotQuantity
-					,schedule.Quantity
-					,schedule.CreatedAt
-                    ,schedule.CreatedBy
+                    AND company.IsDeleted = 0
+                     {differenceCheckCondition}                                      
                 ORDER BY 
-	                schedule.SupplierProductNumber ASC     
+                    receive_schedule.SupplierProductNumber ASC
             ";
             return sql;
         }

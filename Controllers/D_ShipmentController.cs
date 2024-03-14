@@ -18,11 +18,15 @@ namespace mar_sumaken_web.Controllers
         /// 出荷実績照会画面表示
         /// </summary>
         /// <param name="shipmentScheduleId">出荷指示ID</param>
+        /// <param name="categoryTitle">カテゴリータイトル</param>
         /// <param name="depoId">倉庫ID</param>
         /// <param name="companyId">会社ID</param>
-        /// <param name="categoryTitle">カテゴリータイトル</param>
-        /// <returns></returns>
-        public IActionResult Index(int shipmentScheduleId, int depoId, int companyId, string categoryTitle)
+        /// <param name="startDate">納入指示日(開始)</param>
+        /// <param name="endDate">納入指示日(終了)</param>
+        /// <param name="binListStr">便リスト</param>
+        /// <param name="differenceCountCheck">実績数不一致のみ</param>
+        public IActionResult Index(int shipmentScheduleId, string categoryTitle, int depoId, int companyId, 
+            string startDate, string endDate, string binListStr, bool differenceCountCheck)
         {
             D_ShipmentModel model = new();
             try
@@ -43,11 +47,14 @@ namespace mar_sumaken_web.Controllers
                     shipmentScheduleId, depoId, companyId);
                 List<D_ShipmentModel> dShipmentList = D_ShipmentConnectController.ConnectDShipments(sql, user.DatabaseName);
 
-                CommonModel commonModel = new();
-                commonModel.CompanyID= companyId;
-                commonModel.ControllerName = "D_Shipment";
-
+                // 画面名取得
+                CommonModel commonModel = new()
+                {
+                    CompanyID = user.CompanyID,
+                    ControllerName = "D_Shipment"
+                };
                 model.Title = categoryTitle + " - 出荷指示照会 - " + commonModel.GetViewTitle();
+
                 model.DeliveryID = companyId;
                 model.DepoID = depoId;
                 model.ShipmentScheduleID = shipmentScheduleId;
@@ -58,6 +65,10 @@ namespace mar_sumaken_web.Controllers
                 {
                     model.DeliveryDate = dShipmentList[0].DeliveryDate;
                 }
+                model.SearchStartDate = startDate;
+                model.SearchEndDate = endDate;
+                model.BinListStr = binListStr;
+                model.DifferenceCountCheck = differenceCountCheck;
 
                 return View(model);
             }
@@ -103,7 +114,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("DeliveryName")] = item.DeliveryName.ToString().Trim();
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("DeliveryDate")] = item.DeliveryDate.ToString("yyyy/MM/dd");
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("DeliveryTimeClass")] = item.DeliveryTimeClass.ToString().Trim();
-                        newRow[Utils.GetDisplayName<D_ShipmentModel>("ShipmentDatetime")] = item.ShipmentDatetime.ToString("yyyy/MM/dd");
+                        newRow[Utils.GetDisplayName<D_ShipmentModel>("ShipmentDate")] = item.ShipmentDate.ToString("yyyy/MM/dd");
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("DeliveryProductNumber")] = item.DeliveryProductNumber.ToString().Trim();
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("DeliveryProductAbbreviation")] = item.DeliveryProductAbbreviation.ToString().Trim();
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("KanbanSerialNumber")] = item.KanbanSerialNumber.ToString().Trim();
@@ -158,7 +169,7 @@ namespace mar_sumaken_web.Controllers
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("DeliveryName"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("DeliveryDate"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("DeliveryTimeClass"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("ShipmentDatetime"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("ShipmentDate"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("DeliveryProductNumber"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("DeliveryProductAbbreviation"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("KanbanSerialNumber"), typeof(string));

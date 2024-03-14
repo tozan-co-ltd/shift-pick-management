@@ -12,6 +12,12 @@
     <div class="card-body">
         <div class="col-md-12 pb-3">
             <form method="get" asp-controller="D_ShipmentSchedule" asp-action="Index">
+                <input type="hidden" asp-for="DepoID" name="depoId"/>
+                <input type="hidden" asp-for="DeliveryID" name="deliveryId"/>
+                <input type="hidden" asp-for="SearchStartDate" name="startDate"/>
+                <input type="hidden" asp-for="SearchEndDate" name="endDate"/>
+                <input type="hidden" asp-for="BinListStr" name="binListStr" />
+                <input type="hidden" asp-for="DifferenceCountCheck" name="differenceCountCheck" />
                 <button type="submit" class="btn btn-secondary btn-icon-split">
                     <span class="icon text-white-50">
                         <i class="fas fa-arrow-left-long"></i>
@@ -104,7 +110,7 @@
                                 <td>@item.DeliveryName</td>
                                 <td>@item.DeliveryDate.ToString("yyyy/MM/dd")</td>
                                 <td>@item.DeliveryTimeClass</td>
-                                <td>@item.ShipmentDatetime.ToString("yyyy/MM/dd")</td>
+                                <td>@item.ShipmentDate.ToString("yyyy/MM/dd")</td>
                                 <td>@item.DeliveryProductNumber</td>
                                 <td>@item.DeliveryProductAbbreviation</td>
                                 <td>@item.KanbanSerialNumber</td>
