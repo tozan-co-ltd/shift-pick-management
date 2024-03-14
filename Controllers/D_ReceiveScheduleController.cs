@@ -86,7 +86,7 @@ namespace mar_sumaken_web.Controllers
                         <td class='Quantity'>{@item.Quantity}</td>
                         <td class='StoreInNumberOfBox'>{@item.StoreInNumberOfBox}</td>
                         <td class='StoreInQuantity'>{@item.StoreInQuantity}</td>
-                        <td class='CreatedAt'>{@item.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")}</td>
+                        <td class='CreatedAt'>{@item.CreatedAt:yyyy/MM/dd HH:mm:ss}</td>
                         <td class='CreatedBy'>{@item.CreatedBy}</td>
                         <input type='hidden' class='DepoID' value='{item.DepoID}' />
                         <input type='hidden' class='SupplierID' value='{item.SupplierID}' />

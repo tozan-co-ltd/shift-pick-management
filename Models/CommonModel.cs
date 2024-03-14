@@ -94,8 +94,6 @@ namespace mar_sumaken_web.Models
         /// <returns>カテゴリー名</returns>
         public string GetCategoryTitle()
         {
-            string categoryTitle = "";
-
             try
             {
                 var connectionString = ConnectToSQLServer.GetSQLServerConnectionStringForMaster();
@@ -117,10 +115,10 @@ namespace mar_sumaken_web.Models
 
                     var param = new
                     {
-                        CompanyID = CompanyID,
+                        CompanyID,
                         Controller = ControllerName
                     };
-                    categoryTitle = connection.ExecuteScalar<string>(commandText, param);
+                    string categoryTitle = connection.ExecuteScalar<string>(commandText, param);
                     return categoryTitle;
                 }
             }
@@ -136,8 +134,6 @@ namespace mar_sumaken_web.Models
         /// <returns>WEBメニュー名</returns>
         public string GetViewTitle()
         {
-            string pageTitle = "";
-
             try
             {
                 var connectionString = ConnectToSQLServer.GetSQLServerConnectionStringForMaster();
@@ -159,10 +155,10 @@ namespace mar_sumaken_web.Models
 
                     var param = new
                     {
-                        CompanyID = CompanyID,
+                        CompanyID,
                         Controller = ControllerName
                     };
-                    pageTitle = connection.ExecuteScalar<string>(commandText, param);
+                    string pageTitle = connection.ExecuteScalar<string>(commandText, param);
                     return pageTitle;
                 }
             }

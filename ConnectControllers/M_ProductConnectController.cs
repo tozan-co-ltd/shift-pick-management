@@ -22,7 +22,7 @@ namespace mar_sumaken_web.ConnectControllers
         public static List<M_ProductModel> ConnectMProducts(string sql, string databaseName)
         {
             // 戻り値
-            List<M_ProductModel> strList = new List<M_ProductModel>();
+            List<M_ProductModel> strList = new();
 
             try
             {
@@ -424,8 +424,6 @@ namespace mar_sumaken_web.ConnectControllers
         /// <returns>登録結果</returns>
         public static bool InsertMProduct(M_ProductModel model, LoginUserModel loginUser)
         {
-            bool result = false;
-
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
@@ -470,7 +468,7 @@ namespace mar_sumaken_web.ConnectControllers
                     // トランザクションのコミット
                     transaction.Commit();
 
-                    result = true;
+                    bool result = true;
 
                     return result;
                 }
@@ -864,30 +862,6 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番履歴テーブル登録SQL作成
         /// </summary>
-        /// <param name="product">登録情報</param>
-        /// <param name="updatedAt">システムタイム</param>
-        /// <param name="updatedBy">ユーザー名</param>
-        /// <returns>SQL文</returns>
-        private static string CreateSQLToInsertDProductHistory(M_ProductModel product, string historyStatus, DateTime updatedAt, string updatedBy)
-        {
-            List<SelectListItem> selectedItems = product.RDepoProductsRegister.Where(item => item.Selected).ToList();
-            List<string> selectedValues = selectedItems.Select(item => item.Value).ToList();
-            var depoName = string.Join(",", selectedValues);
-
-            var sql = $@"
-                INSERT INTO D_ProductHistory
-                    (HistoryStatus, DepoName, SupplierName, SupplierProductNumber, DeliveryID, DeliveryProductNumber, ProductName, LotQuantity, UpdatedAt, UpdatedBy)
-                VALUES (
-                    {historyStatus}, {depoName}, {product.SupplierName}, '{product.SupplierProductNumber}', {product.DeliveryID}, '{product.DeliveryProductNumber}', '{product.ProductName}', {product.LotQuantity}, '{updatedAt}', '{updatedBy}'
-                )
-;
-            ";
-            return sql;
-        }
-
-        /// <summary>
-        /// 品番履歴テーブル登録SQL作成
-        /// </summary>
         /// <param name="productId">品番ID</param>
         /// <param name="historyStatus">履歴状態</param>
         /// <param name="updatedAt">システムタイム</param>
@@ -896,7 +870,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <returns>SQL文</returns>
         private static string CreateSQLToInsertDProductHistory(int productId, string historyStatus, DateTime updatedAt, string updatedBy, string depoName = "")
         {
-            var depoNameStr = string.Empty;
+            string? depoNameStr;
             if (string.Empty.Equals(depoName))
             {
                 depoNameStr = "COALESCE(STRING_AGG(depo.DepoName,', '), '') AS DepoName";

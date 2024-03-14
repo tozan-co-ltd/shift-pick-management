@@ -98,8 +98,6 @@ namespace mar_sumaken_web.Commons
         /// <returns></returns>
         public static bool InsertDShipmentSchedule(List<D_ShipmentScheduleModel> modelList, int depoId, int companyId, string importFileName, string viewTitle, LoginUserModel loginUser)
         {
-            bool insertFlg = false;
-
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
             // SQLServer接続
@@ -148,7 +146,7 @@ namespace mar_sumaken_web.Commons
                     // トランザクションのコミット
                     transaction.Commit();
 
-                    insertFlg = true;
+                    bool insertFlg = true;
                     return insertFlg;
                 }
                 catch (SqlException)

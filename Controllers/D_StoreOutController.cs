@@ -148,8 +148,8 @@ namespace mar_sumaken_web.Controllers
                         searchData += $@"
                             <td class='StoreOutID'>{@item.StoreOutID}</td>
                             <td class='SupplierName'>{@item.SupplierName}</td>
-                            <td class='StoreOutDate'>{@item.StoreOutDate.ToString("yyyy/MM/dd")}</td>
-                            <td class='DeliveryDate'>{@item.DeliveryDate.ToString("yyyy/MM/dd")}</td>
+                            <td class='StoreOutDate'>{@item.StoreOutDate:yyyy/MM/dd}</td>
+                            <td class='DeliveryDate'>{@item.DeliveryDate:yyyy/MM/dd}</td>
                             <td class='DeliveryTimeClass'>{DisplayBin(@item.DeliveryTimeClass)}</td>
                             <td class='DeliverySlipNumber'>{@item.DeliverySlipNumber}</td>
                             <td class='DeliveryProductNumber'>{@item.DeliveryProductNumber}</td>
@@ -360,8 +360,10 @@ namespace mar_sumaken_web.Controllers
                 List<D_StoreOutModel> storeInList = new();
                 for (int i = 0; i < InitRegisterRowCount; i++)
                 {
-                    var viewModel = new D_StoreOutModel();
-                    viewModel.SelectedDepoID = user.MainDepoID;
+                    D_StoreOutModel viewModel = new()
+                    {
+                        SelectedDepoID = user.MainDepoID
+                    };
                     storeInList.Add(viewModel);
 
                     model.RegisterList = storeInList;
