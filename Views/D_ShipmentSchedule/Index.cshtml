@@ -55,10 +55,10 @@
                                 <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
                             </div>
 
-                            <div class="col-16 d-flex justify-content-start align-items-center">
+                            <div class="col-16 d-flex justify-content-start align-items-center align-items-custom">
                                 <p class="warehouse-name-drs">便</p>
                                 <div class="col-16 d-flex justify-content-start align-items-center sp-cs-dpl">
-                                    <div class="col-16 d-flex justify-content-start align-items-center sp-cs-dpl">
+                                    <div class="col-16 d-flex justify-content-start align-items-center sp-cs-dpl-fix">
                                         @for (var i = 0; i < @Model.BinList.Count; i++)
                                         {
                                             <div class="form-check">
@@ -68,10 +68,10 @@
                                                 <label class="form-check-label ml-1 mr-3" id="label-bin-@i">@Model.BinList[i].Text</label>
                                             </div>
                                         }
-                                        <div class="form-check ml-5">
-                                            <input class="form-check-input" asp-for="DiffenceCountCheck" type="checkbox">
-                                            <label class="form-check-label ml-1" asp-for="DiffenceCountCheck">実績数不一致のみ</label>
-                                        </div>
+                                    </div>
+                                    <div class="form-check ml-5 diffence-count-check">
+                                        <input class="form-check-input" asp-for="DiffenceCountCheck" type="checkbox">
+                                        <label class="form-check-label ml-1" asp-for="DiffenceCountCheck">実績数不一致のみ</label>
                                     </div>
 
                                     <div class="custom-control custom-checkbox col-16 d-flex justify-content-start align-items-center sp-cs-dpl">

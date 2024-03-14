@@ -431,4 +431,24 @@ function CheckPairValueMSupplierKanban(id1, id2, required = false) {
 
     return checkFlag;
 }
+
+// スマホでSidebarカスタマイズ
+function toggleSidebar() {
+    if (window.innerWidth < 1200) {
+        // Sidebar クッキーを削除し、パスをルートに設定
+        $.removeCookie("Sidebar", { path: '/' });
+
+        // body 要素に sb-sidenav-toggled クラスをトグルする
+        $("body").toggleClass("sb-sidenav-toggled");
+
+        // #sidebarToggle 要素に rotateBtn クラスをトグルする
+        $("#sidebarToggle").toggleClass("rotateBtn");
+
+        // body 要素のクラスを取得
+        let $className = $("body").attr("class");
+
+        // Sidebar クッキーに body 要素のクラスを保存し、パスをルートに設定
+        $.cookie("Sidebar", $className, { path: '/' });
+    }
+}
 //--------------------------------------------------------//

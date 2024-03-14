@@ -157,7 +157,11 @@
         var chart = bb.generate({
             data: {
                 columns: shipmentList,
-                type: "donut"
+                type: "donut",
+                colors: {
+                    検品済数: 'gray',
+                    未検品数: 'orange'
+                }
             },
             title: {
                 text: title
