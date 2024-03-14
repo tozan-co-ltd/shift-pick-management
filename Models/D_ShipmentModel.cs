@@ -73,7 +73,7 @@ namespace mar_sumaken_web.Models
         /// 出荷日
         /// </summary>
         [Display(Name = "出荷日")]
-        public DateTime ShipmentDatetime { get; set; }
+        public DateTime ShipmentDate { get; set; }
 
         /// <summary>
         /// 納入先品番

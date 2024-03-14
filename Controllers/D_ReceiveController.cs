@@ -81,7 +81,7 @@ namespace mar_sumaken_web.Controllers
                         </td>
                         <td class='ReceiveID'>{@item.ReceiveID}</td>
                         <td class='SupplierName'>{@item.SupplierName}</td>
-                        <td class='ReceiveDatetime'>{Utils.ConvertToYYYYMMDD(@item.ReceiveDatetime)}</td>
+                        <td class='ReceiveDate'>{Utils.ConvertToYYYYMMDD(@item.ReceiveDate)}</td>
                         <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
                         <td class='LotNumber'>{@item.LotNumber}</td>
                         <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
@@ -154,7 +154,7 @@ namespace mar_sumaken_web.Controllers
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("ReceiveID")] = item.ReceiveID.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("SupplierName")] = item.SupplierName.ToString();
-                        newRow[Utils.GetDisplayName<D_ReceiveModel>("ReceiveDatetime")] = Utils.ConvertToYYYYMMDD(item.ReceiveDatetime);
+                        newRow[Utils.GetDisplayName<D_ReceiveModel>("ReceiveDate")] = Utils.ConvertToYYYYMMDD(item.ReceiveDate);
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("LotNumber")] = item.LotNumber.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("NumberOfBoxes")] = item.NumberOfBoxes.ToString();
@@ -203,7 +203,7 @@ namespace mar_sumaken_web.Controllers
 
             table.Columns.Add(Utils.GetDisplayName<D_ReceiveModel>("ReceiveID"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ReceiveModel>("SupplierName"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<D_ReceiveModel>("ReceiveDatetime"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ReceiveModel>("ReceiveDate"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ReceiveModel>("SupplierProductNumber"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ReceiveModel>("LotNumber"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ReceiveModel>("NumberOfBoxes"), typeof(string));
