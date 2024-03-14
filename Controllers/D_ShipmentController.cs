@@ -18,11 +18,15 @@ namespace mar_sumaken_web.Controllers
         /// 出荷実績照会画面表示
         /// </summary>
         /// <param name="shipmentScheduleId">出荷指示ID</param>
+        /// <param name="categoryTitle">カテゴリータイトル</param>
         /// <param name="depoId">倉庫ID</param>
         /// <param name="companyId">会社ID</param>
-        /// <param name="categoryTitle">カテゴリータイトル</param>
-        /// <returns></returns>
-        public IActionResult Index(int shipmentScheduleId, int depoId, int companyId, string categoryTitle)
+        /// <param name="startDate">納入指示日(開始)</param>
+        /// <param name="endDate">納入指示日(終了)</param>
+        /// <param name="binListStr">便リスト</param>
+        /// <param name="differenceCountCheck">実績数不一致のみ</param>
+        public IActionResult Index(int shipmentScheduleId, string categoryTitle, int depoId, int companyId, 
+            string startDate, string endDate, string binListStr, bool differenceCountCheck)
         {
             D_ShipmentModel model = new();
             try
@@ -61,6 +65,10 @@ namespace mar_sumaken_web.Controllers
                 {
                     model.DeliveryDate = dShipmentList[0].DeliveryDate;
                 }
+                model.SearchStartDate = startDate;
+                model.SearchEndDate = endDate;
+                model.BinListStr = binListStr;
+                model.DifferenceCountCheck = differenceCountCheck;
 
                 return View(model);
             }

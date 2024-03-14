@@ -11,6 +11,26 @@ namespace mar_sumaken_web.Models
         public string? Title { get; set; }
 
         /// <summary>
+        /// 検索納入指示日(開始)
+        /// </summary>
+        public string? SearchStartDate { get; set; }
+
+        /// <summary>
+        /// 検索納入指示日(終了)
+        /// </summary>
+        public string? SearchEndDate { get; set; }
+
+        /// <summary>
+        /// 検索便リスト
+        /// </summary>
+        public string? BinListStr { get; set; }
+
+        /// <summary>
+        /// 検索実績数不一致のみ
+        /// </summary>
+        public bool? DifferenceCountCheck { get; set; }
+
+        /// <summary>
         /// 出荷実績リスト
         /// </summary>
         public List<D_ShipmentModel>? DShipmentList { get; set; }

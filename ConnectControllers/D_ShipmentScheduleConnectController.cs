@@ -448,7 +448,7 @@ namespace mar_sumaken_web.Commons
         {
             // 実績数不一致のみ
             string differenceCheckCondition = string.Empty;
-            if (model.DiffenceCountCheck)
+            if (model.DifferenceCountCheck)
             {
                 differenceCheckCondition = " AND shipment_schedule.NumberOfBoxes <> COALESCE(storeout_sum.StoreOutNumberOfBoxes, 0) ";
             }

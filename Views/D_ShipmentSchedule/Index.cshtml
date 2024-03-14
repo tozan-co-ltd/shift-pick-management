@@ -69,8 +69,8 @@
                                             </div>
                                         }
                                         <div class="form-check ml-5">
-                                            <input class="form-check-input" asp-for="DiffenceCountCheck" type="checkbox">
-                                            <label class="form-check-label ml-1" asp-for="DiffenceCountCheck">実績数不一致のみ</label>
+                                            <input class="form-check-input" asp-for="DifferenceCountCheck" type="checkbox">
+                                            <label class="form-check-label ml-1" asp-for="DifferenceCountCheck">実績数不一致のみ</label>
                                         </div>
                                     </div>
 
@@ -304,13 +304,21 @@
         var depoId = row.getElementsByClassName("DepoID")[0].value;
         var companyId = row.getElementsByClassName("CompanyID")[0].value;
         var categoryTitle = document.getElementById("categoryTitle").value;
-
+        var startDate = document.getElementById("startDate").value;
+        var endDate = document.getElementById("endDate").value;
+        var differenceCountCheck = document.getElementById("DifferenceCountCheck").checked;
+        
+        var selectedValues = GetSelectedValues();
         var url = window.location.origin + '@Url.Action("Index", "D_Shipment")';
         url += '?shipmentScheduleId=' + shipmentScheduleId;
+        url += '&categoryTitle=' + categoryTitle;
         url += '&depoId=' + depoId;
         url += '&companyId=' + companyId;
-        url += '&categoryTitle=' + categoryTitle;
-        
+        url += '&startDate=' + startDate;
+        url += '&endDate=' + endDate;
+        url += '&binListStr=' + selectedValues.join(',');
+        url += '&differenceCountCheck=' + differenceCountCheck;
+
         window.location.href = url;
     }
 

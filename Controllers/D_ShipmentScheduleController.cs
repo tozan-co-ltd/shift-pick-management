@@ -18,8 +18,14 @@ namespace mar_sumaken_web.Controllers
         /// <summary>
         /// 出荷指示照会画面表示
         /// </summary>
+        /// <param name="depoId">デポーID</param>
+        /// <param name="deliveryId">納入先ID</param>
+        /// <param name="startDate">納入指示日(開始)</param>
+        /// <param name="endDate">納入指示日(終了)</param>
+        /// <param name="binListStr">便リスト</param>
+        /// <param name="differenceCountCheck">実績数不一致のみ</param>
         /// <returns></returns>
-        public IActionResult Index()
+        public IActionResult Index(string depoId, string deliveryId, string startDate, string endDate, string binListStr, bool differenceCountCheck = false)
         {
             D_ShipmentScheduleSearchModel model = new();
             try
@@ -29,15 +35,39 @@ namespace mar_sumaken_web.Controllers
 
                 // 会社リスト取得
                 CommonModel commonModel = new();
+                // 納入先
                 model.SearchCompanyList = commonModel.GetMCompanyList(user.DatabaseName, Utils.Const_DeliveryID);
+                if (!string.IsNullOrEmpty(deliveryId)) model.SelectedCompanyID = Convert.ToInt32(deliveryId);
+                // 倉庫
                 model.SearchDepoList = commonModel.GetMDepoList(user.DatabaseName);
-                model.BinList = Utils.Const_BinList;
-                model.BinList[0].Selected= true;
+                if (!string.IsNullOrEmpty(depoId)) model.SelectedDepoID = Convert.ToInt32(depoId);
+                // 便
+                model.BinList = Utils.Const_BinList.Select(item => new SelectListItem() { 
+                    Value = item.Value, Text = item.Text, Selected = false
+                }).ToList();
+                if (string.IsNullOrEmpty(binListStr))
+                {
+                    model.BinList[0].Selected = true;
+                }
+                else
+                {
+                    var binList = binListStr.Split(',');
+                    foreach (var bin in binList)
+                    {
+                        //var selectedBin = Convert.ToInt32(bin);
+                        var selectedItem = model.BinList.FirstOrDefault(item => item.Value.Equals(bin));
+                        if (selectedItem != null) selectedItem.Selected = true;
+                    }
+                }
+
+                // 実績数不一致のみ
+                model.DifferenceCountCheck = differenceCountCheck;
+
                 // 翌日(土日を除く)
                 DateTime currentDate = DateTime.Now;
                 var nextDay = Utils.GetNextday(currentDate).ToString("yyyy/MM/dd");
-                model.SearchStartDate = nextDay;
-                model.SearchEndDate = nextDay;
+                model.SearchStartDate = !string.IsNullOrEmpty(startDate) ? startDate : nextDay;
+                model.SearchEndDate = !string.IsNullOrEmpty(endDate) ? endDate : nextDay;
 
                 return View(model);
             }
@@ -250,7 +280,7 @@ namespace mar_sumaken_web.Controllers
                     SelectedCompanyID = searchModel.CompanyID,
                     SearchStartDate = searchModel.SearchStartDate,
                     SearchEndDate = searchModel.SearchEndDate,
-                    DiffenceCountCheck = searchModel.DiffenceCountCheck,
+                    DifferenceCountCheck = searchModel.DiffenceCountCheck,
                     BinListInt = searchModel.BinList,
                 };
                 var sql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedules(model);

@@ -32,7 +32,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 実績数不一致のみ
         /// </summary>
-        public bool DiffenceCountCheck { get; set; }
+        public bool DifferenceCountCheck { get; set; }
 
         /// <summary>
         /// 検索倉庫リスト
