@@ -449,6 +449,13 @@ function toggleSidebar() {
 
         // Sidebar クッキーに body 要素のクラスを保存し、パスをルートに設定
         $.cookie("Sidebar", $className, { path: '/' });
-    }
+    } 
 }
+
+window.addEventListener('resize', function () {
+    var sidenav = document.querySelector('.sb-nav-fixed');
+    if (sidenav.classList.contains('sb-sidenav-toggled')) {
+        sidenav.classList.remove('sb-sidenav-toggled');
+    }
+});
 //--------------------------------------------------------//
