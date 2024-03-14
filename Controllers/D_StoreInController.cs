@@ -62,6 +62,7 @@ namespace mar_sumaken_web.Controllers
 
                 // 入力規則チェック
                 ModelState.Remove("SupplierProductNumber");
+                ModelState.Remove("Quantity");
                 if (!ModelState.IsValid)
                 {
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
@@ -289,12 +290,13 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 仕入先品番チェック
-                bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(model.SupplierProductNumber, user.DatabaseName);
-                if (!isExistProduct)
+                var product = M_ProductConnectController.GetProductBySupplierProductNumber(model.SupplierProductNumber, user.DatabaseName);
+                if (product == null)
                 {
                     var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
                     return NotFound(new { errorMessage = message });
                 }
+                model.NumberOfBoxes = (int)Math.Ceiling((double)model.Quantity / product.LotQuantity);
 
                 model.DepoID = model.SelectedDepoID;
                 model.CompanyID = model.SelectedCompanyID;

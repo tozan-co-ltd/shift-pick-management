@@ -150,14 +150,24 @@
             data: data
         })
         .done(function (response) {
-            $('#bin-select-list').empty();
-            $('#bin-select-list').html(response);
+                var binSelectListItem = $('#bin-select-list');
+                binSelectListItem.empty();
+                binSelectListItem.html(response);
+
+                var firstSelect = binSelectListItem.first();
+                var firstOptionValue = firstSelect.find('option').first().val();
+                var numberOfOptions = firstSelect.find('option').length;
+                if (numberOfOptions == 1) {
+                    firstSelect.val(firstOptionValue);
+                } else {
+                    var secondOptionValue = firstSelect.find('option').eq(1).val();
+                    firstSelect.val(secondOptionValue);
+                }
         })
         .fail(function (xhr) {
             if (xhr.status === 404) {
                 // データが見つからなかった場合
                 var errorMessage = xhr.responseJSON.errorMessage;
-                //$('#div-error-message').text(errorMessage);
                 $("#div-error-message").html(errorMessage);
             } else {
                 // その他のエラーの場合
