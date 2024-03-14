@@ -105,6 +105,7 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 ModelState.Remove("DeliveryProductNumber");
                 ModelState.Remove("SearchDeliveryDate");
+                ModelState.Remove("Quantity");
                 if (!ModelState.IsValid)
                 {
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
