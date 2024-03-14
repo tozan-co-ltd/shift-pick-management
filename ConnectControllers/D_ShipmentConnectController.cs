@@ -72,7 +72,7 @@ namespace mar_sumaken_web.Commons
                     ,shipment.ShipmentID
                     ,shipment.ShipmentScheduleID
                     ,shipment.ScanResultID
-                    ,shipment.ShipmentDatetime
+                    ,shipment.ShipmentDate
                     ,shipment.KanbanSerialNumber
                     ,shipment.SupplierProductNumber
                     ,shipment.LotNumber

@@ -55,7 +55,7 @@ namespace mar_sumaken_web.Commons
                     ,dReceive.ScanResultID
                     ,dReceive.CompanyID AS SupplierID
                     ,company.CompanyName AS SupplierName
-                    ,dReceive.ReceiveDatetime
+                    ,dReceive.ReceiveDate
                     ,dReceive.SupplierProductNumber
                     ,dReceive.LotNumber
                     ,dReceive.MainProductKey
@@ -87,8 +87,8 @@ namespace mar_sumaken_web.Commons
                 WHERE 
                     scan.DepoID = {model.SelectedDepoID}
                     AND dReceive.CompanyID = {model.SelectedCompanyID}
-                    AND dReceive.ReceiveDatetime >= '{model.SearchStartDate}'
-                    AND dReceive.ReceiveDatetime <= '{searchEndDate}'
+                    AND dReceive.ReceiveDate >= '{model.SearchStartDate}'
+                    AND dReceive.ReceiveDate <= '{searchEndDate}'
                     AND menu.IsDeleted = 0
 	                AND company.IsDeleted = 0
                     AND depo.IsDeleted = 0

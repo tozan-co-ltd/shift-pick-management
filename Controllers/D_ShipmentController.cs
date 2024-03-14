@@ -106,7 +106,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("DeliveryName")] = item.DeliveryName.ToString().Trim();
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("DeliveryDate")] = item.DeliveryDate.ToString("yyyy/MM/dd");
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("DeliveryTimeClass")] = item.DeliveryTimeClass.ToString().Trim();
-                        newRow[Utils.GetDisplayName<D_ShipmentModel>("ShipmentDatetime")] = item.ShipmentDatetime.ToString("yyyy/MM/dd");
+                        newRow[Utils.GetDisplayName<D_ShipmentModel>("ShipmentDate")] = item.ShipmentDate.ToString("yyyy/MM/dd");
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("DeliveryProductNumber")] = item.DeliveryProductNumber.ToString().Trim();
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("DeliveryProductAbbreviation")] = item.DeliveryProductAbbreviation.ToString().Trim();
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("KanbanSerialNumber")] = item.KanbanSerialNumber.ToString().Trim();
@@ -161,7 +161,7 @@ namespace mar_sumaken_web.Controllers
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("DeliveryName"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("DeliveryDate"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("DeliveryTimeClass"), typeof(string));
-            table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("ShipmentDatetime"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("ShipmentDate"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("DeliveryProductNumber"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("DeliveryProductAbbreviation"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<D_ShipmentModel>("KanbanSerialNumber"), typeof(string));

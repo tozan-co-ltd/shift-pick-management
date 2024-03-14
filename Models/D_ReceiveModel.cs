@@ -97,7 +97,7 @@ namespace mar_sumaken_web.Models
         /// 入荷日
         /// </summary>
         [Display(Name = "入荷日")]
-        public string? ReceiveDatetime { get; set; }
+        public string? ReceiveDate { get; set; }
 
         /// <summary>
         /// 仕入先品番
