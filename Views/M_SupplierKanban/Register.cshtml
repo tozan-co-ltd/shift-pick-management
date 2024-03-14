@@ -65,7 +65,7 @@
                                     <span>@Html.DisplayNameFor(model => model.SupplierKanbanName)<span style="color:red">*</span></span>
                                 </div>
                                 <div class="col-12 col-sm-8 column-2nd">
-                                    <input type="text" asp-for="SupplierKanbanName" class="form-control">
+                                    <input class="form-control" type="text" asp-for="SupplierKanbanName">
                                     <span class="text-danger w-100" asp-validation-for="SupplierKanbanName"></span>
                                 </div>
                             </div>
@@ -176,7 +176,7 @@
                                     メインキー
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" asp-for="MainProductKeyLength" value="@Model.MainProductKeyLength" />
+                                    <input type="number" class="form-control" asp-for="MainProductKeyLength" value="@Model.MainProductKeyLength"/>
                                     <span class="text-danger w-100 MainProductKey" asp-validation-for="MainProductKeyLength"></span>
                                 </td>
                                 <td>
@@ -275,11 +275,15 @@
         let result = checkInput();
         if (result == false) return false;
 
+        console.log(result);
+
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("Register", "M_SupplierKanban")';
         let method = 'POST';
         let formId = 'mSupplierKanbanForm';
         let data = $('#' + formId).serializeArray();
+
+        console.log(data);
 
         // Ajax call
         $.ajax({
@@ -306,6 +310,9 @@
         function checkInput() {
             let result = false;
             let isCheck = true;
+
+            // エラーメッセージ削除
+            DeleteErrorMessages();
 
             // 重複許容フラグ
             var selectedAllowedDuplicatesFlagValue = $('input[name="AllowedDuplicatesFlag"]:checked').val();
@@ -337,15 +344,16 @@
 
             // バリデーションチェック
             var checkFlg = CheckValidationMSupplierKanban();
-            if (!checkFlg) {
-                $("#div-error-message").text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
-                isCheck = false;
-                return result;
-            }
 
-            if (isCheck) result = true;
-            return result;
+            return checkFlg;
         }
     });
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
 </script>
 

@@ -359,10 +359,15 @@ function WaitSeconds() {
 //------------------- 仕入先かんばんマスターバリデーションチェック ------------------//
 function CheckValidationMSupplierKanban() {
     // 識別文字
-    var IdentifyString = $("IdentifyStringStartIndex");
-    if (parseInt(IdentifyString.val(), 10) <= 0) {
+    var IdentifyStringStartIndex = $("#IdentifyStringStartIndex");
+    var IdentifyString = $("#IdentifyString");
+    if (IdentifyStringStartIndex.val() <= 0) {
+        IdentifyStringStartIndex.addClass("input-validation-error");
+        checkFlag = false;
+    }
+    if (parseInt(IdentifyString.val().length, 10) <= 0) {
         IdentifyString.addClass("input-validation-error");
-        return false;
+        checkFlag = false;
     }
 
     // 重複許容フラグ
@@ -370,6 +375,13 @@ function CheckValidationMSupplierKanban() {
     var requiredCheck = false;
     if (selectedValue == '0') {
         requiredCheck = true;
+    }
+
+    // 仕入先かんばん名
+    var kanbanName = document.getElementById("SupplierKanbanName");
+    if (kanbanName.value.length <= 0) {
+        kanbanName.classList.add("input-validation-error");
+        checkFlag = false;
     }
 
     // 桁数・開始位置
@@ -382,12 +394,16 @@ function CheckValidationMSupplierKanban() {
     var checkProductBranchNumber = CheckPairValueMSupplierKanban("ProductBranchNumberLength", "ProductBranchNumberStartIndex");
     var checkOrderNumber = CheckPairValueMSupplierKanban("OrderNumberLength", "OrderNumberStartIndex");
 
-    if (!checkProductNumber || !checkQuantity || !checkLot || !checkMainProductKey || !checkFirstSubProductKey
+    if (!checkProductNumber || !checkQuantity || !checkLot || !checkFirstSubProductKey
         || !checkSecondSubProductKey || !checkProductBranchNumber || !checkOrderNumber) {
-        if (!checkMainProductKey) {
-            $(".MainProductKey").text("重複許容フラグが0の場合、メインキーは必須項目です。");
-        }
+        $("#div-error-message").text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
         return false;
+    } else {
+        if (!checkMainProductKey) {
+            $(".MainProductKey").addClass("input-validation-error");
+            $("#div-error-message").text("重複許容フラグが0の場合、メインキーは必須項目です。");
+            return false;
+        }
     }
 
     return true;
@@ -401,18 +417,26 @@ function CheckPairValueMSupplierKanban(id1, id2, required = false) {
     var lengthValue = parseInt(length.val(), 10);
     var startIndexValue = parseInt(startIndex.val(), 10);
 
-    // どちらかが数値でない(空欄)の場合はエラー
-    if (Number.isNaN(lengthValue) || Number.isNaN(startIndexValue)) {
-        startIndex.addClass("input-validation-error");
-        checkFlag = false;
+    // 空白の場合は0に変換
+    if (Number.isNaN(lengthValue)) {
+        length.val(0);
+    }
+    if (Number.isNaN(startIndexValue)) {
+        startIndex.val(0);
     }
 
+    // どちらかが数値でない(空欄)の場合はエラー
+    //if (Number.isNaN(lengthValue) || Number.isNaN(startIndexValue)) {
+    //    startIndex.addClass("input-validation-error");
+    //    checkFlag = false;
+    //}
+
     // どちらかが0の場合はエラー
-    if (lengthValue > 0 && startIndexValue <= 0) {
+    if (lengthValue > 0 && (startIndexValue <= 0 || Number.isNaN(startIndexValue))) {
         startIndex.addClass("input-validation-error");
         checkFlag = false;
     }
-    if (lengthValue <= 0 && startIndexValue > 0) {
+    if ((lengthValue <= 0 || Number.isNaN(lengthValue)) && startIndexValue > 0) {
         length.addClass("input-validation-error");
         checkFlag = false;
     }
