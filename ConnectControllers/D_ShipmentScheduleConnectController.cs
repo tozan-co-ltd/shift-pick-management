@@ -554,7 +554,7 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// 出荷指示削除SQL作成
         /// </summary>
-        /// <param name="storeInId">出荷指示ID</param>
+        /// <param name="shipmentScheduleId">出荷指示ID</param>
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>

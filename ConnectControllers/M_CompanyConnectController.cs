@@ -276,8 +276,7 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// 異なるIDで重複会社情報取得SQL作成
         /// </summary>
-        /// <param name="companyCode">会社コード</param>
-        /// <param name="companyId">会社ID</param>
+        /// <param name="model">登録情報</param>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectDuplicateEditMCompany(M_CompanyModel model)
         {
@@ -379,9 +378,9 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// 会社マスター削除SQL作成
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="updatedAt"></param>
-        /// <param name="updatedBy"></param>
+        /// <param name="companyId">会社ID</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
         private static string CreateSQLToDeleteMCompany(int companyId, DateTime updatedAt, string updatedBy)
         {

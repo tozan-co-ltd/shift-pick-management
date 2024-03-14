@@ -82,10 +82,10 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// ユーザーマスターの詳細を取得
         /// </summary>
-        /// <param name="userList">ユーザー情報</param>
+        /// <param name="model">ユーザー情報</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns>ユーザー情報</returns>
-        public static List<M_UserModel> GetMUserDetailList(List<M_UserModel> userList, string databaseName)
+        public static List<M_UserModel> GetMUserDetailList(List<M_UserModel> model, string databaseName)
         {
             try
             {
@@ -97,9 +97,9 @@ namespace mar_sumaken_web.Commons
                     connection.ConnectionString = connectionString;
                     connection.Open();
 
-                    if (userList.Count > 0)
+                    if (model.Count > 0)
                     {
-                        foreach (M_UserModel user in userList)
+                        foreach (M_UserModel user in model)
                         {
                             // 倉庫マスター情報取得
                             var userDepoSql = CreateSQLToSelectRUserDepoList(user.UserID);
@@ -119,7 +119,7 @@ namespace mar_sumaken_web.Commons
                         }
                     }
                 }
-                return userList;
+                return model;
             }
             catch (Exception)
             {
@@ -130,8 +130,8 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// ユーザーの使用倉庫情報取得
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="databaseName"></param>
+        /// <param name="userId">ユーザーID</param>
+        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
         public static List<M_DepoModel> GetUserDepoByUserId(int userId, string databaseName)
         {
@@ -215,8 +215,8 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// ユーザーマスター登録
         /// </summary>
-        /// <param name="model"></param>
-        /// <param name="loginUser"></param>
+        /// <param name="model">登録情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>登録結果</returns>
         public static bool InsertMUser(M_UserModel model, LoginUserModel loginUser)
         {
@@ -724,7 +724,7 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         ///  ユーザー-倉庫中間テーブル削除SQL作成
         /// </summary>
-        /// <param name="userID">更新ユーザーID</param>
+        /// <param name="userId">ユーザーID</param>
         /// <returns>SQL文</returns>
         private static string CreateSQLToDeleteRUserDepoByUserId(int userId)
         {
@@ -740,7 +740,7 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// ユーザーハンディメニュー中間テーブル削除SQL作成
         /// </summary>
-        /// <param name="userID">更新ユーザーID</param>
+        /// <param name="userId">ユーザーID</param>
         /// <returns>SQL文</returns>
         private static string CreateSQLToDeleteRHandyMenuByUserId(int userId)
         {

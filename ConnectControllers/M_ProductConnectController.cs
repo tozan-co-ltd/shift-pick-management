@@ -47,10 +47,10 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番マスターの詳細を取得
         /// </summary>
-        /// <param name="productList">品番情報</param>
+        /// <param name="model">品番情報</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns>品番情報</returns>
-        public static List<M_ProductModel> GetRDepoProducts(List<M_ProductModel> productList, string databaseName)
+        public static List<M_ProductModel> GetRDepoProducts(List<M_ProductModel> model, string databaseName)
         {
             try
             {
@@ -62,9 +62,9 @@ namespace mar_sumaken_web.ConnectControllers
                     connection.ConnectionString = connectionString;
                     connection.Open();
 
-                    if (productList.Count > 0)
+                    if (model.Count > 0)
                     {
-                        foreach (M_ProductModel item in productList)
+                        foreach (M_ProductModel item in model)
                         {
                             // 品番-品番中間テーブル情報取得
                             var depoProductSql = CreateSQLToSelectRDepoProducts(item.ProductID);
@@ -76,7 +76,7 @@ namespace mar_sumaken_web.ConnectControllers
                         }
                     }
                 }
-                return productList;
+                return model;
             }
             catch (Exception)
             {
@@ -171,7 +171,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 納入先品番から仕入先品番を取得
         /// </summary>
-        /// <param name="supplierId">仕入先品番</param>
+        /// <param name="supplierId">会社ID</param>
         /// <param name="deliveryProductNumber">納入先品番</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
@@ -259,9 +259,9 @@ namespace mar_sumaken_web.ConnectControllers
         /// 仕入先品番から仕入先品番を取得
         /// </summary>
         /// <param name="depoId">倉庫ID</param>
-        /// <param name="companyId">会社ID</param>
-        /// <param name="supplierProductNumber"></param>
-        /// <param name="databaseName"></param>
+        /// <param name="supplierId">会社ID</param>
+        /// <param name="supplierProductNumber">仕入先品番</param>
+        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
         public static M_ProductModel? GetProductBySupplierProductNumber(int depoId, int supplierId, string supplierProductNumber, string databaseName)
         {
@@ -304,6 +304,8 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 会社区分ごとに会社リストを取得
         /// </summary>
+        /// <param name="companyKubun">会社区分</param>
+        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
         public static List<SelectListItem> GetCompanysByCompanyKubun(int companyKubun, string databaseName)
         {
@@ -342,6 +344,8 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 納入先品番ごとに会社リストを取得
         /// </summary>
+        /// <param name="deliverProductNumber">納入先品番</param>
+        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
         public static M_ProductModel GetProductByDeliverProductNUmber(string deliverProductNumber, string databaseName)
         {
@@ -380,10 +384,10 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番重複チェック
         /// </summary>
-        /// <param name="product"></param>
-        /// <param name="databaseName"></param>
+        /// <param name="model">登録情報</param>
+        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static bool IsDuplicateMProduct(M_ProductModel product, string databaseName)
+        public static bool IsDuplicateMProduct(M_ProductModel model, string databaseName)
         {
             // 戻り値
             bool isDuplicateValid = false;
@@ -399,7 +403,7 @@ namespace mar_sumaken_web.ConnectControllers
                     connection.ConnectionString = connectionString;
                     connection.Open();
 
-                    var sql = CreateSQLToSelectDuplicateMProduct(product);
+                    var sql = CreateSQLToSelectDuplicateMProduct(model);
 
                     int result = Convert.ToInt32(connection.ExecuteScalar(sql));
 
@@ -419,8 +423,8 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番マスター登録
         /// </summary>
-        /// <param name="model"></param>
-        /// <param name="loginUser"></param>
+        /// <param name="model">登録情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>登録結果</returns>
         public static bool InsertMProduct(M_ProductModel model, LoginUserModel loginUser)
         {
@@ -483,8 +487,8 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番マスター更新
         /// </summary>
-        /// <param name="model"></param>
-        /// <param name="loginUser"></param>
+        /// <param name="model">登録情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>更新結果</returns>
         public static void UpdateMProduct(M_ProductModel model, LoginUserModel loginUser)
         {
@@ -615,7 +619,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番情報取得SQL作成
         /// </summary>
-        /// <returns>SQL</returns>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToSelectMProducts()
         {
             var sql = $@"
@@ -761,10 +765,10 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番-品番中間テーブル登録SQL作成
         /// </summary>
-        /// <param name="depoId">登録品番ID</param>
-        /// <param name="productId">登録品番ID</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="productId">品番ID</param>
         /// <param name="createdAt">システムタイム</param>
-        /// <param name="createdBy">ユーザーID</param>
+        /// <param name="createdBy">ユーザー名</param>
         /// <returns>SQL文</returns>
         public static string CreateSQLToInsertRDepoProduct(int depoId, int productId, DateTime createdAt, string createdBy)
         {
@@ -826,9 +830,9 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 品番マスター削除SQL作成
         /// </summary>
-        /// <param name="productId"></param>
-        /// <param name="updatedAt"></param>
-        /// <param name="updatedBy"></param>
+        /// <param name="productId">品番ID</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
         private static string CreateSQLToDeleteMCompany(int productId, DateTime updatedAt, string updatedBy)
         {
