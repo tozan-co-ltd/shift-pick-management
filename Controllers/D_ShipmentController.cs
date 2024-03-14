@@ -43,11 +43,14 @@ namespace mar_sumaken_web.Controllers
                     shipmentScheduleId, depoId, companyId);
                 List<D_ShipmentModel> dShipmentList = D_ShipmentConnectController.ConnectDShipments(sql, user.DatabaseName);
 
-                CommonModel commonModel = new();
-                commonModel.CompanyID= companyId;
-                commonModel.ControllerName = "D_Shipment";
-
+                // 画面名取得
+                CommonModel commonModel = new()
+                {
+                    CompanyID = user.CompanyID,
+                    ControllerName = "D_Shipment"
+                };
                 model.Title = categoryTitle + " - 出荷指示照会 - " + commonModel.GetViewTitle();
+
                 model.DeliveryID = companyId;
                 model.DepoID = depoId;
                 model.ShipmentScheduleID = shipmentScheduleId;

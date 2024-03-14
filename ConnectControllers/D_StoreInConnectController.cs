@@ -99,7 +99,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// </summary>
         /// <param name="model">入庫実績モデル</param>
         /// <param name="loginUser">ログインユーザー</param>
-        public static void EditDStoreIn(D_StoreInModel model, LoginUserModel loginUser)
+        public static void UpdateDStoreIn(D_StoreInModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);

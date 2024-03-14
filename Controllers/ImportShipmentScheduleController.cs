@@ -179,21 +179,15 @@ namespace mar_sumaken_web.Controllers
                                 shipmentSchedule.SupplierProductNumber = product.SupplierProductNumber;
                             }
 
-                            // 出荷実績がある場合はエラー
+                            // 出荷実績または出庫実績がある場合はエラー
                             string checkShipmentSql = D_ShipmentScheduleConnectController.CreateSQLToIsExistDShipment(shipmentSchedule, depoId, companyId);
-                            bool isExisted = ConnectToSQLServer.IsExistedSameRecord(checkShipmentSql, user.DatabaseName);
-                            if (isExisted)
+                            bool isExistedShipment = ConnectToSQLServer.IsExistedSameRecord(checkShipmentSql, user.DatabaseName);
+                            string checkStoreOutSql = D_ShipmentScheduleConnectController.CreateSQLToCheckExistDStoreOutByShipmentSchedule(shipmentSchedule);
+                            bool isExistedStoreOut = ConnectToSQLServer.IsExistedSameRecord(checkStoreOutSql, user.DatabaseName);
+                            if (isExistedShipment || isExistedStoreOut)
                             {
                                 isValid = false;
                                 validationResults.Add(new ValidationResult(ErrorMessagesResources.E1020, new List<string> { "ShipmentScheduleID" }));
-                            }
-
-                            // 出庫実績がある場合はエラー
-                            string checkDStoreOutSql = D_ShipmentScheduleConnectController.CreateSQLToCheckExistDStoreOutByShipmentSchedule(shipmentSchedule);
-                            bool isExistedStoreOut = ConnectToSQLServer.IsExistedSameRecord(checkDStoreOutSql, user.DatabaseName);
-                            if (isExistedStoreOut)
-                            {
-                                return NotFound(new { errorMessage = "E1027: " + ErrorMessagesResources.E1027 });
                             }
 
                             // エラーメッセージ作成

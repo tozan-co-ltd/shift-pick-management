@@ -62,6 +62,7 @@ namespace mar_sumaken_web.Controllers
 
                 // 入力規則チェック
                 ModelState.Remove("SupplierProductNumber");
+                ModelState.Remove("Quantity");
                 if (!ModelState.IsValid)
                 {
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
@@ -202,8 +203,9 @@ namespace mar_sumaken_web.Controllers
                     bool isContainSupplierProductNumber = errorMembers.Contains("SupplierProductNumber");
                     if (!isContainSupplierProductNumber)
                     {
-                        // 仕入先品番で品番チェック
-                        var product = M_ProductConnectController.GetProductBySupplierProductNumber(modelItem.SupplierProductNumber, user.DatabaseName);
+                        // 倉庫ID,仕入先ID,仕入先品番が一致するレコードが品番マスターあるかチェック
+                        var product = M_ProductConnectController.GetProductBySupplierProductNumber(
+                            model.SelectedDepoID, model.SelectedCompanyID, modelItem.SupplierProductNumber, user.DatabaseName);
                         if (product == null)
                         {
                             isValid = false;
@@ -289,19 +291,21 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 仕入先品番チェック
-                bool isExistProduct = M_ProductConnectController.IsExistedSupplierProductNumber(model.SupplierProductNumber, user.DatabaseName);
-                if (!isExistProduct)
+                var product = M_ProductConnectController.GetProductBySupplierProductNumber(
+                    model.SelectedDepoID, model.SelectedCompanyID, model.SupplierProductNumber, user.DatabaseName);
+                if (product == null)
                 {
                     var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
                     return NotFound(new { errorMessage = message });
                 }
+                model.NumberOfBoxes = (int)Math.Ceiling((double)model.Quantity / product.LotQuantity);
 
                 model.DepoID = model.SelectedDepoID;
                 model.CompanyID = model.SelectedCompanyID;
                 model.StoreInDate = Convert.ToDateTime(model.SearchStartDate);
 
                 // 入庫実績更新
-                D_StoreInConnectController.EditDStoreIn(model, user);
+                D_StoreInConnectController.UpdateDStoreIn(model, user);
 
                 return Ok();
             }

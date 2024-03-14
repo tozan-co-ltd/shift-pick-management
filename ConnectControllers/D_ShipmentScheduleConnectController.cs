@@ -118,14 +118,6 @@ namespace mar_sumaken_web.Commons
 
                     foreach (var model in modelList)
                     {
-                        // 出荷指示取込時、出荷実績がある場合はエラー
-                        string checkExistSql = CreateSQLToIsExistDShipment(model, depoId, companyId);
-                        int checkedCount = (int)connection.ExecuteScalar(checkExistSql, null, transaction);
-                        if (checkedCount > 0)
-                        {
-                            throw new Exception();
-                        }
-
                         // 出荷指示取込テーブル登録
                         string insertSql = CreateSQLToInsertDShipmentSchedule(model, depoId, companyId, systemDate, loginUser.UserName);
                         int affectRows = connection.Execute(insertSql, null, transaction);
@@ -241,7 +233,6 @@ namespace mar_sumaken_web.Commons
                         AND DeliveryDate = '{model.DeliveryDate}'
                         AND DeliveryTimeClass = {model.DeliveryTimeClass}
                         AND DeliverySlipNumber = '{model.DeliverySlipNumber}'
-                        AND DeliveryProductNumber = '{model.DeliveryProductNumber}'
                         AND IsDeleted = 0
 	            END
             

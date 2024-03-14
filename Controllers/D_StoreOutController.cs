@@ -74,7 +74,7 @@ namespace mar_sumaken_web.Controllers
                 model.SupplierProductNumber = model.DeliveryProductNumber;
 
                 // 出庫実績更新
-                D_StoreOutConnectController.EditDStoreOut(model, user);
+                D_StoreOutConnectController.UpdateDStoreOut(model, user);
 
                 return Ok();
             }
@@ -105,6 +105,7 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 ModelState.Remove("DeliveryProductNumber");
                 ModelState.Remove("SearchDeliveryDate");
+                ModelState.Remove("Quantity");
                 if (!ModelState.IsValid)
                 {
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });

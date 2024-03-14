@@ -258,11 +258,12 @@ namespace mar_sumaken_web.ConnectControllers
         /// <summary>
         /// 仕入先品番から仕入先品番を取得
         /// </summary>
-        /// <param name="deliveryId"></param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="companyId">会社ID</param>
         /// <param name="supplierProductNumber"></param>
         /// <param name="databaseName"></param>
         /// <returns></returns>
-        public static M_ProductModel? GetProductBySupplierProductNumber(string supplierProductNumber, string databaseName)
+        public static M_ProductModel? GetProductBySupplierProductNumber(int depoId, int supplierId, string supplierProductNumber, string databaseName)
         {
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
@@ -277,11 +278,17 @@ namespace mar_sumaken_web.ConnectControllers
                 {
                     // SQL作成
                     string sql = $@"
-                        SELECT TOP 1 *
-                        FROM M_Product
+                        SELECT
+                            TOP 1 product.*
+                        FROM
+                            M_Product AS product
+                        INNER JOIN R_DepoProduct AS depoProduct 
+                            ON product.ProductID = depoProduct.ProductID
                         WHERE 
-                            SupplierProductNumber = '{supplierProductNumber}'
-                            AND IsDeleted = 0
+                            product.SupplierID = {supplierId}
+                            AND depoProduct.DepoID = {depoId}
+                            AND product.SupplierProductNumber = '{supplierProductNumber}'
+                            AND product.IsDeleted = 0
                     ";
 
                     var product = connection.QueryFirstOrDefault<M_ProductModel>(sql);
