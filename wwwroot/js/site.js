@@ -112,6 +112,8 @@
     $('.pickerDate').datetimepicker({
         format: "Y/m/d",
         timepicker: false,
+        scrollMonth: false,
+        scrollInput: false,
         onShow: function (ct) {
             this.setOptions({
                 maxDate: jQuery("#end_datetimepicker").val() ? jQuery("#end_datetimepicker").val() : false,
