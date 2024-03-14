@@ -205,7 +205,7 @@
                 }
             });
             if (editRow.length == 0) {
-                $('#div-error-message').text("E1001: 納入先品番・仕入先品番は必須項目です。");
+                $('#div-error-message').text("E1001: 納入先品番は必須項目です。");
                 return;
             }
 
@@ -240,7 +240,6 @@
                     if (xhr.status === 404) {
                         // データが見つからなかった場合
                         var errorMessage = xhr.responseJSON.errorMessage;
-                        //$('#div-error-message').text(errorMessage);
                         $("#div-error-message").html(errorMessage);
                     } else {
                         // その他のエラーの場合
