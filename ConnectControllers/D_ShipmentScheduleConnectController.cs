@@ -459,118 +459,105 @@ namespace mar_sumaken_web.Commons
             string differenceCheckCondition = string.Empty;
             if (model.DiffenceCountCheck)
             {
-                differenceCheckCondition = " AND shipment.NumberOfBoxes <> COALESCE(storeOut.NumberOfBoxes, 0) ";
+                differenceCheckCondition = " AND shipment_schedule.NumberOfBoxes <> COALESCE(storeout_sum.StoreOutNumberOfBoxes, 0) ";
             }
 
             // 便
             string binCondition = string.Empty;
             if (model.BinListInt != null && model.BinListInt.Count > 0)
             {
-                binCondition = $@" AND shipment.DeliveryTimeClass in ({string.Join(",", model.BinListInt)})";
+                binCondition = $@" AND DeliveryTimeClass in ({string.Join(",", model.BinListInt)})";
             }
             model.SearchEndDate = string.Concat(model.SearchEndDate, " 23:59:59");
-            var sql = $@"
-                SELECT
-	                shipment.ShipmentScheduleID
-	                ,shipment.CompanyID AS CompanyID
+            var sql = $@"          
+                -- 出荷計画を絞り込み
+					WITH 
+					shipment_schedule as
+					(
+					SELECT * FROM 
+					D_ShipmentSchedule
+					WHERE 
+					  DepoID = {model.SelectedDepoID}
+                    AND CompanyID = {model.SelectedCompanyID}
+                    AND DeliveryDate >= '{model.SearchStartDate}'
+                    AND DeliveryDate <= '{model.SearchEndDate}'
+                      {binCondition}              
+	                AND IsDeleted = 0
+					),
+					-- 出庫実績を絞り込んで集計
+					storeout_sum as 
+					(
+						SELECT  DepoID,DeliveryDate,DeliverySlipNumber,DeliveryProductNumber,
+						SUM(COALESCE(NumberOfBoxes, 0)) AS StoreOutNumberOfBoxes -- 出庫箱数
+	                ,SUM(COALESCE(Quantity, 0)) AS StoreOutQuantity --出庫数量
+						FROM D_StoreOut 
+						WHERE IsDeleted = 0
+						AND DepoID ={model.SelectedDepoID}				
+						AND DeliveryDate >='{model.SearchStartDate}'
+						AND DeliveryDate <= '{model.SearchEndDate}'
+						  {binCondition}           
+					GROUP BY  
+					DepoID,DeliveryDate,DeliverySlipNumber,DeliveryProductNumber				
+					)
+
+
+					--両テーブルを外部結合
+					SELECT
+	               shipment_schedule.ShipmentScheduleID
+	                ,shipment_schedule.CompanyID AS CompanyID
 	                ,company.CompanyName AS DeliveryName
                     ,depo.DepoID
 	                ,depo.DepoName
-					,shipment.DeliveryDate
-					,shipment.DeliveryTimeClass
-					,shipment.DeliveryProductNumber
-					,shipment.SupplierProductNumber
-					,shipment.LotQuantity
-					,shipment.OrdererCode
-					,shipment.OrdererFactoryKubun
-					,shipment.OrdererName
-					,shipment.OrdererFactoryName
-					,shipment.ShipperCode
-					,shipment.ShipperFactoryKubun
-					,shipment.ShipperName
-					,shipment.DeliveryCode
-					,shipment.DeliveryFactoryKubun
-					,shipment.DeliveryLocation
-					,shipment.DeliveryName AS NameOfDelivery
-					,shipment.DeliveryFactoryName
-					,shipment.RegularKubun
-					,shipment.IssuedDate
-					,shipment.DeliveryTime
-					,shipment.TranspotationIdentify
-					,shipment.DeliverySlipNumber
-					,shipment.DeliverySlipPageNumber
-					,shipment.DeliverySlipRowNumber
-					,shipment.DeliveryProductAbbreviation
-					,shipment.DeliveryProductName
-					,shipment.BranchNumber
-					,shipment.UpdatedAt
-					,shipment.UpdatedBy
-					,COALESCE(shipment.NumberOfBoxes, 0) AS NumberOfBoxes
-					,COALESCE(shipment.Quantity, 0) AS Quantity
-	                ,SUM(COALESCE(storeOut.NumberOfBoxes, 0)) AS StoreOutNumberOfBoxes -- 出庫箱数
-	                ,SUM(COALESCE(storeOut.Quantity, 0)) AS StoreOutQuantity --出庫数量
-                FROM D_ShipmentSchedule shipment
-                LEFT JOIN D_StoreOut AS storeOut 
-		                ON shipment.DepoID = storeOut.DepoID
-		                AND	shipment.DeliveryDate = storeOut.DeliveryDate
-                        AND shipment.DeliverySlipNumber = storeOut.DeliverySlipNumber
-                        AND shipment.DeliveryProductNumber = storeOut.DeliveryProductNumber
-                        AND storeOut.IsDeleted = 0
+					,shipment_schedule.DeliveryDate
+					,shipment_schedule.DeliveryTimeClass
+					,shipment_schedule.DeliveryProductNumber
+					,shipment_schedule.SupplierProductNumber
+					,shipment_schedule.LotQuantity
+					,shipment_schedule.OrdererCode
+					,shipment_schedule.OrdererFactoryKubun
+					,shipment_schedule.OrdererName
+					,shipment_schedule.OrdererFactoryName
+					,shipment_schedule.ShipperCode
+					,shipment_schedule.ShipperFactoryKubun
+					,shipment_schedule.ShipperName
+					,shipment_schedule.DeliveryCode
+					,shipment_schedule.DeliveryFactoryKubun
+					,shipment_schedule.DeliveryLocation
+					,shipment_schedule.DeliveryName AS NameOfDelivery
+					,shipment_schedule.DeliveryFactoryName
+					,shipment_schedule.RegularKubun
+					,shipment_schedule.IssuedDate
+					,shipment_schedule.DeliveryTime
+					,shipment_schedule.TranspotationIdentify
+					,shipment_schedule.DeliverySlipNumber
+					,shipment_schedule.DeliverySlipPageNumber
+					,shipment_schedule.DeliverySlipRowNumber
+					,shipment_schedule.DeliveryProductAbbreviation
+					,shipment_schedule.DeliveryProductName
+					,shipment_schedule.BranchNumber
+					,shipment_schedule.UpdatedAt
+					,shipment_schedule.UpdatedBy
+					,COALESCE(shipment_schedule.NumberOfBoxes, 0) AS NumberOfBoxes
+					,COALESCE(shipment_schedule.Quantity, 0) AS Quantity
+	                , COALESCE(StoreOutNumberOfBoxes, 0) as StoreOutNumberOfBoxes -- 出庫箱数合計
+	                , COALESCE(StoreOutQuantity, 0) as StoreOutQuantity --出庫数量合計
+                FROM shipment_schedule
+                LEFT OUTER  JOIN 
+				 storeout_sum 
+		                ON shipment_schedule.DepoID = storeout_sum.DepoID
+		                AND	shipment_schedule.DeliveryDate = storeout_sum.DeliveryDate
+                        AND shipment_schedule.DeliverySlipNumber = storeout_sum.DeliverySlipNumber
+                        AND shipment_schedule.DeliveryProductNumber = storeout_sum.DeliveryProductNumber                        
                 INNER JOIN M_Company AS company 
-                        ON shipment.CompanyID = company.CompanyID
+                        ON shipment_schedule.CompanyID = company.CompanyID
                 INNER JOIN M_Depo AS depo 
-                    ON shipment.DepoID = depo.DepoID
-                WHERE 
-                    shipment.DepoID = {model.SelectedDepoID}
-                    AND shipment.CompanyID = {model.SelectedCompanyID}
-                    AND shipment.DeliveryDate >= '{model.SearchStartDate}'
-                    AND shipment.DeliveryDate <= '{model.SearchEndDate}'
-                    {binCondition}
-                    {differenceCheckCondition}
-	                AND shipment.IsDeleted = 0
-	                AND company.IsDeleted = 0
-                    AND depo.IsDeleted = 0
-                GROUP BY
-					shipment.ShipmentScheduleID
-	                ,shipment.CompanyID
-	                ,company.CompanyName
-                    ,depo.DepoID
-	                ,depo.DepoName
-					,shipment.ShipmentScheduleID
-					,shipment.DeliveryName
-					,shipment.DeliveryDate
-					,shipment.DeliveryTimeClass
-					,shipment.DeliveryProductNumber
-					,shipment.SupplierProductNumber
-					,shipment.LotQuantity
-					,shipment.OrdererCode
-					,shipment.OrdererFactoryKubun
-					,shipment.OrdererName
-					,shipment.OrdererFactoryName
-					,shipment.ShipperCode
-					,shipment.ShipperFactoryKubun
-					,shipment.ShipperName
-					,shipment.DeliveryCode
-					,shipment.DeliveryFactoryKubun
-					,shipment.DeliveryLocation
-					,shipment.DeliveryName
-					,shipment.DeliveryFactoryName
-					,shipment.RegularKubun
-					,shipment.IssuedDate
-					,shipment.DeliveryTime
-					,shipment.TranspotationIdentify
-					,shipment.DeliverySlipNumber
-					,shipment.DeliverySlipPageNumber
-					,shipment.DeliverySlipRowNumber
-					,shipment.DeliveryProductAbbreviation
-					,shipment.DeliveryProductName
-					,shipment.BranchNumber
-					,shipment.UpdatedAt
-					,shipment.UpdatedBy
-                    ,shipment.NumberOfBoxes
-					,shipment.Quantity
-                ORDER BY 
-	                shipment.DeliveryProductNumber ASC 
+                    ON shipment_schedule.DepoID = depo.DepoID
+                WHERE                   
+					company.IsDeleted = 0
+                    AND depo.IsDeleted = 0					
+                    {differenceCheckCondition}         
+					ORDER BY 
+	                shipment_schedule.DeliveryProductNumber ASC 
             ";
             return sql;
         }
