@@ -204,7 +204,8 @@ namespace mar_sumaken_web.Controllers
                     if (!isContainSupplierProductNumber)
                     {
                         // 倉庫ID,仕入先ID,仕入先品番が一致するレコードが品番マスターあるかチェック
-                        var product = M_ProductConnectController.GetProductBySupplierProductNumber(modelItem.SupplierProductNumber, user.DatabaseName);
+                        var product = M_ProductConnectController.GetProductBySupplierProductNumber(
+                            model.SelectedDepoID, model.SelectedCompanyID, modelItem.SupplierProductNumber, user.DatabaseName);
                         if (product == null)
                         {
                             isValid = false;
@@ -290,7 +291,8 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 仕入先品番チェック
-                var product = M_ProductConnectController.GetProductBySupplierProductNumber(model.SupplierProductNumber, user.DatabaseName);
+                var product = M_ProductConnectController.GetProductBySupplierProductNumber(
+                    model.SelectedDepoID, model.SelectedCompanyID, model.SupplierProductNumber, user.DatabaseName);
                 if (product == null)
                 {
                     var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));

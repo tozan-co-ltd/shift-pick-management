@@ -205,7 +205,8 @@ namespace mar_sumaken_web.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 仕入先品番で品番取得
-                var product = M_ProductConnectController.GetProductBySupplierProductNumber(supplierProductNumber, user.DatabaseName);
+                var product = M_ProductConnectController.GetProductBySupplierProductNumber(
+                    depoId, companyId, supplierProductNumber, user.DatabaseName);
                 if (product == null)
                 {
                     throw new Exception();
