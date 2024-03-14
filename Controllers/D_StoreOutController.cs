@@ -65,21 +65,16 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 納入先品番で品番チェック
-                var product = M_ProductConnectController.GetProductByDeliveryProductNumber(
-                    model.SelectedCompanyID, model.SelectedDepoID, model.DeliveryProductNumber, user.DatabaseName
-                );
-                if (product == null)
+                bool isExistDeliveryProduct = M_ProductConnectController.IsExistedDeliveryProductNumber(model.DeliveryProductNumber, user.DatabaseName);
+                if (!isExistDeliveryProduct)
                 {
                     var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
                     return NotFound(new { errorMessage = message });
                 }
-                model.LotQuantity = product.LotQuantity;
-                model.DeliveryProductNumber = product.DeliveryProductNumber;
-                model.SupplierProductNumber = product.SupplierProductNumber;
-                model.NumberOfBoxes = (int)Math.Ceiling((double)model.Quantity / model.LotQuantity);
+                model.SupplierProductNumber = model.DeliveryProductNumber;
 
                 // 出庫実績更新
-                D_StoreOutConnectController.EditDStoreOut(model, user);
+                D_StoreOutConnectController.UpdateDStoreOut(model, user);
 
                 return Ok();
             }
@@ -110,7 +105,6 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 ModelState.Remove("DeliveryProductNumber");
                 ModelState.Remove("SearchDeliveryDate");
-                ModelState.Remove("Quantity");
                 if (!ModelState.IsValid)
                 {
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
@@ -316,7 +310,7 @@ namespace mar_sumaken_web.Controllers
         /// <param name="searchDeliveryDate">納入指示日</param>
         public IActionResult ChangeDeliveryTimeClassList(string searchDeliveryDate)
         {
-            var searchData = $@"<option value='0便・'>なし</option>"; ;
+            var searchData = string.Empty;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -328,9 +322,10 @@ namespace mar_sumaken_web.Controllers
                 // 表示用のhtml作成
                 if (binSelectList.Count > 0)
                 {
+                    searchData = string.Empty;
                     foreach (var item in binSelectList)
                     {
-                        searchData += $@"<option value='{item.Text}'>{item.Text}</option>";
+                        searchData += $@" <option value='{item.Text}'>{item.Text}</option>";
                     }
                 }
 
@@ -376,7 +371,6 @@ namespace mar_sumaken_web.Controllers
 
                 // 便-納品書番号
                 List<SelectListItem> binSelectList = D_StoreOutConnectController.GetDeliveryTimeClassList(model.SearchDeliveryDate, user.DatabaseName);
-                binSelectList.Add(new SelectListItem() { Value = "0便・", Text = "なし", Selected = true });
                 model.BinSelectedList = binSelectList;
 
                 // 会社リスト取得
@@ -405,7 +399,7 @@ namespace mar_sumaken_web.Controllers
 
                 List<string> errorMessageList = new();
                 int registerCount = 0;
-                for (int i = 0; i < model.RegisterList.Count; i++)
+                for (int i = 0; i< model.RegisterList.Count; i++)
                 {
                     var modelItem = model.RegisterList[i];
                     if (modelItem.DeliveryProductNumber.Equals("0")) continue;

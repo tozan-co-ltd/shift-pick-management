@@ -203,7 +203,7 @@ namespace mar_sumaken_web.Controllers
                     bool isContainSupplierProductNumber = errorMembers.Contains("SupplierProductNumber");
                     if (!isContainSupplierProductNumber)
                     {
-                        // 仕入先品番で品番チェック
+                        // 倉庫ID,仕入先ID,仕入先品番が一致するレコードが品番マスターあるかチェック
                         var product = M_ProductConnectController.GetProductBySupplierProductNumber(modelItem.SupplierProductNumber, user.DatabaseName);
                         if (product == null)
                         {
@@ -303,7 +303,7 @@ namespace mar_sumaken_web.Controllers
                 model.StoreInDate = Convert.ToDateTime(model.SearchStartDate);
 
                 // 入庫実績更新
-                D_StoreInConnectController.EditDStoreIn(model, user);
+                D_StoreInConnectController.UpdateDStoreIn(model, user);
 
                 return Ok();
             }

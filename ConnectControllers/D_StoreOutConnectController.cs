@@ -177,9 +177,9 @@ namespace mar_sumaken_web.ConnectControllers
                             item.DeliveryTimeClass = deliveryTimeClass;
                             item.DeliverySlipNumber = deliverySlipNumber;
                             item.NumberOfBoxes = (int)Math.Ceiling((double)item.Quantity / item.LotQuantity);
-                            // 出庫実績登録SQL作成
-                            string insertSql = CreateSQLToInsertDStoreOut(item, sysDate, loginUser.UserName);
+
                             // 出庫実績登録
+                            string insertSql = CreateSQLToInsertDStoreOut(item, sysDate, loginUser.UserName);
                             var insertCount = connection.Execute(insertSql, null, transaction);
                             // 更新件数が0の場合はエラーとする
                             if (insertCount == 0)
@@ -205,7 +205,7 @@ namespace mar_sumaken_web.ConnectControllers
         /// </summary>
         /// <param name="model">出庫実績モデル</param>
         /// <param name="user">ログインユーザー</param>
-        public static void EditDStoreOut(D_StoreOutModel model, LoginUserModel loginUser)
+        public static void UpdateDStoreOut(D_StoreOutModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
