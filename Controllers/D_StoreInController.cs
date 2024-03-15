@@ -107,9 +107,9 @@ namespace mar_sumaken_web.Controllers
                             <td class='StoreInDate'>{@item.StoreInDate:yyyy/MM/dd}</td>
                             <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
                             <td class='LotNumber'>{@item.LotNumber}</td>
-                            <td class='LotQuantity'>{@item.LotQuantity}</td>
-                            <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
-                            <td class='Quantity'>{@item.Quantity}</td>
+                            <td class='LotQuantity'>{Utils.FormatNumber(@item.LotQuantity)}</td>
+                            <td class='NumberOfBoxes'>{Utils.FormatNumber(@item.NumberOfBoxes)}</td>
+                            <td class='Quantity'>{Utils.FormatNumber(@item.Quantity)}</td>
                             <td class='MainProductKey'>{@item.MainProductKey}</td>
                             <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                             <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
