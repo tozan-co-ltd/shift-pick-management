@@ -383,6 +383,8 @@ function WaitSeconds() {
 
 //------------------- 仕入先かんばんマスターバリデーションチェック ------------------//
 function CheckValidationMSupplierKanban() {
+    var checkFlag = true;
+
     // 識別文字
     var IdentifyStringStartIndex = $("#IdentifyStringStartIndex");
     var IdentifyString = $("#IdentifyString");
@@ -421,17 +423,20 @@ function CheckValidationMSupplierKanban() {
 
     if (!checkProductNumber || !checkQuantity || !checkLot || !checkFirstSubProductKey
         || !checkSecondSubProductKey || !checkProductBranchNumber || !checkOrderNumber) {
+        checkFlag = false;
+    } 
+
+    if (!checkFlag) {
         $("#div-error-message").text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
-        return false;
-    } else {
-        if (!checkMainProductKey) {
-            $(".MainProductKey").addClass("input-validation-error");
-            $("#div-error-message").text("重複許容フラグが0の場合、メインキーは必須項目です。");
-            return false;
-        }
     }
 
-    return true;
+    if (!checkMainProductKey) {
+        $("#duplicate-error-message").text("E1024: 重複許容フラグが0の場合、メインキーは必須項目です。");
+        $(".MainProductKey").addClass("input-validation-error");
+    }
+
+    if (!checkFlag) return false;
+    if (!checkMainProductKey) return false;
 }
 
 // 入力必須項目チェック
@@ -462,11 +467,11 @@ function CheckPairValueMSupplierKanban(id1, id2, required = false) {
 
     // 必須項目が0未満の場合はエラー
     if (required) {
-        if (lengthValue <= 0) {
+        if (Number.isNaN(lengthValue) || lengthValue <= 0) {
             length.addClass("input-validation-error");
             checkFlag = false;
         }
-        if (startIndexValue <= 0) {
+        if (Number.isNaN(startIndexValue) || startIndexValue <= 0) {
             startIndex.addClass("input-validation-error");
             checkFlag = false;
         }
