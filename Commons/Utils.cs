@@ -161,7 +161,14 @@ namespace mar_sumaken_web.Commons
         /// <param name="number"></param>
         public static string FormatNumber(int number)
         {
-            return string.Format("{0:#,#}", number);
+            if (number >= 1000)
+            {
+                return string.Format("{0:#,#}", number);
+            }
+            else
+            {
+                return number.ToString();
+            }
         }
 
     }
