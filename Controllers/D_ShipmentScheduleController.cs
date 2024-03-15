@@ -160,11 +160,11 @@ namespace mar_sumaken_web.Controllers
                             <td class='DeliveryTimeClass'>{@item.DeliveryTimeClass}</td>
                             <td class='DeliveryProductNumber'>{@item.DeliveryProductNumber}</td>
                             <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
-                            <td class='LotQuantity'>{@item.LotQuantity}</td>
-                            <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
-                            <td class='Quantity'>{@item.Quantity}</td>
-                            <td class='StoreOutNumberOfBoxes'>{@item.StoreOutNumberOfBoxes}</td>
-                            <td class='StoreOutQuantity'>{@item.StoreOutQuantity}</td>
+                            <td class='LotQuantity'>{Utils.FormatNumber(Convert.ToInt32(@item.LotQuantity))}</td>
+                            <td class='NumberOfBoxes'>{Utils.FormatNumber(@item.NumberOfBoxes)}</td>
+                            <td class='Quantity'>{Utils.FormatNumber(Convert.ToInt32(@item.Quantity))}</td>
+                            <td class='StoreOutNumberOfBoxes'>{Utils.FormatNumber(@item.StoreOutNumberOfBoxes)}</td>
+                            <td class='StoreOutQuantity'>{Utils.FormatNumber(@item.StoreOutQuantity)}</td>
                             <td class='OrdererCode'>{@item.OrdererCode}</td>
                             <td class='OrdererFactoryKubun'>{@item.OrdererFactoryKubun}</td>
                             <td class='OrdererName'>{@item.OrdererName}</td>
