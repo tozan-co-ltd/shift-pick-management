@@ -475,12 +475,18 @@
         $("#SearchStartDate").val(row.getElementsByClassName("StoreOutDate")[0].textContent);
         $("#SearchDeliveryDate").val(row.getElementsByClassName("DeliveryDate")[0].textContent);
         
+
+        var lotQuantity = row.getElementsByClassName("LotQuantity")[0].textContent;
+        var quantity = row.getElementsByClassName("Quantity")[0].textContent
+        if (lotQuantity) lotQuantity = lotQuantity.replace(/,/g, '');
+        if (quantity) quantity = quantity.replace(/,/g, '');
+
         $("#DeliverySlipNumber").val(row.getElementsByClassName("DeliverySlipNumber")[0].textContent);
         $("#DeliveryProductNumber").val(row.getElementsByClassName("DeliveryProductNumber")[0].textContent);
         $("#SupplierProductNumber").val(row.getElementsByClassName("SupplierProductNumber")[0].textContent);
         $("#LotNumber").val(row.getElementsByClassName("LotNumber")[0].textContent);
-        $("#LotQuantity").val(row.getElementsByClassName("LotQuantity")[0].textContent);
-        $("#Quantity").val(row.getElementsByClassName("Quantity")[0].textContent);
+        $("#LotQuantity").val(lotQuantity);
+        $("#Quantity").val(quantity);
         $("#MainProductKey").val(row.getElementsByClassName("MainProductKey")[0].textContent);
         $("#FirstSubProductKey").val(row.getElementsByClassName("FirstSubProductKey")[0].textContent);
         $("#SecondSubProductKey").val(row.getElementsByClassName("SecondSubProductKey")[0].textContent);

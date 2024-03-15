@@ -480,3 +480,24 @@ function CheckPairValueMSupplierKanban(id1, id2, required = false) {
     return checkFlag;
 }
 //--------------------------------------------------------//
+
+// 小数点とMaxLengthチェック
+function CheckInputNumber() {
+    console.log("dsfsdf");
+    var checkFlag = true;
+    $('input[type="number"]').each(function () {
+        var value = $(this).val();
+        // 小数点
+        if (!Number.isInteger(Number(value)) || Number(value) < 0) {
+            $(this).addClass('input-validation-error');
+            checkFlag = false;
+        }
+        // MaxLength
+        if (value.length > 10 || isNaN(value)) {
+            $(this).addClass('input-validation-error');
+            checkFlag = false;
+        }
+    });
+    return checkFlag;
+}
+//--------------------------------------------------------//
