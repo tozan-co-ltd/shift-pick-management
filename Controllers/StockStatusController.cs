@@ -72,19 +72,23 @@ namespace mar_sumaken_web.Controllers
 
                     foreach (var item in model.StockStatusList)
                     {
-                        // ロット番号チェック
-                        string supplierProductNumberTag = $@"<td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>";
-                        if (item.StoreInQuantity > 0 || item.StoreOutQuantity > 0)
-                        {
-                            supplierProductNumberTag = $@"<td>
-                                <a href='#' onclick='OnLotNumberDetailClick(this)' data-toggle='modal' data-target='#detail-lot-number-modal'>
-                                {item.SupplierProductNumber}
-                                </a>
-                            </td>";
-                        }
-
                         // 在庫数=月初在庫数+当月入庫数総計-当月出庫数総計
                         item.StockRemainQuantity = @item.StockQuantityAtBeginningMonth + (item.StoreInQuantity - item.StoreOutQuantity);
+
+                        // ロット番号チェック
+                        string supplierProductNumberTag = $@"<td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>";
+                        if (!string.IsNullOrWhiteSpace(item.LotNumber) && item.StockRemainQuantity > 0)
+                        {
+                            if ((item.StoreInQuantity > 0 || item.StoreOutQuantity > 0))
+                            {
+                                supplierProductNumberTag = $@"<td>
+                                    <a href='#' onclick='OnLotNumberDetailClick(this)' data-toggle='modal' data-target='#detail-lot-number-modal'>
+                                    {item.SupplierProductNumber}
+                                    </a>
+                                </td>";
+                            }
+                        }
+
                         searchData += $@"<tr>
                         <td>
                             <a class='btn btn-secondary btn-icon-split ml-1 mr-1'
