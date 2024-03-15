@@ -476,14 +476,13 @@ function CheckPairValueMSupplierKanban(id1, id2, required = false) {
             checkFlag = false;
         }
     }
-
     return checkFlag;
 }
 //--------------------------------------------------------//
 
+//------------------- バリデーションチェック ------------------//
 // 小数点とMaxLengthチェック
 function CheckInputNumber() {
-    console.log("dsfsdf");
     var checkFlag = true;
     $('input[type="number"]').each(function () {
         var value = $(this).val();
