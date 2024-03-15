@@ -54,33 +54,59 @@ namespace mar_sumaken_web.Commons
         public static string CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation(int depoId, int companyId, string nextDay)
         {
             var sql = $@"
+                --先に出庫実績を集計
+                WITH storeout_sum AS (
+                    SELECT 
+                        DepoID,
+                        DeliveryDate,
+                        DeliveryTimeClass,
+                        DeliverySlipNumber,
+                        DeliveryProductNumber,
+                        COALESCE(SUM(NumberOfBoxes), 0) AS StoreOutNumberOfBoxes, -- 出庫箱数
+                        COALESCE(SUM(Quantity), 0) AS StoreOutQuantity -- 出庫数量
+                    FROM 
+                        D_StoreOut
+                    WHERE 
+                        DepoID = {depoId}
+                        AND DeliveryDate = '{nextDay}'
+                        AND IsDeleted = 0
+                    GROUP BY 
+                        DepoID,
+                        DeliveryDate,
+                        DeliveryTimeClass,
+                        DeliverySlipNumber,
+                        DeliveryProductNumber
+                )
+                
+                --出荷指示と出庫実績を紐づけ
                 SELECT  
-                    depo.DepoName
-	                ,company.CompanyName AS SupplierName
-	                ,COALESCE(storeOut.NumberOfBoxes, 0) AS StoreOutNumberOfBoxes --出庫箱数
-	                ,COALESCE(storeOut.Quantity, 0) AS StoreOutQuantity --出庫数量
-					,ROUND(shipment.Quantity / shipment.LotQuantity, 0, 0) AS ScheduleNumberOfBoxes --指示箱数
-					,shipment.Quantity AS ScheduleQuantity --納入指示数
-                    ,shipment.*
-                FROM D_ShipmentSchedule AS shipment
-                LEFT JOIN D_StoreOut AS storeOut
-                    ON shipment.DepoID = storeOut.DepoID
-                    AND shipment.DeliveryDate = storeOut.DeliveryDate
-                    AND shipment.DeliveryTimeClass = storeOut.DeliveryTimeClass
-                    AND shipment.DeliverySlipNumber = storeOut.DeliverySlipNumber
-                    AND shipment.DeliveryProductNumber = storeOut.DeliveryProductNumber
-                    AND storeOut.IsDeleted = 0
-                INNER JOIN M_Company AS company
-                    ON shipment.CompanyID = company.CompanyID
-                INNER JOIN M_Depo AS depo
-                    ON shipment.DepoID = depo.DepoID
+                    shipment.ShipmentScheduleID
+                   ,depo.DepoName
+                   ,company.CompanyName AS SupplierName
+                   ,COALESCE(storeout_sum.StoreOutNumberOfBoxes,0) as StoreOutNumberOfBoxes -- 出庫箱数
+                   ,COALESCE(storeout_sum.StoreOutQuantity,0) as StoreOutQuantity -- 出庫数量    
+                   ,ROUND(shipment.Quantity / shipment.LotQuantity, 0) AS ScheduleNumberOfBoxes -- 指示箱数
+                   ,shipment.Quantity AS ScheduleQuantity -- 納入指示数
+                   ,shipment.*
+                FROM 
+                    D_ShipmentSchedule AS shipment
+                LEFT JOIN 
+                    storeout_sum  ON shipment.DepoID = storeout_sum.DepoID
+                    AND shipment.DeliveryDate = storeout_sum.DeliveryDate
+                    AND shipment.DeliveryTimeClass = storeout_sum.DeliveryTimeClass
+                    AND shipment.DeliverySlipNumber = storeout_sum.DeliverySlipNumber
+                    AND shipment.DeliveryProductNumber = storeout_sum.DeliveryProductNumber                    
+                INNER JOIN 
+                    M_Company AS company ON shipment.CompanyID = company.CompanyID
+                INNER JOIN 
+                    M_Depo AS depo ON shipment.DepoID = depo.DepoID
                 WHERE
-                    shipment.DepoID = {depoId}
-                    AND shipment.CompanyID = {companyId}
-                    AND shipment.DeliveryDate = '{nextDay}'
-                    AND shipment.IsDeleted = 0
-                    AND company.IsDeleted = 0
-                    AND depo.IsDeleted = 0
+                 shipment.DepoID =  {depoId}
+                 AND shipment.CompanyID ={companyId}
+                 AND shipment.DeliveryDate = '{nextDay}'
+                 AND shipment.IsDeleted = 0
+                 AND company.IsDeleted = 0
+                 AND depo.IsDeleted = 0
             ";
 
             return sql;
