@@ -112,6 +112,7 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = "E1017: " + ErrorMessagesResources.E1017;
                     _logger.Error($"仕入先かんばんマスター登録失敗 {errorMessage} {errormsgs}");
+
                     return NotFound(new { errorMessage });
                 }
 
@@ -123,6 +124,7 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_SupplierKanbanModel>("DepoName") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyString") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyStringStartIndex"));
                     _logger.Error($"仕入先かんばんマスター登録失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
 
@@ -242,6 +244,7 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = "E1017: " + ErrorMessagesResources.E1017;
                     _logger.Error($"仕入先かんばんマスター更新失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
 

@@ -16,6 +16,8 @@ namespace mar_sumaken_web.Controllers
     /// </summary>
     public class D_StoreOutController : BaseController
     {
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
         // 新規作成行数
         private const int InitRegisterRowCount = 5;
 
@@ -150,6 +152,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public IActionResult Edit(D_StoreOutModel model)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -158,30 +161,48 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+                    // log取得
+                    errorMessage = "E1017: " + ErrorMessagesResources.E1017;
+                    _logger.Error($"出庫実績更新失敗 {errorMessage}");
+                    return NotFound(new { errorMessage });
                 }
 
                 // 納入先品番で品番チェック
                 bool isExistDeliveryProduct = M_ProductConnectController.IsExistedDeliveryProductNumber(model.DeliveryProductNumber, user.DatabaseName);
                 if (!isExistDeliveryProduct)
                 {
-                    var message = string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
-                    return NotFound(new { errorMessage = message });
+                    // log取得
+                    errorMessage = errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
+                    _logger.Error($"出庫実績更新失敗 {errorMessage}");
+                    return NotFound(new { errorMessage });
                 }
                 model.SupplierProductNumber = model.DeliveryProductNumber;
 
                 // 出庫実績更新
                 D_StoreOutConnectController.UpdateDStoreOut(model, user);
 
+                // log取得
+                _logger.Info($"出庫実績更新成功 出庫実績ID:{model.StoreOutID}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004 :" + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999 :" + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
@@ -287,6 +308,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public IActionResult Register(D_StoreOutModel model)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -359,7 +381,11 @@ namespace mar_sumaken_web.Controllers
                 // エラーが1件以上ある場合はreturn
                 if (errorMessageList.Count > 0)
                 {
-                    var errorMessage = string.Join("</br>", errorMessageList);
+                    errorMessage = string.Join("</br>", errorMessageList);
+
+                    // log取得
+                    _logger.Error($"取込失敗");
+
                     return NotFound(new { errorMessage });
                 }
 
@@ -367,25 +393,39 @@ namespace mar_sumaken_web.Controllers
                 // 出庫実績登録
                 D_StoreOutConnectController.InsertDStoreOuts(model, user);
 
+                // log取得
+                _logger.Info($"出庫実績登録成功 出庫日:{model.StoreOutDate}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004 :" + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999 :" + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
         /// <summary>
         /// 出庫実績削除
         /// </summary>
-        /// <param name="storeInId">出庫実績ID</param>
+        /// <param name="id">出庫実績ID</param>
         /// <returns></returns>
         public IActionResult Delete(int id)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -394,15 +434,28 @@ namespace mar_sumaken_web.Controllers
                 // 出庫実績削除
                 D_StoreOutConnectController.DeleteDStoreOut(id, user);
 
+                // log取得
+                _logger.Info($"出庫実績削除成功 出庫実績ID:{id}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 

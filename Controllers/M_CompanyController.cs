@@ -92,6 +92,7 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = "E1017: " + ErrorMessagesResources.E1017;
                     _logger.Error($"会社マスター登録失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
 
@@ -103,6 +104,7 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_CompanyModel>("CompanyCode"));
                     _logger.Error($"会社マスター登録失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
 
@@ -153,6 +155,7 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = "E1017: " + ErrorMessagesResources.E1017;
                     _logger.Error($"会社マスター更新失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
 
@@ -164,6 +167,7 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_CompanyModel>("CompanyCode"));
                     _logger.Error($"会社マスター更新失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
 
