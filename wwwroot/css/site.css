@@ -833,3 +833,6 @@ select[readonly] {
 
 /*Å@--------------Set color for all text---------------*/
 
+.unset-pd {
+    padding: unset !important;
+}
