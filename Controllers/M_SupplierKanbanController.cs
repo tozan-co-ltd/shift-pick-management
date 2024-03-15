@@ -6,6 +6,7 @@ using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.Design;
 using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
@@ -17,6 +18,8 @@ namespace mar_sumaken_web.Controllers
     /// </summary>
     public class M_SupplierKanbanController : BaseController
     {
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// 仕入先かんばんマスター画面表示
         /// </summary>
@@ -96,6 +99,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public IActionResult Register(M_SupplierKanbanModel model)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -105,7 +109,11 @@ namespace mar_sumaken_web.Controllers
                 if (!ModelState.IsValid)
                 {
                     var errormsgs = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
-                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+                    // log取得
+                    errorMessage = "E1017: " + ErrorMessagesResources.E1017;
+                    _logger.Error($"仕入先かんばんマスター登録失敗 {errorMessage} {errormsgs}");
+
+                    return NotFound(new { errorMessage });
                 }
 
                 // 仕入先かんばんコード重複チェック
@@ -113,21 +121,38 @@ namespace mar_sumaken_web.Controllers
                 bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
                 if (isExisted)
                 {
-                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_SupplierKanbanModel>("DepoName") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyString") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyStringStartIndex")) });
+                    // log取得
+                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_SupplierKanbanModel>("DepoName") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyString") + "・" + Utils.GetDisplayName<M_SupplierKanbanModel>("IdentifyStringStartIndex"));
+                    _logger.Error($"仕入先かんばんマスター登録失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
                 }
 
                 // 仕入先かんばんマスター登録
                 M_SupplierKanbanConnectController.InsertMSupplierKanban(model, user);
 
+                // log取得
+                _logger.Info($"仕入先かんばんマスター登録成功 仕入先かんばん名:{model.SupplierKanbanName}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
@@ -207,6 +232,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public IActionResult Edit(M_SupplierKanbanModel model)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -215,21 +241,38 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+                    // log取得
+                    errorMessage = "E1017: " + ErrorMessagesResources.E1017;
+                    _logger.Error($"仕入先かんばんマスター更新失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
                 }
 
                 // 仕入先かんばんマスター更新
                 M_SupplierKanbanConnectController.UpdateMSupplierKanban(model, user);
 
+                // log取得
+                _logger.Info($"仕入先かんばんマスター更新成功 仕入先かんばんID:{model.SupplierKanbanID}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
@@ -240,6 +283,7 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult Delete(int supplierKanbanId)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -248,15 +292,28 @@ namespace mar_sumaken_web.Controllers
                 // 仕入先かんばんマスター削除
                 M_SupplierKanbanConnectController.DeleteMSupplierKanban(supplierKanbanId, user);
 
+                // log取得
+                _logger.Info($"仕入先かんばんマスター削除成功 会社ID:{supplierKanbanId}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 

@@ -157,7 +157,9 @@
 
             // 仕入先品番と数量チェック
             var checkFlag = checkValue(editRow);
-            if (!checkFlag) {
+            var quantityCheck = CheckInputNumber();
+
+            if (!checkFlag || !quantityCheck) {
                 $('#div-error-message').text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
                 return;
             }

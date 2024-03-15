@@ -5,6 +5,7 @@ using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection;
 using X.PagedList;
 
 namespace mar_sumaken_web.Controllers
@@ -14,12 +15,7 @@ namespace mar_sumaken_web.Controllers
     /// </summary>
     public class M_CompanyController : BaseController
     {
-        private readonly ILogger<M_CompanyController> _logger;
-
-        public M_CompanyController(ILogger<M_CompanyController> logger)
-        {
-            _logger = logger;
-        }
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// 会社マスター画面表示
@@ -84,6 +80,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public IActionResult Register(M_CompanyModel model)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -92,7 +89,11 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+                    // log取得
+                    errorMessage = "E1017: " + ErrorMessagesResources.E1017;
+                    _logger.Error($"会社マスター登録失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
                 }
 
                 // 会社コード重複チェック
@@ -100,21 +101,38 @@ namespace mar_sumaken_web.Controllers
                 bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
                 if (isExisted)
                 {
-                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_CompanyModel>("CompanyCode")) });
+                    // log取得
+                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_CompanyModel>("CompanyCode"));
+                    _logger.Error($"会社マスター登録失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
                 }
 
                 // 会社マスター登録
                 M_CompanyConnectController.InsertMCompany(model, user);
 
+                // log取得
+                _logger.Info($"会社マスター登録成功 会社コード:{model.CompanyCode}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
@@ -125,6 +143,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public IActionResult Edit(M_CompanyModel model)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -133,7 +152,11 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+                    // log取得
+                    errorMessage = "E1017: " + ErrorMessagesResources.E1017;
+                    _logger.Error($"会社マスター更新失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
                 }
 
                 // 異なるIDで会社コード重複チェック
@@ -141,21 +164,38 @@ namespace mar_sumaken_web.Controllers
                 bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
                 if (isExisted)
                 {
-                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_CompanyModel>("CompanyCode")) });
+                    // log取得
+                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_CompanyModel>("CompanyCode"));
+                    _logger.Error($"会社マスター更新失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
                 }
 
                 // 会社マスター更新
                 M_CompanyConnectController.UpdateMCompany(model, user);
 
+                // log取得
+                _logger.Info($"会社マスター更新成功 会社ID:{model.CompanyID}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
@@ -166,6 +206,7 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult Delete(int companyId)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -174,15 +215,28 @@ namespace mar_sumaken_web.Controllers
                 // 会社マスター削除
                 M_CompanyConnectController.DeleteMCompany(companyId, user);
 
+                // log取得
+                _logger.Info($"会社マスター削除成功 会社ID:{companyId}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 

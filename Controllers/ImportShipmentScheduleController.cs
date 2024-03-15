@@ -112,6 +112,7 @@ namespace mar_sumaken_web.Controllers
                             // log取得
                             errorMessage = "E1014: " + ErrorMessagesResources.E1014;
                             _logger.Error($"取込失敗 {errorMessage}");
+
                             return NotFound(new { errorMessage });
                         }
 
@@ -134,6 +135,7 @@ namespace mar_sumaken_web.Controllers
 
                             // log取得
                             _logger.Error($"データ読み取り失敗 {readCsvErrorMsg}");
+
                             return NotFound(new { errorMessage = readCsvErrorMsg });
                         }
 
@@ -224,7 +226,7 @@ namespace mar_sumaken_web.Controllers
                             errorMessage = string.Join("</br>", errorMessageList);
 
                             // log取得
-                            _logger.Error($"取込失敗 {errorMessage}");
+                            _logger.Error($"取込失敗");
 
                             return NotFound(new { errorMessage });
                         }

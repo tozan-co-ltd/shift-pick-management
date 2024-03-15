@@ -82,10 +82,10 @@ namespace mar_sumaken_web.Controllers
                         <td class='ReceiveScheduleDate'>{Utils.ConvertToYYYYMMDD(@item.ReceiveScheduleDate)}</td>
                         <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
                         <td class='LotNumber'>{@item.LotNumber}</td>
-                        <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
-                        <td class='Quantity'>{@item.Quantity}</td>
-                        <td class='StoreInNumberOfBox'>{@item.StoreInNumberOfBox}</td>
-                        <td class='StoreInQuantity'>{@item.StoreInQuantity}</td>
+                        <td class='NumberOfBoxes'>{Utils.FormatNumber(@item.NumberOfBoxes)}</td>
+                        <td class='Quantity'>{Utils.FormatNumber(Convert.ToInt32(@item.Quantity))}</td>
+                        <td class='StoreInNumberOfBox'>{Utils.FormatNumber(@item.StoreInNumberOfBox)}</td>
+                        <td class='StoreInQuantity'>{Utils.FormatNumber(@item.StoreInQuantity)}</td>
                         <td class='CreatedAt'>{@item.CreatedAt:yyyy/MM/dd HH:mm:ss}</td>
                         <td class='CreatedBy'>{@item.CreatedBy}</td>
                         <input type='hidden' class='DepoID' value='{item.DepoID}' />

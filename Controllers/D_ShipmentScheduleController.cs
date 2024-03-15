@@ -15,6 +15,8 @@ namespace mar_sumaken_web.Controllers
     /// </summary>
     public class D_ShipmentScheduleController : BaseController
     {
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// 出荷指示照会画面表示
         /// </summary>
@@ -158,11 +160,11 @@ namespace mar_sumaken_web.Controllers
                             <td class='DeliveryTimeClass'>{@item.DeliveryTimeClass}</td>
                             <td class='DeliveryProductNumber'>{@item.DeliveryProductNumber}</td>
                             <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
-                            <td class='LotQuantity'>{@item.LotQuantity}</td>
-                            <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
-                            <td class='Quantity'>{@item.Quantity}</td>
-                            <td class='StoreOutNumberOfBoxes'>{@item.StoreOutNumberOfBoxes}</td>
-                            <td class='StoreOutQuantity'>{@item.StoreOutQuantity}</td>
+                            <td class='LotQuantity'>{Utils.FormatNumber(Convert.ToInt32(@item.LotQuantity))}</td>
+                            <td class='NumberOfBoxes'>{Utils.FormatNumber(@item.NumberOfBoxes)}</td>
+                            <td class='Quantity'>{Utils.FormatNumber(Convert.ToInt32(@item.Quantity))}</td>
+                            <td class='StoreOutNumberOfBoxes'>{Utils.FormatNumber(@item.StoreOutNumberOfBoxes)}</td>
+                            <td class='StoreOutQuantity'>{Utils.FormatNumber(@item.StoreOutQuantity)}</td>
                             <td class='OrdererCode'>{@item.OrdererCode}</td>
                             <td class='OrdererFactoryKubun'>{@item.OrdererFactoryKubun}</td>
                             <td class='OrdererName'>{@item.OrdererName}</td>
@@ -214,6 +216,7 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult Delete(int id)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -224,14 +227,20 @@ namespace mar_sumaken_web.Controllers
                 bool isExistedShipment = ConnectToSQLServer.IsExistedSameRecord(checkShipmentSql, user.DatabaseName);
                 if (isExistedShipment)
                 {
-                    return NotFound(new { errorMessage = "E1027: " + ErrorMessagesResources.E1027 });
+                    // log取得
+                    errorMessage = "E1027 " + ErrorMessagesResources.E1027;
+                    _logger.Error($"出荷指示削除失敗 {errorMessage}");
+                    return NotFound(new { errorMessage });
                 }
 
                 // 出荷指示IDで出荷指示照会取得
                 var shipmentSchedule = D_ShipmentScheduleConnectController.GetDShipmentScheduleByShipmentScheduleId(id, user.DatabaseName);
                 if (shipmentSchedule == null)
                 {
-                    return NotFound(new { errorMessage = "E1027: " + ErrorMessagesResources.E3004 });
+                    // log取得
+                    errorMessage = "E1027 " + ErrorMessagesResources.E1027;
+                    _logger.Error($"出荷指示削除失敗 {errorMessage}");
+                    return NotFound(new { errorMessage });
                 }
 
                 // 出庫実績がある場合はエラー
@@ -239,21 +248,37 @@ namespace mar_sumaken_web.Controllers
                 bool isExistedStoreOut = ConnectToSQLServer.IsExistedSameRecord(checkDStoreOutSql, user.DatabaseName);
                 if (isExistedStoreOut)
                 {
-                    return NotFound(new { errorMessage = "E1027: " + ErrorMessagesResources.E1027 });
+                    // log取得
+                    errorMessage = "E1027 " + ErrorMessagesResources.E1027;
+                    _logger.Error($"出荷指示削除失敗 {errorMessage}");
+                    return NotFound(new { errorMessage });
                 }
 
                 // 出荷指示削除
                 D_ShipmentScheduleConnectController.DeleteDShipmentSchedule(id, user);
 
+                // log取得
+                _logger.Info($"出荷指示削除成功 出荷指示ID:{id}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
 
             }
         }

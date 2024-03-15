@@ -151,8 +151,6 @@ namespace mar_sumaken_web.Models
         /// 数量
         /// </summary>
         [Display(Name = "数量")]
-        [Range(1, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [RegularExpression(@"[0-9]{1,10}", ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int Quantity { set; get; }
 

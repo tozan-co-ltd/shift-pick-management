@@ -4,6 +4,7 @@ using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.Design;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -14,12 +15,7 @@ namespace mar_sumaken_web.Controllers
     /// </summary>
     public class M_ProductController : BaseController
     {
-        private readonly ILogger<M_ProductController> _logger;
-
-        public M_ProductController(ILogger<M_ProductController> logger)
-        {
-            _logger = logger;
-        }
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// 品番マスター画面表示
@@ -98,6 +94,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public IActionResult Register(M_ProductModel model)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -113,7 +110,11 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+                    // log取得
+                    errorMessage = "E1017: " + ErrorMessagesResources.E1017;
+                    _logger.Error($"品番マスター登録失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
                 }
 
                 // 仕入先品番・納入先品番重複チェック
@@ -121,21 +122,38 @@ namespace mar_sumaken_web.Controllers
                 bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
                 if (isExisted)
                 {
-                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_ProductModel>("SupplierProductNumber") + "または" + Utils.GetDisplayName<M_ProductModel>("DeliveryProductNumber")) });
+                    // log取得
+                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_ProductModel>("SupplierProductNumber") + "または" + Utils.GetDisplayName<M_ProductModel>("DeliveryProductNumber"));
+                    _logger.Error($"品番マスター登録失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
                 }
 
                 // 品番マスター登録
                 M_ProductConnectController.InsertMProduct(model, user);
 
+                // log取得
+                _logger.Info($"品番マスター登録成功 仕入先品番:{model.SupplierProductNumber}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
@@ -146,6 +164,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public IActionResult Edit(M_ProductModel model)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -161,7 +180,11 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+                    // log取得
+                    errorMessage = "E1017: " + ErrorMessagesResources.E1017;
+                    _logger.Error($"品番マスター更新失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
                 }
 
                 // 異なるIDで仕入先品番・納入先品番重複チェック
@@ -169,21 +192,38 @@ namespace mar_sumaken_web.Controllers
                 bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
                 if (isExisted)
                 {
-                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_ProductModel>("SupplierProductNumber") + "または" + Utils.GetDisplayName<M_ProductModel>("DeliveryProductNumber")) });
+                    // log取得
+                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_ProductModel>("SupplierProductNumber") + "または" + Utils.GetDisplayName<M_ProductModel>("DeliveryProductNumber"));
+                    _logger.Error($"品番マスター更新失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
                 }
 
                 // 品番マスター更新
                 M_ProductConnectController.UpdateMProduct(model, user);
 
+                // log取得
+                _logger.Info($"品番マスター更新成功 品番ID:{model.ProductID}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
@@ -194,6 +234,7 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult Delete(int productId)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -202,15 +243,28 @@ namespace mar_sumaken_web.Controllers
                 // 品番マスター削除
                 M_ProductConnectController.DeleteMProduct(productId, user);
 
+                // log取得
+                _logger.Info($"品番マスター削除成功 品番ID:{productId}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
