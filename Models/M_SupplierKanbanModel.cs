@@ -119,7 +119,6 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "識別文字開始位置")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [Range(1, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int IdentifyStringStartIndex { get; set; }
 
         /// <summary>
@@ -127,7 +126,6 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "品番桁数")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [Range(1, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int ProductNumberLength { get; set; }
 
         /// <summary>
@@ -135,7 +133,6 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "品番開始位置")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [Range(1, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int ProductNumberStartIndex { get; set; }
 
         /// <summary>

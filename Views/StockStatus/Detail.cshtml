@@ -90,13 +90,13 @@
                 <tbody>
                     <tr>
                         <td>@Model.SupplierProductNumber</td>
-                        <td>@Model.LotQuantity</td>
-                        <td>@Model.StockQuantityAtBeginningMonth</td>
-                        <td>@Model.StoreInNumberOfBoxes</td>
-                        <td>@Model.StoreInQuantity</td>
-                        <td>@Model.StoreOutNumberOfBoxes</td>
-                        <td>@Model.StoreOutQuantity</td>
-                        <td>@Model.StockRemainQuantity</td>
+                        <td>@Utils.FormatNumber(Model.LotQuantity)</td>
+                        <td>@Utils.FormatNumber(Model.StockQuantityAtBeginningMonth)</td>
+                        <td>@Utils.FormatNumber(Model.StoreInNumberOfBoxes)</td>
+                        <td>@Utils.FormatNumber(Model.StoreInQuantity)</td>
+                        <td>@Utils.FormatNumber(Model.StoreOutNumberOfBoxes)</td>
+                        <td>@Utils.FormatNumber(Model.StoreOutQuantity)</td>
+                        <td>@Utils.FormatNumber(Model.StockRemainQuantity)</td>
                     </tr>
                 </tbody>
             </table>
@@ -117,15 +117,15 @@
                 <tbody>
                     @if (@Model != null && @Model.DetailList != null && @Model.DetailList.Count > 0)
                     {
-                        @foreach (var item in @Model.DetailList)
+                        @foreach (var item in Model.DetailList)
                         {
                              <tr>
                                 <td>@item.WorkedDate</td>
-                                <td>@item.StoreInNumberOfBoxes</td>
-                                <td>@item.StoreInQuantity</td>
-                                <td>@item.StoreOutNumberOfBoxes</td>
-                                <td>@item.StoreOutQuantity</td>
-                                <td>@item.StockRemainQuantity</td>
+                                <td>@Utils.FormatNumber(item.StoreInNumberOfBoxes)</td>
+                                <td>@Utils.FormatNumber(item.StoreInQuantity)</td>
+                                <td>@Utils.FormatNumber(item.StoreOutNumberOfBoxes)</td>
+                                <td>@Utils.FormatNumber(item.StoreOutQuantity)</td>
+                                <td>@Utils.FormatNumber(item.StockRemainQuantity)</td>
                             </tr>
                         }
                     }

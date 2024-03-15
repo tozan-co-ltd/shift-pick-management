@@ -355,23 +355,10 @@
         // バリデーションチェック
         var validationCheck = CheckValidationMSupplierKanban();
 
-        var inputNumnerCheck = true;
         // 小数点とMaxLengthチェック
-        $('input[type="number"]').each(function () {
-            var value = $(this).val();
-            // 小数点
-            if (!Number.isInteger(Number(value)) || Number(value) < 0) {
-                $(this).addClass('input-validation-error');
-                inputNumnerCheck = false;
-            }
-            // MaxLength
-            if (value.length > 10 || isNaN(value)) {
-                $(this).addClass('input-validation-error');
-                inputNumnerCheck = false;
-            }
-        });
+        var inputNumberCheck = CheckInputNumber();
 
-        return validationCheck && inputNumnerCheck;
+        return validationCheck && inputNumberCheck;
     }
 
     // エラーメッセージ削除

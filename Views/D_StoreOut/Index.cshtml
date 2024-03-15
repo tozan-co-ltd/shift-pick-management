@@ -203,7 +203,7 @@
                                 <label>@Html.DisplayNameFor(model => model.Quantity)<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input class="form-control" type="text" asp-for="Quantity" autocomplete="off">
+                                <input class="form-control" type="number" asp-for="Quantity" autocomplete="off">
                                 <span class="text-danger w-100" asp-validation-for="Quantity"></span>
                             </div>
                         </div>
@@ -475,12 +475,18 @@
         $("#SearchStartDate").val(row.getElementsByClassName("StoreOutDate")[0].textContent);
         $("#SearchDeliveryDate").val(row.getElementsByClassName("DeliveryDate")[0].textContent);
         
+
+        var lotQuantity = row.getElementsByClassName("LotQuantity")[0].textContent;
+        var quantity = row.getElementsByClassName("Quantity")[0].textContent
+        if (lotQuantity) lotQuantity = lotQuantity.replace(/,/g, '');
+        if (quantity) quantity = quantity.replace(/,/g, '');
+
         $("#DeliverySlipNumber").val(row.getElementsByClassName("DeliverySlipNumber")[0].textContent);
         $("#DeliveryProductNumber").val(row.getElementsByClassName("DeliveryProductNumber")[0].textContent);
         $("#SupplierProductNumber").val(row.getElementsByClassName("SupplierProductNumber")[0].textContent);
         $("#LotNumber").val(row.getElementsByClassName("LotNumber")[0].textContent);
-        $("#LotQuantity").val(row.getElementsByClassName("LotQuantity")[0].textContent);
-        $("#Quantity").val(row.getElementsByClassName("Quantity")[0].textContent);
+        $("#LotQuantity").val(lotQuantity);
+        $("#Quantity").val(quantity);
         $("#MainProductKey").val(row.getElementsByClassName("MainProductKey")[0].textContent);
         $("#FirstSubProductKey").val(row.getElementsByClassName("FirstSubProductKey")[0].textContent);
         $("#SecondSubProductKey").val(row.getElementsByClassName("SecondSubProductKey")[0].textContent);
@@ -497,6 +503,16 @@
 
             // 送信イベントが他のハンドラーに伝播するのを防ぐ
             event.stopImmediatePropagation();
+
+            let quantity = $("#Quantity");
+            let quantityValue = quantity.val();
+            // 数量: 小数点とMaxLengthチェック
+            let quantityCheck = CheckInputNumber();
+            if (!quantityCheck || quantityValue <= 0) {
+                quantity.addClass('input-validation-error');
+                $('#edit-modal-error-message').text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
+                return;
+            }
 
             // フォーム情報取得
             let url = window.location.origin + '@Url.Action("Edit", "D_StoreOut")';

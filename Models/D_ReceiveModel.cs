@@ -121,7 +121,7 @@ namespace mar_sumaken_web.Models
         /// 数量
         /// </summary>
         [Display(Name = "数量")]
-        public string? Quantity { get; set; }
+        public int Quantity { get; set; }
 
         /// <summary>
         /// メインキー

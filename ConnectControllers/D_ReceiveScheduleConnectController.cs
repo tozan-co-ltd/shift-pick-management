@@ -144,7 +144,7 @@ namespace mar_sumaken_web.Commons
             string differenceCheckCondition = string.Empty;
             if (model.DiffenceCountCheck)
             {
-                differenceCheckCondition = " AND (receive_schedule.Quantity / product.LotQuantity) <> COALESCE(storein_sum.StoreInNumberOfBox, 0) ";
+                differenceCheckCondition = " AND CEILING(CAST(receive_schedule.Quantity AS DECIMAL) / product.LotQuantity) <> COALESCE(storein_sum.StoreInNumberOfBox, 0) ";
             }
 
             var sql = $@" 
@@ -195,7 +195,7 @@ namespace mar_sumaken_web.Commons
                     receive_schedule.SupplierProductNumber,
                     receive_schedule.LotNumber,
                     CASE 
-                        WHEN product.LotQuantity <> 0 THEN ROUND(receive_schedule.Quantity / product.LotQuantity, 0)
+                        WHEN product.LotQuantity <> 0 THEN CEILING(CAST(receive_schedule.Quantity AS DECIMAL) / product.LotQuantity)
                         ELSE 0
                     END AS NumberOfBoxes, -- 予定箱数
                     COALESCE(receive_schedule.Quantity, 0) AS Quantity, --予定数量

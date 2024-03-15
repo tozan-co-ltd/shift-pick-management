@@ -44,45 +44,45 @@
             <table class="table table-sm stripe hover nowrap datatable-normal">
                 <thead>
                     <tr>
-                        <th width="40"></th>
-                        <th class="font-weight-bold">ID</th>
-                        <th class="font-weight-bold">仕入先名</th>
-                        <th class="font-weight-bold">仕入先品番</th>
-                        <th class="font-weight-bold">納入先名</th>
-                        <th class="font-weight-bold">納入先品番</th>
-                        <th class="font-weight-bold">品名</th>
-                        <th class="font-weight-bold">収容数</th>
-                        <th class="font-weight-bold">使用倉庫名</th>
-                        <th class="font-weight-bold">更新日時</th>
-                        <th class="font-weight-bold">更新者</th>
+                        <th></th>
+                        <th>ID</th>
+                        <th>仕入先名</th>
+                        <th>仕入先品番</th>
+                        <th>納入先名</th>
+                        <th>納入先品番</th>
+                        <th>品名</th>
+                        <th>収容数</th>
+                        <th>使用倉庫名</th>
+                        <th>更新日時</th>
+                        <th>更新者</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (@Model != null && @Model.MProductList?.Count > 0)
                     {
-                        @foreach (var item in @Model.MProductList)
+                        @for (int i = 0; i < Model.MProductList.Count(); ++i)
                         {
                             <tr>
                                 <td>
                                     <a class="btn btn-success btn-icon-split ml-1 mr-1"
-                                    onclick="OnEditClick('@item.ProductID')" data-id="@item.ProductID" data-toggle="modal" data-target="#edit-modal">
+                                       onclick="OnEditClick('@Model.MProductList[i].ProductID')" data-id="@Model.MProductList[i].ProductID" data-toggle="modal" data-target="#edit-modal">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
                                     <button class="btn btn-danger btn-icon-split"
-                                    onclick="OnDeleteClick('@item.ProductID')" data-id="@item.ProductID" data-toggle="modal" data-target="#delete-modal">
+                                            onclick="OnDeleteClick('@Model.MProductList[i].ProductID')" data-id="@Model.MProductList[i].ProductID" data-toggle="modal" data-target="#delete-modal">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </td>
-                                <td>@item.ProductID</td>
-                                <td>@item.SupplierName</td>
-                                <td>@item.SupplierProductNumber</td>
-                                <td>@item.DeliveryName</td>
-                                <td>@item.DeliveryProductNumber</td>
-                                <td>@item.ProductName</td>
-                                <td>@item.LotQuantity</td>
-                                <td>@item.RDepoProductNames</td>
-                                <td>@item.UpdatedAt</td>
-                                <td>@item.UpdatedBy</td>
+                                <td>@Html.DisplayFor(model => model.MProductList[i].ProductID)</td>
+                                <td>@Html.DisplayFor(model => model.MProductList[i].SupplierName)</td>
+                                <td>@Html.DisplayFor(model => model.MProductList[i].SupplierProductNumber)</td>
+                                <td>@Html.DisplayFor(model => model.MProductList[i].DeliveryName)</td>
+                                <td>@Html.DisplayFor(model => model.MProductList[i].DeliveryProductNumber)</td>
+                                <td>@Html.DisplayFor(model => model.MProductList[i].ProductName)</td>
+                                <td>@Html.DisplayFor(model => model.MProductList[i].LotQuantity)</td>
+                                <td>@Html.DisplayFor(model => model.MProductList[i].RDepoProductNames)</td>
+                                <td>@Html.DisplayFor(model => model.MProductList[i].UpdatedAt)</td>
+                                <td>@Html.DisplayFor(model => model.MProductList[i].UpdatedBy)</td>
                             </tr>
                         }
                     }

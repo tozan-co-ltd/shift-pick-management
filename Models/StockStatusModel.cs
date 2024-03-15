@@ -108,42 +108,49 @@ namespace mar_sumaken_web.Models
         /// 収容数
         /// </summary>
         [Display(Name = "収容数")]
+        [DisplayFormat(DataFormatString = "{0:#,#}")]
         public int LotQuantity { get; set; }
 
         /// <summary>
         /// 月初在庫数
         /// </summary>
         [Display(Name = "月初在庫数")]
+        [DisplayFormat(DataFormatString = "{0:#,#}")]
         public int StockQuantityAtBeginningMonth { get; set; }
 
         /// <summary>
         /// 入庫箱数
         /// </summary>
         [Display(Name = "入庫箱数")]
+        [DisplayFormat(DataFormatString = "{0:#,#}")]
         public int StoreInNumberOfBoxes { get; set; }
 
         /// <summary>
         /// 入庫数
         /// </summary>
         [Display(Name = "入庫数")]
+        [DisplayFormat(DataFormatString = "{0:#,#}")]
         public int StoreInQuantity { get; set; }
 
         /// <summary>
         /// 出庫箱数
         /// </summary>
         [Display(Name = "出庫箱数")]
+        [DisplayFormat(DataFormatString = "{0:#,#}")]
         public int StoreOutNumberOfBoxes { get; set; }
 
         /// <summary>
         /// 出庫数
         /// </summary>
         [Display(Name = "出庫数")]
+        [DisplayFormat(DataFormatString = "{0:#,#}")]
         public int StoreOutQuantity { get; set; }
 
         /// <summary>
         /// 在庫数
         /// </summary>
         [Display(Name = "在庫数")]
+        [DisplayFormat(DataFormatString = "{0:#,#}")]
         public int StockRemainQuantity { get; set; }
     }
 }

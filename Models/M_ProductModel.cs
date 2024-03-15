@@ -102,6 +102,7 @@ namespace mar_sumaken_web.Models
         /// 収容数
         /// </summary>
         [Display(Name = "収容数")]
+        [DisplayFormat(DataFormatString = "{0:#,#}")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int LotQuantity { get; set; }
 
