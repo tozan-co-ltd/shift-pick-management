@@ -168,8 +168,9 @@ namespace mar_sumaken_web.Controllers
                 }
 
                 // 納入先品番で品番チェック
-                bool isExistDeliveryProduct = M_ProductConnectController.IsExistedDeliveryProductNumber(model.DeliveryProductNumber, user.DatabaseName);
-                if (!isExistDeliveryProduct)
+                var product = M_ProductConnectController.GetProductByDeliveryProductNumber(
+                    model.SelectedCompanyID, model.SelectedDepoID, model.DeliveryProductNumber, user.DatabaseName);
+                if (product == null)
                 {
                     // log取得
                     errorMessage = errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
@@ -177,6 +178,7 @@ namespace mar_sumaken_web.Controllers
                     return NotFound(new { errorMessage });
                 }
                 model.SupplierProductNumber = model.DeliveryProductNumber;
+                model.NumberOfBoxes = (int)Math.Ceiling((double)model.Quantity / product.LotQuantity);
 
                 // 出庫実績更新
                 D_StoreOutConnectController.UpdateDStoreOut(model, user);
@@ -241,6 +243,10 @@ namespace mar_sumaken_web.Controllers
                     {
                         searchData += $@" <option value='{item.Text}'>{item.Text}</option>";
                     }
+                }
+                else
+                {
+                    searchData += $@" <option value='0便・'>なし</option>";
                 }
 
                 return Content(searchData);
