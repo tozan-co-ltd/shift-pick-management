@@ -32,53 +32,53 @@
             }
         </div>
 
-        <div class="mg-bot-20">
+        <div class="mg-bot-20 DStoreOut">
             <div class="col-16 sp-tablet mb-3">
                 <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="DStoreOutForm">
-                    <div class="col-12 input-group div-input-group">
-                        <div class="col-12 col-sm-2 column-1st">
+                    <div class="col-8 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                        <div class="warehouse-name-drs">
                             <label>@Html.DisplayNameFor(model => model.DepoName)<span style="color:red">*</span></label>
                         </div>
-                        <div class="col-12 col-sm-6 column-2nd">
+                        <div class="selectItem unset-pdl for-min-width">
                             <select class="form-select" name="SelectedDepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
                             <span class="text-danger w-100" asp-validation-for="SelectedDepoID"></span>
                         </div>
                     </div>
-                    <div class="col-12 input-group div-input-group">
-                        <div class="col-12 col-sm-2 column-1st">
+                    <div class="col-8 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                        <div class="warehouse-name-drs">
                             <label>@Html.DisplayNameFor(model => model.SupplierName)<span style="color:red">*</span></label>
                         </div>
 
-                        <div class="col-12 col-sm-6 column-2nd">
+                        <div class="selectItem unset-pdl for-min-width">
                             <select class="form-select" name="SelectedCompanyID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
                             <span class="text-danger w-100" asp-validation-for="SelectedCompanyID"></span>
                         </div>
                     </div>
-                    <div class="col-12 input-group div-input-group">
-                        <div class="col-12 col-sm-2 column-1st">
+                    <div class="col-8 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                        <div class="warehouse-name-drs">
                             <span>@Html.DisplayNameFor(model => model.SearchStartDate)<span style="color:red">*</span></span>
                         </div>
-                        <div class="col-12 col-sm-6 column-2nd">
-                            <input type="text" asp-for="SearchStartDate" class="form-control pickerDate">
+                        <div class="selectItem unset-pdl for-min-width">
+                            <input type="text" asp-for="SearchStartDate" class="form-control pickerDate fix-input-width">
                             <span class="text-danger w-100" asp-validation-for="SearchStartDate"></span>
                         </div>
                     </div>
-                    <div class="col-12 input-group div-input-group">
-                        <div class="col-12 col-md-6 input-group div-input-group pl-0">
-                            <div class="col-12 col-sm-2 col-md-4 column-1st">
-                                <span>@Html.DisplayNameFor(model => model.DeliveryDate)</span>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-6 column-2nd ml-1">
-                                <input type="text" asp-for="SearchDeliveryDate" class="form-control pickerDate">
+                    <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                        <div class="warehouse-name-drs">
+                            <span>@Html.DisplayNameFor(model => model.DeliveryDate)</span>
+                        </div>
+                        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                            <div class="selectItem unset-pdl">
+                                <input type="text" asp-for="SearchDeliveryDate" class="form-control pickerDate fix-input-width">
                                 <span class="text-danger w-100" asp-validation-for="SearchDeliveryDate"></span>
                             </div>
-                        </div>
-                        <div class="col-12 col-md-6 input-group div-input-group column-2nd pl-0">
-                            <div class="col-12 col-sm-4 column-1st">
-                                <label>@Html.DisplayNameFor(model => model.BinSelectedList)</label>
-                            </div>
-                            <div class="col-12 col-sm-6 column-2nd">
-                                <select class="form-select" id="bin-select-list" asp-for="SelectedBin" asp-items="@Model.BinSelectedList"></select>
+                            <div class="d-flex justify-content-start align-items-center unset-pdl mg-btn-for-sp sp-cs-dpl">
+                                <div class="col-12 col-sm-5 column-1st label-input-model-mg">
+                                    <label>@Html.DisplayNameFor(model => model.BinSelectedList)</label>
+                                </div>
+                                <div class="selectItem unset-pdl">
+                                    <select class="form-select" id="bin-select-list" asp-for="SelectedBin" asp-items="@Model.BinSelectedList"></select>
+                                </div>
                             </div>
                         </div>
                     </div>

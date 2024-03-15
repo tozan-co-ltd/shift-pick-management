@@ -41,12 +41,20 @@ body {
     color: #3a3b45;
 }
 
+label{
+    margin: 0;
+}
+
 #login-title, #home-title {
     font-family: var(--font-title) !important;
 }
 
 .sidebar-dark .nav-item .nav-link, .sidebar-dark .nav-item .nav-link i {
     color: rgba(255, 255, 255, 0.7);
+}
+
+.text-nowrap {
+    text-wrap: nowrap;
 }
 
 /* || WEBメニューカテゴリーのアイコン */
@@ -419,6 +427,10 @@ body {
     .mg-for-sp{
         margin: 10px 0 0 0 !important;
     }
+    .DStoreOut .selectItem, .DStoreIn .selectItem {
+        width: 250px;
+        min-width: 250px;
+    }
 }
 
 /* || dataTableのカスタマイズ */
@@ -552,7 +564,7 @@ table .btn-primary.btn-icon-split {
 input[type="text"][disabled],
 select[disabled] {
     border: 1px solid #eaecf4 !important;
-    color: #858796 !important;
+    /*color: #858796 !important;*/
 }
 
 input[type="text"][disabled],
@@ -631,7 +643,6 @@ select[readonly] {
     }
     .diffence-count-check {
         margin-left: 0 !important;
-        /*margin-top: 10px;*/
     }
 /*    .warehouse-name-drs {
         margin-bottom: 20px;
@@ -655,11 +666,11 @@ select[readonly] {
     .sp-mg-top-10 {
         margin-top: 10px;
     }
-
-/*    .sp-mg-bt-10 {
-        margin-bottom: 10px;
-    }*/
-    .de-inspection .btn-info.btn-icon-split{
+    .mg-btn-for-sp {
+        margin: 10px 0 0 0 !important;
+    }
+ 
+    .de-inspection .btn-info.btn-icon-split {
         min-width: unset;
     }
 
@@ -674,7 +685,9 @@ select[readonly] {
     .sp-tablet {
         display: block !important;
     }
-
+    .label-input-model-mg{
+        margin-left: 0 !important;
+    }
     #startDate, #endDate {
         width: 100%;
         display: block;
@@ -816,6 +829,18 @@ select[readonly] {
 
 /*　--------------Edit Input form ---------------*/
 
+
+/*　--------------Set color for all text ---------------*/
+.dataTable, .form-control, .border-top-0, table {
+    color: #3a3b45 !important;
+}
+
+/*　--------------Set color for all text---------------*/
+
+.unset-pd {
+    padding: unset !important;
+}
+
 .cs-w300 {
     width: 300px;
 }
@@ -825,4 +850,18 @@ select[readonly] {
     max-width: 350px !important;
 }
 
+.fix-input-width{
+    max-width: 100% !important;
+    width: 100%;
+}
 
+.label-input-model-mg {
+    margin-left: 5rem;
+}
+
+.dataTables_filter {
+    margin-bottom: 10px;
+}
+.for-min-width{
+    min-width: 350px;
+}
