@@ -6,7 +6,7 @@
 }
 
 <div class="card shadow de-inspection masterInfo m-4">
-    <div class="card-header text-gray-800">
+    <div class="card-header">
         @ViewData["Title"]
     </div>
     <div class="card-body">
@@ -97,34 +97,34 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="col-12 col-md-10">
+                <div class="col-12 col-md-12">
                     <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
                     <form class="col-md-12" id="mCompanyForm">
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("CompanyID")</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="CompanyID" autocomplete="off" readonly>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("CompanyCode")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="CompanyCode" autocomplete="off" value="" required>
                                 <small class="form-text text-muted w-100 p-1">1～10文字の数字が使用できます。</small>
                                 <span class="text-danger w-100" asp-validation-for="CompanyCode"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("CompanyKubun")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <select class="form-select" asp-for="CompanyKubun" required>
                                     @for (var i = 0; i < Model.KubunSelectList.Count; i++)
                                     {
@@ -134,20 +134,20 @@
                                 <span class="text-danger w-100" asp-validation-for="CompanyKubun"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("CompanyName")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="CompanyName" autocomplete="off" required>
                                 <span class="text-danger w-100" asp-validation-for="CompanyName"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("ClientName")</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="ClientName" autocomplete="off">
                                 <span class="text-danger w-100" asp-validation-for="ClientName"></span>
                             </div>

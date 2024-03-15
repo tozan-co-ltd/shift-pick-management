@@ -826,3 +826,10 @@ select[readonly] {
 }
 
 
+/*Å@--------------Set color for all text ---------------*/
+.dataTable, .form-control, .border-top-0 {
+    color: #3a3b45;
+}
+
+/*Å@--------------Set color for all text---------------*/
+
