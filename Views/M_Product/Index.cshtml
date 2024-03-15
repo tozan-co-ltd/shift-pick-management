@@ -103,24 +103,24 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="col-12 col-md-10">
+                <div class="col-12 col-md-12">
                     <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
                     <form class="col-md-12" id="mProductForm">
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("ProductID")</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="ProductID" autocomplete="off" readonly>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("SupplierName")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <select class="form-select" asp-for="SupplierID" required>
                                     @for (var i = 0; i < Model.SuplierSelectList.Count; i++)
                                     {
@@ -130,20 +130,20 @@
                                 <span class="text-danger w-100" asp-validation-for="SupplierID"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("SupplierProductNumber")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="SupplierProductNumber" autocomplete="off" required>
                                 <span class="text-danger w-100" asp-validation-for="SupplierProductNumber"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("DeliveryName")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <select class="form-select" asp-for="DeliveryID" required>
                                     @for (var i = 0; i < Model.DeliverySelectList.Count; i++)
                                     {
@@ -153,38 +153,38 @@
                                 <span class="text-danger w-100" asp-validation-for="DeliveryID"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("DeliveryProductNumber")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="DeliveryProductNumber" autocomplete="off" required>
                                 <span class="text-danger w-100" asp-validation-for="DeliveryProductNumber"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("ProductName")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="ProductName" autocomplete="off" required>
                                 <span class="text-danger w-100" asp-validation-for="ProductName"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("LotQuantity")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="LotQuantity" value="" autocomplete="off" required>
                                 <span class="text-danger w-100" asp-validation-for="LotQuantity"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("RDepoProductsRegister")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd warehouse-checkbox">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd warehouse-checkbox">
                                 @for (var i = 0; i < @Model.RDepoProductsRegister.Count; i++)
                                 {
                                     <div class="form-check">
