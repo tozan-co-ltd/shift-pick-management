@@ -1,18 +1,867 @@
+/* || システム全体の配色・フォント */
+:root {
+    /* メインカラー */
+    --base-color-main: rgb(0, 170, 40);
+    --rgb-base-color-main: 0, 170, 40;
+    /* アクセントカラー(ボタン等) */
+    --base-color-accent: rgb(240, 132, 75);
+    --rgb-base-color-accent: 240, 132, 75;
+    /* 背景カラー */
+    --base-color-bg: rgba(var(--rgb-base-color-main), 0.3);
+    /* フォント */
+    --font-family-sans-serif-custom: "main-font", "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", Meiryo, sans-serif;
+}
+
+/* || システム全体のフォント */
+@font-face {
+    font-family: 'main-font';
+    src: url('../fonts/BIZUDPGothic-Regular.ttf') format('truetype');
+}
+
+/* || システム全体のレイアウト */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
+    font-family: 'main-font' !important;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    font-family: 'main-font' !important;
+    color: #3a3b45;
+}
+
+label{
+    margin: 0;
+}
+
+#login-title, #home-title {
+    font-family: var(--font-title) !important;
+}
+
+.sidebar-dark .nav-item .nav-link, .sidebar-dark .nav-item .nav-link i {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.text-nowrap {
+    text-wrap: nowrap;
+}
+
+/* || WEBメニューカテゴリーのアイコン */
+.icon-category {
+    width: 1.2857142857142858em;
+    text-align: center;
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-style: normal;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.icon-categoryid-1::before {
+    content: '\f109';
+}
+
+.icon-categoryid-2::before {
+    content: '\f0ae';
+}
+
+.icon-categoryid-3::before {
+    content: '\f468';
+}
+
+.icon-categoryid-4::before {
+    content: '\f0ad';
+}
+
+.icon-categoryid-5::before {
+    content: '\f474';
+}
+
+.icon-categoryid-6::before {
+    content: '\f0d1';
+}
+
+.icon-categoryid-7::before {
+    content: '\f0ad';
+}
+
+/* || レスポンシブデザイン */
+@media screen and (max-width: 1200px) {
+    html {
+        font-size: 80% !important;
+    }
+}
+
+/* 強調ボタン */
+.btn-accent {
+    color: #fff;
+    background-color: var(--base-color-accent);
+    border-color: var(--base-color-accent);
+    min-width: 70px;
+}
+
+.btn-accent:hover {
+    color: #fff;
+    filter: brightness(90%);
+    background-color: var(--base-color-accent);
+}
+
+.btn-accent:focus,
+.btn-accent.focus {
+    color: #fff;
+    box-shadow: 0 0 0 0.2rem rgba(var(--rgb-base-color-accent), 0.5);
+    filter: brightness(90%);
+}
+
+.btn-accent.disabled,
+.btn-accent:disabled {
+    color: #fff;
+    background-color: var(--base-color-accent);
+    border-color: var(--base-color-accent);
+}
+
+.btn-accent:not(:disabled):not(.disabled):active,
+.btn-accent:not(:disabled):not(.disabled).active,
+.show > .btn-accent.dropdown-toggle {
+    color: #fff;
+    filter: brightness(80%);
+}
+
+.btn-accent:not(:disabled):not(.disabled):active:focus,
+.btn-accent:not(:disabled):not(.disabled).active:focus,
+.show > .btn-accent.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(red, 0.5);
+}
+
+.rotateBtn {
+    transform: rotate(180deg);
+}
+
+.navbar-brand {
+    --font-family-sans-serif: "BIZ UDPGothic", Meiryo UI, sans-serif !important;
+}
+
+.btn-search {
+    border: none !important;
+    border-bottom: 2px solid var(--fontcolor) !important;
+    border-radius: 0px !important;
+    background-color: #ffffff !important;
+    color: var(--fontcolor) !important;
+}
+
+.btn-custom {
+    /*font-weight: 800 !important;*/
+    background-color: var(--othercolor) !important;
+    color: var(--fontcolor) !important;
+    border: 0px solid var(--fontcolor) !important;
+}
+
+    .btn-custom:hover, .btn-search:hover {
+        background-color: var(--sublightcolor) !important;
+    }
+
+.btn-selection {
+    border: 1px solid var(--fontcolor) !important;
+    background-color: transparent !important;
+    color: var(--fontcolor) !important;
+    border-radius: 0px !important;
+}
+
+    .btn-selection:hover {
+        background-color: var(--othercolor) !important;
+    }
+
+.text-right {
+    text-align: right !important;
+}
+
+.required-mark:after {
+    content: "*";
+    color: var(--maincolor);
+    font-weight: bold;
+}
+
+.card {
+    border-color: var(--bs-border-color-translucent) !important;
+    min-width: 300px !important;
+}
+
+.card-header {
+    background-color: #F5F5F5;
+}
+
+.bd-callout {
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #eee;
+    border-left-width: .25rem;
+    border-radius: .25rem;
+    border-left-color: var(--subcolor);
+}
+
+/* ナビゲーションバー */
+.navbar-dark {
+    background-color: #3EB135;
+}
+
+.navbar-dark-test {
+    background-color: #9999CC; /* 開発環境は紫色 */
+}
+
+.navbar-brand {
+    color: aliceblue !important;
+}
+
+
+/* ドロップダウンメニュー */
+.dropdown-menu {
+    --bs-dropdown-min-width: 20rem !important;
+    min-width: 14rem;
+}
+
+.dropdown-menu a.dropdown-item:focus {
+    background-color: var(--subcolor) !important;
+}
+
+.page-item.active > .page-link {
+    font-weight: 800;
+    background-color: var(--othercolor) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+}
+
+.page-link {
+    color: var(--fontcolor) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+}
+
+.page-link:hover {
+    background-color: var(--othercolor) !important;
+}
+/*↑ページャーデザイン上書き*/
+
+/*↓table update animation*/
+.table-update-row {
+    animation: blinking 0.6s 4 ease-in-out alternate;
+}
+
+@keyframes blinking {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        background-color: var(--subcolor);
+    }
+}
+/*↑table update animation*/
+
+/*↓table-hover*/
+.table-hover-evant tr:hover td {
+    background-color: var(--sublightcolor) !important;
+}
+
+th.table-border-less, td.table-border-less {
+    border: none !important;
+    background-color: #fff !important;
+    min-width: auto !important;
+}
+
+.table-hover-evant tr:hover tr.table-border-less, .table-hover-evant tr:hover td.table-border-less {
+    background-color: #fff !important;
+}
+/*↑table-hover*/
+
+.fadeIn {
+    animation-name: fadeInAnime;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInAnime {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    color: #858796;
+}
+
+.container-custom {
+    color: #842029;
+    width: 70%;
+    margin-left: 0px;
+}
+
+.no-scroll {
+    overflow: hidden;
+}
+
+.nav-item .nav-link{
+    display: block !important;
+}
+
+#navbarDropdown .dropdown-toggle::after {
+    content: unset;
+}
+
+.sb-topnav .navbar-brand {
+    width: 175px !important;
+}
+
+.fa-angles-left{
+    font-size: 20px;
+}
+
+.sb-topnav{
+    height: 45px;
+}
+
+.nav-item .collapse-item {
+    cursor: pointer;
+}
+.sb-topnav.navbar-dark #sidebarToggle{
+    color: #fff;
+}
+
+.sb-nav-fixed #layoutSidenav #layoutSidenav_content {
+    top: 45px;
+}
+
+#layoutSidenav #layoutSidenav_content {
+    min-height: calc(100vh - 45px);
+}
+
+#user-detail-dropdown-item:hover{
+    background: none !important;
+}
+
+.dropdown-item {
+    padding: 0.25rem 0.5rem;
+}
+
+.dropdown-item a{
+    padding: 0;
+}
+.dropdown-item .logout{
+    padding: 5px;
+}
+
+.navbar-expand .navbar-nav .dropdown-menu{
+    top: 45px;
+    left: -195px;
+}
+
+#accordionSidebar .collapse-inner {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+#accordionSidebar .collapse.show .collapse-inner {
+    max-height: 1000px;
+    transition: max-height 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .navbar-expand .navbar-nav .dropdown-menu{
+        left: -40vw;
+    }
+    .sidebar .nav-item .nav-link {
+        width: 5rem;
+    }
+
+    .sidebar .nav-item .collapse {
+        left: calc(3.8rem + 1.5rem / 2);
+    }
+}
+
+@media (max-width: 640px) {
+      .dataTables_length, .dataTables_filter {
+        display: flex;
+    }
+    .col-for-sp{
+        display: block !important;
+    }
+ /*   #export-file-btn {
+        margin: 10px 0 0 0 !important;
+    }*/
+    .warehouse-name-drs {
+        width: 80px !important;
+        min-width: 80px !important;
+    }
+    .mg-b-sp{
+        margin-bottom: 50px;
+    }
+    .mg-for-sp{
+        margin: 10px 0 0 0 !important;
+    }
+    .DStoreOut .selectItem, .DStoreIn .selectItem {
+        width: 250px;
+        min-width: 250px;
+    }
+}
+
+/* || dataTableのカスタマイズ */
+table.dataTable {
+    width: 100% !important;
+    margin: 0;
+}
+
+/* データテーブルのボタン */
+table .btn-icon-split {
+    padding: 4px;
+}
+
+table .btn-primary.btn-icon-split {
+    height: 39px;
+    width: 101px;
+}
+/* データテーブルのボタン */
+
+/* カード フォーム*/
+.selectItem{
+    width: 350px;
+}
+
+.border-left-custom {
+    border-left: .25rem solid #f0844b !important;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.border-left-custom > .card-body {
+    padding: 0.4rem;
+}
+
+.c-dialog {
+    max-width: 600px !important;
+}
+
+.c-dialog-area {
+    padding: 1.5rem;
+    border: none;
+}
+
+.c-label-text {
+    border: 1px solid #fff !important;
+    width: 100%;
+    padding-top: 0.375rem;
+    padding-right: 0.75rem;
+    padding-bottom: 0.375rem;
+    padding-left: 0rem;
+}
+
+.input-validation-error {
+    border: 1px solid #ff0000;
+    background-color: #ffeeee;
+}
+
+.de-inspection .dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+.de-inspection .dataTables_wrapper .dataTables_paginate .paginate_button.next {
+    display: none;
+}
+
+.de-inspection .dataTables_wrapper .dataTables_paginate .current {
+    border: 1px solid #f0844b !important;
+    background: #f0844b !important;
+    color: white !important;
+    border-radius: 7px !important;
+}
+
+.de-inspection .paginate_button {
+    border: 1px solid #f8f9fa !important;
+    background: #f8f9fa !important;
+    border-radius: 7px !important;
+    margin-right: 7px !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    color: black !important;
+}
+
+.paginate_button:hover {
+    background: #dcdcdc !important;
+    border: 1px solid #dcdcdc !important;
+}
+
+.de-inspection .dataTables_wrapper .dataTables_paginate {
+    float: left;
+    padding-top: 0.5rem;
+}
+
+.de-inspection .dataTables_wrapper .dataTables_filter input {
+    border-radius: 7px !important;
+    margin-left: 15px;
+}
+
+.de-inspection .excel-input {
+    display: none;
+}
+
+.de-inspection .input-group {
+    padding: 10px 20px;
+    background: #EAECF4;
+}
+
+.de-inspection .input-group-btn {
+    margin: 0;
+}
+
+.de-inspection .btn-pd20 {
+    padding: 6px 20px;
+    margin-right: 20px;
+}
+
+.de-inspection .btn-info.btn-icon-split {
+    min-width: 100px;
+    margin-right: 10px;
+}
+
+
+.de-inspection .btn-primary.btn-icon-split {
+    min-width: 100px;
+    height: 39px;
+    /*width: 101px;*/
+}
+
+.de-inspection .change-password-icon {
+    cursor: pointer !important;
+}
+
+
+input[type="text"][disabled],
+select[disabled] {
+    border: 1px solid #eaecf4 !important;
+    /*color: #858796 !important;*/
+}
+
+input[type="text"][disabled],
+select[disabled],
+input[type="text"][readonly],
+select[readonly] {
+    border: 1px solid #eaecf4 !important;
+}
+
+.file-export {
+    border: none;
+    border-radius: 4px;
+    background: #2E9DAE;
+}
+
+    .file-export .fa-file-export {
+        color: white;
+        padding: 7px 0;
+    }
+
+.cus-input-validation-error .input-validation-error {
+    background-color: #fff !important;
+    border: 1px solid #d1d3e2;
+}
+
+.unset-pdl{
+    padding-left: unset !important;
+}
+
+.modal-content {
+    position: absolute;
+    top: 10px;
+}
+
+.warehouse-name{
+    width: 218px;
+}
+
+/*入荷予定照会*/
+.warehouse-name-drs {
+    width: 150px;
+    min-width: 150px;
+}
+
+.form-check-input:checked {
+    background-color: #f0844b !important;
+    border: 0;
+}
+
+.form-check-input:focus, .label::after, label.form-check-label:focus, .form-check-input::after, .form-check-input:not(:disabled):not(.disabled):active:focus {
+    color: black;
+    outline: 0;
+    border: 0;
+    box-shadow: 0 0 0 0.1rem #f0844b !important;
+}
+
+#startDate, #endDate, .pickerDate{
+    max-width: 163px;
+}
+
+#selectDate{
+    width: 350px;
+    max-width: 350px;
+}
+
+/*スマートフォン対応*/
+@media (max-width: 1200px) {
+    .sp-cs-dpl{
+        display: block !important;
+    }
+    .align-items-custom {
+        align-items: unset !important;
+    }
+    .sp-cs-dpl-fix {
+        display: flex;
+    }
+    .diffence-count-check {
+        margin-left: 0 !important;
+    }
+/*    .warehouse-name-drs {
+        margin-bottom: 20px;
+    }*/
+    .custom-checkbox {
+        padding-left: 0;
+        margin-top: 20px;
+    }
+    #search-btn{
+        margin: 0 !important;
+    }
+    .sp-unset-ml {
+        margin-left: 0 !important;
+    }
+    .warehouse-name {
+        width: 50px;
+    }
+    #selectDate{
+        width: 100%;
+    }
+    .sp-mg-top-10 {
+        margin-top: 10px;
+    }
+    .mg-btn-for-sp {
+        margin: 10px 0 0 0 !important;
+    }
+ 
+    .de-inspection .btn-info.btn-icon-split {
+        min-width: unset;
+    }
+
+    .wd-100 {
+        width: 100% !important;
+    }
+
+    .pd-0-sp {
+        padding: 0 !important;
+    }
+
+    .sp-tablet {
+        display: block !important;
+    }
+    .label-input-model-mg{
+        margin-left: 0 !important;
+    }
+    #startDate, #endDate {
+        width: 100%;
+        display: block;
+    }
+
+    .sp-cs {
+        margin-top: 10px;
+        margin-left: 0 !important;
+    }
+
+    .de-inspection .btn-info.btn-icon-split {
+        max-height: 36px;
+    }
+
+    .de-inspection .btn-primary.btn-icon-split {
+        height: unset !important;
+        min-width: unset !important;
+        width: unset !important;
+    }
+}
+
+@media (max-width: 1024px) {
+    #sidebarToggle{
+        position: absolute;
+        left: 140px;
+    }
+    .cs-w300 {
+        width: 50vw !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        z-index: 0;
+    }
+
+    .container-fluid {
+        padding-top: 5.2rem;
+        padding-left: 1rem;
+    }
+
+    #fadeLayer {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        visibility: hidden;
+        opacity: 0.75;
+        z-index: 1;
+    }
+
+        #fadeLayer.fadeon {
+            visibility: visible !important;
+        }
+
+    #fadeLayer_container {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        visibility: hidden;
+        opacity: 0.75;
+        z-index: 1;
+    }
+
+    #fadeLayer_container.fadeon {
+        visibility: visible !important;
+    }
+
+    .sp-tablet {
+        display: block !important;
+    }
+
+    .de-inspection .btn-info.btn-icon-split {
+        /*        width: 92px !important;
+    min-width: 92px !important;
+    display: block;*/
+    }
+
+    .de-inspection .btn-primary.btn-icon-split {
+        height: unset !important;
+        min-width: unset !important;
+        width: unset !important;
+    }
+
+    .wd-100 {
+        width: 100% !important;
+    }
+
+    .sp-tablet .file-input {
+        margin-top: 10px;
+    }
+
+    .sp-fix-w-100 {
+        display: block !important;
+        width: 100%;
+    }
+
+    #startDate, #endDate {
+        width: 100%;
+    }
+
+    .sp-mg-left-0 {
+        margin-left: 0 !important;
+    }
+
+    .sp-flex {
+        display: block !important;
+    }
+
+/*    .cs-w300 {
+        width: 40vw !important;
+    }*/
+}
+
+/*　--------------Input form ---------------*/
+.div-input-group {
+    margin-bottom: 10px;
+}
+
+.column-1st {
+    padding-left: 0 !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.column-2nd {
+    margin-bottom: 0.25rem !important;
+}
+/*　--------------Input form ---------------*/
+
+/*　--------------Edit Input Modal ---------------*/
+.label-input-model-pl {
+    padding-left: 0.6rem !important;
+}
+
+/*　--------------Edit Input form ---------------*/
+
+
+/*　--------------Set color for all text ---------------*/
+.dataTable, .form-control, .border-top-0, table {
+    color: #3a3b45 !important;
+}
+
+/*　--------------Set color for all text---------------*/
+
+.unset-pd {
+    padding: unset !important;
+}
+
+.cs-w300 {
+    width: 300px;
+}
+
+.cs-w350 {
+    width: 350px;
+    max-width: 350px !important;
+}
+
+.fix-input-width{
+    max-width: 100% !important;
+    width: 100%;
+}
+
+.label-input-model-mg {
+    margin-left: 5rem;
+}
+
+.dataTables_filter {
+    margin-bottom: 10px;
+}
+.for-min-width{
+    min-width: 350px;
 }

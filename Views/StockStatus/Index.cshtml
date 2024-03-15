@@ -1,0 +1,285 @@
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.StockStatusModel
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+}
+<style>
+    a {
+        text-decoration: underline;
+    }
+</style>
+<div class="card shadow de-inspection d-receive-schedule m-4">
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card border-left-custom">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>入荷実績にロット番号の情報が存在する品番は、仕入先品番をクリックすると品番別ロット番号一覧が表示されます。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <div class="row mt-10">
+                    <div class="col-lg-12">
+                        <form id="searchForm" method="post" enctype="multipart/form-data" name="form" onsubmit="return false;">
+                            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                <span class="warehouse-name-drs">倉庫名</span>
+                                <div class="selectItem unset-pdl">
+                                    <select class="form-select" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
+                                </div>
+                            </div>
+                            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                <span class="warehouse-name-drs">仕入先名</span>
+                                <div class="selectItem unset-pdl">
+                                    <select class="form-select" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
+                                </div>
+                            </div>
+                            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                                <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                    <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.DateSearchStart)</span>
+                                    <input id="startDate" type="text" asp-for="DateSearchStart" class="form-control pickerDate cs-w350">
+                                </div>
+                                <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                    <button id="search-btn" type="submit" class="btn btn-secondary btn-icon-split ml-3">
+                                        <span class="icon text-white-50">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </span>
+                                        <span class="text">検索</span>
+                                    </button>
+                                    <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3" id="export-file-btn">
+                                        <span class="icon text-white-50">
+                                            <i class="fa-solid fa-file-export"></i>
+                                        </span>
+                                        <span class="text">出力</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3" id="div-table" style="display: none;">
+            <table class="table table-sm stripe hover nowrap datatable-normal" id="table-datatable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>仕入先名</th>
+                        <th>仕入先品番</th>
+                        <th>収容数</th>
+                        <th>月初在庫数</th>
+                        <th>入庫箱数</th>
+                        <th>入庫数</th>
+                        <th>出庫箱数</th>
+                        <th>出庫数</th>
+                        <th>在庫数</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <input type="hidden" id="viewTitle" value="@Model.ViewTitle" />
+    </div>
+</div>
+
+<!--  Lot Number Modal-->
+<div class="modal fade" id="detail-lot-number-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-lot-number-modal-label">品番別ロット番号一覧</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-10">
+                    <p id="detail-lot-number-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <div class="">
+                    <div class="col-12">
+                        <p class="mb-0"><label>年月日 : <span id="detailDeliveryDate"></span></label></p>
+                        <p><label>仕入先品番 : <span id="detailSupplierProductNumber"></span></label></p>
+                    </div>
+                    <div class="col-12">
+                        <table class="table table-sm stripe hover nowrap" id="detail-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-nowrap">ロット番号</th>
+                                    <th class="text-nowrap">入庫箱数</th>
+                                    <th class="text-nowrap">入庫数</th>
+                                    <th class="text-nowrap">出庫箱数</th>
+                                    <th class="text-nowrap">出庫数</th>
+                                    <th class="text-nowrap">在庫数</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 検索ボタン押下
+    $('#search-btn').click(function () {
+        $('#searchForm').submit(function (e) {
+            DeleteErrorMessages();
+
+            // ページの更新を禁止する
+            e.preventDefault();
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            e.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("SearchData", "StockStatus")';
+            let method = 'POST';
+            var data = $(this).serialize();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $("#table-datatable tbody").empty();
+                $('#table-datatable').DataTable().destroy();
+                $("#div-table").show();
+                $("#table-datatable tbody").html(response);
+                $("#table-datatable").DataTable({
+                    "language": {           // 日本語表示
+                        "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+                    },
+                    lengthChange: true,     // 表示件数
+                    info: false,            // 総件数
+                    scrollX: true,          // 横スクロール可
+                    order: [[2, "asc"]],    // 仕入先品番昇順
+                });
+            }).fail(function (xhr, textStatus, errorThrown) {
+                if (xhr.status === 404) {
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage500);
+                }
+            });
+        });
+    });
+
+    // 詳細ボタン押下(日別在庫照会画面へ遷移)
+    function OnDetailClick(trTag) {
+        var row = trTag.parentNode.parentNode;
+        
+        var searchDate = row.getElementsByClassName("SearchDate")[0].value;
+        var depoId = row.getElementsByClassName("DepoID")[0].value;
+        var companyId = row.getElementsByClassName("SupplierID")[0].value;
+        var supplierProductNumber = row.getElementsByClassName("SupplierProductNumber")[0].value;
+
+        var url = window.location.origin + '@Url.Action("Detail", "StockStatus")';
+        url += '?searchDate=' + searchDate;
+        url += '&depoId=' + depoId;
+        url += '&companyId=' + companyId;
+        url += '&supplierProductNumber=' + supplierProductNumber;
+        
+        window.location.href = url;
+    }
+
+    // ロット番号押下(品番別ロット番号一覧モーダル表示)
+    function OnLotNumberDetailClick(trTag) {
+        $("#detail-table tbody").empty();
+
+        var row = trTag.parentNode.parentNode;
+        var searchDate = row.getElementsByClassName("SearchDate")[0].value;
+        var depoId = row.getElementsByClassName("DepoID")[0].value;
+        var companyId = row.getElementsByClassName("SupplierID")[0].value;
+        var supplierProductNumber = row.getElementsByClassName("SupplierProductNumber")[0].value;
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetLotNumberDetail", "StockStatus")';
+        let method = 'GET';
+        var data = {
+            searchDate: searchDate,
+            depoId: depoId,
+            companyId: companyId,
+            supplierProductNumber: supplierProductNumber
+        };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            $("#detail-table tbody").html(response);
+            $("#detailDeliveryDate").text(searchDate);
+            $("#detailSupplierProductNumber").text(supplierProductNumber);
+        }).fail(function (xhr, textStatus, errorThrown) {
+            if (xhr.status === 404) {
+                var errorMessage = xhr.responseJSON.errorMessage;
+                $("#detail-lot-number-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#detail-lot-number-modal-error-message").text(errorMessage500);
+            }
+        });
+    }
+
+    // 出力ボタン押下
+    $('#export-file-btn').click(function (event) {
+        DeleteErrorMessages();
+
+        // ページの更新を禁止する
+        event.preventDefault();
+
+        // 送信イベントが他のハンドラーに伝播するのを防ぐ
+        event.stopImmediatePropagation();
+
+        var searchFormArr = $('#searchForm').serializeArray();
+
+        // フォーム情報取得
+        var exportFormData = new FormData();
+        exportFormData.append("searchModel.DepoID", searchFormArr[0].value);
+        exportFormData.append("searchModel.DepoName", $('#SelectedDepoID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.CompanyID", searchFormArr[1].value);
+        exportFormData.append("searchModel.CompanyName", $('#SelectedCompanyID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
+
+        // 画面名取得
+        exportFormData.append("gamenName", $("#viewTitle").val());
+
+        // CSV出力
+        onExportCsvByCondition("StockStatus", exportFormData);
+    });
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
+</script>

@@ -1,0 +1,201 @@
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.M_ProductModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "登録";
+}
+
+<div class="card shadow masterInfo m-4">
+
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+        <div class="col-md-12 pb-3">
+            <form method="get" asp-controller="M_Product" asp-action="Index">
+                <button type="submit" class="btn btn-secondary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-arrow-left-long"></i>
+                    </span>
+                    <span class="text">戻る</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <form class="col-md-12" id="mProductForm">
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("SupplierName")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" asp-for="SupplierID" required>
+                                @for (var i = 0; i < Model.SuplierSelectList.Count; i++)
+                                {
+                                    <option value="@Model.SuplierSelectList[i].Value">@Model.SuplierSelectList[i].Text</option>
+                                }
+                            </select>
+                            <span class="text-danger w-100" asp-validation-for="SupplierID"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("SupplierProductNumber")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="text" asp-for="SupplierProductNumber" autocomplete="off" required>
+                            <span class="text-danger w-100" asp-validation-for="SupplierProductNumber"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("DeliveryName")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" asp-for="DeliveryID" required>
+                                @for (var i = 0; i < Model.DeliverySelectList.Count; i++)
+                                {
+                                    <option value="@Model.DeliverySelectList[i].Value">@Model.DeliverySelectList[i].Text</option>
+                                }
+                            </select>
+                            <span class="text-danger w-100" asp-validation-for="DeliveryID"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("DeliveryProductNumber")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="text" asp-for="DeliveryProductNumber" autocomplete="off" required>
+                            <span class="text-danger w-100" asp-validation-for="DeliveryProductNumber"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("ProductName")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="text" asp-for="ProductName" autocomplete="off" required>
+                            <span class="text-danger w-100" asp-validation-for="ProductName"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("LotQuantity")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="number" asp-for="LotQuantity" value="" required>
+                            <span class="text-danger w-100" asp-validation-for="LotQuantity"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("RDepoProductsRegister")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            @for (var i = 0; i < @Model.RDepoProductsRegister.Count; i++)
+                            {
+                                <div class="form-check">
+                                    <input type="hidden" asp-for="RDepoProductsRegister[i].Value" value="@Model.RDepoProductsRegister[i].Value" />
+                                    <input type="hidden" asp-for="RDepoProductsRegister[i].Text" value="@Model.RDepoProductsRegister[i].Value" />
+                                    <input class="form-check-input checkbox" asp-for="RDepoProductsRegister[i].Selected" id="select-depo-@i" type="checkbox">
+                                    <label class="form-check-label" id="label-depo-name-@i">@Model.RDepoProductsRegister[i].Text</label>
+                                </div>
+                            }
+                            <span class="text-danger w-100" id="depoProductErrorMsg"    ></span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-icon-split" style="min-width: 80px" onclick="OnRegister()">
+                        <span class="text">登録</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+       var checkList = @Html.Raw(Json.Serialize(Model.RDepoProductsRegister));
+        for (var i = 0; i < checkList.length; i++) {
+            var item = "#select-depo-" + i;
+            $(item).change(function (item) {
+                CheckIsSelectedDepoProduct();
+            });
+        }
+    });
+
+    // 登録ボタン押下
+    function OnRegister() {
+        $('#mProductForm').submit(function (event) {
+            $("#div-error-message").text("");
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // 使用倉庫名チェック
+            CheckIsSelectedDepoProduct();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Register", "M_Product")';
+            let method = 'POST';
+            let formId = 'mProductForm';
+            let data = $('#' + formId).serializeArray();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#' + formId)[0].reset();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    // データが見つからなかった場合
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    // その他のエラーの場合
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
+        });
+    }
+
+    // 使用倉庫名チェック
+    function CheckIsSelectedDepoProduct() {
+        $('#depoProductErrorMsg').text('');
+        var checkList = @Html.Raw(Json.Serialize(Model.RDepoProductsRegister));
+        var hasSelectedItem = false;
+        for (var i = 0; i < checkList.length; i++) {
+            var item = "#select-depo-" + i;
+            if ($(item).is(":checked")) {
+                hasSelectedItem = true;
+            }
+        }
+        if (!hasSelectedItem) {
+            $('#depoProductErrorMsg').text('使用倉庫名は必須項目です。');
+        }
+    }
+</script>
+

@@ -1,0 +1,296 @@
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.D_StoreOutModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "登録";
+}
+
+<div class="card shadow masterInfo m-4">
+
+    <div class="card-header text-gray-800">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+        <div class="col-md-12 pb-3">
+            <form method="get" asp-controller="D_StoreOut" asp-action="Index">
+                <button type="submit" class="btn btn-secondary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-arrow-left-long"></i>
+                    </span>
+                    <span class="text">戻る</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="mg-bot-20 DStoreOut">
+            <div class="col-16 sp-tablet mb-3">
+                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="DStoreOutForm">
+                    <div class="col-8 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                        <div class="warehouse-name-drs">
+                            <label>@Html.DisplayNameFor(model => model.DepoName)<span style="color:red">*</span></label>
+                        </div>
+                        <div class="selectItem unset-pdl for-min-width">
+                            <select class="form-select" name="SelectedDepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
+                            <span class="text-danger w-100" asp-validation-for="SelectedDepoID"></span>
+                        </div>
+                    </div>
+                    <div class="col-8 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                        <div class="warehouse-name-drs">
+                            <label>@Html.DisplayNameFor(model => model.SupplierName)<span style="color:red">*</span></label>
+                        </div>
+
+                        <div class="selectItem unset-pdl for-min-width">
+                            <select class="form-select" name="SelectedCompanyID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
+                            <span class="text-danger w-100" asp-validation-for="SelectedCompanyID"></span>
+                        </div>
+                    </div>
+                    <div class="col-8 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                        <div class="warehouse-name-drs">
+                            <span>@Html.DisplayNameFor(model => model.SearchStartDate)<span style="color:red">*</span></span>
+                        </div>
+                        <div class="selectItem unset-pdl for-min-width">
+                            <input type="text" asp-for="SearchStartDate" class="form-control pickerDate fix-input-width">
+                            <span class="text-danger w-100" asp-validation-for="SearchStartDate"></span>
+                        </div>
+                    </div>
+                    <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                        <div class="warehouse-name-drs">
+                            <span>@Html.DisplayNameFor(model => model.DeliveryDate)</span>
+                        </div>
+                        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                            <div class="selectItem unset-pdl">
+                                <input type="text" asp-for="SearchDeliveryDate" class="form-control pickerDate fix-input-width">
+                                <span class="text-danger w-100" asp-validation-for="SearchDeliveryDate"></span>
+                            </div>
+                            <div class="d-flex justify-content-start align-items-center unset-pdl mg-btn-for-sp sp-cs-dpl">
+                                <div class="col-12 col-sm-5 column-1st label-input-model-mg">
+                                    <label>@Html.DisplayNameFor(model => model.BinSelectedList)</label>
+                                </div>
+                                <div class="selectItem unset-pdl">
+                                    <select class="form-select" id="bin-select-list" asp-for="SelectedBin" asp-items="@Model.BinSelectedList"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <table class="table table-responsive table-sm" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="border-top-0">@Html.DisplayNameFor(model => model.DeliveryProductNumber)<span style="color:red">*</span></th>
+                                <th class="border-top-0">@Html.DisplayNameFor(model => model.LotNumber)</th>
+                                <th class="border-top-0">@Html.DisplayNameFor(model => model.Quantity)<span style="color:red">*</span></th>
+                                <th class="border-top-0">@Html.DisplayNameFor(model => model.MainProductKey)</th>
+                                <th class="border-top-0">@Html.DisplayNameFor(model => model.FirstSubProductKey)</th>
+                                <th class="border-top-0">@Html.DisplayNameFor(model => model.SecondSubProductKey)</th>
+                                <th class="border-top-0">@Html.DisplayNameFor(model => model.Remarks)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var i = 0;
+                                foreach (var item in Model.RegisterList)
+                                {
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control" id="RegisterList[@i].DeliveryProductNumber" value="@item.DeliveryProductNumber" name="RegisterList[@i].DeliveryProductNumber" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" value="@item.LotNumber" name="RegisterList[@i].LotNumber" />
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control" value="@item.Quantity" name="RegisterList[@i].Quantity" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" value="@item.MainProductKey" name="RegisterList[@i].MainProductKey" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" value="@item.FirstSubProductKey" name="RegisterList[@i].FirstSubProductKey" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" value="@item.SecondSubProductKey" name="RegisterList[@i].SecondSubProductKey" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" value="@item.Remarks" name="RegisterList[@i].Remarks" />
+                                            </td>
+                                        </tr>
+                                    }
+                                    ++i;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                    <button class="btn btn-primary btn-icon-split" id="register-btn" style="min-width: 80px">
+                        <span class="text">登録</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    // 納入指示日が変更されたら便・納品書番号を更新する
+    $('#SearchDeliveryDate').on('change', function () {
+        var data = { "SearchDeliveryDate": $(this).val() };
+        $.ajax({
+        url: '@Url.Action("ChangeDeliveryTimeClassList", "D_StoreOut")',
+            method: 'POST',
+            data: data
+        })
+        .done(function (response) {
+                var binSelectListItem = $('#bin-select-list');
+                binSelectListItem.empty();
+                binSelectListItem.html(response);
+
+                var firstSelect = binSelectListItem.first();
+                var firstOptionValue = firstSelect.find('option').first().val();
+                var numberOfOptions = firstSelect.find('option').length;
+                if (numberOfOptions == 1) {
+                    firstSelect.val(firstOptionValue);
+                } else {
+                    var secondOptionValue = firstSelect.find('option').eq(1).val();
+                    firstSelect.val(secondOptionValue);
+                }
+        })
+        .fail(function (xhr) {
+            if (xhr.status === 404) {
+                // データが見つからなかった場合
+                var errorMessage = xhr.responseJSON.errorMessage;
+                $("#div-error-message").html(errorMessage);
+            } else {
+                // その他のエラーの場合
+                $('#div-error-message').text(errorMessage);
+            }
+        });
+    });
+
+    // 登録ボタン押下
+    $('#register-btn').click(function () {
+        $('#DStoreOutForm').submit(function (event) {
+            // エラーメッセージ削除
+            DeleteErrorMessages();
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            var form = $('#DStoreOutForm');
+
+            // フォーム情報を取得する
+            var formDataArray = form.serializeArray();
+            formDataArray = formDataArray.filter(function (item) {
+                return item.value.trim() !== '' && item.value.trim() !== '0';
+            });
+
+            // 編集された行数を取得
+            var editRow = [];
+            formDataArray.forEach(function (item) {
+                if (item.name.includes("RegisterList")) {
+                    var rowNumber = GetEditRowNumber(item.name);
+                    editRow.push(rowNumber);
+                }
+            });
+            if (editRow.length == 0) {
+                $('#div-error-message').text("E1001: 納入先品番は必須項目です。");
+                return;
+            }
+
+            // 仕入先品番と数量チェック
+            var checkFlag = checkValue(editRow);
+            var quantityCheck = CheckInputNumber();
+
+            if (!checkFlag || !quantityCheck) {
+                $('#div-error-message').text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
+                return;
+            }
+
+            // 仕入先品番リストを作成
+            for (var i = 0; i < 5; i++) {
+                var id = "RegisterList[" + i + "].DeliveryProductNumber";
+                var productItem = document.getElementById(id);
+                if (productItem.value == 0) {
+                    formDataArray.push({ name: id, value: 0 });
+                }
+            }
+
+            // Ajax call
+            $.ajax({
+                url: '@Url.Action("Register", "D_StoreOut")',
+                method: 'POST',
+                data: formDataArray
+            })
+                .done(function (response) {
+                    $('#DStoreOutForm')[0].reset();
+                    // 完了モーダル表示
+                    AlertMessage('', '完了', '登録が完了しました。', null, null);
+                })
+                .fail(function (xhr) {
+                    if (xhr.status === 404) {
+                        // データが見つからなかった場合
+                        var errorMessage = xhr.responseJSON.errorMessage;
+                        $("#div-error-message").html(errorMessage);
+                    } else {
+                        // その他のエラーの場合
+                        $('#div-error-message').text(errorMessage);
+                    }
+                });
+        });
+    });
+
+    // 納入先品番と数量チェック
+    function checkValue(rowCheckArr) {
+        var checkFlag = true;
+        rowCheckArr.forEach(function (index) {
+            // 納入先品番
+            var productNumberName = "RegisterList[" + index + "].DeliveryProductNumber";
+            var productNumberElement = document.querySelector('[name="' + productNumberName + '"]');
+            if ($(productNumberElement).val() == '') {
+                productNumberElement.classList.add("input-validation-error");
+                checkFlag = false;
+            }
+            else {
+                productNumberElement.classList.remove("input-validation-error");
+            }
+
+            // 数量
+            var quantityName = "RegisterList[" + index + "].Quantity";
+            var quantityNameElement = document.querySelector('[name="' + quantityName + '"]');
+            if ($(quantityNameElement).val() <= 0) {
+                quantityNameElement.classList.add("input-validation-error");
+                checkFlag = false;
+            }
+            else {
+                quantityNameElement.classList.remove("input-validation-error");
+            }
+        });
+        return checkFlag;
+    }
+
+    // 編集された行数を取得
+    function GetEditRowNumber(fieldName) {
+        var match = fieldName.match(/\[(\d+)\]/);
+        return match ? parseInt(match[1]) : null;
+    }
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
+</script>
+

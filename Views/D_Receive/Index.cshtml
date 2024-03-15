@@ -1,0 +1,212 @@
+﻿@using mar_sumaken_web.Commons;
+@model mar_sumaken_web.Models.D_ReceiveModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+}
+
+<div class="card shadow de-inspection d-receive-schedule m-4">
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+    <div class="card-body">
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <div class="row mt-10">
+                    <div class="col-lg-12">
+                        <form id="searchForm" method="post" enctype="multipart/form-data" name="form" onsubmit="return false;">
+                            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                <span class="warehouse-name-drs">倉庫名</span>
+                                <div class="selectItem unset-pdl">
+                                    <select class="form-select" name="SelectedDepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
+                                </div>
+                            </div>
+                            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                <span class="warehouse-name-drs">仕入先名</span>
+                                <div class="selectItem unset-pdl">
+                                    <select class="form-select" name="SelectedCompanyID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
+                                </div>
+                            </div>
+                            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                    <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.SearchStartDate)</span>
+                                    <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate"> <lable class="m-1">～</lable> <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
+                                </div>
+                                <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                    <button type="submit" id="search-btn" class="btn btn-secondary btn-icon-split ml-3">
+                                        <span class="icon text-white-50">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </span>
+                                        <span class="text">検索</span>
+                                    </button>
+                                    <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3" id="export-file-btn">
+                                        <span class="icon text-white-50">
+                                            <i class="fa-solid fa-file-export"></i>
+                                        </span>
+                                        <span class="text">出力</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3" id="div-table" style="display: none;">
+            <table class="table table-sm stripe hover nowrap datatable-normal" id="table-datatable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>ID</th>
+                        <th>仕入先名</th>
+                        <th>入荷日</th>
+                        <th>仕入先品番</th>
+                        <th>ロット番号</th>
+                        <th>箱数</th>
+                        <th>数量</th>
+                        <th>メインキー</th>
+                        <th>サブキー1</th>
+                        <th>サブキー2</th>
+                        <th>登録日時</th>
+                        <th>読取日時</th>
+                        <th>登録者</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <input type="hidden" id="viewTitle" value="@Model.ViewTitle" />
+    </div>
+</div>
+
+<!-- Detail Modal-->
+<div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-labelledby="detail-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-modal-label">読取実績</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12">
+                    <p>倉庫名：<span id="detailDepoName"></span></p>
+                    <p>読取日時：<span id="detailCreatedAt"></span></p>
+                    <p>ハンディメニュー名：<span id="detailHandyMenuName"></span></p>
+                    <p>仕入先品番：<span id="detailSupplierProductNumber"></span></p>
+                    <p>読取内容(1回目)：<br><span class="text-break" id="detailFirstScanedString"></span></p>
+                    <p>読取内容(2回目)：<br><span class="text-break" id="detailSecondScanedString"></span></p>
+                    <p>登録者：<span id="detailCreatedBy"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 検索ボタン押下
+    $('#search-btn').click(function () {
+        $('#searchForm').submit(function (e) {
+            DeleteErrorMessages();
+
+            // ページの更新を禁止する
+            e.preventDefault();
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            e.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("SearchData", "D_Receive")';
+            let method = 'POST';
+            var data = $(this).serialize();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $("#table-datatable tbody").empty();
+                $('#table-datatable').DataTable().destroy();
+                $("#div-table").show();
+                $("#table-datatable tbody").html(response);
+                $("#table-datatable").DataTable({
+                    "language": {           // 日本語表示
+                        "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+                    },
+                    lengthChange: true,     // 表示件数
+                    info: false,            // 総件数
+                    scrollX: true,          // 横スクロール可
+                    order: [[4, "asc"]],    // 仕入先品番昇順
+                });
+            }).fail(function (xhr, textStatus, errorThrown) {
+                if (xhr.status === 404) {
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    var errorMessage500 = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage500);
+                }
+            });
+        });
+    });
+
+    // 出力ボタン押下
+    $('#export-file-btn').click(function (event) {
+        DeleteErrorMessages();
+
+        // ページの更新を禁止する
+        event.preventDefault();
+
+        // 送信イベントが他のハンドラーに伝播するのを防ぐ
+        event.stopImmediatePropagation();
+
+        var searchFormArr = $('#searchForm').serializeArray();
+
+        // フォーム情報取得
+        var exportFormData = new FormData();
+        exportFormData.append("searchModel.DepoID", searchFormArr[0].value);
+        exportFormData.append("searchModel.DepoName", $('#SelectedDepoID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.CompanyID", searchFormArr[1].value);
+        exportFormData.append("searchModel.CompanyName", $('#SelectedCompanyID option:selected').text().replace(/ /g, ""));
+        exportFormData.append("searchModel.SearchStartDate", searchFormArr[2].value);
+        exportFormData.append("searchModel.SearchEndDate", searchFormArr[3].value);
+
+        // 画面名取得
+        exportFormData.append("gamenName", $("#viewTitle").val());
+
+        // CSV出力
+        onExportCsvByCondition("D_Receive", exportFormData);
+    });
+
+    // 詳細ボタン押下
+    function OnDetailClick(trTag) {
+        var row = trTag.parentNode.parentNode;
+        $("#detailDepoName").text(row.getElementsByClassName("DepoName")[0].value);
+        $("#detailCreatedAt").text(row.getElementsByClassName("ScanedAt")[0].textContent);
+        $("#detailHandyMenuName").text(row.getElementsByClassName("HandyMenuName")[0].value);
+        $("#detailSupplierProductNumber").text(row.getElementsByClassName("SupplierProductNumber")[0].textContent);
+        $("#detailFirstScanedString").text(row.getElementsByClassName("FirstScanedString")[0].value);
+        $("#detailSecondScanedString").text(row.getElementsByClassName("SecondScanedString")[0].value);
+        $("#detailCreatedBy").text(row.getElementsByClassName("ScanCreatedBy")[0].value);
+    }
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
+</script>

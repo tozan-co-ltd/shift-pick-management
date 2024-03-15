@@ -1,49 +1,203 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@using System.Security.Claims
+@using mar_sumaken_web.Commons;
+@{
+    var Model = new WebMenuModel();
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.ViewTitle;
+}
+
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - mar_sumaken_web</title>
+    <title>@ViewData["Title"] - スマホDE検品</title>
+
+    <!-- ▼ファビコン -->
+    <link rel="shortcut icon" type="image/png" href="~/images\webicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="~/images\webicon.png">
+
+    <!-- ▼CSSファイル読み込み -->
+    <!--Bootstrap admin template-->
+    <link rel="stylesheet" href="~/lib/startbootstrap-sb-admin-gh-pages/css/styles.css" />
+    <!-- font-awesome -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- datetimepicker-->
+    <link href="~/css/datetimepicker.css" rel="stylesheet" />
+    <!-- bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- sb-admin-2 -->
+    <link href="~/css/sb-admin-2.css?@DateTime.Now" rel="stylesheet">
+    <!-- icheck -->
+    <!-- <link rel="stylesheet" href="~/css/skins/all.css"> -->
+    <!-- dataTables-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <!-- 内部ファイル -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/mar_sumaken_web.styles.css" asp-append-version="true" />
+
+    <!-- jquery-->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">mar_sumaken_web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+@{
+    /* 開発環境はナビゲーションバーを紫色に変更 */
+    var wrapperClass = Model.DataBaseName;
+    if (wrapperClass.Contains("_test"))
+    {
+        wrapperClass = "navbar-dark-test";
+    }
+
+    var bodyClass = Context.Request.Cookies["Sidebar"];
+    if (string.IsNullOrWhiteSpace(bodyClass))
+    {
+        bodyClass = "sb-nav-fixed";
+
+    }
+}
+<body class="@bodyClass">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark @wrapperClass">
+        <!-- Navbar Brand-->
+        <a id="home-title" class="navbar-brand ps-3" asp-controller="Top" asp-action="Index">スマホDE検品</a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-angles-left"></i></button>
+        <!-- Navbar Search-->
+        <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+        </div>
+        <!-- Navbar-->
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <div class="d-flex justify-content-end align-items-center" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="text-white">@(User.Identity.IsAuthenticated ? User.FindFirst("UserName").Value : null)</span>
+                    <a class="nav-link dropdown-toggle"><i class="fas fa-user fa-fw"></i></a>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+                <!-- Dropdown -->
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" id="navbarDropdown"
+                     aria-labelledby="navbarDropdown">
+                    <div id="user-detail-dropdown-item" class="dropdown-item text-gray-600">
+                        <p>
+                            <label class="mr-2 col-4">
+                                会社名
+                            </label>
+                            <span class="col">
+                                @(User.Identity.IsAuthenticated ? User.FindFirst("CompanyName").Value : null)
+                            </span>
+                        </p>
+                        <p>
+                            <label class="mr-2 col-4">
+                                メイン倉庫名
+                            </label>
+                            <span class="col">
+                                @(User.Identity.IsAuthenticated ? User.FindFirst("MainDepoName").Value : null)
+                            </span>
+                        </p>
+                        <hr />
+                        <a class="dropdown-item mt-2 logout" asp-controller="ChangePassword" asp-action="Index">
+                            <i class="fa fa-gears fa-fw mr-2"></i>
+                            パスワード変更
+                        </a>
+                        <a class="dropdown-item mt-2 logout" href="#" data-toggle="modal" data-target="#logoutModal">
+                            <i class="fas fa-sign-out-alt fa-fw mr-2"></i>
+                            ログアウト
+                        </a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <!-- Topbar Navbar -->
+    </nav>
+
+    <!-- Side Navbar-->
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <ul class="navbar-nav bg-gradient-imagecolor sidebar sidebar-dark accordion" id="accordionSidebar">
+                            @foreach (var category in Model.WebMenuCategoryList())
+                            {
+                                var categoryMenuList = Model.GetWebMenuCategoryList(category);
+                                var categoryName = categoryMenuList.M_WebMenuCategoryModel.CategoryName;
+                                var categoryID = categoryMenuList.M_WebMenuCategoryModel.CategoryID;
+                                var menuList = categoryMenuList.WebMenuList;
+                                if (menuList.Count != 0)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse@(categoryID)"
+                                           aria-expanded="true" aria-controls="collapse@(categoryID)">
+                                            <i class="icon-category @("icon-categoryid-" + categoryID)"></i>
+                                            <span>@(categoryName)</span>
+                                        </a>
+                                        <div id="collapse@(categoryID)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                            <div class="bg-white py-2 collapse-inner rounded">
+                                                @foreach (var obj in menuList)
+                                                {
+                                                    <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                }
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div id="layoutSidenav_content">
+            <main>
+                @RenderBody()
+            </main>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - mar_sumaken_web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">確認</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">ログアウトします。よろしいですか？</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">キャンセル</button>
+                    <a class="btn btn-accent" asp-area="" asp-controller="Login" asp-action="Logout">ログアウト</a>
+                </div>
+            </div>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    </div>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!--Bootstrap admin template-->
+    <script src="~/lib/startbootstrap-sb-admin-gh-pages/js/scripts.js"></script>
+
+    <!--jQueryの動的validation-->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="~/js/icheck.min.js"></script>
+
+    <!--datepicker↓-->
+    <script src="~/lib/jquery-detetimepicker/datetimepicker.js"></script>
+
+    <!--dataTables↓-->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+    <!--jquery.cookie.js-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
+    @* @await RenderSectionAsync("Scripts", required: false) *@
 </body>
 </html>
+
+
