@@ -88,9 +88,28 @@ body {
 }
 
 /* || レスポンシブデザイン */
+@media screen and (max-width: 1260px) {
+    .sp-cs-dpl {
+        display: block !important;
+    }
+    .ml-for-sp{
+        display: flex !important;
+        justify-content: flex-start !important;
+    }
+}
+
+
+/* || レスポンシブデザイン */
 @media screen and (max-width: 1200px) {
     html {
         font-size: 80% !important;
+    }
+    .receive-display-sp {
+        display: block !important;
+    }
+    .diplay-btn-for-sp {
+        text-align: center;
+        display: block !important;
     }
 }
 
