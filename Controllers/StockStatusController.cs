@@ -76,7 +76,7 @@ namespace mar_sumaken_web.Controllers
                         item.StockRemainQuantity = @item.StockQuantityAtBeginningMonth + (item.StoreInQuantity - item.StoreOutQuantity);
 
                         // ロット番号チェック
-                        string supplierProductNumberTag = $@"<td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>";
+                        string supplierProductNumberTag = $@"<td>{@item.SupplierProductNumber}</td>";
                         if (!string.IsNullOrWhiteSpace(item.LotNumber) && item.StockRemainQuantity > 0)
                         {
                             if ((item.StoreInQuantity > 0 || item.StoreOutQuantity > 0))
