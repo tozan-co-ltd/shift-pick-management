@@ -6,7 +6,7 @@
 }
 
 <div class="card shadow de-inspection d-receive-schedule m-4">
-    <div class="card-header text-gray-800">
+    <div class="card-header">
         @ViewData["Title"]
     </div>
     <div class="card-body">
@@ -57,23 +57,25 @@
                                     <lable class="m-1">～</lable> 
                                     <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
                                 </div>
-                                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                                    <div class="form-check ml-5">
+                                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl receive-display-sp">
+                                    <div class="form-check ml-3 ml-for-sp">
                                         <input class="form-check-input" asp-for="DiffenceCountCheck" type="checkbox">
                                         <label class="form-check-label ml-1" asp-for="DiffenceCountCheck">実績数不一致のみ</label>
                                     </div>
-                                    <button type="submit" id="search-btn" class="btn btn-secondary btn-icon-split ml-3">
-                                        <span class="icon text-white-50">
-                                            <i class="fa-solid fa-magnifying-glass"></i>
-                                        </span>
-                                        <span class="text">検索</span>
-                                    </button>
-                                    <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3" id="export-file-btn">
-                                        <span class="icon text-white-50">
-                                            <i class="fa-solid fa-file-export"></i>
-                                        </span>
-                                        <span class="text">出力</span>
-                                    </button>
+                                    <div class="btn btn-d-recevie">
+                                        <button type="submit" id="search-btn" class="btn btn-secondary btn-icon-split ml-3">
+                                            <span class="icon text-white-50">
+                                                <i class="fa-solid fa-magnifying-glass"></i>
+                                            </span>
+                                            <span class="text">検索</span>
+                                        </button>
+                                        <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3" id="export-file-btn">
+                                            <span class="icon text-white-50">
+                                                <i class="fa-solid fa-file-export"></i>
+                                            </span>
+                                            <span class="text">出力</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </form>

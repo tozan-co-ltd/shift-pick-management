@@ -88,9 +88,28 @@ body {
 }
 
 /* || レスポンシブデザイン */
+@media screen and (max-width: 1260px) {
+    .sp-cs-dpl {
+        display: block !important;
+    }
+    .ml-for-sp{
+        display: flex !important;
+        justify-content: flex-start !important;
+    }
+}
+
+
+/* || レスポンシブデザイン */
 @media screen and (max-width: 1200px) {
     html {
         font-size: 80% !important;
+    }
+    .receive-display-sp {
+        display: block !important;
+    }
+    .diplay-btn-for-sp {
+        text-align: center;
+        display: block !important;
     }
 }
 
@@ -826,3 +845,13 @@ select[readonly] {
 }
 
 
+/*　--------------Set color for all text ---------------*/
+.dataTable, .form-control, .border-top-0 {
+    color: #3a3b45;
+}
+
+/*　--------------Set color for all text---------------*/
+
+.unset-pd {
+    padding: unset !important;
+}

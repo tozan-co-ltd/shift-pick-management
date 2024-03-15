@@ -6,7 +6,7 @@
 }
 
 <div class="card shadow de-inspection d-store-in m-4">
-    <div class="card-header text-gray-800">
+    <div class="card-header">
         @ViewData["Title"]
     </div>
     <div class="card-body">
@@ -112,109 +112,109 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="col-12 col-md-10">
+                <div class="col-12 col-md-12">
                     <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
                     <form class="col-md-12" id="editForm">
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("StoreInID")</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="StoreInID" autocomplete="off" readonly>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("DepoName")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <div class="unset-pdl">
                                     <select class="form-select" id="editSelectedDepoID" asp-for="SelectedDepoID" asp-items="@Model.SearchDepoList"></select>
                                 </div>
                                 <span class="text-danger w-100" asp-validation-for="SelectedDepoID"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("SupplierName")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <div class="unset-pdl">
                                     <select class="form-select" id="editSelectedCompanyID" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
                                 </div>
                                 <span class="text-danger w-100" asp-validation-for="SelectedCompanyID"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <span>@Html.DisplayNameFor(model => model.SearchStartDate)<span style="color:red">*</span></span>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input type="text" asp-for="SearchStartDate" class="form-control pickerDate">
                                 <span class="text-danger w-100" asp-validation-for="SearchStartDate"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("SupplierProductNumber")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="SupplierProductNumber" autocomplete="off" required>
                                 <span class="text-danger w-100" asp-validation-for="SupplierProductNumber"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("LotNumber")</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="LotNumber" autocomplete="off">
                                 <span class="text-danger w-100" asp-validation-for="LotNumber"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("Quantity")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="Quantity" autocomplete="off">
                                 <span class="text-danger w-100" asp-validation-for="Quantity"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("MainProductKey")</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" id="MainProductKey" asp-for="MainProductKey" autocomplete="off">
                                 <span class="text-danger w-100" asp-validation-for="MainProductKey"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("FirstSubProductKey")</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="FirstSubProductKey" autocomplete="off">
                                 <span class="text-danger w-100" asp-validation-for="FirstSubProductKey"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("SecondSubProductKey")</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="SecondSubProductKey" autocomplete="off">
                                 <span class="text-danger w-100" asp-validation-for="SecondSubProductKey"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("Remarks")</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="Remarks" autocomplete="off">
                                 <span class="text-danger w-100" asp-validation-for="Remarks"></span>
                             </div>
@@ -245,12 +245,12 @@
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <div class="col-12 col-md-10">
+            <div class="modal-body unset-pd">
+                <div class="col-12 col-md-12">
                     <p id="delete-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
-                    <div class="col-12 col-md-10">
+                    <div class="col-12 col-md-12">
                         <div class="col-12 d-flex flex-wrap">
                             <div class="col-12 col-sm-4">
                                 <label>ID</label>

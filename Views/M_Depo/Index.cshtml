@@ -6,7 +6,7 @@
 }
 
 <div class="card shadow de-inspection masterInfo m-4">
-    <div class="card-header text-gray-800">
+    <div class="card-header">
         @ViewData["Title"]
     </div>
     <div class="card-body">
@@ -93,34 +93,34 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="col-12 col-md-10">
+                <div class="col-12 col-md-12">
                     <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
                     <form class="col-md-12" id="mDepoForm">
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("DepoID")</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="DepoID" autocomplete="off" readonly>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("DepoCode")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="DepoCode" autocomplete="off" value="" required>
                                 <small class="form-text text-muted w-100 p-1">1～10文字の数字が使用できます。</small>
                                 <span class="text-danger w-100" asp-validation-for="DepoCode"></span>
                             </div>
                         </div>
-                        <div class="col-12 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("DepoName")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="DepoName" autocomplete="off" required>
                                 <span class="text-danger w-100" asp-validation-for="DepoName"></span>
                             </div>
@@ -151,17 +151,17 @@
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <div class="col-12 col-md-10">
+            <div class="modal-body unset-pd">
+                <div class="col-12 col-md-12">
                     <p id="delete-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
-                    <div class="col-12 col-md-10">
+                    <div class="col-12 col-md-12">
                         <div class="col-12 d-flex flex-wrap">
                             <div class="col-12 col-sm-4 col-md-4">
                                 <label>ID</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
                                 <input class="form-control" id="deleteDepoId" type="text" disabled>
                             </div>
                         </div>
@@ -169,7 +169,7 @@
                             <div class="col-12 col-sm-4 col-md-4">
                                 <label>倉庫コード</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
                                 <input class="form-control" id="deleteDepoCode" type="text" disabled>
                             </div>
                         </div>
@@ -177,7 +177,7 @@
                             <div class="col-12 col-sm-4 col-md-4">
                                 <label>倉庫名</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-7 mb-2">
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
                                 <input class="form-control" id="deleteDepoName" type="text" disabled>
                             </div>
                         </div>
