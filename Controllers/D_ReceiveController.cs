@@ -1,4 +1,5 @@
-﻿using mar_sumaken_web.Commons;
+﻿using AutoMapper.Execution;
+using mar_sumaken_web.Commons;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
@@ -84,8 +85,8 @@ namespace mar_sumaken_web.Controllers
                         <td class='ReceiveDate'>{Utils.ConvertToYYYYMMDD(@item.ReceiveDate)}</td>
                         <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
                         <td class='LotNumber'>{@item.LotNumber}</td>
-                        <td class='NumberOfBoxes'>{@item.NumberOfBoxes}</td>
-                        <td class='Quantity'>{@item.Quantity}</td>
+                        <td class='NumberOfBoxes'>{Utils.FormatNumber(@item.NumberOfBoxes)}</td>
+                        <td class='Quantity'>{Utils.FormatNumber(@item.Quantity)}</td>
                         <td class='MainProductKey'>{@item.MainProductKey}</td>
                         <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                         <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>

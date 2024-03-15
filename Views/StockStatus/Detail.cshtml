@@ -87,14 +87,14 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>@Model.SupplierProductNumber</td>
-                        <td>@Model.LotQuantity</td>
-                        <td>@Model.StockQuantityAtBeginningMonth</td>
-                        <td>@Model.StoreInNumberOfBoxes</td>
-                        <td>@Model.StoreInQuantity</td>
-                        <td>@Model.StoreOutNumberOfBoxes</td>
-                        <td>@Model.StoreOutQuantity</td>
-                        <td>@Model.StockRemainQuantity</td>
+                        <td>@Html.DisplayFor(model => model.SupplierProductNumber)</td>
+                        <td>@Html.DisplayFor(model => model.LotQuantity)</td>
+                        <td>@Html.DisplayFor(model => model.StockQuantityAtBeginningMonth)</td>
+                        <td>@Html.DisplayFor(model => model.StoreInNumberOfBoxes)</td>
+                        <td>@Html.DisplayFor(model => model.StoreInQuantity)</td>
+                        <td>@Html.DisplayFor(model => model.StoreOutNumberOfBoxes)</td>
+                        <td>@Html.DisplayFor(model => model.StoreOutQuantity)</td>
+                        <td>@Html.DisplayFor(model => model.StockRemainQuantity)</td>
                     </tr>
                 </tbody>
             </table>
@@ -115,15 +115,15 @@
                 <tbody>
                     @if (@Model != null && @Model.DetailList != null && @Model.DetailList.Count > 0)
                     {
-                        @foreach (var item in @Model.DetailList)
+                        @for (int i = 0; i < Model.DetailList.Count(); ++i)
                         {
                              <tr>
-                                <td>@item.WorkedDate</td>
-                                <td>@item.StoreInNumberOfBoxes</td>
-                                <td>@item.StoreInQuantity</td>
-                                <td>@item.StoreOutNumberOfBoxes</td>
-                                <td>@item.StoreOutQuantity</td>
-                                <td>@item.StockRemainQuantity</td>
+                                <td>@Html.DisplayFor(model => model.DetailList[i].WorkedDate)</td>
+                                <td>@Html.DisplayFor(model => model.DetailList[i].StoreInNumberOfBoxes)</td>
+                                <td>@Html.DisplayFor(model => model.DetailList[i].StoreInQuantity)</td>
+                                <td>@Html.DisplayFor(model => model.DetailList[i].StoreOutNumberOfBoxes)</td>
+                                <td>@Html.DisplayFor(model => model.DetailList[i].StoreOutQuantity)</td>
+                                <td>@Html.DisplayFor(model => model.DetailList[i].StockRemainQuantity)</td>
                             </tr>
                         }
                     }

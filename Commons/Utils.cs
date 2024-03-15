@@ -155,5 +155,14 @@ namespace mar_sumaken_web.Commons
             return formattedDateString;
         }
 
+        /// <summary>
+        /// フォーマット番号
+        /// </summary>
+        /// <param name="number"></param>
+        public static string FormatNumber(int number)
+        {
+            return string.Format("{0:#,#}", number);
+        }
+
     }
 }

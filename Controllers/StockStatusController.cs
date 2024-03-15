@@ -98,13 +98,13 @@ namespace mar_sumaken_web.Controllers
                         </td>
                         <td class='SupplierName'>{@item.SupplierName}</td>
                         {supplierProductNumberTag}
-                        <td class='LotQuantity'>{@item.LotQuantity}</td>
-                        <td class='StockQuantityAtBeginningMonth'>{@item.StockQuantityAtBeginningMonth}</td>
-                        <td class='StoreInNumberOfBoxes'>{@item.StoreInNumberOfBoxes}</td>
-                        <td class='StoreInQuantity'>{@item.StoreInQuantity}</td>
-                        <td class='StoreOutNumberOfBoxes'>{@item.StoreOutNumberOfBoxes}</td>
-                        <td class='StoreOutQuantity'>{@item.StoreOutQuantity}</td>
-                        <td class='StockRemainQuantity'>{@item.StockRemainQuantity}</td>                        
+                        <td class='LotQuantity'>{Utils.FormatNumber(@item.LotQuantity)}</td>
+                        <td class='StockQuantityAtBeginningMonth'>{Utils.FormatNumber(@item.StockQuantityAtBeginningMonth)}</td>
+                        <td class='StoreInNumberOfBoxes'>{Utils.FormatNumber(@item.StoreInNumberOfBoxes)}</td>
+                        <td class='StoreInQuantity'>{Utils.FormatNumber(@item.StoreInQuantity)}</td>
+                        <td class='StoreOutNumberOfBoxes'>{Utils.FormatNumber(@item.StoreOutNumberOfBoxes)}</td>
+                        <td class='StoreOutQuantity'>{Utils.FormatNumber(@item.StoreOutQuantity)}</td>
+                        <td class='StockRemainQuantity'>{Utils.FormatNumber(@item.StockRemainQuantity)}</td>                        
                         <input type='hidden' class='ProductID' value='{item.ProductID}' />
                         <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
                         <input type='hidden' class='DepoID' value='{item.DepoID}' />
@@ -229,11 +229,11 @@ namespace mar_sumaken_web.Controllers
                     {
                         searchData += $@"<tr>
                             <td>{@item.LotNumber}</td>
-                            <td>{@item.StoreInNumberOfBoxes}</td>
-                            <td>{@item.StoreInQuantity}</td>
-                            <td>{@item.StoreOutNumberOfBoxes}</td>
-                            <td>{@item.StoreOutQuantity}</td>
-                            <td>{@item.StockRemainQuantity}</td>
+                            <td>{Utils.FormatNumber(@item.StoreInNumberOfBoxes)}</td>
+                            <td>{Utils.FormatNumber(@item.StoreInQuantity)}</td>
+                            <td>{Utils.FormatNumber(@item.StoreOutNumberOfBoxes)}</td>
+                            <td>{Utils.FormatNumber(@item.StoreOutQuantity)}</td>
+                            <td>{Utils.FormatNumber(@item.StockRemainQuantity)}</td>
                         </tr>";
                     }
                 }
