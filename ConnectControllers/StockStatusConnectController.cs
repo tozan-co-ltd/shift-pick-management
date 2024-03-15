@@ -65,24 +65,25 @@ namespace mar_sumaken_web.Commons
                 SearchData AS 
                 (
 	                SELECT
-		                searchInfo.SupplierProductNumber 
+		                searchInfo.SupplierProductNumber
+                        ,STRING_AGG(searchInfo.LotNumber, '') AS LotNumber
 		                ,SUM(searchInfo.InNumberOfBoxes) AS  SearchStoreInNumberOfBoxes
 		                ,SUM(searchInfo.OutNUmberOfBoxes) AS SearchStoreOutNumberOfBoxes
 	                FROM 
 	                (
-	                 SELECT storeIn.SupplierProductNumber ,SUM(storeIn.NumberOfBoxes) AS InNumberOfBoxes , NULL AS OutNUmberOfBoxes
+	                 SELECT storeIn.SupplierProductNumber ,SUM(storeIn.NumberOfBoxes) AS InNumberOfBoxes , NULL AS OutNUmberOfBoxes, STRING_AGG(storeIn.LotNumber, '') AS LotNumber
 	                 FROM D_StoreIn AS storeIn 
 	                 WHERE 
 		                storeIn.StoreInDate >= @SearchStartDate AND storeIn.StoreInDate <= @SearchEndDate 
 		                AND storeIn.CompanyID = @CompanyId AND storeIn.DepoID = @DepoId AND storeIn.IsDeleted = 0
 	                 GROUP BY storeIn.SupplierProductNumber
 	                 UNION ALL
-	                 SELECT storeOut.SupplierProductNumber, NULL AS InNumberOfBoxes, SUM(storeOut.NumberOfBoxes) AS OutNUmberOfBoxes
+	                 SELECT storeOut.SupplierProductNumber, NULL AS InNumberOfBoxes, SUM(storeOut.NumberOfBoxes) AS OutNUmberOfBoxes, STRING_AGG(storeOut.LotNumber, '') AS LotNumber
 	                 FROM D_StoreOut AS storeOut
 	                 WHERE 
 		                storeOut.StoreOutDate >= @SearchStartDate AND storeOut.StoreOutDate <= @SearchEndDate
 		                AND storeOut.CompanyID = @CompanyId AND storeOut.DepoID = @DepoId AND storeOut.IsDeleted = 0
-	                 GROUP BY storeOut.SupplierProductNumber
+	                 GROUP BY storeOut.SupplierProductNumber, storeOut.LotNumber
 	                ) AS searchInfo
 	                GROUP BY searchInfo.SupplierProductNumber
                 ),
@@ -119,6 +120,7 @@ namespace mar_sumaken_web.Commons
                 ,company.CompanyName AS SupplierName -- 仕入先名
                 ,product.SupplierProductNumber  -- 仕入先品番
                 ,product.LotQuantity -- 収容数
+                ,search.LotNumber --ロット番号
                 ,COALESCE((total.TotalStoreInNumberOfBoxes - total.TotalStoreOutNumberOfBoxes) * product.LotQuantity, 0) AS StockQuantityAtBeginningMonth -- 月初在庫数
                 ,COALESCE(search.SearchStoreInNumberOfBoxes, 0) AS StoreInNumberOfBoxes -- 入庫箱数
                 ,COALESCE(search.SearchStoreOutNumberOfBoxes, 0) AS StoreOutNumberOfBoxes -- 出庫箱数

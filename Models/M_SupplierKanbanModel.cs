@@ -170,14 +170,14 @@ namespace mar_sumaken_web.Models
         /// メインキー桁数
         /// </summary>
         [Display(Name = "メインキー桁数")]
-        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int MainProductKeyLength { get; set; }
 
         /// <summary>
         /// メインキー開始位置
         /// </summary>
         [Display(Name = "メインキー開始位置")]
-        [Range(0, int.MaxValue, ErrorMessageResourceName = "E1021", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int MainProductKeyStartIndex { get; set; }
 
         /// <summary>

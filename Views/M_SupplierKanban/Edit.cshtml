@@ -23,8 +23,9 @@
             </form>
         </div>
 
-        <div class="form-group col-sm-12 pl-3">
-            <p id="div-error-message" class="mt-1 text-danger"></p>
+        <div class="form-group col-sm-12 pl-3 error-wrapper">
+            <p id="div-error-message" class="mt-1 mb-1 text-danger"></p>
+            <p id="duplicate-error-message" class="mt-1 text-danger"></p>
 
             @if (ViewData["ErrorMessage"] != null)
             {
@@ -276,8 +277,6 @@
 
     // 更新ボタン押下
     $("#edit-btn").on("click", function () {
-        $("#div-error-message").text("");
-
         // ページの更新を禁止する
         event.preventDefault();
 
@@ -314,49 +313,66 @@
                 $("#div-error-message").text(errorMessage);
             }
         });
-
-        // 入力値チェック
-        function checkInput() {
-            let result = false;
-            let isCheck = true;
-
-            // エラーメッセージ削除
-            DeleteErrorMessages();
-
-            // 重複許容フラグ
-            var selectedAllowedDuplicatesFlagValue = $('input[name="AllowedDuplicatesFlag"]:checked').val();
-            var requiredCheck = false;
-            if (selectedAllowedDuplicatesFlagValue == '0') {
-                requiredCheck = true;
-            }
-
-            // 使用ハンディメニューチェック
-            $(".checkboxHandyMenu").children("input:checked").each(function () {
-                let checkboxLabel = $(this).next('label').text();
-                
-                if (requiredCheck) {
-                    // 重複許容フラグ=0の場合「まとめ入庫」は選択不可
-                    if (checkboxLabel == "まとめ入庫") {
-                        $("#div-error-message").text("E1025: 重複許容フラグが0の場合、「まとめ入庫」は選択できません。");
-                        isCheck = false;
-                        return result;
-                    }
-                } else {
-                    // 重複許容フラグ=1の場合「入庫」は選択不可
-                    if (checkboxLabel == "入庫") {
-                        $("#div-error-message").text("E1026: 重複許容フラグが1の場合、「入庫」は選択できません。");
-                        isCheck = false;
-                        return result;
-                    }
-                }
-            });
-
-            // バリデーションチェック
-            var checkFlg = CheckValidationMSupplierKanban();
-
-            return checkFlg;
-        }
     });
+
+    // 入力値チェック
+    function checkInput() {
+
+        // エラーメッセージ削除
+        DeleteErrorMessages();
+
+        // 重複許容フラグ
+        var selectedAllowedDuplicatesFlagValue = $('input[name="AllowedDuplicatesFlag"]:checked').val();
+        var requiredCheck = false;
+        if (selectedAllowedDuplicatesFlagValue == '0') {
+            requiredCheck = true;
+        }
+
+        var handyErrorMessage = null;
+        // 使用ハンディメニューチェック
+        $(".checkboxHandyMenu").children("input:checked").each(function () {
+            let checkboxLabel = $(this).next('label').text();
+
+            if (requiredCheck) {
+                // 重複許容フラグ=0の場合「まとめ入庫」は選択不可
+                if (checkboxLabel == "まとめ入庫") {
+                    //$("#div-error-message").text("E1025: 重複許容フラグが0の場合、「まとめ入庫」は選択できません。");
+                    handyErrorMessage = "E1025: 重複許容フラグが0の場合、「まとめ入庫」は選択できません。";
+                }
+            } else {
+                // 重複許容フラグ=1の場合「入庫」は選択不可
+                if (checkboxLabel == "入庫") {
+                    //$("#div-error-message").text("E1026: 重複許容フラグが1の場合、「入庫」は選択できません。");
+                    handyErrorMessage = "E1026: 重複許容フラグが1の場合、「入庫」は選択できません。";
+                }
+            }
+        });
+        if (handyErrorMessage != null) {
+            $("#div-error-message").text(handyErrorMessage);
+            return false;
+        }
+
+        // バリデーションチェック
+        var validationCheck = CheckValidationMSupplierKanban();
+
+        var inputNumnerCheck = true;
+        // 小数点とMaxLengthチェック
+        $('input[type="number"]').each(function () {
+            var value = $(this).val();
+            // 小数点
+            if (!Number.isInteger(Number(value)) || Number(value) < 0) {
+                $(this).addClass('input-validation-error');
+                inputNumnerCheck = false;
+            }
+            // MaxLength
+            if (value.length > 10 || isNaN(value)) {
+                $(this).addClass('input-validation-error');
+                inputNumnerCheck = false;
+            }
+        });
+
+        return validationCheck && inputNumnerCheck;
+    }
 
     // エラーメッセージ削除
     function DeleteErrorMessages() {
