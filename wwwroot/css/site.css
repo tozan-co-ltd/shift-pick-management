@@ -399,6 +399,28 @@ body {
     }
 }
 
+@media (max-width: 640px) {
+      .dataTables_length, .dataTables_filter {
+        display: flex;
+    }
+    .col-for-sp{
+        display: block !important;
+    }
+ /*   #export-file-btn {
+        margin: 10px 0 0 0 !important;
+    }*/
+    .warehouse-name-drs {
+        width: 80px !important;
+        min-width: 80px !important;
+    }
+    .mg-b-sp{
+        margin-bottom: 50px;
+    }
+    .mg-for-sp{
+        margin: 10px 0 0 0 !important;
+    }
+}
+
 /* || dataTableのカスタマイズ */
 table.dataTable {
     width: 100% !important;
@@ -478,8 +500,8 @@ table .btn-primary.btn-icon-split {
 }
 
 .paginate_button:hover {
-    background: #DDE2F1 !important;
-    border: 1px solid #DDE2F1 !important;
+    background: #dcdcdc !important;
+    border: 1px solid #dcdcdc !important;
 }
 
 .de-inspection .dataTables_wrapper .dataTables_paginate {
@@ -609,11 +631,11 @@ select[readonly] {
     }
     .diffence-count-check {
         margin-left: 0 !important;
-        margin-top: 10px;
+        /*margin-top: 10px;*/
     }
-    .warehouse-name-drs {
+/*    .warehouse-name-drs {
         margin-bottom: 20px;
-    }
+    }*/
     .custom-checkbox {
         padding-left: 0;
         margin-top: 20px;
@@ -679,6 +701,9 @@ select[readonly] {
         position: absolute;
         left: 140px;
     }
+    .cs-w300 {
+        width: 50vw !important;
+    }
 }
 
 @media (max-width: 768px) {
@@ -719,9 +744,9 @@ select[readonly] {
         z-index: 1;
     }
 
-        #fadeLayer_container.fadeon {
-            visibility: visible !important;
-        }
+    #fadeLayer_container.fadeon {
+        visibility: visible !important;
+    }
 
     .sp-tablet {
         display: block !important;
@@ -763,6 +788,10 @@ select[readonly] {
     .sp-flex {
         display: block !important;
     }
+
+/*    .cs-w300 {
+        width: 40vw !important;
+    }*/
 }
 
 /*　--------------Input form ---------------*/
@@ -779,3 +808,21 @@ select[readonly] {
     margin-bottom: 0.25rem !important;
 }
 /*　--------------Input form ---------------*/
+
+/*　--------------Edit Input Modal ---------------*/
+.label-input-model-pl {
+    padding-left: 0.6rem !important;
+}
+
+/*　--------------Edit Input form ---------------*/
+
+.cs-w300 {
+    width: 300px;
+}
+
+.cs-w350 {
+    width: 350px;
+    max-width: 350px !important;
+}
+
+
