@@ -5,6 +5,7 @@ using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.Design;
 using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
@@ -16,12 +17,7 @@ namespace mar_sumaken_web.Controllers
     /// </summary>
     public class M_UserController : BaseController
     {
-        private readonly ILogger<M_UserController> _logger;
-
-        public M_UserController(ILogger<M_UserController> logger)
-        {
-            _logger = logger;
-        }
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// ユーザーマスター画面表示
@@ -122,6 +118,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public IActionResult Register(M_UserModel model)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -140,7 +137,10 @@ namespace mar_sumaken_web.Controllers
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
-                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+                    // log取得
+                    errorMessage = "E1017: " + ErrorMessagesResources.E1017;
+                    _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
+                    return NotFound(new { errorMessage });
                 }
 
                 // ログインID重複チェック
@@ -148,7 +148,10 @@ namespace mar_sumaken_web.Controllers
                 bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, user.DatabaseName);
                 if (isExisted)
                 {
-                    return NotFound(new { errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_UserModel>("LoginID")) });
+                    // log取得
+                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_UserModel>("LoginID"));
+                    _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
+                    return NotFound(new { errorMessage });
                 }
 
                 // saltの作成とパスワードのハッシュ化
@@ -171,15 +174,28 @@ namespace mar_sumaken_web.Controllers
                 // ユーザーマスター登録
                 M_UserConnectController.InsertMUser(model, user);
 
+                // log取得
+                _logger.Info($"ユーザーマスター登録成功 ログインID:{model.LoginID}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
@@ -296,6 +312,7 @@ namespace mar_sumaken_web.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(M_UserModel model)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -320,7 +337,11 @@ namespace mar_sumaken_web.Controllers
                 if (!ModelState.IsValid || !isDepoSelected)
                 {
                     var errormsgs = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
-                    return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
+
+                    // log取得
+                    errorMessage = "E1017: " + ErrorMessagesResources.E1017;
+                    _logger.Error($"ユーザーマスター更新失敗 {errorMessage} {errormsgs}");
+                    return NotFound(new { errorMessage });
                 }
 
                 if (!isNotChangePassword)
@@ -346,15 +367,28 @@ namespace mar_sumaken_web.Controllers
                 // ユーザーマスター更新
                 await M_UserConnectController.UpdateMUser(model, user);
 
+                // log取得
+                _logger.Info($"ユーザーマスター更新成功 ユーザーID:{model.UserID}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
@@ -365,6 +399,7 @@ namespace mar_sumaken_web.Controllers
         /// <returns></returns>
         public IActionResult Delete(int userId)
         {
+            string? errorMessage;
             try
             {
                 // ログイン中ユーザー情報取得
@@ -373,15 +408,28 @@ namespace mar_sumaken_web.Controllers
                 // ユーザーマスター削除
                 M_UserConnectController.DeleteMUser(userId, user);
 
+                // log取得
+                _logger.Info($"ユーザーマスター削除成功 ユーザーID:{userId}");
+
                 return Ok();
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 });
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
 
