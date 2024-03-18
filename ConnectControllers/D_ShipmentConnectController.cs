@@ -92,7 +92,7 @@ namespace mar_sumaken_web.Commons
                     ,scanResult.FirstScanedString
                     ,scanResult.SecondScanedString
                     ,FORMAT(scanResult.ScanedAt, 'yyyy/MM/dd HH:mm') AS ScanedAt
-                    ,FORMAT(scanResult.CreatedAt, 'yyyy/MM/dd HH:mm') AS ScanCreatedAt
+                    ,scanResult.CreatedAt AS ScanCreatedAt
                     ,scanResult.CreatedBy AS ScanCreatedBy
                     
                 FROM D_Shipment shipment
