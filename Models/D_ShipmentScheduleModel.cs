@@ -328,6 +328,7 @@ namespace mar_sumaken_web.Models
         /// 更新日時
         /// </summary>
         [Display(Name = "更新日時")]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime UpdatedAt { get; set; }
 
         /// <summary>

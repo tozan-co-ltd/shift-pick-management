@@ -270,7 +270,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<M_CompanyModel>("CompanyKubun")] = item.CompanyKubunName;
                         newRow[Utils.GetDisplayName<M_CompanyModel>("CompanyName")] = item.CompanyName;
                         newRow[Utils.GetDisplayName<M_CompanyModel>("ClientName")] = item.ClientName;
-                        newRow[Utils.GetDisplayName<M_CompanyModel>("UpdatedAt")] = item.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<M_CompanyModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<M_CompanyModel>("UpdatedBy")] = item.UpdatedBy;
 
                         dataTable.Rows.Add(newRow);

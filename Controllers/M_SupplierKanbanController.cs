@@ -446,7 +446,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("ProductBranchNumberStartIndex")] = supplierKanbanItem.ProductBranchNumberStartIndex.ToString();
                         newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("OrderNumberLength")] = supplierKanbanItem.OrderNumberLength.ToString();
                         newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("OrderNumberStartIndex")] = supplierKanbanItem.OrderNumberStartIndex.ToString();
-                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("UpdatedAt")] = supplierKanbanItem.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("UpdatedAt")] = supplierKanbanItem.UpdatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<M_SupplierKanbanModel>("UpdatedBy")] = supplierKanbanItem.UpdatedBy;
 
                         mSupplierKanbanDataTable.Rows.Add(newRow);

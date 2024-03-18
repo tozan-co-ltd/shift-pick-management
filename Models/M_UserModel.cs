@@ -119,6 +119,7 @@ namespace mar_sumaken_web.Models
         /// 最終ログイン日時
         /// </summary>
         [Display(Name = "最終ログイン日時")]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime LastLoginDatetime { get; set; }
 
         /// <summary>
@@ -131,6 +132,7 @@ namespace mar_sumaken_web.Models
         /// 作成日時
         /// </summary>
         [Display(Name = "作成日時")]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
@@ -143,6 +145,7 @@ namespace mar_sumaken_web.Models
         /// 更新日時
         /// </summary>
         [Display(Name = "更新日時")]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime UpdatedAt { get; set; }
 
         /// <summary>

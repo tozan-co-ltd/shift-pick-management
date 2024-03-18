@@ -50,12 +50,14 @@ namespace mar_sumaken_web.Models
         /// 読取日時
         /// </summary>
         [Display(Name = "読取日時")]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime ScanedAt { get; set; }
 
         /// <summary>
         /// 作成日時
         /// </summary>
         [Display(Name = "作成日時")]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime ScanCreatedAt { get; set; }
 
         /// <summary>

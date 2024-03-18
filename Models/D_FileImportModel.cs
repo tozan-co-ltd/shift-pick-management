@@ -66,6 +66,7 @@ namespace mar_sumaken_web.Models
         /// <summary>
         /// 作成日時
         /// </summary>
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
