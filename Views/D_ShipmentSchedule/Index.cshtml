@@ -303,8 +303,8 @@
         var depoId = row.getElementsByClassName("DepoID")[0].value;
         var companyId = row.getElementsByClassName("CompanyID")[0].value;
         var categoryTitle = document.getElementById("categoryTitle").value;
-        var startDate = document.getElementById("startDate").value;
-        var endDate = document.getElementById("endDate").value;
+        var startDate = document.getElementById("SearchStartDate").value;
+        var endDate = document.getElementById("SearchEndDate").value;
         var differenceCountCheck = document.getElementById("DifferenceCountCheck").checked;
         
         var selectedValues = GetSelectedValues();
@@ -358,7 +358,8 @@
             AlertMessage('', '完了', '登録完了しました。', null, null, true);
             await WaitSeconds();
             // 再検索
-            $('#search-btn').trigger('click');
+            $('#search-btn').click();
+            $('.btn-danger-shipment-schedule').click();
         }).fail(function (xhr, textStatus, errorThrown) {
             if (xhr.status === 404) {
                 var errorMessage = xhr.responseJSON.errorMessage;

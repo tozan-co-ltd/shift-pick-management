@@ -134,7 +134,7 @@ namespace mar_sumaken_web.Controllers
                                         <a class='btn btn-secondary btn-icon-split ml-1 mr-1' onclick='OnDetailClick(this)'>
                                             <i class='fa-solid fa-list'></i>
                                         </a>
-                                        <button class='btn btn-danger btn-icon-split'
+                                        <button class='btn btn-danger btn-icon-split btn-danger-shipment-schedule'
                                         onclick='OnDeleteClick(this)' data-id='{item.ShipmentScheduleID}' data-toggle='modal' data-target='#delete-modal'>
                                             <i class='fa-solid fa-trash'></i>
                                         </button>
