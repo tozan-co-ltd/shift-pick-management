@@ -802,6 +802,10 @@ select[readonly] {
         display: block !important;
     }
 
+    #div-table {
+        max-width: 100%;
+        width: 100%;
+    }
 /*    .cs-w300 {
         width: 40vw !important;
     }*/
@@ -864,4 +868,23 @@ select[readonly] {
 }
 .for-min-width{
     min-width: 350px;
+}
+
+.table-fixed {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table-fixed thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table-fixed tbody {
+    overflow-y: auto;
+}
+
+.table-fixed tr{
+    background: #fff;
 }
