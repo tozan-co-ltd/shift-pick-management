@@ -199,7 +199,7 @@ namespace mar_sumaken_web.Controllers
                                 {
                                     // フォーマットエラーメッセージ
                                     List<string> errorMessageItem = Utils.FormatValidationErrorMessage<D_ShipmentScheduleModel>(error);
-                                    errorMessageItem.Insert(0, readCount + "行目");
+                                    errorMessageItem.Insert(0, string.Concat(readCount + 1, "行目"));
 
                                     // HTMLに変換
                                     var errorHtml = string.Empty;
