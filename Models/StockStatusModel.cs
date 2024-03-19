@@ -152,5 +152,12 @@ namespace mar_sumaken_web.Models
         [Display(Name = "在庫数")]
         [DisplayFormat(DataFormatString = "{0:#,#}")]
         public int StockRemainQuantity { get; set; }
+
+        /// <summary>
+        /// 在庫箱数
+        /// </summary>
+        [Display(Name = "在庫箱数")]
+        [DisplayFormat(DataFormatString = "{0:#,#}")]
+        public int StockRemainNumberOfBoxes { get; set; }
     }
 }
