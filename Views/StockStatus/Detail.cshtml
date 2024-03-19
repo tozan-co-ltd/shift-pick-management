@@ -79,7 +79,6 @@
                     <tr>
                         <th>仕入先品番</th>
                         <th>収容数</th>
-                        <th>月初在庫数</th>
                         <th>入庫箱数</th>
                         <th>入庫数</th>
                         <th>出庫箱数</th>
@@ -92,7 +91,6 @@
                     <tr>
                         <td>@Model.SupplierProductNumber</td>
                         <td>@Utils.FormatNumber(Model.LotQuantity)</td>
-                        <td>@Utils.FormatNumber(Model.StockQuantityAtBeginningMonth)</td>
                         <td>@Utils.FormatNumber(Model.StoreInNumberOfBoxes)</td>
                         <td>@Utils.FormatNumber(Model.StoreInQuantity)</td>
                         <td>@Utils.FormatNumber(Model.StoreOutNumberOfBoxes)</td>
