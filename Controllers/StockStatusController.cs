@@ -332,6 +332,7 @@ namespace mar_sumaken_web.Controllers
             {
                 model.SupplierProductNumber = searchResult.SupplierProductNumber;
                 model.LotQuantity = searchResult.LotQuantity;
+                model.StockQuantityAtBeginningMonth = searchResult.StockQuantityAtBeginningMonth;
                 model.StoreInNumberOfBoxes = searchResult.StoreInNumberOfBoxes;
                 model.StoreInQuantity = searchResult.StoreInQuantity;
                 model.StoreOutNumberOfBoxes = searchResult.StoreOutNumberOfBoxes;
