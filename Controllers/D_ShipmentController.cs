@@ -125,8 +125,8 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("MainProductKey")] = item.MainProductKey.ToString().Trim();
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("FirstSubProductKey")] = item.FirstSubProductKey.ToString().Trim();
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("SecondSubProductKey")] = item.SecondSubProductKey.ToString().Trim();
-                        newRow[Utils.GetDisplayName<D_ShipmentModel>("ScanedAt")] = item.ScanedAt.ToString().Trim();
-                        newRow[Utils.GetDisplayName<D_ShipmentModel>("CreatedAt")] = item.CreatedAt.ToString().Trim();
+                        newRow[Utils.GetDisplayName<D_ShipmentModel>("ScanedAt")] = item.ScanedAt.Trim();
+                        newRow[Utils.GetDisplayName<D_ShipmentModel>("CreatedAt")] = item.CreatedAt.ToString("yyyy/MM/dd HH:mm").Trim();
                         newRow[Utils.GetDisplayName<D_ShipmentModel>("CreatedBy")] = item.CreatedBy.ToString().Trim();
 
                         searchResult.Rows.Add(newRow);

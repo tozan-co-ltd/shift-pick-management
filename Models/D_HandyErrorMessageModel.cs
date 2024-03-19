@@ -1,4 +1,5 @@
-﻿using X.PagedList;
+﻿using System.ComponentModel.DataAnnotations;
+using X.PagedList;
 
 namespace mar_sumaken_web.Models
 {
@@ -45,6 +46,7 @@ namespace mar_sumaken_web.Models
         // <summary>
         /// 読取日時
         /// </summary>
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public string? CreatedAt { get; set; }
 
         /// <summary>

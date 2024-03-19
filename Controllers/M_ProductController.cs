@@ -302,7 +302,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<M_ProductModel>("ProductName")] = item.ProductName;
                         newRow[Utils.GetDisplayName<M_ProductModel>("LotQuantity")] = item.LotQuantity.ToString();
                         newRow[Utils.GetDisplayName<M_ProductModel>("RDepoProductNames")] = item.RDepoProductNames;
-                        newRow[Utils.GetDisplayName<M_ProductModel>("UpdatedAt")] = item.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<M_ProductModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<M_ProductModel>("UpdatedBy")] = item.UpdatedBy;
 
                         dataTable.Rows.Add(newRow);

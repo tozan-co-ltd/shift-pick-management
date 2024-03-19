@@ -91,7 +91,7 @@ namespace mar_sumaken_web.Commons
                     ,scanResult.NumberOfInputBoxes
                     ,scanResult.FirstScanedString
                     ,scanResult.SecondScanedString
-                    ,FORMAT(scanResult.ScanedAt, 'yyyy/MM/dd HH:mm:ss') AS ScanedAt
+                    ,FORMAT(scanResult.ScanedAt, 'yyyy/MM/dd HH:mm') AS ScanedAt
                     ,scanResult.CreatedAt AS ScanCreatedAt
                     ,scanResult.CreatedBy AS ScanCreatedBy
                     

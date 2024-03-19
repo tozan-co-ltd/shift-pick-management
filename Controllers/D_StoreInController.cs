@@ -116,7 +116,7 @@ namespace mar_sumaken_web.Controllers
                             <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                             <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
                             <td class='Remarks'>{@item.Remarks}</td>
-                            <td class='UpdatedAt'>{@item.UpdatedAt:yyyy/MM/dd HH:mm:ss}</td>
+                            <td class='UpdatedAt'>{@item.UpdatedAt:yyyy/MM/dd HH:mm}</td>
                             <td class='UpdatedBy'>{@item.UpdatedBy}</td>
                             <input type='hidden' class='DepoID' value='{item.DepoID}' />
                             <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
@@ -441,7 +441,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_StoreInModel>("FirstSubProductKey")] = item.FirstSubProductKey;
                         newRow[Utils.GetDisplayName<D_StoreInModel>("SecondSubProductKey")] = item.SecondSubProductKey;
                         newRow[Utils.GetDisplayName<D_StoreInModel>("Remarks")] = item.Remarks;
-                        newRow[Utils.GetDisplayName<D_StoreInModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm:ss");
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<D_StoreInModel>("UpdatedBy")] = item.UpdatedBy;
 
                         searchResult.Rows.Add(newRow);

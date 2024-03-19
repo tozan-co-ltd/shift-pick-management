@@ -86,7 +86,7 @@ namespace mar_sumaken_web.Controllers
                         <td class='Quantity'>{Utils.FormatNumber(Convert.ToInt32(@item.Quantity))}</td>
                         <td class='StoreInNumberOfBox'>{Utils.FormatNumber(@item.StoreInNumberOfBox)}</td>
                         <td class='StoreInQuantity'>{Utils.FormatNumber(@item.StoreInQuantity)}</td>
-                        <td class='CreatedAt'>{@item.CreatedAt:yyyy/MM/dd HH:mm:ss}</td>
+                        <td class='CreatedAt'>{@item.CreatedAt:yyyy/MM/dd HH:mm}</td>
                         <td class='CreatedBy'>{@item.CreatedBy}</td>
                         <input type='hidden' class='DepoID' value='{item.DepoID}' />
                         <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
@@ -149,7 +149,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("Quantity")] = item.Quantity.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("StoreInNumberOfBox")] = item.StoreInNumberOfBox.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("StoreInQuantity")] = item.StoreInQuantity.ToString();
-                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("CreatedAt")] = item.CreatedAt.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("CreatedAt")] = item.CreatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<D_ReceiveScheduleModel>("CreatedBy")] = item.CreatedBy.ToString();
 
                         searchResult.Rows.Add(newRow);

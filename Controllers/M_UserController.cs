@@ -465,7 +465,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<M_UserModel>("UserName")] = userItem.UserName;
                         newRow[Utils.GetDisplayName<M_UserModel>("MainDepoName")] = userItem.MainDepoName;
                         newRow[Utils.GetDisplayName<M_UserModel>("AuthorizedKubun")] = userItem.AuthorizedKubun;
-                        newRow[Utils.GetDisplayName<M_UserModel>("UpdatedAt")] = userItem.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<M_UserModel>("UpdatedAt")] = userItem.UpdatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<M_UserModel>("UpdatedBy")] = userItem.UpdatedBy;
 
                         mUserDataTable.Rows.Add(newRow);
