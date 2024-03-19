@@ -84,6 +84,7 @@
                         <th>入庫数</th>
                         <th>出庫箱数</th>
                         <th>出庫数</th>
+                        <th>在庫箱数</th>
                         <th>在庫数</th>
                     </tr>
                 </thead>
@@ -96,6 +97,7 @@
                         <td>@Utils.FormatNumber(Model.StoreInQuantity)</td>
                         <td>@Utils.FormatNumber(Model.StoreOutNumberOfBoxes)</td>
                         <td>@Utils.FormatNumber(Model.StoreOutQuantity)</td>
+                        <td>@Utils.FormatNumber(Model.StockRemainNumberOfBoxes)</td>
                         <td>@Utils.FormatNumber(Model.StockRemainQuantity)</td>
                     </tr>
                 </tbody>
@@ -111,6 +113,7 @@
                         <th class="text-nowrap border-top-0">入庫数</th>
                         <th class="text-nowrap border-top-0">出庫箱数</th>
                         <th class="text-nowrap border-top-0">出庫数</th>
+                        <th class="text-nowrap border-top-0">在庫箱数</th>
                         <th class="text-nowrap border-top-0">在庫数</th>
                     </tr>
                 </thead>
@@ -125,6 +128,7 @@
                                 <td>@Utils.FormatNumber(item.StoreInQuantity)</td>
                                 <td>@Utils.FormatNumber(item.StoreOutNumberOfBoxes)</td>
                                 <td>@Utils.FormatNumber(item.StoreOutQuantity)</td>
+                                <td>@Utils.FormatNumber(item.StockRemainNumberOfBoxes)</td>
                                 <td>@Utils.FormatNumber(item.StockRemainQuantity)</td>
                             </tr>
                         }

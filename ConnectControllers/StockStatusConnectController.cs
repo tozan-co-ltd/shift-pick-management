@@ -218,6 +218,7 @@ namespace mar_sumaken_web.Commons
 		            ,SUM(searchInfo.OutNUmberOfBoxes) AS StoreOutNumberOfBoxes -- 出庫箱数
 					,SUM(searchInfo.InQuantity) AS StoreInQuantity -- 入庫数量
 		            ,SUM(searchInfo.OutQuantity) AS StoreOutQuantity -- 出庫箱数
+                    ,(SUM(searchInfo.InNumberOfBoxes) - SUM(searchInfo.OutNUmberOfBoxes)) AS StockRemainNumberOfBoxes
 					,(SUM(searchInfo.InQuantity) - SUM(searchInfo.OutQuantity)) AS StockRemainQuantity
 	            FROM 
 	            (
