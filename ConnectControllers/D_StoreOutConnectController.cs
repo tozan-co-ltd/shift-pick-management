@@ -127,29 +127,6 @@ namespace mar_sumaken_web.ConnectControllers
                     AND company.IsDeleted = 0
                     AND depo.IsDeleted = 0
                     AND product.IsDeleted = 0
-                GROUP BY
-					storeOut.storeOutID
-                    ,storeOut.DepoID
-                    ,storeOut.CompanyID
-                    ,company.CompanyName
-                    ,storeOut.StoreOutDate
-                    ,storeOut.DeliveryDate
-                    ,storeOut.DeliveryTimeClass
-                    ,storeOut.DeliverySlipNumber
-                    ,storeOut.DeliveryProductNumber
-                    ,storeOut.SupplierProductNumber
-                    ,storeOut.LotNumber
-                    ,product.LotQuantity
-                    ,storeOut.NumberOfBoxes
-                    ,storeOut.Quantity
-                    ,storeOut.MainProductKey
-                    ,storeOut.FirstSubProductKey
-                    ,storeOut.SecondSubProductKey
-                    ,storeOut.Remarks
-                    ,storeOut.CreatedAt
-                    ,storeOut.CreatedBy
-                    ,storeOut.UpdatedAt
-                    ,storeOut.UpdatedBy
                 ORDER BY storeOut.SupplierProductNumber
             ";
             return sql;
