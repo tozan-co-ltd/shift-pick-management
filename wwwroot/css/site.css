@@ -621,7 +621,7 @@ select[readonly] {
     box-shadow: 0 0 0 0.1rem #f0844b !important;
 }
 
-#startDate, #endDate, .pickerDate{
+.startDate, .endDate, .pickerDate{
     max-width: 163px;
 }
 
@@ -688,7 +688,7 @@ select[readonly] {
     .label-input-model-mg{
         margin-left: 0 !important;
     }
-    #startDate, #endDate {
+    .startDate, .endDate {
         width: 100%;
         display: block;
     }
@@ -790,7 +790,7 @@ select[readonly] {
         width: 100%;
     }
 
-    #startDate, #endDate {
+    .startDate, .endDate {
         width: 100%;
     }
 

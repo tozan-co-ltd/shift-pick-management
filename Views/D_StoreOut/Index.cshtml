@@ -39,9 +39,9 @@
                             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                                     <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.SearchStartDate)</span>
-                                    <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate">
-                                    <lable class="m-1">～</lable>
-                                    <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
+                                    <input type="text" asp-for="SearchStartDate" class="form-control pickerDate startDate">
+                                    <label class="m-1">～</label>
+                                    <input type="text" asp-for="SearchEndDate" class="form-control pickerDate endDate">
                                 </div>
                                 <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
                                     <button type="submit" class="btn btn-secondary btn-icon-split ml-3 sp-mg-top-10 sp-mg-left-0 mt-0" id="search-btn">
