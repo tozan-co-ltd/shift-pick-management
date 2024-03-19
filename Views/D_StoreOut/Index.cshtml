@@ -530,7 +530,8 @@
                 AlertMessage('', '完了', '登録完了しました。', null, null, true);
                 await WaitSeconds();
                 // 再検索
-                $('#search-btn').trigger('click');
+                $('#search-btn').click();
+                $('.btn-success-store-out').click();
             }).fail(function (xhr, textStatus, errorThrown) {
                 if (xhr.status === 404) {
                     var errorMessage = xhr.responseJSON.errorMessage;
@@ -587,7 +588,8 @@
             AlertMessage('', '完了', '登録完了しました。', null, null, true);
             await WaitSeconds();
             // 再検索
-            $('#search-btn').trigger('click');
+            $('#search-btn').click();
+            $('.btn-danger-store-out').click();
         }).fail(function (xhr, textStatus, errorThrown) {
             if (xhr.status === 404) {
                 var errorMessage = xhr.responseJSON.errorMessage;

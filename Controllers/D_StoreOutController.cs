@@ -89,11 +89,11 @@ namespace mar_sumaken_web.Controllers
                             searchData += $@"
                                 <tr>
                                     <td>
-                                        <a class='btn btn-success btn-icon-split ml-1 mr-1'
+                                        <a class='btn btn-success btn-icon-split ml-1 mr-1 btn-success-store-out'
                                         onclick='OnEditClick(this)' data-id='{item.StoreOutID}' data-toggle='modal' data-target='#edit-modal'>
                                             <i class='fa-solid fa-pen'></i>
                                         </a>
-                                        <button class='btn btn-danger btn-icon-split'
+                                        <button class='btn btn-danger btn-icon-split btn-danger-store-out'
                                         onclick='OnDeleteClick(this)' data-id='{item.StoreOutID}' data-toggle='modal' data-target='#delete-modal'>
                                             <i class='fa-solid fa-trash'></i>
                                         </button>
