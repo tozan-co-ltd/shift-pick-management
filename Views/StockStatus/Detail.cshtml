@@ -121,7 +121,7 @@
                         @foreach (var item in Model.DetailList)
                         {
                              <tr>
-                                <td class="text-nowrap">@item.WorkedDate</td>
+                                <td>@item.WorkedDate</td>
                                 <td class="text-nowrap">@Utils.FormatNumber(item.StoreInNumberOfBoxes)</td>
                                 <td class="text-nowrap">@Utils.FormatNumber(item.StoreInQuantity)</td>
                                 <td class="text-nowrap">@Utils.FormatNumber(item.StoreOutNumberOfBoxes)</td>
