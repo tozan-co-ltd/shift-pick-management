@@ -106,7 +106,7 @@ namespace mar_sumaken_web.Models
         /// 出庫日
         /// </summary>
         [Display(Name = "出庫日")]
-        public DateTime StoreOutDate { set; get; }
+        public string? StoreOutDate { set; get; }
 
         /// <summary>
         /// 納入指示日

@@ -108,7 +108,7 @@ namespace mar_sumaken_web.Controllers
                         searchData += $@"
                             <td class='StoreOutID'>{@item.StoreOutID}</td>
                             <td class='SupplierName'>{@item.SupplierName}</td>
-                            <td class='StoreOutDate'>{@item.StoreOutDate:yyyy/MM/dd}</td>
+                            <td class='StoreOutDate'>{Utils.ConvertToYYYYMMDD(@item.StoreOutDate)}</td>
                             <td class='DeliveryDate'>{@item.DeliveryDate:yyyy/MM/dd}</td>
                             <td class='DeliveryTimeClass'>{DisplayBin(@item.DeliveryTimeClass)}</td>
                             <td class='DeliverySlipNumber'>{@item.DeliverySlipNumber}</td>
@@ -498,7 +498,7 @@ namespace mar_sumaken_web.Controllers
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("StoreOutID")] = item.StoreOutID.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("SupplierName")] = item.SupplierName.ToString();
-                        newRow[Utils.GetDisplayName<D_StoreOutModel>("StoreOutDate")] = item.StoreOutDate.ToString("yyyy/MM/dd");
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("StoreOutDate")] = Utils.ConvertToYYYYMMDD(item.StoreOutDate);
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliveryDate")] = item.DeliveryDate.ToString("yyyy/MM/dd");
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliveryTimeClass")] = item.DeliveryTimeClass.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliverySlipNumber")] = item.DeliverySlipNumber.ToString();
