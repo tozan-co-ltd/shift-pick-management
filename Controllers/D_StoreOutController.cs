@@ -226,7 +226,7 @@ namespace mar_sumaken_web.Controllers
         /// <param name="searchDeliveryDate">納入指示日</param>
         public IActionResult ChangeDeliveryTimeClassList(string searchDeliveryDate)
         {
-            var searchData = string.Empty;
+            var searchData = $@" <option value='0便・'>なし</option>";
             try
             {
                 // ログイン中ユーザー情報取得
@@ -238,15 +238,10 @@ namespace mar_sumaken_web.Controllers
                 // 表示用のhtml作成
                 if (binSelectList.Count > 0)
                 {
-                    searchData = string.Empty;
                     foreach (var item in binSelectList)
                     {
                         searchData += $@" <option value='{item.Text}'>{item.Text}</option>";
                     }
-                }
-                else
-                {
-                    searchData += $@" <option value='0便・'>なし</option>";
                 }
 
                 return Content(searchData);
