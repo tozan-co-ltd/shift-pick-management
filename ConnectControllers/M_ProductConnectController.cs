@@ -508,6 +508,15 @@ namespace mar_sumaken_web.ConnectControllers
                 {
                     DateTime sysDate = DateTime.Now;
 
+                    // 品番履歴テーブル登録
+                    string logSql = CreateSQLToInsertDProductHistory(model.ProductID, "更新", sysDate, loginUser.UserName);
+                    var logAddedCount = connection.Execute(logSql, null, transaction);
+                    // 更新件数が0の場合はエラーとする
+                    if (logAddedCount == 0)
+                    {
+                        throw new Exception();
+                    }
+
                     // 品番マスター更新
                     string sql = CreateSQLToUpdateMProduct(model, sysDate, loginUser.UserName);
                     var affectRows = connection.Execute(sql, null, transaction);
@@ -534,18 +543,6 @@ namespace mar_sumaken_web.ConnectControllers
                                 throw new Exception();
                             }
                         }
-                    }
-
-                    List<SelectListItem> selectedItems = model.RDepoProductsRegister.Where(item => item.Selected).ToList();
-                    List<string> selectedValues = selectedItems.Select(item => item.Text).ToList();
-                    var depoName = string.Join(",", selectedValues);
-                    // 品番履歴テーブル登録
-                    string logSql = CreateSQLToInsertDProductHistory(model.ProductID, "更新", sysDate, loginUser.UserName, depoName);
-                    var logAddedCount = connection.Execute(logSql, null, transaction);
-                    // 更新件数が0の場合はエラーとする
-                    if (logAddedCount == 0)
-                    {
-                        throw new Exception();
                     }
 
                     // トランザクションのコミット
@@ -870,25 +867,15 @@ namespace mar_sumaken_web.ConnectControllers
         /// <param name="historyStatus">履歴状態</param>
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
-        /// <param name="depoName">倉庫名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToInsertDProductHistory(int productId, string historyStatus, DateTime updatedAt, string updatedBy, string depoName = "")
+        private static string CreateSQLToInsertDProductHistory(int productId, string historyStatus, DateTime updatedAt, string updatedBy)
         {
-            string? depoNameStr;
-            if (string.Empty.Equals(depoName))
-            {
-                depoNameStr = "COALESCE(STRING_AGG(depo.DepoName,', '), '') AS DepoName";
-            }
-            else
-            {
-                depoNameStr = $@"'{depoName}' AS DepoName";
-            }
             var sql = $@"
                 INSERT INTO D_ProductHistory
                     (HistoryStatus, DepoName, SupplierName, SupplierProductNumber, DeliveryName, DeliveryProductNumber, ProductName, LotQuantity, UpdatedAt, UpdatedBy)
                 SELECT 
-                    '{historyStatus}', 
-                    {depoNameStr}
+                    '{historyStatus}'
+                    ,COALESCE(STRING_AGG(depo.DepoName,', '), '') AS DepoName
                     ,supplier.CompanyName AS SupplierName
                     ,product.SupplierProductNumber
                     ,delivery.CompanyName
