@@ -168,6 +168,10 @@ namespace mar_sumaken_web.ConnectControllers
                 {
                     DateTime sysDate = DateTime.Now;
 
+                    // 仕入先かんばん履歴テーブル登録
+                    string logSql = CreateSQLToInsertMSupplierKanbanHistory(model.SupplierKanbanID, "更新", sysDate, loginUser.UserName);
+                    connection.Execute(logSql, null, transaction);
+
                     // 仕入先かんばんマスター更新
                     string sql = CreateSQLToUpdateMSupplierKanban(model, sysDate, loginUser.UserName);
                     connection.Execute(sql, null, transaction);
@@ -191,10 +195,6 @@ namespace mar_sumaken_web.ConnectControllers
                             }
                         }
                     }
-
-                    // 仕入先かんばん履歴テーブル登録
-                    string logSql = CreateSQLToInsertMSupplierKanbanHistory(model.SupplierKanbanID, "更新", sysDate, loginUser.UserName);
-                    connection.Execute(logSql, null, transaction);
 
                     // トランザクションのコミット
                     transaction.Commit();
