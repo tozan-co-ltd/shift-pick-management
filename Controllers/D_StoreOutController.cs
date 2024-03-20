@@ -164,6 +164,7 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = "E1017: " + ErrorMessagesResources.E1017;
                     _logger.Error($"出庫実績更新失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
 
@@ -175,9 +176,10 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
                     _logger.Error($"出庫実績更新失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
-                model.SupplierProductNumber = model.DeliveryProductNumber;
+                model.SupplierProductNumber = product.SupplierProductNumber;
                 model.NumberOfBoxes = (int)Math.Ceiling((double)model.Quantity / product.LotQuantity);
 
                 // 出庫実績更新
@@ -385,7 +387,7 @@ namespace mar_sumaken_web.Controllers
                     errorMessage = string.Join("</br>", errorMessageList);
 
                     // log取得
-                    _logger.Error($"取込失敗");
+                    _logger.Error($"出庫実績登録失敗");
 
                     return NotFound(new { errorMessage });
                 }

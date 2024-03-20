@@ -257,7 +257,7 @@ namespace mar_sumaken_web.Controllers
                     errorMessage = string.Join("</br>", errorMessageList);
 
                     // log取得
-                    _logger.Error($"取込失敗");
+                    _logger.Error($"入庫実績登録失敗");
 
                     return NotFound(new { errorMessage });
                 }
@@ -321,6 +321,7 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
                     _logger.Error($"入庫実績更新失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
                 model.DepoID = model.SelectedDepoID;
