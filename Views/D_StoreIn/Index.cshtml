@@ -149,11 +149,11 @@
                         </div>
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
-                                <span>@Html.DisplayNameFor(model => model.SearchStartDate)<span style="color:red">*</span></span>
+                                <span>@Html.DisplayNameFor(model => model.StoreInDate)<span style="color:red">*</span></span>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input type="text" asp-for="SearchStartDate" class="form-control pickerDate">
-                                <span class="text-danger w-100" asp-validation-for="SearchStartDate"></span>
+                                <input type="text" asp-for="StoreInDate" class="form-control pickerDate">
+                                <span class="text-danger w-100" asp-validation-for="StoreInDate"></span>
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
@@ -417,7 +417,7 @@
         
         $("#editSelectedDepoID").val(row.getElementsByClassName("DepoID")[0].value);
         $("#editSelectedCompanyID").val(row.getElementsByClassName("SupplierID")[0].value);
-        $("#edit-modal > #SearchStartDate").val(row.getElementsByClassName("StoreInDate")[0].textContent);
+        $("#StoreInDate").val(row.getElementsByClassName("StoreInDate")[0].textContent);
         $("#StoreInID").val(row.getElementsByClassName("StoreInID")[0].textContent);
         $("#SupplierName").val(row.getElementsByClassName("SupplierName")[0].textContent);
         $("#SupplierProductNumber").val(row.getElementsByClassName("SupplierProductNumber")[0].textContent);

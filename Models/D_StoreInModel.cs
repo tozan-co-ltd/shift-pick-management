@@ -96,7 +96,7 @@ namespace mar_sumaken_web.Models
         /// 入庫日
         /// </summary>
         [Display(Name = "入庫日")]
-        public DateTime StoreInDate { set; get; }
+        public string? StoreInDate { set; get; }
 
         /// <summary>
         /// 仕入先品番
