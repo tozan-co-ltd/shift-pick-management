@@ -106,7 +106,7 @@ namespace mar_sumaken_web.Controllers
                         searchData += $@"
                             <td class='StoreInID'>{@item.StoreInID}</td>
                             <td class='SupplierName'>{@item.SupplierName}</td>
-                            <td class='StoreInDate'>{@item.StoreInDate:yyyy/MM/dd}</td>
+                            <td class='StoreInDate'>{Utils.ConvertToYYYYMMDD(@item.StoreInDate)}</td>
                             <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
                             <td class='LotNumber'>{@item.LotNumber}</td>
                             <td class='LotQuantity'>{Utils.FormatNumber(@item.LotQuantity)}</td>
@@ -257,7 +257,7 @@ namespace mar_sumaken_web.Controllers
                     errorMessage = string.Join("</br>", errorMessageList);
 
                     // log取得
-                    _logger.Error($"取込失敗");
+                    _logger.Error($"入庫実績登録失敗");
 
                     return NotFound(new { errorMessage });
                 }
@@ -321,11 +321,11 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
                     _logger.Error($"入庫実績更新失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
                 model.DepoID = model.SelectedDepoID;
                 model.CompanyID = model.SelectedCompanyID;
-                model.StoreInDate = Convert.ToDateTime(model.SearchStartDate);
                 model.NumberOfBoxes = (int)Math.Ceiling((double)model.Quantity / product.LotQuantity);
 
                 // 入庫実績更新
@@ -431,7 +431,7 @@ namespace mar_sumaken_web.Controllers
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_StoreInModel>("StoreInID")] = item.StoreInID.ToString();
                         newRow[Utils.GetDisplayName<D_StoreInModel>("SupplierName")] = item.SupplierName;
-                        newRow[Utils.GetDisplayName<D_StoreInModel>("StoreInDate")] = item.StoreInDate.ToString("yyyy/MM/dd");
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("StoreInDate")] = Utils.ConvertToYYYYMMDD(item.StoreInDate);
                         newRow[Utils.GetDisplayName<D_StoreInModel>("SupplierProductNumber")] = item.SupplierProductNumber;
                         newRow[Utils.GetDisplayName<D_StoreInModel>("LotNumber")] = item.LotNumber;
                         newRow[Utils.GetDisplayName<D_StoreInModel>("LotQuantity")] = item.LotQuantity.ToString();

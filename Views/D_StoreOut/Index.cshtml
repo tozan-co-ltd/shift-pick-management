@@ -154,11 +154,11 @@
                         </div>
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
-                                <span>@Html.DisplayNameFor(model => model.SearchStartDate)<span style="color:red">*</span></span>
+                                <span>@Html.DisplayNameFor(model => model.StoreOutDate)<span style="color:red">*</span></span>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input id="SearchStartDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate">
-                                <span class="text-danger w-100" asp-validation-for="SearchStartDate"></span>
+                                <input type="text" asp-for="StoreOutDate" class="form-control pickerDate">
+                                <span class="text-danger w-100" asp-validation-for="StoreOutDate"></span>
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
@@ -472,7 +472,7 @@
         $("#StoreOutID").val(row.getElementsByClassName("StoreOutID")[0].textContent);
 
         $("#SupplierName").val(row.getElementsByClassName("SupplierName")[0].textContent);
-        $("#edit-modal > #SearchStartDate").val(row.getElementsByClassName("StoreOutDate")[0].textContent);
+        $("#StoreOutDate").val(row.getElementsByClassName("StoreOutDate")[0].textContent);
         $("#SearchDeliveryDate").val(row.getElementsByClassName("DeliveryDate")[0].textContent);
         
 

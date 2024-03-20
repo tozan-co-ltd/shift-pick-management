@@ -102,7 +102,7 @@
             </table>
         </div>
         <!-- Detail List-->
-        <div class="col-8 mt-4 pl-0 scrollable-table sticky_table" id="div-table">
+        <div class="col-10 mt-4 pl-0 scrollable-table sticky_table" id="div-table">
             <table class="table table-container table-sm stripe hover nowrap table-fixed" id="table-datatable">
                 <thead>
                     <tr>
@@ -122,12 +122,12 @@
                         {
                              <tr>
                                 <td>@item.WorkedDate</td>
-                                <td>@Utils.FormatNumber(item.StoreInNumberOfBoxes)</td>
-                                <td>@Utils.FormatNumber(item.StoreInQuantity)</td>
-                                <td>@Utils.FormatNumber(item.StoreOutNumberOfBoxes)</td>
-                                <td>@Utils.FormatNumber(item.StoreOutQuantity)</td>
-                                <td>@Utils.FormatNumber(item.StockRemainNumberOfBoxes)</td>
-                                <td>@Utils.FormatNumber(item.StockRemainQuantity)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StoreInNumberOfBoxes)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StoreInQuantity)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StoreOutNumberOfBoxes)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StoreOutQuantity)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StockRemainNumberOfBoxes)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StockRemainQuantity)</td>
                             </tr>
                         }
                     }
