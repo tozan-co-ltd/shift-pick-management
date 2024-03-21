@@ -54,7 +54,8 @@ namespace mar_sumaken_web.Commons
                 supplierProductNumberCondition = $@" AND product.SupplierProductNumber = '{supplierProductNumber}' ";
             }
             var sql = $@"
-                DECLARE @InputDate DATE = '{searchDate}'; 
+                DECLARE @InputDate DATE = '{searchDate}';
+                DECLARE @SearchStartDate DATETIME = DATEADD(MONTH, DATEDIFF(MONTH, 0, @InputDate), 0);
                 DECLARE @SearchEndDate DATETIME = CONVERT(DATETIME, CONVERT(VARCHAR(10), @InputDate) + ' 23:59:59');
                 DECLARE @LastMonthDate DATETIME = DATEADD(DAY, -1, DATEADD(MONTH, DATEDIFF(MONTH, 0, @InputDate), 0));
                 DECLARE @CompanyId int = {supplierId};
@@ -86,7 +87,7 @@ namespace mar_sumaken_web.Commons
 							    ,storeIn.LotNumber
 							FROM D_StoreIn AS storeIn 
 							WHERE 
-							    --storeIn.StoreInDate >= @SearchStartDate AND 
+							    storeIn.StoreInDate >= @SearchStartDate AND 
                                 storeIn.StoreInDate <= @SearchEndDate 
 							    AND storeIn.CompanyID = @CompanyId AND storeIn.DepoID = @DepoId AND storeIn.IsDeleted = 0
 							GROUP BY storeIn.SupplierProductNumber, storeIn.StoreInDate, storeIn.LotNumber
@@ -97,7 +98,7 @@ namespace mar_sumaken_web.Commons
 							    ,storeOut.LotNumber
 							FROM D_StoreOut AS storeOut
 							WHERE 
-							    --storeOut.StoreOutDate >= @SearchStartDate AND 
+							    storeOut.StoreOutDate >= @SearchStartDate AND 
                                 storeOut.StoreOutDate <= @SearchEndDate
 							    AND storeOut.CompanyID = @CompanyId AND storeOut.DepoID = @DepoId AND storeOut.IsDeleted = 0
 							GROUP BY storeOut.SupplierProductNumber, storeOut.StoreOutDate, storeOut.LotNumber
@@ -244,7 +245,7 @@ namespace mar_sumaken_web.Commons
 		                AND storeIn.SupplierProductNumber = @ProductNumber
 		                AND storeIn.LotNumber is not null
 		                AND storeIn.LotNumber <> ''
-	                GROUP BY LotNumber, storeIn.StoreInDate, storeIn.SupplierProductNumber
+	                GROUP BY LotNumber, storeIn.SupplierProductNumber
                 ),
                 storeOut AS 
                 (
@@ -261,7 +262,7 @@ namespace mar_sumaken_web.Commons
 		                AND storeOut.SupplierProductNumber = @ProductNumber
 		                AND storeOut.LotNumber is not null
 		                AND storeOut.LotNumber <> ''
-	                GROUP BY LotNumber, storeOut.StoreOutDate, storeOut.SupplierProductNumber
+	                GROUP BY LotNumber, storeOut.SupplierProductNumber
                 )
 
                 SELECT 
