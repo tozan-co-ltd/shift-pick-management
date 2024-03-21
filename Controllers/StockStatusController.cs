@@ -101,6 +101,7 @@ namespace mar_sumaken_web.Controllers
                         <td class='SupplierName'>{@item.SupplierName}</td>
                         {supplierProductNumberTag}
                         <td class='LotQuantity'>{Utils.FormatNumber(@item.LotQuantity)}</td>
+                        <td class='StockQuantityAtBeginningMonth'>{Utils.FormatNumber(@item.StockQuantityAtBeginningMonth)}</td>
                         <td class='StoreInNumberOfBoxes'>{Utils.FormatNumber(@item.StoreInNumberOfBoxes)}</td>
                         <td class='StoreInQuantity'>{Utils.FormatNumber(@item.StoreInQuantity)}</td>
                         <td class='StoreOutNumberOfBoxes'>{Utils.FormatNumber(@item.StoreOutNumberOfBoxes)}</td>
@@ -377,6 +378,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<StockStatusModel>("SupplierName")] = item.SupplierName.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("LotQuantity")] = item.LotQuantity.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StockQuantityAtBeginningMonth")] = item.StockQuantityAtBeginningMonth.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreInNumberOfBoxes")] = item.StoreInNumberOfBoxes.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreInQuantity")] = item.StoreInQuantity.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes")] = item.StoreOutNumberOfBoxes.ToString();
@@ -525,6 +527,7 @@ namespace mar_sumaken_web.Controllers
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("SupplierName"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("SupplierProductNumber"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("LotQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StockQuantityAtBeginningMonth"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreInNumberOfBoxes"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreInQuantity"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes"), typeof(string));
