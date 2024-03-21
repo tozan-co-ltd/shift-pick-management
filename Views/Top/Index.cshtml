@@ -35,8 +35,9 @@
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
         <p class="mb-0">出荷作業進捗(@Model.DepoName)</p>
-        <div class="chart-part p-2 col-12 d-flex">
-            <div class="col-6 d-flex" id="donut-chart"></div>
+        <div class="chart-part p-2 col-12 row">
+            <div class="col-12 col-md-6" id="next-day-chart"></div>
+            <div class="col-12 col-md-6" id="next-two-day-chart"></div>
         </div>
         <hr />
         <p>ハンディエラーメッセージ履歴(直近1週間)</p>
@@ -134,14 +135,22 @@
 <script>
 
     document.addEventListener("DOMContentLoaded", function () {
-        var total = @Model.ShipmentScheduleTotal;
-        var process = @Model.StoreOutTotal;
-
         var data = @Html.Raw(Json.Serialize(Model));
-        LoadGraph(process, total - process, data.graphTitle);
+
+        // 納入指示日は翌日(土日を除く)
+        var nextDayTitle = data.nextDayGraph.graphTitle;
+        var nextDayTotal = data.nextDayGraph.shipmentScheduleTotal;
+        var nextDayProcess = data.nextDayGraph.storeOutTotal;
+        LoadGraph(nextDayProcess, nextDayTotal - nextDayProcess, nextDayTitle, "#next-day-chart");
+
+        // 納入指示日は翌々日(土日を除く)
+        var nextTwoDayTitle = data.nextTwoDayGraph.graphTitle;
+        var nextTwoDayTotal = data.nextTwoDayGraph.shipmentScheduleTotal;
+        var nextTwoDayProcess = data.nextTwoDayGraph.storeOutTotal;
+        LoadGraph(nextTwoDayProcess, nextTwoDayTotal - nextTwoDayProcess, nextTwoDayTitle, "#next-two-day-chart");
     });
 
-    function LoadGraph(checked, uncheck, title) {
+    function LoadGraph(checked, uncheck, title, chartId) {
         // 作業進捗表示
         var shipmentList = [
             ["検品済数", checked],
@@ -185,7 +194,7 @@
             legend: {
                 position: "right",
             },
-            bindto: "#donut-chart",
+            bindto: chartId,
         });
     }
 
