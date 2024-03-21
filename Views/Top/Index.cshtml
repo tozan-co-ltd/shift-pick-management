@@ -160,10 +160,13 @@
         var percentage = 0;
         var total = checked + uncheck;
         if (total > 0) {
-            percentage = Math.round(checked / (checked + uncheck) * 100);
+            percentage = checked / (checked + uncheck) * 100;
         }
 
         var donutTitle = percentage + "%";
+        if (!Number.isInteger(percentage)) {
+            donutTitle = percentage.toFixed(1) + "%";
+        }
         if (total == 0) {
             donutTitle = "データが\nありません";
         }
