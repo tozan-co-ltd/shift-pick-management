@@ -169,9 +169,9 @@ namespace mar_sumaken_web.Controllers
                     if (checkItem != null)
                     {
                         newItem.StoreInNumberOfBoxes = checkItem.StoreInNumberOfBoxes;
-                        newItem.StoreInQuantity = checkItem.StoreInNumberOfBoxes * model.LotQuantity;
+                        newItem.StoreInQuantity = checkItem.StoreInQuantity;
                         newItem.StoreOutNumberOfBoxes = checkItem.StoreOutNumberOfBoxes;
-                        newItem.StoreOutQuantity = checkItem.StoreOutNumberOfBoxes * model.LotQuantity;
+                        newItem.StoreOutQuantity = checkItem.StoreOutQuantity;
                     }
                     // その日の在庫数を計算
                     remainQuantityPreviousDay += (newItem.StoreInQuantity - newItem.StoreOutQuantity);

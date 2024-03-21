@@ -194,33 +194,37 @@ namespace mar_sumaken_web.Commons
                 DECLARE @DepoId int = {depoId};
                 DECLARE @ProductNumber nvarchar(50) = '{supplierProductNumber}';
                 SELECT
-		            searchInfo.SupplierProductNumber
-		            ,WorkedDate
-		            ,COALESCE(SUM(searchInfo.InNumberOfBoxes), 0)  AS StoreInNumberOfBoxes -- 入庫箱数
-		            ,COALESCE(SUM(searchInfo.OutNUmberOfBoxes), 0) AS StoreOutNumberOfBoxes -- 出庫箱数
-	            FROM 
-	            (
-			            SELECT 
-			            storeIn.StoreInDate AS WorkedDate ,storeIn.SupplierProductNumber 
-			            ,SUM(storeIn.NumberOfBoxes) AS InNumberOfBoxes , NULL AS OutNUmberOfBoxes
-		            FROM D_StoreIn AS storeIn 
-		            WHERE 
-			            storeIn.StoreInDate >= @SearchStartDate AND storeIn.StoreInDate <= @SearchEndDate 
-			            AND storeIn.CompanyID = @CompanyId AND storeIn.DepoID = @DepoId AND storeIn.IsDeleted = 0
-			            AND storeIn.SupplierProductNumber = @ProductNumber
-		            GROUP BY storeIn.SupplierProductNumber, storeIn.StoreInDate
-		            UNION ALL
-		            SELECT 
-			            storeOut.StoreOutDate AS WorkedDate ,storeOut.SupplierProductNumber, 
-			            NULL AS InNumberOfBoxes, SUM(storeOut.NumberOfBoxes) AS OutNUmberOfBoxes
-		            FROM D_StoreOut AS storeOut
-		            WHERE 
-			            storeOut.StoreOutDate >= @SearchStartDate AND storeOut.StoreOutDate <= @SearchEndDate
-			            AND storeOut.CompanyID = @CompanyId AND storeOut.DepoID = @DepoId AND storeOut.IsDeleted = 0
-			            AND storeOut.SupplierProductNumber = @ProductNumber
-		            GROUP BY storeOut.SupplierProductNumber, storeOut.StoreOutDate
-	            ) AS searchInfo
-	            GROUP BY searchInfo.SupplierProductNumber, WorkedDate
+	                searchInfo.SupplierProductNumber
+	                ,WorkedDate
+	                ,COALESCE(SUM(searchInfo.InNumberOfBoxes), 0)  AS StoreInNumberOfBoxes -- 入庫箱数
+	                ,COALESCE(SUM(searchInfo.InQuantity), 0) AS StoreInQuantity -- 入庫数量
+	                ,COALESCE(SUM(searchInfo.OutNUmberOfBoxes), 0) AS StoreOutNumberOfBoxes -- 出庫箱数
+	                ,COALESCE(SUM(searchInfo.OutQuantity), 0) AS StoreOutQuantity -- 出庫数量
+                FROM 
+                (
+		                SELECT
+		                storeIn.StoreInDate AS WorkedDate, storeIn.SupplierProductNumber 
+		                ,SUM(storeIn.NumberOfBoxes) AS InNumberOfBoxes, 0 AS OutNUmberOfBoxes
+		                ,SUM(storeIn.Quantity) AS InQuantity, 0 AS OutQuantity
+	                FROM D_StoreIn AS storeIn 
+	                WHERE 
+		                storeIn.StoreInDate >= @SearchStartDate AND storeIn.StoreInDate <= @SearchEndDate 
+		                AND storeIn.CompanyID = @CompanyId AND storeIn.DepoID = @DepoId AND storeIn.IsDeleted = 0
+		                AND storeIn.SupplierProductNumber = @ProductNumber
+	                GROUP BY storeIn.SupplierProductNumber, storeIn.StoreInDate
+	                UNION ALL
+	                SELECT 
+		                storeOut.StoreOutDate AS WorkedDate ,storeOut.SupplierProductNumber, 
+		                NULL AS InNumberOfBoxes, SUM(storeOut.NumberOfBoxes) AS OutNUmberOfBoxes
+		                ,0 AS InQuantity, SUM(storeOut.Quantity) AS OutQuantity
+	                FROM D_StoreOut AS storeOut
+	                WHERE 
+		                storeOut.StoreOutDate >= @SearchStartDate AND storeOut.StoreOutDate <= @SearchEndDate
+		                AND storeOut.CompanyID = @CompanyId AND storeOut.DepoID = @DepoId AND storeOut.IsDeleted = 0
+		                AND storeOut.SupplierProductNumber = @ProductNumber
+	                GROUP BY storeOut.SupplierProductNumber, storeOut.StoreOutDate
+                ) AS searchInfo
+                GROUP BY searchInfo.SupplierProductNumber, WorkedDate
                 ORDER BY WorkedDate ASC
             ";
             return sql;
