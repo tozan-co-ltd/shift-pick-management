@@ -18,23 +18,39 @@ namespace mar_sumaken_web.Models
         public IPagedList<D_HandyErrorMessageModel> D_HandyErrorMessageList { get; set; }
 
         /// <summary>
-        /// 指示箱数
-        /// </summary>
-        public int ShipmentScheduleTotal { get; set; } = 0;
-
-        /// <summary>
-        /// 出庫箱数
-        /// </summary>
-        public int StoreOutTotal { get; set; } = 0;
-
-        /// <summary>
-        /// グラフのタイトル
-        /// </summary>
-        public string? GraphTitle { get; set; } = "";
-
-        /// <summary>
         /// 倉庫名
         /// </summary>
         public string? DepoName { get; set; }
+
+        /// <summary>
+        /// 翌日グラフ情報
+        /// </summary>
+        public GraphInfo NextDayGraph { get; set; }
+
+        /// <summary>
+        /// 翌々日グラフ情報
+        /// </summary>
+        public GraphInfo NextTwoDayGraph { get; set; }
+
+        /// <summary>
+        /// グラフ情報
+        /// </summary>
+        public class GraphInfo
+        {
+            /// <summary>
+            /// 指示箱数
+            /// </summary>
+            public int ShipmentScheduleTotal { get; set; } = 0;
+
+            /// <summary>
+            /// 出庫箱数
+            /// </summary>
+            public int StoreOutTotal { get; set; } = 0;
+
+            /// <summary>
+            /// グラフのタイトル
+            /// </summary>
+            public string? GraphTitle { get; set; } = "";
+        }
     }
 }
