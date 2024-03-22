@@ -165,7 +165,7 @@
 
         var donutTitle = percentage + "%";
         if (!Number.isInteger(percentage)) {
-            donutTitle = percentage.toFixed(1) + "%";
+            donutTitle = Math.floor(percentage * 10) / 10 + "%";
         }
         if (total == 0) {
             donutTitle = "データが\nありません";
