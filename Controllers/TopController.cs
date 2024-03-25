@@ -2,11 +2,9 @@
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
 using mar_sumaken_web.Properties;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using System.Reflection;
 using X.PagedList;
+using static mar_sumaken_web.Models.TopModel;
 
 namespace mar_sumaken_web.Controllers
 {
@@ -42,30 +40,14 @@ namespace mar_sumaken_web.Controllers
                 var mCompany = M_CompanyConnectController.GetMCompanyByCompanyCode("10001", user.DatabaseName);
 
                 // 納入指示日は翌日(土日を除く)
-                var nextDay = Utils.GetNextday(DateTime.Now).ToString("yyyy/MM/dd");
+                var nextDay = Utils.GetNextday(DateTime.Now);
+                topModel.NextDayGraph = GetGraphInfo(user.MainDepoID, mCompany.CompanyID, nextDay.ToString("yyyy/MM/dd"), user.DatabaseName);
+                // 納入指示日は翌々日(土日を除く)
+                var nextTwoDay = Utils.GetNextday(nextDay);
+                topModel.NextTwoDayGraph = GetGraphInfo(user.MainDepoID, mCompany.CompanyID, nextTwoDay.ToString("yyyy/MM/dd"), user.DatabaseName);
 
-                // 出荷指示情報取得
-                var shipmentSql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation(user.MainDepoID, mCompany.CompanyID, nextDay);
-                IEnumerable<D_ShipmentScheduleModel> searchList = D_ShipmentScheduleConnectController.ConnectDShipmentSchedules(shipmentSql, user.DatabaseName);
-                topModel.ShipmentScheduleList = searchList.ToPagedList();
-
-                if (topModel.ShipmentScheduleList.Count > 0)
-                {
-                    // 検品済数と未検品数を取得
-                    int scheduleTotal = 0;
-                    int storeOutTotal = 0;
-                    // 計算
-                    foreach (var item in topModel.ShipmentScheduleList)
-                    {
-                        scheduleTotal += item.ScheduleNumberOfBoxes;
-                        storeOutTotal += item.StoreOutNumberOfBoxes;
-                    }
-                    topModel.ShipmentScheduleTotal = scheduleTotal;
-                    topModel.StoreOutTotal = storeOutTotal;
-                }
                 // 項目設定
-                topModel.DepoName = user.MainDepoName;
-                topModel.GraphTitle = string.Concat(nextDay, "分　", mCompany.CompanyName, "向け", "　出荷検品数");
+                topModel.DepoName = string.Concat(user.MainDepoName, "/", mCompany.CompanyName, "向け");
 
                 return View(topModel);
             }
@@ -74,6 +56,46 @@ namespace mar_sumaken_web.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(topModel);
+            }
+        }
+
+        /// <summary>
+        /// グラフデータを作成
+        /// </summary>
+        /// <param name="mainDepoId">倉庫ID</param>
+        /// <param name="companyId">会社ID</param>
+        /// <param name="searchDate">検索日</param>
+        /// <param name="databaseName">データベース</param>
+        public GraphInfo GetGraphInfo(int mainDepoId, int companyId, string searchDate, string databaseName)
+        {
+            var graphInfo = new GraphInfo();
+            try 
+            {
+                // 出荷指示情報取得
+                var shipmentSql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation(mainDepoId, companyId, searchDate);
+                IEnumerable<D_ShipmentScheduleModel> searchList = D_ShipmentScheduleConnectController.ConnectDShipmentSchedules(shipmentSql, databaseName);
+                var ShipmentScheduleList = searchList.ToPagedList();
+
+                graphInfo.GraphTitle = string.Concat(searchDate, "分　出荷検品数");
+                if (ShipmentScheduleList.Count > 0)
+                {
+                    // 検品済数と未検品数を取得
+                    int scheduleTotal = 0;
+                    int storeOutTotal = 0;
+                    // 計算
+                    foreach (var item in ShipmentScheduleList)
+                    {
+                        scheduleTotal += item.ScheduleNumberOfBoxes;
+                        storeOutTotal += item.StoreOutNumberOfBoxes;
+                    }
+                    graphInfo.ShipmentScheduleTotal = scheduleTotal;
+                    graphInfo.StoreOutTotal = storeOutTotal;
+                }
+                return graphInfo;
+            }
+            catch (Exception)
+            {
+                throw new Exception();
             }
         }
     }
