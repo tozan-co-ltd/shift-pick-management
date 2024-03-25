@@ -150,6 +150,15 @@
         LoadGraph(nextTwoDayProcess, nextTwoDayTotal - nextTwoDayProcess, nextTwoDayTitle, "#next-two-day-chart");
     });
 
+    // カスタムツールチップ
+    var tooltip = {
+        format: {
+            value: function (value, ratio, id) {
+                return (ratio * 100).toFixed(2) + "%";
+            }
+        }
+    };
+
     function LoadGraph(checked, uncheck, title, chartId) {
         // 作業進捗表示
         var shipmentList = [
@@ -161,11 +170,12 @@
         var total = checked + uncheck;
         if (total > 0) {
             percentage = checked / (checked + uncheck) * 100;
+            percentage = percentage.toFixed(2);
         }
 
         var donutTitle = percentage + "%";
         if (!Number.isInteger(percentage)) {
-            donutTitle = Math.floor(percentage * 10) / 10 + "%";
+            donutTitle = percentage * 10 / 10 + "%";
         }
         if (total == 0) {
             donutTitle = "データが\nありません";
@@ -180,6 +190,7 @@
                     未検品数: 'lightgray'
                 }
             },
+            tooltip: tooltip,
             title: {
                 text: title
             },
