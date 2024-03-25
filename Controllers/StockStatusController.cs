@@ -76,10 +76,12 @@ namespace mar_sumaken_web.Controllers
                         int beginNumberOfBoxes = (int)(Math.Ceiling((double)item.StockQuantityAtBeginningMonth / item.LotQuantity));
                         item.StockRemainNumberOfBoxes = beginNumberOfBoxes + (item.StoreInNumberOfBoxes - item.StoreOutNumberOfBoxes);
                         item.StockRemainQuantity = item.StockQuantityAtBeginningMonth + (item.StoreInQuantity - item.StoreOutQuantity);
+                        // 品番別ロット番号の数量チェック
+                        bool lotNumberCheck = StockStatusConnectController.CheckLotNumberRemainQuantity(searchModel.DateSearchStart, searchModel.SelectedDepoID, searchModel.SelectedCompanyID, item.SupplierProductNumber, user.DatabaseName);
 
                         // ロット番号チェック
                         string supplierProductNumberTag = $@"<td>{@item.SupplierProductNumber}</td>";
-                        if (!string.IsNullOrWhiteSpace(item.LotNumber) && item.StockRemainQuantity > 0)
+                        if (!string.IsNullOrWhiteSpace(item.LotNumber) && item.StockRemainQuantity > 0 && lotNumberCheck)
                         {
                             if ((item.StoreInQuantity > 0 || item.StoreOutQuantity > 0))
                             {
