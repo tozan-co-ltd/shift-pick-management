@@ -5,9 +5,17 @@
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 <style>
-    a {
+    .link-decoration {
+        cursor: pointer;
+        text-decoration: underline;
+        color: #4e73df;
+    }
+
+    .link-decoration:hover {
+        color: #224abe;
         text-decoration: underline;
     }
+
 </style>
 <div class="card shadow de-inspection d-receive-schedule m-4">
     <div class="card-header">
@@ -78,7 +86,7 @@
             </div>
         </div>
         <div class="mt-3" id="div-table" style="display: none;">
-            <table class="table table-sm stripe hover nowrap datatable-normal" id="table-datatable">
+            <table class="table table-sm stripe hover nowrap" id="table-datatable">
                 <thead>
                     <tr>
                         <th></th>
@@ -213,7 +221,7 @@
     function OnLotNumberDetailClick(trTag) {
         $("#detail-table tbody").empty();
 
-        var row = trTag.parentNode.parentNode;
+        var row = trTag.parentNode;
         var searchDate = row.getElementsByClassName("SearchDate")[0].value;
         var depoId = row.getElementsByClassName("DepoID")[0].value;
         var companyId = row.getElementsByClassName("SupplierID")[0].value;

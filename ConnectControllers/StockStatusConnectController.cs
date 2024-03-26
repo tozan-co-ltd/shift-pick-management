@@ -39,6 +39,38 @@ namespace mar_sumaken_web.Commons
         }
 
         /// <summary>
+        /// 品番別ロット番号の数量チェック
+        /// </summary>
+        /// <param name="searchDate">年月日</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="supplierId">会社ID</param>
+        /// <param name="supplierProductNumber">仕入先品番</param>
+        /// <param name="databaseName">データベース名</param>
+        public static bool CheckLotNumberRemainQuantity(string searchDate, int depoId, int supplierId, string supplierProductNumber, string databaseName)
+        {
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    // 品番別ロット番号の数量チェック
+                    var checkSql = CreateSQLToCheckLotNumberRemainQuantity(searchDate, depoId, supplierId, supplierProductNumber);
+                    var count = connection.ExecuteScalar(checkSql);
+                    return Convert.ToInt32(count) > 0;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
         /// 在庫情報取得SQL作成
         /// </summary>
         /// <param name="searchDate">年月日</param>
@@ -296,6 +328,58 @@ namespace mar_sumaken_web.Commons
 	                ON storeIn.SupplierProductNumber = storeOut.SupplierProductNumber 
 	                and storeIn.LotNumber = storeOut.LotNumber
                 GROUP BY storeIn.LotNumber
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 品番別ロット番号の数量チェックSQL作成
+        /// </summary>
+        /// <param name="searchDate">年月日</param>
+        /// <param name="depoId">倉庫ID</param>
+        /// <param name="supplierId">会社ID</param>
+        /// <param name="supplierProductNumber">仕入先品番</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToCheckLotNumberRemainQuantity(string searchDate, int depoId, int supplierId, string supplierProductNumber)
+        {
+            var sql = $@"
+                DECLARE @InputDate DATE = '{searchDate}';
+                DECLARE @SearchStartDate DATETIME = DATEADD(MONTH, DATEDIFF(MONTH, 0, @InputDate), 0);
+                DECLARE @SearchEndDate DATETIME = CONVERT(DATETIME, CONVERT(VARCHAR(10), @InputDate) + ' 23:59:59');
+                DECLARE @CompanyId int = {supplierId};
+                DECLARE @DepoId int = {depoId};
+                DECLARE @ProductNumber nvarchar(50) = '{supplierProductNumber}';
+                SELECT 
+	                COUNT(*) as count 
+                FROM 
+                (
+	                SELECT
+		                LotNumber, (SUM(InQuantity) - SUM(OutQuantity)) AS RemainQuantity 
+	                FROM 
+	                (
+		                SELECT 
+		                    storeIn.LotNumber, sum(storeIn.Quantity) as InQuantity, 0 as OutQuantity
+		                FROM D_StoreIn AS storeIn
+		                WHERE
+			                SupplierProductNumber = @ProductNumber
+			                AND storeIn.StoreInDate >= @SearchStartDate AND storeIn.StoreInDate <= @SearchEndDate 
+			                AND storeIn.CompanyID = @CompanyId AND storeIn.DepoID = @DepoId AND storeIn.IsDeleted = 0
+		                GROUP BY storeIn.LotNumber
+		                UNION ALL
+		                SELECT 
+		                    storeOut.LotNumber, 0 as InQuantity, sum(storeOut.Quantity) as OutQuantity
+		                FROM D_StoreOut AS storeOut
+		                WHERE 
+		                    SupplierProductNumber = @ProductNumber
+		                    AND storeOut.StoreOutDate >= @SearchStartDate AND storeOut.StoreOutDate <= @SearchEndDate
+		                    AND storeOut.CompanyID = @CompanyId AND storeOut.DepoID = @DepoId AND storeOut.IsDeleted = 0
+		                GROUP BY storeOut.LotNumber
+	                ) AS store_sum
+	                GROUP BY LotNumber
+                ) AS CheckData
+                WHERE
+	                LotNumber <> '' AND LotNumber IS NOT NULL
+                    AND RemainQuantity > 0
             ";
             return sql;
         }
