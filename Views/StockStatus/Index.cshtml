@@ -8,6 +8,13 @@
     a {
         text-decoration: underline;
     }
+
+    .link-decoration {
+        cursor: pointer;
+        text-decoration: underline;
+        color: blue;
+    }
+
 </style>
 <div class="card shadow de-inspection d-receive-schedule m-4">
     <div class="card-header">
@@ -213,7 +220,7 @@
     function OnLotNumberDetailClick(trTag) {
         $("#detail-table tbody").empty();
 
-        var row = trTag.parentNode.parentNode;
+        var row = trTag.parentNode;
         var searchDate = row.getElementsByClassName("SearchDate")[0].value;
         var depoId = row.getElementsByClassName("DepoID")[0].value;
         var companyId = row.getElementsByClassName("SupplierID")[0].value;

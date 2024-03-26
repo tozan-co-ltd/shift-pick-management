@@ -85,10 +85,9 @@ namespace mar_sumaken_web.Controllers
                         {
                             if ((item.StoreInQuantity > 0 || item.StoreOutQuantity > 0))
                             {
-                                supplierProductNumberTag = $@"<td>
-                                    <a href='#' onclick='OnLotNumberDetailClick(this)' data-toggle='modal' data-target='#detail-lot-number-modal'>
+                                supplierProductNumberTag = $@"
+                                <td onclick='OnLotNumberDetailClick(this)' data-toggle='modal' data-target='#detail-lot-number-modal' class='link-decoration'>
                                     {item.SupplierProductNumber}
-                                    </a>
                                 </td>";
                             }
                         }
