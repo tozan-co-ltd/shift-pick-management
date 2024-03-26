@@ -154,7 +154,8 @@
     var tooltip = {
         format: {
             value: function (value, ratio, id) {
-                return (ratio * 100).toFixed(2) + "%";
+                let roundedPercentage = Math.floor((ratio * 100) * 10) / 10;
+                return roundedPercentage + "%";
             }
         }
     };
@@ -169,8 +170,7 @@
         var percentage = 0;
         var total = checked + uncheck;
         if (total > 0) {
-            percentage = checked / (checked + uncheck) * 100;
-            percentage = percentage.toFixed(2);
+            percentage = Math.floor(((checked / (checked + uncheck)) * 100) * 10) / 10;
         }
 
         var donutTitle = percentage + "%";
