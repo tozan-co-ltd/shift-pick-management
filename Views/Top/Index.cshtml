@@ -154,7 +154,12 @@
     var tooltip = {
         format: {
             value: function (value, ratio, id) {
-                let roundedPercentage = Math.floor((ratio * 100) * 10) / 10;
+                let roundedPercentage;
+                if (value % 10 == 0)
+                    roundedPercentage = Math.round((ratio * 100) * 10) / 10;
+                else
+                    roundedPercentage = Math.floor((ratio * 100) * 10) / 10;
+
                 return roundedPercentage + "%";
             }
         }
