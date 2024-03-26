@@ -150,14 +150,17 @@
         LoadGraph(nextTwoDayProcess, nextTwoDayTotal - nextTwoDayProcess, nextTwoDayTitle, "#next-two-day-chart");
     });
 
-    // カスタムツールチップ
+    // ドーナツグラフのカスタムツールチップ
     var tooltip = {
         format: {
             value: function (value, ratio, id) {
+                // 小数点第二位を自動で四捨五入しないよう制御
                 let roundedPercentage;
                 if (value % 10 == 0)
+                    // 四捨五入
                     roundedPercentage = Math.round((ratio * 100) * 10) / 10;
                 else
+                    // 小数点以下を切り捨て
                     roundedPercentage = Math.floor((ratio * 100) * 10) / 10;
 
                 return roundedPercentage + "%";
@@ -165,6 +168,7 @@
         }
     };
 
+    // 出荷作業進捗のドーナツグラフ作成
     function LoadGraph(checked, uncheck, title, chartId) {
         // 作業進捗表示
         var shipmentList = [
@@ -172,14 +176,17 @@
             ["未検品数", uncheck],
         ];
 
+        // ドーナツグラフの真ん中に表示するパーセンテージの計算
         var percentage = 0;
         var total = checked + uncheck;
         if (total > 0) {
+            // 小数点以下を切り捨て
             percentage = Math.floor(((checked / (checked + uncheck)) * 100) * 10) / 10;
         }
 
         var donutTitle = percentage + "%";
         if (!Number.isInteger(percentage)) {
+            // 小数点第一位まで表示
             donutTitle = percentage * 10 / 10 + "%";
         }
         if (total == 0) {
