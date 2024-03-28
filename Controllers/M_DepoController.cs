@@ -261,7 +261,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<M_DepoModel>("DepoID")] = item.DepoID.ToString();
                         newRow[Utils.GetDisplayName<M_DepoModel>("DepoCode")] = item.DepoCode;
                         newRow[Utils.GetDisplayName<M_DepoModel>("DepoName")] = item.DepoName;
-                        newRow[Utils.GetDisplayName<M_DepoModel>("UpdatedAt")] = item.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<M_DepoModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<M_DepoModel>("UpdatedBy")] = item.UpdatedBy;
 
                         dataTable.Rows.Add(newRow);

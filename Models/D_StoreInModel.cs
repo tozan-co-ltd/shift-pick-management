@@ -96,7 +96,7 @@ namespace mar_sumaken_web.Models
         /// 入庫日
         /// </summary>
         [Display(Name = "入庫日")]
-        public DateTime StoreInDate { set; get; }
+        public string? StoreInDate { set; get; }
 
         /// <summary>
         /// 仕入先品番
@@ -165,6 +165,7 @@ namespace mar_sumaken_web.Models
         /// 登録日時
         /// </summary>
         [Display(Name = "登録日時")]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime CreatedAt { set; get; }
 
         /// <summary>
@@ -177,6 +178,7 @@ namespace mar_sumaken_web.Models
         /// 更新日時
         /// </summary>
         [Display(Name = "更新日時")]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime UpdatedAt { set; get; }
 
         /// <summary>

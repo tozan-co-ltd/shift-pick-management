@@ -141,7 +141,7 @@ namespace mar_sumaken_web.Commons
         /// <summary>
         /// 日付に変換
         /// </summary>
-        public static string ConvertToYYYYMMDD(string inputDateString)
+        public static string ConvertToYYYYMMDD(string? inputDateString)
         {
             if(inputDateString == null) { return string.Empty; }
             DateTime inputDate = DateTime.Parse(inputDateString);

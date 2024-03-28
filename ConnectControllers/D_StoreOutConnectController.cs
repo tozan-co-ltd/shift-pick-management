@@ -172,7 +172,7 @@ namespace mar_sumaken_web.ConnectControllers
                         {
                             item.DepoID = model.SelectedDepoID;
                             item.CompanyID = model.SelectedCompanyID;
-                            item.StoreOutDate = Convert.ToDateTime(model.SearchStartDate);
+                            item.StoreOutDate = model.SearchStartDate;
                             item.DeliveryDate = Convert.ToDateTime(model.SearchDeliveryDate);
                             item.DeliveryTimeClass = deliveryTimeClass;
                             item.DeliverySlipNumber = deliverySlipNumber;
@@ -222,7 +222,6 @@ namespace mar_sumaken_web.ConnectControllers
                     DateTime sysDate = DateTime.Now;
                     model.DepoID = model.SelectedDepoID;
                     model.CompanyID = model.SelectedCompanyID;
-                    model.StoreOutDate = Convert.ToDateTime(model.SearchStartDate);
                     model.DeliveryDate = Convert.ToDateTime(model.SearchDeliveryDate);
                     // 便・納品書番号
                     int deliveryTimeClass = 0;

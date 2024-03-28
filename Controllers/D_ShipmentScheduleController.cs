@@ -134,7 +134,7 @@ namespace mar_sumaken_web.Controllers
                                         <a class='btn btn-secondary btn-icon-split ml-1 mr-1' onclick='OnDetailClick(this)'>
                                             <i class='fa-solid fa-list'></i>
                                         </a>
-                                        <button class='btn btn-danger btn-icon-split'
+                                        <button class='btn btn-danger btn-icon-split btn-danger-shipment-schedule'
                                         onclick='OnDeleteClick(this)' data-id='{item.ShipmentScheduleID}' data-toggle='modal' data-target='#delete-modal'>
                                             <i class='fa-solid fa-trash'></i>
                                         </button>
@@ -187,7 +187,7 @@ namespace mar_sumaken_web.Controllers
                             <td class='DeliveryProductAbbreviation'>{@item.DeliveryProductAbbreviation}</td>
                             <td class='DeliveryProductName'>{@item.DeliveryProductName}</td>
                             <td class='BranchNumber'>{@item.BranchNumber}</td>
-                            <td class='UpdatedAt'>{@item.UpdatedAt}</td>
+                            <td class='UpdatedAt'>{@item.UpdatedAt:yyyy/MM/dd HH:mm}</td>
                             <td class='UpdatedBy'>{@item.UpdatedBy}</td>
                             <input type='hidden' class='CompanyID' value='{item.CompanyID}' />
                             <input type='hidden' class='DepoID' value='{item.DepoID}' />
@@ -350,7 +350,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductAbbreviation")] = item.DeliveryProductAbbreviation.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("DeliveryProductName")] = item.DeliveryProductName.ToString();
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("BranchNumber")] = item.BranchNumber.ToString();
-                        newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("UpdatedAt")] = item.UpdatedAt.ToString();
+                        newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<D_ShipmentScheduleModel>("UpdatedBy")] = item.UpdatedBy.ToString();
 
                         searchResult.Rows.Add(newRow);

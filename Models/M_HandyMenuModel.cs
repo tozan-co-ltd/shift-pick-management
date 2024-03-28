@@ -1,4 +1,6 @@
-﻿namespace mar_sumaken_web.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace mar_sumaken_web.Models
 {
     /// <summary>
     /// ハンディメニューマスターのModel
@@ -28,6 +30,7 @@
         /// <summary>
         /// 作成日時
         /// </summary>
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
@@ -38,6 +41,7 @@
         /// <summary>
         /// 更新日時
         /// </summary>
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime UpdatedAt { get; set; }
 
         /// <summary>

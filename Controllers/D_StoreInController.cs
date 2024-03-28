@@ -87,11 +87,11 @@ namespace mar_sumaken_web.Controllers
                             searchData += $@"
                                 <tr>
                                     <td>
-                                        <a class='btn btn-success btn-icon-split ml-1 mr-1'
+                                        <a class='btn btn-success btn-icon-split ml-1 mr-1 btn-success-store-in'
                                         onclick='OnEditClick(this)' data-id='{item.StoreInID}' data-toggle='modal' data-target='#edit-modal'>
                                             <i class='fa-solid fa-pen'></i>
                                         </a>
-                                        <button class='btn btn-danger btn-icon-split'
+                                        <button class='btn btn-danger btn-icon-split btn-danger-store-in'
                                         onclick='OnDeleteClick(this)' data-id='{item.StoreInID}' data-toggle='modal' data-target='#delete-modal'>
                                             <i class='fa-solid fa-trash'></i>
                                         </button>
@@ -106,7 +106,7 @@ namespace mar_sumaken_web.Controllers
                         searchData += $@"
                             <td class='StoreInID'>{@item.StoreInID}</td>
                             <td class='SupplierName'>{@item.SupplierName}</td>
-                            <td class='StoreInDate'>{@item.StoreInDate:yyyy/MM/dd}</td>
+                            <td class='StoreInDate'>{Utils.ConvertToYYYYMMDD(@item.StoreInDate)}</td>
                             <td class='SupplierProductNumber'>{@item.SupplierProductNumber}</td>
                             <td class='LotNumber'>{@item.LotNumber}</td>
                             <td class='LotQuantity'>{Utils.FormatNumber(@item.LotQuantity)}</td>
@@ -116,7 +116,7 @@ namespace mar_sumaken_web.Controllers
                             <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                             <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
                             <td class='Remarks'>{@item.Remarks}</td>
-                            <td class='UpdatedAt'>{@item.UpdatedAt:yyyy/MM/dd HH:mm:ss}</td>
+                            <td class='UpdatedAt'>{@item.UpdatedAt:yyyy/MM/dd HH:mm}</td>
                             <td class='UpdatedBy'>{@item.UpdatedBy}</td>
                             <input type='hidden' class='DepoID' value='{item.DepoID}' />
                             <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
@@ -257,7 +257,7 @@ namespace mar_sumaken_web.Controllers
                     errorMessage = string.Join("</br>", errorMessageList);
 
                     // log取得
-                    _logger.Error($"取込失敗");
+                    _logger.Error($"入庫実績登録失敗");
 
                     return NotFound(new { errorMessage });
                 }
@@ -321,11 +321,11 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_ReceiveScheduleModel>("SupplierProductNumber"));
                     _logger.Error($"入庫実績更新失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
                 model.DepoID = model.SelectedDepoID;
                 model.CompanyID = model.SelectedCompanyID;
-                model.StoreInDate = Convert.ToDateTime(model.SearchStartDate);
                 model.NumberOfBoxes = (int)Math.Ceiling((double)model.Quantity / product.LotQuantity);
 
                 // 入庫実績更新
@@ -431,7 +431,7 @@ namespace mar_sumaken_web.Controllers
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_StoreInModel>("StoreInID")] = item.StoreInID.ToString();
                         newRow[Utils.GetDisplayName<D_StoreInModel>("SupplierName")] = item.SupplierName;
-                        newRow[Utils.GetDisplayName<D_StoreInModel>("StoreInDate")] = item.StoreInDate.ToString("yyyy/MM/dd");
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("StoreInDate")] = Utils.ConvertToYYYYMMDD(item.StoreInDate);
                         newRow[Utils.GetDisplayName<D_StoreInModel>("SupplierProductNumber")] = item.SupplierProductNumber;
                         newRow[Utils.GetDisplayName<D_StoreInModel>("LotNumber")] = item.LotNumber;
                         newRow[Utils.GetDisplayName<D_StoreInModel>("LotQuantity")] = item.LotQuantity.ToString();
@@ -441,7 +441,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_StoreInModel>("FirstSubProductKey")] = item.FirstSubProductKey;
                         newRow[Utils.GetDisplayName<D_StoreInModel>("SecondSubProductKey")] = item.SecondSubProductKey;
                         newRow[Utils.GetDisplayName<D_StoreInModel>("Remarks")] = item.Remarks;
-                        newRow[Utils.GetDisplayName<D_StoreInModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm:ss");
+                        newRow[Utils.GetDisplayName<D_StoreInModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<D_StoreInModel>("UpdatedBy")] = item.UpdatedBy;
 
                         searchResult.Rows.Add(newRow);

@@ -63,7 +63,6 @@ namespace mar_sumaken_web.Commons
                     ,dReceive.SecondSubProductKey
                     ,dReceive.NumberOfBoxes
                     ,dReceive.Quantity
-                    --,dReceive.ScanedAt
                     ,dReceive.CreatedAt
                     ,dReceive.CreatedBy
                     ,depo.DepoName AS DepoName
@@ -73,7 +72,7 @@ namespace mar_sumaken_web.Commons
                     ,scan.NumberOfInputBoxes
                     ,scan.FirstScanedString
                     ,scan.SecondScanedString
-                    ,FORMAT(scan.ScanedAt, 'yyyy/MM/dd HH:mm:ss') AS ScanedAt
+                    ,FORMAT(scan.ScanedAt, 'yyyy/MM/dd HH:mm') AS ScanedAt
                     ,scan.CreatedBy AS ScanCreatedBy
                 FROM D_Receive AS dReceive
                 INNER JOIN D_ScanResult AS scan 

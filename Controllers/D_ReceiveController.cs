@@ -90,7 +90,7 @@ namespace mar_sumaken_web.Controllers
                         <td class='MainProductKey'>{@item.MainProductKey}</td>
                         <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                         <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
-                        <td class='CreatedAt'>{@item.CreatedAt}</td>
+                        <td class='CreatedAt'>{@item.CreatedAt:yyyy/MM/dd HH:mm}</td>
                         <td class='ScanedAt'>{@item.ScanedAt}</td>
                         <td class='CreatedBy'>{@item.CreatedBy}</td>
                         <input type='hidden' class='DepoID' value='{item.DepoID}' />
@@ -163,7 +163,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("MainProductKey")] = item.MainProductKey.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("FirstSubProductKey")] = item.FirstSubProductKey.ToString();
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("SecondSubProductKey")] = item.SecondSubProductKey.ToString();
-                        newRow[Utils.GetDisplayName<D_ReceiveModel>("CreatedAt")] = item.CreatedAt.ToString();
+                        newRow[Utils.GetDisplayName<D_ReceiveModel>("CreatedAt")] = item.CreatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<D_ReceiveModel>("CreatedBy")] = item.CreatedBy.ToString();
 
                         searchResult.Rows.Add(newRow);

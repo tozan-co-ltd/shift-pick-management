@@ -621,7 +621,7 @@ select[readonly] {
     box-shadow: 0 0 0 0.1rem #f0844b !important;
 }
 
-#startDate, #endDate, .pickerDate{
+.startDate, .endDate, .pickerDate{
     max-width: 163px;
 }
 
@@ -688,7 +688,7 @@ select[readonly] {
     .label-input-model-mg{
         margin-left: 0 !important;
     }
-    #startDate, #endDate {
+    .startDate, .endDate {
         width: 100%;
         display: block;
     }
@@ -790,7 +790,7 @@ select[readonly] {
         width: 100%;
     }
 
-    #startDate, #endDate {
+    .startDate, .endDate {
         width: 100%;
     }
 
@@ -802,6 +802,10 @@ select[readonly] {
         display: block !important;
     }
 
+    #div-table {
+        max-width: 100%;
+        width: 100%;
+    }
 /*    .cs-w300 {
         width: 40vw !important;
     }*/
@@ -864,4 +868,23 @@ select[readonly] {
 }
 .for-min-width{
     min-width: 350px;
+}
+
+.table-fixed {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table-fixed thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table-fixed tbody {
+    overflow-y: auto;
+}
+
+.table-fixed tr{
+    background: #fff;
 }

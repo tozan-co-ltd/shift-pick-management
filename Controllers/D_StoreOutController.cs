@@ -89,11 +89,11 @@ namespace mar_sumaken_web.Controllers
                             searchData += $@"
                                 <tr>
                                     <td>
-                                        <a class='btn btn-success btn-icon-split ml-1 mr-1'
+                                        <a class='btn btn-success btn-icon-split ml-1 mr-1 btn-success-store-out'
                                         onclick='OnEditClick(this)' data-id='{item.StoreOutID}' data-toggle='modal' data-target='#edit-modal'>
                                             <i class='fa-solid fa-pen'></i>
                                         </a>
-                                        <button class='btn btn-danger btn-icon-split'
+                                        <button class='btn btn-danger btn-icon-split btn-danger-store-out'
                                         onclick='OnDeleteClick(this)' data-id='{item.StoreOutID}' data-toggle='modal' data-target='#delete-modal'>
                                             <i class='fa-solid fa-trash'></i>
                                         </button>
@@ -108,7 +108,7 @@ namespace mar_sumaken_web.Controllers
                         searchData += $@"
                             <td class='StoreOutID'>{@item.StoreOutID}</td>
                             <td class='SupplierName'>{@item.SupplierName}</td>
-                            <td class='StoreOutDate'>{@item.StoreOutDate:yyyy/MM/dd}</td>
+                            <td class='StoreOutDate'>{Utils.ConvertToYYYYMMDD(@item.StoreOutDate)}</td>
                             <td class='DeliveryDate'>{@item.DeliveryDate:yyyy/MM/dd}</td>
                             <td class='DeliveryTimeClass'>{DisplayBin(@item.DeliveryTimeClass)}</td>
                             <td class='DeliverySlipNumber'>{@item.DeliverySlipNumber}</td>
@@ -122,7 +122,7 @@ namespace mar_sumaken_web.Controllers
                             <td class='FirstSubProductKey'>{@item.FirstSubProductKey}</td>
                             <td class='SecondSubProductKey'>{@item.SecondSubProductKey}</td>
                             <td class='Remarks'>{@item.Remarks}</td>
-                            <td class='CreatedAt'>{@item.CreatedAt}</td>
+                            <td class='CreatedAt'>{@item.CreatedAt:yyyy/MM/dd HH:mm}</td>
                             <td class='CreatedBy'>{@item.CreatedBy}</td>                        
                             <input type='hidden' class='DepoID' value='{item.DepoID}' />
                             <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
@@ -164,6 +164,7 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = "E1017: " + ErrorMessagesResources.E1017;
                     _logger.Error($"出庫実績更新失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
 
@@ -175,9 +176,10 @@ namespace mar_sumaken_web.Controllers
                     // log取得
                     errorMessage = errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, Utils.GetDisplayName<D_StoreOutModel>("DeliveryProductNumber"));
                     _logger.Error($"出庫実績更新失敗 {errorMessage}");
+
                     return NotFound(new { errorMessage });
                 }
-                model.SupplierProductNumber = model.DeliveryProductNumber;
+                model.SupplierProductNumber = product.SupplierProductNumber;
                 model.NumberOfBoxes = (int)Math.Ceiling((double)model.Quantity / product.LotQuantity);
 
                 // 出庫実績更新
@@ -226,7 +228,7 @@ namespace mar_sumaken_web.Controllers
         /// <param name="searchDeliveryDate">納入指示日</param>
         public IActionResult ChangeDeliveryTimeClassList(string searchDeliveryDate)
         {
-            var searchData = string.Empty;
+            var searchData = $@" <option value='0便・'>なし</option>";
             try
             {
                 // ログイン中ユーザー情報取得
@@ -238,15 +240,10 @@ namespace mar_sumaken_web.Controllers
                 // 表示用のhtml作成
                 if (binSelectList.Count > 0)
                 {
-                    searchData = string.Empty;
                     foreach (var item in binSelectList)
                     {
                         searchData += $@" <option value='{item.Text}'>{item.Text}</option>";
                     }
-                }
-                else
-                {
-                    searchData += $@" <option value='0便・'>なし</option>";
                 }
 
                 return Content(searchData);
@@ -390,7 +387,7 @@ namespace mar_sumaken_web.Controllers
                     errorMessage = string.Join("</br>", errorMessageList);
 
                     // log取得
-                    _logger.Error($"取込失敗");
+                    _logger.Error($"出庫実績登録失敗");
 
                     return NotFound(new { errorMessage });
                 }
@@ -498,7 +495,7 @@ namespace mar_sumaken_web.Controllers
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("StoreOutID")] = item.StoreOutID.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("SupplierName")] = item.SupplierName.ToString();
-                        newRow[Utils.GetDisplayName<D_StoreOutModel>("StoreOutDate")] = item.StoreOutDate.ToString("yyyy/MM/dd");
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("StoreOutDate")] = Utils.ConvertToYYYYMMDD(item.StoreOutDate);
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliveryDate")] = item.DeliveryDate.ToString("yyyy/MM/dd");
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliveryTimeClass")] = item.DeliveryTimeClass.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("DeliverySlipNumber")] = item.DeliverySlipNumber.ToString();
@@ -512,7 +509,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("FirstSubProductKey")] = item.FirstSubProductKey.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("SecondSubProductKey")] = item.SecondSubProductKey.ToString();
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("Remarks")] = item.Remarks.ToString();
-                        newRow[Utils.GetDisplayName<D_StoreOutModel>("CreatedAt")] = item.CreatedAt.ToString();
+                        newRow[Utils.GetDisplayName<D_StoreOutModel>("CreatedAt")] = item.CreatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<D_StoreOutModel>("CreatedBy")] = item.CreatedBy.ToString();
 
                         searchResult.Rows.Add(newRow);

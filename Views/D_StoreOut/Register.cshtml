@@ -7,7 +7,7 @@
 
 <div class="card shadow masterInfo m-4">
 
-    <div class="card-header text-gray-800">
+    <div class="card-header">
         @ViewData["Title"]
     </div>
 
@@ -141,39 +141,15 @@
 
 <script>
 
+    $(document).ready(function () {
+        var searchDate = $("#SearchDeliveryDate").val();
+        ChangeDeliveryTimeClassList(searchDate);
+    });
+
     // 納入指示日が変更されたら便・納品書番号を更新する
     $('#SearchDeliveryDate').on('change', function () {
-        var data = { "SearchDeliveryDate": $(this).val() };
-        $.ajax({
-        url: '@Url.Action("ChangeDeliveryTimeClassList", "D_StoreOut")',
-            method: 'POST',
-            data: data
-        })
-        .done(function (response) {
-                var binSelectListItem = $('#bin-select-list');
-                binSelectListItem.empty();
-                binSelectListItem.html(response);
-
-                var firstSelect = binSelectListItem.first();
-                var firstOptionValue = firstSelect.find('option').first().val();
-                var numberOfOptions = firstSelect.find('option').length;
-                if (numberOfOptions == 1) {
-                    firstSelect.val(firstOptionValue);
-                } else {
-                    var secondOptionValue = firstSelect.find('option').eq(1).val();
-                    firstSelect.val(secondOptionValue);
-                }
-        })
-        .fail(function (xhr) {
-            if (xhr.status === 404) {
-                // データが見つからなかった場合
-                var errorMessage = xhr.responseJSON.errorMessage;
-                $("#div-error-message").html(errorMessage);
-            } else {
-                // その他のエラーの場合
-                $('#div-error-message').text(errorMessage);
-            }
-        });
+        var searchDate = $(this).val();
+        ChangeDeliveryTimeClassList(searchDate);
     });
 
     // 登録ボタン押下
@@ -250,6 +226,41 @@
                 });
         });
     });
+
+    // 便リスト取得
+    function ChangeDeliveryTimeClassList(date) {
+        var data = { "SearchDeliveryDate": date };
+        $.ajax({
+            url: '@Url.Action("ChangeDeliveryTimeClassList", "D_StoreOut")',
+            method: 'POST',
+            data: data
+        })
+            .done(function (response) {
+                var binSelectListItem = $('#bin-select-list');
+                binSelectListItem.empty();
+                binSelectListItem.html(response);
+
+                var firstSelect = binSelectListItem.first();
+                var firstOptionValue = firstSelect.find('option').first().val();
+                var numberOfOptions = firstSelect.find('option').length;
+                if (numberOfOptions == 1) {
+                    firstSelect.val(firstOptionValue);
+                } else {
+                    var secondOptionValue = firstSelect.find('option').eq(1).val();
+                    firstSelect.val(secondOptionValue);
+                }
+            })
+            .fail(function (xhr) {
+                if (xhr.status === 404) {
+                    // データが見つからなかった場合
+                    var errorMessage = xhr.responseJSON.errorMessage;
+                    $("#div-error-message").html(errorMessage);
+                } else {
+                    // その他のエラーの場合
+                    $('#div-error-message').text(errorMessage);
+                }
+            });
+    }
 
     // 納入先品番と数量チェック
     function checkValue(rowCheckArr) {

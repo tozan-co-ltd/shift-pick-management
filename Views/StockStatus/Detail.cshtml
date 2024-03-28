@@ -11,7 +11,7 @@
     }
 </style>
 <div class="card shadow de-inspection d-receive-schedule m-4">
-    <div class="card-header text-gray-800">
+    <div class="card-header">
         @ViewData["Title"]
     </div>
     <div class="card-body">
@@ -84,6 +84,7 @@
                         <th>入庫数</th>
                         <th>出庫箱数</th>
                         <th>出庫数</th>
+                        <th>在庫箱数</th>
                         <th>在庫数</th>
                     </tr>
                 </thead>
@@ -96,22 +97,24 @@
                         <td>@Utils.FormatNumber(Model.StoreInQuantity)</td>
                         <td>@Utils.FormatNumber(Model.StoreOutNumberOfBoxes)</td>
                         <td>@Utils.FormatNumber(Model.StoreOutQuantity)</td>
+                        <td>@Utils.FormatNumber(Model.StockRemainNumberOfBoxes)</td>
                         <td>@Utils.FormatNumber(Model.StockRemainQuantity)</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <!-- Detail List-->
-        <div class="col-8 mt-3 pl-0 scrollable-table" id="div-table">
-            <table class="table table-container table-sm stripe hover nowrap" id="table-datatable">
+        <div class="col-10 mt-4 pl-0 scrollable-table sticky_table" id="div-table">
+            <table class="table table-container table-sm stripe hover nowrap table-fixed" id="table-datatable">
                 <thead>
                     <tr>
-                        <th>日付</th>
-                        <th class="text-nowrap">入庫箱数</th>
-                        <th class="text-nowrap">入庫数</th>
-                        <th class="text-nowrap">出庫箱数</th>
-                        <th class="text-nowrap">出庫数</th>
-                        <th class="text-nowrap">在庫数</th>
+                        <th class="text-nowrap border-top-0">日付</th>
+                        <th class="text-nowrap border-top-0">入庫箱数</th>
+                        <th class="text-nowrap border-top-0">入庫数</th>
+                        <th class="text-nowrap border-top-0">出庫箱数</th>
+                        <th class="text-nowrap border-top-0">出庫数</th>
+                        <th class="text-nowrap border-top-0">在庫箱数</th>
+                        <th class="text-nowrap border-top-0">在庫数</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -121,11 +124,12 @@
                         {
                              <tr>
                                 <td>@item.WorkedDate</td>
-                                <td>@Utils.FormatNumber(item.StoreInNumberOfBoxes)</td>
-                                <td>@Utils.FormatNumber(item.StoreInQuantity)</td>
-                                <td>@Utils.FormatNumber(item.StoreOutNumberOfBoxes)</td>
-                                <td>@Utils.FormatNumber(item.StoreOutQuantity)</td>
-                                <td>@Utils.FormatNumber(item.StockRemainQuantity)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StoreInNumberOfBoxes)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StoreInQuantity)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StoreOutNumberOfBoxes)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StoreOutQuantity)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StockRemainNumberOfBoxes)</td>
+                                <td class="text-nowrap">@Utils.FormatNumber(item.StockRemainQuantity)</td>
                             </tr>
                         }
                     }

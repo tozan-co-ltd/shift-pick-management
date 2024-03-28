@@ -50,9 +50,9 @@
                             </div>
                             <div class="col-12 d-flex justify-content-start align-items-center mb-3 unset-pdl">
                                 <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.SearchStartDate)</span>
-                                <input id="startDate" type="text" asp-for="SearchStartDate" class="form-control pickerDate"> 
-                                <lable class="m-1">～</lable>
-                                <input id="endDate" type="text" asp-for="SearchEndDate" class="form-control pickerDate">
+                                <input type="text" asp-for="SearchStartDate" class="form-control pickerDate startDate"> 
+                                <label class="m-1">～</label>
+                                <input type="text" asp-for="SearchEndDate" class="form-control pickerDate endDate">
                             </div>
 
                             <div class="col-16 d-flex justify-content-start align-items-center align-items-custom">
@@ -95,7 +95,7 @@
             </div>
         </div>
         <div class="mt-3" id="div-table" style="display: none;">
-            <table class="table table-sm stripe hover nowrap datatable-normal" id="table-datatable">
+            <table class="table table-sm stripe hover nowrap" id="table-datatable">
                 <thead>
                     <tr>
                         <th></th>
@@ -303,8 +303,8 @@
         var depoId = row.getElementsByClassName("DepoID")[0].value;
         var companyId = row.getElementsByClassName("CompanyID")[0].value;
         var categoryTitle = document.getElementById("categoryTitle").value;
-        var startDate = document.getElementById("startDate").value;
-        var endDate = document.getElementById("endDate").value;
+        var startDate = document.getElementById("SearchStartDate").value;
+        var endDate = document.getElementById("SearchEndDate").value;
         var differenceCountCheck = document.getElementById("DifferenceCountCheck").checked;
         
         var selectedValues = GetSelectedValues();
@@ -358,7 +358,8 @@
             AlertMessage('', '完了', '登録完了しました。', null, null, true);
             await WaitSeconds();
             // 再検索
-            $('#search-btn').trigger('click');
+            $('#search-btn').click();
+            $('.btn-danger-shipment-schedule').click();
         }).fail(function (xhr, textStatus, errorThrown) {
             if (xhr.status === 404) {
                 var errorMessage = xhr.responseJSON.errorMessage;

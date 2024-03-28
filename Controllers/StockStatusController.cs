@@ -73,18 +73,21 @@ namespace mar_sumaken_web.Controllers
                     foreach (var item in model.StockStatusList)
                     {
                         // 在庫数=月初在庫数+当月入庫数総計-当月出庫数総計
-                        item.StockRemainQuantity = @item.StockQuantityAtBeginningMonth + (item.StoreInQuantity - item.StoreOutQuantity);
+                        int beginNumberOfBoxes = (int)(Math.Ceiling((double)item.StockQuantityAtBeginningMonth / item.LotQuantity));
+                        item.StockRemainNumberOfBoxes = beginNumberOfBoxes + (item.StoreInNumberOfBoxes - item.StoreOutNumberOfBoxes);
+                        item.StockRemainQuantity = item.StockQuantityAtBeginningMonth + (item.StoreInQuantity - item.StoreOutQuantity);
+                        // 品番別ロット番号の数量チェック
+                        bool lotNumberCheck = StockStatusConnectController.CheckLotNumberRemainQuantity(searchModel.DateSearchStart, searchModel.SelectedDepoID, searchModel.SelectedCompanyID, item.SupplierProductNumber, user.DatabaseName);
 
                         // ロット番号チェック
                         string supplierProductNumberTag = $@"<td>{@item.SupplierProductNumber}</td>";
-                        if (!string.IsNullOrWhiteSpace(item.LotNumber) && item.StockRemainQuantity > 0)
+                        if (!string.IsNullOrWhiteSpace(item.LotNumber) && item.StockRemainQuantity > 0 && lotNumberCheck)
                         {
                             if ((item.StoreInQuantity > 0 || item.StoreOutQuantity > 0))
                             {
-                                supplierProductNumberTag = $@"<td>
-                                    <a href='#' onclick='OnLotNumberDetailClick(this)' data-toggle='modal' data-target='#detail-lot-number-modal'>
+                                supplierProductNumberTag = $@"
+                                <td onclick='OnLotNumberDetailClick(this)' data-toggle='modal' data-target='#detail-lot-number-modal' class='link-decoration'>
                                     {item.SupplierProductNumber}
-                                    </a>
                                 </td>";
                             }
                         }
@@ -104,6 +107,7 @@ namespace mar_sumaken_web.Controllers
                         <td class='StoreInQuantity'>{Utils.FormatNumber(@item.StoreInQuantity)}</td>
                         <td class='StoreOutNumberOfBoxes'>{Utils.FormatNumber(@item.StoreOutNumberOfBoxes)}</td>
                         <td class='StoreOutQuantity'>{Utils.FormatNumber(@item.StoreOutQuantity)}</td>
+                        <td class='StockRemainNumberOfBoxes'>{Utils.FormatNumber(@item.StockRemainNumberOfBoxes)}</td>
                         <td class='StockRemainQuantity'>{Utils.FormatNumber(@item.StockRemainQuantity)}</td>                        
                         <input type='hidden' class='ProductID' value='{item.ProductID}' />
                         <input type='hidden' class='SupplierID' value='{item.SupplierID}' />
@@ -149,7 +153,7 @@ namespace mar_sumaken_web.Controllers
                 // ○月1日の在庫数＝月初在庫数
                 DateTime date = Convert.ToDateTime(searchDate);
                 int remainQuantityPreviousDay = model.StockQuantityAtBeginningMonth;
-
+                int remainNumberOfbox = (int)(Math.Ceiling((double)remainQuantityPreviousDay / model.LotQuantity));
                 // ○月1日から検索日まで順に計算
                 for (int i = 1; i <= date.Day; i++)
                 {
@@ -166,13 +170,16 @@ namespace mar_sumaken_web.Controllers
                     if (checkItem != null)
                     {
                         newItem.StoreInNumberOfBoxes = checkItem.StoreInNumberOfBoxes;
-                        newItem.StoreInQuantity = checkItem.StoreInNumberOfBoxes * model.LotQuantity;
+                        newItem.StoreInQuantity = checkItem.StoreInQuantity;
                         newItem.StoreOutNumberOfBoxes = checkItem.StoreOutNumberOfBoxes;
-                        newItem.StoreOutQuantity = checkItem.StoreOutNumberOfBoxes * model.LotQuantity;
+                        newItem.StoreOutQuantity = checkItem.StoreOutQuantity;
                     }
                     // その日の在庫数を計算
                     remainQuantityPreviousDay += (newItem.StoreInQuantity - newItem.StoreOutQuantity);
                     newItem.StockRemainQuantity = remainQuantityPreviousDay;
+
+                    remainNumberOfbox += (newItem.StoreInNumberOfBoxes - newItem.StoreOutNumberOfBoxes);
+                    newItem.StockRemainNumberOfBoxes = remainNumberOfbox;
 
                     detailList.Add(newItem);
                 }
@@ -219,7 +226,7 @@ namespace mar_sumaken_web.Controllers
 
                 // 日別在庫照会画面表示
                 List<StockStatusModel> searchProductResult = GetLotNumberDetail(searchDate, depoId, companyId, supplierProductNumber, user.DatabaseName);
-                detailList = searchProductResult.Where(item => item.StockRemainQuantity > 0 && !string.IsNullOrEmpty(item.LotNumber)).ToList();
+                detailList = searchProductResult.Where(item => item.StockRemainQuantity > 0).ToList();
 
                 var searchData = string.Empty;
                 // 表示用のhtml作成
@@ -233,6 +240,7 @@ namespace mar_sumaken_web.Controllers
                             <td>{Utils.FormatNumber(@item.StoreInQuantity)}</td>
                             <td>{Utils.FormatNumber(@item.StoreOutNumberOfBoxes)}</td>
                             <td>{Utils.FormatNumber(@item.StoreOutQuantity)}</td>
+                            <td>{Utils.FormatNumber(@item.StockRemainNumberOfBoxes)}</td>
                             <td>{Utils.FormatNumber(@item.StockRemainQuantity)}</td>
                         </tr>";
                     }
@@ -333,7 +341,9 @@ namespace mar_sumaken_web.Controllers
                 model.StoreOutQuantity = searchResult.StoreOutQuantity;
                 // 在庫数=月初在庫数+当月入庫数総計-当月出庫数総計
                 model.StockRemainQuantity = searchResult.StockQuantityAtBeginningMonth + (searchResult.StoreInQuantity - searchResult.StoreOutQuantity);
-            }
+                int beginNumberOfBoxes = (int)(Math.Ceiling((double)searchResult.StockQuantityAtBeginningMonth / searchResult.LotQuantity));
+                model.StockRemainNumberOfBoxes = beginNumberOfBoxes + (searchResult.StoreInNumberOfBoxes - searchResult.StoreOutNumberOfBoxes);
+             }
         }
 
         /// <summary>
@@ -362,6 +372,9 @@ namespace mar_sumaken_web.Controllers
                     foreach (StockStatusModel item in searchList)
                     {
                         var stockRemainQuantity = item.StockQuantityAtBeginningMonth + (item.StoreInQuantity - item.StoreOutQuantity);
+                        int beginNumberOfBoxes = (int)(Math.Ceiling((double) item.StockQuantityAtBeginningMonth / item.LotQuantity));
+                        var stockRemainNumberOfBoxes = beginNumberOfBoxes + (item.StoreInNumberOfBoxes - item.StoreOutNumberOfBoxes);
+                        
                         DataRow newRow = searchResult.NewRow();
                         newRow[Utils.GetDisplayName<StockStatusModel>("SupplierName")] = item.SupplierName.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("SupplierProductNumber")] = item.SupplierProductNumber.ToString();
@@ -371,6 +384,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreInQuantity")] = item.StoreInQuantity.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes")] = item.StoreOutNumberOfBoxes.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutQuantity")] = item.StoreOutQuantity.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StockRemainNumberOfBoxes")] = stockRemainNumberOfBoxes.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StockRemainQuantity")] = stockRemainQuantity.ToString();
 
                         searchResult.Rows.Add(newRow);
@@ -428,7 +442,7 @@ namespace mar_sumaken_web.Controllers
                 // ○月1日の在庫数＝月初在庫数
                 DateTime date = Convert.ToDateTime(searchModel.SearchStartDate);
                 int remainQuantityPreviousDay = model.StockQuantityAtBeginningMonth;
-
+                int remainNumberOfbox = (int)(Math.Ceiling((double)remainQuantityPreviousDay / model.LotQuantity));
                 // ○月1日から検索日まで順に計算
                 for (int i = 1; i <= date.Day; i++)
                 {
@@ -453,6 +467,9 @@ namespace mar_sumaken_web.Controllers
                     remainQuantityPreviousDay += (newItem.StoreInQuantity - newItem.StoreOutQuantity);
                     newItem.StockRemainQuantity = remainQuantityPreviousDay;
 
+                    remainNumberOfbox += (newItem.StoreInNumberOfBoxes - newItem.StoreOutNumberOfBoxes);
+                    newItem.StockRemainNumberOfBoxes = remainNumberOfbox;
+
                     detailList.Add(newItem);
                 }
                 model.DetailList = detailList;
@@ -469,6 +486,7 @@ namespace mar_sumaken_web.Controllers
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreInQuantity")] = item.StoreInQuantity.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes")] = item.StoreOutNumberOfBoxes.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StoreOutQuantity")] = item.StoreOutQuantity.ToString();
+                        newRow[Utils.GetDisplayName<StockStatusModel>("StockRemainNumberOfBoxes")] = item.StockRemainNumberOfBoxes.ToString();
                         newRow[Utils.GetDisplayName<StockStatusModel>("StockRemainQuantity")] = item.StockRemainQuantity.ToString();
 
                         searchResult.Rows.Add(newRow);
@@ -515,6 +533,7 @@ namespace mar_sumaken_web.Controllers
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreInQuantity"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreOutQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StockRemainNumberOfBoxes"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StockRemainQuantity"), typeof(string));
 
             return table;
@@ -533,6 +552,7 @@ namespace mar_sumaken_web.Controllers
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreInQuantity"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreOutNumberOfBoxes"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StoreOutQuantity"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StockRemainNumberOfBoxes"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<StockStatusModel>("StockRemainQuantity"), typeof(string));
 
             return table;
