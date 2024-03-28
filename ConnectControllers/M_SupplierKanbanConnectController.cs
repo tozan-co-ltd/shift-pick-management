@@ -503,6 +503,7 @@ namespace mar_sumaken_web.ConnectControllers
             var sql = $@"
                 UPDATE M_SupplierKanban
                 SET 
+                    DepoID = '{model.SelectedDepoID}',
                     CompanyID = '{model.SelectedSupplierID}',
                     SupplierKanbanName = '{model.SupplierKanbanName}',
                     AllowedDuplicatesFlag = '{model.AllowedDuplicatesFlag}',
