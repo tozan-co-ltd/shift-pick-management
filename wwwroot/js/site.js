@@ -504,7 +504,7 @@ function CheckInputNumber() {
 // --------異なるログインを検出したため自動ログアウトされ、テーブルデータを表示--------//
 function HasOtherLogin(response, url, colNum) {
     var errorCode = "E1016";
-    // 返されるデータは本文ではなくコンテンツ
+    // エラーコードを含む戻り値をチェックし
     if (response.indexOf(errorCode) !== -1)
         window.location.href = url;
     else {
