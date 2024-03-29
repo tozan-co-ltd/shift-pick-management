@@ -230,7 +230,7 @@ function onUploadFile(page) {
             contentType: false
         }).done(function (response) {
             var errorCode = "E1016";
-            // エラーコードを含む戻り値をチェックし
+            // エラーコードを含む戻り値をチェック
             if (response.indexOf(errorCode) == -1) {
                 hideLoading();
                 AlertMessage('', '取込', '登録が完了しました。', null, null);
@@ -512,7 +512,7 @@ function CheckInputNumber() {
 // --------異なるログインを検出したため自動ログアウトされ、テーブルデータを表示--------//
 function HasOtherLogin(response, url, colNum) {
     var errorCode = "E1016";
-    // エラーコードを含む戻り値をチェックし
+    // エラーコードを含む戻り値をチェック
     if (response.indexOf(errorCode) !== -1)
         window.location.href = url;
     else {

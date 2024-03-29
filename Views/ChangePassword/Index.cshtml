@@ -80,7 +80,7 @@
                 data: data
             }).done(function (response) {
                 var errorCode = "E1016";
-                // エラーコードを含む戻り値をチェックし
+                // エラーコードを含む戻り値をチェック
                 if (response.indexOf(errorCode) == -1) {
                     $('#' + formId)[0].reset();
                     // 完了モーダル表示
