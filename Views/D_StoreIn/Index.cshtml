@@ -352,19 +352,9 @@
                 method: method,
                 data: data
             }).done(function (response) {
-                $("#table-datatable tbody").empty();
-                $('#table-datatable').DataTable().destroy();
-                $("#div-table").show();
-                $("#table-datatable tbody").html(response);
-                $("#table-datatable").DataTable({
-                    "language": {           // 日本語表示
-                        "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
-                    },
-                    lengthChange: true,     // 表示件数
-                    info: false,            // 総件数
-                    scrollX: true,          // 横スクロール可
-                    order: [[4, "asc"]],    // 仕入先品番昇順
-                });
+                var loginUrl = '@Url.Action("", "Login", new { param = "autologout" })';
+                // 異なるログインを検出し
+                HasOtherLogin(response, loginUrl, 4); // 4: 仕入先品番昇順
             }).fail(function (xhr, textStatus, errorThrown) {
                 if (xhr.status === 404) {
                     var errorMessage = xhr.responseJSON.errorMessage;
