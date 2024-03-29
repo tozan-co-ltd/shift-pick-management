@@ -219,6 +219,7 @@ function onUploadFile(page) {
         $('#import-modal').modal('hide');
 
         var importUrl = document.getElementById('import_action_url').value;
+        var loginUrl = document.getElementById('login_action_url').value;
 
         showLoading();
         $.ajax({
@@ -228,8 +229,15 @@ function onUploadFile(page) {
             processData: false,
             contentType: false
         }).done(function (response) {
-            hideLoading();
-            AlertMessage('', '取込', '登録が完了しました。', null, null);
+            var errorCode = "E1016";
+            // エラーコードを含む戻り値をチェックし
+            if (response.indexOf(errorCode) == -1) {
+                hideLoading();
+                AlertMessage('', '取込', '登録が完了しました。', null, null);
+            }
+            else {
+                window.location.href = loginUrl;
+            }
         }).fail(function (jqXHR, textStatus, errorThrown) {
             hideLoading();
             if (jqXHR.status === 404) {
