@@ -79,9 +79,15 @@
                 method: method,
                 data: data
             }).done(function (response) {
-                $('#' + formId)[0].reset();
-                // 完了モーダル表示
-                AlertMessage('', '完了', '登録が完了しました。', null, null);
+                var errorCode = "E1016";
+                // エラーコードを含む戻り値をチェックし
+                if (response.indexOf(errorCode) == -1) {
+                    $('#' + formId)[0].reset();
+                    // 完了モーダル表示
+                    AlertMessage('', '完了', '登録が完了しました。', null, null);
+                } else {
+                    window.location.href = '@Url.Action("", "Login", new { param = "autologout" })';
+                }
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
                     // データが見つからなかった場合
