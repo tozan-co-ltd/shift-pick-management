@@ -8,14 +8,6 @@
     --rgb-base-color-accent: 240, 132, 75;
     /* 背景カラー */
     --base-color-bg: rgba(var(--rgb-base-color-main), 0.3);
-    /* フォント */
-    --font-family-sans-serif-custom: "main-font", "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", Meiryo, sans-serif;
-}
-
-/* || システム全体のフォント */
-@font-face {
-    font-family: 'main-font';
-    src: url('../fonts/BIZUDPGothic-Regular.ttf') format('truetype');
 }
 
 /* || システム全体のレイアウト */
@@ -30,14 +22,14 @@ html {
 }
 
 html {
+    font-family: 'Varela Round' !important;
     position: relative;
     min-height: 100%;
-    font-family: 'main-font' !important;
 }
 
 body {
+    font-family: 'Varela Round' !important;
     margin-bottom: 60px;
-    font-family: 'main-font' !important;
     color: #3a3b45;
 }
 

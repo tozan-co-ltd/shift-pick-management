@@ -47,7 +47,7 @@ namespace mar_sumaken_web.Controllers
                 topModel.NextTwoDayGraph = GetGraphInfo(user.MainDepoID, mCompany.CompanyID, nextTwoDay.ToString("yyyy/MM/dd"), user.DatabaseName);
 
                 // 項目設定
-                topModel.DepoName = string.Concat(user.MainDepoName, "/", mCompany.CompanyName, "向け");
+                topModel.DepoName = string.Concat(user.MainDepoName, " / ", mCompany.CompanyName, "向け");
 
                 return View(topModel);
             }
