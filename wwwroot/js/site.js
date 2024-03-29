@@ -219,6 +219,7 @@ function onUploadFile(page) {
         $('#import-modal').modal('hide');
 
         var importUrl = document.getElementById('import_action_url').value;
+        var loginUrl = document.getElementById('login_action_url').value;
 
         showLoading();
         $.ajax({
@@ -228,8 +229,15 @@ function onUploadFile(page) {
             processData: false,
             contentType: false
         }).done(function (response) {
-            hideLoading();
-            AlertMessage('', '取込', '登録が完了しました。', null, null);
+            var errorCode = "E1016";
+            // エラーコードを含む戻り値をチェック
+            if (response.indexOf(errorCode) == -1) {
+                hideLoading();
+                AlertMessage('', '取込', '登録が完了しました。', null, null);
+            }
+            else {
+                window.location.href = loginUrl;
+            }
         }).fail(function (jqXHR, textStatus, errorThrown) {
             hideLoading();
             if (jqXHR.status === 404) {
@@ -498,5 +506,29 @@ function CheckInputNumber() {
         }
     });
     return checkFlag;
+}
+//--------------------------------------------------------//
+
+// --------異なるログインを検出したため自動ログアウトされ、テーブルデータを表示--------//
+function HasOtherLogin(response, url, colNum) {
+    var errorCode = "E1016";
+    // エラーコードを含む戻り値をチェック
+    if (response.indexOf(errorCode) !== -1)
+        window.location.href = url;
+    else {
+        $("#table-datatable tbody").empty();
+        $('#table-datatable').DataTable().destroy();
+        $("#div-table").show();
+        $("#table-datatable tbody").html(response);
+        $("#table-datatable").DataTable({
+            "language": {           // 日本語表示
+                "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
+            },
+            lengthChange: true,     // 表示件数
+            info: false,            // 総件数
+            scrollX: true,          // 横スクロール可
+            order: [[colNum, "asc"]],    // 仕入先品番昇順
+        });
+    }
 }
 //--------------------------------------------------------//
