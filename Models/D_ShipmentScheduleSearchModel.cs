@@ -20,16 +20,6 @@ namespace mar_sumaken_web.Models
         public string SearchEndDate { get; set; }
 
         /// <summary>
-        /// 検索便リスト
-        /// </summary>
-        public List<SelectListItem>? BinList { get; set; }
-
-        /// <summary>
-        /// 便リスト
-        /// </summary>
-        public List<int>? BinListInt { get; set; }
-
-        /// <summary>
         /// 実績数不一致のみ
         /// </summary>
         public bool DifferenceCountCheck { get; set; }

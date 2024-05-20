@@ -48,45 +48,30 @@
                                     <select class="form-select" asp-for="SelectedCompanyID" asp-items="@Model.SearchCompanyList"></select>
                                 </div>
                             </div>
-                            <div class="col-12 d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                                <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.SearchStartDate)</span>
-                                <input type="text" asp-for="SearchStartDate" class="form-control pickerDate startDate"> 
-                                <label class="m-1">～</label>
-                                <input type="text" asp-for="SearchEndDate" class="form-control pickerDate endDate">
-                            </div>
-
-                            <div class="col-16 d-flex justify-content-start align-items-center align-items-custom">
-                                <p class="warehouse-name-drs">便</p>
-                                <div class="col-16 d-flex justify-content-start align-items-center sp-cs-dpl">
-                                    <div class="col-16 d-flex justify-content-start align-items-center sp-cs-dpl-fix">
-                                        @for (var i = 0; i < @Model.BinList.Count; i++)
-                                        {
-                                            <div class="form-check">
-                                                <input type="hidden" asp-for="BinList[i].Value" value="@Model.BinList[i].Value" />
-                                                <input type="hidden" asp-for="BinList[i].Text" value="@Model.BinList[i].Text" />
-                                                <input class="form-check-input bin-checkbox" asp-for="BinList[i].Selected" id="bin-@i" data="@Model.BinList[i].Text" type="checkbox">
-                                                <label class="form-check-label ml-1 mr-3" id="label-bin-@i">@Model.BinList[i].Text</label>
-                                            </div>
-                                        }
-                                        <div class="form-check ml-5 diffence-count-check">
-                                            <input class="form-check-input" asp-for="DifferenceCountCheck" type="checkbox">
-                                            <label class="form-check-label ml-1" asp-for="DifferenceCountCheck">実績数不一致のみ</label>
-                                        </div>
+                            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                                    <span class="warehouse-name-drs">@Html.DisplayNameFor(Model => Model.SearchStartDate)</span>
+                                    <input type="text" asp-for="SearchStartDate" class="form-control pickerDate startDate">
+                                    <label class="m-1">～</label>
+                                    <input type="text" asp-for="SearchEndDate" class="form-control pickerDate endDate">
+                                </div>
+                                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl sp-tablet">
+                                    <div class="form-check ml-3 diffence-count-check">
+                                        <input class="form-check-input" asp-for="DifferenceCountCheck" type="checkbox">
+                                        <label class="form-check-label ml-1" asp-for="DifferenceCountCheck">実績数不一致のみ</label>
                                     </div>
-                                    <div class="custom-control custom-checkbox col-16 d-flex justify-content-start align-items-center sp-cs-dpl">
-                                        <button id="search-btn" type="submit" class="btn btn-secondary btn-icon-split ml-3">
-                                            <span class="icon text-white-50">
-                                                <i class="fa-solid fa-magnifying-glass"></i>
-                                            </span>
-                                            <span class="text">検索</span>
-                                        </button>
-                                        <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3" id="export-file-btn">
-                                            <span class="icon text-white-50">
-                                                <i class="fa-solid fa-file-export"></i>
-                                            </span>
-                                            <span class="text">出力</span>
-                                        </button>
-                                    </div>
+                                    <button id="search-btn" type="submit" class="btn btn-secondary btn-icon-split ml-3">
+                                        <span class="icon text-white-50">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </span>
+                                        <span class="text">検索</span>
+                                    </button>
+                                    <button class="btn btn-info btn-icon-split sp-mg-bt-10 ml-3" id="export-file-btn">
+                                        <span class="icon text-white-50">
+                                            <i class="fa-solid fa-file-export"></i>
+                                        </span>
+                                        <span class="text">出力</span>
+                                    </button>
                                 </div>
                             </div>
                         </form>
