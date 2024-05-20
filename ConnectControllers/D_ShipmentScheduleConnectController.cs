@@ -1,12 +1,7 @@
 ﻿using Dapper;
 using mar_sumaken_web.ConnectControllers;
 using mar_sumaken_web.Models;
-using mar_sumaken_web.Properties;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel.Design;
 using System.Data.SqlClient;
-using System.Reflection;
-using System.Transactions;
 
 namespace mar_sumaken_web.Commons
 {
@@ -477,42 +472,34 @@ namespace mar_sumaken_web.Commons
                 differenceCheckCondition = " AND shipment_schedule.NumberOfBoxes <> COALESCE(storeout_sum.StoreOutNumberOfBoxes, 0) ";
             }
 
-            // 便
-            string binCondition = string.Empty;
-            if (model.BinListInt != null && model.BinListInt.Count > 0)
-            {
-                binCondition = $@" AND DeliveryTimeClass in ({string.Join(",", model.BinListInt)})";
-            }
             model.SearchEndDate = string.Concat(model.SearchEndDate, " 23:59:59");
             var sql = $@"          
                 -- 出荷計画を絞り込み
 					WITH 
 					shipment_schedule as
 					(
-					SELECT * FROM 
-					D_ShipmentSchedule
-					WHERE 
-					  DepoID = {model.SelectedDepoID}
-                    AND CompanyID = {model.SelectedCompanyID}
-                    AND DeliveryDate >= '{model.SearchStartDate}'
-                    AND DeliveryDate <= '{model.SearchEndDate}'
-                      {binCondition}              
-	                AND IsDeleted = 0
+					    SELECT * FROM 
+					    D_ShipmentSchedule
+					    WHERE 
+					      DepoID = {model.SelectedDepoID}
+                        AND CompanyID = {model.SelectedCompanyID}
+                        AND DeliveryDate >= '{model.SearchStartDate}'
+                        AND DeliveryDate <= '{model.SearchEndDate}'
+	                    AND IsDeleted = 0
 					),
 					-- 出庫実績を絞り込んで集計
 					storeout_sum as 
 					(
 						SELECT  DepoID,DeliveryDate,DeliverySlipNumber,DeliveryProductNumber,
-						SUM(COALESCE(NumberOfBoxes, 0)) AS StoreOutNumberOfBoxes -- 出庫箱数
-	                ,SUM(COALESCE(Quantity, 0)) AS StoreOutQuantity --出庫数量
+						    SUM(COALESCE(NumberOfBoxes, 0)) AS StoreOutNumberOfBoxes -- 出庫箱数
+	                        ,SUM(COALESCE(Quantity, 0)) AS StoreOutQuantity --出庫数量
 						FROM D_StoreOut 
 						WHERE IsDeleted = 0
 						AND DepoID ={model.SelectedDepoID}				
 						AND DeliveryDate >='{model.SearchStartDate}'
 						AND DeliveryDate <= '{model.SearchEndDate}'
-						  {binCondition}           
 					GROUP BY  
-					DepoID,DeliveryDate,DeliverySlipNumber,DeliveryProductNumber				
+					    DepoID,DeliveryDate,DeliverySlipNumber,DeliveryProductNumber				
 					)
 
 
@@ -554,8 +541,8 @@ namespace mar_sumaken_web.Commons
 					,shipment_schedule.UpdatedBy
 					,COALESCE(shipment_schedule.NumberOfBoxes, 0) AS NumberOfBoxes
 					,COALESCE(shipment_schedule.Quantity, 0) AS Quantity
-	                , COALESCE(StoreOutNumberOfBoxes, 0) as StoreOutNumberOfBoxes -- 出庫箱数合計
-	                , COALESCE(StoreOutQuantity, 0) as StoreOutQuantity --出庫数量合計
+	                ,COALESCE(StoreOutNumberOfBoxes, 0) as StoreOutNumberOfBoxes -- 出庫箱数合計
+	                ,COALESCE(StoreOutQuantity, 0) as StoreOutQuantity --出庫数量合計
                 FROM shipment_schedule
                 LEFT OUTER  JOIN 
 				 storeout_sum 

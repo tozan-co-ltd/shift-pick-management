@@ -43,24 +43,6 @@ namespace mar_sumaken_web.Controllers
                 // 倉庫
                 model.SearchDepoList = commonModel.GetMDepoList(user.DatabaseName);
                 if (!string.IsNullOrEmpty(depoId)) model.SelectedDepoID = Convert.ToInt32(depoId);
-                // 便
-                model.BinList = Utils.Const_BinList.Select(item => new SelectListItem() { 
-                    Value = item.Value, Text = item.Text, Selected = false
-                }).ToList();
-                if (string.IsNullOrEmpty(binListStr))
-                {
-                    model.BinList[0].Selected = true;
-                }
-                else
-                {
-                    var binList = binListStr.Split(',');
-                    foreach (var bin in binList)
-                    {
-                        //var selectedBin = Convert.ToInt32(bin);
-                        var selectedItem = model.BinList.FirstOrDefault(item => item.Value.Equals(bin));
-                        if (selectedItem != null) selectedItem.Selected = true;
-                    }
-                }
 
                 // 実績数不一致のみ
                 model.DifferenceCountCheck = differenceCountCheck;
@@ -95,19 +77,7 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 便
-                string binCondition = string.Empty;
-                if (searchModel.BinList != null && searchModel.BinList.Count > 0)
-                {
-                    List<SelectListItem> selectedItems = searchModel.BinList.Where(item => item.Selected).ToList();
-                    searchModel.BinListInt = selectedItems.Select(item => Convert.ToInt32(item.Value)).ToList();
-                }
-
                 // 入力規則チェック
-                ModelState.Remove("BinList[0].Selected");
-                ModelState.Remove("BinList[1].Selected");
-                ModelState.Remove("BinList[2].Selected");
-                ModelState.Remove("BinList[3].Selected");
                 if (!ModelState.IsValid)
                 {
                     return NotFound(new { errorMessage = "E1017: " + ErrorMessagesResources.E1017 });
@@ -306,7 +276,6 @@ namespace mar_sumaken_web.Controllers
                     SearchStartDate = searchModel.SearchStartDate,
                     SearchEndDate = searchModel.SearchEndDate,
                     DifferenceCountCheck = searchModel.DiffenceCountCheck,
-                    BinListInt = searchModel.BinList,
                 };
                 var sql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedules(model);
                 List<D_ShipmentScheduleModel> searchList = D_ShipmentScheduleConnectController.ConnectDShipmentSchedules(sql, user.DatabaseName);
