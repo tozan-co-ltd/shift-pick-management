@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace  ai_truck_load_measurement.Models
+namespace ai_truck_load_measurement.Models
 {
     /// <summary>
     /// ログイン時に使うModel

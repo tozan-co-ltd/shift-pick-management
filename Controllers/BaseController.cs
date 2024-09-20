@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using  ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Models;
 
-namespace  ai_truck_load_measurement.Controllers
+namespace ai_truck_load_measurement.Controllers
 {
 
     public class BaseController : Controller

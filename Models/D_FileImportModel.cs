@@ -1,9 +1,9 @@
-﻿using  ai_truck_load_measurement.Commons;
+﻿using ai_truck_load_measurement.Commons;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
-namespace  ai_truck_load_measurement.Models
+namespace ai_truck_load_measurement.Models
 {
     /// <summary>
     /// ファイル取込実績テーブルのModel

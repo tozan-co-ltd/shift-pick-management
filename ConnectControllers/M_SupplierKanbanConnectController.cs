@@ -1,11 +1,11 @@
 ﻿using Dapper;
-using  ai_truck_load_measurement.Commons;
-using  ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
 using System.Reflection;
 
-namespace  ai_truck_load_measurement.ConnectControllers
+namespace ai_truck_load_measurement.ConnectControllers
 {
     /// <summary>
     /// 仕入先かんばんマスターに関する関数

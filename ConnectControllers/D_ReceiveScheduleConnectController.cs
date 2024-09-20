@@ -1,9 +1,9 @@
 ﻿using Dapper;
-using  ai_truck_load_measurement.ConnectControllers;
-using  ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.ConnectControllers;
+using ai_truck_load_measurement.Models;
 using System.Data.SqlClient;
 
-namespace  ai_truck_load_measurement.Commons
+namespace ai_truck_load_measurement.Commons
 {
     /// <summary>
     /// 入荷予定テーブルに関する関数

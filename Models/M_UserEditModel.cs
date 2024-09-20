@@ -1,7 +1,7 @@
-﻿using  ai_truck_load_measurement.Properties;
+﻿using ai_truck_load_measurement.Properties;
 using System.ComponentModel.DataAnnotations;
 
-namespace  ai_truck_load_measurement.Models
+namespace ai_truck_load_measurement.Models
 {
     /// <summary>
     /// ユーザーマスターのModel(修正画面用)

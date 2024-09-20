@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
-using  ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Models;
 
-namespace  ai_truck_load_measurement.Commons
+namespace ai_truck_load_measurement.Commons
 {
     /// <summary>
     /// warehouse_0_masterの会社マスターに関する関数

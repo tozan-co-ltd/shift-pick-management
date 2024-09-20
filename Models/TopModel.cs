@@ -1,6 +1,6 @@
 ﻿using X.PagedList;
 
-namespace  ai_truck_load_measurement.Models
+namespace ai_truck_load_measurement.Models
 {
     /// <summary>
     /// 倉庫マスターのModel

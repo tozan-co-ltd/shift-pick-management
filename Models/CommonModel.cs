@@ -1,11 +1,11 @@
 ﻿using System.Data.SqlClient;
-using  ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.Commons;
 using System.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using Dapper;
 
-namespace  ai_truck_load_measurement.Models
+namespace ai_truck_load_measurement.Models
 {
     /// <summary>
     /// 共通Model

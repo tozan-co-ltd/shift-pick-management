@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Security.Cryptography;
 
-namespace  ai_truck_load_measurement.Commons
+namespace ai_truck_load_measurement.Commons
 {
     /// <summary>
     /// ハッシュ化に関する関数

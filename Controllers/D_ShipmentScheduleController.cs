@@ -1,6 +1,6 @@
-﻿using  ai_truck_load_measurement.Commons;
-using  ai_truck_load_measurement.Models;
-using  ai_truck_load_measurement.Properties;
+﻿using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,7 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
 
-namespace  ai_truck_load_measurement.Controllers
+namespace ai_truck_load_measurement.Controllers
 {
     /// <summary>
     /// 出荷指示照会画面

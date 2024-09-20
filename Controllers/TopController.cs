@@ -1,12 +1,12 @@
-﻿using  ai_truck_load_measurement.Commons;
-using  ai_truck_load_measurement.ConnectControllers;
-using  ai_truck_load_measurement.Models;
-using  ai_truck_load_measurement.Properties;
+﻿using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.ConnectControllers;
+using ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using static ai_truck_load_measurement.Models.TopModel;
 
-namespace  ai_truck_load_measurement.Controllers
+namespace ai_truck_load_measurement.Controllers
 {
     /// <summary>
     /// トップ画面

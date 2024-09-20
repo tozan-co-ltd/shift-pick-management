@@ -1,8 +1,8 @@
 ﻿using Dapper;
-using  ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.Commons;
 using System.Data.SqlClient;
 
-namespace  ai_truck_load_measurement.Models
+namespace ai_truck_load_measurement.Models
 {
     /// <summary>
     /// WEBメニューのModel

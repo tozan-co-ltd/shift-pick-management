@@ -1,12 +1,12 @@
-﻿using  ai_truck_load_measurement.Commons;
-using  ai_truck_load_measurement.Models;
-using  ai_truck_load_measurement.Properties;
+﻿using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
 
-namespace  ai_truck_load_measurement.Controllers
+namespace ai_truck_load_measurement.Controllers
 {
     /// <summary>
     /// 入荷予定照会画面

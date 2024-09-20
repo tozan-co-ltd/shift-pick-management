@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace  ai_truck_load_measurement.Commons
+namespace ai_truck_load_measurement.Commons
 {
     public static class Utils
     {

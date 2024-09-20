@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace  ai_truck_load_measurement.Commons
+namespace ai_truck_load_measurement.Commons
 {
     /// <summary>
     /// Claim情報

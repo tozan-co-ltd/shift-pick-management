@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
-namespace  ai_truck_load_measurement.Models
+namespace ai_truck_load_measurement.Models
 {
     /// <summary>
     /// ハンディエラーメッセージ実績テーブルのModel

@@ -1,9 +1,9 @@
 ﻿using Dapper;
-using  ai_truck_load_measurement.Commons;
-using  ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.Models;
 using System.Data.SqlClient;
 
-namespace  ai_truck_load_measurement.ConnectControllers
+namespace ai_truck_load_measurement.ConnectControllers
 {
     /// <summary>
     /// 倉庫マスターに関する関数

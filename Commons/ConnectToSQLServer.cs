@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
 
-namespace  ai_truck_load_measurement.Commons
+namespace ai_truck_load_measurement.Commons
 {
     /// <summary>
     /// SQLServer接続に関する関数
