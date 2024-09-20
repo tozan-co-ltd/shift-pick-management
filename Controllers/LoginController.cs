@@ -201,7 +201,8 @@ namespace  ai_truck_load_measurement.Controllers
             try
             {
                 // URLからパスを取得(https://www.tozan.co.jp/の直後１つ目のパス)
-                var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
+                // var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
+                var urlWebPath = "https://wbtzn/sumaken-web-MRq2xg5_test";
 
                 // 会社WEBアプリパスを取得("sumaken-web-***"の"***"のみ)
                 string pattern = "sumaken-web-";
