@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
-namespace mar_sumaken_web.Models
+namespace  ai_truck_load_measurement.Models
 {
     /// <summary>
     /// 入荷予定照会テーブルのModel

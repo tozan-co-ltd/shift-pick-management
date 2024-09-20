@@ -1,8 +1,8 @@
 ﻿using Dapper;
-using mar_sumaken_web.Models;
+using  ai_truck_load_measurement.Models;
 using System.Data.SqlClient;
 
-namespace mar_sumaken_web.Commons
+namespace  ai_truck_load_measurement.Commons
 {
     /// <summary>
     /// 入荷実績テーブルに関する関数

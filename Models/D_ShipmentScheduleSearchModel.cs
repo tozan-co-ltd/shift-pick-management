@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace mar_sumaken_web.Models
+namespace  ai_truck_load_measurement.Models
 {
     /// <summary>
     /// 出荷指示照会のModel

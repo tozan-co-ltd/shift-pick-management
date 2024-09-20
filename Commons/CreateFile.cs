@@ -1,10 +1,10 @@
-﻿using mar_sumaken_web.Models;
-using mar_sumaken_web.Properties;
+﻿using  ai_truck_load_measurement.Models;
+using  ai_truck_load_measurement.Properties;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace mar_sumaken_web.Commons
+namespace  ai_truck_load_measurement.Commons
 {
     public static class CreateFile
     {

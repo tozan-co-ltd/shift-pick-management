@@ -1,12 +1,12 @@
-﻿using mar_sumaken_web.Commons;
-using mar_sumaken_web.Models;
-using mar_sumaken_web.Properties;
+﻿using  ai_truck_load_measurement.Commons;
+using  ai_truck_load_measurement.Models;
+using  ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
 
-namespace mar_sumaken_web.Controllers
+namespace  ai_truck_load_measurement.Controllers
 {
     /// <summary>
     /// 入荷予定照会画面

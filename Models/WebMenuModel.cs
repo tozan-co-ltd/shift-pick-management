@@ -1,8 +1,8 @@
 ﻿using Dapper;
-using mar_sumaken_web.Commons;
+using  ai_truck_load_measurement.Commons;
 using System.Data.SqlClient;
 
-namespace mar_sumaken_web.Models
+namespace  ai_truck_load_measurement.Models
 {
     /// <summary>
     /// WEBメニューのModel

@@ -1,9 +1,9 @@
 ﻿using Dapper;
-using mar_sumaken_web.Models;
+using  ai_truck_load_measurement.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
 
-namespace mar_sumaken_web.Commons
+namespace  ai_truck_load_measurement.Commons
 {
     /// <summary>
     /// ユーザーマスターに関する関数

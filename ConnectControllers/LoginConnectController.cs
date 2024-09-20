@@ -1,9 +1,9 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
-using mar_sumaken_web.Models;
+using  ai_truck_load_measurement.Models;
 using System;
 
-namespace mar_sumaken_web.Commons
+namespace  ai_truck_load_measurement.Commons
 {
     /// <summary>
     /// ログインユーザー(ユーザーマスター)に関する関数

@@ -1,8 +1,8 @@
-﻿using mar_sumaken_web.Properties;
+﻿using  ai_truck_load_measurement.Properties;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
-namespace mar_sumaken_web.Models
+namespace  ai_truck_load_measurement.Models
 {
     /// <summary>
     /// 倉庫マスターのModel

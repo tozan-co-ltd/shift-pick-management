@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using mar_sumaken_web.Models;
+using  ai_truck_load_measurement.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
-using mar_sumaken_web.Commons;
+using  ai_truck_load_measurement.Commons;
 using System.ComponentModel.Design;
 using System.Data;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using mar_sumaken_web.ConnectControllers;
+using  ai_truck_load_measurement.ConnectControllers;
 
-namespace mar_sumaken_web.Filters
+namespace  ai_truck_load_measurement.Filters
 {
 
     public class AccessControlFilter : IActionFilter

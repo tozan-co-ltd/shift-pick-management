@@ -1,9 +1,9 @@
 ﻿using Dapper;
-using mar_sumaken_web.Models;
+using  ai_truck_load_measurement.Models;
 using System.ComponentModel.Design;
 using System.Data.SqlClient;
 
-namespace mar_sumaken_web.Commons
+namespace  ai_truck_load_measurement.Commons
 {
     /// <summary>
     /// WEBメニューに関する関数

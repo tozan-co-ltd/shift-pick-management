@@ -1,6 +1,6 @@
 ﻿using X.PagedList;
 
-namespace mar_sumaken_web.Models
+namespace  ai_truck_load_measurement.Models
 {
     /// <summary>
     /// 倉庫マスターのModel

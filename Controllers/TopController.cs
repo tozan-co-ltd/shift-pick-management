@@ -1,12 +1,12 @@
-﻿using mar_sumaken_web.Commons;
-using mar_sumaken_web.ConnectControllers;
-using mar_sumaken_web.Models;
-using mar_sumaken_web.Properties;
+﻿using  ai_truck_load_measurement.Commons;
+using  ai_truck_load_measurement.ConnectControllers;
+using  ai_truck_load_measurement.Models;
+using  ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
-using static mar_sumaken_web.Models.TopModel;
+using static ai_truck_load_measurement.Models.TopModel;
 
-namespace mar_sumaken_web.Controllers
+namespace  ai_truck_load_measurement.Controllers
 {
     /// <summary>
     /// トップ画面

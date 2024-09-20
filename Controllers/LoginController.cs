@@ -1,6 +1,6 @@
-﻿using mar_sumaken_web.Commons;
-using mar_sumaken_web.Models;
-using mar_sumaken_web.Properties;
+﻿using  ai_truck_load_measurement.Commons;
+using  ai_truck_load_measurement.Models;
+using  ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using System.Security.Claims;
 
-namespace mar_sumaken_web.Controllers
+namespace  ai_truck_load_measurement.Controllers
 {
     /// <summary>
     /// ログイン関係
