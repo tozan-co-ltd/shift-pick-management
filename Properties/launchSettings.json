@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "mar_sumaken_web": {
+    "ai_truck_load_measurement": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

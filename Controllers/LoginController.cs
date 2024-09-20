@@ -1,6 +1,6 @@
-﻿using mar_sumaken_web.Commons;
-using mar_sumaken_web.Models;
-using mar_sumaken_web.Properties;
+﻿using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using System.Security.Claims;
 
-namespace mar_sumaken_web.Controllers
+namespace ai_truck_load_measurement.Controllers
 {
     /// <summary>
     /// ログイン関係
@@ -201,7 +201,8 @@ namespace mar_sumaken_web.Controllers
             try
             {
                 // URLからパスを取得(https://www.tozan.co.jp/の直後１つ目のパス)
-                var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
+                // var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
+                var urlWebPath = "https://wbtzn/sumaken-web-MRq2xg5_test";
 
                 // 会社WEBアプリパスを取得("sumaken-web-***"の"***"のみ)
                 string pattern = "sumaken-web-";
