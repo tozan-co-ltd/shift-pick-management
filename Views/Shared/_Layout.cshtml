@@ -74,27 +74,6 @@
                 <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" id="navbarDropdown"
                      aria-labelledby="navbarDropdown">
                     <div id="user-detail-dropdown-item" class="dropdown-item text-gray-600">
-                        <p>
-                            <label class="mr-2 col-4">
-                                会社名
-                            </label>
-                            <span class="col">
-                                @(User.Identity.IsAuthenticated ? User.FindFirst("CompanyName").Value : null)
-                            </span>
-                        </p>
-                        <p>
-                            <label class="mr-2 col-4">
-                                メイン倉庫名
-                            </label>
-                            <span class="col">
-                                @(User.Identity.IsAuthenticated ? User.FindFirst("MainDepoName").Value : null)
-                            </span>
-                        </p>
-                        <hr />
-                        <a class="dropdown-item mt-2 logout" asp-controller="ChangePassword" asp-action="Index">
-                            <i class="fa fa-gears fa-fw mr-2"></i>
-                            パスワード変更
-                        </a>
                         <a class="dropdown-item mt-2 logout" href="#" data-toggle="modal" data-target="#logoutModal">
                             <i class="fas fa-sign-out-alt fa-fw mr-2"></i>
                             ログアウト
