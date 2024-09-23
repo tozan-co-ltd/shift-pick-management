@@ -221,7 +221,7 @@ namespace ai_truck_load_measurement.Controllers
                 var password = loginModel.Password;
 
                 // ActiveDirectory認証処理
-                var authenticateUserName = AuthenticateUser(loginId, password);
+                var authenticateUserName = GetAuthenticateUserName(loginId, password);
                 if(authenticateUserName == null)
                 {
                     return null;
@@ -250,12 +250,12 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
-        /// ActiveDirectory認証処理
+        /// ActiveDirectory認証とユーザー名取得
         /// </summary>
         /// <param name="loginId">ログインID</param>
         /// <param name="password">パスワード</param>
-        /// <returns></returns>
-        private string? AuthenticateUser(string loginId, string password)
+        /// <returns>認証されたユーザー名</returns>
+        private string? GetAuthenticateUserName(string loginId, string password)
         {
             try
             {
@@ -263,11 +263,11 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     return null;
                 }
-                string domain = "LDAP://192.168.1.6/DC=tozan,DC=co,DC=jp";
-                DirectoryEntry root1 = new DirectoryEntry(domain, loginId, password);
+                string ldapPath = "LDAP://192.168.1.6/DC=tozan,DC=co,DC=jp";
+                DirectoryEntry directoryEntry = new DirectoryEntry(ldapPath, loginId, password);
 
                 // Active Directory でユーザーを検索
-                DirectorySearcher searcher = new DirectorySearcher(root1);
+                DirectorySearcher searcher = new DirectorySearcher(directoryEntry);
                 searcher.Filter = "(&(objectClass=user)(sAMAccountName=" + loginId + "))";
                 searcher.SearchScope = SearchScope.Subtree;
 
