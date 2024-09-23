@@ -252,8 +252,8 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// ActiveDirectory認証処理
         /// </summary>
-        /// <param name="loginId"></param>
-        /// <param name="password"></param>
+        /// <param name="loginId">ログインID</param>
+        /// <param name="password">パスワード</param>
         /// <returns></returns>
         private string? AuthenticateUser(string loginId, string password)
         {
@@ -268,6 +268,7 @@ namespace ai_truck_load_measurement.Controllers
                 searcher.SearchScope = SearchScope.Subtree;
 
                 // ユーザーが見つかったかどうかを確認
+                // IDとパスワードが一致しなかった場合、例外処理に移行
                 SearchResult result = searcher.FindOne();
 
                 if (result == null)
