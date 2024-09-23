@@ -204,11 +204,7 @@ label{
 
 /* ナビゲーションバー */
 .navbar-dark {
-    background-color: #3EB135;
-}
-
-.navbar-dark-test {
-    background-color: #9999CC; /* 開発環境は紫色 */
+    background-color: #EC52AC;
 }
 
 .navbar-brand {
