@@ -72,34 +72,34 @@ namespace ai_truck_load_measurement.Filters
                     return;
                 }
 
-                // 2.同一ユーザーによる複数端末での同時ログインを禁止する
-                //   先にログインしたユーザーがログアウト(ログイン画面へリダイレクト)される
-                var controller = context.Controller as Controller;
-                var databaseName = controller.User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
+                //// 2.同一ユーザーによる複数端末での同時ログインを禁止する
+                ////   先にログインしたユーザーがログアウト(ログイン画面へリダイレクト)される
+                //var controller = context.Controller as Controller;
+                //var databaseName = controller.User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
 
-                // ログイン中ユーザー情報取得
-                var loginUserModel = new LoginUserModel();
-                var userID = Convert.ToInt32(context.HttpContext.User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value);
-                var timeStamp = context.HttpContext.User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_TimeStamp).First().Value.ToString();
+                //// ログイン中ユーザー情報取得
+                //var loginUserModel = new LoginUserModel();
+                //var userID = Convert.ToInt32(context.HttpContext.User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value);
+                //var timeStamp = context.HttpContext.User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_TimeStamp).First().Value.ToString();
 
-                // Claimsのタイムスタンプとユーザーマスターの最終ログイン日時が一致しない場合は強制ログアウト
-                // 最終ログイン日時が一致するユーザー情報取得
-                var IsMatched = false;
-                if (DateTime.TryParse(timeStamp, out DateTime lastLoginDatetime))
-                {
-                    // SQL作成
-                    var sql = LoginConnectController.CreateSQLToSelectMUserByLastLoginDatetime(userID, lastLoginDatetime);
-                    // DB接続
-                    IsMatched = M_UserConnectController.ConnectMUserWithMatchingLastLoginDatetime(sql, databaseName);
-                }
+                //// Claimsのタイムスタンプとユーザーマスターの最終ログイン日時が一致しない場合は強制ログアウト
+                //// 最終ログイン日時が一致するユーザー情報取得
+                //var IsMatched = false;
+                //if (DateTime.TryParse(timeStamp, out DateTime lastLoginDatetime))
+                //{
+                //    // SQL作成
+                //    var sql = LoginConnectController.CreateSQLToSelectMUserByLastLoginDatetime(userID, lastLoginDatetime);
+                //    // DB接続
+                //    IsMatched = M_UserConnectController.ConnectMUserWithMatchingLastLoginDatetime(sql, databaseName);
+                //}
 
-                // 一致するユーザー情報がない場合はログイン画面へリダイレクト
-                if (!IsMatched)
-                {
-                    var viewResult = controller.RedirectToAction("Logout", "Login", new { param = "autologout" });
-                    context.Result = viewResult;
-                    return;
-                }
+                //// 一致するユーザー情報がない場合はログイン画面へリダイレクト
+                //if (!IsMatched)
+                //{
+                //    var viewResult = controller.RedirectToAction("Logout", "Login", new { param = "autologout" });
+                //    context.Result = viewResult;
+                //    return;
+                //}
             }
         }
 
