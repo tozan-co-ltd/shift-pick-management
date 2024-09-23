@@ -220,14 +220,7 @@ namespace ai_truck_load_measurement.Controllers
                 var loginId = loginModel.LoginId;
                 var password = loginModel.Password;
 
-                // 会社マスターからデータベース名取得
-                var mCompany = GetMCompany();
-                if (mCompany == null ||  string.IsNullOrWhiteSpace(mCompany.DatabaseName))
-                {
-                    return null;
-                }
-
-                // 
+                // ActiveDirectory認証処理
                 var authenticateUserName = AuthenticateUser(loginId, password);
                 if(authenticateUserName == null)
                 {
@@ -236,10 +229,10 @@ namespace ai_truck_load_measurement.Controllers
 
                 LoginUserModel loginUserModel = new()
                 {
-                    CompanyID = mCompany.CompanyID,
-                    CompanyCode = mCompany.CompanyCode,
-                    CompanyName = mCompany.CompanyName,
-                    DatabaseName = mCompany.DatabaseName,
+                    CompanyID = 5,
+                    CompanyCode = "testCompanyCode",
+                    CompanyName = "testCompany",
+                    DatabaseName = "warehouse_2_test",
                     UserID = 0,
                     UserName = authenticateUserName,
                     Role = 1,
@@ -288,36 +281,5 @@ namespace ai_truck_load_measurement.Controllers
                 return null;
             }
         }
-
-        /// <summary>
-        /// 会社マスター情報取得
-        /// </summary>
-        /// <returns></returns>
-        private Warehouse_M_CompanyModel? GetMCompany()
-        {
-            try
-            {
-                string companyWebPath = GetCompanyWebPathByURL();
-
-                if (companyWebPath != "")
-                {
-                    // SQL作成
-                    var sql = Warehouse_M_CompanyConnectController.CreateSQLToSelectMCompanyByWebPath(companyWebPath);
-                    // DB接続
-                    Warehouse_M_CompanyModel? companyModel = Warehouse_M_CompanyConnectController.ConnectMCompanny(sql);
-
-                    return companyModel;
-                }
-                else
-                {
-                    throw new Exception();
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
     }
 }
