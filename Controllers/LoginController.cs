@@ -220,13 +220,6 @@ namespace ai_truck_load_measurement.Controllers
                 var loginId = loginModel.LoginId;
                 var password = loginModel.Password;
 
-                // 入力規則チェック
-                // ログインIDまたはパスワードが空欄、パスワードが4桁未満または10桁を超える場合はエラー
-                if (!ModelState.IsValid)
-                {
-                    return null;
-                }
-
                 // 会社マスターからデータベース名取得
                 var mCompany = GetMCompany();
                 if (mCompany == null ||  string.IsNullOrWhiteSpace(mCompany.DatabaseName))
