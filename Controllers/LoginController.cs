@@ -259,6 +259,10 @@ namespace ai_truck_load_measurement.Controllers
         {
             try
             {
+                if(loginId == null || password == null)
+                {
+                    return null;
+                }
                 string domain = "LDAP://192.168.1.6/DC=tozan,DC=co,DC=jp";
                 DirectoryEntry root1 = new DirectoryEntry(domain, loginId, password);
 
