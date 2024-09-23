@@ -29,10 +29,10 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // 強制ログアウトの場合はエラーメッセージ表示
-                if (param == "autologout")
-                {
-                    ViewData["ErrorMessage"] = "E1016: " + ErrorMessagesResources.E1016;
-                }
+                //if (param == "autologout")
+                //{
+                //    ViewData["ErrorMessage"] = "E1016: " + ErrorMessagesResources.E1016;
+                //}
 
                 // 開発環境("_test"が含まれている)の場合はViewDataに"true"を代入し、
                 // _LayoutLogin.cshtmlで背景の色を変更(薄紫#EFEDFF)
@@ -162,10 +162,10 @@ namespace ai_truck_load_measurement.Controllers
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
                 // 強制ログアウトの場合はエラーメッセージ表示
-                if (param == "autologout")
-                {
-                    return RedirectToAction("Index", new { param = "autologout" });
-                }
+                //if (param == "autologout")
+                //{
+                //    return RedirectToAction("Index", new { param = "autologout" });
+                //}
 
                 // ログイン画面へリダイレクト
                 return RedirectToAction("Index");
