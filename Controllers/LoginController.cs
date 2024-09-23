@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using System.DirectoryServices;
+using DirectoryEntry = System.DirectoryServices.DirectoryEntry;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -247,20 +249,27 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // ログインユーザー情報取得
-                var sql = LoginConnectController.CreateSQLToSelectMUserByLoginUser(loginId);
-                List<M_UserModel> mUsers = M_UserConnectController.ConnectMUsers(sql, mCompany.DatabaseName);
-                M_UserModel? mUser = mUsers.FirstOrDefault();
-                if (mUser == null)
-                {
-                    return null;
-                }
+                //var sql = LoginConnectController.CreateSQLToSelectMUserByLoginUser(loginId);
+                //List<M_UserModel> mUsers = M_UserConnectController.ConnectMUsers(sql, mCompany.DatabaseName);
+                //M_UserModel? mUser = mUsers.FirstOrDefault();
+                //if (mUser == null)
+                //{
+                //    return null;
+                //}
 
-                // 入力されたパスワードをハッシュ化
-                byte[] salt = Hashing.ConvertStringToBytes(mUser.Salt);
-                string hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(password, salt);
+                // Active Directory サーバーの DirectoryEntry オブジェクトを作成
+                string domain = "LDAP://192.168.1.6/DC=tozan,DC=co,DC=jp";
+                DirectoryEntry root1 = new DirectoryEntry(domain, loginId, password);
 
-                // ハッシュ化されたパスワードと一致するかチェック
-                if (!mUser.Password.Equals(hashedPassword))
+                // Active Directory でユーザーを検索
+                DirectorySearcher searcher = new DirectorySearcher(root1);
+                searcher.Filter = "(&(objectClass=user)(sAMAccountName=" + loginId + "))";
+                searcher.SearchScope = SearchScope.Subtree;
+
+                // ユーザーが見つかったかどうかを確認
+                SearchResult result = searcher.FindOne();
+
+                if (result == null)
                 {
                     return null;
                 }
@@ -271,12 +280,12 @@ namespace ai_truck_load_measurement.Controllers
                     CompanyCode = mCompany.CompanyCode,
                     CompanyName = mCompany.CompanyName,
                     DatabaseName = mCompany.DatabaseName,
-                    UserID = mUser.UserID,
-                    UserName = mUser.UserName,
-                    Role = mUser.Role,
-                    MainDepoID = mUser.MainDepoID,
-                    MainDepoName = mUser.MainDepoName,
-                    AuthorizedKubun = mUser.AuthorizedKubun
+                    UserID = 0,
+                    UserName = result.Properties["displayname"][0].ToString(),
+                    Role = 1,
+                    MainDepoID = 1,
+                    MainDepoName = "testDepoName",
+                    AuthorizedKubun = 1
                 };
 
                 return loginUserModel;
