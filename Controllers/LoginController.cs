@@ -126,10 +126,7 @@ namespace ai_truck_load_measurement.Controllers
                   authProperties
                 );
 
-                // ログインフラグ=1,最終ログイン日時更新
-                var sql = LoginConnectController.CreateSQLToUpdateMUserByLogin(loginUserModel.UserID, dateTime);
-                M_UserConnectController.ConnectMUsers(sql, loginUserModel.DatabaseName);
-
+              
                 // log取得
                 _logger.Info($"ログイン成功 ログインID:{model.LoginId}, ログインユーザー名:{loginUserModel.UserName}");
 
@@ -159,17 +156,6 @@ namespace ai_truck_load_measurement.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var claimsList = User.Claims.ToList();
-
-                // ログインフラグ=0に更新
-                if (claimsList.Count > 0)
-                {
-                    int userID = Convert.ToInt32(User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value);
-                    string databaseName = User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
-
-                    // ユーザーマスター更新
-                    var sql = LoginConnectController.CreateSQLToUpdateMUserByLogout(userID);
-                    M_UserConnectController.ConnectMUsers(sql, databaseName);
-                }
 
                 // サインアウト
                 // レスポンスから認証クッキーを削除
@@ -247,15 +233,6 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     return null;
                 }
-
-                // ログインユーザー情報取得
-                //var sql = LoginConnectController.CreateSQLToSelectMUserByLoginUser(loginId);
-                //List<M_UserModel> mUsers = M_UserConnectController.ConnectMUsers(sql, mCompany.DatabaseName);
-                //M_UserModel? mUser = mUsers.FirstOrDefault();
-                //if (mUser == null)
-                //{
-                //    return null;
-                //}
 
                 // Active Directory サーバーの DirectoryEntry オブジェクトを作成
                 string domain = "LDAP://192.168.1.6/DC=tozan,DC=co,DC=jp";
