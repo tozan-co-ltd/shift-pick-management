@@ -234,7 +234,45 @@ namespace ai_truck_load_measurement.Controllers
                     return null;
                 }
 
-                // Active Directory サーバーの DirectoryEntry オブジェクトを作成
+                // 
+                var authenticateUserName = AuthenticateUser(loginId, password);
+                if(authenticateUserName == null)
+                {
+                    return null;
+                }
+
+                LoginUserModel loginUserModel = new()
+                {
+                    CompanyID = mCompany.CompanyID,
+                    CompanyCode = mCompany.CompanyCode,
+                    CompanyName = mCompany.CompanyName,
+                    DatabaseName = mCompany.DatabaseName,
+                    UserID = 0,
+                    UserName = authenticateUserName,
+                    Role = 1,
+                    MainDepoID = 1,
+                    MainDepoName = "testDepoName",
+                    AuthorizedKubun = 1
+                };
+
+                return loginUserModel;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// ActiveDirectory認証処理
+        /// </summary>
+        /// <param name="loginId"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        private string? AuthenticateUser(string loginId, string password)
+        {
+            try
+            {
                 string domain = "LDAP://192.168.1.6/DC=tozan,DC=co,DC=jp";
                 DirectoryEntry root1 = new DirectoryEntry(domain, loginId, password);
 
@@ -250,26 +288,11 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     return null;
                 }
-
-                LoginUserModel loginUserModel = new()
-                {
-                    CompanyID = mCompany.CompanyID,
-                    CompanyCode = mCompany.CompanyCode,
-                    CompanyName = mCompany.CompanyName,
-                    DatabaseName = mCompany.DatabaseName,
-                    UserID = 0,
-                    UserName = result.Properties["displayname"][0].ToString(),
-                    Role = 1,
-                    MainDepoID = 1,
-                    MainDepoName = "testDepoName",
-                    AuthorizedKubun = 1
-                };
-
-                return loginUserModel;
+                return result.Properties["displayname"][0].ToString();
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
         }
 
