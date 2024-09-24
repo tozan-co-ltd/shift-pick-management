@@ -87,6 +87,14 @@ label{
     content: '\f0ad';
 }
 
+.icon-categoryid-11::before {
+    content: '\f0d1';
+}
+
+.icon-categoryid-12::before {
+    content: '\f0ad';
+}
+
 /* || レスポンシブデザイン */
 @media screen and (max-width: 1200px) {
     html {

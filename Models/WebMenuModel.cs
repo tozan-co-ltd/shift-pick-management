@@ -24,6 +24,8 @@ namespace ai_truck_load_measurement.Models
 
                 var selectCategoryList = new List<M_WebMenuCategory>()
                 {
+                    new M_WebMenuCategory{CategoryID = 11, CategoryName = "実績"},
+                    new M_WebMenuCategory{CategoryID = 12, CategoryName = "マスター" },
                     new M_WebMenuCategory{CategoryID = 1, CategoryName ="入出荷"},
                     new M_WebMenuCategory{CategoryID = 5, CategoryName ="入荷"},
                     new M_WebMenuCategory{CategoryID = 10, CategoryName ="その他"},
@@ -133,6 +135,13 @@ namespace ai_truck_load_measurement.Models
                     new M_WebMenu{CategoryID = 7, MenuID = 3, MenuName = "会社マスター", Controller = "M_Company", Action = "Index"},
                     new M_WebMenu{CategoryID = 7, MenuID = 4, MenuName = "品番マスター", Controller = "M_Product", Action = "Index"},
                     new M_WebMenu{CategoryID = 7, MenuID = 5, MenuName = "仕入先かんばんマスター", Controller = "M_SupplierKanban", Action = "Index"},
+                    new M_WebMenu{CategoryID = 11, MenuID = 1, MenuName = "荷量分布", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 11, MenuID = 2, MenuName = "荷量推移", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 11, MenuID = 3, MenuName = "荷量と運行実績", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 11, MenuID = 4, MenuName = "実績出力", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 12, MenuID = 1, MenuName = "車両マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 12, MenuID = 2, MenuName = "便マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 12, MenuID = 3, MenuName = "便枝番マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
                 };
                 webMenuList = referenceList.FindAll(x => x.CategoryID == categoryID);
 
