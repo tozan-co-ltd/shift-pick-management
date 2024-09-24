@@ -62,15 +62,15 @@ namespace ai_truck_load_measurement.Filters
                 }
 
                 // アクセスするController名が表示しているメニューに含まれていない場合はアクセス拒否ページ(Shared/AccessDenied)へ遷移
-                if (!IsAccessible)
-                {
-                    var viewResult = new ViewResult
-                    {
-                        ViewName = "AccessDenied"
-                    };
-                    context.Result = viewResult;
-                    return;
-                }
+                //if (!IsAccessible)
+                //{
+                //    var viewResult = new ViewResult
+                //    {
+                //        ViewName = "AccessDenied"
+                //    };
+                //    context.Result = viewResult;
+                //    return;
+                //}
 
                 //// 2.同一ユーザーによる複数端末での同時ログインを禁止する
                 ////   先にログインしたユーザーがログアウト(ログイン画面へリダイレクト)される
