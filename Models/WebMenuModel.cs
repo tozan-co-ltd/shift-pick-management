@@ -141,7 +141,6 @@ namespace ai_truck_load_measurement.Models
                     new M_WebMenu{CategoryID = 11, MenuID = 4, MenuName = "実績出力", Controller = "ImportReceiveSchedule", Action = "Index"},
                     new M_WebMenu{CategoryID = 12, MenuID = 1, MenuName = "車両マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
                     new M_WebMenu{CategoryID = 12, MenuID = 2, MenuName = "便マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
-                    new M_WebMenu{CategoryID = 12, MenuID = 3, MenuName = "便枝番マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
                 };
                 webMenuList = referenceList.FindAll(x => x.CategoryID == categoryID);
 
