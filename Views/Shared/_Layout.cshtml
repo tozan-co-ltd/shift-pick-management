@@ -13,7 +13,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - スマホDE検品</title>
+    <title>@ViewData["Title"] - AI荷量把握</title>
 
     <!-- ▼ファビコン -->
     <link rel="shortcut icon" type="image/png" href="~/images\webicon.png">
@@ -57,7 +57,9 @@
 <body class="@bodyClass">
     <nav class="sb-topnav navbar navbar-expand navbar-dark @wrapperClass">
         <!-- Navbar Brand-->
-        <a id="home-title" class="navbar-brand ps-3" asp-controller="Top" asp-action="Index">スマホDE検品</a>
+        <a id="home-title" class="navbar-brand ps-3 navbar-logo" asp-controller="Top" asp-action="Index">
+            <img class="login-img card-img-top" src="~/images/webicon.png" /> AI荷量把握
+        </a>
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-angles-left"></i></button>
         <!-- Navbar Search-->
@@ -74,27 +76,6 @@
                 <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" id="navbarDropdown"
                      aria-labelledby="navbarDropdown">
                     <div id="user-detail-dropdown-item" class="dropdown-item text-gray-600">
-                        <p>
-                            <label class="mr-2 col-4">
-                                会社名
-                            </label>
-                            <span class="col">
-                                @(User.Identity.IsAuthenticated ? User.FindFirst("CompanyName").Value : null)
-                            </span>
-                        </p>
-                        <p>
-                            <label class="mr-2 col-4">
-                                メイン倉庫名
-                            </label>
-                            <span class="col">
-                                @(User.Identity.IsAuthenticated ? User.FindFirst("MainDepoName").Value : null)
-                            </span>
-                        </p>
-                        <hr />
-                        <a class="dropdown-item mt-2 logout" asp-controller="ChangePassword" asp-action="Index">
-                            <i class="fa fa-gears fa-fw mr-2"></i>
-                            パスワード変更
-                        </a>
                         <a class="dropdown-item mt-2 logout" href="#" data-toggle="modal" data-target="#logoutModal">
                             <i class="fas fa-sign-out-alt fa-fw mr-2"></i>
                             ログアウト
@@ -119,6 +100,8 @@
                                 var categoryName = categoryMenuList.M_WebMenuCategoryModel.CategoryName;
                                 var categoryID = categoryMenuList.M_WebMenuCategoryModel.CategoryID;
                                 var menuList = categoryMenuList.WebMenuList;
+                                var currentController = ViewContext.RouteData.Values["controller"].ToString();
+                                var currentCategoryID = Model.GetCategoryIDFromControlerName(currentController);
                                 if (menuList.Count != 0)
                                 {
                                     <li class="nav-item">
@@ -127,14 +110,28 @@
                                             <i class="icon-category @("icon-categoryid-" + categoryID)"></i>
                                             <span>@(categoryName)</span>
                                         </a>
-                                        <div id="collapse@(categoryID)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                                            <div class="bg-white py-2 collapse-inner rounded">
-                                                @foreach (var obj in menuList)
-                                                {
-                                                    <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
-                                                }
+                                        @if(currentCategoryID == categoryID || (currentCategoryID == null && categoryID == 11))
+                                        {
+                                            <div id="collapse@(categoryID)" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                                <div class="bg-white py-2 collapse-inner rounded">
+                                                    @foreach (var obj in menuList)
+                                                    {
+                                                        <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                    }
+                                                </div>
                                             </div>
-                                        </div>
+                                        }
+                                        else
+                                        {
+                                            <div id="collapse@(categoryID)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                                <div class="bg-white py-2 collapse-inner rounded">
+                                                    @foreach (var obj in menuList)
+                                                    {
+                                                        <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
                                     </li>
                                 }
                             }
