@@ -100,6 +100,8 @@
                                 var categoryName = categoryMenuList.M_WebMenuCategoryModel.CategoryName;
                                 var categoryID = categoryMenuList.M_WebMenuCategoryModel.CategoryID;
                                 var menuList = categoryMenuList.WebMenuList;
+                                var currentController = ViewContext.RouteData.Values["controller"].ToString();
+                                var currentCategoryID = Model.GetCategoryIDFromControlerName(currentController);
                                 if (menuList.Count != 0)
                                 {
                                     <li class="nav-item">
@@ -108,14 +110,28 @@
                                             <i class="icon-category @("icon-categoryid-" + categoryID)"></i>
                                             <span>@(categoryName)</span>
                                         </a>
-                                        <div id="collapse@(categoryID)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                                            <div class="bg-white py-2 collapse-inner rounded">
-                                                @foreach (var obj in menuList)
-                                                {
-                                                    <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
-                                                }
+                                        @if(currentCategoryID == categoryID || (currentCategoryID == null && categoryID == 11))
+                                        {
+                                            <div id="collapse@(categoryID)" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                                <div class="bg-white py-2 collapse-inner rounded">
+                                                    @foreach (var obj in menuList)
+                                                    {
+                                                        <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                    }
+                                                </div>
                                             </div>
-                                        </div>
+                                        }
+                                        else
+                                        {
+                                            <div id="collapse@(categoryID)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                                <div class="bg-white py-2 collapse-inner rounded">
+                                                    @foreach (var obj in menuList)
+                                                    {
+                                                        <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
                                     </li>
                                 }
                             }

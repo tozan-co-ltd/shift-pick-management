@@ -9,6 +9,29 @@ namespace ai_truck_load_measurement.Models
     /// </summary>
     public class WebMenuModel : CommonModel
     {
+        private readonly List<M_WebMenu> referenceList = new List<M_WebMenu>()
+                {
+                    new M_WebMenu{CategoryID = 5, MenuID = 1, MenuName = "入荷予定取込", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 5, MenuID = 2, MenuName = "入荷予定照会", Controller = "D_ReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 5, MenuID = 3, MenuName = "入荷実績照会", Controller = "D_Receive", Action = "Index"},
+                    new M_WebMenu{CategoryID = 6, MenuID = 1, MenuName = "出荷指示取込", Controller = "ImportShipmentSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 6, MenuID = 2, MenuName = "出荷指示照会", Controller = "D_ShipmentSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 3, MenuID = 4, MenuName = "在庫照会", Controller = "StockStatus", Action = "Index"},
+                    new M_WebMenu{CategoryID = 3, MenuID = 8, MenuName = "入庫実績照会・修正", Controller = "D_StoreIn", Action = "Index"},
+                    new M_WebMenu{CategoryID = 3, MenuID = 3, MenuName = "出庫実績照会・修正", Controller = "D_StoreOut", Action = "Index"},
+                    new M_WebMenu{CategoryID = 7, MenuID = 1, MenuName = "倉庫マスター", Controller = "M_Depo", Action = "Index"},
+                    new M_WebMenu{CategoryID = 7, MenuID = 2, MenuName = "ユーザーマスター", Controller = "M_User", Action = "Index"},
+                    new M_WebMenu{CategoryID = 7, MenuID = 3, MenuName = "会社マスター", Controller = "M_Company", Action = "Index"},
+                    new M_WebMenu{CategoryID = 7, MenuID = 4, MenuName = "品番マスター", Controller = "M_Product", Action = "Index"},
+                    new M_WebMenu{CategoryID = 7, MenuID = 5, MenuName = "仕入先かんばんマスター", Controller = "M_SupplierKanban", Action = "Index"},
+                    new M_WebMenu{CategoryID = 11, MenuID = 1, MenuName = "荷量分布", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 11, MenuID = 2, MenuName = "荷量推移", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 11, MenuID = 3, MenuName = "荷量と運行実績", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 11, MenuID = 4, MenuName = "実績出力", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 12, MenuID = 1, MenuName = "車両マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 12, MenuID = 2, MenuName = "便マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
+                };
+
         /// <summary>
         /// WEBカテゴリーリスト取得
         /// </summary>
@@ -120,28 +143,7 @@ namespace ai_truck_load_measurement.Models
                 //// DB接続
                 //webMenuList = WebMenuConnectController.ConnectMWebMenu(sql, CompanyID, categoryID);
 
-                List<M_WebMenu> referenceList = new List<M_WebMenu>()
-                {
-                    new M_WebMenu{CategoryID = 5, MenuID = 1, MenuName = "入荷予定取込", Controller = "ImportReceiveSchedule", Action = "Index"},
-                    new M_WebMenu{CategoryID = 5, MenuID = 2, MenuName = "入荷予定照会", Controller = "D_ReceiveSchedule", Action = "Index"},
-                    new M_WebMenu{CategoryID = 5, MenuID = 3, MenuName = "入荷実績照会", Controller = "D_Receive", Action = "Index"},
-                    new M_WebMenu{CategoryID = 6, MenuID = 1, MenuName = "出荷指示取込", Controller = "ImportShipmentSchedule", Action = "Index"},
-                    new M_WebMenu{CategoryID = 6, MenuID = 2, MenuName = "出荷指示照会", Controller = "D_ShipmentSchedule", Action = "Index"},
-                    new M_WebMenu{CategoryID = 3, MenuID = 4, MenuName = "在庫照会", Controller = "StockStatus", Action = "Index"},
-                    new M_WebMenu{CategoryID = 3, MenuID = 8, MenuName = "入庫実績照会・修正", Controller = "D_StoreIn", Action = "Index"},
-                    new M_WebMenu{CategoryID = 3, MenuID = 3, MenuName = "出庫実績照会・修正", Controller = "D_StoreOut", Action = "Index"},
-                    new M_WebMenu{CategoryID = 7, MenuID = 1, MenuName = "倉庫マスター", Controller = "M_Depo", Action = "Index"},
-                    new M_WebMenu{CategoryID = 7, MenuID = 2, MenuName = "ユーザーマスター", Controller = "M_User", Action = "Index"},
-                    new M_WebMenu{CategoryID = 7, MenuID = 3, MenuName = "会社マスター", Controller = "M_Company", Action = "Index"},
-                    new M_WebMenu{CategoryID = 7, MenuID = 4, MenuName = "品番マスター", Controller = "M_Product", Action = "Index"},
-                    new M_WebMenu{CategoryID = 7, MenuID = 5, MenuName = "仕入先かんばんマスター", Controller = "M_SupplierKanban", Action = "Index"},
-                    new M_WebMenu{CategoryID = 11, MenuID = 1, MenuName = "荷量分布", Controller = "ImportReceiveSchedule", Action = "Index"},
-                    new M_WebMenu{CategoryID = 11, MenuID = 2, MenuName = "荷量推移", Controller = "ImportReceiveSchedule", Action = "Index"},
-                    new M_WebMenu{CategoryID = 11, MenuID = 3, MenuName = "荷量と運行実績", Controller = "ImportReceiveSchedule", Action = "Index"},
-                    new M_WebMenu{CategoryID = 11, MenuID = 4, MenuName = "実績出力", Controller = "ImportReceiveSchedule", Action = "Index"},
-                    new M_WebMenu{CategoryID = 12, MenuID = 1, MenuName = "車両マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
-                    new M_WebMenu{CategoryID = 12, MenuID = 2, MenuName = "便マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
-                };
+               
 
                 if(categoryID == 0)
                 {
@@ -158,6 +160,22 @@ namespace ai_truck_load_measurement.Models
             {
                 throw;
             }
+        }
+
+        /// <summary>
+        /// コントローラー名に対応するカテゴリーIDの値を返す
+        /// </summary>
+        /// <param name="currentControler"></param>
+        /// <returns></returns>
+        public int? GetCategoryIDFromControlerName(string controlerName)
+        {
+            var currentWebMenu = referenceList.Where(x => x.Controller.Equals(controlerName)).FirstOrDefault();
+            if(currentWebMenu == null)
+            {
+                return null;
+            }
+            int currentCategoryID = currentWebMenu.CategoryID;
+            return currentCategoryID;
         }
     }
 
