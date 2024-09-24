@@ -17,10 +17,24 @@ namespace ai_truck_load_measurement.Models
         {
             try
             {
-                // SQL作成
-                var sql = WebMenuConnectController.CreateSQLToSelectMWebMenuCategory();
-                // DB接続
-                var selectCategoryList = WebMenuConnectController.ConnectMWebMenuCategory(sql);
+                //// SQL作成
+                //var sql = WebMenuConnectController.CreateSQLToSelectMWebMenuCategory();
+                //// DB接続
+                //var selectCategoryList = WebMenuConnectController.ConnectMWebMenuCategory(sql);
+
+                var selectCategoryList = new List<M_WebMenuCategory>()
+                {
+                    new M_WebMenuCategory{CategoryID = 1, CategoryName ="入出荷"},
+                    new M_WebMenuCategory{CategoryID = 5, CategoryName ="入荷"},
+                    new M_WebMenuCategory{CategoryID = 10, CategoryName ="その他"},
+                    new M_WebMenuCategory{CategoryID = 6, CategoryName ="出荷"},
+                    new M_WebMenuCategory{CategoryID = 2, CategoryName ="納入支持"},
+                    new M_WebMenuCategory{CategoryID = 3, CategoryName ="在庫"},
+                    new M_WebMenuCategory{CategoryID = 9, CategoryName ="棚卸"},
+                    new M_WebMenuCategory{CategoryID = 4, CategoryName ="管理"},
+                    new M_WebMenuCategory{CategoryID = 7, CategoryName ="マスター情報"},
+                    new M_WebMenuCategory{CategoryID = 8, CategoryName ="AGF管理"}
+                };
 
                 return selectCategoryList;
             }
@@ -99,10 +113,28 @@ namespace ai_truck_load_measurement.Models
                     categoryID = mWebMenuCategory.CategoryID;
                 }
 
-                // SQL作成
-                var sql = WebMenuConnectController.CreateSQLToSelectMWebMenu(CompanyID, userRoleName, categoryID);
-                // DB接続
-                webMenuList = WebMenuConnectController.ConnectMWebMenu(sql, CompanyID, categoryID);
+                //// SQL作成
+                //var sql = WebMenuConnectController.CreateSQLToSelectMWebMenu(CompanyID, userRoleName, categoryID);
+                //// DB接続
+                //webMenuList = WebMenuConnectController.ConnectMWebMenu(sql, CompanyID, categoryID);
+
+                List<M_WebMenu> referenceList = new List<M_WebMenu>()
+                {
+                    new M_WebMenu{CategoryID = 5, MenuID = 1, MenuName = "入荷予定取込", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 5, MenuID = 2, MenuName = "入荷予定照会", Controller = "D_ReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 5, MenuID = 3, MenuName = "入荷実績照会", Controller = "D_Receive", Action = "Index"},
+                    new M_WebMenu{CategoryID = 6, MenuID = 1, MenuName = "出荷指示取込", Controller = "ImportShipmentSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 6, MenuID = 2, MenuName = "出荷指示照会", Controller = "D_ShipmentSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 3, MenuID = 4, MenuName = "在庫照会", Controller = "StockStatus", Action = "Index"},
+                    new M_WebMenu{CategoryID = 3, MenuID = 8, MenuName = "入庫実績照会・修正", Controller = "D_StoreIn", Action = "Index"},
+                    new M_WebMenu{CategoryID = 3, MenuID = 3, MenuName = "出庫実績照会・修正", Controller = "D_StoreOut", Action = "Index"},
+                    new M_WebMenu{CategoryID = 7, MenuID = 1, MenuName = "倉庫マスター", Controller = "M_Depo", Action = "Index"},
+                    new M_WebMenu{CategoryID = 7, MenuID = 2, MenuName = "ユーザーマスター", Controller = "M_User", Action = "Index"},
+                    new M_WebMenu{CategoryID = 7, MenuID = 3, MenuName = "会社マスター", Controller = "M_Company", Action = "Index"},
+                    new M_WebMenu{CategoryID = 7, MenuID = 4, MenuName = "品番マスター", Controller = "M_Product", Action = "Index"},
+                    new M_WebMenu{CategoryID = 7, MenuID = 5, MenuName = "仕入先かんばんマスター", Controller = "M_SupplierKanban", Action = "Index"},
+                };
+                webMenuList = referenceList.FindAll(x => x.CategoryID == categoryID);
 
                 return webMenuList;
             }

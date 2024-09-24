@@ -216,7 +216,8 @@ label{
     max-height: 35px;
     vertical-align: middle;
     /*filter: drop-shadow(-5px 5px 5px rgba(0,0,0,0.5));*/
-    background-color: #ffffff;
+    border: solid, 1px, #ffffff;
+    border-radius: 5px;
 }
 
 
