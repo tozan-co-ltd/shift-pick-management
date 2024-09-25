@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 /// </summary>
 namespace ai_truck_load_measurement.ConnectControllers
 {
-    public class M_TrackConnectController
+    public class M_TruckConnectController
     {
         /// <summary>
         /// 車両情報取得
@@ -32,7 +32,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 {
                     connection.ConnectionString = connectionString;
                     connection.Open();
-
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
                     strList = connection.Query<M_TruckModel>(sql).ToList();
                 }
                 return strList;
@@ -148,15 +148,15 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 SELECT 
 	                truck_id
-                    ,truck_code
-                    ,truck_name
+                    ,truck_number
+                    ,identify_number
                     ,is_deleted
                     ,created_at
                     ,created_by
                     ,updated_at
                     ,updated_by
                 FROM 
-	                m_truck
+	                m_trucks
                 WHERE 
                     is_deleted = 0
             ";
@@ -174,7 +174,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT
                     COUNT(*)                      
                 FROM 
-                    m_truck
+                    m_trucks
                 WHERE
                     truck_number = {truckNumber}
                     AND is_deleted = 0
@@ -194,7 +194,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT
                     COUNT(*)                      
                 FROM 
-                    m_truck
+                    m_trucks
                 WHERE
                     truck_number = {model.TruckNumber}
                     AND truck_id <> {model.TruckID}
@@ -215,7 +215,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     SELECT
                         *               
                     FROM 
-                        m_truck
+                        m_trucks
                     WHERE
                         truck_id = {truckId}
                         AND is_deleted = 0

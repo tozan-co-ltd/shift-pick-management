@@ -1,5 +1,6 @@
 ﻿using ai_truck_load_measurement.Properties;
 using System.ComponentModel.DataAnnotations;
+using X.PagedList;
 
 namespace ai_truck_load_measurement.Models
 {
@@ -8,6 +9,11 @@ namespace ai_truck_load_measurement.Models
     /// </summary>
     public class M_TruckModel: CommonModel
     {
+        /// <summary>
+        /// 倉庫リスト
+        /// </summary>
+        public IPagedList<M_TruckModel>? M_TruckList { get; set; }
+
         /// <summary>
         /// 車両ID
         /// </summary>

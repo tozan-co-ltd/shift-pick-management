@@ -39,5 +39,44 @@
                 </div>
             </div>
         </div>
+        <div class="mt-3">
+            <table class="table table-sm stripe hover nowrap datatable-normal">
+                <thead>
+                    <tr>
+                        <th width="40"></th>
+                        <th class="font-weight-bold">車両ID</th>
+                        <th class="font-weight-bold">車両番号</th>
+                        <th class="font-weight-bold">識別番号</th>
+                        <th class="font-weight-bold">更新日時</th>
+                        <th class="font-weight-bold">更新者</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (@Model.M_TruckList != null)
+                    {
+                        @foreach (var item in @Model.M_TruckList)
+                        {
+                            <tr>
+                                <td>
+                                    <a class="btn btn-success btn-icon-split ml-1 mr-1"
+                                       onclick="OnEditClick('@item.TruckID')" data-id="@item.TruckID" data-toggle="modal" data-target="#edit-modal">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <button class="btn btn-danger btn-icon-split"
+                                            onclick="OnDeleteClick('@item.TruckID')" data-id="@item.TruckID" data-toggle="modal" data-target="#delete-modal">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                                <td>@item.TruckID</td>
+                                <td>@item.TruckNumber</td>
+                                <td>@item.IdentifyNumber</td>
+                                <td>@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                                <td>@item.UpdatedBy</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
