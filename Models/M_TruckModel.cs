@@ -1,4 +1,7 @@
-﻿namespace ai_truck_load_measurement.Models
+﻿using ai_truck_load_measurement.Properties;
+using System.ComponentModel.DataAnnotations;
+
+namespace ai_truck_load_measurement.Models
 {
     /// <summary>
     /// 車両マスターのモデル
@@ -8,16 +11,23 @@
         /// <summary>
         /// 車両ID
         /// </summary>
+        [Display(Name="ID")]
         public int TruckID {  get; set; }
 
         /// <summary>
         /// 車両番号
         /// </summary>
+        [Display(Name="車両番号")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [RegularExpression(@"[0-9]+", ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int TruckNumber {  get; set; }
 
         /// <summary>
         /// 識別番号
         /// </summary>
+        [Display(Name = "識別番号")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [RegularExpression(@"[0-9]+", ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int IdentifyNumber {  get; set; }
 
         /// <summary>
@@ -28,6 +38,7 @@
         /// <summary>
         /// 作成日時
         /// </summary>
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
@@ -38,6 +49,7 @@
         /// <summary>
         /// 更新日時
         /// </summary>
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime UpdatedAt { get; set; }
 
         /// <summary>
