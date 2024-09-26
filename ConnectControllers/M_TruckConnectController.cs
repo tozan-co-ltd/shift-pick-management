@@ -52,12 +52,13 @@ namespace ai_truck_load_measurement.ConnectControllers
         public static int InsertMTruck(M_TruckModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
                 connection.ConnectionString = connectionString;
                 connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
                 // DB接続
                 try
@@ -84,12 +85,13 @@ namespace ai_truck_load_measurement.ConnectControllers
         public static int UpdateMTruck(M_TruckModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
                 connection.ConnectionString = connectionString;
                 connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
                 // DB接続
                 try
@@ -116,12 +118,13 @@ namespace ai_truck_load_measurement.ConnectControllers
         public static int DeleteMTruck(int truckId, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
                 connection.ConnectionString = connectionString;
                 connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
                 // DB接続
                 try
@@ -241,8 +244,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     identify_number,
                     created_at,
                     created_by,
-                    update_at,
-                    update_by
+                    updated_at,
+                    updated_by
                 )
                 VALUES (
                     '{model.TruckNumber}',
@@ -274,7 +277,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     updated_by = '{updatedBy}'
                 WHERE
                     truck_id = {model.TruckID}
-                    and IsDeleted = 0
+                    and is_deleted = 0
             ";
             return sql;
         }

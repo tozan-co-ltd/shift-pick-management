@@ -196,3 +196,111 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    // 編集ボタン押下
+    function OnEditClick(truckID) {
+        DeleteErrorMessages();
+
+        // M_TruckModel取得
+        var truckModel = @Html.Raw(Json.Serialize(Model));
+        truckModel.m_TruckList.forEach(function (item) {
+            if (item.truckID == truckID) {
+                $("#TruckID").val(item.truckID);
+                $("#TruckNumber").val(item.truckNumber);
+                $("#IdentifyNumber").val(item.identifyNumber);
+            }
+        });
+    }
+
+    // 更新
+    function OnExecuteEdit() {
+        $('#mTruckForm').submit(function (event) {
+            DeleteErrorMessages();
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Edit", "M_Truck")';
+            let method = 'POST';
+            let formId = 'mTruckForm';
+            let data = $('#' + formId).serializeArray();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#edit-modal').hide();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#edit-modal-error-message").text(errorMessage);
+                }
+            });
+        });
+    }
+
+    // 削除ボタン押下
+    function OnDeleteClick(truckID) {
+        console.log("OnDeleteClick", truckID)
+        // M_TruckModel取得
+        var truckModel = @Html.Raw(Json.Serialize(Model));
+        truckModel.m_TruckList.forEach(function (item) {
+
+            if (item.truckID == truckID) {
+                $("#deleteTruckId").val(item.truckID);
+                $("#deleteTruckNumber").val(item.truckNumber);
+                $("#deleteIdentifyNumber").val(item.identifyNumber);
+            }
+        });
+    }
+
+    // 削除
+    function OnExecuteDelete() {
+        DeleteErrorMessages();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("Delete", "M_Truck")';
+        let method = 'POST';
+        let data = { "TruckId": $('#deleteTruckId').val() };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            $('#delete-modal').hide();
+            // 完了モーダル表示
+            AlertMessage('', '完了', '登録が完了しました。', null, null);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#delete-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#delete-modal-error-message").text(errorMessage);
+            }
+        });
+    }
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
+</script>

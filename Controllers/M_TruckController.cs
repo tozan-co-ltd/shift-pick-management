@@ -193,9 +193,9 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 車両マスター削除
         /// </summary>
-        /// <param name="depoId">車両ID</param>
+        /// <param name="truckId">車両ID</param>
         /// <returns></returns>
-        public IActionResult Delete(int depoId)
+        public IActionResult Delete(int truckId)
         {
             string? errorMessage;
             try
@@ -204,10 +204,10 @@ namespace ai_truck_load_measurement.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 車両マスター削除
-                int deleteAffectedRows = M_TruckConnectController.DeleteMTruck(depoId, user);
+                int deleteAffectedRows = M_TruckConnectController.DeleteMTruck(truckId, user);
 
                 // log取得
-                _logger.Info($"車両マスター削除成功 車両ID:{depoId}");
+                _logger.Info($"車両マスター削除成功 車両ID:{truckId}");
 
                 return Ok();
             }
