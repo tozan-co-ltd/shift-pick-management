@@ -86,7 +86,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="edit-modal-label">修正</h5>
+                <h5 class="modal-title" id="edit-modal-label">更新</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -126,11 +126,11 @@
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
-                            <button class="btn btn-success btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteEdit()">
-                                <span class="text" style="min-width:84px">更新</span>
-                            </button>
-                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
+                            <button class="btn btn-secondary btn-icon-split mb-2 mr-0 mr-sm-5" data-dismiss="modal" aria-label="Close">
                                 <span class="text">キャンセル</span>
+                            </button>
+                            <button class="btn btn-success btn-icon-split mb-2" onclick="OnExecuteEdit()">
+                                <span class="text" style="min-width:84px">更新</span>
                             </button>
                         </div>
                     </form>
@@ -182,11 +182,11 @@
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
-                            <button class="btn btn-danger btn-icon-split mb-2 mr-0 mr-sm-5" onclick="OnExecuteDelete()">
-                                <span class="text" style="min-width:84px">削除</span>
-                            </button>
-                            <button class="btn btn-secondary btn-icon-split mb-2" data-dismiss="modal" aria-label="Close">
+                            <button class="btn btn-secondary btn-icon-split mb-2 mr-0 mr-sm-5" data-dismiss="modal" aria-label="Close">
                                 <span class="text">キャンセル</span>
+                            </button>
+                            <button class="btn btn-danger btn-icon-split mb-2" onclick="OnExecuteDelete()">
+                                <span class="text" style="min-width:84px">削除</span>
                             </button>
                         </div>
                     </div>
