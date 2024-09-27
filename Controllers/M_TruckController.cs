@@ -81,7 +81,7 @@ namespace ai_truck_load_measurement.Controllers
                 if (!ModelState.IsValid)
                 {
                     // log取得
-                    errorMessage = "E1017: " + ErrorMessagesResources.E1017;
+                    errorMessage = "E1011: " + ErrorMessagesResources.E1011;
                     _logger.Error($"車両マスター登録失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
@@ -156,7 +156,7 @@ namespace ai_truck_load_measurement.Controllers
                 if (!ModelState.IsValid)
                 {
                     // log取得
-                    errorMessage = "E1017: " + ErrorMessagesResources.E1017;
+                    errorMessage = "E1011: " + ErrorMessagesResources.E1011;
                     _logger.Error($"車両マスター更新失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });

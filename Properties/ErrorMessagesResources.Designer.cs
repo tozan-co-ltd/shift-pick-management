@@ -151,7 +151,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   {0}が会社マスターに存在しません。 に類似しているローカライズされた文字列を検索します。
+        ///   入力値に不正な値があります。正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1011 {
             get {
