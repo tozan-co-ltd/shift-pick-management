@@ -59,6 +59,7 @@ namespace ai_truck_load_measurement.Commons
                 {
                     connection.ConnectionString = connectionString;
                     connection.Open();
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
                     int result = Convert.ToInt32(connection.ExecuteScalar(sql));
 

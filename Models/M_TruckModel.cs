@@ -25,7 +25,7 @@ namespace ai_truck_load_measurement.Models
         /// </summary>
         [Display(Name="車両番号")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [RegularExpression(@"[0-9]+", ErrorMessageResourceName = "E1007", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [RegularExpression(@"^[0-9]{4,4}$", ErrorMessageResourceName = "E1024", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int TruckNumber {  get; set; }
 
         /// <summary>

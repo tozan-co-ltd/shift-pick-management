@@ -183,6 +183,9 @@
   <data name="E1022" xml:space="preserve">
     <value>仕入先かんばんマスターに一致するデータがありません。</value>
   </data>
+  <data name="E1024" xml:space="preserve">
+	<value>4桁の半角数字で入力してください。</value>
+  </data>
   <data name="E2001" xml:space="preserve">
     <value>QRコードが正しくありません。正しいQRコードを読み取ってください。</value>
   </data>
