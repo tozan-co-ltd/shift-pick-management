@@ -207,7 +207,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 異なるIDで重複車両情報取得SQL作成
+        /// 異なるIDで重複車両番号情報取得SQL作成
         /// </summary>
         /// <param name="model">登録情報</param>
         /// <returns>SQL文</returns>
@@ -220,6 +220,27 @@ namespace ai_truck_load_measurement.ConnectControllers
                     m_trucks
                 WHERE
                     truck_number = {model.TruckNumber}
+                    AND truck_id <> {model.TruckID}
+                    AND is_deleted = 0
+            ";
+
+            return sql;
+        }
+
+        /// <summary>
+        /// 異なるIDで重複車両番号情報取得SQL作成
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectDuplicateEditMTruckIdentifyNumber(M_TruckModel model)
+        {
+            var sql = $@"
+                SELECT
+                    COUNT(*)                      
+                FROM 
+                    m_trucks
+                WHERE
+                    identify_number = {model.IdentifyNumber}
                     AND truck_id <> {model.TruckID}
                     AND is_deleted = 0
             ";

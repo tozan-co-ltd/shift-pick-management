@@ -164,11 +164,23 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 異なるIDで車両コード重複チェック
                 var sql = M_TruckConnectController.CreateSQLToSelectDuplicateEditMTruck(model);
-                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, "AI-truck-load-measurement_test");
-                if (isExisted)
+                bool isExistedTruckNumber = ConnectToSQLServer.IsExistedSameRecord(sql, "AI-truck-load-measurement_test");
+                var sqlIdentifyNumber = M_TruckConnectController.CreateSQLToSelectDuplicateEditMTruckIdentifyNumber(model);
+                bool isExistedIdentifyNumber = ConnectToSQLServer.IsExistedSameRecord(sqlIdentifyNumber, "AI-truck-load-measurement_test");
+                if (isExistedTruckNumber || isExistedIdentifyNumber)
                 {
+                    string displayName = "";
+                    if (isExistedTruckNumber)
+                    {
+                        displayName = Utils.GetDisplayName<M_TruckModel>("TruckNumber");
+                    }
+                    else
+                    {
+                        displayName = Utils.GetDisplayName<M_TruckModel>("IdentifyNumber");
+                    }
+
                     // log取得
-                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_TruckModel>("TruckNumber"));
+                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, displayName);
                     _logger.Error($"車両マスター更新失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
