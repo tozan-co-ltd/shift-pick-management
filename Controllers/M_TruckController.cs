@@ -105,7 +105,7 @@ namespace ai_truck_load_measurement.Controllers
                     }
 
                     // log取得
-                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, displayName);
+                    errorMessage = errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1009, displayName);
                     _logger.Error($"車両マスター登録失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
@@ -180,7 +180,7 @@ namespace ai_truck_load_measurement.Controllers
                     }
 
                     // log取得
-                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, displayName);
+                    errorMessage = errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1009, displayName);
                     _logger.Error($"車両マスター更新失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
