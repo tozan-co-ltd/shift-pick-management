@@ -88,12 +88,24 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // 車両コード重複チェック
-                var sql = M_TruckConnectController.CreateSQLToSelectDuplicateMTruck(model.TruckNumber);
-                bool isExisted = ConnectToSQLServer.IsExistedSameRecord(sql, "AI-truck-load-measurement_test");
-                if (isExisted)
+                var sqlTruckNumber = M_TruckConnectController.CreateSQLToSelectDuplicateMTruck(model.TruckNumber);
+                bool isExistedTruckNumber = ConnectToSQLServer.IsExistedSameRecord(sqlTruckNumber, "AI-truck-load-measurement_test");
+                var sqlIdentifyNumber = M_TruckConnectController.CreateSQLToSelectDuplicateMTruckIdentifyNumber(model.IdentifyNumber);
+                bool isExistedIdentifyNumber = ConnectToSQLServer.IsExistedSameRecord(sqlIdentifyNumber, "AI-truck-load-measurement_test");
+                if (isExistedTruckNumber || isExistedIdentifyNumber)
                 {
+                    string displayName = "";
+                    if (isExistedTruckNumber)
+                    {
+                        displayName = Utils.GetDisplayName<M_TruckModel>("TruckNumber");
+                    }
+                    else
+                    {
+                        displayName = Utils.GetDisplayName<M_TruckModel>("IdentifyNumber");
+                    }
+
                     // log取得
-                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, Utils.GetDisplayName<M_TruckModel>("TruckNumber"));
+                    errorMessage = errorMessage = "E1009: " + string.Format(ErrorMessagesResources.E1009, displayName);
                     _logger.Error($"車両マスター登録失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
