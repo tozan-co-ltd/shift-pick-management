@@ -31,9 +31,9 @@ namespace ai_truck_load_measurement.Controllers
                 // 車両マスター情報取得SQL作成
                 var sql = M_TruckConnectController.CreateSQLToSelectMTrucks();
                 // DB接続
-                IEnumerable<M_TruckModel> demoList = M_TruckConnectController.ConnectMTrucks(sql, "AI-truck-load-measurement_test");
+                IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(sql, "AI-truck-load-measurement_test");
 
-                model.M_TruckList = demoList.ToPagedList();
+                model.M_TruckList = truckList.ToPagedList();
 
                 return View(model);
             }
