@@ -433,22 +433,5 @@ namespace ai_truck_load_measurement.Commons
                 throw;
             }
         }
-
-        public static void CreateDatatableToExcel(this System.Data.DataTable dataTable, string filePath)
-        {
-            //Workbook workBook = new Workbook();
-            //workBook.Worksheets.Clear();
-            //Worksheet workSheet = workBook.Worksheets.Add("DataTableToExcel");
-            //workSheet.InsertDataTable(dataTable, true, 1, 1, true);
-            //workBook.SaveToFile(filePath, ExcelVersion.Version2016);
-            _Application excelapp = new _excel.Application();
-            Workbook wb;
-            Worksheet ws;
-            wb = excelapp.Workbooks.Add(XlWBATemplate.xlWBATWorksheet);
-            ws = (Worksheet)wb.Worksheets[1];
-            Worksheet worksheet1 = (Worksheet)excelapp.Worksheets.Add(After: ws);
-            wb.SaveAs(filePath);
-            wb.Close();
-        }
     }
 }
