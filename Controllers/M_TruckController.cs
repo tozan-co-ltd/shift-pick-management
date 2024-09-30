@@ -88,25 +88,10 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // 車両コード重複チェック
-                var sqlTruckNumber = M_TruckConnectController.CreateSQLToSelectDuplicateMTruck(model.TruckNumber);
-                bool isExistedTruckNumber = ConnectToSQLServer.IsExistedSameRecord(sqlTruckNumber, "AI-truck-load-measurement_test");
-                var sqlIdentifyNumber = M_TruckConnectController.CreateSQLToSelectDuplicateMTruckIdentifyNumber(model.IdentifyNumber);
-                bool isExistedIdentifyNumber = ConnectToSQLServer.IsExistedSameRecord(sqlIdentifyNumber, "AI-truck-load-measurement_test");
-                if (isExistedTruckNumber || isExistedIdentifyNumber)
+                var duplicateCheck = TrackCodeDuplicateCheck(model);
+                if (duplicateCheck != null)
                 {
-                    string displayName = "";
-                    if (isExistedTruckNumber)
-                    {
-                        displayName = Utils.GetDisplayName<M_TruckModel>("TruckNumber");
-                    }
-                    else
-                    {
-                        displayName = Utils.GetDisplayName<M_TruckModel>("IdentifyNumber");
-                    }
-
-                    // log取得
-                    errorMessage = errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1009, displayName);
-                    _logger.Error($"車両マスター登録失敗 {errorMessage}");
+                    errorMessage = duplicateCheck;
 
                     return NotFound(new { errorMessage });
                 }
@@ -162,26 +147,11 @@ namespace ai_truck_load_measurement.Controllers
                     return NotFound(new { errorMessage });
                 }
 
-                // 異なる車両IDで車両コード重複チェック
-                var sql = M_TruckConnectController.CreateSQLToSelectDuplicateEditMTruck(model);
-                bool isExistedTruckNumber = ConnectToSQLServer.IsExistedSameRecord(sql, "AI-truck-load-measurement_test");
-                var sqlIdentifyNumber = M_TruckConnectController.CreateSQLToSelectDuplicateEditMTruckIdentifyNumber(model);
-                bool isExistedIdentifyNumber = ConnectToSQLServer.IsExistedSameRecord(sqlIdentifyNumber, "AI-truck-load-measurement_test");
-                if (isExistedTruckNumber || isExistedIdentifyNumber)
+                // 車両コード重複チェック
+                var duplicateCheck = TrackCodeDuplicateCheck(model);
+                if (duplicateCheck != null)
                 {
-                    string displayName = "";
-                    if (isExistedTruckNumber)
-                    {
-                        displayName = Utils.GetDisplayName<M_TruckModel>("TruckNumber");
-                    }
-                    else
-                    {
-                        displayName = Utils.GetDisplayName<M_TruckModel>("IdentifyNumber");
-                    }
-
-                    // log取得
-                    errorMessage = errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1009, displayName);
-                    _logger.Error($"車両マスター更新失敗 {errorMessage}");
+                    errorMessage = duplicateCheck;
 
                     return NotFound(new { errorMessage });
                 }
@@ -372,6 +342,39 @@ namespace ai_truck_load_measurement.Controllers
             table.Columns.Add(Utils.GetDisplayName<M_TruckModel>("UpdatedBy"), typeof(string));
 
             return table;
+        }
+
+        /// <summary>
+        /// 車両コード重複チェック
+        /// </summary>
+        /// <param name="model">チェック対象</param>
+        /// <returns></returns>
+        private string? TrackCodeDuplicateCheck(M_TruckModel model)
+        {
+                var sqlTruckNumber = M_TruckConnectController.CreateSQLToSelectDuplicateMTruck(model);
+                bool isExistedTruckNumber = ConnectToSQLServer.IsExistedSameRecord(sqlTruckNumber, "AI-truck-load-measurement_test");
+                var sqlIdentifyNumber = M_TruckConnectController.CreateSQLToSelectDuplicateMTruckIdentifyNumber(model);
+                bool isExistedIdentifyNumber = ConnectToSQLServer.IsExistedSameRecord(sqlIdentifyNumber, "AI-truck-load-measurement_test");
+                if (isExistedTruckNumber || isExistedIdentifyNumber)
+                {
+                    string displayName = "";
+                    if (isExistedTruckNumber)
+                    {
+                        displayName = Utils.GetDisplayName<M_TruckModel>("TruckNumber");
+                    }
+                    else
+                    {
+                        displayName = Utils.GetDisplayName<M_TruckModel>("IdentifyNumber");
+                    }
+
+                    // log取得
+                    var errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, displayName);
+                    _logger.Error($"車両マスター登録失敗 {errorMessage}");
+
+                    return errorMessage;
+                }
+
+            return null;
         }
     }
 }
