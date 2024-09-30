@@ -17,7 +17,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 車両ID
         /// </summary>
-        [Display(Name="ID")]
+        [Display(Name="車両ID")]
         public int TruckID {  get; set; }
 
         /// <summary>
@@ -39,17 +39,20 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 削除フラグ
         /// </summary>
+        [Display(Name="削除フラグ")]
         public bool IsDeleted {  get; set; }
 
         /// <summary>
         /// 作成日時
         /// </summary>
+        [Display(Name = "作成日時")]
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd HH:mm}")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// 作成者
         /// </summary>
+        [Display(Name = "作成者")]
         public string? CreatedBy {  get; set; }
 
         /// <summary>

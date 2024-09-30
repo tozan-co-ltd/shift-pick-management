@@ -3,6 +3,13 @@ using ai_truck_load_measurement.Properties;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Office.Interop.Excel;
+using _excel = Microsoft.Office.Interop.Excel;
+using System.Runtime.CompilerServices;
 
 namespace ai_truck_load_measurement.Commons
 {
@@ -53,7 +60,7 @@ namespace ai_truck_load_measurement.Commons
         /// </summary>
         /// <param name="dataTable">データテーブル</param>
         /// <param name="filePath">ファイルパス</param>
-        public static void ConvertDataTableToCsv(this DataTable dataTable, string filePath)
+        public static void ConvertDataTableToCsv(this System.Data.DataTable dataTable, string filePath)
         {
             try
             {
@@ -192,7 +199,7 @@ namespace ai_truck_load_measurement.Commons
                 // SearchConditionListがnullの場合
                 if (searchModel == null)
                 {
-                    return string.Concat(fileName, gamenName, ".csv");
+                    return string.Concat(fileName, gamenName, ".xlsx");
                 }
 
                 // 日付
@@ -427,5 +434,21 @@ namespace ai_truck_load_measurement.Commons
             }
         }
 
+        public static void CreateDatatableToExcel(this System.Data.DataTable dataTable, string filePath)
+        {
+            //Workbook workBook = new Workbook();
+            //workBook.Worksheets.Clear();
+            //Worksheet workSheet = workBook.Worksheets.Add("DataTableToExcel");
+            //workSheet.InsertDataTable(dataTable, true, 1, 1, true);
+            //workBook.SaveToFile(filePath, ExcelVersion.Version2016);
+            _Application excelapp = new _excel.Application();
+            Workbook wb;
+            Worksheet ws;
+            wb = excelapp.Workbooks.Add(XlWBATemplate.xlWBATWorksheet);
+            ws = (Worksheet)wb.Worksheets[1];
+            Worksheet worksheet1 = (Worksheet)excelapp.Worksheets.Add(After: ws);
+            wb.SaveAs(filePath);
+            wb.Close();
+        }
     }
 }

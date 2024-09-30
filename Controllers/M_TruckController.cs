@@ -258,18 +258,16 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// ファイル出力
         /// </summary>
-        /// <param name="gamenName">画面名</param>
+        /// <param name="gamenName">現在の画面名</param>
+        /// <returns></returns>
         public JsonResult ExportFile(string gamenName)
         {
             string? errorMessage;
             try
-            {
-                // ログイン中ユーザー情報取得
-                var user = ClaimsLoginUserData();
+            { 
 
                 // テーブルデータ取得
-                DataTable dataTable = CreateDataTable();
-
+                DataTable dt = CreateDataTable();
                 // 車両マスター情報取得
                 var sql = M_TruckConnectController.CreateSQLToSelectMTrucks();
                 List<M_TruckModel> selectedList = M_TruckConnectController.ConnectMTrucks(sql, "AI-truck-load-measurement_test");
@@ -279,37 +277,82 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     foreach (M_TruckModel item in selectedList)
                     {
-                        DataRow newRow = dataTable.NewRow();
+                        DataRow newRow = dt.NewRow();
                         newRow[Utils.GetDisplayName<M_TruckModel>("TruckID")] = item.TruckID.ToString();
                         newRow[Utils.GetDisplayName<M_TruckModel>("TruckNumber")] = item.TruckNumber;
                         newRow[Utils.GetDisplayName<M_TruckModel>("IdentifyNumber")] = item.IdentifyNumber;
+                        newRow[Utils.GetDisplayName<M_TruckModel>("IsDeleted")] = item.IsDeleted;
+                        newRow[Utils.GetDisplayName<M_TruckModel>("CreatedAt")] = item.CreatedAt.ToString("yyyy/MM/dd HH:mm");
+                        newRow[Utils.GetDisplayName<M_TruckModel>("CreatedBy")] = item.CreatedBy;
                         newRow[Utils.GetDisplayName<M_TruckModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm");
                         newRow[Utils.GetDisplayName<M_TruckModel>("UpdatedBy")] = item.UpdatedBy;
 
-                        dataTable.Rows.Add(newRow);
+                        dt.Rows.Add(newRow);
                     }
                 }
 
+                // 取込についての詳細説明を設定
+                List<string> aboutImport = new() { "・新規登録(行追加)のデータは「出荷レーン名」「出荷レーン連番」「トラックヤード名」「工場区分」「削除フラグ(0)」が入力必須です。",
+                                                "・「工場区分」は、000:空箱、001:第一工場、003:第3工場　で設定してください。",
+                                                "・データを削除する場合は、対象行の削除フラグに1を入力してください。", };
+
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(null, gamenName);
-                // CSVファイルへのパスを作成
-                string filePath = Path.Combine(Path.GetTempPath(), tmpFilename);
-                // DataTableをCSVに変換
-                CreateFile.ConvertDataTableToCsv(dataTable, filePath);
-                // ファイル作成
-                var file = System.IO.File.ReadAllBytes(filePath);
+                // フォルダ名
+                var folderName = "ai_truck_load_measurement";
+                // ヘッダー名
+                var headerName = "MShippingLanes";
+                // 2シートあり
+                bool sheetTwo = false;
+                // 取込についてシートあり
+                bool sheetAboutImport = false;
 
-                return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
-            }
-            catch (SqlException)
-            {
-                return Json(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+
+                try
+                {
+                    // Excelファイル作成チェック
+                    var createRs = ExcelController.CheckCreateExcel(dt, null, tmpFilename, folderName, headerName, sheetTwo, sheetAboutImport, aboutImport, null, null);
+
+                    if (createRs.Item1)
+                    {
+                        var file = System.IO.File.ReadAllBytes(createRs.Item2);
+
+                       
+                        return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+                    }
+                    else
+                    {
+                        // エラーメッセージ取得
+                        // 「ファイルが存在しません。」
+                        errorMessage = ErrorMessagesResources.E9999;
+
+                        return Json(new { res = "NG", error = errorMessage });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // エラーメッセージ取得
+                    // 「NASに接続できませんでした。」
+                    errorMessage = ErrorMessagesResources.E9999;
+
+                    // log取得
+                    var exceptionMessage = ex.Message;
+                    return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+                }
             }
             catch (Exception ex)
             {
-                return Json(new { errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message });
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+
+                // log取得
+                var exceptionMessage = ex.Message;
+                return Json(new { res = "NG", error = errorMessage + exceptionMessage });
             }
+
         }
+
 
         /// <summary>
         /// データテーブル作成
@@ -322,6 +365,9 @@ namespace ai_truck_load_measurement.Controllers
             table.Columns.Add(Utils.GetDisplayName<M_TruckModel>("TruckID"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<M_TruckModel>("TruckNumber"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<M_TruckModel>("IdentifyNumber"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_TruckModel>("IsDeleted"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_TruckModel>("CreatedAt"), typeof(string));
+            table.Columns.Add(Utils.GetDisplayName<M_TruckModel>("CreatedBy"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<M_TruckModel>("UpdatedAt"), typeof(string));
             table.Columns.Add(Utils.GetDisplayName<M_TruckModel>("UpdatedBy"), typeof(string));
 
