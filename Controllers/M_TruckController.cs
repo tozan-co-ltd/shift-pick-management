@@ -261,11 +261,6 @@ namespace ai_truck_load_measurement.Controllers
                     }
                 }
 
-                // 取込についての詳細説明を設定
-                List<string> aboutImport = new() { "・新規登録(行追加)のデータは「出荷レーン名」「出荷レーン連番」「トラックヤード名」「工場区分」「削除フラグ(0)」が入力必須です。",
-                                                "・「工場区分」は、000:空箱、001:第一工場、003:第3工場　で設定してください。",
-                                                "・データを削除する場合は、対象行の削除フラグに1を入力してください。", };
-
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(null, gamenName);
                 // フォルダ名
@@ -281,7 +276,7 @@ namespace ai_truck_load_measurement.Controllers
                 try
                 {
                     // Excelファイル作成チェック
-                    var createRs = ExcelController.CheckCreateExcel(dt, null, tmpFilename, folderName, headerName, sheetTwo, sheetAboutImport, aboutImport, null, null);
+                    var createRs = ExcelController.CheckCreateExcel(dt, null, tmpFilename, folderName, headerName, sheetTwo, sheetAboutImport, null, null, null);
 
                     if (createRs.Item1)
                     {
