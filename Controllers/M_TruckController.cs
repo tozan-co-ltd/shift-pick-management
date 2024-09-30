@@ -276,7 +276,7 @@ namespace ai_truck_load_measurement.Controllers
                 try
                 {
                     // Excelファイル作成チェック
-                    var createRs = ExcelController.CheckCreateExcel(dt, null, tmpFilename, folderName, headerName, sheetTwo, sheetAboutImport, null, null, null);
+                    var createRs = CreateFile.CheckCreateExcel(dt, null, tmpFilename, folderName, headerName, sheetTwo, sheetAboutImport, null, null, null);
 
                     if (createRs.Item1)
                     {
