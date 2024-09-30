@@ -207,7 +207,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 異なるIDで重複車両番号情報取得SQL作成
+        /// 異なる車両IDで重複車両番号情報取得SQL作成
         /// </summary>
         /// <param name="model">登録情報</param>
         /// <returns>SQL文</returns>
@@ -228,7 +228,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 異なるIDで重複車両番号情報取得SQL作成
+        /// 異なる車両IDで重複車両番号情報取得SQL作成
         /// </summary>
         /// <param name="model">登録情報</param>
         /// <returns>SQL文</returns>

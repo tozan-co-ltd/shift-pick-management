@@ -10,7 +10,7 @@ namespace ai_truck_load_measurement.Models
     public class M_TruckModel: CommonModel
     {
         /// <summary>
-        /// 倉庫リスト
+        /// 車両リスト
         /// </summary>
         public IPagedList<M_TruckModel>? M_TruckList { get; set; }
 

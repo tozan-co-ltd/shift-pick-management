@@ -162,7 +162,7 @@ namespace ai_truck_load_measurement.Controllers
                     return NotFound(new { errorMessage });
                 }
 
-                // 異なるIDで車両コード重複チェック
+                // 異なる車両IDで車両コード重複チェック
                 var sql = M_TruckConnectController.CreateSQLToSelectDuplicateEditMTruck(model);
                 bool isExistedTruckNumber = ConnectToSQLServer.IsExistedSameRecord(sql, "AI-truck-load-measurement_test");
                 var sqlIdentifyNumber = M_TruckConnectController.CreateSQLToSelectDuplicateEditMTruckIdentifyNumber(model);
