@@ -235,31 +235,9 @@ namespace ai_truck_load_measurement.Controllers
             string? errorMessage;
             try
             { 
-
-                // テーブルデータ取得
-                DataTable dt = CreateDataTable();
                 // 車両マスター情報取得
-                var sql = M_TruckConnectController.CreateSQLToSelectMTrucks();
-                List<M_TruckModel> selectedList = M_TruckConnectController.ConnectMTrucks(sql, "AI-truck-load-measurement_test");
-
-                // DataRowに格納
-                if (selectedList.Count > 0)
-                {
-                    foreach (M_TruckModel item in selectedList)
-                    {
-                        DataRow newRow = dt.NewRow();
-                        newRow[Utils.GetDisplayName<M_TruckModel>("TruckID")] = item.TruckID.ToString();
-                        newRow[Utils.GetDisplayName<M_TruckModel>("TruckNumber")] = item.TruckNumber;
-                        newRow[Utils.GetDisplayName<M_TruckModel>("IdentifyNumber")] = item.IdentifyNumber;
-                        newRow[Utils.GetDisplayName<M_TruckModel>("IsDeleted")] = item.IsDeleted;
-                        newRow[Utils.GetDisplayName<M_TruckModel>("CreatedAt")] = item.CreatedAt.ToString("yyyy/MM/dd HH:mm");
-                        newRow[Utils.GetDisplayName<M_TruckModel>("CreatedBy")] = item.CreatedBy;
-                        newRow[Utils.GetDisplayName<M_TruckModel>("UpdatedAt")] = item.UpdatedAt.ToString("yyyy/MM/dd HH:mm");
-                        newRow[Utils.GetDisplayName<M_TruckModel>("UpdatedBy")] = item.UpdatedBy;
-
-                        dt.Rows.Add(newRow);
-                    }
-                }
+                var sql = M_TruckConnectController.CreateSQLToSelectMTrucksForDataTable();
+                DataTable dt = M_TruckConnectController.ConnectMTrucksToDataTable(sql, "AI-truck-load-measurement_test");
 
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(null, gamenName);

@@ -759,14 +759,14 @@ namespace ai_truck_load_measurement.Commons
         public static List<string> CreateHeaderList()
         {
             List<string> headerList = new();
-            headerList.Add(Utils.GetDisplayName<M_TruckModel>("TruckID"));
-            headerList.Add(Utils.GetDisplayName<M_TruckModel>("TruckNumber"));
-            headerList.Add(Utils.GetDisplayName<M_TruckModel>("IdentifyNumber"));
-            headerList.Add(Utils.GetDisplayName<M_TruckModel>("IsDeleted"));
-            headerList.Add(Utils.GetDisplayName<M_TruckModel>("CreatedAt"));
-            headerList.Add(Utils.GetDisplayName<M_TruckModel>("CreatedBy"));
-            headerList.Add(Utils.GetDisplayName<M_TruckModel>("UpdatedAt"));
-            headerList.Add(Utils.GetDisplayName<M_TruckModel>("UpdatedBy"));
+            headerList.Add("車両ID");
+            headerList.Add("車両番号");
+            headerList.Add("識別番号");
+            headerList.Add("削除フラグ");
+            headerList.Add("作成日時");
+            headerList.Add("作成者");
+            headerList.Add("更新日時");
+            headerList.Add("更新者");
             return headerList;
         }
     }

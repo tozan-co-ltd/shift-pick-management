@@ -3,6 +3,7 @@ using ai_truck_load_measurement.Commons;
 using ai_truck_load_measurement.Models;
 using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 /// <summary>
 /// 車両マスターに関する関数
@@ -30,12 +31,48 @@ namespace ai_truck_load_measurement.ConnectControllers
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {
+
+                    DataTable dt = new DataTable();
                     connection.ConnectionString = connectionString;
                     connection.Open();
                     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
                     strList = connection.Query<M_TruckModel>(sql).ToList();
                 }
                 return strList;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 車両情報をデータテーブルとして取得
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static DataTable ConnectMTrucksToDataTable(string sql, string databaseName)
+        {
+            // 戻り値
+           DataTable dataTable = new DataTable();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandText = sql;
+                    var adapter = new SqlDataAdapter(command);
+                    adapter.Fill(dataTable);
+                }
+                return dataTable;
             }
             catch (Exception)
             {
@@ -66,7 +103,6 @@ namespace ai_truck_load_measurement.ConnectControllers
                     DateTime sysDate = DateTime.Now;
                     string sql = CreateSQLToInsertMTruck(model, sysDate, loginUser.UserName);
                     var insertedCount = connection.Execute(sql);
-
                     return insertedCount;
                 }
                 catch (Exception)
@@ -157,6 +193,30 @@ namespace ai_truck_load_measurement.ConnectControllers
                     ,created_at
                     ,created_by
                     ,updated_at
+                    ,updated_by
+                FROM 
+	                m_trucks
+                WHERE 
+                    is_deleted = 0
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// DataTable用の車両マスター情報取得SQL作成
+        /// </summary>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectMTrucksForDataTable()
+        {
+            var sql = $@"
+                SELECT 
+	                truck_id
+                    ,truck_number
+                    ,identify_number
+                    ,is_deleted
+                    ,FORMAT (created_at, 'yyyy/MM/dd HH:mm:ss')
+                    ,created_by
+                    ,FORMAT (updated_at, 'yyyy/MM/dd HH:mm:ss')
                     ,updated_by
                 FROM 
 	                m_trucks
