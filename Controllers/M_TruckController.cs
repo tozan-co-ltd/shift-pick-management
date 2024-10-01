@@ -269,14 +269,12 @@ namespace ai_truck_load_measurement.Controllers
                 var headerName = "MShippingLanes";
                 // 2シートあり
                 bool sheetTwo = false;
-                // 取込についてシートあり
-                bool sheetAboutImport = false;
 
 
                 try
                 {
                     // Excelファイル作成チェック
-                    var createRs = CreateFile.CheckCreateExcel(dt, null, tmpFilename, folderName, headerName, sheetTwo, sheetAboutImport, null, null, null);
+                    var createRs = CreateFile.CheckCreateExcel(dt, null, tmpFilename, folderName, headerName, sheetTwo, null, null);
 
                     if (createRs.Item1)
                     {
