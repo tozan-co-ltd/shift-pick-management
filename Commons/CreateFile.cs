@@ -441,30 +441,10 @@ namespace ai_truck_load_measurement.Commons
         /// <param name="folderName">フォルダ名</param>
         /// <param name="headerName">ヘッダー名</param>
         /// <returns>作成結果,出力フォルダフルパス</returns>
-        public static (bool, string) CheckCreateExcel(DataTable dtOne, DataTable dtTwo, string tmpFilename, string folderName, string headerName, bool sheetTwo, string sheetNameOne, string sheetNameTwo)
+        public static (bool, string) CheckCreateExcel(DataTable dtOne, DataTable dtTwo, string tmpFilename, bool sheetTwo, string sheetNameOne, string sheetNameTwo)
         {
             try
             {
-#if DEBUG
-                // デバッグ
-                // ...\tec-shipping-management-web\wwwroot\sv-esm-bk\export\
-                var rootPath = Directory.GetCurrentDirectory();
-                string _folderPath = "\\wwwroot\\sv-esm-bk\\export\\";
-
-                var folderPath = Path.Combine(rootPath, _folderPath);
-#else
-                // 本番環境
-                // \\\\sv-esm-bk\share\export\
-                var section = "productionFolderPath";
-                var folderPath = ConnectToBackupNas.GetBackupNasConnectionString(section, in_out, folderName);
-#endif
-
-                // フォルダが存在しない場合は新規作成
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
-
-                // 出力フォルダフルパス
-                var expPath = Path.Combine(folderPath, tmpFilename);
                 // シート名
                 var sheetName = tmpFilename.Replace(".xlsx", "");
 
@@ -474,11 +454,11 @@ namespace ai_truck_load_measurement.Commons
                 // Excelファイル作成
                 bool createRs;
                 if (sheetTwo == true)
-                    createRs = CreateTwoSheetExcel(dtOne, dtTwo, expPath, headerList, sheetNameOne, sheetNameTwo);
+                    createRs = CreateTwoSheetExcel(dtOne, dtTwo, tmpFilename, headerList, sheetNameOne, sheetNameTwo);
                 else
-                    createRs = CreateExcel(dtOne, expPath, headerList, sheetName);
+                    createRs = CreateExcel(dtOne, tmpFilename, headerList, sheetName);
 
-                return (createRs, expPath);
+                return (createRs, tmpFilename);
             }
             catch (Exception)
             {
@@ -529,22 +509,6 @@ namespace ai_truck_load_measurement.Commons
                     package.Save();
                 }
                 return true;
-            }
-
-            // 出力ファイルパスが未指定の場合は中断する
-            if (String.IsNullOrWhiteSpace(exportfileFullPath))
-            {
-                return false;
-            }
-            // 出力フォルダが存在しない場合は中断する
-            if (!Directory.Exists(Path.GetDirectoryName(exportfileFullPath)))
-            {
-                return false;
-            }
-            // 既にファイルが存在している場合は削除する
-            if (File.Exists(exportfileFullPath))
-            {
-                File.Delete(exportfileFullPath);
             }
 
             try
@@ -660,22 +624,6 @@ namespace ai_truck_load_measurement.Commons
                     package.Save();
                 }
                 return true;
-            }
-
-            // 出力ファイルパスが未指定の場合は中断する
-            if (String.IsNullOrWhiteSpace(exportfileFullPath))
-            {
-                return false;
-            }
-            // 出力フォルダが存在しない場合は中断する
-            if (!Directory.Exists(Path.GetDirectoryName(exportfileFullPath)))
-            {
-                return false;
-            }
-            // 既にファイルが存在している場合は削除する
-            if (File.Exists(exportfileFullPath))
-            {
-                File.Delete(exportfileFullPath);
             }
 
             try

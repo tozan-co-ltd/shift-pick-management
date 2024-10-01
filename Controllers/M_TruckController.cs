@@ -241,10 +241,6 @@ namespace ai_truck_load_measurement.Controllers
 
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(null, gamenName);
-                // フォルダ名
-                var folderName = "ai_truck_load_measurement";
-                // ヘッダー名
-                var headerName = "MShippingLanes";
                 // 2シートあり
                 bool sheetTwo = false;
 
@@ -252,7 +248,7 @@ namespace ai_truck_load_measurement.Controllers
                 try
                 {
                     // Excelファイル作成チェック
-                    var createRs = CreateFile.CheckCreateExcel(dt, null, tmpFilename, folderName, headerName, sheetTwo, null, null);
+                    var createRs = CreateFile.CheckCreateExcel(dt, null, tmpFilename, sheetTwo, null, null);
 
                     if (createRs.Item1)
                     {
