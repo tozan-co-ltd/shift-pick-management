@@ -5,7 +5,7 @@ namespace ai_truck_load_measurement.Models
     /// <summary>
     /// 便マスターのモデル
     /// </summary>
-    public class M_TripModel
+    public class M_TripModel: CommonModel
     {
         /// <summary>
         /// 便ID
