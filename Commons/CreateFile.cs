@@ -3,6 +3,11 @@ using ai_truck_load_measurement.Properties;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using OfficeOpenXml;
 
 namespace ai_truck_load_measurement.Commons
 {
@@ -53,7 +58,7 @@ namespace ai_truck_load_measurement.Commons
         /// </summary>
         /// <param name="dataTable">データテーブル</param>
         /// <param name="filePath">ファイルパス</param>
-        public static void ConvertDataTableToCsv(this DataTable dataTable, string filePath)
+        public static void ConvertDataTableToCsv(this System.Data.DataTable dataTable, string filePath)
         {
             try
             {
@@ -192,7 +197,7 @@ namespace ai_truck_load_measurement.Commons
                 // SearchConditionListがnullの場合
                 if (searchModel == null)
                 {
-                    return string.Concat(fileName, gamenName, ".csv");
+                    return string.Concat(fileName, gamenName, ".xlsx");
                 }
 
                 // 日付
@@ -427,5 +432,291 @@ namespace ai_truck_load_measurement.Commons
             }
         }
 
+        /// <summary>
+        /// Excel作成チェック
+        /// </summary>
+        /// <param name="dtOne">DataTable</param>
+        /// <param name="dtTwo">DataTable</param>
+        /// <param name="tmpFilename">tmpファイル名</param>
+        /// <param name="folderName">フォルダ名</param>
+        /// <param name="headerName">ヘッダー名</param>
+        /// <returns>作成結果,出力フォルダフルパス</returns>
+        public static (bool, string) CheckCreateExcel(DataTable dtOne, DataTable dtTwo, string tmpFilename, bool sheetTwo, string sheetNameOne, string sheetNameTwo)
+        {
+            try
+            {
+                // シート名
+                var sheetName = tmpFilename.Replace(".xlsx", "");
+
+                // ヘッダーリストを作成
+                List<string> headerList = CreateHeaderList();
+
+                // Excelファイル作成
+                bool createRs;
+                if (sheetTwo == true)
+                    createRs = CreateTwoSheetExcel(dtOne, dtTwo, tmpFilename, headerList, sheetNameOne, sheetNameTwo);
+                else
+                    createRs = CreateExcel(dtOne, tmpFilename, headerList, sheetName);
+
+                return (createRs, tmpFilename);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// Excel作成
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="exportfileFullPath"></param>
+        /// <param name="headerList"></param>
+        /// <param name="sheetName"></param>
+        /// <returns>作成結果</returns>
+        public static bool CreateExcel(DataTable dt, string exportfileFullPath, List<string> headerList, string sheetName)
+        {
+            // データがない場合はヘッダーのみ作成
+            if (dt == null || dt.Rows.Count == 0)
+            {
+                // ファイル情報取得
+                FileInfo fileInfo = new(exportfileFullPath);
+                using (var package = new ExcelPackage(fileInfo))
+                {
+                    var ws = package.Workbook.Worksheets.FirstOrDefault(x => x.Name == sheetName);
+                    // シート1が存在場合シート1追加
+                    if (ws == null)
+                        package.Workbook.Worksheets.Add(sheetName);
+
+                    using ExcelWorksheet sheet = package.Workbook.Worksheets[sheetName];
+                    // フィルター設定
+                    sheet.Cells["A1:AM1"].AutoFilter = true;
+                    // ウィンドウ枠の固定
+                    sheet.View.FreezePanes(2, 1);
+                    // セル自動選択
+                    sheet.Select("A2");
+
+                    // タイトル行が指定されているときは、タイトル行をセットする
+                    if (headerList != null && headerList.Count > 0)
+                    {
+                        for (int i = 0; i < headerList.Count; i++)
+                        {
+                            sheet.Cells[1, i + 1].Value = headerList[i];
+                        }
+                    }
+                    // 保管
+                    package.Save();
+                }
+                return true;
+            }
+
+            try
+            {
+                var startIndex = 1;
+                var printHeader = true;
+
+                // ファイル情報取得
+                FileInfo fileInfo = new(exportfileFullPath);
+                // ワークシート作成
+                using var package = new ExcelPackage(fileInfo);
+                // シート追加
+                package.Workbook.Worksheets.Add(sheetName);
+                // シート取得
+                using ExcelWorksheet sheet = package.Workbook.Worksheets[sheetName];
+                // フィルター設定
+                sheet.Cells["A1:AM1"].AutoFilter = true;
+                // ウィンドウ枠の固定
+                sheet.View.FreezePanes(2, 1);
+                // セル自動選択
+                sheet.Select("A2");
+
+                // タイトル行が指定されているときは、タイトル行をセットする
+                if (headerList != null && headerList.Count > 0)
+                {
+                    for (int i = 0; i < headerList.Count; i++)
+                    {
+                        sheet.Cells[1, i + 1].Value = headerList[i];
+                    }
+                    // 開始行番号をセット
+                    startIndex = 2;
+                    // タイトル出力済なので、列名は出力しない
+                    printHeader = false;
+                }
+
+                // データセット
+                sheet.Cells[startIndex, 1].LoadFromDataTable(dt, printHeader);
+
+                // 保管
+                package.Save();
+                return true;
+            }
+            catch (Exception)
+            {
+                // 失敗した場合は出力用ファイル削除
+                if (File.Exists(exportfileFullPath))
+                {
+                    File.Delete(exportfileFullPath);
+                }
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// 2シートExcel作成
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="exportfileFullPath"></param>
+        /// <param name="headerList"></param>
+        /// <param name="sheetName"></param>
+        /// <param name="sheetName2"></param>
+        /// <param name="aboutImport"></param>
+        /// <returns>作成結果</returns>
+        public static bool CreateTwoSheetExcel(DataTable dt, DataTable dtTwo, string exportfileFullPath, List<string> headerList, string sheetName, string sheetName2)
+        {
+            // データがない場合はヘッダーのみ作成
+            if (dt == null || dt.Rows.Count == 0)
+            {
+                // ファイル情報取得
+                FileInfo fileInfo = new(exportfileFullPath);
+                using (var package = new ExcelPackage(fileInfo))
+                {
+                    var wsOne = package.Workbook.Worksheets.FirstOrDefault(x => x.Name == sheetName);
+                    // シート1が存在場合シート1追加
+                    if (wsOne == null)
+                        package.Workbook.Worksheets.Add(sheetName);
+
+                    using ExcelWorksheet sheet = package.Workbook.Worksheets[sheetName];
+                    // フィルター設定
+                    sheet.Cells["A1:AM1"].AutoFilter = true;
+                    // ウィンドウ枠の固定
+                    sheet.View.FreezePanes(2, 1);
+                    // セル自動選択
+                    sheet.Select("A2");
+
+                    // タイトル行が指定されているときは、タイトル行をセットする
+                    if (headerList != null && headerList.Count > 0)
+                    {
+                        for (int i = 0; i < headerList.Count; i++)
+                        {
+                            sheet.Cells[1, i + 1].Value = headerList[i];
+                        }
+                    }
+
+                    // シート2が存在場合シート2追加
+                    var wsTwo = package.Workbook.Worksheets.FirstOrDefault(x => x.Name == sheetName2);
+                    if (wsOne == null)
+                        package.Workbook.Worksheets.Add(sheetName2);
+
+                    using ExcelWorksheet sheetTwo = package.Workbook.Worksheets[sheetName2];
+
+                    // タイトル行が指定されているときは、タイトル行をセットする
+                    if (headerList != null && headerList.Count > 0)
+                    {
+                        for (int i = 0; i < headerList.Count; i++)
+                        {
+                            sheetTwo.Cells[1, i + 1].Value = headerList[i];
+                        }
+                    }
+
+                    // ファイル保存
+                    package.Save();
+                }
+                return true;
+            }
+
+            try
+            {
+                var startIndex = 1;
+                var printHeader = true;
+
+                // ファイル情報取得
+                FileInfo fileInfo = new(exportfileFullPath);
+                // ワークシート作成
+                using var package = new ExcelPackage(fileInfo);
+                // シート追加
+                package.Workbook.Worksheets.Add(sheetName);
+                // シート取得
+                using ExcelWorksheet sheet = package.Workbook.Worksheets[sheetName];
+                // フィルター設定
+                sheet.Cells["A1:AM1"].AutoFilter = true;
+                // ウィンドウ枠の固定
+                sheet.View.FreezePanes(2, 1);
+                // セル自動選択
+                sheet.Select("A2");
+
+                // タイトル行が指定されているときは、タイトル行をセットする
+                if (headerList != null && headerList.Count > 0)
+                {
+                    for (int i = 0; i < headerList.Count; i++)
+                    {
+                        sheet.Cells[1, i + 1].Value = headerList[i];
+                    }
+                    // 開始行番号をセット
+                    startIndex = 2;
+                    // タイトル出力済なので、列名は出力しない
+                    printHeader = false;
+                }
+
+                // シート2 追加
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(sheetName2);
+                // シート2取得
+                using ExcelWorksheet sheetTwo = package.Workbook.Worksheets[sheetName2];
+                // フィルター設定
+                sheetTwo.Cells["A1:AM1"].AutoFilter = true;
+
+                // タイトル行が指定されているときは、タイトル行をセットする
+                if (headerList != null && headerList.Count > 0)
+                {
+                    for (int i = 0; i < headerList.Count; i++)
+                    {
+                        sheetTwo.Cells[1, i + 1].Value = headerList[i];
+                    }
+                    // 開始行番号をセット
+                    startIndex = 2;
+                    // タイトル出力済なので、列名は出力しない
+                    printHeader = false;
+                }
+
+                // シート1 データセット
+                sheet.Cells[startIndex, 1].LoadFromDataTable(dt, printHeader);
+                // シート2 データセット
+                sheetTwo.Cells[startIndex, 1].LoadFromDataTable(dtTwo, printHeader);
+
+                // ファイル保存
+                package.Save();
+                return true;
+            }
+            catch (Exception)
+            {
+                // 失敗した場合は出力用ファイル削除
+                if (File.Exists(exportfileFullPath))
+                {
+                    File.Delete(exportfileFullPath);
+                }
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// ヘッダーリスト作成
+        /// </summary>
+        /// <param name="headerName">ヘッダー名</param>
+        /// <returns>ヘッダーリスト</returns>
+        public static List<string> CreateHeaderList()
+        {
+            List<string> headerList = new();
+            headerList.Add("車両ID");
+            headerList.Add("車両番号");
+            headerList.Add("識別番号");
+            headerList.Add("削除フラグ");
+            headerList.Add("作成日時");
+            headerList.Add("作成者");
+            headerList.Add("更新日時");
+            headerList.Add("更新者");
+            return headerList;
+        }
     }
 }
+

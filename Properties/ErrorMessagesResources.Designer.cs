@@ -79,7 +79,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   {0}は半角英数字で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        ///   {0}は4桁の半角数字で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1003 {
             get {
@@ -97,7 +97,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   日付指定に不正な値があります。半角YYYYMMDD形式で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        ///   時間指定に不正な値があります。半角HHMM形式で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1005 {
             get {
@@ -106,7 +106,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   時間指定に不正な値があります。半角HHMM形式で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        ///   選択した期間に実績が存在しない便が選択されています。期間を修正するか、便を削除してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1006 {
             get {
@@ -115,7 +115,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   数値指定に不正な値があります。半角数字で正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        ///   検索できる期間は最長90日です。90日を超えないように選択してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1007 {
             get {
@@ -124,7 +124,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   規定の桁数に満たない、または超えている値があります。正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
+        ///   選択できる便数は最大20件です。20件を超えないように選択してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1008 {
             get {
@@ -133,7 +133,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   この{0}は既に存在するため登録できません。 に類似しているローカライズされた文字列を検索します。
+        ///   選択できる稼働日は最大20日です。20日を超えないように選択してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1009 {
             get {
@@ -142,7 +142,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   {0}が品番マスターに存在しません。 に類似しているローカライズされた文字列を検索します。
+        ///   この{0}は既に存在するため登録できません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1010 {
             get {
@@ -151,7 +151,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   {0}が会社マスターに存在しません。 に類似しているローカライズされた文字列を検索します。
+        ///   入力値に不正な値があります。正しい値を入力してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1011 {
             get {

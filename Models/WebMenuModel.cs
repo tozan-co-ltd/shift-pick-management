@@ -28,7 +28,7 @@ namespace ai_truck_load_measurement.Models
                     new M_WebMenu{CategoryID = 11, MenuID = 2, MenuName = "荷量推移", Controller = "ImportReceiveSchedule", Action = "Index"},
                     new M_WebMenu{CategoryID = 11, MenuID = 3, MenuName = "荷量と運行実績", Controller = "ImportReceiveSchedule", Action = "Index"},
                     new M_WebMenu{CategoryID = 11, MenuID = 4, MenuName = "実績出力", Controller = "ImportReceiveSchedule", Action = "Index"},
-                    new M_WebMenu{CategoryID = 12, MenuID = 1, MenuName = "車両マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
+                    new M_WebMenu{CategoryID = 12, MenuID = 1, MenuName = "車両マスター", Controller = "M_Truck", Action = "Index"},
                     new M_WebMenu{CategoryID = 12, MenuID = 2, MenuName = "便マスター", Controller = "ImportReceiveSchedule", Action = "Index"},
                 };
 
@@ -163,19 +163,50 @@ namespace ai_truck_load_measurement.Models
         }
 
         /// <summary>
-        /// コントローラー名に対応するカテゴリーIDの値を返す
+        /// コントローラー名に対応するカテゴリーID取得
         /// </summary>
         /// <param name="currentControler"></param>
         /// <returns></returns>
-        public int? GetCategoryIDFromControlerName(string controlerName)
+        public int? GetCategoryIDFromControlerName(string controllerName)
         {
-            var currentWebMenu = referenceList.Where(x => x.Controller.Equals(controlerName)).FirstOrDefault();
+            var currentWebMenu = referenceList.Where(x => x.Controller.Equals(controllerName)).FirstOrDefault();
             if(currentWebMenu == null)
             {
                 return null;
             }
             int currentCategoryID = currentWebMenu.CategoryID;
             return currentCategoryID;
+        }
+
+        /// <summary>
+        /// コントローラー名に対応するカテゴリー名取得
+        /// </summary>
+        /// <param name="controllerName"></param>
+        /// <returns></returns>
+        public string? GetCategoryNameFromControllerName(string controllerName)
+        {
+            var categoryID = GetCategoryIDFromControlerName(controllerName);
+            if(categoryID == null)
+            {
+                return null;
+            }
+            var currentWebMenu = WebMenuCategoryList().Find(x => x.CategoryID == categoryID);
+            if(currentWebMenu == null)
+            {
+                return null;
+            }
+            return currentWebMenu.CategoryName;
+        }
+
+        public string? GetMenuNameFromControllerName(string controllerName)
+        {
+            var currentWebMenu = referenceList.Where(x => x.Controller.Equals(controllerName)).FirstOrDefault();
+            if (currentWebMenu == null)
+            {
+                return null;
+            }
+            string currentMenuName = currentWebMenu.MenuName;
+            return currentMenuName;
         }
     }
 

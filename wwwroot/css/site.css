@@ -893,3 +893,11 @@ select[readonly] {
 .table-fixed tr{
     background: #fff;
 }
+
+.table-center td{
+    text-align:center !important;
+}
+
+.table-center th{
+    text-align: center !important;
+}
