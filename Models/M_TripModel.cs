@@ -21,6 +21,11 @@ namespace ai_truck_load_measurement.Models
         public int TripID { get; set; }
 
         /// <summary>
+        /// 便履歴ID
+        /// </summary>
+        public int TripHistoryID {  get; set; }
+
+        /// <summary>
         /// 便名称
         /// </summary>
         [Display(Name = "便名称")]

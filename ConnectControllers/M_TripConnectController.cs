@@ -79,6 +79,41 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// 便情報更新
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns>更新件数</returns>
+        public static int UpdateMTrip(M_TripModel model, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+                    string mTripSql = CreateSQLToUpdateMTrip(model);
+                    string mTripHistorySql = CreateSQLToUpdateMTripHistory(model, sysDate, loginUser.UserName);
+                    var count = connection.Execute(mTripSql);
+                    count += connection.Execute(mTripHistorySql);
+
+                    return count;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// 同じ便名称のデータが便マスターに登録されているか
         /// </summary>
         /// <param name="connection"></param>
@@ -219,6 +254,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 同名の便の有無情報取得SQL
+        /// </summary>
+        /// <param name="tripName"></param>
+        /// <returns></returns>
         private static string CreateSQLToExistMTripName(string tripName)
         {
             var sql = $@"
@@ -301,6 +341,49 @@ namespace ai_truck_load_measurement.ConnectControllers
                     '{formatCreatedAt}',
                     '{createdBy}'
                 );
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 便履歴テーブル更新SQL作成
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToUpdateMTripHistory(M_TripModel model, DateTime updatedAt, string updatedBy)
+        {
+            string formatupdatedAt = updatedAt.ToString("yyyy/MM/dd HH:mm:ss");
+            var sql = $@"
+                UPDATE m_trip_histories
+                SET 
+	                driver_name = '{model.DriverName}',
+	                truck_id = {model.SelectedTruckID},
+	                day_shift_start_time = '{model.DayShiftStartTime}',
+	                applicable_start_datetime = '{model.ApplicableStartDateTime}',
+	                applicable_end_datetime = '{model.ApplicableEndDateTime}',
+                    updated_at = '{formatupdatedAt}',
+                    updated_by = '{updatedBy}'
+                WHERE trip_history_id = {model.TripHistoryID}
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 便テーブル更新SQL作成
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToUpdateMTrip(M_TripModel model)
+        {
+            var sql = $@"
+                UPDATE m_trip
+                SET 
+	                trip_name = '{model.TripName}'
+                WHERE trip_id = {model.TripID}
             ";
             return sql;
         }
