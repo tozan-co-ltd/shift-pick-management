@@ -4,6 +4,7 @@ using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data.SqlClient;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -46,9 +47,8 @@ namespace ai_truck_load_measurement.Controllers
             M_TripModel model = new();
             try
             {
-                // 車両マスター情報取得SQL作成
+                // 車両マスター情報取得
                 var sql = M_TruckConnectController.CreateSQLToSelectMTrucks();
-                // DB接続
                 IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(sql, "AI-truck-load-measurement_test"); 
                 foreach (var truck in truckList)
                 {
@@ -67,6 +67,78 @@ namespace ai_truck_load_measurement.Controllers
             {
                 ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
                 return View(model);
+            }
+        }
+
+        /// <summary>
+        /// 車両マスター登録
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        [HttpPost]
+        public IActionResult Register(M_TripModel model)
+        {
+            string? errorMessage;
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 入力規則チェック
+                if (!ModelState.IsValid)
+                {
+                    // log取得
+                    errorMessage = "E1011: " + ErrorMessagesResources.E1011;
+                    _logger.Error($"便マスター登録失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
+                }
+
+                // 便名称が重複している便履歴の取得
+                var duplicateMTripNameSql = M_TripConnectController.CreateSQLToSelectDuplicateMTripName(model);
+                var duplicateMTripNameList = M_TripConnectController.ConnectMTrips(duplicateMTripNameSql, "AI-truck-load-measurement_test");
+
+                // 適用期間重複チェック
+                bool isDupulicatedApplicablePeriod = false;
+                foreach (var item in duplicateMTripNameList)
+                {
+                    var startTime = item.ApplicableStartDateTime;
+                    var endTime = item.ApplicableEndDateTime;
+                    var modelStartTime = model.ApplicableStartDateTime;
+                    var modelEndTime = model.ApplicableEndDateTime;
+                    if (modelEndTime > startTime && endTime > modelStartTime)
+                    {
+                        isDupulicatedApplicablePeriod = true;
+                    }
+                }
+                if (isDupulicatedApplicablePeriod)
+                {
+                    // log取得
+                     errorMessage = "E1012: " + ErrorMessagesResources.E1012;
+                    _logger.Error($"便マスター登録失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
+                }
+
+
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+            catch (Exception ex)
+            {
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
             }
         }
     }

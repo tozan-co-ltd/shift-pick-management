@@ -9,7 +9,7 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class M_TripConnectController 
     {
         /// <summary>
-        /// 車両情報取得
+        /// 便情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
@@ -40,8 +40,9 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
         }
 
+
         /// <summary>
-        /// 車両マスター情報取得SQL作成
+        /// 便マスター情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectMTrips()
@@ -69,6 +70,29 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ON
                     TripHistories.truck_id = Trucks.truck_id
             ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 重複便名称取得SQL作成
+        /// </summary>
+        /// <param name="truckNumber">車両コード</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectDuplicateMTripName(M_TripModel model)
+        {
+            var sql = $@"
+                SELECT 
+	                applicable_start_datetime,
+	                applicable_end_datetime
+                FROM m_trip_histories AS Histories
+                INNER JOIN
+	                m_trips AS Trips
+                ON
+	                Histories.trip_id = Trips.trip_id
+                WHERE
+	                Trips.trip_name = '{model.TripName}'
+            ";
+
             return sql;
         }
     }

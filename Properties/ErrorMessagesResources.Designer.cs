@@ -160,7 +160,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   ファイルが選択されていません。 に類似しているローカライズされた文字列を検索します。
+        ///   登録済みの便の適用開始/終了日時がかぶるため登録できません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1012 {
             get {
