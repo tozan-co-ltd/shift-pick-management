@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using X.PagedList;
 
 namespace ai_truck_load_measurement.Models
@@ -86,5 +87,11 @@ namespace ai_truck_load_measurement.Models
         [Display(Name = "更新者")]
         public string? UpdatedBy { get; set; }
 
+        /// <summary>
+        /// 選択された車両ID
+        /// </summary>
+        public int SelectedTrcukID {  get; set; }
+
+        public List<SelectListItem> TruckSelectList { get; set; } = new List<SelectListItem>();
     }
 }

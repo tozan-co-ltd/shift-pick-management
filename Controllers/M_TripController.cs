@@ -3,6 +3,7 @@ using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -45,6 +46,21 @@ namespace ai_truck_load_measurement.Controllers
             M_TripModel model = new();
             try
             {
+                // 車両マスター情報取得SQL作成
+                var sql = M_TruckConnectController.CreateSQLToSelectMTrucks();
+                // DB接続
+                IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(sql, "AI-truck-load-measurement_test"); 
+                foreach (var truck in truckList)
+                {
+                    SelectListItem menuItem = new()
+                    {
+                        Text = Convert.ToString(truck.TruckNumber),
+                        Value = Convert.ToString(truck.TruckID),
+                        Selected = false
+                    };
+
+                    model.TruckSelectList.Add(menuItem);
+                }
                 return View(model);
             }
             catch (Exception)

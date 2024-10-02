@@ -44,11 +44,11 @@
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayName("TruckNumber")<span style="color:red">*</span></label>
+                            <label>@Html.DisplayNameFor(model => model.TruckNumber)<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <input class="form-control" type="text" asp-for="TruckNumber" autocomplete="off" value="" required>
-                            <span class="text-danger w-100" asp-validation-for="TruckNumber"></span>
+                            <select class="form-control" name="SelectedTrcukID" asp-for="SelectedTrcukID" asp-items="@Model.TruckSelectList" required></select>
+                            <span class="text-danger w-100" asp-validation-for="SelectedTrcukID"></span>
                         </div>
                     </div>
                     <div class="col-12 input-group div-input-group">
