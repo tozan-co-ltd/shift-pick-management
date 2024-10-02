@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using X.PagedList;
 
 namespace ai_truck_load_measurement.Models
 {
@@ -8,10 +9,15 @@ namespace ai_truck_load_measurement.Models
     public class M_TripModel: CommonModel
     {
         /// <summary>
+        /// 車両リスト
+        /// </summary>
+        public IPagedList<M_TripModel>? M_TripList { get; set; }
+
+        /// <summary>
         /// 便ID
         /// </summary>
         [Display(Name = "便ID")]
-        public int TripId { get; set; }
+        public int TripID { get; set; }
 
         /// <summary>
         /// 便名称
@@ -42,7 +48,7 @@ namespace ai_truck_load_measurement.Models
         /// 昼勤開始時間  
         /// </summary>
         [Display(Name = "昼勤開始時間")]
-        public TimeOnly DayShiftStartTime {  get; set; }
+        public DateTime DayShiftStartTime {  get; set; }
 
         /// <summary>
         ///  適用開始日時
@@ -72,13 +78,13 @@ namespace ai_truck_load_measurement.Models
         /// 更新日時
         /// </summary>
         [Display(Name = "更新日時")]
-        public DateTime UploadedAt {  get; set; }
+        public DateTime UpdatedAt {  get; set; }
 
         /// <summary>
         /// 更新者
         /// </summary>
         [Display(Name = "更新者")]
-        public string? UploadedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
     }
 }

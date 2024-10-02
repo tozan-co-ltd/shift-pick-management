@@ -30,7 +30,7 @@
                     </a>
                 </div>
                 <div class="input-group-append">
-                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFile('M_Truck', '@Model.ViewTitle')">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFile('M_Trip', '@Model.ViewTitle')">
                         <span class="icon text-white-50">
                             <i class="fas fa-file-export"></i>
                         </span>
@@ -38,6 +38,51 @@
                     </a>
                 </div>
             </div>
+        </div>
+        <div class="mt-3">
+            <table class="table table-sm stripe hover nowrap datatable-normal table-center">
+                <thead>
+                    <tr align="center">
+                        <th width="40"></th>
+                        <th class="font-weight-bold">便ID</th>
+                        <th class="font-weight-bold">便名称</th>
+                        <th class="font-weight-bold">乗務員</th>
+                        <th class="font-weight-bold">車両番号</th>
+                        <th class="font-weight-bold">識別番号</th>
+                        <th class="font-weight-bold">昼勤開始時間</th>
+                        <th class="font-weight-bold">適用開始日時</th>
+                        <th class="font-weight-bold">適用終了日時</th>
+                        <th class="font-weight-bold">更新日時</th>
+                        <th class="font-weight-bold">更新者</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (@Model.M_TripList != null)
+                    {
+                        @foreach (var item in @Model.M_TripList)
+                        {
+                            <tr>
+                                <td>
+                                    <a class="btn btn-success btn-icon-split ml-1 mr-1"
+                                       onclick="OnEditClick('@item.TripID')" data-id="@item.TripID" data-toggle="modal" data-target="#edit-modal">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                </td>
+                                <td>@item.TripID</td>
+                                <td>@item.TripName</td>
+                                <td>@item.DriverName</td>
+                                <td>@item.TruckNumber</td>
+                                <td>@item.IdentifyNumber</td>
+                                <td>@item.DayShiftStartTime.ToString("HH:mm")</td>
+                                <td>@item.ApplicableStartDateTime.ToString("yyyy/MM/dd HH:mm")</td>
+                                <td>@item.ApplicableEndDateTime.ToString("yyyy/MM/dd HH:mm")</td>
+                                <td>@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                                <td>@item.UpdatedBy</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

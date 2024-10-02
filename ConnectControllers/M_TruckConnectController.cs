@@ -32,7 +32,6 @@ namespace ai_truck_load_measurement.ConnectControllers
                 using (var connection = new SqlConnection())
                 {
 
-                    DataTable dt = new DataTable();
                     connection.ConnectionString = connectionString;
                     connection.Open();
                     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
