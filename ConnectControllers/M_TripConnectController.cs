@@ -2,6 +2,7 @@
 using ai_truck_load_measurement.Commons;
 using ai_truck_load_measurement.Models;
 using System.Data.SqlClient;
+using System;
 using System.Data;
 
 namespace ai_truck_load_measurement.ConnectControllers
@@ -40,6 +41,128 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
         }
 
+        /// <summary>
+        /// 便情報登録
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns>インサート数</returns>
+        public static int InsertMTrip(M_TripModel model, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                // 同じ便名称のデータが便マスターに登録されているか
+                var isTripExist = IsSameTripNameExist(connection, model.TripName);
+
+                // 便名称が便マスターに登録されていない場合
+                // 便テーブルに新規登録
+                if (!isTripExist)
+                {
+                    InsertMTripTable(connection, model.TripName);
+                }
+
+                // 便名称から便ID取得
+                model.TripID = SelectMTripID(connection, model.TripName);
+
+                // 便履歴テーブルに登録
+                var insertedCount = InsertMTripHistoryTable(connection, model, loginUser.UserName);
+
+                return insertedCount;
+            }
+        }
+
+        /// <summary>
+        /// 同じ便名称のデータが便マスターに登録されているか
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="tripName">便名称</param>
+        /// <returns></returns>
+        private static bool IsSameTripNameExist(SqlConnection connection, string tripName)
+        {
+            var isTripExist = false;
+
+            try
+            {
+                string sql = CreateSQLToExistMTripName(tripName);
+                var reader = connection.ExecuteScalar(sql);
+                if (reader != null)
+                {
+                    isTripExist = true;
+                }
+                return isTripExist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 便テーブルに新規登録
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="tripName"></param>
+        private static void InsertMTripTable(SqlConnection connection, string tripName)
+        {
+            try
+            {
+                string sql = CreateSQLToInsertMTrip(tripName);
+                connection.Execute(sql);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 便名称から便ID取得
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="tripName">便名称</param>
+        /// <returns></returns>
+        private static int SelectMTripID(SqlConnection connection, string tripName)
+        {
+            try
+            {
+                string sql = CreateSQLToSelectMTripID(tripName);
+                var tripID = Convert.ToInt32(connection.ExecuteScalar(sql));
+                return tripID;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 便履歴テーブルに登録
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="model">便履歴モデル</param>
+        /// <param name="userName">登録者名</param>
+        /// <returns></returns>
+        private static int InsertMTripHistoryTable(SqlConnection connection, M_TripModel model, string userName)
+        {
+            try
+            {
+                DateTime sysDate = DateTime.Now;
+                string sql = CreateSQLToInsertMTripHistory(model, sysDate, userName);
+                var insertedCount = connection.Execute(sql);
+                return insertedCount;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         /// <summary>
         /// 便マスター情報取得SQL作成
@@ -76,7 +199,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 重複便名称取得SQL作成
         /// </summary>
-        /// <param name="truckNumber">車両コード</param>
+        /// <param name="truckNumber">便名称</param>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectDuplicateMTripName(M_TripModel model)
         {
@@ -93,6 +216,92 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                Trips.trip_name = '{model.TripName}'
             ";
 
+            return sql;
+        }
+
+        private static string CreateSQLToExistMTripName(string tripName)
+        {
+            var sql = $@"
+                SELECT TOP(1) *
+                FROM m_trips
+                WHERE trip_name = '{tripName}'
+                    
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 便名称から便IDを取得するSQL作成
+        /// </summary>
+        /// <param name="tripName">便名称</param>
+        /// <returns></returns>
+        private static string CreateSQLToSelectMTripID(string tripName)
+        {
+            var sql = $@"
+                SELECT 
+	                trip_id
+                FROM m_trips
+                WHERE trip_name = '{tripName}'
+                    
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 便テーブル登録SQL作成
+        /// </summary>
+        /// <param name="tripName">便名称</param>
+        /// <returns></returns>
+        private static string CreateSQLToInsertMTrip(string tripName)
+        {
+            var sql = $@"
+                INSERT INTO m_trips(
+                    trip_name
+                )
+                VALUES (
+                    '{tripName}'
+                );
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 便履歴テーブル登録SQL作成
+        /// </summary>
+        /// <param name="model">便履歴</param>
+        /// <param name="createdAt">作成時間</param>
+        /// <param name="createdBy">作成者</param>
+        /// <returns></returns>
+        private static string CreateSQLToInsertMTripHistory(M_TripModel model, DateTime createdAt, string createdBy)
+        {
+            string formatCreatedAt = createdAt.ToString("yyyy/MM/dd HH:mm:ss");
+
+            var sql = $@"
+                INSERT INTO m_trip_histories(
+                    trip_id,
+                    truck_id,
+                    driver_name,
+                    day_shift_start_time,
+                    applicable_start_datetime,
+                    applicable_end_datetime,
+                    created_at,
+                    created_by,
+                    updated_at,
+                    updated_by
+                )
+                VALUES (
+                    '{model.TripID}',
+                    '{model.SelectedTruckID}',
+                    '{model.DriverName}',
+                    '{model.DayShiftStartTime}',
+                    '{model.ApplicableStartDateTime}',
+                    '{model.ApplicableEndDateTime}',
+                    '{formatCreatedAt}',
+                    '{createdBy}',
+                    '{formatCreatedAt}',
+                    '{createdBy}'
+                );
+            ";
             return sql;
         }
     }

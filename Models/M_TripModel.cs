@@ -90,7 +90,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 選択された車両ID
         /// </summary>
-        public int SelectedTrcukID {  get; set; }
+        public int SelectedTruckID {  get; set; }
 
         public List<SelectListItem> TruckSelectList { get; set; } = new List<SelectListItem>();
     }

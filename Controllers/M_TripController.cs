@@ -120,6 +120,9 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
 
+                M_TripConnectController.InsertMTrip(model, user);
+                // log取得
+                _logger.Info($"車両マスター登録成功 便名称:{model.TripName}");
                 return Ok();
             }
             catch (SqlException ex)
