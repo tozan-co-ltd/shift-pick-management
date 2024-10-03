@@ -152,6 +152,15 @@
                         </div>
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <label>@Html.DisplayName("IdentifyNumber")<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input class="form-control" type="text" asp-for="IdentifyNumber" autocomplete="off" value="" id="identifyNumber" required readonly>
+                                <span class="text-danger w-100" asp-validation-for="IdentifyNumber"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("DayShiftStartTime")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
@@ -315,6 +324,35 @@
             }
         });
     })
+
+    // 車両番号選択時の処理
+    $('[name=SelectedTruckID]').change(function () {
+        var truckID = $('[name=SelectedTruckID]').val();
+        console.log(truckID);
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetIdentifyNumberFromTruckID", "M_Trip")';
+        let method = 'POST';
+        let data = { truckID: truckID };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            $('#identifyNumber').val(response);
+            console.log(response);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    });
 
 
     // エラーメッセージ削除
