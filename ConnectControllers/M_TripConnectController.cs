@@ -58,18 +58,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                 connection.Open();
                 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-                // 同じ便名称のデータが便マスターに登録されているか
-                var isTripExist = IsSameTripNameExist(connection, model.TripName);
-
-                // 便名称が便マスターに登録されていない場合
-                // 便テーブルに新規登録
-                if (!isTripExist)
-                {
-                    InsertMTripTable(connection, model.TripName);
-                }
-
-                // 便名称から便ID取得
-                model.TripID = SelectMTripID(connection, model.TripName);
+                // 便名称の重複チェックと便ID取得
+                model.TripID = CheckDuplicateNameAndGetID(connection, model.TripName); 
 
                 // 便履歴テーブルに登録
                 var insertedCount = InsertMTripHistoryTable(connection, model, loginUser.UserName);
@@ -99,11 +89,13 @@ namespace ai_truck_load_measurement.ConnectControllers
                 try
                 {
                     DateTime sysDate = DateTime.Now;
-                    string mTripSql = CreateSQLToUpdateMTrip(model);
-                    string mTripHistorySql = CreateSQLToUpdateMTripHistory(model, sysDate, loginUser.UserName);
-                    var count = connection.Execute(mTripSql);
-                    count += connection.Execute(mTripHistorySql);
 
+                    // 便名称の重複チェックと便ID取得
+                    model.TripID = CheckDuplicateNameAndGetID(connection, model.TripName);
+
+                    // 便履歴テーブル更新
+                    string sql = CreateSQLToUpdateMTripHistory(model, sysDate, loginUser.UserName);
+                    var count = connection.Execute(sql);
                     return count;
                 }
                 catch (Exception)
@@ -200,14 +192,38 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// 便名称の重複チェックとID取得
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="tripName"></param>
+        /// <returns></returns>
+        private static int CheckDuplicateNameAndGetID(SqlConnection connection, string tripName)
+        {
+            // 同じ便名称のデータが便マスターに登録されているか
+            var isTripExist = IsSameTripNameExist(connection, tripName);
+
+            // 便名称が便マスターに登録されていない場合
+            // 便テーブルに新規登録
+            if (!isTripExist)
+            {
+                InsertMTripTable(connection, tripName);
+            }
+
+            // 便名称から便ID取得
+            var tripID = SelectMTripID(connection, tripName);
+            return tripID;
+        }
+
+        /// <summary>
         /// 便マスター情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMTrips()
+        public static string CreateSQLToSelectMTrips(bool beforePeriod)
         {
             var sql = $@"
                 SELECT 
 	                TripHistories.trip_id,
+                    TripHistories.trip_history_id,
                     Trips.trip_name,
                     TripHistories.driver_name,
                     Trucks.truck_number,
@@ -228,6 +244,15 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ON
                     TripHistories.truck_id = Trucks.truck_id
             ";
+            if (!beforePeriod)
+            {
+                DateTime today = DateTime.Now;
+                string formatToday = today.ToString("yyyy/MM/dd HH:mm:ss");
+                sql += $@"
+                    WHERE
+                        TripHistories.applicable_end_datetime > '{today}'
+                ";
+            }
             return sql;
         }
 
@@ -249,6 +274,8 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                Histories.trip_id = Trips.trip_id
                 WHERE
 	                Trips.trip_name = '{model.TripName}'
+                AND
+                    Histories.trip_history_id <> '{model.TripHistoryID}'
             ";
 
             return sql;
@@ -358,6 +385,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 UPDATE m_trip_histories
                 SET 
+                    trip_id = '{model.TripID}',
 	                driver_name = '{model.DriverName}',
 	                truck_id = {model.SelectedTruckID},
 	                day_shift_start_time = '{model.DayShiftStartTime}',

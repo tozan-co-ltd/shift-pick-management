@@ -15,13 +15,13 @@ namespace ai_truck_load_measurement.Controllers
         {
             M_TripModel model = new();
 
+            // 適用期間外のデータが必要か
+            bool beforePeriod = false;
+            
             try
             {
-                // ログイン中ユーザー情報取得
-                var user = ClaimsLoginUserData();
-
                 // 車両マスター情報取得SQL作成
-                var sql = M_TripConnectController.CreateSQLToSelectMTrips();
+                var sql = M_TripConnectController.CreateSQLToSelectMTrips(beforePeriod);
                 // DB接続
                 IEnumerable<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(sql, "AI-truck-load-measurement_test");
 
@@ -34,6 +34,60 @@ namespace ai_truck_load_measurement.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
+            }
+        }
+
+        /// <summary>
+        /// 便情報テーブル非同期更新用
+        /// </summary>
+        /// <param name="beforePeriod">適用期間外のデータを含めるか</param>
+        /// <returns></returns>
+        public IActionResult SearchData(bool beforePeriod)
+        {
+            var searchData = string.Empty;
+            List<M_TripModel> tripList = new();
+            try
+            {
+                // 車両マスター情報取得SQL作成
+                var sql = M_TripConnectController.CreateSQLToSelectMTrips(beforePeriod);
+                // DB接続
+                tripList = M_TripConnectController.ConnectMTrips(sql, "AI-truck-load-measurement_test");
+                if (tripList.Count > 0)
+                {
+                    foreach (var item in tripList)
+                    {
+                        searchData += $@"
+                            <tr>
+                                <td>
+                                    <a class=""btn btn-success btn-icon-split ml-1 mr-1""
+                                       onclick=""OnEditClick('@item.TripHistoryID')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
+                                        <i class=""fa-solid fa-pen""></i>
+                                    </a>
+                                </td>
+                                <td>{@item.TripID}</td>
+                                <td>{@item.TripName}</td>
+                                <td>{@item.DriverName}</td>
+                                <td>{@item.TruckNumber}</td>
+                                <td>{@item.IdentifyNumber}</td>
+                                <td>{@item.DayShiftStartTime.ToString("HH:mm")}</td>
+                                <td>{@item.ApplicableStartDateTime.ToString("yyyy/MM/dd HH:mm")}</td>
+                                <td>{@item.ApplicableEndDateTime.ToString("yyyy/MM/dd HH:mm")}</td>
+                                <td>{@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")}</td>
+                                <td>{@item.UpdatedBy}</td>
+                            </tr>
+                    ";
+                    }
+                }
+                return Content(searchData);
+            }
+            catch (SqlException)
+            {
+                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                return Content(errorMessage);
             }
         }
 

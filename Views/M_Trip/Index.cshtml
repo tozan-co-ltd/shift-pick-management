@@ -9,6 +9,19 @@
         @ViewData["Title"]
     </div>
     <div class="card-body">
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="card border-left-custom">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>新しい適用期間の作成時は <i class="fa-regular fa-copy"></i> をクリックしてください。</li>
+                            <li>適用期間内の便が初期表示されます。</li>
+                            <li>基準日時時点の便マスターに便枝番マスターが紐づいたデータが出力されます。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="form-group col-sm-12 pl-3">
             <p id="div-error-message" class="mt-1 text-danger"></p>
@@ -17,6 +30,10 @@
             {
                 <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
             }
+        </div>
+
+        <div class="mb-3">
+            <label><input type="checkbox" id="m_tripCheckBox"/> 適用終了日時を過ぎた便も表示する</label>
         </div>
 
         <div class="mg-bot-20">
@@ -56,7 +73,7 @@
                         <th class="font-weight-bold">更新者</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="m_tripTableBody">
                     @if (@Model.M_TripList != null)
                     {
                         @foreach (var item in @Model.M_TripList)
@@ -64,7 +81,7 @@
                             <tr>
                                 <td>
                                     <a class="btn btn-success btn-icon-split ml-1 mr-1"
-                                       onclick="OnEditClick('@item.TripID')" data-id="@item.TripID" data-toggle="modal" data-target="#edit-modal">
+                                       onclick="OnEditClick('@item.TripHistoryID')" data-id="@item.TripHistoryID" data-toggle="modal" data-target="#edit-modal">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
                                 </td>
@@ -104,8 +121,8 @@
                 </div>
                 <div class="d-flex justify-content-center">
                     <form class="col-md-12" id="mTripForm">
-                        <input type="hidden" asp-for="TripID" value="@Model.TripID" />
                         <input type="hidden" asp-for="TripHistoryID" value="@Model.TripHistoryID" />
+                        <input type="hidden" asp-for="TripID" value="@Model.TripID" />
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("TripName")</label>
@@ -181,7 +198,7 @@
 
 <script type="text/javascript">
     // 編集ボタン押下
-    function OnEditClick(tripID) {
+    function OnEditClick(tripHistoryID) {
         DeleteErrorMessages();
 
         // M_TripModel取得
@@ -191,9 +208,9 @@
             var dayShiftStartTime = GetTimeString(new Date(item.dayShiftStartTime));
             var applicableStartDateTime = GetDateString(new Date(item.applicableStartDateTime));
             var applicableEndDateTime = GetDateString(new Date(item.applicableEndDateTime));
-            if (item.tripID == tripID) {
-                $("#TripID").val(item.tripID);
+            if (item.tripHistoryID == tripHistoryID) {
                 $("#TripHistoryID").val(item.tripHistoryID);
+                $("#TripID").val(item.tripID);
                 $("#TripName").val(item.tripName);
                 $("#DriverName").val(item.driverName);
                 $("#SelectedTruckID").val(item.mTruckList);
@@ -264,6 +281,41 @@
             });
         });
     }
+
+    // チェックボックス押下時
+    $('input').change(function () {
+        var h = 'test';
+        var checkBox = false;
+        $('input:checked').each(function () {
+            checkBox = $(this).prop('checked');
+        })
+        console.log(h);
+
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("SearchData", "M_Trip")';
+        let method = 'Post';
+        let data = { beforePeriod: checkBox };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            console.log(response);
+            $('#m_tripTableBody').empty().html(response);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    })
+
 
     // エラーメッセージ削除
     function DeleteErrorMessages() {
