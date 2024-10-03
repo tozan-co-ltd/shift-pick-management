@@ -146,7 +146,7 @@
                                 <label>@Html.DisplayNameFor(model => model.TruckNumber)<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <select class="form-control" name="SelectedTruckID" asp-for="SelectedTruckID" asp-items="@Model.MTruckList" required></select>
+                                <select class="form-control" name="SelectedTruckID" asp-for="SelectedTruckID" asp-items="@Model.MTruckList" required id="selectedTruckID"></select>
                                 <span class="text-danger w-100" asp-validation-for="DriverName"></span>
                             </div>
                         </div>
@@ -284,12 +284,12 @@
 
     // チェックボックス押下時
     $('input').change(function () {
-        var h = 'test';
+
+        // チェックボックスの入力情報取得
         var checkBox = false;
         $('input:checked').each(function () {
             checkBox = $(this).prop('checked');
         })
-        console.log(h);
 
 
         // フォーム情報取得

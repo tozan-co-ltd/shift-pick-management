@@ -289,26 +289,6 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 車両IDで車両情報を取得
-        /// </summary>
-        /// <param name="truckId">車両ID</param>
-        /// <returns></returns>
-        public static string CreateSQLToSelectByTruckId(int truckId)
-        {
-            var sql = $@"
-                    SELECT
-                        *               
-                    FROM 
-                        m_trucks
-                    WHERE
-                        truck_id = {truckId}
-                        AND is_deleted = 0
-            ";
-
-            return sql;
-        }
-
-        /// <summary>
         /// 車両マスター登録SQL作成
         /// </summary>
         /// <param name="model">登録情報</param>

@@ -274,5 +274,16 @@ namespace ai_truck_load_measurement.Controllers
             }
             return isDupulicated;
         }
+
+        /// <summary>
+        /// 車両IDから識別番号を取得
+        /// </summary>
+        /// <param name="truckID"></param>
+        /// <returns></returns>
+        public IActionResult GetIdentifyNumberFromTruckID(int truckID)
+        {
+            var identifyNumber =  M_TripConnectController.SelectIdentifyNumberByTruckId(truckID);
+            return Content(identifyNumber.ToString());
+        }
     }
 }

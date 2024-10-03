@@ -214,6 +214,39 @@ namespace ai_truck_load_measurement.ConnectControllers
             return tripID;
         }
 
+
+        /// <summary>
+        /// 車両IDから識別番号を取得
+        /// </summary>
+        /// <param name="truckID">車両ID</param>
+        /// <returns></returns>
+        public static int SelectIdentifyNumberByTruckId(int truckID)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                // DB接続
+                try
+                {
+                    string sql = CreateSQLToSelectIdentifyNumberByTruckId(truckID);
+                    var identifyNumber = Convert.ToInt32(connection.ExecuteScalar(sql));
+
+                    return identifyNumber;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+
         /// <summary>
         /// 便マスター情報取得SQL作成
         /// </summary>
@@ -399,20 +432,22 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 便テーブル更新SQL作成
+        /// 車両IDで識別番号を取得
         /// </summary>
-        /// <param name="model">更新情報</param>
-        /// <param name="updatedAt">システムタイム</param>
-        /// <param name="updatedBy">ユーザー名</param>
-        /// <returns>SQL文</returns>
-        private static string CreateSQLToUpdateMTrip(M_TripModel model)
+        /// <param name="truckId">車両ID</param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectIdentifyNumberByTruckId(int truckID)
         {
             var sql = $@"
-                UPDATE m_trip
-                SET 
-	                trip_name = '{model.TripName}'
-                WHERE trip_id = {model.TripID}
+                    SELECT
+                        identify_number               
+                    FROM 
+                        m_trucks
+                    WHERE
+                        truck_id = {truckID}
+                        AND is_deleted = 0
             ";
+
             return sql;
         }
     }
