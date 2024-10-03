@@ -87,6 +87,7 @@
     </div>
 </div>
 
+
 <!--  Edit Modal-->
 <div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -107,7 +108,7 @@
                         <input type="hidden" asp-for="TripHistoryID" value="@Model.TripHistoryID" />
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
-                                <label>@Html.DisplayName("TripName")<span style="color:red">*</span></label>
+                                <label>@Html.DisplayName("TripName")</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="TripName" autocomplete="off" value="" required>
@@ -115,50 +116,41 @@
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("DriverName")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="DriverName" autocomplete="off" value="" required>
                                 <span class="text-danger w-100" asp-validation-for="DriverName"></span>
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-2 column-1st">
-                                <label>@Html.DisplayNameFor(model => model.TruckNumber)<span style="color:red">*</span></label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                                <select class="form-control" name="SelectedTruckID" asp-for="SelectedTruckID" asp-items="@Model.TruckSelectList" required></select>
-                                <span class="text-danger w-100" asp-validation-for="SelectedTruckID"></span>
-                            </div>
-                        </div>
-                        <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("DayShiftStartTime")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="DayShiftStartTime" autocomplete="off" value="" required>
-                                <small class="form-text text-muted w-100 p-1">hh:mmで入力してください</small>
+                                <small class="form-text text-muted w-100 p-1">hh:mmで入力してください。</small>
                                 <span class="text-danger w-100" asp-validation-for="DayShiftStartTime"></span>
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("ApplicableStartDateTime")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                                <input class="form-control" type="datetime-local" asp-for="ApplicableStartDateTime" autocomplete="off" value="" required>
-                                <small class="form-text text-muted w-100 p-1">YYYY/MM/DD hh:mmで入力してください</small>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input class="form-control" type="text" asp-for="ApplicableStartDateTime" autocomplete="off" value="" required>
+                                <small class="form-text text-muted w-100 p-1">YYYY/MM/DD hh:mmで入力してください。</small>
                                 <span class="text-danger w-100" asp-validation-for="ApplicableStartDateTime"></span>
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("ApplicableEndDateTime")<span style="color:red">*</span></label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                                <input class="form-control" type="datetime-local" asp-for="ApplicableEndDateTime" autocomplete="off" value="" required>
-                                <small class="form-text text-muted w-100 p-1">YYYY/MM/DD hh:mmで入力してください</small>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input class="form-control" type="text" asp-for="ApplicableEndDateTime" autocomplete="off" value="" required>
+                                <small class="form-text text-muted w-100 p-1">YYYY/MM/DD hh:mmで入力してください。</small>
                                 <span class="text-danger w-100" asp-validation-for="ApplicableEndDateTime"></span>
                             </div>
                         </div>
@@ -185,18 +177,43 @@
 
         // M_TripModel取得
         var tripModel = @Html.Raw(Json.Serialize(Model));
+        console.log(tripModel)
         tripModel.m_TripList.forEach(function (item) {
+            var dayShiftStartTime = GetTimeString(new Date(item.dayShiftStartTime));
+            var applicableStartDateTime = GetDateString(new Date(item.applicableStartDateTime));
+            var applicableEndDateTime = GetDateString(new Date(item.applicableEndDateTime));
             if (item.tripID == tripID) {
                 $("#TripID").val(item.tripID);
                 $("#TripHistoryID").val(item.tripHistoryID);
                 $("#TripName").val(item.tripName);
                 $("#DriverName").val(item.driverName);
                 $("#SelectedTruckID").val(item.selectedTruckID);
-                $("#DayShiftStartTime").val(item.dayShiftStartTime.toString("HH:mm"));
-                $("#ApplicableStartDateTime").val(item.applicableStartDateTime);
-                $("#ApplicableEndDateTime").val(item.applicableEndDateTime);
+                $("#DayShiftStartTime").val(dayShiftStartTime);
+                $("#ApplicableStartDateTime").val(applicableStartDateTime);
+                $("#ApplicableEndDateTime").val(applicableEndDateTime);
             }
         });
+    }
+
+    function GetTimeString(date){
+        var hour = date.getHours();
+        if (hour < 10) {
+            hour = "0" + hour;
+        }
+        var minute = date.getMinutes();
+        if (minute < 10) {
+            minute = "0" + minute;
+        }
+        return hour + ":" + minute;
+    }
+
+    function GetDateString(date) {
+        var day = date.toLocaleDateString("ja-JP", {
+            year: "numeric", month: "2-digit",
+            day: "2-digit"
+        });
+        var time = GetTimeString(date);
+        return day + " " + time;
     }
 
     // 更新
