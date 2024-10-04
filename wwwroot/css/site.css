@@ -901,3 +901,8 @@ select[readonly] {
 .table-center th{
     text-align: center !important;
 }
+
+/*Å@-------------- Modal ---------------*/
+.modalLabel a{
+    white-space: nowrap;
+}
