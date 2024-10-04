@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using X.PagedList;
 
@@ -29,13 +30,14 @@ namespace ai_truck_load_measurement.Models
         /// 便名称
         /// </summary>
         [Display(Name = "便名称")]
-        [Required]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? TripName { get; set; }
 
         /// <summary>
         /// 乗務員
         /// </summary>
         [Display(Name = "乗務員")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DriverName {  get; set; }
 
         /// <summary>
@@ -59,18 +61,21 @@ namespace ai_truck_load_measurement.Models
         /// 昼勤開始時間  
         /// </summary>
         [Display(Name = "昼勤開始時間")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public DateTime DayShiftStartTime {  get; set; }
 
         /// <summary>
         ///  適用開始日時
         /// </summary>
         [Display(Name = "適用開始日時")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public DateTime ApplicableStartDateTime { get; set; }
 
         /// <summary>
         /// 適用終了日時
         /// </summary>
         [Display(Name = "適用終了日時")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public DateTime ApplicableEndDateTime { get;set; }
 
         /// <summary>
