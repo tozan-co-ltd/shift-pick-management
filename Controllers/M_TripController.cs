@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
+using ai_truck_load_measurement.Commons;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -63,6 +65,10 @@ namespace ai_truck_load_measurement.Controllers
                                        onclick=""OnEditClick('@item.TripHistoryID')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
                                         <i class=""fa-solid fa-pen""></i>
                                     </a>
+                                    <a class=""btn btn-icon-split ml-1 mr-1""
+                                       onclick=""OnEditClick('@item.TripHistoryID')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
+                                        <i class=""fa-regular fa-copy""></i>
+                                    </a>
                                 </td>
                                 <td>{@item.TripID}</td>
                                 <td>{@item.TripName}</td>
@@ -96,14 +102,25 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult Register()
+        public IActionResult Register(int? id)
         {
             M_TripModel model = new();
             try
-            {
+            {   
+                if (id != null)
+                {
+                    var tripSql = M_TripConnectController.CreateSQLToSelectMTripHistoryByTripHistoryId(id.Value);
+                    List<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(tripSql, "AI-truck-load-measurement_test");
+                    if (tripList.Count != 1)
+                    {
+                        ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
+                        return View(model);
+                    }
+                    model = tripList[0];
+                }
                 // 車両マスター情報取得
-                var sql = M_TruckConnectController.CreateSQLToSelectMTrucks();
-                IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(sql, "AI-truck-load-measurement_test"); 
+                var truckSql = M_TruckConnectController.CreateSQLToSelectMTrucks();
+                IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(truckSql, "AI-truck-load-measurement_test");
                 foreach (var truck in truckList)
                 {
                     SelectListItem menuItem = new()
@@ -275,6 +292,31 @@ namespace ai_truck_load_measurement.Controllers
             return isDupulicated;
         }
 
+        public IActionResult EditNewApplicable(int tripHistoryID)
+        {
+            M_TripModel model = new();
+            try
+            {
+                // IDが一致する便履歴情報取得
+                // SQL作成
+                var tripListSql = M_TripConnectController.CreateSQLToSelectMTripHistoryByTripHistoryId(tripHistoryID);
+                // DB接続
+                List<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(tripListSql, "AI-truck-load-measurement_test");
+                if (tripList.Count != 1)
+                {
+                    ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
+                    return View(model);
+                }
+                model = tripList[0];
+                return View("Register", model);
+            }
+            catch (Exception)
+            {
+                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
+                return View(model);
+            }
+        }
+
         /// <summary>
         /// 車両IDから識別番号を取得
         /// </summary>
@@ -282,7 +324,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public IActionResult GetIdentifyNumberFromTruckID(int truckID)
         {
-            var identifyNumber =  M_TripConnectController.SelectIdentifyNumberByTruckId(truckID);
+            var identifyNumber = M_TripConnectController.SelectIdentifyNumberByTruckId(truckID);
             return Content(identifyNumber.ToString());
         }
     }

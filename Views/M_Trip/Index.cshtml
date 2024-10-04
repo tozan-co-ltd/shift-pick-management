@@ -84,6 +84,9 @@
                                        onclick="OnEditClick('@item.TripHistoryID')" data-id="@item.TripHistoryID" data-toggle="modal" data-target="#edit-modal">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
+                                    <a class="btn btn-icon-split ml-1 mr-1" asp-controller="M_Trip" asp-action="Register" asp-route-id="@item.TripHistoryID">
+                                        <i class="fa-regular fa-copy"></i>
+                                    </a>
                                 </td>
                                 <td>@item.TripID</td>
                                 <td>@item.TripName</td>
@@ -146,7 +149,7 @@
                                 <label>@Html.DisplayNameFor(model => model.TruckNumber)<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <select class="form-control" name="SelectedTruckID" asp-for="SelectedTruckID" asp-items="@Model.MTruckList" required id="selectedTruckID"></select>
+                                <select class="form-control" name="TruckID" asp-for="TruckID" asp-items="@Model.MTruckList" required id="TruckID"></select>
                                 <span class="text-danger w-100" asp-validation-for="DriverName"></span>
                             </div>
                         </div>
@@ -212,7 +215,6 @@
 
         // M_TripModel取得
         var tripModel = @Html.Raw(Json.Serialize(Model));
-        console.log(tripModel)
         tripModel.m_TripList.forEach(function (item) {
             var dayShiftStartTime = GetTimeString(new Date(item.dayShiftStartTime));
             var applicableStartDateTime = GetDateString(new Date(item.applicableStartDateTime));
@@ -222,10 +224,38 @@
                 $("#TripID").val(item.tripID);
                 $("#TripName").val(item.tripName);
                 $("#DriverName").val(item.driverName);
-                $("#SelectedTruckID").val(item.mTruckList);
+                $("#TruckID").val(item.truckID);
+                getIdentifyNumber(item.truckID);
                 $("#DayShiftStartTime").val(dayShiftStartTime);
                 $("#ApplicableStartDateTime").val(applicableStartDateTime);
                 $("#ApplicableEndDateTime").val(applicableEndDateTime);
+            }
+        });
+    }
+
+    // 識別番号取得、反映処理
+    function getIdentifyNumber(truckID) {
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetIdentifyNumberFromTruckID", "M_Trip")';
+        let method = 'POST';
+        let data = { truckID: truckID };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            $('#identifyNumber').val(response);
+            console.log(response);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
             }
         });
     }
@@ -326,34 +356,12 @@
     })
 
     // 車両番号選択時の処理
-    $('[name=SelectedTruckID]').change(function () {
-        var truckID = $('[name=SelectedTruckID]').val();
+    $('[name=TruckID]').change(function () {
+        var truckID = $('[name=TruckID]').val();
         console.log(truckID);
 
-        // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetIdentifyNumberFromTruckID", "M_Trip")';
-        let method = 'POST';
-        let data = { truckID: truckID };
-
-        // Ajax call
-        $.ajax({
-            url: url,
-            method: method,
-            data: data
-        }).done(function (response) {
-            $('#identifyNumber').val(response);
-            console.log(response);
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 404) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#edit-modal-error-message").text(errorMessage);
-            } else {
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#edit-modal-error-message").text(errorMessage);
-            }
-        });
+        getIdentifyNumber(truckID);
     });
-
 
     // エラーメッセージ削除
     function DeleteErrorMessages() {

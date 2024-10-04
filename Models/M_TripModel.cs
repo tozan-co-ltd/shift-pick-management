@@ -39,6 +39,11 @@ namespace ai_truck_load_measurement.Models
         public string? DriverName {  get; set; }
 
         /// <summary>
+        /// 車両ID
+        /// </summary>
+        public int TruckID {  get; set; }
+
+        /// <summary>
         /// 車両番号
         /// </summary>
         [Display(Name = "車両番号")]
@@ -91,11 +96,6 @@ namespace ai_truck_load_measurement.Models
         /// </summary>
         [Display(Name = "更新者")]
         public string? UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 選択された車両ID
-        /// </summary>
-        public int SelectedTruckID {  get; set; }
 
         public List<SelectListItem> TruckSelectList { get; set; } = new List<SelectListItem>();
     }

@@ -259,6 +259,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     TripHistories.trip_history_id,
                     Trips.trip_name,
                     TripHistories.driver_name,
+                    Trucks.truck_id,
                     Trucks.truck_number,
                     Trucks.identify_number,
                     CONVERT(DATETIME, TripHistories.day_shift_start_time) AS day_shift_start_time,
@@ -284,6 +285,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                 sql += $@"
                     WHERE
                         TripHistories.applicable_end_datetime > '{today}'
+                    ORDER BY 
+                        TripHistories.trip_id
                 ";
             }
             return sql;
@@ -391,7 +394,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 )
                 VALUES (
                     '{model.TripID}',
-                    '{model.SelectedTruckID}',
+                    '{model.TruckID}',
                     '{model.DriverName}',
                     '{model.DayShiftStartTime}',
                     '{model.ApplicableStartDateTime}',
@@ -420,7 +423,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SET 
                     trip_id = '{model.TripID}',
 	                driver_name = '{model.DriverName}',
-	                truck_id = {model.SelectedTruckID},
+	                truck_id = {model.TruckID},
 	                day_shift_start_time = '{model.DayShiftStartTime}',
 	                applicable_start_datetime = '{model.ApplicableStartDateTime}',
 	                applicable_end_datetime = '{model.ApplicableEndDateTime}',
@@ -432,7 +435,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 車両IDで識別番号を取得
+        /// 車両IDで識別番号を取得するSQL作成
         /// </summary>
         /// <param name="truckId">車両ID</param>
         /// <returns></returns>
@@ -448,6 +451,43 @@ namespace ai_truck_load_measurement.ConnectControllers
                         AND is_deleted = 0
             ";
 
+            return sql;
+        }
+
+        /// <summary>
+        /// 便履歴IDをもとに便データを取得するSQL
+        /// </summary>
+        /// <param name="tripHistoryId"></param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectMTripHistoryByTripHistoryId(int tripHistoryId)
+        {
+            var sql = $@"
+                    SELECT 
+	                TripHistories.trip_id,
+                    TripHistories.trip_history_id,
+                    Trips.trip_name,
+                    TripHistories.driver_name,
+                    Trucks.truck_id,
+                    Trucks.truck_number,
+                    Trucks.identify_number,
+                    CONVERT(DATETIME, TripHistories.day_shift_start_time) AS day_shift_start_time,
+                    TripHistories.applicable_start_datetime,
+                    TripHistories.applicable_end_datetime,
+                    TripHistories.updated_at,
+                    TripHistories.updated_by
+                FROM 
+	                m_trip_histories as TripHistories
+                INNER JOIN
+                    m_trips as Trips
+                ON 
+                    TripHistories.trip_id = Trips.trip_id
+                INNER JOIN
+                    m_trucks as Trucks
+                ON
+                    TripHistories.truck_id = Trucks.truck_id
+                WHERE 
+                    TripHistories.trip_history_id = {tripHistoryId}
+            ";
             return sql;
         }
     }
