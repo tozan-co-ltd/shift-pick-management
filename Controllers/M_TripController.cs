@@ -62,11 +62,10 @@ namespace ai_truck_load_measurement.Controllers
                             <tr>
                                 <td>
                                     <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                       onclick=""OnEditClick('@item.TripHistoryID')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
+                                       onclick=""OnEditClick('{@item.TripHistoryID}')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
                                         <i class=""fa-solid fa-pen""></i>
                                     </a>
-                                    <a class=""btn btn-icon-split ml-1 mr-1""
-                                       onclick=""OnEditClick('@item.TripHistoryID')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
+                                    <a class=""btn btn-icon-split ml-1 mr-1"" asp-controller=""M_Trip"" asp-action=""Register"" asp-route-id=""@item.TripHistoryID"">
                                         <i class=""fa-regular fa-copy""></i>
                                     </a>
                                 </td>

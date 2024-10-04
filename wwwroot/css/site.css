@@ -906,3 +906,7 @@ select[readonly] {
 .modalLabel a{
     white-space: nowrap;
 }
+
+.selectbox {
+    -webkit-appearance:listitem !important;
+}
