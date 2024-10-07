@@ -8,6 +8,15 @@
     <div class="card-header">
         @ViewData["Title"]
     </div>
+
+    <div class="form-group col-sm-12 pl-3">
+        <p id="div-error-message" class="mt-1 text-danger"></p>
+
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+        }
+    </div>
     <div class="card-body">
         <div class="row">
             <div class="col-lg-10">
@@ -23,14 +32,6 @@
             </div>
         </div>
 
-        <div class="form-group col-sm-12 pl-3">
-            <p id="div-error-message" class="mt-1 text-danger"></p>
-
-            @if (ViewData["ErrorMessage"] != null)
-            {
-                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
-            }
-        </div>
 
         <div class="mb-3">
             <label><input type="checkbox" id="m_tripCheckBox"/> 適用終了日時を過ぎた便も表示する</label>
@@ -48,10 +49,10 @@
                 </div>
                 <div class="d-flex xs-block justify-content-start align-items-center excel-date">
                     <div class="mr-3">
-                        <label>基準日時 <input type="date" id="referenceDate" /></label>
+                        <label>基準日時 <input type="datetime-local" id="referenceDate" /></label>
                     </div>
                     <div class="input-group-append mr-0">
-                        <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFile('M_Trip', '@Model.ViewTitle')">
+                        <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('M_Trip', '@Model.ViewTitle')">
                             <span class="icon text-white-50">
                                 <i class="fas fa-file-export"></i>
                             </span>
@@ -216,13 +217,55 @@
 <script type="text/javascript">
     // 画面ロード時
     $(document).ready(function () {
+        // 今日の日付を取得
         var today = new Date();
         today.setDate(today.getDate());
         var yyyy = today.getFullYear();
-        var mm = ("0" + (today.getMonth() + 1)).slice(-2);
+        var MM = ("0" + (today.getMonth() + 1)).slice(-2);
         var dd = ("0" + today.getDate()).slice(-2);
-        $('#referenceDate').val(yyyy+'-'+mm+'-'+dd);
+        var hh = ("0" + today.getHours()).slice(-2);
+        var mm = ("0" + today.getMinutes()).slice(-2);;
+
+        $('#referenceDate').val(yyyy+'-'+MM+'-'+dd+"T"+hh+":"+mm);
     });
+    
+    // csv出力
+    async function onExportFileTrips(page, gamenName) {
+        event.preventDefault();
+        $('#div-error-message').text("");
+
+        // チェックボックスの入力情報取得
+        var checkBox = false;
+        $('input:checked').each(function () {
+            checkBox = $(this).prop('checked');
+        });
+
+        // 基準日時取得
+        var referenceDate = $('#referenceDate').val();
+
+        console.log(referenceDate);
+
+        const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&beforePeriod=' + checkBox + '&referenceDate=' + referenceDate, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        var { data, errorMessage } = await response.json();
+
+        if (errorMessage) {
+            $("#div-error-message").show();
+            $("#div-error-message").text(errorMessage);
+        } else {
+            var { contentType, fileContents, fileDownloadName } = data;
+            {
+                const link = document.createElement("a");
+                link.href = `data:${contentType};base64,${fileContents}`;
+                link.download = fileDownloadName;
+                link.click();
+            }
+        }
+    }
 
     // 編集ボタン押下
     function OnEditClick(tripHistoryID) {

@@ -246,6 +246,40 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
         }
 
+        /// <summary>
+        /// 便情報をデータテーブルとして取得
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <param name="databaseName">データベース名</param>
+        /// <returns></returns>
+        public static DataTable ConnectMTripsToDataTable(string sql, string databaseName)
+        {
+            // 戻り値
+            DataTable dataTable = new DataTable();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandText = sql;
+                    var adapter = new SqlDataAdapter(command);
+                    adapter.Fill(dataTable);
+                }
+                return dataTable;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
 
         /// <summary>
         /// 便マスター情報取得SQL作成
@@ -289,6 +323,111 @@ namespace ai_truck_load_measurement.ConnectControllers
                         TripHistories.trip_id
                 ";
             }
+            return sql;
+        }
+
+
+        /// <summary>
+        /// データテーブル用の便マスター情報取得SQL作成
+        /// </summary>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectMTripsForDataTable(bool beforePeriod, DateTime refferenceDate)
+        {
+            var sql = $@"
+                SELECT 
+	                TripHistories.trip_id,
+                    Trips.trip_name,
+                    TripHistories.driver_name,
+                    Trucks.truck_number,
+                    Trucks.identify_number,
+                    FORMAT(CONVERT(DATETIME, TripHistories.day_shift_start_time), 'HH:mm'),
+                    FORMAT(TripHistories.applicable_start_datetime, 'yyyy/MM/dd HH:mm:ss'),
+                    FORMAT(TripHistories.applicable_end_datetime, 'yyyy/MM/dd HH:mm:ss'),
+                    FORMAT(TripHistories.created_at, 'yyyy/MM/dd HH:mm:ss'),
+                    TripHistories.created_by,
+                    FORMAT(TripHistories.updated_at, 'yyyy/MM/dd HH:mm:ss'),
+                    TripHistories.updated_by
+                FROM 
+	                m_trip_histories as TripHistories
+                INNER JOIN
+                    m_trips as Trips
+                ON 
+                    TripHistories.trip_id = Trips.trip_id
+                INNER JOIN
+                    m_trucks as Trucks
+                ON
+                    TripHistories.truck_id = Trucks.truck_id
+            ";
+            if (!beforePeriod)
+            {
+                string formatRefferenceDate = refferenceDate.ToString("yyyy/MM/dd HH:mm:ss");
+                sql += $@"
+                    WHERE
+                        TripHistories.applicable_end_datetime > '{formatRefferenceDate}'
+                ";
+            }
+            sql += $@"
+                    ORDER BY 
+                        TripHistories.trip_id
+                ";
+            return sql;
+        }
+
+        /// <summary>
+        /// データテーブル用の便マスター、便枝番マスター結合情報取得SQL作成
+        /// </summary>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectMTripBranchesForDataTable(DateTime refferenceDate)
+        {
+            string formatRefferenceDate = refferenceDate.ToString("yyyy/MM/dd HH:mm:ss");
+            var sql = $@"
+                SELECT 
+	                TripHistories.trip_id,
+                    Trips.trip_name,
+                    TripHistories.driver_name,
+                    Trucks.truck_number,
+                    Trucks.identify_number,
+                    FORMAT(CONVERT(DATETIME, TripHistories.day_shift_start_time), 'HH:mm'),
+                    FORMAT(TripHistories.applicable_start_datetime, 'yyyy/MM/dd HH:mm:ss'),
+                    FORMAT(TripHistories.applicable_end_datetime, 'yyyy/MM/dd HH:mm:ss'),
+                    FORMAT(TripHistories.created_at, 'yyyy/MM/dd HH:mm:ss'),
+                    TripHistories.created_by,
+                    FORMAT(TripHistories.updated_at, 'yyyy/MM/dd HH:mm:ss'),
+                    TripHistories.updated_by,
+	                BranchNumbers.trip_branch_number_id,
+	                FORMAT(CONVERT(DATETIME, BranchNumbers.arrival_scheduled_time), 'HH:mm'),
+	                FORMAT(CONVERT(DATETIME, BranchNumbers.departure_scheduled_time), 'HH:mm'),
+	                FORMAT(BranchNumbers.applicable_start_datetime, 'yyyy/MM/dd HH:mm:ss'),
+	                FORMAT(BranchNumbers.applicable_end_datetime, 'yyyy/MM/dd HH:mm:ss'),
+	                FORMAT(BranchNumbers.created_at, 'yyyy/MM/dd HH:mm:ss'),
+	                BranchNumbers.created_by,
+	                FORMAT(BranchNumbers.updated_at, 'yyyy/MM/dd HH:mm:ss'),
+	                BranchNumbers.updated_by
+                FROM 
+	                m_trip_histories as TripHistories
+                INNER JOIN
+                    m_trips as Trips
+                ON 
+                    TripHistories.trip_id = Trips.trip_id
+                INNER JOIN
+                    m_trucks as Trucks
+                ON
+                    TripHistories.truck_id = Trucks.truck_id
+                INNER JOIN
+	                m_trip_branch_numbers as BranchNumbers
+                ON
+	                TripHistories.trip_id = BranchNumbers.trip_id
+                WHERE
+                    TripHistories.applicable_start_datetime < '{formatRefferenceDate}'
+                AND
+                    '{formatRefferenceDate}' < TripHistories.applicable_end_datetime
+                AND
+                    BranchNumbers.applicable_start_datetime < '{formatRefferenceDate}'
+                AND
+                    '{formatRefferenceDate}' < TripHistories.applicable_end_datetime
+                ORDER BY
+                    TripHistories.trip_id
+            ";
             return sql;
         }
 

@@ -6,13 +6,18 @@ using X.PagedList;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
 using ai_truck_load_measurement.Commons;
-using DocumentFormat.OpenXml.Office2010.Excel;
+using System.Data;
 
 namespace ai_truck_load_measurement.Controllers
 {
     public class M_TripController : BaseController
     {
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// 便マスター画面表示
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
             M_TripModel model = new();
@@ -22,7 +27,7 @@ namespace ai_truck_load_measurement.Controllers
             
             try
             {
-                // 車両マスター情報取得SQL作成
+                // 便マスター情報取得SQL作成
                 var sql = M_TripConnectController.CreateSQLToSelectMTrips(beforePeriod);
                 // DB接続
                 IEnumerable<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(sql, "AI-truck-load-measurement_test");
@@ -291,29 +296,77 @@ namespace ai_truck_load_measurement.Controllers
             return isDupulicated;
         }
 
-        public IActionResult EditNewApplicable(int tripHistoryID)
+        /// <summary>
+        /// ファイル出力
+        /// </summary>
+        /// <param name="gamenName">現在の画面名</param>
+        /// <returns></returns>
+        public JsonResult ExportFile(string gamenName, bool beforePeriod, DateTime referenceDate)
         {
-            M_TripModel model = new();
+            string? errorMessage;
             try
             {
-                // IDが一致する便履歴情報取得
-                // SQL作成
-                var tripListSql = M_TripConnectController.CreateSQLToSelectMTripHistoryByTripHistoryId(tripHistoryID);
-                // DB接続
-                List<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(tripListSql, "AI-truck-load-measurement_test");
-                if (tripList.Count != 1)
+                // 便マスター情報取得
+                var mTripSql = M_TripConnectController.CreateSQLToSelectMTripsForDataTable(beforePeriod, referenceDate);
+                DataTable mTripDT = M_TripConnectController.ConnectMTripsToDataTable(mTripSql, "AI-truck-load-measurement_test");
+
+                // 便枝番マスター情報取得
+                var mTripBranchSql = M_TripConnectController.CreateSQLToSelectMTripBranchesForDataTable(referenceDate);
+                DataTable mTripBranchDT = M_TripConnectController.ConnectMTripsToDataTable(mTripBranchSql, "AI-truck-load-measurement_test");
+
+                // ファイル名
+                var tmpFilename = CreateFile.CreateFileName(null, gamenName);
+                // 2シートあり
+                bool sheetTwo = true;
+
+                // シート名
+                string sheetNameOne = "便マスターシート";
+                string sheetNameTwo = "便枝番マスターシート";
+
+
+                try
                 {
-                    ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
-                    return View(model);
+                    // Excelファイル作成チェック
+                    var createRs = CreateFile.CheckCreateExcel(mTripDT, mTripBranchDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
+
+                    if (createRs.Item1)
+                    {
+                        var file = System.IO.File.ReadAllBytes(createRs.Item2);
+
+
+                        return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+                    }
+                    else
+                    {
+                        // エラーメッセージ取得
+                        // 「ファイルが存在しません。」
+                        errorMessage = ErrorMessagesResources.E9999;
+
+                        return Json(new { res = "NG", error = errorMessage });
+                    }
                 }
-                model = tripList[0];
-                return View("Register", model);
+                catch (Exception ex)
+                {
+                    // エラーメッセージ取得
+                    // 「NASに接続できませんでした。」
+                    errorMessage = ErrorMessagesResources.E9999;
+
+                    // log取得
+                    var exceptionMessage = ex.Message;
+                    return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
-                return View(model);
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+
+                // log取得
+                var exceptionMessage = ex.Message;
+                return Json(new { res = "NG", error = errorMessage + exceptionMessage });
             }
+
         }
 
         /// <summary>
