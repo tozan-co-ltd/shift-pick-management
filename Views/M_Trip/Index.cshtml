@@ -128,7 +128,7 @@
                         <input type="hidden" asp-for="TripID" value="@Model.TripID" />
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
-                                <label>@Html.DisplayName("TripName")</label>
+                                <label>@Html.DisplayName("TripName")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="TripName" autocomplete="off" value="" required>
