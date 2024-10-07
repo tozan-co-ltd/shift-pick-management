@@ -62,6 +62,7 @@ namespace ai_truck_load_measurement.Models
         /// </summary>
         [Display(Name = "昼勤開始時間")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [RegularExpression(@"^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$", ErrorMessage = "hh:mmで入力してください。")]
         public DateTime DayShiftStartTime {  get; set; }
 
         /// <summary>
