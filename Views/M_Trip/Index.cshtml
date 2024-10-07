@@ -38,7 +38,7 @@
 
         <div class="mg-bot-20">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
-                <div class="input-group-append mr-2">
+                <div class="input-group-append mr-3">
                     <a class="btn btn-primary btn-icon-split btn-register" asp-controller="M_Trip" asp-action="Register">
                         <span class="icon text-white-50">
                             <i class="fas fa-plus"></i>
@@ -46,13 +46,18 @@
                         <span class="text">新規作成</span>
                     </a>
                 </div>
-                <div class="input-group-append">
-                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFile('M_Trip', '@Model.ViewTitle')">
-                        <span class="icon text-white-50">
-                            <i class="fas fa-file-export"></i>
-                        </span>
-                        <span class="text">Excel出力</span>
-                    </a>
+                <div class="d-flex xs-block justify-content-start align-items-center excel-date">
+                    <div class="mr-3">
+                        <label>基準日時 <input type="date" id="referenceDate" /></label>
+                    </div>
+                    <div class="input-group-append mr-0">
+                        <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFile('M_Trip', '@Model.ViewTitle')">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-file-export"></i>
+                            </span>
+                            <span class="text">Excel出力</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -209,6 +214,16 @@
 </div>
 
 <script type="text/javascript">
+    // 画面ロード時
+    $(document).ready(function () {
+        var today = new Date();
+        today.setDate(today.getDate());
+        var yyyy = today.getFullYear();
+        var mm = ("0" + (today.getMonth() + 1)).slice(-2);
+        var dd = ("0" + today.getDate()).slice(-2);
+        $('#referenceDate').val(yyyy+'-'+mm+'-'+dd);
+    });
+
     // 編集ボタン押下
     function OnEditClick(tripHistoryID) {
         DeleteErrorMessages();
