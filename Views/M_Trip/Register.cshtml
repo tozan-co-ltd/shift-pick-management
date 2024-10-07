@@ -126,11 +126,11 @@
 <script type="text/javascript">
     // ロード時の処理
     $(document).ready(function(){
-        getIdentifyNumber(1);
         // M_TripModel取得
         var tripModel = @Html.Raw(Json.Serialize(Model));
+        getIdentifyNumber(tripModel.truckID);
         console.log(tripModel);
-        if (tripModel.tripHistoryID == 0) {
+        if (tripModel.truckID == 0) {
             $('#DayShiftStartTime').val("");
             $('#ApplicableStartDateTime').val("");
             $('#ApplicableEndDateTime').val("");
@@ -157,6 +157,10 @@
 
     // 識別番号取得、反映処理
     function getIdentifyNumber(truckID) {
+
+        if (truckID == 0) {
+            truckID = 1;
+        }
 
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetIdentifyNumberFromTruckID", "M_Trip")';

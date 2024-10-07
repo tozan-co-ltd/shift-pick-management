@@ -463,8 +463,6 @@ namespace ai_truck_load_measurement.ConnectControllers
         {
             var sql = $@"
                     SELECT 
-	                TripHistories.trip_id,
-                    TripHistories.trip_history_id,
                     Trips.trip_name,
                     TripHistories.driver_name,
                     Trucks.truck_id,
@@ -472,9 +470,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     Trucks.identify_number,
                     CONVERT(DATETIME, TripHistories.day_shift_start_time) AS day_shift_start_time,
                     TripHistories.applicable_start_datetime,
-                    TripHistories.applicable_end_datetime,
-                    TripHistories.updated_at,
-                    TripHistories.updated_by
+                    TripHistories.applicable_end_datetime
                 FROM 
 	                m_trip_histories as TripHistories
                 INNER JOIN
