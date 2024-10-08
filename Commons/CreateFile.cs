@@ -516,6 +516,18 @@ namespace ai_truck_load_measurement.Commons
                 return true;
             }
 
+            // 出力ファイルパスが未指定の場合は中断する
+            if (String.IsNullOrWhiteSpace(exportfileFullPath))
+            {
+                return false;
+            }
+           
+            // 既にファイルが存在している場合は削除する
+            if (File.Exists(exportfileFullPath))
+            {
+                File.Delete(exportfileFullPath);
+            }
+
             try
             {
                 var startIndex = 1;
@@ -629,6 +641,18 @@ namespace ai_truck_load_measurement.Commons
                     package.Save();
                 }
                 return true;
+            }
+
+            // 出力ファイルパスが未指定の場合は中断する
+            if (String.IsNullOrWhiteSpace(exportfileFullPath))
+            {
+                return false;
+            }
+            
+            // 既にファイルが存在している場合は削除する
+            if (File.Exists(exportfileFullPath))
+            {
+                File.Delete(exportfileFullPath);
             }
 
             try
