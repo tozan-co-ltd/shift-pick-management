@@ -908,10 +908,6 @@ select[readonly] {
 }
 /*Å@-------------- Modal ---------------*/
 
-.selectbox {
-    -webkit-appearance:listitem !important;
-}
-
 .excel-date {
     border: solid 1px #000;
     padding: 5px;

@@ -155,7 +155,7 @@
                                 <label>@Html.DisplayNameFor(model => model.TruckNumber)<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <select class="form-control" name="TruckID" asp-for="TruckID" asp-items="@Model.MTruckList" required id="TruckID"></select>
+                                <select class="form-select" name="TruckID" asp-for="TruckID" asp-items="@Model.MTruckList" required id="TruckID"></select>
                                 <span class="text-danger w-100" asp-validation-for="DriverName"></span>
                             </div>
                         </div>
