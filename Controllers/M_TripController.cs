@@ -55,7 +55,7 @@ namespace ai_truck_load_measurement.Controllers
             List<M_TripModel> tripList = new();
             try
             {
-                // 車両マスター情報取得SQL作成
+                // 便マスター情報取得SQL作成
                 var sql = M_TripConnectController.CreateSQLToSelectMTrips(beforePeriod);
                 // DB接続
                 tripList = M_TripConnectController.ConnectMTrips(sql, "AI-truck-load-measurement_test");
@@ -183,7 +183,7 @@ namespace ai_truck_load_measurement.Controllers
                 M_TripConnectController.InsertMTripAndMTripHistory(model, user);
 
                 // log取得
-                _logger.Info($"車両マスター登録成功 便名称:{model.TripName}");
+                _logger.Info($"便マスター登録成功 便名称:{model.TripName}");
                 return Ok();
             }
             catch (SqlException ex)
@@ -224,7 +224,7 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     // log取得
                     errorMessage = "E1011: " + ErrorMessagesResources.E1011;
-                    _logger.Error($"車両マスター更新失敗 {errorMessage}");
+                    _logger.Error($"便マスター更新失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
                 }
