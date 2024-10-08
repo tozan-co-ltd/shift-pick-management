@@ -432,11 +432,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 重複便名称取得SQL作成
+        /// 便名称が重複している適用期間取得SQL作成
         /// </summary>
         /// <param name="truckNumber">便名称</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectDuplicateMTripName(M_TripModel model)
+        public static string CreateSQLToSelectApplicablePeriodFromDuplicateMTripName(M_TripModel model)
         {
             var sql = $@"
                 SELECT 

@@ -276,7 +276,7 @@ namespace ai_truck_load_measurement.Controllers
         private bool IsDupulicatedApplicablePeriod(M_TripModel model)
         {
             // 便名称が重複している便履歴の取得
-            var duplicateMTripNameSql = M_TripConnectController.CreateSQLToSelectDuplicateMTripName(model);
+            var duplicateMTripNameSql = M_TripConnectController.CreateSQLToSelectApplicablePeriodFromDuplicateMTripName(model);
             var duplicateMTripNameList = M_TripConnectController.ConnectMTrips(duplicateMTripNameSql, "AI-truck-load-measurement_test");
 
             // 適用期間重複チェック
