@@ -244,7 +244,7 @@
         // 基準日時取得
         var referenceDate = $('#referenceDate').val();
 
-        const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&beforePeriod=' + checkBox + '&referenceDate=' + referenceDate, {
+        const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&isBeforeApplicablePeriod=' + checkBox + '&referenceDate=' + referenceDate, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -391,7 +391,7 @@
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "M_Trip")';
         let method = 'Post';
-        let data = { beforePeriod: checkBox };
+        let data = { isBeforeApplicablePeriod: checkBox };
 
         // Ajax call
         $.ajax({

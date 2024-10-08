@@ -23,12 +23,12 @@ namespace ai_truck_load_measurement.Controllers
             M_TripModel model = new();
 
             // 適用期間外のデータが必要か
-            bool beforePeriod = false;
+            bool isBeforeApplicablePeriod = false;
             
             try
             {
                 // 便マスター情報取得SQL作成
-                var sql = M_TripConnectController.CreateSQLToSelectMTrips(beforePeriod);
+                var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod);
                 // DB接続
                 IEnumerable<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(sql, "AI-truck-load-measurement_test");
 
@@ -47,16 +47,16 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 便情報テーブル非同期更新用
         /// </summary>
-        /// <param name="beforePeriod">適用期間外のデータを含めるか</param>
+        /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
         /// <returns></returns>
-        public IActionResult SearchData(bool beforePeriod)
+        public IActionResult SearchData(bool isBeforeApplicablePeriod)
         {
             var searchData = string.Empty;
             List<M_TripModel> tripList = new();
             try
             {
                 // 便マスター情報取得SQL作成
-                var sql = M_TripConnectController.CreateSQLToSelectMTrips(beforePeriod);
+                var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod);
                 // DB接続
                 tripList = M_TripConnectController.ConnectMTrips(sql, "AI-truck-load-measurement_test");
                 if (tripList.Count > 0)
@@ -301,13 +301,13 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="gamenName">現在の画面名</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, bool beforePeriod, DateTime referenceDate)
+        public JsonResult ExportFile(string gamenName, bool isBeforeApplicablePeriod, DateTime referenceDate)
         {
             string? errorMessage;
             try
             {
                 // 便マスター情報取得
-                var mTripSql = M_TripConnectController.CreateSQLToSelectMTripsForDataTable(beforePeriod, referenceDate);
+                var mTripSql = M_TripConnectController.CreateSQLToSelectMTripsForDataTable(isBeforeApplicablePeriod, referenceDate);
                 DataTable mTripDT = M_TripConnectController.ConnectMTripsToDataTable(mTripSql, "AI-truck-load-measurement_test");
 
                 // 便枝番マスター情報取得

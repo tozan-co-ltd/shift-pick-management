@@ -286,7 +286,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便マスター情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMTrips(bool beforePeriod)
+        public static string CreateSQLToSelectMTrips(bool isBeforeApplicablePeriod)
         {
             var sql = $@"
                 SELECT 
@@ -313,7 +313,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ON
                     TripHistories.truck_id = Trucks.truck_id
             ";
-            if (!beforePeriod)
+            if (!isBeforeApplicablePeriod)
             {
                 DateTime today = DateTime.Now;
                 string formatToday = today.ToString("yyyy/MM/dd HH:mm:ss");
@@ -334,7 +334,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// データテーブル用の便マスター情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMTripsForDataTable(bool beforePeriod, DateTime refferenceDate)
+        public static string CreateSQLToSelectMTripsForDataTable(bool isBeforeApplicablePeriod, DateTime refferenceDate)
         {
             var sql = $@"
                 SELECT 
@@ -361,7 +361,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ON
                     TripHistories.truck_id = Trucks.truck_id
             ";
-            if (!beforePeriod)
+            if (!isBeforeApplicablePeriod)
             {
                 string formatRefferenceDate = refferenceDate.ToString("yyyy/MM/dd HH:mm:ss");
                 sql += $@"
