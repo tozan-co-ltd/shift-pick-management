@@ -765,6 +765,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("便マスター作成者");
                     headerList.Add("便マスター更新日時");
                     headerList.Add("便マスター更新者");
+                    headerList.Add("便枝連番");
                     headerList.Add("便枝番ID");
                     headerList.Add("到着予定時間");
                     headerList.Add("出発予定時間");

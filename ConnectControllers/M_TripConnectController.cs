@@ -387,7 +387,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     TripHistories.driver_name,
                     Trucks.truck_number,
                     Trucks.identify_number,
-                    FORMAT(CONVERT(DATETIME, TripHistories.day_shift_start_time), 'HH:mm'),
+                    FORMAT(CONVERT(DATETIME, TripHistories.day_shift_start_time), 'HH:mm') AS day_shift_start_time,
                     FORMAT(TripHistories.applicable_start_datetime, 'yyyy/MM/dd HH:mm:ss'),
                     FORMAT(TripHistories.applicable_end_datetime, 'yyyy/MM/dd HH:mm:ss'),
                     FORMAT(TripHistories.created_at, 'yyyy/MM/dd HH:mm:ss'),
@@ -395,7 +395,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     FORMAT(TripHistories.updated_at, 'yyyy/MM/dd HH:mm:ss'),
                     TripHistories.updated_by,
 	                BranchNumbers.trip_branch_number_id,
-	                FORMAT(CONVERT(DATETIME, BranchNumbers.arrival_scheduled_time), 'HH:mm'),
+	                FORMAT(CONVERT(DATETIME, BranchNumbers.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
 	                FORMAT(CONVERT(DATETIME, BranchNumbers.departure_scheduled_time), 'HH:mm'),
 	                FORMAT(BranchNumbers.applicable_start_datetime, 'yyyy/MM/dd HH:mm:ss'),
 	                FORMAT(BranchNumbers.applicable_end_datetime, 'yyyy/MM/dd HH:mm:ss'),
@@ -426,7 +426,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 AND
                     '{formatRefferenceDate}' < TripHistories.applicable_end_datetime
                 ORDER BY
-                    TripHistories.trip_id
+                    TripHistories.trip_id, BranchNumbers.arrival_scheduled_time
             ";
             return sql;
         }

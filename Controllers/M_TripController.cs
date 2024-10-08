@@ -313,6 +313,8 @@ namespace ai_truck_load_measurement.Controllers
                 // 便枝番マスター情報取得
                 var mTripBranchSql = M_TripConnectController.CreateSQLToSelectMTripBranchesForDataTable(referenceDate);
                 DataTable mTripBranchDT = M_TripConnectController.ConnectMTripsToDataTable(mTripBranchSql, "AI-truck-load-measurement_test");
+                // 便枝番マスターに便枝連番列を追加
+                var mTripBranchConsecutiveDT = SortDataTableFromBranchConsecutiveNumber(mTripBranchDT);
 
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(null, gamenName);
@@ -327,7 +329,7 @@ namespace ai_truck_load_measurement.Controllers
                 try
                 {
                     // Excelファイル作成チェック
-                    var createRs = CreateFile.CheckCreateExcel(mTripDT, mTripBranchDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
+                    var createRs = CreateFile.CheckCreateExcel(mTripDT, mTripBranchConsecutiveDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
 
                     if (createRs.Item1)
                     {
@@ -378,6 +380,65 @@ namespace ai_truck_load_measurement.Controllers
         {
             var identifyNumber = M_TripConnectController.SelectIdentifyNumberByTruckId(truckID);
             return Content(identifyNumber.ToString());
+        }
+
+        /// <summary>
+        /// 便枝連番列を追加し、便IDと便枝連番でソートする
+        /// </summary>
+        /// <param name="dt">追加対象のデータテーブル</param>
+        /// <returns></returns>
+        public DataTable SortDataTableFromBranchConsecutiveNumber(DataTable dt)
+        {
+            // テーブルに枝連番列を追加
+            dt.Columns.Add("branch_consecutive_number", typeof(int)).SetOrdinal(12);
+
+            // 各便IDごとに
+            int maxTripID = (int)dt.Select("trip_id = MAX(trip_id)", "")[0][0];
+            for(int id = 1; id <= maxTripID; id++)
+            {
+                // 各行ごとに
+                var idRows = dt.Select($"trip_id = {id}", "");
+                int countIDRows = idRows.Count();
+                if (countIDRows > 0)
+                {
+                    var countBeforeShiftStartTimeRow = 0;　// 到着予定時間が昼勤開始時間より早い行の数
+                    var branchConsecutiveNumber = 1;
+                    for (int i = 0; i < countIDRows; i++)
+                    {
+                        var dayShiftStartTime = DateTime.Parse(idRows[i]["day_shift_start_time"].ToString());
+                        var arrivalScheduledTime = DateTime.Parse(idRows[i]["arrival_scheduled_time"].ToString());
+
+                        // 到着予定時間が昼勤開始時間以降のデータに枝連番付与
+                        if (arrivalScheduledTime > dayShiftStartTime)
+                        {
+                            DataRow dr = idRows[i];
+                            dr["branch_consecutive_number"] = branchConsecutiveNumber;
+
+                            branchConsecutiveNumber++;
+                        }
+                        else
+                        {
+                            countBeforeShiftStartTimeRow++;
+                        }
+                    }
+
+                    // 到着予定時間が昼勤開始時間以前のデータに枝連番付与
+                    if (countBeforeShiftStartTimeRow > 0)
+                    {
+                        for(int i=0; i < countBeforeShiftStartTimeRow; i++)
+                        {
+                            DataRow dr = idRows[i];
+                            dr["branch_consecutive_number"] = branchConsecutiveNumber;
+                            branchConsecutiveNumber++;
+                        }
+                    }
+                }
+            }
+            // 便IDと枝連番でソート
+            DataView dv = new DataView(dt);
+            dv.Sort = "trip_id, branch_consecutive_number";
+            dt = dv.ToTable();
+            return dt;
         }
     }
 }
