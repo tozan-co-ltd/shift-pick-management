@@ -59,6 +59,7 @@ namespace ai_truck_load_measurement.Controllers
                 var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod);
                 // DB接続
                 tripList = M_TripConnectController.ConnectMTrips(sql, "AI-truck-load-measurement_test");
+                // 新しい便情報テーブルのhtml作成
                 if (tripList.Count > 0)
                 {
                     foreach (var item in tripList)
@@ -104,6 +105,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 便マスター登録画面表示
         /// </summary>
+        /// <param name="id">便履歴ID、新しい適用期間の作成時に値が入る</param>
         /// <returns></returns>
         [HttpGet]
         public IActionResult Register(int? id)
@@ -111,10 +113,14 @@ namespace ai_truck_load_measurement.Controllers
             M_TripModel model = new();
             try
             {   
+                // 新しい適用期間の作成の場合
                 if (id != null)
                 {
+                    // 便履歴IDから便履歴情報取得
                     var tripSql = M_TripConnectController.CreateSQLToSelectMTripHistoryByTripHistoryId(id.Value);
                     List<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(tripSql, "AI-truck-load-measurement_test");
+
+                    // 同一便IDのデータが1つだけのとき以外はエラー
                     if (tripList.Count != 1)
                     {
                         ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
@@ -125,6 +131,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 車両マスター情報取得
                 var truckSql = M_TruckConnectController.CreateSQLToSelectMTrucks();
                 IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(truckSql, "AI-truck-load-measurement_test");
+                // 車両番号のセレクトリスト作成
                 foreach (var truck in truckList)
                 {
                     SelectListItem menuItem = new()
@@ -374,7 +381,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 車両IDから識別番号を取得
         /// </summary>
-        /// <param name="truckID"></param>
+        /// <param name="truckID">車両ID</param>
         /// <returns></returns>
         public IActionResult GetIdentifyNumberFromTruckID(int truckID)
         {
@@ -396,19 +403,21 @@ namespace ai_truck_load_measurement.Controllers
             int maxTripID = (int)dt.Select("trip_id = MAX(trip_id)", "")[0][0];
             for(int id = 1; id <= maxTripID; id++)
             {
-                // 各行ごとに
+                // 便IDに対応する行が存在するか
                 var idRows = dt.Select($"trip_id = {id}", "");
                 int countIDRows = idRows.Count();
                 if (countIDRows > 0)
                 {
                     var countBeforeShiftStartTimeRow = 0;　// 到着予定時間が昼勤開始時間より早い行の数
                     var branchConsecutiveNumber = 1;
+                    // 各行ごとに
                     for (int i = 0; i < countIDRows; i++)
                     {
                         var dayShiftStartTime = DateTime.Parse(idRows[i]["day_shift_start_time"].ToString());
                         var arrivalScheduledTime = DateTime.Parse(idRows[i]["arrival_scheduled_time"].ToString());
 
-                        // 到着予定時間が昼勤開始時間以降のデータに枝連番付与
+                        // 到着予定時間が昼勤開始時間以降のデータの場合、枝連番付与
+                        // それ以外の場合、昼勤開始時間以前の行数のカウントを1増やす
                         if (arrivalScheduledTime > dayShiftStartTime)
                         {
                             DataRow dr = idRows[i];

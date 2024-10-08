@@ -114,11 +114,13 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <returns></returns>
         private static bool IsSameTripNameExist(SqlConnection connection, string tripName)
         {
+            // 戻り値
             var isTripExist = false;
 
             try
             {
                 string sql = CreateSQLToExistMTripName(tripName);
+                // 同じ便名称のデータが存在する場合、値が代入される
                 var reader = connection.ExecuteScalar(sql);
                 if (reader != null)
                 {
@@ -285,6 +287,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 便マスター情報取得SQL作成
         /// </summary>
+        /// <param name="isBeforeApplicablePeriod">適用終了日時を過ぎた便を表示するか</param>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectMTrips(bool isBeforeApplicablePeriod)
         {
@@ -313,6 +316,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ON
                     TripHistories.truck_id = Trucks.truck_id
             ";
+            // 適用終了日時を過ぎた便を表示しない場合
             if (!isBeforeApplicablePeriod)
             {
                 DateTime today = DateTime.Now;
@@ -322,6 +326,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                         TripHistories.applicable_end_datetime > '{today}'
                 ";
             }
+
             sql += $@"
                     ORDER BY 
                         TripHistories.trip_id, TripHistories.applicable_start_datetime
@@ -333,6 +338,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// データテーブル用の便マスター情報取得SQL作成
         /// </summary>
+        /// <param name="isBeforeApplicablePeriod">適用終了日時を過ぎた便を含むか</param>
+        /// <param name="refferenceDate">基準日時</param>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectMTripsForDataTable(bool isBeforeApplicablePeriod, DateTime refferenceDate)
         {
@@ -361,6 +368,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ON
                     TripHistories.truck_id = Trucks.truck_id
             ";
+            // 適用終了日時を過ぎた便を含まない場合
             if (!isBeforeApplicablePeriod)
             {
                 string formatRefferenceDate = refferenceDate.ToString("yyyy/MM/dd HH:mm:ss");
@@ -369,6 +377,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                         TripHistories.applicable_end_datetime > '{formatRefferenceDate}'
                 ";
             }
+
             sql += $@"
                     ORDER BY 
                         TripHistories.trip_id
@@ -379,6 +388,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// データテーブル用の便マスター、便枝番マスター結合情報取得SQL作成
         /// </summary>
+        /// <param name="refferenceDate">基準日時</param>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectMTripBranchesForDataTable(DateTime refferenceDate)
         {
@@ -437,7 +447,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 便名称が重複している適用期間取得SQL作成
         /// </summary>
-        /// <param name="truckNumber">便名称</param>
+        /// <param name="model">調査対象の便情報</param>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectApplicablePeriodFromDuplicateMTripName(M_TripModel model)
         {
@@ -462,7 +472,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 同名の便の有無情報取得SQL
         /// </summary>
-        /// <param name="tripName"></param>
+        /// <param name="tripName">調査対象の便名称</param>
         /// <returns></returns>
         private static string CreateSQLToExistMTripName(string tripName)
         {
@@ -580,7 +590,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 車両IDで識別番号を取得するSQL作成
         /// </summary>
         /// <param name="truckId">車両ID</param>
-        /// <returns></returns>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToSelectIdentifyNumberByTruckId(int truckID)
         {
             var sql = $@"
@@ -600,7 +610,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便履歴IDをもとに便データを取得するSQL
         /// </summary>
         /// <param name="tripHistoryId"></param>
-        /// <returns></returns>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToSelectMTripHistoryByTripHistoryId(int tripHistoryId)
         {
             var sql = $@"
