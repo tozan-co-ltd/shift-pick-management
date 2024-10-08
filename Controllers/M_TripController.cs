@@ -146,7 +146,7 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
-        /// 車両マスター登録
+        /// 便マスター登録
         /// </summary>
         /// <param name="model">登録情報</param>
         [HttpPost]
@@ -180,7 +180,7 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // 便マスター登録
-                M_TripConnectController.InsertMTrip(model, user);
+                M_TripConnectController.InsertMTripAndMTripHistory(model, user);
 
                 // log取得
                 _logger.Info($"車両マスター登録成功 便名称:{model.TripName}");

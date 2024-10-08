@@ -42,12 +42,12 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 便情報登録
+        /// 便情報と便履歴情報登録
         /// </summary>
         /// <param name="model">登録情報</param>
         /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>インサート数</returns>
-        public static int InsertMTrip(M_TripModel model, LoginUserModel loginUser)
+        public static int InsertMTripAndMTripHistory(M_TripModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
