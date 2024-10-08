@@ -4,6 +4,7 @@ using ai_truck_load_measurement.Models;
 using System.Data.SqlClient;
 using System;
 using System.Data;
+using NPOI.SS.Formula.Functions;
 
 namespace ai_truck_load_measurement.ConnectControllers
 {
@@ -319,10 +320,12 @@ namespace ai_truck_load_measurement.ConnectControllers
                 sql += $@"
                     WHERE
                         TripHistories.applicable_end_datetime > '{today}'
-                    ORDER BY 
-                        TripHistories.trip_id
                 ";
             }
+            sql += $@"
+                    ORDER BY 
+                        TripHistories.trip_id, TripHistories.applicable_start_datetime
+                ";
             return sql;
         }
 
