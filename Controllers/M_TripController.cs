@@ -313,7 +313,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便枝番マスター情報取得
                 var mTripBranchSql = M_TripConnectController.CreateSQLToSelectMTripBranchesForDataTable(referenceDate);
                 DataTable mTripBranchDT = M_TripConnectController.ConnectMTripsToDataTable(mTripBranchSql, "AI-truck-load-measurement_test");
-                // 便枝番マスターに便枝連番列を追加
+                // 便枝番マスターに枝連番列を追加
                 var mTripBranchConsecutiveDT = SortDataTableFromBranchConsecutiveNumber(mTripBranchDT);
 
                 // ファイル名
@@ -383,14 +383,14 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
-        /// 便枝連番列を追加し、便IDと便枝連番でソートする
+        /// 枝連番列を追加し、便IDと枝連番でソートする
         /// </summary>
         /// <param name="dt">追加対象のデータテーブル</param>
         /// <returns></returns>
         public DataTable SortDataTableFromBranchConsecutiveNumber(DataTable dt)
         {
             // テーブルに枝連番列を追加
-            dt.Columns.Add("branch_consecutive_number", typeof(int)).SetOrdinal(12);
+            dt.Columns.Add("branch_consecutive_number", typeof(int)).SetOrdinal(13);
 
             // 各便IDごとに
             int maxTripID = (int)dt.Select("trip_id = MAX(trip_id)", "")[0][0];
