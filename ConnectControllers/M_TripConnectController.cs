@@ -58,8 +58,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                 connection.Open();
                 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-                // 便名称の重複チェックと便ID取得
-                model.TripID = CheckDuplicateNameAndGetID(connection, model.TripName); 
+                // 便名称の便ID取得と重複チェックおよび新規登録
+                model.TripID = GetMTripIDAndDuplicateChecksAndInsertsForTripName(connection, model.TripName); 
 
                 // 便履歴テーブルに登録
                 var insertedCount = InsertMTripHistoryTable(connection, model, loginUser.UserName);
@@ -90,8 +90,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                 {
                     DateTime sysDate = DateTime.Now;
 
-                    // 便名称の重複チェックと便ID取得
-                    model.TripID = CheckDuplicateNameAndGetID(connection, model.TripName);
+                    // 便名称の便ID取得と重複チェックおよび新規登録
+                    model.TripID = GetMTripIDAndDuplicateChecksAndInsertsForTripName(connection, model.TripName);
 
                     // 便履歴テーブル更新
                     string sql = CreateSQLToUpdateMTripHistory(model, sysDate, loginUser.UserName);
@@ -192,12 +192,12 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 便名称の重複チェックとID取得
+        /// 便名称のID取得と重複チェック、及び新規登録
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="tripName"></param>
         /// <returns></returns>
-        private static int CheckDuplicateNameAndGetID(SqlConnection connection, string tripName)
+        private static int GetMTripIDAndDuplicateChecksAndInsertsForTripName(SqlConnection connection, string tripName)
         {
             // 同じ便名称のデータが便マスターに登録されているか
             var isTripExist = IsSameTripNameExist(connection, tripName);
