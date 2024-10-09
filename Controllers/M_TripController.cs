@@ -22,8 +22,8 @@ namespace ai_truck_load_measurement.Controllers
         {
             M_TripModel model = new();
 
-            // 適用期間外のデータが必要か
-            bool isBeforeApplicablePeriod = false;
+            // 適用期間より前のデータが必要か
+            bool isBeforeApplicablePeriod = true;
             
             try
             {
@@ -59,6 +59,27 @@ namespace ai_truck_load_measurement.Controllers
                 var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod);
                 // DB接続
                 tripList = M_TripConnectController.ConnectMTrips(sql, "AI-truck-load-measurement_test");
+
+                searchData += $@"
+                    <div class=""mt-3"">
+                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripTable"">
+                            <thead>
+                                <tr align=""center"">
+                                    <th width=""40""></th>
+                                    <th class=""font-weight-bold"">便ID</th>
+                                    <th class=""font-weight-bold"">便名称</th>
+                                    <th class=""font-weight-bold"">乗務員</th>
+                                    <th class=""font-weight-bold"">車両番号</th>
+                                    <th class=""font-weight-bold"">識別番号</th>
+                                    <th class=""font-weight-bold"">昼勤開始時間</th>
+                                    <th class=""font-weight-bold"">適用開始日時</th>
+                                    <th class=""font-weight-bold"">適用終了日時</th>
+                                    <th class=""font-weight-bold"">更新日時</th>
+                                    <th class=""font-weight-bold"">更新者</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                ";
                 // 新しい便情報テーブルのhtml作成
                 if (tripList.Count > 0)
                 {
@@ -89,6 +110,12 @@ namespace ai_truck_load_measurement.Controllers
                     ";
                     }
                 }
+                searchData += $@"
+                            </tbody>
+                        </table>
+                    </div>
+                ";
+
                 return Content(searchData);
             }
             catch (SqlException)

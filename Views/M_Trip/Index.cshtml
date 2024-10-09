@@ -63,53 +63,7 @@
                 </div>
             </div>
         </div>
-        <div class="mt-3">
-            <table class="table table-sm stripe hover nowrap datatable-normal table-center">
-                <thead>
-                    <tr align="center">
-                        <th width="40"></th>
-                        <th class="font-weight-bold">便ID</th>
-                        <th class="font-weight-bold">便名称</th>
-                        <th class="font-weight-bold">乗務員</th>
-                        <th class="font-weight-bold">車両番号</th>
-                        <th class="font-weight-bold">識別番号</th>
-                        <th class="font-weight-bold">昼勤開始時間</th>
-                        <th class="font-weight-bold">適用開始日時</th>
-                        <th class="font-weight-bold">適用終了日時</th>
-                        <th class="font-weight-bold">更新日時</th>
-                        <th class="font-weight-bold">更新者</th>
-                    </tr>
-                </thead>
-                <tbody id="m_tripTableBody">
-                    @if (@Model.M_TripList != null)
-                    {
-                        @foreach (var item in @Model.M_TripList)
-                        {
-                            <tr>
-                                <td>
-                                    <a class="btn btn-success btn-icon-split ml-1 mr-1"
-                                       onclick="OnEditClick('@item.TripHistoryID')" data-id="@item.TripHistoryID" data-toggle="modal" data-target="#edit-modal">
-                                        <i class="fa-solid fa-pen"></i>
-                                    </a>
-                                    <a class="btn btn-icon-split ml-1 mr-1" asp-controller="M_Trip" asp-action="Register" asp-route-id="@item.TripHistoryID">
-                                        <i class="fa-regular fa-copy"></i>
-                                    </a>
-                                </td>
-                                <td>@item.TripID</td>
-                                <td>@item.TripName</td>
-                                <td>@item.DriverName</td>
-                                <td>@item.TruckNumber</td>
-                                <td>@item.IdentifyNumber</td>
-                                <td>@item.DayShiftStartTime.ToString("HH:mm")</td>
-                                <td>@item.ApplicableStartDateTime.ToString("yyyy/MM/dd HH:mm")</td>
-                                <td>@item.ApplicableEndDateTime.ToString("yyyy/MM/dd HH:mm")</td>
-                                <td>@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
-                                <td>@item.UpdatedBy</td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
+        <div id="m_tripTable">
         </div>
     </div>
 </div>
@@ -228,6 +182,9 @@
         var mm = ("0" + today.getMinutes()).slice(-2);;
 
         $('#referenceDate').val(yyyy+'-'+MM+'-'+dd+"T"+hh+":"+mm);
+
+        // テーブル表示
+        tableDisplay();
     });
     
     // csv出力
@@ -380,14 +337,19 @@
 
     // チェックボックス押下時
     $('input').change(function () {
+        tableDisplay();
+    });
 
+    // 便テーブルの表示
+    function tableDisplay() {
         // チェックボックスの入力情報取得
         var checkBox = false;
         $('input:checked').each(function () {
             checkBox = $(this).prop('checked');
-        })
+        });
 
 
+        console.log('test');
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "M_Trip")';
         let method = 'Post';
@@ -399,8 +361,25 @@
             method: method,
             data: data
         }).done(function (response) {
-            console.log(response);
-            $('#m_tripTableBody').empty().html(response);
+            
+            $('#m_tripTable').empty().html(response);
+            // 日本語表示
+            const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+
+            // ID(2列目)昇順
+            $("#tripTable").DataTable({
+                "language": {
+                    "url": language_url
+                },
+                lengthChange: true,     // 件数切替
+                info: false,            // 総件数
+                scrollX: true,          // 横スクロール可
+                scrollCollapse: true,   // 縦スクロール表示
+                order: [[1, "asc"]],    // ID昇順
+                columnDefs: [
+                    { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
+                ]
+            });
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -410,7 +389,8 @@
                 $("#edit-modal-error-message").text(errorMessage);
             }
         });
-    })
+
+    }
 
     // 車両番号選択時の処理
     $('[name=TruckID]').change(function () {
