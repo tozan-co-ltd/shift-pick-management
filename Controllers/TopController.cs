@@ -30,6 +30,12 @@ namespace ai_truck_load_measurement.Controllers
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
+                // 最新のステーション状況取得SQL作成
+                // 最新のステーション状況取得
+                // トラック有無取得SQL作成
+                // トラック有無取得
+                // 取得値の変換
+                // ステーションの画像取得
 
                 return View(topModel);
             }
