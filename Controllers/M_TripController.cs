@@ -17,13 +17,20 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 便マスター画面表示
         /// </summary>
+        /// <param name="isChecked">適用終了日時を過ぎた便を表示するチェックボックスの入力</param>
         /// <returns></returns>
-        public IActionResult Index()
+        public IActionResult Index(bool? isChecked)
         {
             M_TripModel model = new();
 
             // 適用期間より前のデータが必要か
             bool isBeforeApplicablePeriod = true;
+
+            // 適用終了日時を過ぎた便を表示するチェックボックスの入力がある場合
+            if (isChecked != null)
+            {
+                model.IsCheckedBeforeApplicablePeriod = isChecked.Value;
+            }
             
             try
             {
@@ -92,7 +99,7 @@ namespace ai_truck_load_measurement.Controllers
                                        onclick=""OnEditClick('{@item.TripHistoryID}')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
                                         <i class=""fa-solid fa-pen""></i>
                                     </a>
-                                    <a class=""btn btn-icon-split ml-1 mr-1"" href=""/M_Trip/Register/{item.TripHistoryID}"">
+                                    <a class=""btn btn-icon-split ml-1 mr-1""onclick=""onRegisterClick('M_Trip', {item.TripHistoryID})"">
                                         <i class=""fa-regular fa-copy""></i>
                                     </a>
                                 </td>
@@ -135,16 +142,16 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="id">便履歴ID、新しい適用期間の作成時に値が入る</param>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult Register(int? id)
+        public IActionResult Register(bool isChecked, int id)
         {
             M_TripModel model = new();
             try
             {   
                 // 新しい適用期間の作成の場合
-                if (id != null)
+                if (id != 0)
                 {
                     // 便履歴IDから便履歴情報取得
-                    var tripSql = M_TripConnectController.CreateSQLToSelectMTripHistoryByTripHistoryId(id.Value);
+                    var tripSql = M_TripConnectController.CreateSQLToSelectMTripHistoryByTripHistoryId(id);
                     List<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(tripSql, "AI-truck-load-measurement_test");
 
                     // 同一便IDのデータが1つだけのとき以外はエラー
@@ -170,6 +177,10 @@ namespace ai_truck_load_measurement.Controllers
 
                     model.TruckSelectList.Add(menuItem);
                 }
+
+                // 適用終了日時を過ぎた便を表示するチェックボックスの入力
+                model.IsCheckedBeforeApplicablePeriod = isChecked;
+
                 return View(model);
             }
             catch (Exception)

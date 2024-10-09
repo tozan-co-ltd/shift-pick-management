@@ -41,7 +41,7 @@
         <div class="mg-bot-20">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-3">
-                    <a class="btn btn-primary btn-icon-split btn-register" asp-controller="M_Trip" asp-action="Register">
+                    <a href="#" class="btn btn-primary btn-icon-split btn-register" onclick="onRegisterClick('M_Trip', 0)">
                         <span class="icon text-white-50">
                             <i class="fas fa-plus"></i>
                         </span>
@@ -183,10 +183,24 @@
 
         $('#referenceDate').val(yyyy+'-'+MM+'-'+dd+"T"+hh+":"+mm);
 
+        // 適用終了日時を過ぎた便を表示するチェックボックスの値を取得
+        var trip_model = @Html.Raw(Json.Serialize(Model));
+        $('input').prop('checked', trip_model.isCheckedBeforeApplicablePeriod);
         // テーブル表示
         tableDisplay();
     });
     
+    // 新規登録、新しい適用期間の作成ボタン押下時
+    function onRegisterClick(page, tripHistoryID) {
+        event.preventDefault();
+        // チェックボックスの入力情報取得
+        var checkBox = false;
+        $('input:checked').each(function () {
+            checkBox = $(this).prop('checked');
+        });
+        location.href = "" + page + "/Register?isChecked=" + checkBox + "&id=" + tripHistoryID;
+    }
+
     // csv出力
     async function onExportFileTrips(page, gamenName) {
         event.preventDefault();

@@ -104,5 +104,8 @@ namespace ai_truck_load_measurement.Models
         public string? UpdatedBy { get; set; }
 
         public List<SelectListItem> TruckSelectList { get; set; } = new List<SelectListItem>();
+
+        // 適用終了日時を過ぎた便を表示するチェックボックスの入力
+        public bool IsCheckedBeforeApplicablePeriod {  get; set; } = false;
     }
 }
