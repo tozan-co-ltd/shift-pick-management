@@ -20,4 +20,10 @@
         <button class="btn btn-primary">更新</button>
     </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var top_model = @Html.Raw(Json.Serialize(Model));
+        console.log(top_model);
+    });
+</script>
 

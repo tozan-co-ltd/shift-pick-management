@@ -44,7 +44,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 最新のステーション状況取得SQL
         /// </summary>
-        /// <returns></returns>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToSelectLatestStationStatus()
         {
             var sql = $@"
@@ -57,6 +57,27 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ) latest_detect_recprds
                 ON detect_records.station_id = latest_detect_recprds.station_id 
                 AND detect_records.created_at = latest_detect_recprds.latest_create
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// ステーション毎のトラック有無取得SQL
+        /// </summary>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectIsExistTrucksPerStationID()
+        {
+            var sql = $@"
+                SELECT truck_sensor_records.station_id
+                       ,truck_exist
+                FROM t_truck_sensor_records truck_sensor_records
+                JOIN (
+	                SELECT station_id, MAX(created_at) AS latest_create
+	                FROM t_truck_sensor_records
+	                GROUP BY station_id
+                ) latest_detect_recprds
+                ON truck_sensor_records.station_id = latest_detect_recprds.station_id 
+                AND truck_sensor_records.created_at = latest_detect_recprds.latest_create
             ";
             return sql;
         }
