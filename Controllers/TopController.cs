@@ -31,7 +31,9 @@ namespace ai_truck_load_measurement.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
                 // 最新のステーション状況取得SQL作成
+                var latestStationStatusSQL = TopConnectController.CreateSQLToSelectLatestStationStatus();
                 // 最新のステーション状況取得
+                IEnumerable<TopModel> latestStationStatusList = TopConnectController.ConnectTops(latestStationStatusSQL, "AI-truck-load-measurement_test");
                 // トラック有無取得SQL作成
                 // トラック有無取得
                 // 取得値の変換

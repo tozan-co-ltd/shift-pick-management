@@ -41,5 +41,24 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
         }
 
+        /// <summary>
+        /// 最新のステーション状況取得SQL
+        /// </summary>
+        /// <returns></returns>
+        public static string CreateSQLToSelectLatestStationStatus()
+        {
+            var sql = $@"
+                SELECT *
+                FROM t_load_detect_records detect_records
+                JOIN (
+	                SELECT station_id, MAX(created_at) AS latest_create
+	                FROM t_load_detect_records
+	                GROUP BY station_id
+                ) latest_detect_recprds
+                ON detect_records.station_id = latest_detect_recprds.station_id 
+                AND detect_records.created_at = latest_detect_recprds.latest_create
+            ";
+            return sql;
+        }
     }
 }
