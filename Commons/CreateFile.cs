@@ -441,7 +441,7 @@ namespace ai_truck_load_measurement.Commons
         /// <param name="folderName">フォルダ名</param>
         /// <param name="headerName">ヘッダー名</param>
         /// <returns>作成結果,出力フォルダフルパス</returns>
-        public static (bool, string) CheckCreateExcel(DataTable dtOne, DataTable dtTwo, string tmpFilename, bool sheetTwo, string sheetNameOne, string sheetNameTwo)
+        public static (bool, string) CheckCreateExcel(DataTable dtOne, DataTable dtTwo, string tmpFilename, bool sheetTwo, string sheetNameOne, string sheetNameTwo, string gamenName)
         {
             try
             {
@@ -449,14 +449,19 @@ namespace ai_truck_load_measurement.Commons
                 var sheetName = tmpFilename.Replace(".xlsx", "");
 
                 // ヘッダーリストを作成
-                List<string> headerList = CreateHeaderList();
+                List<string> headerList = CreateHeaderList(gamenName);
+                List<string> headerListTwo = new();
+                if (sheetTwo)
+                {
+                    headerListTwo = CreateHeaderListTwo(gamenName);
+                }
 
                 // Excelファイル作成
                 bool createRs;
                 if (sheetTwo == true)
-                    createRs = CreateTwoSheetExcel(dtOne, dtTwo, tmpFilename, headerList, sheetNameOne, sheetNameTwo);
+                    createRs = CreateTwoSheetExcel(dtOne, dtTwo, tmpFilename, headerList, headerListTwo, sheetNameOne, sheetNameTwo);
                 else
-                    createRs = CreateExcel(dtOne, tmpFilename, headerList, sheetName);
+                    createRs = CreateExcel(dtOne, tmpFilename, headerList, headerListTwo, sheetName);
 
                 return (createRs, tmpFilename);
             }
@@ -475,7 +480,7 @@ namespace ai_truck_load_measurement.Commons
         /// <param name="headerList"></param>
         /// <param name="sheetName"></param>
         /// <returns>作成結果</returns>
-        public static bool CreateExcel(DataTable dt, string exportfileFullPath, List<string> headerList, string sheetName)
+        public static bool CreateExcel(DataTable dt, string exportfileFullPath, List<string> headerList, List<string> headerList2, string sheetName)
         {
             // データがない場合はヘッダーのみ作成
             if (dt == null || dt.Rows.Count == 0)
@@ -509,6 +514,18 @@ namespace ai_truck_load_measurement.Commons
                     package.Save();
                 }
                 return true;
+            }
+
+            // 出力ファイルパスが未指定の場合は中断する
+            if (String.IsNullOrWhiteSpace(exportfileFullPath))
+            {
+                return false;
+            }
+           
+            // 既にファイルが存在している場合は削除する
+            if (File.Exists(exportfileFullPath))
+            {
+                File.Delete(exportfileFullPath);
             }
 
             try
@@ -573,7 +590,7 @@ namespace ai_truck_load_measurement.Commons
         /// <param name="sheetName2"></param>
         /// <param name="aboutImport"></param>
         /// <returns>作成結果</returns>
-        public static bool CreateTwoSheetExcel(DataTable dt, DataTable dtTwo, string exportfileFullPath, List<string> headerList, string sheetName, string sheetName2)
+        public static bool CreateTwoSheetExcel(DataTable dt, DataTable dtTwo, string exportfileFullPath, List<string> headerList, List<string> headerListTwo, string sheetName, string sheetName2)
         {
             // データがない場合はヘッダーのみ作成
             if (dt == null || dt.Rows.Count == 0)
@@ -612,11 +629,11 @@ namespace ai_truck_load_measurement.Commons
                     using ExcelWorksheet sheetTwo = package.Workbook.Worksheets[sheetName2];
 
                     // タイトル行が指定されているときは、タイトル行をセットする
-                    if (headerList != null && headerList.Count > 0)
+                    if (headerListTwo != null && headerListTwo.Count > 0)
                     {
-                        for (int i = 0; i < headerList.Count; i++)
+                        for (int i = 0; i < headerListTwo.Count; i++)
                         {
-                            sheetTwo.Cells[1, i + 1].Value = headerList[i];
+                            sheetTwo.Cells[1, i + 1].Value = headerListTwo[i];
                         }
                     }
 
@@ -624,6 +641,18 @@ namespace ai_truck_load_measurement.Commons
                     package.Save();
                 }
                 return true;
+            }
+
+            // 出力ファイルパスが未指定の場合は中断する
+            if (String.IsNullOrWhiteSpace(exportfileFullPath))
+            {
+                return false;
+            }
+            
+            // 既にファイルが存在している場合は削除する
+            if (File.Exists(exportfileFullPath))
+            {
+                File.Delete(exportfileFullPath);
             }
 
             try
@@ -667,11 +696,11 @@ namespace ai_truck_load_measurement.Commons
                 sheetTwo.Cells["A1:AM1"].AutoFilter = true;
 
                 // タイトル行が指定されているときは、タイトル行をセットする
-                if (headerList != null && headerList.Count > 0)
+                if (headerListTwo != null && headerListTwo.Count > 0)
                 {
-                    for (int i = 0; i < headerList.Count; i++)
+                    for (int i = 0; i < headerListTwo.Count; i++)
                     {
-                        sheetTwo.Cells[1, i + 1].Value = headerList[i];
+                        sheetTwo.Cells[1, i + 1].Value = headerListTwo[i];
                     }
                     // 開始行番号をセット
                     startIndex = 2;
@@ -704,17 +733,74 @@ namespace ai_truck_load_measurement.Commons
         /// </summary>
         /// <param name="headerName">ヘッダー名</param>
         /// <returns>ヘッダーリスト</returns>
-        public static List<string> CreateHeaderList()
+        public static List<string> CreateHeaderList(string gamenName)
         {
             List<string> headerList = new();
-            headerList.Add("車両ID");
-            headerList.Add("車両番号");
-            headerList.Add("識別番号");
-            headerList.Add("削除フラグ");
-            headerList.Add("作成日時");
-            headerList.Add("作成者");
-            headerList.Add("更新日時");
-            headerList.Add("更新者");
+            switch (gamenName)
+            {
+                case "車両マスター":
+                    headerList.Add("車両ID");
+                    headerList.Add("車両番号");
+                    headerList.Add("識別番号");
+                    headerList.Add("削除フラグ");
+                    headerList.Add("作成日時");
+                    headerList.Add("作成者");
+                    headerList.Add("更新日時");
+                    headerList.Add("更新者");
+                    break;
+                case "便マスター":
+                    headerList.Add("便ID");
+                    headerList.Add("便名称");
+                    headerList.Add("乗務員");
+                    headerList.Add("車両番号");
+                    headerList.Add("識別番号");
+                    headerList.Add("昼勤開始時間");
+                    headerList.Add("適用開始日時");
+                    headerList.Add("適用終了日時");
+                    headerList.Add("作成日時");
+                    headerList.Add("作成者");
+                    headerList.Add("更新日時");
+                    headerList.Add("更新者");
+                    break;
+            }
+            return headerList;
+        }
+
+        /// <summary>
+        /// シート2枚目のヘッダーリスト作成
+        /// </summary>
+        /// <param name="headerName">ヘッダー名</param>
+        /// <returns>ヘッダーリスト</returns>
+        public static List<string> CreateHeaderListTwo(string gamenName)
+        {
+            List<string> headerList = new();
+            switch (gamenName)
+            {
+                case "便マスター":
+                    headerList.Add("便ID");
+                    headerList.Add("便名称");
+                    headerList.Add("乗務員");
+                    headerList.Add("車両番号");
+                    headerList.Add("識別番号");
+                    headerList.Add("昼勤開始時間");
+                    headerList.Add("便マスター適用開始日時");
+                    headerList.Add("便マスター適用終了日時");
+                    headerList.Add("便マスター作成日時");
+                    headerList.Add("便マスター作成者");
+                    headerList.Add("便マスター更新日時");
+                    headerList.Add("便マスター更新者");
+                    headerList.Add("便枝番ID");
+                    headerList.Add("枝連番");
+                    headerList.Add("到着予定時間");
+                    headerList.Add("出発予定時間");
+                    headerList.Add("便枝番マスター適用開始日時");
+                    headerList.Add("便枝番マスター適用終了日時");
+                    headerList.Add("便枝番マスター作成日時");
+                    headerList.Add("便枝番マスター作成者");
+                    headerList.Add("便枝番マスター更新日時");
+                    headerList.Add("便枝番マスター更新者");
+                    break;
+            }
             return headerList;
         }
     }

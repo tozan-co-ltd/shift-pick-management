@@ -64,6 +64,11 @@ namespace ai_truck_load_measurement.Models
         public IEnumerable<SelectListItem>? MCompanyList { get; set; }
 
         /// <summary>
+        /// 車両リスト
+        /// </summary>
+        public IEnumerable<SelectListItem>? MTruckList { get; set; }
+
+        /// <summary>
         /// 選択された倉庫ID
         /// </summary>
         public int SelectedDepoID { get; set; }
@@ -85,6 +90,7 @@ namespace ai_truck_load_measurement.Models
             CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();
             MDepoList = GetMDepoList(DataBaseName);
+            MTruckList = GetMTruckList("AI-truck-load-measurement_test");
             SelectedDepoID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_MainDepoID).First().Value);
         }
 
@@ -245,6 +251,40 @@ namespace ai_truck_load_measurement.Models
                 }
 
                 return companyList;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 車両リスト取得
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<SelectListItem> GetMTruckList(string databaseName)
+        {
+            var selectListItem = new List<SelectListItem>();
+
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string commandText = $@"
+                        SELECT
+                            truck_id as Value,
+                            truck_number AS Text
+                        FROM m_trucks
+                        WHERE (1=1)
+                            AND is_deleted = 0
+                        ";
+
+                    selectListItem = connection.Query<SelectListItem>(commandText).ToList();
+                }
+                return selectListItem;
             }
             catch (Exception)
             {

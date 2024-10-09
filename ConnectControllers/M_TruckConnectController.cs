@@ -32,7 +32,6 @@ namespace ai_truck_load_measurement.ConnectControllers
                 using (var connection = new SqlConnection())
                 {
 
-                    DataTable dt = new DataTable();
                     connection.ConnectionString = connectionString;
                     connection.Open();
                     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
@@ -284,26 +283,6 @@ namespace ai_truck_load_measurement.ConnectControllers
                     identify_number = {model.IdentifyNumber}
                     AND truck_id <> {model.TruckID}
                     AND is_deleted = 0
-            ";
-
-            return sql;
-        }
-
-        /// <summary>
-        /// 車両IDで車両情報を取得
-        /// </summary>
-        /// <param name="truckId">車両ID</param>
-        /// <returns></returns>
-        public static string CreateSQLToSelectByTruckId(int truckId)
-        {
-            var sql = $@"
-                    SELECT
-                        *               
-                    FROM 
-                        m_trucks
-                    WHERE
-                        truck_id = {truckId}
-                        AND is_deleted = 0
             ";
 
             return sql;

@@ -901,3 +901,14 @@ select[readonly] {
 .table-center th{
     text-align: center !important;
 }
+
+/*Å@-------------- Modal ---------------*/
+.modalLabel a{
+    white-space: nowrap;
+}
+/*Å@-------------- Modal ---------------*/
+
+.excel-date {
+    border: solid 1px #000;
+    padding: 5px;
+}
