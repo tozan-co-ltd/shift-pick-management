@@ -26,6 +26,17 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         public IActionResult Index()
         {
+            // トップ画面モデル取得
+            TopModel topModel = GetTopModel();
+            return View(topModel);
+        }
+
+        /// <summary>
+        /// トップ画面モデル取得
+        /// </summary>
+        /// <returns></returns>
+        public TopModel GetTopModel()
+        {
             TopModel topModel = new();
             try
             {
@@ -41,11 +52,11 @@ namespace ai_truck_load_measurement.Controllers
                 IEnumerable<TopModel> isExistTrucksList = TopConnectController.ConnectTops(isExistTrucksSQL, "AI-truck-load-measurement_test");
                 foreach (var item in topModelList)
                 {
-                    var isExistTruck = isExistTrucksList.Where(x =>x.StationID == item.StationID).ToList();
-                    if(isExistTruck.Count != 1)
+                    var isExistTruck = isExistTrucksList.Where(x => x.StationID == item.StationID).ToList();
+                    if (isExistTruck.Count != 1)
                     {
                         ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
-                        return View(topModel);
+                        throw new Exception();
                     }
                     item.TruckExist = isExistTruck[0].TruckExist;
                 }
@@ -54,13 +65,13 @@ namespace ai_truck_load_measurement.Controllers
                 // ステーションの画像取得
                 topModelList = GetStationImage(topModelList);
                 topModel.TopModelList = topModelList;
-                return View(topModel);
+                return topModel;
             }
             catch (Exception ex)
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return View(topModel);
+                return topModel;
             }
         }
 
@@ -77,57 +88,17 @@ namespace ai_truck_load_measurement.Controllers
                 var loadClass = model.LoadClass;
                 var truckExist = model.TruckExist;
                 var truckStatus = string.Empty;
-                if (loadClass == -1 && !truckExist)
+
+                if(loadClass < 3)
                 {
-                    truckStatus = "空車";
+                    truckStatus = string.Empty;
                 }
-                else if (loadClass == -1 && truckExist || loadClass == 0 || loadClass == 1)
+                else
                 {
-                    truckStatus = "停車";
-                }
-                else if (loadClass == 2)
-                {
-                    truckStatus = "停車, 0%";
-                }
-                else if (loadClass == 3)
-                {
-                    truckStatus = "停車, 1~10%";
-                }
-                else if (loadClass == 4)
-                {
-                    truckStatus = "停車, 11~20%";
-                }
-                else if (loadClass == 5)
-                {
-                    truckStatus = "停車, 21~30%";
-                }
-                else if (loadClass == 6)
-                {
-                    truckStatus = "停車, 31~40%";
-                }
-                else if (loadClass == 7)
-                {
-                    truckStatus = "停車, 41~50%";
-                }
-                else if (loadClass == 8)
-                {
-                    truckStatus = "停車, 51~60%";
-                }
-                else if (loadClass == 9)
-                {
-                    truckStatus = "停車, 61~70%";
-                }
-                else if (loadClass == 10)
-                {
-                    truckStatus = "停車, 71~80%";
-                }
-                else if (loadClass == 11)
-                {
-                    truckStatus = "停車, 81~90%";
-                }
-                else if (loadClass == 12)
-                {
-                    truckStatus = "停車, 91~100%";
+                    model.TruckExist = true;
+                    int lowerLimit = (loadClass - 3) * 10 + 1;
+                    int upperLimit = (loadClass - 2) * 10;
+                    truckStatus = ($"{lowerLimit}~{upperLimit}%");
                 }
                 model.TruckStatus = truckStatus;
             }

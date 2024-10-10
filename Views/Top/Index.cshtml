@@ -46,7 +46,7 @@
     }
 
     /* カードレイアウトの説明文部分 */
-    .created-by {
+    .created-at {
         margin: 0;
         padding: 0.5em;
         color: #493511;
@@ -86,7 +86,7 @@
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
         <p class="mb-0">SyncBase ステーション状況</p>
-        <button class="btn btn-primary">更新</button>
+        <button class="btn btn-primary" onclick="onUpdateClick()" id="updateStation">更新</button>
 
         <div id="cardlayout-wrap">
             <!-- カードレイアウトをラッピング -->
@@ -94,22 +94,22 @@
                 <p class="station-number">ステーション1</p>
                 <h2 class="card-title" id="card-title1">停車</h2>
                 <p class="truck-status" id="truck-status1">11~20%</p>
-                <figure class="card-figure" id="card-figure1"><img src=""></figure>
-                <p class="created-by" id="created-by1">登録日時：</p>
+                <figure class="card-figure"><img src="" id="image1"></figure>
+                <p class="created-at" id="created-at1">登録日時：</p>
             </section>
             <section class="card-list">
                 <p class="station-number">ステーション2</p>
                 <h2 class="card-title" id="card-title2">停車</h2>
                 <p class="truck-status" id="truck-status2">11~20%</p>
-                <figure class="card-figure" id="card-figure2"><img src=""></figure>
-                <p class="created-by" id="created-by2">登録日時：</p>
+                <figure class="card-figure"><img src="" id="image2"></figure>
+                <p class="created-at" id="created-at2">登録日時：</p>
             </section>
             <section class="card-list">
                 <p class="station-number">ステーション3</p>
                 <h2 class="card-title" id="card-title3">停車</h2>
                 <p class="truck-status" id="truck-status3">11~20%</p>
-                <figure class="card-figure" id="card-figure3"><img src=""></figure>
-                <p class="created-by" id="created-by3">登録日時：</p>
+                <figure class="card-figure"><img src="" id="image3"></figure>
+                <p class="created-at" id="created-at3">登録日時：</p>
             </section>
         </div>
             <!-- カードレイアウトをラッピング -->
@@ -117,8 +117,74 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function () {
+        // モデル取得
         var top_model = @Html.Raw(Json.Serialize(Model));
-        console.log(top_model);
+        viewCards(top_model)
     });
+
+    function viewCards(top_model) {
+        for (var i = 1; i <= 3; i++) {
+            var cardModel = top_model.topModelList.find(x => x.stationID == i);
+            if (cardModel.truckExist) {
+                $('#card-title' + i).text("停車");
+            }
+            else {
+                $('#card-title' + i).text("空車");
+            }
+
+            $('#truck-status' + i).text(cardModel.truckStatus);
+
+            // // $('#image' + i).attr("src", cardModel.imagePath);
+
+            var createdAt = GetDateString(new Date(cardModel.createdAt));
+            $('#created-at' + i).text("取得日時：" + createdAt);
+        }
+    }
+
+    function onUpdateClick(){
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTopModel", "Top")';
+        let method = 'Get';
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method
+        }).done(function (response) {
+            console.log(response);
+            viewCards(response);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    }
+
+    // 時刻の表示形式変換(HH:mm)
+    function GetTimeString(date) {
+        var hour = date.getHours();
+        if (hour < 10) {
+            hour = "0" + hour;
+        }
+        var minute = date.getMinutes();
+        if (minute < 10) {
+            minute = "0" + minute;
+        }
+        return hour + ":" + minute;
+    }
+
+    // 日付の表示形式変換(yyyy/MM/dd hh:mm)
+    function GetDateString(date) {
+        var day = date.toLocaleDateString("ja-JP", {
+            year: "numeric", month: "2-digit",
+            day: "2-digit"
+        });
+        var time = GetTimeString(date);
+        return day + " " + time;
+    }
 </script>
 
