@@ -4,8 +4,11 @@ using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
 using DocumentFormat.OpenXml.Office.CustomUI;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing.Imaging;
 using X.PagedList;
 using static ai_truck_load_measurement.Models.TopModel;
+using System.IO;
+using System.Drawing;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -91,7 +94,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 if(loadClass < 3)
                 {
-                    truckStatus = string.Empty;
+                    truckStatus = "　";
                 }
                 else
                 {
@@ -119,8 +122,28 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     model.ImagePath = "\"V:\\data\\system\\企業別\\T011_東山\\システム部\\AI荷量把握改善2024\\10_仕様書\\05_詳細設計書\\images\\NoImage.png\"";
                 }
+                else
+                {
+                    string imagePath = model.ImagePath;
+                    string imagePathToBase64 = ImageToBase64(imagePath);
+                    model.ImagePath = imagePathToBase64;
+                }
             }
             return models;
+        }
+
+        // 画像をBase64文字列に変換するメソッド
+        private static string ImageToBase64(string imagePath)
+        {
+            using (Image image = Image.FromFile(imagePath))
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    image.Save(memoryStream, ImageFormat.Jpeg); // 画像フォーマットを指定（ここではJPEG）
+                    byte[] imageBytes = memoryStream.ToArray();
+                    return Convert.ToBase64String(imageBytes);
+                }
+            }
         }
     }
 }
