@@ -20,7 +20,7 @@ namespace ai_truck_load_measurement.Models
         // 車両の存在有無
         public bool TruckExist {  get; set; }
         // トップ画面モデルリスト
-        public IEnumerable<TopModel>? TopModelList { get; set; }
+        public List<TopModel>? TopModelList { get; set; }
         // トラックの状況
         public string? TruckStatus {  get; set; }
     }
