@@ -7,11 +7,11 @@ namespace ai_truck_load_measurement.Models
     /// </summary>
     public class TopModel : CommonModel
     { 
-        // 道路検出レコードID
+        // 荷量検出レコードID
         public int LoadDetectRecordID {  get; set; }
         // ステーションID
         public int StationID {  get; set; }
-        // 道路クラス
+        // 荷量クラス
         public int LoadClass {  get; set; }
         // 作成日時
         public DateTime CreatedAt { get; set; }

@@ -87,7 +87,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             foreach (var model in models)
             {
-                // 道路クラスと車両の存在有無により分岐
+                // 荷量クラスと車両の存在有無により分岐
                 var loadClass = model.LoadClass;
                 var truckExist = model.TruckExist;
                 var truckStatus = string.Empty;
