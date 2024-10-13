@@ -132,7 +132,11 @@ namespace ai_truck_load_measurement.Controllers
             return models;
         }
 
-        // 画像をBase64文字列に変換するメソッド
+        /// <summary>
+        /// 画像のパスをBase64文字列に変換する
+        /// </summary>
+        /// <param name="imagePath">変換したい画像のパス</param>
+        /// <returns></returns>
         private static string ImageToBase64(string imagePath)
         {
             using (Image image = Image.FromFile(imagePath))
