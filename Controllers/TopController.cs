@@ -120,7 +120,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 画像パスに画像がない場合はダミー画像を表示する
                 if (string.IsNullOrEmpty(model.ImagePath))
                 {
-                    model.ImagePath = "\"V:\\data\\system\\企業別\\T011_東山\\システム部\\AI荷量把握改善2024\\10_仕様書\\05_詳細設計書\\images\\NoImage.png\"";
+                    model.ImagePath = "~/images/NoImage.png";
                 }
                 else
                 {
