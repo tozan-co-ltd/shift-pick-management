@@ -2,9 +2,15 @@
 using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
+using DocumentFormat.OpenXml.Office.CustomUI;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing.Imaging;
 using X.PagedList;
 using static ai_truck_load_measurement.Models.TopModel;
+using System.IO;
+using System.Drawing;
+using System;
+using SixLabors.ImageSharp.Formats;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -25,77 +31,150 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         public IActionResult Index()
         {
+            // トップ画面モデル取得
+            TopModel topModel = GetTopModel();
+            return View(topModel);
+        }
+
+        /// <summary>
+        /// トップ画面モデル取得
+        /// </summary>
+        /// <returns></returns>
+        public TopModel GetTopModel()
+        {
             TopModel topModel = new();
             try
             {
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-
-                // ハンディエラーメッセージ取得
-                var sql = D_HandyErrorMessageConnectController.CreateSQLToSelectDHandyErrorMessages();
-                IEnumerable<D_HandyErrorMessageModel> handyErrorMessageList = D_HandyErrorMessageConnectController.ConnectDHandyErrorMessages(sql, user.DatabaseName);
-                topModel.D_HandyErrorMessageList = handyErrorMessageList.ToPagedList();
-
-                // 表示する出荷作業進捗は、会社コード=10001(豊田自動織機)固定
-                var mCompany = M_CompanyConnectController.GetMCompanyByCompanyCode("10001", user.DatabaseName);
-
-                // 納入指示日は翌日(土日を除く)
-                var nextDay = Utils.GetNextday(DateTime.Now);
-                topModel.NextDayGraph = GetGraphInfo(user.MainDepoID, mCompany.CompanyID, nextDay.ToString("yyyy/MM/dd"), user.DatabaseName);
-                // 納入指示日は翌々日(土日を除く)
-                var nextTwoDay = Utils.GetNextday(nextDay);
-                topModel.NextTwoDayGraph = GetGraphInfo(user.MainDepoID, mCompany.CompanyID, nextTwoDay.ToString("yyyy/MM/dd"), user.DatabaseName);
-
-                // 項目設定
-                topModel.DepoName = string.Concat(user.MainDepoName, " / ", mCompany.CompanyName, "向け");
-
-                return View(topModel);
+                // 最新のステーション状況取得SQL作成
+                var latestStationStatusSQL = TopConnectController.CreateSQLToSelectLatestStationStatus();
+                // 最新のステーション状況取得
+                List<TopModel> topModelList = TopConnectController.ConnectTops(latestStationStatusSQL, "AI-truck-load-measurement_test");
+                // トラック有無取得SQL作成
+                var isExistTrucksSQL = TopConnectController.CreateSQLToSelectIsExistTrucksPerStationID();
+                // トラック有無取得
+                IEnumerable<TopModel> isExistTrucksList = TopConnectController.ConnectTops(isExistTrucksSQL, "AI-truck-load-measurement_test");
+                foreach (var item in topModelList)
+                {
+                    var isExistTruck = isExistTrucksList.Where(x => x.StationID == item.StationID).ToList();
+                    if (isExistTruck.Count != 1)
+                    {
+                        ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
+                        throw new Exception();
+                    }
+                    item.TruckExist = isExistTruck[0].TruckExist;
+                }
+                // 取得値の変換
+                topModelList = ConversionOfGetValues(topModelList);
+                // ステーションの画像取得
+                topModelList = GetStationImage(topModelList);
+                topModel.TopModelList = topModelList;
+                return topModel;
             }
             catch (Exception ex)
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return View(topModel);
+                return topModel;
             }
         }
 
         /// <summary>
-        /// グラフデータを作成
+        /// 取得値の変換
         /// </summary>
-        /// <param name="mainDepoId">倉庫ID</param>
-        /// <param name="companyId">会社ID</param>
-        /// <param name="searchDate">検索日</param>
-        /// <param name="databaseName">データベース</param>
-        public GraphInfo GetGraphInfo(int mainDepoId, int companyId, string searchDate, string databaseName)
+        /// <param name="models">対象のトップ画面モデルリスト</param>
+        /// <returns></returns>
+        private List<TopModel> ConversionOfGetValues(List<TopModel> models)
         {
-            var graphInfo = new GraphInfo();
-            try 
+            foreach (var model in models)
             {
-                // 出荷指示情報取得
-                var shipmentSql = D_ShipmentScheduleConnectController.CreateSQLToSelectDShipmentSchedulesForWorkProgressInformation(mainDepoId, companyId, searchDate);
-                IEnumerable<D_ShipmentScheduleModel> searchList = D_ShipmentScheduleConnectController.ConnectDShipmentSchedules(shipmentSql, databaseName);
-                var ShipmentScheduleList = searchList.ToPagedList();
+                // 荷量クラスと車両の存在有無により分岐
+                var loadClass = model.LoadClass;
+                var truckExist = model.TruckExist;
+                var truckStatus = string.Empty;
 
-                graphInfo.GraphTitle = string.Concat(searchDate, "分　出荷検品数");
-                if (ShipmentScheduleList.Count > 0)
+                if(loadClass < 3)
                 {
-                    // 検品済数と未検品数を取得
-                    int scheduleTotal = 0;
-                    int storeOutTotal = 0;
-                    // 計算
-                    foreach (var item in ShipmentScheduleList)
-                    {
-                        scheduleTotal += item.ScheduleNumberOfBoxes;
-                        storeOutTotal += item.StoreOutNumberOfBoxes;
-                    }
-                    graphInfo.ShipmentScheduleTotal = scheduleTotal;
-                    graphInfo.StoreOutTotal = storeOutTotal;
+                    truckStatus = "　";
                 }
-                return graphInfo;
+                else
+                {
+                    model.TruckExist = true;
+                    int lowerLimit = (loadClass - 3) * 10 + 1;
+                    int upperLimit = (loadClass - 2) * 10;
+                    truckStatus = ($"{lowerLimit}~{upperLimit}%");
+                }
+                model.TruckStatus = truckStatus;
+            }
+            return models;
+        }
+
+        /// <summary>
+        /// ステーションの画像取得
+        /// </summary>
+        /// <param name="models"></param>
+        /// <returns></returns>
+        private List<TopModel> GetStationImage(List<TopModel> models)
+        {
+            foreach (var model in models)
+            {
+                string imagePath = model.ImagePath;
+                // 画像パスに画像がないかパスが不正な場合はダミー画像を表示する
+                if (!IsValidImage(imagePath))
+                {
+                    var rootPath = Directory.GetCurrentDirectory();
+                    imagePath = Path.Combine(rootPath, @"wwwroot\images\NoImage.png");
+                }
+                model.ImagePath = ImageToBase64(imagePath);
+            }
+            return models;
+        }
+
+        /// <summary>
+        /// 画像のパスをBase64文字列に変換する
+        /// </summary>
+        /// <param name="imagePath">変換したい画像のパス</param>
+        /// <returns></returns>
+        private static string ImageToBase64(string imagePath)
+        {
+            using (Image image = Image.FromFile(imagePath))
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    image.Save(memoryStream, ImageFormat.Jpeg); // 画像フォーマットを指定（ここではJPEG）
+                    byte[] imageBytes = memoryStream.ToArray();
+                    return Convert.ToBase64String(imageBytes);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 画像のパスが正しいかどうか確認する
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <returns></returns>        
+        public bool IsValidImage(string imagePath)
+        {
+            // 画像パスがここに含まれたフォーマットの場合trueを返す
+            var imageFormats = new List<ImageFormat>()
+                  {
+                    ImageFormat.Jpeg,
+                    ImageFormat.Png,
+                  };
+            try
+            {
+
+                using (FileStream fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                using (Image targetImage = Image.FromStream(fileStream))
+                {
+                    return imageFormats.Contains(targetImage.RawFormat);
+                }
             }
             catch (Exception)
             {
-                throw new Exception();
+                return false;
             }
         }
     }

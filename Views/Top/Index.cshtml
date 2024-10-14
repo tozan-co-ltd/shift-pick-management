@@ -2,26 +2,101 @@
 @model ai_truck_load_measurement.Models.TopModel;
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = Model.ViewTitle;
+    ViewData["Title"] = "トップ";
 }
 <style>
-    .bb-chart-arcs-title {
-        font-size: 1.7em !important;
+    /* カードレイアウト部分をラッピングし、
+    Flexboxを指定"space-between"で各アイテムを均等に配置し、
+    最初と最後のアイテムを端に寄せます。*/
+    #cardlayout-wrap {
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-pack: justify;
+        margin: 2em auto;
+        width: 100%;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        -webkit-box-pack: justify;
+        justify-content: space-between;
+    }
+
+    
+
+    /* カードレイアウト内の画像を幅いっぱいに表示 */
+    #cardlayout-wrap img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin: auto;
+    }
+
+    .card-figure {
+        margin: 0 0 0;
+        padding: 0.5em;
+    }
+
+    /* カードレイアウトのタイトル部分 */
+    .card-title {
+        margin: 0 0 0;
+        color: #333;
+        text-align: center;
+        font-size: 3.0em;
         font-weight: bold;
     }
 
-    .manual-icon{
-        padding-right:2px;
-        color: var(--base-color-accent);
+    /* カードレイアウトの説明文部分 */
+    .created-at {
+        margin: 0 0.5em 0;
+        color: #493511;
+        text-align: center;
     }
 
-    a.manual-link {
-        text-decoration: none;
-        color: var(--fontcolor);
+    .station-number{
+        margin: 0;
+        padding: 0.5em;
+        color: #493511;
+        font-size: 1.4em;
     }
 
-    a.manual-link:hover {
-            color: var(--base-color-accent);
+    .truck-status{
+        color: #493511;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.5em;
+    }
+
+    .card-list {
+        margin: 0.5em auto;
+        padding: 0;
+        width: calc(96% / 3); /* 96%幅を3で割るという指定 */
+        background: #ffffff;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+    }
+
+    .top-title {
+        color: #493511;
+        font-size: 1.8em;
+    }
+
+    .btn-update:not(:disabled):not(.disabled):active, .btn-update:not(:disabled):not(.disabled).active,
+    .show > .btn-update.dropdown-toggle {
+        background-color: #1CC88A !important; 
+        border: #1CC88A !important;
+        color: #ffffff !important;
+    }
+
+    .btn-update{
+        background-color: #1CC88A;
+        border: #1CC88A;
+        color:#ffffff;
+    }
+    .btn-update:hover{
+            background-color: #1CC88A;
+            border: #1CC88A;
+            color: #ffffff;
     }
 </style>
 <div class="card shadow de-inspection m-4">
@@ -34,218 +109,118 @@
         {
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
-        <p class="mb-0">出荷作業進捗(@Model.DepoName)</p>
-        <div class="chart-part p-2 col-12 row">
-            <div class="col-12 col-md-6" id="next-day-chart"></div>
-            <div class="col-12 col-md-6" id="next-two-day-chart"></div>
+        <p class="mb-2 top-title">SyncBase ステーション状況</p>
+        <button class="btn btn-update" onclick="onUpdateClick()" id="updateStation">更新</button>
+
+        <div id="cardlayout-wrap">
+            <!-- カードレイアウトをラッピング -->
+            <section class="card-list">
+                <p class="station-number">ステーション1</p>
+                <h2 class="card-title" id="card-title1">停車</h2>
+                <p class="truck-status" id="truck-status1">11~20%</p>
+                <figure class="card-figure"><img src="" id="image1"></figure>
+                <p class="created-at mb-3" id="created-at1">登録日時：</p>
+            </section>
+            <section class="card-list">
+                <p class="station-number">ステーション2</p>
+                <h2 class="card-title" id="card-title2">停車</h2>
+                <p class="truck-status" id="truck-status2">11~20%</p>
+                <figure class="card-figure"><img src="" id="image2"></figure>
+                <p class="created-at mb-3" id="created-at2">登録日時：</p>
+            </section>
+            <section class="card-list">
+                <p class="station-number">ステーション3</p>
+                <h2 class="card-title" id="card-title3">停車</h2>
+                <p class="truck-status" id="truck-status3">11~20%</p>
+                <figure class="card-figure"><img src="" id="image3"></figure>
+                <p class="created-at mb-3" id="created-at3">登録日時：</p>
+            </section>
         </div>
-        <hr />
-        <p>ハンディエラーメッセージ履歴(直近1週間)</p>
-        <div class="row col-lg-12">
-            <div class="mt-10">
-                <table class="table table-sm stripe hover nowrap datatable-handyErrorMessage">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>読取日時</th>
-                            <th>ハンディメニュー名</th>
-                            <th>エラーメッセージ</th>
-                            <th>登録者</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (@Model != null && @Model.D_HandyErrorMessageList != null)
-                        {
-                            @foreach (var item in @Model.D_HandyErrorMessageList)
-                            {
-                                <tr>
-                                    <td>
-                                        <button class="btn btn-secondary btn-icon-split" title="詳細"
-                                                onclick="OnDetailClick('@item.HandyErrorMessageID')" data-id="@item.UserID" data-toggle="modal" data-target="#detail-modal">
-                                            <i class="fa-solid fa-list"></i>
-                                        </button>
-                                    </td>
-                                    <td>@item.CreatedAt</td>
-                                    <td>@item.HandyMenuName</td>
-                                    <td>@item.ErrorMessage</td>
-                                    <td>@item.CreatedBy</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <hr />
-        <div id="pdf-list">
-            <p>システムマニュアル</p>
-            <ul>
-                <li>
-                    <a class="manual-link" target="_blank" href="~/manual/在庫管理システム_操作マニュアル(はじめにお読みください)_ver1.0.pdf">
-                        <i class="fa-solid fa-file manual-icon"></i> AI荷量把握 操作マニュアル(はじめにお読みください).pdf
-                    </a>
-                </li>
-                <li>
-                    <a class="manual-link" target="_blank" href="~/manual/在庫管理システム_操作マニュアル(webアプリ)_ver1.0.pdf">
-                        <i class="fa-solid fa-file manual-icon"></i> AI荷量把握 操作マニュアル(webアプリ).pdf
-                    </a>
-                </li>
-                <li>
-                    <a class="manual-link" target="_blank" href="~/manual/在庫管理システム_操作マニュアル(ハンディアプリ)_ver1.0.pdf">
-                        <i class="fa-solid fa-file manual-icon"></i> AI荷量把握 操作マニュアル(ハンディアプリ).pdf
-                    </a>
-                </li>
-            </ul>
-        </div>
+            <!-- カードレイアウトをラッピング -->
     </div>
 </div>
-
-<!-- Detail Modal-->
-<div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-labelledby="detail-modal-label" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="detail-modal-label">ハンディエラーメッセージ詳細</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="col-12">
-                    <p>倉庫名：<span id="detailDepoName"></span></p>
-                    <p>読取日時：<span id="detailCreatedAt"></span></p>
-                    <p>ハンディメニュー名：<span id="detailHandyMenuName"></span></p>
-                    <p>エラーメッセージ：<span id="detailErrorMessage"></span></p>
-                    <p>読取内容(1回目)：<br><span class="text-break" id="detailFirstScanedString"></span></p>
-                    <p>読取内容(2回目)：<br><span class="text-break" id="detailSecondScanedString"></span></p>
-                    <p>登録者：<span id="detailCreatedBy"></span></p>
-                    <p>解除者：<span id="detailUnlockedBy"></span></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@* ドーナツグラフ *@
-<link rel="stylesheet" href="~/lib/billboard/billboard.css">
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="https://d3js.org/d3.v6.min.js"></script>
-<script src="~/lib/billboard/billboard.js"></script>
-
-<script>
-
-    document.addEventListener("DOMContentLoaded", function () {
-        var data = @Html.Raw(Json.Serialize(Model));
-
-        // 納入指示日は翌日(土日を除く)
-        var nextDayTitle = data.nextDayGraph.graphTitle;
-        var nextDayTotal = data.nextDayGraph.shipmentScheduleTotal;
-        var nextDayProcess = data.nextDayGraph.storeOutTotal;
-        LoadGraph(nextDayProcess, nextDayTotal - nextDayProcess, nextDayTitle, "#next-day-chart");
-
-        // 納入指示日は翌々日(土日を除く)
-        var nextTwoDayTitle = data.nextTwoDayGraph.graphTitle;
-        var nextTwoDayTotal = data.nextTwoDayGraph.shipmentScheduleTotal;
-        var nextTwoDayProcess = data.nextTwoDayGraph.storeOutTotal;
-        LoadGraph(nextTwoDayProcess, nextTwoDayTotal - nextTwoDayProcess, nextTwoDayTitle, "#next-two-day-chart");
+<script type="text/javascript">
+    $(document).ready(function () {
+        // モデル取得
+        var top_model = @Html.Raw(Json.Serialize(Model));
+        viewCards(top_model)
     });
 
-    // ドーナツグラフのカスタムツールチップ
-    var tooltip = {
-        format: {
-            value: function (value, ratio, id) {
-                // 小数点第二位を自動で四捨五入しないよう制御
-                let roundedPercentage;
-                if (value % 10 == 0)
-                    // 四捨五入
-                    roundedPercentage = Math.round((ratio * 100) * 10) / 10;
-                else
-                    // 小数点以下を切り捨て
-                    roundedPercentage = Math.floor((ratio * 100) * 10) / 10;
-
-                return roundedPercentage + "%";
+    function viewCards(top_model) {
+        for (var i = 1; i <= 3; i++) {
+            var cardModel = top_model.topModelList.find(x => x.stationID == i);
+            if (cardModel.truckExist) {
+                $('#card-title' + i).text("停車");
             }
-        }
-    };
+            else {
+                $('#card-title' + i).text("空車");
+                $('#card-title' + i).css("color", "#1CC88A");
+            }
 
-    // 出荷作業進捗のドーナツグラフ作成
-    function LoadGraph(checked, uncheck, title, chartId) {
-        // 作業進捗表示
-        var shipmentList = [
-            ["検品済数", checked],
-            ["未検品数", uncheck],
-        ];
+            $('#truck-status' + i).text(cardModel.truckStatus);
+            
+            $('#image' + i).attr("src", "data:image/jpeg;base64," + cardModel.imagePath);
 
-        // ドーナツグラフの真ん中に表示するパーセンテージの計算
-        var percentage = 0;
-        var total = checked + uncheck;
-        if (total > 0) {
-            // 小数点以下を切り捨て
-            percentage = Math.floor(((checked / (checked + uncheck)) * 100) * 10) / 10;
+            var createdAt = GetDateString(new Date(cardModel.createdAt));
+            $('#created-at' + i).text("取得日時：" + createdAt);
         }
-
-        var donutTitle = percentage + "%";
-        if (!Number.isInteger(percentage)) {
-            // 小数点第一位まで表示
-            donutTitle = percentage * 10 / 10 + "%";
-        }
-        if (total == 0) {
-            donutTitle = "データが\nありません";
-        }
-
-        var chart = bb.generate({
-            data: {
-                columns: shipmentList,
-                type: "donut",
-                colors: {
-                    検品済数: '#F0844B',
-                    未検品数: 'lightgray'
-                }
-            },
-            tooltip: tooltip,
-            title: {
-                text: title
-            },
-            size: {
-                width: 400,
-                height: 150
-            },
-            donut: {
-                title: donutTitle,
-                label: {
-                    format: function (value, ratio, id) { return value; },
-                    ratio: 1,
-                }
-            },
-            legend: {
-                position: "right",
-            },
-            bindto: chartId,
-        });
     }
 
-    // 詳細ボタン押下
-    function OnDetailClick(handyErrorMessageID) {
-        // D_HandyErrorMessageModel取得
-        var data = @Html.Raw(Json.Serialize(Model));
-        var handyErrorMessageModel = data.d_HandyErrorMessageList;
+    function onUpdateClick(){
+        DeleteErrorMessages();
 
-        handyErrorMessageModel.forEach(function (item) {
-            if (item.handyErrorMessageID == handyErrorMessageID) {
-                $("#detailDepoName").text(item.depoName);
-                $("#detailCreatedAt").text(item.createdAt);
-                $("#detailHandyMenuName").text(item.handyMenuName);
-                $("#detailErrorMessage").text(item.errorMessage);
-                $("#detailFirstScanedString").text(item.firstScanedString);
-                $("#detailSecondScanedString").text(item.secondScanedString);
-                $("#detailCreatedBy").text(item.createdBy);
-                $("#detailUnlockedBy").text(item.unlockedBy);
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTopModel", "Top")';
+        let method = 'Get';
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method
+        }).done(function (response) {
+            console.log(response);
+            viewCards(response);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
             }
         });
     }
 
-    // マニュアルボタン押下
-    function navigate(url) {
-        window.location.href = url;
+    // 時刻の表示形式変換(HH:mm)
+    function GetTimeString(date) {
+        var hour = date.getHours();
+        if (hour < 10) {
+            hour = "0" + hour;
+        }
+        var minute = date.getMinutes();
+        if (minute < 10) {
+            minute = "0" + minute;
+        }
+        return hour + ":" + minute;
+    }
+
+    // 日付の表示形式変換(yyyy/MM/dd hh:mm)
+    function GetDateString(date) {
+        var day = date.toLocaleDateString("ja-JP", {
+            year: "numeric", month: "2-digit",
+            day: "2-digit"
+        });
+        var time = GetTimeString(date);
+        return day + " " + time;
+    }
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
     }
 </script>
+
