@@ -29,11 +29,12 @@
         display: block;
         max-width: 100%;
         height: auto;
+        margin: auto;
     }
 
     .card-figure {
-        margin: 0 0.7em 0;
-        text-align:center;
+        margin: 0 0 0;
+        padding: 0.5em;
     }
 
     /* カードレイアウトのタイトル部分 */
@@ -79,14 +80,22 @@
         font-size: 1.8em;
     }
 
-    .update-button {
-        background: #1CC88A;
-        border: #1CC88A;
+    .btn-update:not(:disabled):not(.disabled):active, .btn-update:not(:disabled):not(.disabled).active,
+    .show > .btn-update.dropdown-toggle {
+        background-color: #1CC88A !important; 
+        border: #1CC88A !important;
+        color: #ffffff !important;
     }
 
-    .update-button:hover{
-            background: #1CC88A;
+    .btn-update{
+        background-color: #1CC88A;
+        border: #1CC88A;
+        color:#ffffff;
+    }
+    .btn-update:hover{
+            background-color: #1CC88A;
             border: #1CC88A;
+            color: #ffffff;
     }
 </style>
 <div class="card shadow de-inspection m-4">
@@ -100,7 +109,7 @@
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
         <p class="mb-2 top-title">SyncBase ステーション状況</p>
-        <button class="btn btn-primary update-button" onclick="onUpdateClick()" id="updateStation">更新</button>
+        <button class="btn btn-update" onclick="onUpdateClick()" id="updateStation">更新</button>
 
         <div id="cardlayout-wrap">
             <!-- カードレイアウトをラッピング -->
