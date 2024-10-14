@@ -9,6 +9,8 @@ using X.PagedList;
 using static ai_truck_load_measurement.Models.TopModel;
 using System.IO;
 using System.Drawing;
+using System;
+using SixLabors.ImageSharp.Formats;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -117,17 +119,14 @@ namespace ai_truck_load_measurement.Controllers
         {
             foreach (var model in models)
             {
-                // 画像パスに画像がない場合はダミー画像を表示する
-                if (string.IsNullOrEmpty(model.ImagePath))
+                string imagePath = model.ImagePath;
+                // 画像パスに画像がないかパスが不正な場合はダミー画像を表示する
+                if (!IsValidImage(imagePath))
                 {
-                    model.ImagePath = "~/images/NoImage.png";
+                    var rootPath = Directory.GetCurrentDirectory();
+                    imagePath = Path.Combine(rootPath, @"wwwroot\images\NoImage.png");
                 }
-                else
-                {
-                    string imagePath = model.ImagePath;
-                    string imagePathToBase64 = ImageToBase64(imagePath);
-                    model.ImagePath = imagePathToBase64;
-                }
+                model.ImagePath = ImageToBase64(imagePath);
             }
             return models;
         }
@@ -147,6 +146,35 @@ namespace ai_truck_load_measurement.Controllers
                     byte[] imageBytes = memoryStream.ToArray();
                     return Convert.ToBase64String(imageBytes);
                 }
+            }
+        }
+
+
+        /// <summary>
+        /// 画像のパスが正しいかどうか確認する
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <returns></returns>        
+        public bool IsValidImage(string imagePath)
+        {
+            // 画像パスがここに含まれたフォーマットの場合trueを返す
+            var imageFormats = new List<ImageFormat>()
+                  {
+                    ImageFormat.Jpeg,
+                    ImageFormat.Png,
+                  };
+            try
+            {
+
+                using (FileStream fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                using (Image targetImage = Image.FromStream(fileStream))
+                {
+                    return imageFormats.Contains(targetImage.RawFormat);
+                }
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
     }

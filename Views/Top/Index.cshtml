@@ -167,6 +167,8 @@
     }
 
     function onUpdateClick(){
+        DeleteErrorMessages();
+
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetTopModel", "Top")';
         let method = 'Get';
@@ -210,6 +212,15 @@
         });
         var time = GetTimeString(date);
         return day + " " + time;
+    }
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
     }
 </script>
 
