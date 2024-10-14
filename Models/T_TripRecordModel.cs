@@ -5,40 +5,43 @@ using X.PagedList;
 
 namespace ai_truck_load_measurement.Models
 {
-    public class TruckRecordsOutputModel : CommonModel
+    public class T_TripRecordModel : CommonModel
     {
+        // 便名称
         public string? TripName { get; set; }
-
-        public int TripBrunchNumber { get; set; }
-
+        // 便枝番  
+        public int TripBranchSeq { get; set; }
+        // 乗務員
         public string? DriverName { get; set; }
-
+        // ステーションID
         public int StationID { get; set; }
-
-        public int TruckID { get; set; }
-
+        // 車両番号
+        public int TruckNumber { get; set; }
+        // 識別番号
         public int IdentifyNumber { get; set; }
-
+        // 到着予定時間
         public DateTime ArrivalScheduledTime { get; set; }
-
+        // 出発予定時間
         public DateTime DepartureScheduledTime { get; set; }
-
+        // 稼働日
         public DateTime WorkDay { get; set; }
-
+        // 到着日時
         public DateTime ArrivedAt { get; set; }
-
+        // 出発日時
         public DateTime DeparturedAt { get; set; }
-
+        // 到着荷量
         public int ArrivalLoadClass { get; set; }
-
+        // 出発荷量
         public int DepartureLoadClass { get; set; }
-
+        // 訂正後到着荷量
         public int RevisionArrivalLoadClass { get; set; }
-
+        // 訂正後出発荷量
         public int RevisionDepartureLoadClass { get; set; }
-
+        // 到着荷量画像パス
         public string? ArrivalLoadImagePath { get; set; }
-
+        // 出発荷量画像パス
         public string? DepartureLoadImagePath { get; set; }
+
+        public IPagedList<T_TripRecordModel>? TripRecordList { get; set; }
     }
 }

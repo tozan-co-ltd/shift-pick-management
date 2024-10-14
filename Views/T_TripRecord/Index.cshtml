@@ -1,0 +1,104 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.T_TripRecordModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+}
+<div class="card shadow de-inspection masterInfo m-4">
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label><input type="checkbox" id="m_tripCheckBox" /> 適用終了日時を過ぎた便も表示する</label>
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                <div class="input-group-append mr-3">
+                    <a href="#" class="btn btn-primary btn-icon-split btn-register" onclick="onRegisterClick('M_Trip', 0)">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">新規作成</span>
+                    </a>
+                </div>
+                <div class="d-flex xs-block justify-content-start align-items-center excel-date">
+                    <div class="mr-3">
+                        <label>基準日時 <input type="datetime-local" id="referenceDate" /></label>
+                    </div>
+                    <div class="input-group-append mr-0">
+                        <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('M_Trip', '@Model.ViewTitle')">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-file-export"></i>
+                            </span>
+                            <span class="text">Excel出力</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <table class="table table-sm stripe hover nowrap datatable-normal table-center">
+                <thead>
+                    <tr align="center">
+                        <th class="font-weight-bold">便名称</th>
+                        <th class="font-weight-bold">便枝番</th>
+                        <th class="font-weight-bold">乗務員</th>
+                        <th class="font-weight-bold">ステーションID</th>
+                        <th class="font-weight-bold">車両ID</th>
+                        <th class="font-weight-bold">識別番号</th>
+                        <th class="font-weight-bold">到着予定時間</th>
+                        <th class="font-weight-bold">出発予定時間</th>
+                        <th class="font-weight-bold">作業日</th>
+                        <th class="font-weight-bold">到着日時</th>
+                        <th class="font-weight-bold">出発日時</th>
+                        <th class="font-weight-bold">到着荷量</th>
+                        <th class="font-weight-bold">出発荷量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (@Model.TripRecordList != null)
+                    {
+                        @foreach (var item in @Model.TripRecordList)
+                        {
+                            <tr>
+                                <td>@item.TripName</td>
+                                <td>@item.TripBranchSeq</td>
+                                <td>@item.DriverName</td>
+                                <td>@item.StationID</td>
+                                <td>@item.TruckNumber</td>
+                                <td>@item.IdentifyNumber</td>
+                                <td>@item.ArrivalScheduledTime.ToString("HH:mm")</td>
+                                <td>@item.DepartureScheduledTime.ToString("HH:mm")</td>
+                                <td>@item.WorkDay.ToString("yyyy/MM/dd")</td>
+                                <td>@item.ArrivedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                                <td>@item.DeparturedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                                <td>@item.ArrivalLoadClass</td>
+                                <td>@item.DepartureLoadClass</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var model = @Html.Raw(Json.Serialize(Model));
+        // console.log(model);
+    })
+</script>
