@@ -30,7 +30,7 @@ namespace ai_truck_load_measurement.Models
         // 到着日時
         public DateTime ArrivedAt { get; set; }
         // 出発日時
-        public DateTime DeparturedAt { get; set; }
+        public DateTime DepartedAt { get; set; }
         // 到着荷量
         public int ArrivalLoadClass { get; set; }
         // 到着荷量の%表示
