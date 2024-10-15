@@ -20,32 +20,44 @@
             }
         </div>
 
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                <span class="warehouse-name-drs">期間</span>
+                <input type="date" id="startOfPeriod" class="form-control pickerDate startDate">
+                <label class="m-1">～</label>
+                <input type="date" id="endOfPeriod" class="form-control pickerDate endDate">
+            </div>
+        </div>
+
         <div class="mb-3">
-            <label><input type="checkbox" id="m_tripCheckBox" /> 適用終了日時を過ぎた便も表示する</label>
+            <label>荷量の相違ありのみ表示<input type="checkbox" class="ml-3" id="m_tripCheckBox" /></label>
         </div>
 
         <div class="mg-bot-20">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-3">
-                    <a href="#" class="btn btn-primary btn-icon-split btn-register" onclick="onRegisterClick('M_Trip', 0)">
+                    <a href="#" class="btn btn-secondary btn-icon-split" onclick="onRegisterClick('M_Trip', 0)">
                         <span class="icon text-white-50">
-                            <i class="fas fa-plus"></i>
+                            <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
-                        <span class="text">新規作成</span>
+                        <span class="text">検索</span>
                     </a>
                 </div>
-                <div class="d-flex xs-block justify-content-start align-items-center excel-date">
-                    <div class="mr-3">
-                        <label>基準日時 <input type="datetime-local" id="referenceDate" /></label>
-                    </div>
-                    <div class="input-group-append mr-0">
-                        <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('M_Trip', '@Model.ViewTitle')">
-                            <span class="icon text-white-50">
-                                <i class="fas fa-file-export"></i>
-                            </span>
-                            <span class="text">Excel出力</span>
-                        </a>
-                    </div>
+                <div class="input-group-append mr-3">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('M_Trip', '@Model.ViewTitle')">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-file-export"></i>
+                        </span>
+                        <span class="text">Excel出力</span>
+                    </a>
+                </div>
+                <div class="input-group-append mr-3">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('M_Trip', '@Model.ViewTitle')">
+                        <span class="icon text-white-50">
+                            <i class="fa-solid fa-circle-down"></i>
+                        </span>
+                        <span class="text">画像一括出力</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -137,8 +149,24 @@
 <script type="text/javascript">
     $(document).ready(function () {
         var model = @Html.Raw(Json.Serialize(Model));
-        console.log(model);
-    })
+        var today = new Date();
+        var oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        console.log("test");
+        var todayString = getInputDateString(today);
+        var oneWeekAgoString = getInputDateString(oneWeekAgo);
+        $('#endOfPeriod').val(todayString);
+        $('#startOfPeriod').val(oneWeekAgoString);
+    });
+
+    function getInputDateString(days) {
+        date = new Date(days)
+        var yyyy = date.getFullYear();
+        var MM = ("0" + (date.getMonth() + 1)).slice(-2);
+        var dd = ("0" + date.getDate()).slice(-2);
+        
+        return yyyy + '-' + MM + '-' + dd;
+    }
 
     // 詳細ボタン押下
     function OnArrivalLoadImageClick(tripRecordID) {
