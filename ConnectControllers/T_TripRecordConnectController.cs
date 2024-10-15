@@ -54,6 +54,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd"); 
             var sql = $@"
                 SELECT
+                    trip_record_id,
 	                trip_name,
 	                trip_branch_seq,
 	                driver_name,

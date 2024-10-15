@@ -66,6 +66,8 @@
                         <th class="font-weight-bold">出発日時</th>
                         <th class="font-weight-bold">到着荷量</th>
                         <th class="font-weight-bold">出発荷量</th>
+                        <th class="font-weight-bold">到着荷量画像</th>
+                        <th class="font-weight-bold">出発荷量画像</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -85,8 +87,20 @@
                                 <td>@item.WorkDay.ToString("yyyy/MM/dd")</td>
                                 <td>@item.ArrivedAt.ToString("yyyy/MM/dd HH:mm")</td>
                                 <td>@item.DeparturedAt.ToString("yyyy/MM/dd HH:mm")</td>
-                                <td>@item.ArrivalLoadClass</td>
-                                <td>@item.DepartureLoadClass</td>
+                                <td>@item.ArrivalLoadStatus</td>
+                                <td>@item.DepartureLoadStatus</td>
+                                <td>
+                                    <a class="btn btn-success btn-icon-split ml-1 mr-1"
+                                       onclick="OnArrivalLoadImageClick('@item.TripRecordID')" data-id="@item.TripRecordID" data-toggle="modal" data-target="#detail-modal">
+                                        <i class="fa-solid fa-truck"></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-success btn-icon-split ml-1 mr-1"
+                                       onclick="OnDepartureLoadImageClick('@item.TripRecordID')" data-id="@item.TripRecordID" data-toggle="modal" data-target="#detail-modal">
+                                        <i class="fa-solid fa-truck"></i>
+                                    </a>
+                                </td>
                             </tr>
                         }
                     }
@@ -96,9 +110,133 @@
     </div>
 </div>
 
+<!--  Detail Modal-->
+<div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-modal-label"></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-12">
+                    <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <figure><img src="" id="modalImage"/></figure>
+                <table class="table table-sm p-2">
+                    <tbody id="tripRecord-contatiner">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     $(document).ready(function () {
         var model = @Html.Raw(Json.Serialize(Model));
-        // console.log(model);
+        console.log(model);
     })
+
+    // 詳細ボタン押下
+    function OnArrivalLoadImageClick(tripRecordID) {
+        var isArrived = true;
+        EditModal(tripRecordID, isArrived);
+    }
+
+    function OnDepartureLoadImageClick(tripRecordID){
+        var isArrived = false;
+        EditModal(tripRecordID, isArrived);
+    }
+
+    function EditModal(tripRecordID, isArrived) {
+        // M_supplierKanbanModel取得
+        var data = @Html.Raw(Json.Serialize(Model));
+        var tripRecordModel = data.tripRecordList;
+        tripRecordModel.forEach(function (item) {
+            if (item.tripRecordID == tripRecordID) {
+                var imagePath = "";
+                var arriveOrDeparture = "";
+                var arriveOrDepartureDate = "";
+                if (isArrived) {
+                    $('#detail-modal-label').text("到着荷量画像");
+                    imagePath = item.arrivalLoadImgPath;
+                    arriveOrDeparture = "到着時間";
+                    arriveOrDepartureDate = GetDateString(new Date(item.arrivedAt));
+                }
+                else{
+                    $('#detail-modal-label').text("出発荷量画像");
+                    imagePath = item.departureLoadImgPath;
+                    arriveOrDeparture = "出発時間";
+                    arriveOrDepartureDate = GetDateString(new Date(item.departuredAt));
+                }
+
+                $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
+
+                var workDay = GetDayString(new Date(item.workDay));
+
+
+                // 桁数・開始位置
+                var container = $("#tripRecord-contatiner");
+                container.empty();
+                let tr = "<tr>"
+                    + "<td>荷量</td>"
+                    + "<td>" + item.arrivalLoadStatus + "</td>"
+                    + "</tr><tr>"
+                    + "<td>便名称_便枝番</td>"
+                    + "<td>" + item.tripName + "_" + item.tripBranchSeq + "</td>"
+                    + "</tr><tr>"
+                    + "<td>乗務員</td>"
+                    + "<td>" + item.driverName + "</td>"
+                    + "</tr><tr>"
+                    + "<td>ステーションID</td>"
+                    + "<td>" + item.stationID + "</td>"
+                    + "</tr><tr>"
+                    + "<td>車両番号</td>"
+                    + "<td>" + item.truckNumber + "</td>"
+                    + "</tr><tr>"
+                    + "<td>識別番号</td>"
+                    + "<td>" + item.identifyNumber + "</td>"
+                    + "</tr><tr>"
+                    + "<td>稼働日</td>"
+                    + "<td>" + workDay + "</td>"
+                    + "</tr><tr>"
+                    + "<td>"+ arriveOrDeparture +"</td>"
+                    + "<td>" + arriveOrDepartureDate + "</td>"
+                    + "</tr>";
+                container.append(tr);
+
+            }
+        });
+    }
+
+    // 時刻の表示形式変換(HH:mm)
+    function GetTimeString(date) {
+        var hour = date.getHours();
+        if (hour < 10) {
+            hour = "0" + hour;
+        }
+        var minute = date.getMinutes();
+        if (minute < 10) {
+            minute = "0" + minute;
+        }
+        return hour + ":" + minute;
+    }
+
+    function GetDayString(date){
+        var day = date.toLocaleDateString("ja-JP", {
+            year: "numeric", month: "2-digit",
+            day: "2-digit"
+        });
+        return day;
+    }
+
+    // 日付の表示形式変換(yyyy/MM/dd hh:mm)
+    function GetDateString(date) {
+        var day = GetDayString(date);
+        var time = GetTimeString(date);
+        return day + " " + time;
+    }
 </script>
