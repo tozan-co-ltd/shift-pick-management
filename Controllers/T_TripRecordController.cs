@@ -260,76 +260,111 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-        ///// <summary>
-        ///// ファイル出力
-        ///// </summary>
-        ///// <param name="gamenName">現在の画面名</param>
-        ///// <returns></returns>
-        //public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod)
-        //{
-        //    string? errorMessage;
-        //    try
-        //    {
-        //        // 検索条件シート用データテーブル作成
+        /// <summary>
+        /// ファイル出力
+        /// </summary>
+        /// <param name="gamenName">現在の画面名</param>
+        /// <returns></returns>
+        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod)
+        {
+            string? errorMessage;
+            string startDate = startOfPeriod.ToString("yyyyMMdd");
+            string endDate = endOfPeriod.ToString("yyyyMMdd");
+            try
+            {
+                // 検索条件シート用データテーブル作成
+                DataTable searchConditionDT = new DataTable();
+                searchConditionDT.Columns.Add("項目名");
+                searchConditionDT.Columns.Add("検索条件");
+                searchConditionDT.Rows.Add("期間",$"{startDate}~{endDate}");
 
-        //        // 便実績情報取得
-        //        var mTripSql = M_TripConnectController.CreateSQLToSelectMTripsForDataTable(isBeforeApplicablePeriod, referenceDate);
-        //        DataTable mTripDT = M_TripConnectController.ConnectMTripsToDataTable(mTripSql, "AI-truck-load-measurement_test");
+                // 便実績情報取得
+                var tTripRecordSql = T_TripRecordConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod);
+                DataTable tTripRecordDT = T_TripRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql, "AI-truck-load-measurement_test");
 
-        //        // ファイル名
-        //        var tmpFilename = CreateFile.CreateFileName(null, gamenName);
-        //        // 2シートあり
-        //        bool sheetTwo = true;
+                // 荷量のクラスを数値化
+                tTripRecordDT = GetConvertedLoadClassDataTable(tTripRecordDT);
 
-        //        // シート名
-        //        string sheetNameOne = "便マスターシート";
-        //        string sheetNameTwo = "便枝番マスターシート";
+                // ファイル名
+                var tmpFilename = $"荷量実績_{startDate}-{endDate}.xlsx";
+                // 2シートあり
+                bool sheetTwo = true;
 
-
-        //        try
-        //        {
-        //            // Excelファイル作成チェック
-        //            var createRs = CreateFile.CheckCreateExcel(mTripDT, mTripBranchConsecutiveDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
-
-        //            if (createRs.Item1)
-        //            {
-        //                var file = System.IO.File.ReadAllBytes(createRs.Item2);
+                // シート名
+                string sheetNameOne = "検索条件シート";
+                string sheetNameTwo = "荷量実績シート";
 
 
-        //                return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
-        //            }
-        //            else
-        //            {
-        //                // エラーメッセージ取得
-        //                // 「ファイルが存在しません。」
-        //                errorMessage = ErrorMessagesResources.E9999;
+                try
+                {
+                    // Excelファイル作成チェック
+                    var createRs = CreateFile.CheckCreateExcel(searchConditionDT, tTripRecordDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
 
-        //                return Json(new { res = "NG", error = errorMessage });
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            // エラーメッセージ取得
-        //            // 「NASに接続できませんでした。」
-        //            errorMessage = ErrorMessagesResources.E9999;
+                    if (createRs.Item1)
+                    {
+                        var file = System.IO.File.ReadAllBytes(createRs.Item2);
 
-        //            // log取得
-        //            var exceptionMessage = ex.Message;
-        //            return Json(new { res = "NG", error = errorMessage + exceptionMessage });
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // エラーメッセージ取得
-        //        // 「予期せぬエラーが発⽣しました。」
-        //        errorMessage = "E9999: " + ErrorMessagesResources.E9999;
 
-        //        // log取得
-        //        var exceptionMessage = ex.Message;
-        //        return Json(new { res = "NG", error = errorMessage + exceptionMessage });
-        //    }
+                        return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+                    }
+                    else
+                    {
+                        // エラーメッセージ取得
+                        // 「ファイルが存在しません。」
+                        errorMessage = ErrorMessagesResources.E9999;
 
-        //}
+                        return Json(new { res = "NG", error = errorMessage });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // エラーメッセージ取得
+                    // 「NASに接続できませんでした。」
+                    errorMessage = ErrorMessagesResources.E9999;
+
+                    // log取得
+                    var exceptionMessage = ex.Message;
+                    return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+                }
+            }
+            catch (Exception ex)
+            {
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+
+                // log取得
+                var exceptionMessage = ex.Message;
+                return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+            }
+
+        }
+
+        /// <summary>
+        /// データテーブルの荷量クラスを数値に変換
+        /// </summary>
+        /// <param name="dt">変換元データテーブル</param>
+        /// <returns></returns>
+        private DataTable GetConvertedLoadClassDataTable(DataTable dt)
+        {
+            // テーブルに荷量の数値列を追加
+            dt.Columns.Add("arrival_load_status", typeof(string)).SetOrdinal(11);
+            dt.Columns.Add("departure_load_status", typeof(string)).SetOrdinal(12);
+
+            // 荷量クラスを数値に変換
+            foreach (DataRow row in dt.Rows)
+            {
+                var arrivalLoadClass = (int)row["arrival_load_class"];
+                var departureLoadClass = (int)row["departure_load_class"];
+                row["arrival_load_status"] = ConversionLoadClassToLoadStatus(arrivalLoadClass);
+                row["departure_load_status"] = ConversionLoadClassToLoadStatus(departureLoadClass);
+            }
+
+            // 荷量クラスの列を削除
+            dt.Columns.Remove("arrival_load_class");
+            dt.Columns.Remove("departure_load_class");
+            return dt;
+        }
     }
 }
 
