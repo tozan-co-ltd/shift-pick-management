@@ -76,11 +76,114 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
         }
 
+
+        /// <summary>
+        ///「荷量の相違あり」で保存した値があるか
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="isArrived">到着か否か</param>
+        public static bool IsSameAnnotationLoadsExist(int tripRecordID, bool isArrived)
+        {
+            // 戻り値
+            var isAnnotationLoadsExist = false;
+
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                try
+                {
+                    string sql = CreateSQLToSelectAnnotationLoadsByTripRecordIDAndIsArrived(tripRecordID, isArrived);
+                    // 同じ便名称のデータが存在する場合、値が代入される
+                    var reader = connection.ExecuteScalar(sql);
+                    if (reader != null)
+                    {
+                        isAnnotationLoadsExist = true;
+                    }
+                    return isAnnotationLoadsExist;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 荷量の相違あり情報登録
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="loadStatus">荷量クラス</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns>インサート数</returns>
+        public static int InsertAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+                    string sql = CreateSQLToInsertAnnotaionLoads(tripRecordID, loadStatus, loginUser.UserName, sysDate, isArrived);
+                    var insertedCount = connection.Execute(sql);
+                    return insertedCount;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// 荷量の相違あり情報更新
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="loadStatus">荷量クラス</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns>インサート数</returns>
+        public static int UpdateAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+                    string sql = CreateSQLToUpdateAnnotationLoads(tripRecordID, loadStatus, loginUser.UserName, sysDate, isArrived);
+                    var insertedCount = connection.Execute(sql);
+                    return insertedCount;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+
+            }
+        }
+
         /// <summary>
         /// 便実績情報取得SQL
         /// </summary>
-        /// <param name="startOfPeriod"></param>
-        /// <param name="endOfPeriod"></param>
+        /// <param name="startOfPeriod">期間開始日</param>
+        /// <param name="endOfPeriod">期間終了日</param>
         /// <returns></returns>
         public static string CreatSQLToSelectTripRecord(DateTime startOfPeriod, DateTime endOfPeriod)
         {
@@ -110,6 +213,12 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// データベース用便実績情報取得SQL
+        /// </summary>
+        /// <param name="startOfPeriod">期間開始日</param>
+        /// <param name="endOfPeriod">期間終了日</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectTripRecordForDataTable(DateTime startOfPeriod, DateTime endOfPeriod)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
@@ -136,6 +245,108 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ORDER BY arrived_at
 ";
             return sql;
+        }
+
+        /// <summary>
+        /// 便実績IDと到着、出発の属性が同じデータを取得するSQL
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectAnnotationLoadsByTripRecordIDAndIsArrived(int tripRecordID, bool isArrived)
+        {
+            var arrivalOrDeparture = GetArrivalOrDeparture(isArrived);
+            var sql = $@"
+                SELECT *
+                FROM t_annotation_loads
+                WHERE 
+                    trip_record_id = '{tripRecordID}'
+                AND
+                    arrival_departure_class = '{arrivalOrDeparture}'
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 荷量の相違ありデータ登録SQL
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="loadStatus">荷量クラス</param>
+        /// <param name="createdBy">登録者</param>
+        /// <param name="createdAt">登録日時</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        public static string CreateSQLToInsertAnnotaionLoads(int tripRecordID, int loadStatus, string createdBy, DateTime createdAt, bool isArrived)
+        {
+            var arrivalOrDeparture = GetArrivalOrDeparture(isArrived);
+            string formatCreatedAt = createdAt.ToString("yyyy/MM/dd HH:mm");
+            var sql = $@"
+                INSERT INTO t_annotation_loads(
+	                trip_record_id,
+	                arrival_departure_class,
+                    annotation_load_class,
+	                created_at,
+	                created_by,
+	                updated_at,
+	                updated_by
+                )
+                VALUES(
+                    '{tripRecordID}',
+                    '{arrivalOrDeparture}',
+                    '{loadStatus}',
+                    '{formatCreatedAt}',
+                    '{createdBy}',
+                    '{formatCreatedAt}',
+                    '{createdBy}'
+                )            
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 荷量の相違ありデータ更新SQL
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="loadStatus">荷量クラス</param>
+        /// <param name="createdBy">登録者</param>
+        /// <param name="createdAt">登録日時</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        public static string CreateSQLToUpdateAnnotationLoads(int tripRecordID, int loadStatus, string updatedBy, DateTime updatedAt, bool isArrived)
+        {
+            var arrivalOrDeparture = GetArrivalOrDeparture(isArrived);
+            string formatUpdatedAt = updatedAt.ToString("yyyy/MM/dd HH:mm");
+            var sql = $@"
+                UPDATE t_annotation_loads
+                SET
+                    annotation_load_class = '{loadStatus}',
+                    updated_at = '{formatUpdatedAt}',
+                    updated_by = '{updatedBy}'
+                WHERE
+                    trip_record_id = '{tripRecordID}'
+                AND
+                    arrival_departure_class = '{arrivalOrDeparture}'
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 荷量の相違ありテーブルの到着出発クラスに保存する値
+        /// </summary>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        private static string GetArrivalOrDeparture(bool isArrived)
+        {
+            var arrivalOrDeparture = string.Empty;
+            if (isArrived)
+            {
+                arrivalOrDeparture = "arrival";
+            }
+            else
+            {
+                arrivalOrDeparture = "departure";
+            }
+            return arrivalOrDeparture;
         }
     }
 }

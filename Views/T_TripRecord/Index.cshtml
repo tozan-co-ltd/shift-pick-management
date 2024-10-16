@@ -4,6 +4,30 @@
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
+<style>
+     .btn-update:not(:disabled):not(.disabled):active, .btn-update:not(:disabled):not(.disabled).active,
+     .show > .btn-update.dropdown-toggle {
+         background-color: #1CC88A !important;
+         border: #1CC88A !important;
+         color: #ffffff !important;
+     }
+
+     .btn-update {
+         background-color: #1CC88A;
+         border: #1CC88A;
+         color: #ffffff;
+     }
+
+    .btn-update:hover {
+        background-color: #1CC88A;
+        border: #1CC88A;
+        color: #ffffff;
+    }
+
+    .select-modal select{
+        width: 120px
+    }
+</style>
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
         @ViewData["Title"]
@@ -149,7 +173,6 @@
 <script type="text/javascript">
     $(document).ready(function () {
         var model = @Html.Raw(Json.Serialize(Model));
-        console.log(model);
         var today = new Date();
         var oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -157,17 +180,19 @@
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
     });
 
-    // 詳細ボタン押下
+    // 到着荷量画像ボタン押下
     function OnArrivalLoadImageClick(tripRecordID) {
         var isArrived = true;
         EditModal(tripRecordID, isArrived);
     }
 
+    // 出発荷量画像ボタン押下
     function OnDepartureLoadImageClick(tripRecordID){
         var isArrived = false;
         EditModal(tripRecordID, isArrived);
     }
 
+    // 荷量画像モーダル作成
     function EditModal(tripRecordID, isArrived) {
         // M_supplierKanbanModel取得
         var data = @Html.Raw(Json.Serialize(Model));
@@ -177,17 +202,20 @@
                 var imagePath = "";
                 var arriveOrDeparture = "";
                 var arriveOrDepartureDate = "";
+                var loadStatus = "";
                 if (isArrived) {
                     $('#detail-modal-label').text("到着荷量画像");
+                    loadStatus = item.arrivalLoadStatus;
                     imagePath = item.arrivalLoadImgPath;
                     arriveOrDeparture = "到着時間";
                     arriveOrDepartureDate = GetDateString(new Date(item.arrivedAt));
                 }
                 else{
                     $('#detail-modal-label').text("出発荷量画像");
+                    loadStatus = item.departureLoadStatus;
                     imagePath = item.departureLoadImgPath;
                     arriveOrDeparture = "出発時間";
-                    arriveOrDepartureDate = GetDateString(new Date(item.departuredAt));
+                    arriveOrDepartureDate = GetDateString(new Date(item.departedAt));
                 }
 
                 $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
@@ -199,12 +227,13 @@
                 container.empty();
                 let tr = "<tr>"
                     + "<td>荷量</td>"
-                    + "<td>" + item.arrivalLoadStatus + "</td>"
+                    + "<td>" + loadStatus + "%</td>"
                     + "</tr><tr>"
                     + "<td>荷量の相違あり</td>"
                     + "<td>"
-                    + "<select name=\"loadStatusSelect\">"
-                    + "<option value=\"\"></option>"
+                    + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">"
+                    + "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" >"
+                    + "<option value=\"\" hidden></option>"
                     + "<option value=\"3\">1-10%</option>"
                     + "<option value=\"4\">11-20%</option>"
                     + "<option value=\"5\">21-30%</option>"
@@ -216,6 +245,10 @@
                     + "<option value=\"11\">81-90%</option>"
                     + "<option value=\"12\">91-100%</option>"
                     + "</select>"
+                    + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "')\" id=\"verificationRequired\">"
+                    + "<span class=\"text\">要検証</span>"
+                    + "</a>"
+                    + "</div>"
                     +"</td>"
                     + "</tr><tr>"
                     + "<td>便名称_便枝番</td>"
@@ -243,6 +276,39 @@
 
             }
         });
+    }
+
+    // 要検証ボタン押下時
+    function onVerificationRequiredClick(tripRecordID, isArrived) {
+        var loadStatus = $('[name=loadStatusSelect]').val();
+        if (loadStatus != "") {
+
+            DeleteErrorMessages();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("RegistOrInsertAnnotationLoads", "T_TripRecord")';
+            let method = 'POST';
+            let data = { tripRecordID: tripRecordID, loadStatus: loadStatus, isArrived: isArrived };
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#detail-modal').hide();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#edit-modal-error-message").text(errorMessage);
+                }
+            });
+        }
     }
 
     // 時刻の表示形式変換(HH:mm)
@@ -358,5 +424,12 @@
         }
     }
 
-
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
 </script>
