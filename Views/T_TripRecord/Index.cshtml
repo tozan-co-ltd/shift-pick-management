@@ -44,7 +44,7 @@
                     </a>
                 </div>
                 <div class="input-group-append mr-3">
-                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('M_Trip', '@Model.ViewTitle')">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('T_TripRecord', '@Model.ViewTitle')">
                         <span class="icon text-white-50">
                             <i class="fas fa-file-export"></i>
                         </span>
@@ -73,11 +73,11 @@
                         <th class="font-weight-bold">識別番号</th>
                         <th class="font-weight-bold">到着予定時間</th>
                         <th class="font-weight-bold">出発予定時間</th>
-                        <th class="font-weight-bold">作業日</th>
+                        <th class="font-weight-bold">稼働日</th>
                         <th class="font-weight-bold">到着日時</th>
                         <th class="font-weight-bold">出発日時</th>
-                        <th class="font-weight-bold">到着荷量</th>
-                        <th class="font-weight-bold">出発荷量</th>
+                        <th class="font-weight-bold">到着荷量(%)</th>
+                        <th class="font-weight-bold">出発荷量(%)</th>
                         <th class="font-weight-bold">到着荷量画像</th>
                         <th class="font-weight-bold">出発荷量画像</th>
                     </tr>
@@ -308,5 +308,39 @@
             }
         });
     }
+
+    // csv出力
+    async function onExportFileTrips(page, gamenName) {
+        event.preventDefault();
+        $('#div-error-message').text("");
+
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+        console.log(startOfPeriod);
+        console.log(endOfPeriod);
+
+        const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&startOfPeriod=' + startOfPeriod + '&endOfPeriod=' + endOfPeriod, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        var { data, errorMessage } = await response.json();
+
+        if (errorMessage) {
+            $("#div-error-message").show();
+            $("#div-error-message").text(errorMessage);
+        } else {
+            var { contentType, fileContents, fileDownloadName } = data;
+            {
+                const link = document.createElement("a");
+                link.href = `data:${contentType};base64,${fileContents}`;
+                link.download = fileDownloadName;
+                link.click();
+            }
+        }
+    }
+
 
 </script>

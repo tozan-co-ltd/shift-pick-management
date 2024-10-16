@@ -6,6 +6,8 @@ using System.Drawing.Imaging;
 using X.PagedList;
 using System.Drawing;
 using System.Data.SqlClient;
+using ai_truck_load_measurement.Commons;
+using System.Data;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -75,7 +77,7 @@ namespace ai_truck_load_measurement.Controllers
             {
                 int lowerLimit = (loadClass - 3) * 10 + 1;
                 int upperLimit = (loadClass - 2) * 10;
-                loadStatus = ($"{lowerLimit}~{upperLimit}%");
+                loadStatus = ($"{lowerLimit}-{upperLimit}");
             }
             return loadStatus;
         }
@@ -167,13 +169,17 @@ namespace ai_truck_load_measurement.Controllers
         public IActionResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod)
         {
             var searchData = string.Empty;
-            List<T_TripRecordModel> tripRecordList = new();
+            IEnumerable<T_TripRecordModel> tripRecordList;
             try
             {
                 // 便マスター情報取得SQL作成
                 var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod);
                 // DB接続
                 tripRecordList = T_TripRecordConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+
+                tripRecordList = ConversionOfGetValues(tripRecordList);
+
+                tripRecordList = GetStationImage(tripRecordList);
 
                 searchData += $@"
                     <div class=""mt-3"">
@@ -188,11 +194,11 @@ namespace ai_truck_load_measurement.Controllers
                                     <th class=""font-weight-bold"">識別番号</th>
                                     <th class=""font-weight-bold"">到着予定時間</th>
                                     <th class=""font-weight-bold"">出発予定時間</th>
-                                    <th class=""font-weight-bold"">作業日</th>
+                                    <th class=""font-weight-bold"">稼働日</th>
                                     <th class=""font-weight-bold"">到着日時</th>
                                     <th class=""font-weight-bold"">出発日時</th>
-                                    <th class=""font-weight-bold"">到着荷量</th>
-                                    <th class=""font-weight-bold"">出発荷量</th>
+                                    <th class=""font-weight-bold"">到着荷量(%)</th>
+                                    <th class=""font-weight-bold"">出発荷量(%)</th>
                                     <th class=""font-weight-bold"">到着荷量画像</th>
                                     <th class=""font-weight-bold"">出発荷量画像</th>
                                 </tr>
@@ -200,7 +206,7 @@ namespace ai_truck_load_measurement.Controllers
                             <tbody>
                 ";
                 // 新しい便情報テーブルのhtml作成
-                if (tripRecordList.Count > 0)
+                if (tripRecordList.Count() > 0)
                 {
                     foreach (var item in tripRecordList)
                     {
@@ -253,6 +259,77 @@ namespace ai_truck_load_measurement.Controllers
                 return Content(errorMessage);
             }
         }
+
+        ///// <summary>
+        ///// ファイル出力
+        ///// </summary>
+        ///// <param name="gamenName">現在の画面名</param>
+        ///// <returns></returns>
+        //public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod)
+        //{
+        //    string? errorMessage;
+        //    try
+        //    {
+        //        // 検索条件シート用データテーブル作成
+
+        //        // 便実績情報取得
+        //        var mTripSql = M_TripConnectController.CreateSQLToSelectMTripsForDataTable(isBeforeApplicablePeriod, referenceDate);
+        //        DataTable mTripDT = M_TripConnectController.ConnectMTripsToDataTable(mTripSql, "AI-truck-load-measurement_test");
+
+        //        // ファイル名
+        //        var tmpFilename = CreateFile.CreateFileName(null, gamenName);
+        //        // 2シートあり
+        //        bool sheetTwo = true;
+
+        //        // シート名
+        //        string sheetNameOne = "便マスターシート";
+        //        string sheetNameTwo = "便枝番マスターシート";
+
+
+        //        try
+        //        {
+        //            // Excelファイル作成チェック
+        //            var createRs = CreateFile.CheckCreateExcel(mTripDT, mTripBranchConsecutiveDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
+
+        //            if (createRs.Item1)
+        //            {
+        //                var file = System.IO.File.ReadAllBytes(createRs.Item2);
+
+
+        //                return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+        //            }
+        //            else
+        //            {
+        //                // エラーメッセージ取得
+        //                // 「ファイルが存在しません。」
+        //                errorMessage = ErrorMessagesResources.E9999;
+
+        //                return Json(new { res = "NG", error = errorMessage });
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // エラーメッセージ取得
+        //            // 「NASに接続できませんでした。」
+        //            errorMessage = ErrorMessagesResources.E9999;
+
+        //            // log取得
+        //            var exceptionMessage = ex.Message;
+        //            return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // エラーメッセージ取得
+        //        // 「予期せぬエラーが発⽣しました。」
+        //        errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+
+        //        // log取得
+        //        var exceptionMessage = ex.Message;
+        //        return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+        //    }
+
+        //}
     }
 }
 
