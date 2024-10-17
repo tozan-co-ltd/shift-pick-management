@@ -28,7 +28,7 @@ namespace ai_truck_load_measurement.Controllers
                 // DB接続
                 IEnumerable<T_TripRecordModel> tripRecordList =T_TripRecordConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に、画像パスをBase64に変換
-                tripRecordList = ConversionLoadClassAndImages(tripRecordList);
+                tripRecordList = ConversionLoadClass(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
                 return View(model);
@@ -46,7 +46,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="models">変換元</param>
         /// <returns></returns>
-        private IEnumerable<T_TripRecordModel> ConversionLoadClassAndImages(IEnumerable<T_TripRecordModel> models)
+        private IEnumerable<T_TripRecordModel> ConversionLoadClass(IEnumerable<T_TripRecordModel> models)
         {
             foreach (var model in models)
             {
@@ -56,9 +56,6 @@ namespace ai_truck_load_measurement.Controllers
                 // 到着荷量クラスと出発荷量クラスをそれぞれ変換
                 model.ArrivalLoadStatus = ConversionLoadClassToLoadStatus(arrivalLoadClass);
                 model.DepartureLoadStatus = ConversionLoadClassToLoadStatus(departureLoadClass);
-                // ステーションの画像取得
-                model.ArrivalLoadImgPath = CheckAndConvertImagePath(model.ArrivalLoadImgPath);
-                model.DepartureLoadImgPath = CheckAndConvertImagePath(model.DepartureLoadImgPath);
             }
             return models;
         }
@@ -164,7 +161,7 @@ namespace ai_truck_load_measurement.Controllers
                 // DB接続
                 tripRecordList = T_TripRecordConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に、画像パスをBase64に変換
-                tripRecordList = ConversionLoadClassAndImages(tripRecordList);
+                tripRecordList = ConversionLoadClass(tripRecordList);
 
                 searchData += $@"
                     <div class=""mt-3"">
@@ -401,6 +398,29 @@ namespace ai_truck_load_measurement.Controllers
 
                 return NotFound(new { errorMessage });
             }
+        }
+
+        public T_TripRecordModel GetModalItems(T_TripRecordModel model, bool isArrived)
+        {
+            // 「荷量の相違あり」で保存した値が既に存在するか
+            var isSameAnnotationLoadsExist = T_TripRecordConnectController.IsSameAnnotationLoadsExist(model.TripRecordID, isArrived);
+            if (isSameAnnotationLoadsExist)
+            {
+                var annotationLoadClass = T_TripRecordConnectController.GetAnnotationLoadClassByTripRecordIDAndIsArrived(model.TripRecordID, isArrived, "AI-truck-load-measurement_test");
+                model.AnnotationLoadClass = annotationLoadClass;
+            }
+
+            // ステーションの画像取得
+            if (isArrived)
+            {
+                model.ArrivalLoadImgPath = CheckAndConvertImagePath(model.ArrivalLoadImgPath);
+            }
+            else
+            {
+                model.DepartureLoadImgPath = CheckAndConvertImagePath(model.DepartureLoadImgPath);
+            }
+            
+            return model;
         }
     }
 }

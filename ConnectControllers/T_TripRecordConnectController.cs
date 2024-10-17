@@ -97,8 +97,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
                 try
                 {
-                    string sql = CreateSQLToSelectAnnotationLoadsByTripRecordIDAndIsArrived(tripRecordID, isArrived);
-                    // 同じ便名称のデータが存在する場合、値が代入される
+                    string sql = CreateSQLToSelectAnnotationLoadClassByTripRecordIDAndIsArrived(tripRecordID, isArrived);
+                    // 同じ便実績IDかつ到着か否かが一致するデータが存在する場合、値が代入される
                     var reader = connection.ExecuteScalar(sql);
                     if (reader != null)
                     {
@@ -170,6 +170,37 @@ namespace ai_truck_load_measurement.ConnectControllers
                     string sql = CreateSQLToUpdateAnnotationLoads(tripRecordID, loadStatus, loginUser.UserName, sysDate, isArrived);
                     var insertedCount = connection.Execute(sql);
                     return insertedCount;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// 便実績IDと到着か否かから訂正後荷量クラスを取得する
+        /// </summary>
+        /// <param name="tripRecordID"></param>
+        /// <param name="isArrived"></param>
+        /// <param name="databaseName"></param>
+        /// <returns></returns>
+        public static int GetAnnotationLoadClassByTripRecordIDAndIsArrived(int  tripRecordID, bool isArrived, string databaseName)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                try
+                {
+                    string sql = CreateSQLToSelectAnnotationLoadClassByTripRecordIDAndIsArrived(tripRecordID, isArrived);
+                    var annotationLoadClass = Convert.ToInt32(connection.ExecuteScalar(sql));
+                    return annotationLoadClass;
                 }
                 catch (Exception)
                 {
@@ -253,11 +284,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="tripRecordID">便実績ID</param>
         /// <param name="isArrived">到着か否か</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectAnnotationLoadsByTripRecordIDAndIsArrived(int tripRecordID, bool isArrived)
+        public static string CreateSQLToSelectAnnotationLoadClassByTripRecordIDAndIsArrived(int tripRecordID, bool isArrived)
         {
             var arrivalOrDeparture = GetArrivalOrDeparture(isArrived);
             var sql = $@"
-                SELECT *
+                SELECT annotation_load_class
                 FROM t_annotation_loads
                 WHERE 
                     trip_record_id = '{tripRecordID}'

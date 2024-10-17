@@ -51,7 +51,9 @@ namespace ai_truck_load_measurement.Models
         public string? ArrivalLoadImgPath { get; set; }
         // 出発荷量画像パス
         public string? DepartureLoadImgPath { get; set; }
-
+        // 便実績リスト
         public IPagedList<T_TripRecordModel>? TripRecordList { get; set; }
+        // 訂正後荷量クラス
+        public int AnnotationLoadClass {  get; set; }
     }
 }

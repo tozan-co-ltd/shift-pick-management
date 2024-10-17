@@ -199,80 +199,102 @@
         var tripRecordModel = data.tripRecordList;
         tripRecordModel.forEach(function (item) {
             if (item.tripRecordID == tripRecordID) {
-                var imagePath = "";
-                var arriveOrDeparture = "";
-                var arriveOrDepartureDate = "";
-                var loadStatus = "";
-                if (isArrived) {
-                    $('#detail-modal-label').text("到着荷量画像");
-                    loadStatus = item.arrivalLoadStatus;
-                    imagePath = item.arrivalLoadImgPath;
-                    arriveOrDeparture = "到着時間";
-                    arriveOrDepartureDate = GetDateString(new Date(item.arrivedAt));
-                }
-                else{
-                    $('#detail-modal-label').text("出発荷量画像");
-                    loadStatus = item.departureLoadStatus;
-                    imagePath = item.departureLoadImgPath;
-                    arriveOrDeparture = "出発時間";
-                    arriveOrDepartureDate = GetDateString(new Date(item.departedAt));
-                }
 
-                $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
+                // フォーム情報取得
+                let url = window.location.origin + '@Url.Action("GetModalItems", "T_TripRecord")';
+                let method = 'POST';
+                let data = { model: item, isArrived: isArrived };
 
-                var workDay = GetDayString(new Date(item.workDay));
+                // Ajax call
+                $.ajax({
+                    url: url,
+                    method: method,
+                    data: data
+                }).done(function (response) {
+                    var imagePath = "";
+                    var arriveOrDeparture = "";
+                    var arriveOrDepartureDate = "";
+                    var loadStatus = "";
+                    if (isArrived) {
+                        $('#detail-modal-label').text("到着荷量画像");
+                        loadStatus = item.arrivalLoadStatus;
+                        imagePath = response.arrivalLoadImgPath;
+                        arriveOrDeparture = "到着時間";
+                        arriveOrDepartureDate = GetDateString(new Date(item.arrivedAt));
+                    }
+                    else {
+                        $('#detail-modal-label').text("出発荷量画像");
+                        loadStatus = item.departureLoadStatus;
+                        imagePath = response.departureLoadImgPath;
+                        arriveOrDeparture = "出発時間";
+                        arriveOrDepartureDate = GetDateString(new Date(item.departedAt));
+                    }
 
-                // 桁数・開始位置
-                var container = $("#tripRecord-contatiner");
-                container.empty();
-                let tr = "<tr>"
-                    + "<td>荷量</td>"
-                    + "<td>" + loadStatus + "%</td>"
-                    + "</tr><tr>"
-                    + "<td>荷量の相違あり</td>"
-                    + "<td>"
-                    + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">"
-                    + "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" >"
-                    + "<option value=\"\" hidden></option>"
-                    + "<option value=\"3\">1-10%</option>"
-                    + "<option value=\"4\">11-20%</option>"
-                    + "<option value=\"5\">21-30%</option>"
-                    + "<option value=\"6\">31-40%</option>"
-                    + "<option value=\"7\">41-50%</option>"
-                    + "<option value=\"8\">51-60%</option>"
-                    + "<option value=\"9\">61-70%</option>"
-                    + "<option value=\"10\">71-80%</option>"
-                    + "<option value=\"11\">81-90%</option>"
-                    + "<option value=\"12\">91-100%</option>"
-                    + "</select>"
-                    + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "')\" id=\"verificationRequired\">"
-                    + "<span class=\"text\">要検証</span>"
-                    + "</a>"
-                    + "</div>"
-                    +"</td>"
-                    + "</tr><tr>"
-                    + "<td>便名称_便枝番</td>"
-                    + "<td>" + item.tripName + "_" + item.tripBranchSeq + "</td>"
-                    + "</tr><tr>"
-                    + "<td>乗務員</td>"
-                    + "<td>" + item.driverName + "</td>"
-                    + "</tr><tr>"
-                    + "<td>ステーションID</td>"
-                    + "<td>" + item.stationID + "</td>"
-                    + "</tr><tr>"
-                    + "<td>車両番号</td>"
-                    + "<td>" + item.truckNumber + "</td>"
-                    + "</tr><tr>"
-                    + "<td>識別番号</td>"
-                    + "<td>" + item.identifyNumber + "</td>"
-                    + "</tr><tr>"
-                    + "<td>稼働日</td>"
-                    + "<td>" + workDay + "</td>"
-                    + "</tr><tr>"
-                    + "<td>"+ arriveOrDeparture +"</td>"
-                    + "<td>" + arriveOrDepartureDate + "</td>"
-                    + "</tr>";
-                container.append(tr);
+                    $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
+
+                    var workDay = GetDayString(new Date(item.workDay));
+
+                    // 桁数・開始位置
+                    var container = $("#tripRecord-contatiner");
+                    container.empty();
+                    let tr = "<tr>"
+                        + "<td>荷量</td>"
+                        + "<td>" + loadStatus + "%</td>"
+                        + "</tr><tr>"
+                        + "<td>荷量の相違あり</td>"
+                        + "<td>"
+                        + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">"
+                        + "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" id=\"loadStatusSelect\" >"
+                        + "<option value=\"\" hidden></option>"
+                        + "<option value=\"3\">1-10%</option>"
+                        + "<option value=\"4\">11-20%</option>"
+                        + "<option value=\"5\">21-30%</option>"
+                        + "<option value=\"6\">31-40%</option>"
+                        + "<option value=\"7\">41-50%</option>"
+                        + "<option value=\"8\">51-60%</option>"
+                        + "<option value=\"9\">61-70%</option>"
+                        + "<option value=\"10\">71-80%</option>"
+                        + "<option value=\"11\">81-90%</option>"
+                        + "<option value=\"12\">91-100%</option>"
+                        + "</select>"
+                        + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "')\" id=\"verificationRequired\">"
+                        + "<span class=\"text\">要検証</span>"
+                        + "</a>"
+                        + "</div>"
+                        + "</td>"
+                        + "</tr><tr>"
+                        + "<td>便名称_便枝番</td>"
+                        + "<td>" + item.tripName + "_" + item.tripBranchSeq + "</td>"
+                        + "</tr><tr>"
+                        + "<td>乗務員</td>"
+                        + "<td>" + item.driverName + "</td>"
+                        + "</tr><tr>"
+                        + "<td>ステーションID</td>"
+                        + "<td>" + item.stationID + "</td>"
+                        + "</tr><tr>"
+                        + "<td>車両番号</td>"
+                        + "<td>" + item.truckNumber + "</td>"
+                        + "</tr><tr>"
+                        + "<td>識別番号</td>"
+                        + "<td>" + item.identifyNumber + "</td>"
+                        + "</tr><tr>"
+                        + "<td>稼働日</td>"
+                        + "<td>" + workDay + "</td>"
+                        + "</tr><tr>"
+                        + "<td>" + arriveOrDeparture + "</td>"
+                        + "<td>" + arriveOrDepartureDate + "</td>"
+                        + "</tr>";
+                    container.append(tr);
+                    $('#loadStatusSelect').val(response.annotationLoadClass);
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status === 404) {
+                        var errorMessage = jqXHR.responseJSON.errorMessage;
+                        $("#edit-modal-error-message").text(errorMessage);
+                    } else {
+                        var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                        $("#edit-modal-error-message").text(errorMessage);
+                    }
+                });
 
             }
         });
@@ -284,6 +306,7 @@
         if (loadStatus != "") {
 
             DeleteErrorMessages();
+
 
             // フォーム情報取得
             let url = window.location.origin + '@Url.Action("RegistOrInsertAnnotationLoads", "T_TripRecord")';
