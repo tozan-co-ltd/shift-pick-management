@@ -76,7 +76,7 @@
                     </a>
                 </div>
                 <div class="input-group-append mr-3">
-                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('M_Trip', '@Model.ViewTitle')">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportAllImages()">
                         <span class="icon text-white-50">
                             <i class="fa-solid fa-circle-down"></i>
                         </span>
@@ -193,9 +193,10 @@
         var isArrived = true;
         // テーブルに表示されている便実績のIDをリスト化
         trs = button.parentNode.parentNode.parentNode.childNodes;
-        console.log(trs);
-        for(i=0; i<trs.length - 58; i++){
-            arrayTrs.push(trs[i + 58].childNodes[1].textContent);
+        $("#tripRecordDataTable").DataTable().length;
+        console.log($("#tripRecordDataTable").DataTable());
+        for(i=0; i<trs.length - 63; i++){
+            arrayTrs.push(trs[i + 63].childNodes[1].textContent);
         }
         EditModal(tripRecordID, isArrived);
     }
@@ -208,8 +209,8 @@
         var isArrived = false;
         // テーブルに表示されている便実績のIDをリスト化
         trs = button.parentNode.parentNode.parentNode.childNodes;
-        for (i = 0; i < trs.length - 58; i++) {
-            arrayTrs.push(trs[i + 58].childNodes[1].textContent);
+        for (i = 0; i < trs.length - 63; i++) {
+            arrayTrs.push(trs[i + 63].childNodes[1].textContent);
         }
         EditModal(tripRecordID, isArrived);
     }
@@ -219,7 +220,7 @@
     // 荷量画像モーダル作成
     function EditModal(tripRecordID, isArrived) {
 
-        // M_supplierKanbanModel取得
+        // T_TripRecordModel取得
         var data = @Html.Raw(Json.Serialize(Model));
         var tripRecordModel = data.tripRecordList;
         tripRecordModel.forEach(function (item) {
@@ -448,11 +449,7 @@
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
-        console.log(startOfPeriod);
-        console.log(endOfPeriod);
 
-
-        console.log('test');
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "T_TripRecord")';
         let method = 'Post';
@@ -491,7 +488,7 @@
         });
     }
 
-    // csv出力
+    // Excel出力
     async function onExportFileTrips(page, gamenName) {
         event.preventDefault();
         $('#div-error-message').text("");
@@ -522,6 +519,42 @@
                 link.click();
             }
         }
+    }
+
+    function onExportAllImages(){
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("ZipDownload", "T_TripRecord")';
+        let method = 'GET';
+        data = { download: "download", startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            console.log(response);
+            var { contentType, fileContents, fileDownloadName } = response.data;
+            {
+                const link = document.createElement("a");
+                link.href = `data:${contentType};base64,${fileContents}`;
+                link.download = fileDownloadName;
+                link.click();
+            }
+            console.log("success");
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
     }
 
     // エラーメッセージ削除

@@ -8,6 +8,10 @@ using System.Drawing;
 using System.Data.SqlClient;
 using ai_truck_load_measurement.Commons;
 using System.Data;
+using System.Formats.Asn1;
+using System.IO.Compression;
+using System.Text;
+using NPOI.SS.Formula.Functions;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -27,7 +31,7 @@ namespace ai_truck_load_measurement.Controllers
                 var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(oneWeekAgo, today);
                 // DB接続
                 IEnumerable<T_TripRecordModel> tripRecordList =T_TripRecordConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
-                // 荷量のクラスを数値に、画像パスをBase64に変換
+                // 荷量のクラスを数値に変換
                 tripRecordList = ConversionLoadClass(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
@@ -42,7 +46,7 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
-        /// 荷量のクラスを数値に、画像パスをBase64に変換
+        /// 荷量のクラスを数値に変換
         /// </summary>
         /// <param name="models">変換元</param>
         /// <returns></returns>
@@ -68,11 +72,7 @@ namespace ai_truck_load_measurement.Controllers
         private string ConversionLoadClassToLoadStatus(int loadClass)
         {
             var loadStatus = string.Empty;
-            if (loadClass < 3)
-            {
-                loadStatus = "　";
-            }
-            else
+            if (loadClass >= 3)
             {
                 int lowerLimit = (loadClass - 3) * 10 + 1;
                 int upperLimit = (loadClass - 2) * 10;
@@ -417,6 +417,84 @@ namespace ai_truck_load_measurement.Controllers
             model.DepartureLoadImgPath = CheckAndConvertImagePath(model.DepartureLoadImgPath);
             
             return model;
+        }
+
+        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod)
+        {
+            // ダウンロードボタンが押された際の処理
+            if (download == "download")
+            {
+                // 便実績情報取得SQL作成
+                var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod);
+                // DB接続
+                IEnumerable<T_TripRecordModel> tripRecordList = T_TripRecordConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+
+                var startDate = startOfPeriod.ToString("yyyyMMdd");
+                var endDate = endOfPeriod.ToString("yyyyMMdd");
+
+                // 空のメモリストリームを生成
+                using (var ms = new MemoryStream())
+                {// メモリストリームを指定してZipArchiveを作成
+                    using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
+                    {
+                        var date = string.Empty;
+                        foreach (var tripRecord in tripRecordList)
+                        {
+                            // ステーションの画像取得
+                            var arrivalLoadImgPath = CheckAndConvertImagePath(tripRecord.ArrivalLoadImgPath);
+                            var departureLoadImgPath = CheckAndConvertImagePath(tripRecord.DepartureLoadImgPath);
+                            byte[] arrivalLoadImgBytes = Convert.FromBase64String(arrivalLoadImgPath);
+                            byte[] departureLoadImgBytes = Convert.FromBase64String(departureLoadImgPath);
+                            // 荷量取得
+                            var arrivalLoadStatus = ConversionLoadClassToLoadStatus(tripRecord.ArrivalLoadClass);
+                            var departureLoadStatus = ConversionLoadClassToLoadStatus(tripRecord.DepartureLoadClass);
+                            date = tripRecord.WorkDay.ToString("yyyyMMdd");
+
+                        
+                                // ファイルネームの指定
+                            var FileNameArrive = string.Format($"{tripRecord.TripName}_{tripRecord.TripBranchSeq}_{date}_A_{arrivalLoadStatus}.jpg");
+                            var FileNameDeparture = string.Format($"{tripRecord.TripName}_{tripRecord.TripBranchSeq}_{date}_D_{departureLoadStatus}.jpg");
+
+
+                            // 到着の画像をzipストリームに書き込む
+                            var zipEntry = archive.CreateEntry(FileNameArrive, CompressionLevel.Fastest);
+                            using (var zipStream = zipEntry.Open())
+                            {
+                                zipStream.Write(arrivalLoadImgBytes, 0, arrivalLoadImgBytes.Length);
+                            }
+
+                            // 出発の画像をzipストリームに書き込む
+                            var zipEntry2 = archive.CreateEntry(FileNameDeparture, CompressionLevel.Fastest);
+                            using (var zipStream = zipEntry2.Open())
+                            {
+                                zipStream.Write(departureLoadImgBytes, 0, departureLoadImgBytes.Length);
+                            }
+                        }
+                    }
+                    
+
+                    // メモリストリームを配列に変換してViewに渡す
+                    return Json(new { data = File(ms.ToArray(), "application/zip", $"荷量画像_{startDate}-{endDate}")});
+                }
+            }
+            // エラーメッセージ取得
+            // 「ファイルが存在しません。」
+            var errorMessage = ErrorMessagesResources.E9999;
+
+            return Json(new { res = "NG", error = errorMessage });
+        }
+
+        public Image Base64ToImage(string base64String)
+        {
+            // Base64文字列をバイト配列に変換
+            byte[] imageBytes = Convert.FromBase64String(base64String);
+            using (MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length))
+            {
+                // バイト配列から画像を生成
+                ms.Write(imageBytes, 0, imageBytes.Length);
+                Image image = Image.FromStream(ms, true);
+                return image;
+            }
         }
     }
 }
