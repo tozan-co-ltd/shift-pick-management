@@ -411,14 +411,8 @@ namespace ai_truck_load_measurement.Controllers
             }
 
             // ステーションの画像取得
-            if (isArrived)
-            {
-                model.ArrivalLoadImgPath = CheckAndConvertImagePath(model.ArrivalLoadImgPath);
-            }
-            else
-            {
-                model.DepartureLoadImgPath = CheckAndConvertImagePath(model.DepartureLoadImgPath);
-            }
+            model.ArrivalLoadImgPath = CheckAndConvertImagePath(model.ArrivalLoadImgPath);
+            model.DepartureLoadImgPath = CheckAndConvertImagePath(model.DepartureLoadImgPath);
             
             return model;
         }
