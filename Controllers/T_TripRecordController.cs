@@ -168,6 +168,7 @@ namespace ai_truck_load_measurement.Controllers
                         <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
                             <thead>
                                 <tr align=""center"">
+                                    <th hidden>便実績ID</th>
                                     <th class=""font-weight-bold"">便名称</th>
                                     <th class=""font-weight-bold"">便枝番</th>
                                     <th class=""font-weight-bold"">乗務員</th>
@@ -194,6 +195,7 @@ namespace ai_truck_load_measurement.Controllers
                     {
                         searchData += $@"
                             <tr>
+                                <td hidden>{item.TripRecordID}</td>
                                 <td>{item.TripName}</td>
                                 <td>{item.TripBranchSeq}</td>
                                 <td>{item.DriverName}</td>
@@ -209,13 +211,13 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{item.DepartureLoadStatus}</td>
                                 <td>
                                     <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                       onclick=""OnArrivalLoadImageClick('{item.TripRecordID}')"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                       onclick=""OnArrivalLoadImageClick('{item.TripRecordID}', this)"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
                                         <i class=""fa-solid fa-truck""></i>
                                     </a>
                                 </td>
                                 <td>
                                     <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                       onclick=""OnDepartureLoadImageClick('{item.TripRecordID}')"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                       onclick=""OnDepartureLoadImageClick('{item.TripRecordID}', this)"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
                                         <i class=""fa-solid fa-truck""></i>
                                     </a>
                                 </td>

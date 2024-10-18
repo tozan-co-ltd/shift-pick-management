@@ -135,7 +135,7 @@
                                 </td>
                                 <td>
                                     <a class="btn btn-success btn-icon-split ml-1 mr-1"
-                                       onclick="OnDepartureLoadImageClick('@item.TripRecordID')" data-id="@item.TripRecordID" data-toggle="modal" data-target="#detail-modal">
+                                       onclick="OnDepartureLoadImageClick('@item.TripRecordID', this)" data-id="@item.TripRecordID" data-toggle="modal" data-target="#detail-modal">
                                         <i class="fa-solid fa-truck"></i>
                                     </a>
                                 </td>
@@ -193,8 +193,9 @@
         var isArrived = true;
         // テーブルに表示されている便実績のIDをリスト化
         trs = button.parentNode.parentNode.parentNode.childNodes;
-        for(i=0; i<trs.length - 55; i++){
-            arrayTrs.push(trs[i + 55].childNodes[1].textContent);
+        console.log(trs);
+        for(i=0; i<trs.length - 58; i++){
+            arrayTrs.push(trs[i + 58].childNodes[1].textContent);
         }
         EditModal(tripRecordID, isArrived);
     }
@@ -207,8 +208,8 @@
         var isArrived = false;
         // テーブルに表示されている便実績のIDをリスト化
         trs = button.parentNode.parentNode.parentNode.childNodes;
-        for (i = 0; i < trs.length - 55; i++) {
-            arrayTrs.push(trs[i + 55].childNodes[1].textContent);
+        for (i = 0; i < trs.length - 58; i++) {
+            arrayTrs.push(trs[i + 58].childNodes[1].textContent);
         }
         EditModal(tripRecordID, isArrived);
     }
@@ -239,6 +240,8 @@
                     var arriveOrDeparture = "";
                     var arriveOrDepartureDate = "";
                     var loadStatus = "";
+                    var downloadFileName = "";
+                    var workDayForFile = GetDayStringForFile(new Date(item.workDay));
                    
                     // 到着か出発かで変わる要素の登録
                     if (isArrived) {
@@ -247,6 +250,7 @@
                         imagePath = response.arrivalLoadImgPath;
                         arriveOrDeparture = "到着時間";
                         arriveOrDepartureDate = GetDateString(new Date(item.arrivedAt));
+                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_A_" + loadStatus + ".jpg";
                     }
                     else {
                         $('#detail-modal-label').text("出発荷量画像");
@@ -254,6 +258,7 @@
                         imagePath = response.departureLoadImgPath;
                         arriveOrDeparture = "出発時間";
                         arriveOrDepartureDate = GetDateString(new Date(item.departedAt));
+                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + item.workDay + "_D_" + loadStatus + ".jpg";
                     }
 
                     $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
@@ -264,6 +269,7 @@
                     var tripRecordIDIndex = arrayTrs.indexOf(tripRecordID);
                     var previousTripRecordID = arrayTrs[tripRecordIDIndex - 1];
                     var nextTripRecordID = arrayTrs[tripRecordIDIndex + 1];
+
 
                     // ボタンの追加
                     var buttons = $("#tripRecord-buttons");
@@ -280,7 +286,7 @@
                         + "</a>"
                         + "</div>"
                         + "<div class=\"input-group-append mr-3\" >"
-                        + " <a href=\"#\" class=\"btn btn-info btn-icon-split\" onclick = \"onSearchClick()\" >"
+                        + " <a href=\"data:image/jpeg;base64,"+ imagePath +"\", download=\""+ downloadFileName +"\" class=\"btn btn-info btn-icon-split\"  >"
                         + "<span class=\"icon text-white-50\" >"
                         + "<i class=\"fa-solid fa-circle-down\" > </i>"
                         + "</span>"
@@ -357,6 +363,11 @@
 
     // モーダル内の「上へ」「下へ」ボタン押下時
     function onOtherModalClick(otherTripRecordID, isArrived) {
+        if (isArrived == "true") {
+            isArrived = true;
+        } else {
+            isArrived = false;
+        }
         EditModal(otherTripRecordID, isArrived);
     }
 
@@ -394,6 +405,7 @@
         }
     }
 
+
     // 時刻の表示形式変換(HH:mm)
     function GetTimeString(date) {
         var hour = date.getHours();
@@ -406,7 +418,7 @@
         }
         return hour + ":" + minute;
     }
-
+    // 日付の表示形式変換(yyyy/MM/dd)
     function GetDayString(date){
         var day = date.toLocaleDateString("ja-JP", {
             year: "numeric", month: "2-digit",
@@ -415,11 +427,19 @@
         return day;
     }
 
-    // 日付の表示形式変換(yyyy/MM/dd hh:mm)
+    // 日時の表示形式変換(yyyy/MM/dd hh:mm)
     function GetDateString(date) {
         var day = GetDayString(date);
         var time = GetTimeString(date);
         return day + " " + time;
+    }
+
+    // 日付の表示形式変換(yyyyMMdd)
+    function GetDayStringForFile(date) {
+        var year = date.getFullYear().toString();
+        var month = (date.getMonth() + 1).toString();
+        var day = date.getDate().toString();
+        return year + month + day;
     }
 
     // 便実績テーブルの表示
