@@ -553,6 +553,14 @@ namespace ai_truck_load_measurement.Controllers
                                 zipStream.Write(departureLoadImgBytes, 0, departureLoadImgBytes.Length);
                             }
                         }
+                        // 検索条件のテキストファイルを追加
+                        var zipEntryText = archive.CreateEntry("検索条件.txt"); 
+                        using (StreamWriter sw = new StreamWriter(zipEntryText.Open(),
+                            System.Text.Encoding.GetEncoding("shift_jis")))
+                        {
+                            //書き込む
+                            sw.Write($"期間：{startDate}~{endDate}");
+                        }
                     }
                     
 

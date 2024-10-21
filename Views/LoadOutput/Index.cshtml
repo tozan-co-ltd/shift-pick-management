@@ -142,7 +142,6 @@
     $(document).ready(function () {
         var model = @Html.Raw(Json.Serialize(Model));
         tableLength = model.tripRecordList.length + 1;
-        console.log(model);
         var today = new Date();
         var oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -442,7 +441,6 @@
             method: method,
             data: data
         }).done(function (response) {
-            console.log(response);
             var tableHTML = response.searchedTripRecordHTML;
             tableLength = response.searchedTripRecordLength + 1;
             $('#tripRecordTable').empty().html(tableHTML);
@@ -532,7 +530,6 @@
             method: method,
             data: data
         }).done(function (response) {
-            console.log(response);
             var { contentType, fileContents, fileDownloadName } = response.data;
             {
                 const link = document.createElement("a");
@@ -540,7 +537,6 @@
                 link.download = fileDownloadName;
                 link.click();
             }
-            console.log("success");
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
