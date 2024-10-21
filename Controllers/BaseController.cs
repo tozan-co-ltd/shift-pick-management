@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using mar_sumaken_web.Models;
+using ai_truck_load_measurement.Models;
 
-namespace mar_sumaken_web.Controllers
+namespace ai_truck_load_measurement.Controllers
 {
 
     public class BaseController : Controller

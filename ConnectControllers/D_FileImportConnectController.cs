@@ -1,9 +1,9 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
-using mar_sumaken_web.Models;
-using mar_sumaken_web.Commons;
+using ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Commons;
 
-namespace mar_sumaken_web.ConnectControllers
+namespace ai_truck_load_measurement.ConnectControllers
 {
     /// <summary>
     /// ファイル取込実績テーブルに関する関数

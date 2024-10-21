@@ -271,7 +271,7 @@ function hideLoading() {
 //--------------------------------------------------------//
 
 
-//------------------- CSV出力 ------------------//
+//------------------- CSV,Excel出力 ------------------//
 async function onExportFile(page, gamenName) {
     event.preventDefault();
     $('#div-error-message').text("");
@@ -297,6 +297,8 @@ async function onExportFile(page, gamenName) {
         }
     }
 }
+
+
 
 // 条件あり
 function onExportCsvByCondition(page, formData) {

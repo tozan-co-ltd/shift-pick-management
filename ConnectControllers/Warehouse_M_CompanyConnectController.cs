@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
-using mar_sumaken_web.Models;
+using ai_truck_load_measurement.Models;
 
-namespace mar_sumaken_web.Commons
+namespace ai_truck_load_measurement.Commons
 {
     /// <summary>
     /// warehouse_0_masterの会社マスターに関する関数

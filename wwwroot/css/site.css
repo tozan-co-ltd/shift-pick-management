@@ -1,8 +1,8 @@
 /* || システム全体の配色・フォント */
 :root {
     /* メインカラー */
-    --base-color-main: rgb(0, 170, 40);
-    --rgb-base-color-main: 0, 170, 40;
+    --base-color-main: rgb(236, 82, 172);
+    --rgb-base-color-main: 236, 82, 172;
     /* アクセントカラー(ボタン等) */
     --base-color-accent: rgb(240, 132, 75);
     --rgb-base-color-accent: 240, 132, 75;
@@ -84,6 +84,14 @@ label{
 }
 
 .icon-categoryid-7::before {
+    content: '\f0ad';
+}
+
+.icon-categoryid-11::before {
+    content: '\f0d1';
+}
+
+.icon-categoryid-12::before {
     content: '\f0ad';
 }
 
@@ -204,15 +212,20 @@ label{
 
 /* ナビゲーションバー */
 .navbar-dark {
-    background-color: #3EB135;
-}
-
-.navbar-dark-test {
-    background-color: #9999CC; /* 開発環境は紫色 */
+    background-color: #EC52AC;
 }
 
 .navbar-brand {
     color: aliceblue !important;
+}
+
+.navbar-logo img {
+    max-width: 35px;
+    max-height: 35px;
+    vertical-align: middle;
+    /*filter: drop-shadow(-5px 5px 5px rgba(0,0,0,0.5));*/
+    border: solid, 1px, #ffffff;
+    border-radius: 5px;
 }
 
 
@@ -879,4 +892,23 @@ select[readonly] {
 
 .table-fixed tr{
     background: #fff;
+}
+
+.table-center td{
+    text-align:center !important;
+}
+
+.table-center th{
+    text-align: center !important;
+}
+
+/*　-------------- Modal ---------------*/
+.modalLabel a{
+    white-space: nowrap;
+}
+/*　-------------- Modal ---------------*/
+
+.excel-date {
+    border: solid 1px #000;
+    padding: 5px;
 }

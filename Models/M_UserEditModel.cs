@@ -1,7 +1,7 @@
-﻿using mar_sumaken_web.Properties;
+﻿using ai_truck_load_measurement.Properties;
 using System.ComponentModel.DataAnnotations;
 
-namespace mar_sumaken_web.Models
+namespace ai_truck_load_measurement.Models
 {
     /// <summary>
     /// ユーザーマスターのModel(修正画面用)

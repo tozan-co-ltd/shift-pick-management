@@ -1,6 +1,6 @@
-﻿using mar_sumaken_web.Commons;
-using mar_sumaken_web.Models;
-using mar_sumaken_web.Properties;
+﻿using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using System.DirectoryServices;
+using DirectoryEntry = System.DirectoryServices.DirectoryEntry;
 
-namespace mar_sumaken_web.Controllers
+namespace ai_truck_load_measurement.Controllers
 {
     /// <summary>
     /// ログイン関係
@@ -27,10 +29,10 @@ namespace mar_sumaken_web.Controllers
             try
             {
                 // 強制ログアウトの場合はエラーメッセージ表示
-                if (param == "autologout")
-                {
-                    ViewData["ErrorMessage"] = "E1016: " + ErrorMessagesResources.E1016;
-                }
+                //if (param == "autologout")
+                //{
+                //    ViewData["ErrorMessage"] = "E1016: " + ErrorMessagesResources.E1016;
+                //}
 
                 // 開発環境("_test"が含まれている)の場合はViewDataに"true"を代入し、
                 // _LayoutLogin.cshtmlで背景の色を変更(薄紫#EFEDFF)
@@ -124,10 +126,7 @@ namespace mar_sumaken_web.Controllers
                   authProperties
                 );
 
-                // ログインフラグ=1,最終ログイン日時更新
-                var sql = LoginConnectController.CreateSQLToUpdateMUserByLogin(loginUserModel.UserID, dateTime);
-                M_UserConnectController.ConnectMUsers(sql, loginUserModel.DatabaseName);
-
+              
                 // log取得
                 _logger.Info($"ログイン成功 ログインID:{model.LoginId}, ログインユーザー名:{loginUserModel.UserName}");
 
@@ -158,26 +157,15 @@ namespace mar_sumaken_web.Controllers
                 // ログイン中ユーザー情報取得
                 var claimsList = User.Claims.ToList();
 
-                // ログインフラグ=0に更新
-                if (claimsList.Count > 0)
-                {
-                    int userID = Convert.ToInt32(User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value);
-                    string databaseName = User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
-
-                    // ユーザーマスター更新
-                    var sql = LoginConnectController.CreateSQLToUpdateMUserByLogout(userID);
-                    M_UserConnectController.ConnectMUsers(sql, databaseName);
-                }
-
                 // サインアウト
                 // レスポンスから認証クッキーを削除
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
                 // 強制ログアウトの場合はエラーメッセージ表示
-                if (param == "autologout")
-                {
-                    return RedirectToAction("Index", new { param = "autologout" });
-                }
+                //if (param == "autologout")
+                //{
+                //    return RedirectToAction("Index", new { param = "autologout" });
+                //}
 
                 // ログイン画面へリダイレクト
                 return RedirectToAction("Index");
@@ -201,7 +189,8 @@ namespace mar_sumaken_web.Controllers
             try
             {
                 // URLからパスを取得(https://www.tozan.co.jp/の直後１つ目のパス)
-                var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
+                // var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
+                var urlWebPath = "https://wbtzn/sumaken-web-MRq2xg5_test";
 
                 // 会社WEBアプリパスを取得("sumaken-web-***"の"***"のみ)
                 string pattern = "sumaken-web-";
@@ -231,51 +220,25 @@ namespace mar_sumaken_web.Controllers
                 var loginId = loginModel.LoginId;
                 var password = loginModel.Password;
 
-                // 入力規則チェック
-                // ログインIDまたはパスワードが空欄、パスワードが4桁未満または10桁を超える場合はエラー
-                if (!ModelState.IsValid)
-                {
-                    return null;
-                }
-
-                // 会社マスターからデータベース名取得
-                var mCompany = GetMCompany();
-                if (mCompany == null ||  string.IsNullOrWhiteSpace(mCompany.DatabaseName))
-                {
-                    return null;
-                }
-
-                // ログインユーザー情報取得
-                var sql = LoginConnectController.CreateSQLToSelectMUserByLoginUser(loginId);
-                List<M_UserModel> mUsers = M_UserConnectController.ConnectMUsers(sql, mCompany.DatabaseName);
-                M_UserModel? mUser = mUsers.FirstOrDefault();
-                if (mUser == null)
-                {
-                    return null;
-                }
-
-                // 入力されたパスワードをハッシュ化
-                byte[] salt = Hashing.ConvertStringToBytes(mUser.Salt);
-                string hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(password, salt);
-
-                // ハッシュ化されたパスワードと一致するかチェック
-                if (!mUser.Password.Equals(hashedPassword))
+                // ActiveDirectory認証処理
+                var authenticateUserName = GetAuthenticateUserName(loginId, password);
+                if(authenticateUserName == null)
                 {
                     return null;
                 }
 
                 LoginUserModel loginUserModel = new()
                 {
-                    CompanyID = mCompany.CompanyID,
-                    CompanyCode = mCompany.CompanyCode,
-                    CompanyName = mCompany.CompanyName,
-                    DatabaseName = mCompany.DatabaseName,
-                    UserID = mUser.UserID,
-                    UserName = mUser.UserName,
-                    Role = mUser.Role,
-                    MainDepoID = mUser.MainDepoID,
-                    MainDepoName = mUser.MainDepoName,
-                    AuthorizedKubun = mUser.AuthorizedKubun
+                    CompanyID = 5,
+                    CompanyCode = "testCompanyCode",
+                    CompanyName = "testCompany",
+                    DatabaseName = "warehouse_2_test",
+                    UserID = 0,
+                    UserName = authenticateUserName,
+                    Role = 1,
+                    MainDepoID = 1,
+                    MainDepoName = "testDepoName",
+                    AuthorizedKubun = 1
                 };
 
                 return loginUserModel;
@@ -287,34 +250,41 @@ namespace mar_sumaken_web.Controllers
         }
 
         /// <summary>
-        /// 会社マスター情報取得
+        /// ActiveDirectory認証とユーザー名取得
         /// </summary>
-        /// <returns></returns>
-        private Warehouse_M_CompanyModel? GetMCompany()
+        /// <param name="loginId">ログインID</param>
+        /// <param name="password">パスワード</param>
+        /// <returns>認証されたユーザー名</returns>
+        private string? GetAuthenticateUserName(string loginId, string password)
         {
             try
             {
-                string companyWebPath = GetCompanyWebPathByURL();
-
-                if (companyWebPath != "")
+                if(loginId == null || password == null)
                 {
-                    // SQL作成
-                    var sql = Warehouse_M_CompanyConnectController.CreateSQLToSelectMCompanyByWebPath(companyWebPath);
-                    // DB接続
-                    Warehouse_M_CompanyModel? companyModel = Warehouse_M_CompanyConnectController.ConnectMCompanny(sql);
+                    return null;
+                }
+                string ldapPath = "LDAP://192.168.1.6/DC=tozan,DC=co,DC=jp";
+                DirectoryEntry directoryEntry = new DirectoryEntry(ldapPath, loginId, password);
 
-                    return companyModel;
-                }
-                else
+                // Active Directory でユーザーを検索
+                DirectorySearcher searcher = new DirectorySearcher(directoryEntry);
+                searcher.Filter = "(&(objectClass=user)(sAMAccountName=" + loginId + "))";
+                searcher.SearchScope = SearchScope.Subtree;
+
+                // ユーザーが見つかったかどうかを確認
+                // IDとパスワードが一致しなかった場合、例外処理に移行
+                SearchResult result = searcher.FindOne();
+
+                if (result == null)
                 {
-                    throw new Exception();
+                    return null;
                 }
+                return result.Properties["displayname"][0].ToString();
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
         }
-
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System.Data.SqlClient;
-using mar_sumaken_web.Commons;
+using ai_truck_load_measurement.Commons;
 using System.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using Dapper;
 
-namespace mar_sumaken_web.Models
+namespace ai_truck_load_measurement.Models
 {
     /// <summary>
     /// 共通Model
@@ -64,6 +64,11 @@ namespace mar_sumaken_web.Models
         public IEnumerable<SelectListItem>? MCompanyList { get; set; }
 
         /// <summary>
+        /// 車両リスト
+        /// </summary>
+        public IEnumerable<SelectListItem>? MTruckList { get; set; }
+
+        /// <summary>
         /// 選択された倉庫ID
         /// </summary>
         public int SelectedDepoID { get; set; }
@@ -85,6 +90,7 @@ namespace mar_sumaken_web.Models
             CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();
             MDepoList = GetMDepoList(DataBaseName);
+            MTruckList = GetMTruckList("AI-truck-load-measurement_test");
             SelectedDepoID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_MainDepoID).First().Value);
         }
 
@@ -96,31 +102,36 @@ namespace mar_sumaken_web.Models
         {
             try
             {
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionStringForMaster();
-                using (var connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-                    string commandText = $@"
-                              SELECT
-	                                A.CategoryName AS CategoryName
-                              FROM M_WebMenuCategory AS A
-                              LEFT OUTER JOIN 
-                                    M_WebMenuController AS B ON (A.CategoryID = B.CategoryID)
-                              LEFT OUTER JOIN 
-                                    M_WebMenu AS C ON (C.CategoryID = B.CategoryID AND C.MenuID = B.MenuID)
-                              WHERE 1=1
-                                  AND C.CompanyID   = @CompanyID
-                                  AND B.Controller  = @Controller
-                        ";
+                //var connectionString = ConnectToSQLServer.GetSQLServerConnectionStringForMaster();
+                //using (var connection = new SqlConnection(connectionString))
+                //{
+                //    connection.Open();
+                //    string commandText = $@"
+                //              SELECT
+                //                 A.CategoryName AS CategoryName
+                //              FROM M_WebMenuCategory AS A
+                //              LEFT OUTER JOIN 
+                //                    M_WebMenuController AS B ON (A.CategoryID = B.CategoryID)
+                //              LEFT OUTER JOIN 
+                //                    M_WebMenu AS C ON (C.CategoryID = B.CategoryID AND C.MenuID = B.MenuID)
+                //              WHERE 1=1
+                //                  AND C.CompanyID   = @CompanyID
+                //                  AND B.Controller  = @Controller
+                //        ";
 
-                    var param = new
-                    {
-                        CompanyID,
-                        Controller = ControllerName
-                    };
-                    string categoryTitle = connection.ExecuteScalar<string>(commandText, param);
-                    return categoryTitle;
-                }
+                //    var param = new
+                //    {
+                //        CompanyID,
+                //        Controller = ControllerName
+                //    };
+                //    string categoryTitle = connection.ExecuteScalar<string>(commandText, param);
+                //    return categoryTitle;
+                //}
+
+
+                WebMenuModel model = new WebMenuModel();
+                var categoryTitle = model.GetCategoryNameFromControllerName(ControllerName);
+                return categoryTitle;
             }
             catch (Exception)
             {
@@ -136,31 +147,34 @@ namespace mar_sumaken_web.Models
         {
             try
             {
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionStringForMaster();
-                using (var connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-                    string commandText = $@"
-                              SELECT
-	                                A.MenuName          AS MenuName
-                              FROM M_WebMenu            AS A
-                              LEFT OUTER JOIN 
-                                    M_WebMenuController AS B 
-                                    ON (A.CategoryID = B.CategoryID AND A.MenuID = B.MenuID)
-                              WHERE 1=1
-                                    AND A.CompanyID     = @CompanyID
-                                    AND B.Controller    = @Controller
-                              ORDER BY SortNumber Asc
-                        ";
+                //var connectionString = ConnectToSQLServer.GetSQLServerConnectionStringForMaster();
+                //using (var connection = new SqlConnection(connectionString))
+                //{
+                //    connection.Open();
+                //    string commandText = $@"
+                //              SELECT
+                //                 A.MenuName          AS MenuName
+                //              FROM M_WebMenu            AS A
+                //              LEFT OUTER JOIN 
+                //                    M_WebMenuController AS B 
+                //                    ON (A.CategoryID = B.CategoryID AND A.MenuID = B.MenuID)
+                //              WHERE 1=1
+                //                    AND A.CompanyID     = @CompanyID
+                //                    AND B.Controller    = @Controller
+                //              ORDER BY SortNumber Asc
+                //        ";
 
-                    var param = new
-                    {
-                        CompanyID,
-                        Controller = ControllerName
-                    };
-                    string pageTitle = connection.ExecuteScalar<string>(commandText, param);
-                    return pageTitle;
-                }
+                //    var param = new
+                //    {
+                //        CompanyID,
+                //        Controller = ControllerName
+                //    };
+                //    string pageTitle = connection.ExecuteScalar<string>(commandText, param);
+                //    return pageTitle;
+                //}
+                WebMenuModel model = new WebMenuModel();
+                var categoryTitle = model.GetMenuNameFromControllerName(ControllerName);
+                return categoryTitle;
             }
             catch (Exception)
             {
@@ -237,6 +251,40 @@ namespace mar_sumaken_web.Models
                 }
 
                 return companyList;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 車両リスト取得
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<SelectListItem> GetMTruckList(string databaseName)
+        {
+            var selectListItem = new List<SelectListItem>();
+
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string commandText = $@"
+                        SELECT
+                            truck_id as Value,
+                            truck_number AS Text
+                        FROM m_trucks
+                        WHERE (1=1)
+                            AND is_deleted = 0
+                        ";
+
+                    selectListItem = connection.Query<SelectListItem>(commandText).ToList();
+                }
+                return selectListItem;
             }
             catch (Exception)
             {

@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
 
-namespace mar_sumaken_web.Commons
+namespace ai_truck_load_measurement.Commons
 {
     /// <summary>
     /// SQLServer接続に関する関数
@@ -59,6 +59,7 @@ namespace mar_sumaken_web.Commons
                 {
                     connection.ConnectionString = connectionString;
                     connection.Open();
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
                     int result = Convert.ToInt32(connection.ExecuteScalar(sql));
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace mar_sumaken_web.Models
+namespace ai_truck_load_measurement.Models
 {
     /// <summary>
     /// ログイン時に使うModel
@@ -12,7 +12,7 @@ namespace mar_sumaken_web.Models
         /// </summary>
         [Display(Name = "ログインID")]
         [Required]
-        [RegularExpression(@"[a-zA-Z0-9]+")]
+        //[RegularExpression(@"[a-zA-Z0-9]+")]
         public string? LoginId { get; set; }
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace mar_sumaken_web.Models
         [Display(Name = "パスワード")]
         [DataType(DataType.Password)]
         [Required]
-        [RegularExpression(@"[a-zA-Z0-9]{4,10}")]
+        //[RegularExpression(@"[a-zA-Z0-9]")]
         public string? Password { get; set; }
     }
 }
