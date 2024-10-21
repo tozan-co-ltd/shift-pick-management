@@ -33,8 +33,8 @@ namespace ai_truck_load_measurement.Controllers
                 var sql = LoadOutputConnectController.CreatSQLToSelectTripRecord(oneWeekAgo, today, isOnlyHasAmountDefference);
                 // DB接続
                 IEnumerable<LoadOutputModel> tripRecordList =LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
-                // 荷量のクラスを数値に変換
-                tripRecordList = ConversionLoadClass(tripRecordList);
+                // テーブル情報を変換
+                tripRecordList = ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
                 return View(model);
@@ -48,11 +48,11 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
-        /// 荷量のクラスを数値に変換
+        /// テーブル情報を変換
         /// </summary>
         /// <param name="models">変換元</param>
         /// <returns></returns>
-        private IEnumerable<LoadOutputModel> ConversionLoadClass(IEnumerable<LoadOutputModel> models)
+        private IEnumerable<LoadOutputModel> ConversionForTable(IEnumerable<LoadOutputModel> models)
         {
             foreach (var model in models)
             {
@@ -62,6 +62,11 @@ namespace ai_truck_load_measurement.Controllers
                 // 到着荷量クラスと出発荷量クラスをそれぞれ変換
                 model.ArrivalLoadStatus = ConversionLoadClassToLoadStatus(arrivalLoadClass);
                 model.DepartureLoadStatus = ConversionLoadClassToLoadStatus(departureLoadClass);
+
+                // テーブルの空欄を"-"に変換
+                if (string.IsNullOrEmpty(model.TripName)) model.TripName = "-";
+                if (string.IsNullOrEmpty(model.TripBranchSeq)) model.TripBranchSeq = "-";
+                if (string.IsNullOrEmpty(model.DriverName)) model.DriverName = "-";
             }
             return models;
         }
@@ -163,8 +168,7 @@ namespace ai_truck_load_measurement.Controllers
                 // DB接続
                 tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に、画像パスをBase64に変換
-                tripRecordList = ConversionLoadClass(tripRecordList);
-
+                tripRecordList = ConversionForTable(tripRecordList);
                 searchData += $@"
                     <div class=""mt-3"">
                         <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
@@ -195,6 +199,12 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     foreach (var item in tripRecordList)
                     {
+                        var truckNumber = ConvertNumberToFourDigitOrHyphen(item.TruckNumber);
+                        var identifyNumber = ConvertNumberToFourDigitOrHyphen(item.IdentifyNumber);
+                        var arrivalScheduledTime = item.ArrivalScheduledTime.ToString("HH:mm");
+                        if (arrivalScheduledTime == "00:00") arrivalScheduledTime = "-";
+                        var departureScheduledTime = item.DepartureScheduledTime.ToString("HH:mm");
+                        if(departureScheduledTime == "00:00") departureScheduledTime = "-";
                         searchData += $@"
                             <tr>
                                 <td hidden>{item.TripRecordID}</td>
@@ -202,10 +212,10 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{item.TripBranchSeq}</td>
                                 <td>{item.DriverName}</td>
                                 <td>{item.StationID}</td>
-                                <td>{item.TruckNumber}</td>
-                                <td>{item.IdentifyNumber}</td>
-                                <td>{item.ArrivalScheduledTime.ToString("HH:mm")}</td>
-                                <td>{item.DepartureScheduledTime.ToString("HH:mm")}</td>
+                                <td>{truckNumber}</td>
+                                <td>{identifyNumber}</td>
+                                <td>{arrivalScheduledTime}</td>
+                                <td>{departureScheduledTime}</td>
                                 <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
                                 <td>{item.ArrivedAt.ToString("yyyy/MM/dd HH:mm")}</td>
                                 <td>{item.DepartedAt.ToString("yyyy/MM/dd HH:mm")}</td>
@@ -250,6 +260,19 @@ namespace ai_truck_load_measurement.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 return Json(new { res = "NG", errorMessage = errorMessage });
             }
+        }
+
+        /// <summary>
+        /// 数値を4桁表示またはハイフンに変更する
+        /// </summary>
+        /// <param name="number">変更したい数値</param>
+        /// <returns></returns>
+        private string ConvertNumberToFourDigitOrHyphen(int number)
+        {
+            var returnNumber = number.ToString();
+            returnNumber = returnNumber.PadLeft(4, '0');
+            if (returnNumber == "0000") returnNumber = "-";
+            return returnNumber;
         }
 
         /// <summary>

@@ -292,6 +292,8 @@
                     $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
 
                     var workDay = GetDayString(new Date(item.workDay));
+                    var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
+                    if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
 
                     // 表示している行の上下の行の便実績ID取得
                     var tripRecordIDIndex = arrayTrs.indexOf(tripRecordID);
@@ -353,7 +355,7 @@
                         + "</td>"
                         + "</tr><tr>"
                         + "<td>便名称_便枝番</td>"
-                        + "<td>" + item.tripName + "_" + item.tripBranchSeq + "</td>"
+                        + "<td>" + tripNameAndBranchSeq + "</td>"
                         + "</tr><tr>"
                         + "<td>乗務員</td>"
                         + "<td>" + item.driverName + "</td>"

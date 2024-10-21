@@ -12,7 +12,7 @@ namespace ai_truck_load_measurement.Models
         // 便名称
         public string? TripName { get; set; }
         // 便枝番  
-        public int TripBranchSeq { get; set; }
+        public string? TripBranchSeq { get; set; }
         // 乗務員
         public string? DriverName { get; set; }
         // ステーションID
