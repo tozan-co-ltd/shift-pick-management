@@ -242,6 +242,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             if (isOnlyHasAmountDeference)
             {
                 sql += $@"
+                    ,arrival_departure_class
                 FROM t_annotation_loads
                 INNER JOIN t_trip_records
                 ON t_annotation_loads.trip_record_id = t_trip_records.trip_record_id
@@ -278,7 +279,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                identify_number,
 	                FORMAT(CONVERT(DATETIME, arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
 	                FORMAT(CONVERT(DATETIME, departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
-	                FORMAT(work_day, 'yyyy/MM/dd'),
+	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
 	                FORMAT(arrived_at, 'yyyy/MM/dd HH:mm'),
 	                FORMAT(departed_at, 'yyyy/MM/dd HH:mm'),
 	                arrival_load_class,
@@ -299,9 +300,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 sql += $@"
                 FROM t_trip_records";
             }
+
             sql += $@"
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
-                ORDER BY arrived_at, trip_name, trip_branch_seq
+                ORDER BY trip_name, work_day, trip_branch_seq
 ";
             return sql;
         }

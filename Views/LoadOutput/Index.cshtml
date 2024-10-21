@@ -141,6 +141,7 @@
     // 画面ロード時
     $(document).ready(function () {
         var model = @Html.Raw(Json.Serialize(Model));
+        console.log(model);
         tableLength = model.tripRecordList.length + 1;
         var today = new Date();
         var oneWeekAgo = new Date();
@@ -415,7 +416,7 @@
     }
 
     // チェックボックス押下時
-    $('input').change(function () {
+    $('input[type="checkbox"]').change(function () {
         tableDisplay();
     });
 

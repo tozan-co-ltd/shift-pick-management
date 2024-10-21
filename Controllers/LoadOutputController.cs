@@ -538,19 +538,24 @@ namespace ai_truck_load_measurement.Controllers
                             var FileNameArrive = string.Format($"{tripRecord.TripName}_{tripRecord.TripBranchSeq}_{date}_A_{arrivalLoadStatus}.jpg");
                             var FileNameDeparture = string.Format($"{tripRecord.TripName}_{tripRecord.TripBranchSeq}_{date}_D_{departureLoadStatus}.jpg");
 
-
                             // 到着の画像をzipストリームに書き込む
-                            var zipEntry = archive.CreateEntry(FileNameArrive, CompressionLevel.Fastest);
-                            using (var zipStream = zipEntry.Open())
+                            if (!isOnlyHasAmountDefference || tripRecord.ArrivalDepartureClass == "arrival")
                             {
-                                zipStream.Write(arrivalLoadImgBytes, 0, arrivalLoadImgBytes.Length);
+                                var zipEntry = archive.CreateEntry(FileNameArrive, CompressionLevel.Fastest);
+                                using (var zipStream = zipEntry.Open())
+                                {
+                                    zipStream.Write(arrivalLoadImgBytes, 0, arrivalLoadImgBytes.Length);
+                                }
                             }
-
+                            
                             // 出発の画像をzipストリームに書き込む
-                            var zipEntry2 = archive.CreateEntry(FileNameDeparture, CompressionLevel.Fastest);
-                            using (var zipStream = zipEntry2.Open())
+                            if(!isOnlyHasAmountDefference || tripRecord.ArrivalDepartureClass == "departure")
                             {
-                                zipStream.Write(departureLoadImgBytes, 0, departureLoadImgBytes.Length);
+                                var zipEntry2 = archive.CreateEntry(FileNameDeparture, CompressionLevel.Fastest);
+                                using (var zipStream = zipEntry2.Open())
+                                {
+                                    zipStream.Write(departureLoadImgBytes, 0, departureLoadImgBytes.Length);
+                                }
                             }
                         }
                         // 検索条件のテキストファイルを追加

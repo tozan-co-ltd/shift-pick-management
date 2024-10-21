@@ -56,6 +56,7 @@ namespace ai_truck_load_measurement.Models
         public int TripRecordListLength { get; set; }
         // 訂正後荷量クラス
         public int AnnotationLoadClass { get; set; }
+        public string? ArrivalDepartureClass {  get; set; }
     }
 
     public class SearchedTripRecordListModel{
