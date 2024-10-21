@@ -174,8 +174,10 @@
 </div>
 
 <script type="text/javascript">
+    // 画面ロード時
     $(document).ready(function () {
         var model = @Html.Raw(Json.Serialize(Model));
+        tableLength = model.tripRecordList.length + 1;
         console.log(model);
         var today = new Date();
         var oneWeekAgo = new Date();
@@ -183,7 +185,9 @@
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
     });
-
+    // 便実績テーブルの要素数
+    let tableLength = 0;
+    // 便実績テーブルの行情報配列
     let arrayTrs = [];
     // 到着荷量画像ボタン押下
     function OnArrivalLoadImageClick(tripRecordID, button) {
@@ -193,10 +197,8 @@
         var isArrived = true;
         // テーブルに表示されている便実績のIDをリスト化
         trs = button.parentNode.parentNode.parentNode.childNodes;
-        $("#tripRecordDataTable").DataTable().length;
-        console.log($("#tripRecordDataTable").DataTable());
-        for(i=0; i<trs.length - 63; i++){
-            arrayTrs.push(trs[i + 63].childNodes[1].textContent);
+        for (i = 0; i < trs.length - tableLength; i++){
+            arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
         }
         EditModal(tripRecordID, isArrived);
     }
@@ -209,8 +211,10 @@
         var isArrived = false;
         // テーブルに表示されている便実績のIDをリスト化
         trs = button.parentNode.parentNode.parentNode.childNodes;
-        for (i = 0; i < trs.length - 63; i++) {
-            arrayTrs.push(trs[i + 63].childNodes[1].textContent);
+        var model = @Html.Raw(Json.Serialize(Model));
+        var tableLength = model.tripRecordList.length + 1;
+        for (i = 0; i < trs.length - tableLength; i++) {
+            arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
         }
         EditModal(tripRecordID, isArrived);
     }
@@ -443,7 +447,7 @@
         return year + month + day;
     }
 
-    // 便実績テーブルの表示
+    // 便実績テーブルの検索ボタン押下
     function onSearchClick() {
 
         // 期間の開始、終了日付の取得
@@ -462,7 +466,9 @@
             data: data
         }).done(function (response) {
             console.log(response);
-            $('#tripRecordTable').empty().html(response);
+            var tableHTML = response.searchedTripRecordHTML;
+            tableLength = response.searchedTripRecordLength + 1;
+            $('#tripRecordTable').empty().html(tableHTML);
             // 日本語表示
             const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
 
@@ -521,6 +527,7 @@
         }
     }
 
+    // 画像一括出力ボタン押下
     function onExportAllImages(){
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));

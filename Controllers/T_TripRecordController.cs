@@ -150,7 +150,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
         /// <returns></returns>
-        public IActionResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod)
+        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod)
         {
             var searchData = string.Empty;
             IEnumerable<T_TripRecordModel> tripRecordList;
@@ -231,16 +231,22 @@ namespace ai_truck_load_measurement.Controllers
                     </div>
                 ";
 
-                return Content(searchData);
+                var searchedTripRecordListModel = new SearchedTripRecordListModel()
+                {
+                    searchedTripRecordHTML = searchData,
+                    searchedTripRecordLength = tripRecordList.Count()
+                };
+
+                return Json(searchedTripRecordListModel);
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                return Json(new { res = "NG", errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
-                return Content(errorMessage);
+                return Json(new { res = "NG", errorMessage = errorMessage });
             }
         }
 
