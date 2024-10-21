@@ -27,6 +27,28 @@
     .select-modal select{
         width: 120px
     }
+    .modal-table td{
+        vertical-align: middle;
+    }
+
+    .modal-table {
+        margin: auto;
+        table-layout: fixed;
+        width: 100%;
+    }
+    .modal-img img{
+        width:100%;
+    }
+
+    .trip-record-buttons {
+        position: relative;
+    }
+
+    .right-button {
+        float: right;
+        position: absolute;
+        right: 0;
+    }
 </style>
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
@@ -67,7 +89,7 @@
                         <span class="text">検索</span>
                     </a>
                 </div>
-                <div class="input-group-append mr-3">
+                <div class="input-group-append mr-1">
                     <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('T_TripRecord', '@Model.ViewTitle')" id="exportFile">
                         <span class="icon text-white-50">
                             <i class="fas fa-file-export"></i>
@@ -151,7 +173,7 @@
 <!--  Detail Modal-->
 <div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
+        <div class="modal-content trip-record-modal">
             <div class="modal-header">
                 <h5 class="modal-title" id="detail-modal-label"></h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
@@ -162,9 +184,9 @@
                 <div class="col-12 col-md-12">
                     <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
-                <figure class="mb-2"><img src="" id="modalImage"/></figure>
+                <figure class="mb-2 modal-img"><img src="" id="modalImage"/></figure>
                 <div id="tripRecord-buttons"></div>
-                <table class="table table-sm p-2">
+                <table class="table table-sm p-2 modal-table">
                     <tbody id="tripRecord-contatiner">
                     </tbody>
                 </table>
@@ -279,7 +301,7 @@
                     // ボタンの追加
                     var buttons = $("#tripRecord-buttons");
                     buttons.empty();
-                    let div = "<div class=\"d-flex xs-block justify-content-start align-items-center p-0 mb-2\">"
+                    let div = "<div class=\"d-flex xs-block justify-content-start align-items-center p-0 mb-2 trip-record-buttons\">"
                         + "<div class=\"input-group-append mr-3\" >"
                         + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherModalClick('" + previousTripRecordID  + "','" + isArrived + "')\" >"
                         + "<span class=\"text\" >▲上へ</span>"
@@ -290,7 +312,7 @@
                         + "<span class=\"text\" >▼下へ</span>"
                         + "</a>"
                         + "</div>"
-                        + "<div class=\"input-group-append mr-3\" >"
+                        + "<div class=\"input-group-append mr-3 right-button\" >"
                         + " <a href=\"data:image/jpeg;base64,"+ imagePath +"\", download=\""+ downloadFileName +"\" class=\"btn btn-info btn-icon-split\"  >"
                         + "<span class=\"icon text-white-50\" >"
                         + "<i class=\"fa-solid fa-circle-down\" > </i>"
@@ -485,7 +507,7 @@
                 info: false,            // 総件数
                 scrollX: true,          // 横スクロール可
                 scrollCollapse: true,   // 縦スクロール表示
-                order: [[1, "asc"]],    // ID昇順
+                order: [[1, "asc"],[9,"asc"],[2,"asc"]],    // ID昇順
             });
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
