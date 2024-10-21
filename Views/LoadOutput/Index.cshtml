@@ -141,7 +141,6 @@
     // 画面ロード時
     $(document).ready(function () {
         var model = @Html.Raw(Json.Serialize(Model));
-        console.log(model);
         tableLength = model.tripRecordList.length + 1;
         var today = new Date();
         var oneWeekAgo = new Date();
@@ -484,8 +483,6 @@
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
-        console.log(startOfPeriod);
-        console.log(endOfPeriod);
 
         const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&startOfPeriod=' + startOfPeriod + '&endOfPeriod=' + endOfPeriod + "&isOnlyHasAmountDefference=" + checkBox, {
             method: 'GET',
