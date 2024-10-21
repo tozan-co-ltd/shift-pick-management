@@ -67,6 +67,8 @@ namespace ai_truck_load_measurement.Controllers
                 if (string.IsNullOrEmpty(model.TripName)) model.TripName = "-";
                 if (string.IsNullOrEmpty(model.TripBranchSeq)) model.TripBranchSeq = "-";
                 if (string.IsNullOrEmpty(model.DriverName)) model.DriverName = "-";
+
+                model.IdentifyNumber = ConvertNumberToFourDigitOrHyphen(model.IdentifyNumber);
             }
             return models;
         }
@@ -179,7 +181,7 @@ namespace ai_truck_load_measurement.Controllers
                                     <th class=""font-weight-bold"">便枝番</th>
                                     <th class=""font-weight-bold"">乗務員</th>
                                     <th class=""font-weight-bold"">ステーションID</th>
-                                    <th class=""font-weight-bold"">車両ID</th>
+                                    <th class=""font-weight-bold"">車両番号</th>
                                     <th class=""font-weight-bold"">識別番号</th>
                                     <th class=""font-weight-bold"">到着予定時間</th>
                                     <th class=""font-weight-bold"">出発予定時間</th>
@@ -199,8 +201,8 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     foreach (var item in tripRecordList)
                     {
-                        var truckNumber = ConvertNumberToFourDigitOrHyphen(item.TruckNumber);
-                        var identifyNumber = ConvertNumberToFourDigitOrHyphen(item.IdentifyNumber);
+                        var truckNumber = item.TruckNumber.ToString();
+                        if (truckNumber == "0") truckNumber = "-";
                         var arrivalScheduledTime = item.ArrivalScheduledTime.ToString("HH:mm");
                         if (arrivalScheduledTime == "00:00") arrivalScheduledTime = "-";
                         var departureScheduledTime = item.DepartureScheduledTime.ToString("HH:mm");
@@ -213,7 +215,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{item.DriverName}</td>
                                 <td>{item.StationID}</td>
                                 <td>{truckNumber}</td>
-                                <td>{identifyNumber}</td>
+                                <td>{item.IdentifyNumber}</td>
                                 <td>{arrivalScheduledTime}</td>
                                 <td>{departureScheduledTime}</td>
                                 <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
@@ -267,12 +269,15 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="number">変更したい数値</param>
         /// <returns></returns>
-        private string ConvertNumberToFourDigitOrHyphen(int number)
+        private string ConvertNumberToFourDigitOrHyphen(string? number)
         {
-            var returnNumber = number.ToString();
-            returnNumber = returnNumber.PadLeft(4, '0');
-            if (returnNumber == "0000") returnNumber = "-";
-            return returnNumber;
+            if (string.IsNullOrEmpty(number))
+            {
+                return "-";
+            }
+            number = number.PadLeft(4, '0');
+            if (number == "0000") number = "-";
+            return number;
         }
 
         /// <summary>
@@ -383,9 +388,9 @@ namespace ai_truck_load_measurement.Controllers
                 // 各列の値が空白の場合、"-"に変換する
                 if (string.IsNullOrEmpty(row["trip_name"].ToString())) row["trip_name"] = "-";
                 if (string.IsNullOrEmpty(row["driver_name"].ToString())) row["driver_name"] = "-";
+                row["converted_identify_number"] = ConvertNumberToFourDigitOrHyphen(row["identify_number"].ToString());
                 ConvertString(row, "trip_branch_seq", "converted_branch_seq");
                 ConvertString(row, "truck_number", "converted_truck_number");
-                ConvertString(row, "identify_number", "converted_identify_number");
                 ConvertString(row, "arrival_scheduled_time", "converted_arrival_scheduled_time");
                 ConvertString(row, "departure_scheduled_time", "converted_departure_scheduled_time");
             }

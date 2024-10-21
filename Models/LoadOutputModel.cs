@@ -20,7 +20,7 @@ namespace ai_truck_load_measurement.Models
         // 車両番号
         public int TruckNumber { get; set; }
         // 識別番号
-        public int IdentifyNumber { get; set; }
+        public string? IdentifyNumber { get; set; }
         // 到着予定時間
         public DateTime ArrivalScheduledTime { get; set; }
         // 出発予定時間
