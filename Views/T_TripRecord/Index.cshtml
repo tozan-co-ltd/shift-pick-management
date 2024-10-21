@@ -206,6 +206,7 @@
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
+        onSearchClick();
     });
     // 便実績テーブルの要素数
     let tableLength = 0;
