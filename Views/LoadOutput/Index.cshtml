@@ -270,6 +270,8 @@
                     var loadStatus = "";
                     var downloadFileName = "";
                     var workDayForFile = GetDayStringForFile(new Date(item.workDay));
+                    var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
+                    if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
                    
                     // 到着か出発かで変わる要素の登録
                     if (isArrived) {
@@ -286,14 +288,12 @@
                         imagePath = response.departureLoadImgPath;
                         arriveOrDeparture = "出発時間";
                         arriveOrDepartureDate = GetDateString(new Date(item.departedAt));
-                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + item.workDay + "_D_" + loadStatus + ".jpg";
+                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_D_" + loadStatus + ".jpg";
                     }
 
                     $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
 
                     var workDay = GetDayString(new Date(item.workDay));
-                    var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
-                    if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
 
                     // 表示している行の上下の行の便実績ID取得
                     var tripRecordIDIndex = arrayTrs.indexOf(tripRecordID);
