@@ -296,7 +296,7 @@ namespace ai_truck_load_measurement.Controllers
                 DataTable searchConditionDT = new DataTable();
                 searchConditionDT.Columns.Add("項目名");
                 searchConditionDT.Columns.Add("検索条件");
-                searchConditionDT.Rows.Add("期間",$"{startDate}~{endDate}");
+                searchConditionDT.Rows.Add("期間",$"{startDate}～{endDate}");
 
                 // 便実績情報取得
                 var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
