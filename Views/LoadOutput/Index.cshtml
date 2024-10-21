@@ -82,7 +82,7 @@
         <div class="mg-bot-20">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-3">
-                    <a href="#" class="btn btn-secondary btn-icon-split" onclick="onSearchClick()">
+                    <a href="#" class="btn btn-secondary btn-icon-split" onclick="tableDisplay()">
                         <span class="icon text-white-50">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
@@ -108,64 +108,6 @@
             </div>
         </div>
         <div class="mt-3" id="tripRecordTable">
-            <table class="table table-sm stripe hover nowrap datatable-normal table-center" id="tripRecordDataTable">
-                <thead>
-                    <tr align="center">
-                        <th hidden>便実績ID</th>
-                        <th class="font-weight-bold">便名称</th>
-                        <th class="font-weight-bold">便枝番</th>
-                        <th class="font-weight-bold">乗務員</th>
-                        <th class="font-weight-bold">ステーションID</th>
-                        <th class="font-weight-bold">車両ID</th>
-                        <th class="font-weight-bold">識別番号</th>
-                        <th class="font-weight-bold">到着予定時間</th>
-                        <th class="font-weight-bold">出発予定時間</th>
-                        <th class="font-weight-bold">稼働日</th>
-                        <th class="font-weight-bold">到着日時</th>
-                        <th class="font-weight-bold">出発日時</th>
-                        <th class="font-weight-bold">到着荷量(%)</th>
-                        <th class="font-weight-bold">出発荷量(%)</th>
-                        <th class="font-weight-bold">到着荷量画像</th>
-                        <th class="font-weight-bold">出発荷量画像</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (@Model.TripRecordList != null)
-                    {
-                        @foreach (var item in @Model.TripRecordList)
-                        {
-                            <tr>
-                                <td hidden>@item.TripRecordID</td>
-                                <td>@item.TripName</td>
-                                <td>@item.TripBranchSeq</td>
-                                <td>@item.DriverName</td>
-                                <td>@item.StationID</td>
-                                <td>@item.TruckNumber</td>
-                                <td>@item.IdentifyNumber</td>
-                                <td>@item.ArrivalScheduledTime.ToString("HH:mm")</td>
-                                <td>@item.DepartureScheduledTime.ToString("HH:mm")</td>
-                                <td>@item.WorkDay.ToString("yyyy/MM/dd")</td>
-                                <td>@item.ArrivedAt.ToString("yyyy/MM/dd HH:mm")</td>
-                                <td>@item.DepartedAt.ToString("yyyy/MM/dd HH:mm")</td>
-                                <td>@item.ArrivalLoadStatus</td>
-                                <td>@item.DepartureLoadStatus</td>
-                                <td>
-                                    <a class="btn btn-success btn-icon-split ml-1 mr-1"
-                                       onclick="OnArrivalLoadImageClick('@item.TripRecordID', this)" data-id="@item.TripRecordID" data-toggle="modal" data-target="#detail-modal">
-                                        <i class="fa-solid fa-truck"></i>
-                                    </a>
-                                </td>
-                                <td>
-                                    <a class="btn btn-success btn-icon-split ml-1 mr-1"
-                                       onclick="OnDepartureLoadImageClick('@item.TripRecordID', this)" data-id="@item.TripRecordID" data-toggle="modal" data-target="#detail-modal">
-                                        <i class="fa-solid fa-truck"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
         </div>
     </div>
 </div>
@@ -206,7 +148,7 @@
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
-        onSearchClick();
+        tableDisplay();
     });
     // 便実績テーブルの要素数
     let tableLength = 0;
@@ -473,8 +415,13 @@
         return year + month + day;
     }
 
-    // 便実績テーブルの検索ボタン押下
-    function onSearchClick() {
+    // チェックボックス押下時
+    $('input').change(function () {
+        tableDisplay();
+    });
+
+    // 便実績テーブル表示
+    function tableDisplay() {
         // チェックボックスの入力情報取得
         var checkBox = false;
         $('input:checked').each(function () {
