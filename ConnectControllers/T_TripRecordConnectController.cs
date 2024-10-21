@@ -301,7 +301,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
             sql += $@"
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
-                ORDER BY arrived_at
+                ORDER BY arrived_at, trip_name, trip_branch_seq
 ";
             return sql;
         }

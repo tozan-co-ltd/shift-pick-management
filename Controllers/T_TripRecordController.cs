@@ -73,7 +73,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         private string ConversionLoadClassToLoadStatus(int loadClass)
         {
-            var loadStatus = string.Empty;
+            var loadStatus = "-";
             if (loadClass >= 3)
             {
                 int lowerLimit = (loadClass - 3) * 10 + 1;
@@ -339,23 +339,61 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         private DataTable GetConvertedLoadClassDataTable(DataTable dt)
         {
-            // テーブルに荷量の数値列を追加
-            dt.Columns.Add("arrival_load_status", typeof(string)).SetOrdinal(11);
-            dt.Columns.Add("departure_load_status", typeof(string)).SetOrdinal(12);
+            // テーブルに値を変換した後の文字列を格納する列を追加
+            dt.Columns.Add("converted_branch_seq", typeof(string)).SetOrdinal(1);
+            dt.Columns.Add("converted_truck_number", typeof(string)).SetOrdinal(5);
+            dt.Columns.Add("converted_identify_number", typeof(string)).SetOrdinal(6);
+            dt.Columns.Add("converted_arrival_scheduled_time", typeof(string)).SetOrdinal(7);
+            dt.Columns.Add("converted_departure_scheduled_time", typeof(string)).SetOrdinal(8);
+            dt.Columns.Add("arrival_load_status", typeof(string)).SetOrdinal(16);
+            dt.Columns.Add("departure_load_status", typeof(string)).SetOrdinal(17);
 
-            // 荷量クラスを数値に変換
+            // 各列の値を適切な値に変換
             foreach (DataRow row in dt.Rows)
             {
+                // 荷量クラスを%表示に変換
                 var arrivalLoadClass = (int)row["arrival_load_class"];
                 var departureLoadClass = (int)row["departure_load_class"];
                 row["arrival_load_status"] = ConversionLoadClassToLoadStatus(arrivalLoadClass);
                 row["departure_load_status"] = ConversionLoadClassToLoadStatus(departureLoadClass);
+
+                // 各列の値が空白の場合、"-"に変換する
+                if (string.IsNullOrEmpty(row["trip_name"].ToString())) row["trip_name"] = "-";
+                if (string.IsNullOrEmpty(row["driver_name"].ToString())) row["driver_name"] = "-";
+                ConvertString(row, "trip_branch_seq", "converted_branch_seq");
+                ConvertString(row, "truck_number", "converted_truck_number");
+                ConvertString(row, "identify_number", "converted_identify_number");
+                ConvertString(row, "arrival_scheduled_time", "converted_arrival_scheduled_time");
+                ConvertString(row, "departure_scheduled_time", "converted_departure_scheduled_time");
             }
 
-            // 荷量クラスの列を削除
+            // 変換前の列を削除
+            dt.Columns.Remove("trip_branch_seq");
+            dt.Columns.Remove("truck_number");
+            dt.Columns.Remove("identify_number");
+            dt.Columns.Remove("arrival_scheduled_time");
+            dt.Columns.Remove("departure_scheduled_time");
             dt.Columns.Remove("arrival_load_class");
             dt.Columns.Remove("departure_load_class");
             return dt;
+        }
+
+        /// <summary>
+        /// 列の値を文字列に変換して違う列に格納する
+        /// </summary>
+        /// <param name="row">行データ</param>
+        /// <param name="beforeColumnName">変換したい列名</param>
+        /// <param name="afterColumnName">変換後の列名</param>
+        private void ConvertString(DataRow row, string beforeColumnName, string afterColumnName)
+        {
+            if (string.IsNullOrEmpty(row[beforeColumnName].ToString()))
+            {
+                row[afterColumnName] = "-";
+            }
+            else
+            {
+                row[afterColumnName] = row[beforeColumnName].ToString();
+            }
         }
 
         /// <summary>
