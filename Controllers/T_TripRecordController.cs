@@ -24,11 +24,13 @@ namespace ai_truck_load_measurement.Controllers
             // 初期表示の日付を取得
             var today = DateTime.Now;
             var oneWeekAgo = today.AddDays(-7);
+            // 荷量の相違なしも表示
+            var isOnlyHasAmountDefference = false;
 
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(oneWeekAgo, today);
+                var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(oneWeekAgo, today, isOnlyHasAmountDefference);
                 // DB接続
                 IEnumerable<T_TripRecordModel> tripRecordList =T_TripRecordConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に変換
@@ -150,14 +152,14 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
         /// <returns></returns>
-        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod)
+        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
         {
             var searchData = string.Empty;
             IEnumerable<T_TripRecordModel> tripRecordList;
             try
             {
                 // 便マスター情報取得SQL作成
-                var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod);
+                var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
                 // DB接続
                 tripRecordList = T_TripRecordConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に、画像パスをBase64に変換
@@ -255,7 +257,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="gamenName">現在の画面名</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod)
+        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
         {
             string? errorMessage;
             string startDate = startOfPeriod.ToString("yyyyMMdd");
@@ -269,7 +271,7 @@ namespace ai_truck_load_measurement.Controllers
                 searchConditionDT.Rows.Add("期間",$"{startDate}~{endDate}");
 
                 // 便実績情報取得
-                var tTripRecordSql = T_TripRecordConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod);
+                var tTripRecordSql = T_TripRecordConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
                 DataTable tTripRecordDT = T_TripRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql, "AI-truck-load-measurement_test");
 
                 // 荷量のクラスを数値化
@@ -408,6 +410,12 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
+        /// <summary>
+        /// 荷量画像モーダルに表示する値の取得
+        /// </summary>
+        /// <param name="model">モーダルに表示するモデル</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
         public T_TripRecordModel GetModalItems(T_TripRecordModel model, bool isArrived)
         {
             // 「荷量の相違あり」で保存した値が既に存在するか
@@ -425,13 +433,21 @@ namespace ai_truck_load_measurement.Controllers
             return model;
         }
 
-        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod)
+        /// <summary>
+        /// 画像一括ダウンロード
+        /// </summary>
+        /// <param name="download"></param>
+        /// <param name="startOfPeriod">期間開始日</param>
+        /// <param name="endOfPeriod">期間終了日</param>
+        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみのデータか</param>
+        /// <returns></returns>
+        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
         {
             // ダウンロードボタンが押された際の処理
             if (download == "download")
             {
                 // 便実績情報取得SQL作成
-                var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod);
+                var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
                 // DB接続
                 IEnumerable<T_TripRecordModel> tripRecordList = T_TripRecordConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
 
@@ -488,19 +504,6 @@ namespace ai_truck_load_measurement.Controllers
             var errorMessage = ErrorMessagesResources.E9999;
 
             return Json(new { res = "NG", error = errorMessage });
-        }
-
-        public Image Base64ToImage(string base64String)
-        {
-            // Base64文字列をバイト配列に変換
-            byte[] imageBytes = Convert.FromBase64String(base64String);
-            using (MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length))
-            {
-                // バイト配列から画像を生成
-                ms.Write(imageBytes, 0, imageBytes.Length);
-                Image image = Image.FromStream(ms, true);
-                return image;
-            }
         }
     }
 }

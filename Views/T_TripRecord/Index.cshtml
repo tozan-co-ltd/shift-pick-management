@@ -54,7 +54,7 @@
         </div>
 
         <div class="mb-3">
-            <label>荷量の相違ありのみ表示<input type="checkbox" class="ml-3" id="m_tripCheckBox" /></label>
+            <label>荷量の相違ありのみ表示<input type="checkbox" class="ml-3" id="t_tripRecordCheckBox" /></label>
         </div>
 
         <div class="mg-bot-20">
@@ -449,7 +449,11 @@
 
     // 便実績テーブルの検索ボタン押下
     function onSearchClick() {
-
+        // チェックボックスの入力情報取得
+        var checkBox = false;
+        $('input:checked').each(function () {
+            checkBox = $(this).prop('checked');
+        });
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
@@ -457,7 +461,7 @@
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "T_TripRecord")';
         let method = 'Post';
-        let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+        let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, isOnlyHasAmountDefference: checkBox };
 
         // Ajax call
         $.ajax({
@@ -499,13 +503,19 @@
         event.preventDefault();
         $('#div-error-message').text("");
 
+        // チェックボックスの入力情報取得
+        var checkBox = false;
+        $('input:checked').each(function () {
+            checkBox = $(this).prop('checked');
+        });
+
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
         console.log(startOfPeriod);
         console.log(endOfPeriod);
 
-        const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&startOfPeriod=' + startOfPeriod + '&endOfPeriod=' + endOfPeriod, {
+        const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&startOfPeriod=' + startOfPeriod + '&endOfPeriod=' + endOfPeriod + "&isOnlyHasAmountDefference=" + checkBox, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -529,6 +539,11 @@
 
     // 画像一括出力ボタン押下
     function onExportAllImages(){
+        // チェックボックスの入力情報取得
+        var checkBox = false;
+        $('input:checked').each(function () {
+            checkBox = $(this).prop('checked');
+        });
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
@@ -536,7 +551,7 @@
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("ZipDownload", "T_TripRecord")';
         let method = 'GET';
-        data = { download: "download", startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+        data = { download: "download", startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, isOnlyHasAmountDefference: checkBox };
 
         // Ajax call
         $.ajax({

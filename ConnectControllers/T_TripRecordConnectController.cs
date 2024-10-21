@@ -216,13 +216,13 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="startOfPeriod">期間開始日</param>
         /// <param name="endOfPeriod">期間終了日</param>
         /// <returns></returns>
-        public static string CreatSQLToSelectTripRecord(DateTime startOfPeriod, DateTime endOfPeriod)
+        public static string CreatSQLToSelectTripRecord(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
-            string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd"); 
+            string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
             var sql = $@"
                 SELECT
-                    trip_record_id,
+                    t_trip_records.trip_record_id,
 	                trip_name,
 	                trip_branch_seq,
 	                driver_name,
@@ -238,7 +238,21 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departure_load_class,
 	                arrival_load_img_path,
 	                departure_load_img_path
-                FROM t_trip_records
+                ";
+            if (isOnlyHasAmountDeference)
+            {
+                sql += $@"
+                FROM t_annotation_loads
+                INNER JOIN t_trip_records
+                ON t_annotation_loads.trip_record_id = t_trip_records.trip_record_id
+                ";
+            }
+            else
+            {
+                sql += $@"
+                FROM t_trip_records";
+            }
+            sql += $@"
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 ORDER BY arrived_at";
             return sql;
@@ -250,7 +264,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="startOfPeriod">期間開始日</param>
         /// <param name="endOfPeriod">期間終了日</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectTripRecordForDataTable(DateTime startOfPeriod, DateTime endOfPeriod)
+        public static string CreateSQLToSelectTripRecordForDataTable(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
@@ -271,7 +285,21 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departure_load_class,
 	                arrival_load_img_path,
 	                departure_load_img_path
-                FROM t_trip_records
+                ";
+            if (isOnlyHasAmountDeference)
+            {
+                sql += $@"
+                FROM t_annotation_loads
+                INNER JOIN t_trip_records
+                ON t_annotation_loads.trip_record_id = t_trip_records.trip_record_id
+                ";
+            }
+            else
+            {
+                sql += $@"
+                FROM t_trip_records";
+            }
+            sql += $@"
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 ORDER BY arrived_at
 ";
