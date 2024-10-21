@@ -1,5 +1,5 @@
 ﻿@using ai_truck_load_measurement.Commons;
-@model ai_truck_load_measurement.Models.T_TripRecordModel;
+@model ai_truck_load_measurement.Models.LoadOutputModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
@@ -76,7 +76,7 @@
         </div>
 
         <div class="mb-3">
-            <label>荷量の相違ありのみ表示<input type="checkbox" class="ml-3" id="t_tripRecordCheckBox" /></label>
+            <label>荷量の相違ありのみ表示<input type="checkbox" class="ml-3" id="LoadOutputCheckBox" /></label>
         </div>
 
         <div class="mg-bot-20">
@@ -90,7 +90,7 @@
                     </a>
                 </div>
                 <div class="input-group-append mr-1">
-                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('T_TripRecord', '@Model.ViewTitle')" id="exportFile">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('LoadOutput', '@Model.ViewTitle')" id="exportFile">
                         <span class="icon text-white-50">
                             <i class="fas fa-file-export"></i>
                         </span>
@@ -247,14 +247,14 @@
     // 荷量画像モーダル作成
     function EditModal(tripRecordID, isArrived) {
 
-        // T_TripRecordModel取得
+        // LoadOutputModel取得
         var data = @Html.Raw(Json.Serialize(Model));
         var tripRecordModel = data.tripRecordList;
         tripRecordModel.forEach(function (item) {
             if (item.tripRecordID == tripRecordID) {
 
                 // フォーム情報取得
-                let url = window.location.origin + '@Url.Action("GetModalItems", "T_TripRecord")';
+                let url = window.location.origin + '@Url.Action("GetModalItems", "LoadOutput")';
                 let method = 'POST';
                 let data = { model: item, isArrived: isArrived };
 
@@ -408,7 +408,7 @@
 
 
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("RegistOrInsertAnnotationLoads", "T_TripRecord")';
+            let url = window.location.origin + '@Url.Action("RegistOrInsertAnnotationLoads", "LoadOutput")';
             let method = 'POST';
             let data = { tripRecordID: tripRecordID, loadStatus: loadStatus, isArrived: isArrived };
 
@@ -482,7 +482,7 @@
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
         // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("SearchData", "T_TripRecord")';
+        let url = window.location.origin + '@Url.Action("SearchData", "LoadOutput")';
         let method = 'Post';
         let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, isOnlyHasAmountDefference: checkBox };
 
@@ -572,7 +572,7 @@
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
         // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("ZipDownload", "T_TripRecord")';
+        let url = window.location.origin + '@Url.Action("ZipDownload", "LoadOutput")';
         let method = 'GET';
         data = { download: "download", startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, isOnlyHasAmountDefference: checkBox };
 

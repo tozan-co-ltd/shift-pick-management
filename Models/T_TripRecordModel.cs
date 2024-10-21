@@ -5,7 +5,7 @@ using X.PagedList;
 
 namespace ai_truck_load_measurement.Models
 {
-    public class T_TripRecordModel : CommonModel
+    public class LoadOutputModel : CommonModel
     {
         // 便実績ID
         public int TripRecordID { get; set; }
@@ -52,7 +52,7 @@ namespace ai_truck_load_measurement.Models
         // 出発荷量画像パス
         public string? DepartureLoadImgPath { get; set; }
         // 便実績リスト
-        public IPagedList<T_TripRecordModel>? TripRecordList { get; set; }
+        public IPagedList<LoadOutputModel>? TripRecordList { get; set; }
         public int TripRecordListLength { get; set; }
         // 訂正後荷量クラス
         public int AnnotationLoadClass { get; set; }

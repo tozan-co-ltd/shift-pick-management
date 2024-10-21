@@ -8,7 +8,7 @@ using NPOI.SS.Formula.Functions;
 
 namespace ai_truck_load_measurement.ConnectControllers
 {
-    public class T_TripRecordConnectController
+    public class LoadOutputConnectController
     {
         /// <summary>
         /// 便実績情報取得
@@ -16,10 +16,10 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static List<T_TripRecordModel> ConnectTTripRecords(string sql, string databaseName)
+        public static List<LoadOutputModel> ConnectTTripRecords(string sql, string databaseName)
         {
             // 戻り値
-            List<T_TripRecordModel> strList = new();
+            List<LoadOutputModel> strList = new();
 
             // DB接続
             try
@@ -32,7 +32,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     connection.ConnectionString = connectionString;
                     connection.Open();
                     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<T_TripRecordModel>(sql).ToList();
+                    strList = connection.Query<LoadOutputModel>(sql).ToList();
                 }
                 return strList;
             }

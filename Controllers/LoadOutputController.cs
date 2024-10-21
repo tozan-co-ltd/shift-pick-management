@@ -15,12 +15,12 @@ using NPOI.SS.Formula.Functions;
 
 namespace ai_truck_load_measurement.Controllers
 {
-    public class T_TripRecordController : BaseController
+    public class LoadOutputController : BaseController
     {
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         public IActionResult Index()
         {
-            T_TripRecordModel model = new();
+            LoadOutputModel model = new();
             // 初期表示の日付を取得
             var today = DateTime.Now;
             var oneWeekAgo = today.AddDays(-7);
@@ -30,9 +30,9 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(oneWeekAgo, today, isOnlyHasAmountDefference);
+                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecord(oneWeekAgo, today, isOnlyHasAmountDefference);
                 // DB接続
-                IEnumerable<T_TripRecordModel> tripRecordList =T_TripRecordConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                IEnumerable<LoadOutputModel> tripRecordList =LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に変換
                 tripRecordList = ConversionLoadClass(tripRecordList);
 
@@ -52,7 +52,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="models">変換元</param>
         /// <returns></returns>
-        private IEnumerable<T_TripRecordModel> ConversionLoadClass(IEnumerable<T_TripRecordModel> models)
+        private IEnumerable<LoadOutputModel> ConversionLoadClass(IEnumerable<LoadOutputModel> models)
         {
             foreach (var model in models)
             {
@@ -155,13 +155,13 @@ namespace ai_truck_load_measurement.Controllers
         public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
         {
             var searchData = string.Empty;
-            IEnumerable<T_TripRecordModel> tripRecordList;
+            IEnumerable<LoadOutputModel> tripRecordList;
             try
             {
                 // 便マスター情報取得SQL作成
-                var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
+                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
                 // DB接続
-                tripRecordList = T_TripRecordConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に、画像パスをBase64に変換
                 tripRecordList = ConversionLoadClass(tripRecordList);
 
@@ -271,8 +271,8 @@ namespace ai_truck_load_measurement.Controllers
                 searchConditionDT.Rows.Add("期間",$"{startDate}~{endDate}");
 
                 // 便実績情報取得
-                var tTripRecordSql = T_TripRecordConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
-                DataTable tTripRecordDT = T_TripRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql, "AI-truck-load-measurement_test");
+                var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
+                DataTable tTripRecordDT = LoadOutputConnectController.ConnectTTripRecordToDataTable(tTripRecordSql, "AI-truck-load-measurement_test");
 
                 // 荷量のクラスを数値化
                 tTripRecordDT = GetConvertedLoadClassDataTable(tTripRecordDT);
@@ -412,18 +412,18 @@ namespace ai_truck_load_measurement.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 「荷量の相違あり」で保存した値が既に存在するか
-                var isSameAnnotationLoadsExist = T_TripRecordConnectController.IsSameAnnotationLoadsExist(tripRecordID, isArrived);
+                var isSameAnnotationLoadsExist = LoadOutputConnectController.IsSameAnnotationLoadsExist(tripRecordID, isArrived);
 
                 // 「荷量の相違あり」の設定値を更新、保存
                 if (isSameAnnotationLoadsExist)
                 {
                     // 更新
-                    T_TripRecordConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user, "AI-truck-load-measurement_test");
+                    LoadOutputConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user, "AI-truck-load-measurement_test");
                 }
                 else
                 {
                     // 新規保存
-                    T_TripRecordConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user, "AI-truck-load-measurement_test");
+                    LoadOutputConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user, "AI-truck-load-measurement_test");
                 }
 
                 return Ok();
@@ -454,13 +454,13 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="model">モーダルに表示するモデル</param>
         /// <param name="isArrived">到着か否か</param>
         /// <returns></returns>
-        public T_TripRecordModel GetModalItems(T_TripRecordModel model, bool isArrived)
+        public LoadOutputModel GetModalItems(LoadOutputModel model, bool isArrived)
         {
             // 「荷量の相違あり」で保存した値が既に存在するか
-            var isSameAnnotationLoadsExist = T_TripRecordConnectController.IsSameAnnotationLoadsExist(model.TripRecordID, isArrived);
+            var isSameAnnotationLoadsExist = LoadOutputConnectController.IsSameAnnotationLoadsExist(model.TripRecordID, isArrived);
             if (isSameAnnotationLoadsExist)
             {
-                var annotationLoadClass = T_TripRecordConnectController.GetAnnotationLoadClassByTripRecordIDAndIsArrived(model.TripRecordID, isArrived, "AI-truck-load-measurement_test");
+                var annotationLoadClass = LoadOutputConnectController.GetAnnotationLoadClassByTripRecordIDAndIsArrived(model.TripRecordID, isArrived, "AI-truck-load-measurement_test");
                 model.AnnotationLoadClass = annotationLoadClass;
             }
 
@@ -485,9 +485,9 @@ namespace ai_truck_load_measurement.Controllers
             if (download == "download")
             {
                 // 便実績情報取得SQL作成
-                var sql = T_TripRecordConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
+                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
                 // DB接続
-                IEnumerable<T_TripRecordModel> tripRecordList = T_TripRecordConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                IEnumerable<LoadOutputModel> tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");
                 var endDate = endOfPeriod.ToString("yyyyMMdd");
