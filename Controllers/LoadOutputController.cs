@@ -576,7 +576,7 @@ namespace ai_truck_load_measurement.Controllers
                             System.Text.Encoding.GetEncoding("shift_jis")))
                         {
                             //書き込む
-                            sw.Write($"期間：{startDate}~{endDate}");
+                            sw.Write($"期間：{startDate}～{endDate}");
                         }
                     }
                     
