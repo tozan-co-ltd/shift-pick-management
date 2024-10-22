@@ -537,11 +537,16 @@ namespace ai_truck_load_measurement.Controllers
                             var arrivalLoadStatus = ConversionLoadClassToLoadStatus(tripRecord.ArrivalLoadClass);
                             var departureLoadStatus = ConversionLoadClassToLoadStatus(tripRecord.DepartureLoadClass);
                             date = tripRecord.WorkDay.ToString("yyyyMMdd");
+                            // 便名称と便枝番が空欄の時の処理
+                            var tripName = tripRecord.TripName;
+                            if (string.IsNullOrEmpty(tripName)) tripName = "-";
+                            var tripBranchSeq = tripRecord.TripBranchSeq;
+                            if(string.IsNullOrEmpty(tripBranchSeq)) tripBranchSeq = "-";
 
                         
                                 // ファイルネームの指定
-                            var FileNameArrive = string.Format($"{tripRecord.TripName}_{tripRecord.TripBranchSeq}_{date}_A_{arrivalLoadStatus}.jpg");
-                            var FileNameDeparture = string.Format($"{tripRecord.TripName}_{tripRecord.TripBranchSeq}_{date}_D_{departureLoadStatus}.jpg");
+                            var FileNameArrive = string.Format($"{tripName}_{tripBranchSeq}_{date}_A_{arrivalLoadStatus}.jpg");
+                            var FileNameDeparture = string.Format($"{tripName}_{tripBranchSeq}_{date}_D_{departureLoadStatus}.jpg");
 
                             // 到着の画像をzipストリームに書き込む
                             if (!isOnlyHasAmountDefference || tripRecord.ArrivalDepartureClass == "arrival")
