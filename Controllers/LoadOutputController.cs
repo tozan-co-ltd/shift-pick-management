@@ -427,7 +427,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="loadStatus">荷量クラス</param>
         /// <param name="isArrived">到着か否か</param>
         /// <returns></returns>
-        public IActionResult RegistOrInsertAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived)
+        public IActionResult InsertOrUpdateAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived)
         {
             string? errorMessage;
             try
