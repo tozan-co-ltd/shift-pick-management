@@ -175,8 +175,6 @@
         var isArrived = false;
         // テーブルに表示されている便実績のIDをリスト化
         trs = button.parentNode.parentNode.parentNode.childNodes;
-        var model = @Html.Raw(Json.Serialize(Model));
-        var tableLength = model.tripRecordList.length + 1;
         for (i = 0; i < trs.length - tableLength; i++) {
             arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
         }

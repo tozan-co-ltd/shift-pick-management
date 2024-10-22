@@ -20,17 +20,13 @@ namespace ai_truck_load_measurement.Controllers
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         public IActionResult Index()
         {
+            // 戻り値
             LoadOutputModel model = new();
-            // 初期表示の日付を取得
-            var today = DateTime.Now;
-            var oneWeekAgo = today.AddDays(-7);
-            // 荷量の相違なしも表示
-            var isOnlyHasAmountDefference = false;
 
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecord(oneWeekAgo, today, isOnlyHasAmountDefference);
+                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecord();
                 // DB接続
                 IEnumerable<LoadOutputModel> tripRecordList =LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // テーブル情報を変換
@@ -165,8 +161,8 @@ namespace ai_truck_load_measurement.Controllers
             IEnumerable<LoadOutputModel> tripRecordList;
             try
             {
-                // 便マスター情報取得SQL作成
-                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
+                // 指定した期間の便マスター情報取得SQL作成
+                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
                 // DB接続
                 tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に、画像パスをBase64に変換
@@ -518,8 +514,8 @@ namespace ai_truck_load_measurement.Controllers
             // ダウンロードボタンが押された際の処理
             if (download == "download")
             {
-                // 便実績情報取得SQL作成
-                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecord(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
+                // 指定した期間の便実績情報取得SQL作成
+                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
                 // DB接続
                 IEnumerable<LoadOutputModel> tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
 
