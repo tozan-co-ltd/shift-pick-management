@@ -515,7 +515,7 @@ namespace ai_truck_load_measurement.Controllers
             if (download == "download")
             {
                 // 指定した期間の便実績情報取得SQL作成
-                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
+                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
                 // DB接続
                 IEnumerable<LoadOutputModel> tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
 

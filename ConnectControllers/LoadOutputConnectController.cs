@@ -251,6 +251,54 @@ namespace ai_truck_load_measurement.ConnectControllers
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
             var sql = $@"
+                SELECT DISTINCT
+                    t_trip_records.trip_record_id,
+	                trip_name,
+	                trip_branch_seq,
+	                driver_name,
+	                station_id,
+	                truck_number,
+	                identify_number,
+	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
+	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+	                work_day,
+	                arrived_at,
+	                departed_at,
+	                arrival_load_class,
+	                departure_load_class,
+	                arrival_load_img_path,
+	                departure_load_img_path
+                ";
+            if (isOnlyHasAmountDeference)
+            {
+                sql += $@"
+                FROM t_annotation_loads
+                INNER JOIN t_trip_records
+                ON t_annotation_loads.trip_record_id = t_trip_records.trip_record_id
+                ";
+            }
+            else
+            {
+                sql += $@"
+                FROM t_trip_records";
+            }
+            sql += $@"
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
+                ORDER BY arrived_at";
+            return sql;
+        }
+
+        /// <summary>
+        /// 画像出力用の便実績情報取得SQL
+        /// </summary>
+        /// <param name="startOfPeriod">期間開始日</param>
+        /// <param name="endOfPeriod">期間終了日</param>
+        /// <returns></returns>
+        public static string CreatSQLToSelectTripRecordForImage(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference)
+        {
+            string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
+            string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
+            var sql = $@"
                 SELECT
                     t_trip_records.trip_record_id,
 	                trip_name,
