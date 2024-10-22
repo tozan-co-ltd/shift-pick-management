@@ -182,9 +182,9 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 便実績IDと到着か否かから訂正後荷量クラスを取得する
         /// </summary>
-        /// <param name="tripRecordID"></param>
-        /// <param name="isArrived"></param>
-        /// <param name="databaseName"></param>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
         public static int GetAnnotationLoadClassByTripRecordIDAndIsArrived(int  tripRecordID, bool isArrived, string databaseName)
         {
@@ -213,8 +213,6 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 便実績情報取得SQL
         /// </summary>
-        /// <param name="startOfPeriod">期間開始日</param>
-        /// <param name="endOfPeriod">期間終了日</param>
         /// <returns></returns>
         public static string CreatSQLToSelectTripRecord()
         {
@@ -245,6 +243,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="startOfPeriod">期間開始日</param>
         /// <param name="endOfPeriod">期間終了日</param>
+        /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
         public static string CreatSQLToSelectTripRecordFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference)
         {
@@ -293,6 +292,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="startOfPeriod">期間開始日</param>
         /// <param name="endOfPeriod">期間終了日</param>
+        /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
         public static string CreatSQLToSelectTripRecordForImage(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference)
         {
@@ -342,6 +342,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="startOfPeriod">期間開始日</param>
         /// <param name="endOfPeriod">期間終了日</param>
+        /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
         public static string CreateSQLToSelectTripRecordForDataTable(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference)
         {
@@ -447,8 +448,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="tripRecordID">便実績ID</param>
         /// <param name="loadStatus">荷量クラス</param>
-        /// <param name="createdBy">登録者</param>
-        /// <param name="createdAt">登録日時</param>
+        /// <param name="updatedBy">更新者</param>
+        /// <param name="updatedAt">更新日時</param>
         /// <param name="isArrived">到着か否か</param>
         /// <returns></returns>
         public static string CreateSQLToUpdateAnnotationLoads(int tripRecordID, int loadStatus, string updatedBy, DateTime updatedAt, bool isArrived)

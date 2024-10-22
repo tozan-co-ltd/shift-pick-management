@@ -89,7 +89,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 画像のパスが正しいかどうかのチェックとパスの変換
         /// </summary>
-        /// <param name="imagePath"></param>
+        /// <param name="imagePath">画像パス</param>
         /// <returns></returns>
         private string CheckAndConvertImagePath(string imagePath)
         {
@@ -125,7 +125,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 画像のパスが正しいかどうか確認する
         /// </summary>
-        /// <param name="imagePath"></param>
+        /// <param name="imagePath">確認したい画像パス</param>
         /// <returns></returns>        
         public bool IsValidImage(string imagePath)
         {
@@ -153,7 +153,9 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 便実績情報テーブル非同期更新用
         /// </summary>
-        /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
         public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
         {
@@ -280,6 +282,9 @@ namespace ai_truck_load_measurement.Controllers
         /// ファイル出力
         /// </summary>
         /// <param name="gamenName">現在の画面名</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
         public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
         {
