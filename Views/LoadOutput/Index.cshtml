@@ -210,6 +210,8 @@
                     var downloadFileName = "";
                     var workDayForFile = GetDayStringForFile(new Date(item.workDay));
                     var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
+                    var truckNumber = item.truckNumber;
+                    if (truckNumber == "0") truckNumber = "-";
                     if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
                    
                     // 到着か出発かで変わる要素の登録
@@ -304,7 +306,7 @@
                         + "<td>" + item.stationID + "</td>"
                         + "</tr><tr>"
                         + "<td>車両番号</td>"
-                        + "<td>" + item.truckNumber + "</td>"
+                        + "<td>" + truckNumber + "</td>"
                         + "</tr><tr>"
                         + "<td>識別番号</td>"
                         + "<td>" + item.identifyNumber + "</td>"
