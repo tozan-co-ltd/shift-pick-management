@@ -436,6 +436,12 @@ namespace ai_truck_load_measurement.Controllers
             string? errorMessage;
             try
             {
+                // 初期値でクリックした場合は何も起こらない
+                if (loadStatus == 0)
+                {
+                    return NotFound();
+                }
+
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
