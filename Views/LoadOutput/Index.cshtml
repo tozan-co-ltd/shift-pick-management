@@ -505,79 +505,95 @@
 
     // Excel出力
     async function onExportFileTrips(page, gamenName) {
-        event.preventDefault();
-        $('#div-error-message').text("");
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+            event.preventDefault();
+            $('#div-error-message').text("");
 
-        // チェックボックスの入力情報取得
-        var checkBox = false;
-        $('input:checked').each(function () {
-            checkBox = $(this).prop('checked');
-        });
+            // チェックボックスの入力情報取得
+            var checkBox = false;
+            $('input:checked').each(function () {
+                checkBox = $(this).prop('checked');
+            });
 
-        // 期間の開始、終了日付の取得
-        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
-        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
-        const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&startOfPeriod=' + startOfPeriod + '&endOfPeriod=' + endOfPeriod + "&isOnlyHasAmountDefference=" + checkBox, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-        var { data, errorMessage } = await response.json();
+            const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&startOfPeriod=' + startOfPeriod + '&endOfPeriod=' + endOfPeriod + "&isOnlyHasAmountDefference=" + checkBox, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+            var { data, errorMessage } = await response.json();
 
-        if (errorMessage) {
-            $("#div-error-message").show();
-            $("#div-error-message").text(errorMessage);
-        } else {
-            var { contentType, fileContents, fileDownloadName } = data;
-            {
-                const link = document.createElement("a");
-                link.href = `data:${contentType};base64,${fileContents}`;
-                link.download = fileDownloadName;
-                link.click();
+            if (errorMessage) {
+                $("#div-error-message").show();
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var { contentType, fileContents, fileDownloadName } = data;
+                {
+                    const link = document.createElement("a");
+                    link.href = `data:${contentType};base64,${fileContents}`;
+                    link.download = fileDownloadName;
+                    link.click();
+                }
             }
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
         }
     }
 
     // 画像一括出力ボタン押下
     function onExportAllImages(){
-        // チェックボックスの入力情報取得
-        var checkBox = false;
-        $('input:checked').each(function () {
-            checkBox = $(this).prop('checked');
-        });
-        // 期間の開始、終了日付の取得
-        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
-        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+            // チェックボックスの入力情報取得
+            var checkBox = false;
+            $('input:checked').each(function () {
+                checkBox = $(this).prop('checked');
+            });
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
-        // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("ZipDownload", "LoadOutput")';
-        let method = 'GET';
-        data = { download: "download", startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, isOnlyHasAmountDefference: checkBox };
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("ZipDownload", "LoadOutput")';
+            let method = 'GET';
+            data = { download: "download", startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, isOnlyHasAmountDefference: checkBox };
 
-        // Ajax call
-        $.ajax({
-            url: url,
-            method: method,
-            data: data
-        }).done(function (response) {
-            var { contentType, fileContents, fileDownloadName } = response.data;
-            {
-                const link = document.createElement("a");
-                link.href = `data:${contentType};base64,${fileContents}`;
-                link.download = fileDownloadName;
-                link.click();
-            }
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 404) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#edit-modal-error-message").text(errorMessage);
-            } else {
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#edit-modal-error-message").text(errorMessage);
-            }
-        });
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                var { contentType, fileContents, fileDownloadName } = response.data;
+                {
+                    const link = document.createElement("a");
+                    link.href = `data:${contentType};base64,${fileContents}`;
+                    link.download = fileDownloadName;
+                    link.click();
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
     }
 
     // エラーメッセージ削除
