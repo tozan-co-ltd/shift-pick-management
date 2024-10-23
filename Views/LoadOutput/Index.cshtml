@@ -82,7 +82,7 @@
         <div class="mg-bot-20">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-3">
-                    <a href="#" class="btn btn-secondary btn-icon-split" onclick="tableDisplay()">
+                    <a href="#" class="btn btn-secondary btn-icon-split" onclick="onSearchClick()">
                         <span class="icon text-white-50">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
@@ -210,7 +210,7 @@
                     var downloadFileName = "";
                     var workDayForFile = GetDayStringForFile(new Date(item.workDay));
                     var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
-                    var truckNumber = item.truckNumber;
+                    var truckNumber = item.truckNumber.ToString();
                     if (truckNumber == "0") truckNumber = "-";
                     if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
                    
@@ -416,8 +416,41 @@
 
     // チェックボックス押下時
     $('input[type="checkbox"]').change(function () {
-        tableDisplay();
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
     });
+
+    function onSearchClick(){
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+    // 期間が90日以内か否か
+    function isWithin90Days() {
+        var startOfPeriod = new Date($('#startOfPeriod').val());
+        var endOfPeriod = new Date($('#endOfPeriod').val());
+        var diffMilliSec = endOfPeriod - startOfPeriod;
+        var diffDays = parseInt(diffMilliSec / 1000 / 60 / 60 / 24);
+        if (diffDays <= 90) {
+            return true;
+        } 
+        else 
+        {
+            return false;
+        }
+    }
 
     // 便実績テーブル表示
     function tableDisplay() {
