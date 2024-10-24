@@ -210,7 +210,7 @@
                     var downloadFileName = "";
                     var workDayForFile = GetDayStringForFile(new Date(item.workDay));
                     var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
-                    var truckNumber = item.truckNumber.ToString();
+                    var truckNumber = item.truckNumber;
                     if (truckNumber == "0") truckNumber = "-";
                     if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
                    
