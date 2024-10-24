@@ -1,0 +1,607 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.LoadOutputModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+}
+<style>
+     .btn-update:not(:disabled):not(.disabled):active, .btn-update:not(:disabled):not(.disabled).active,
+     .show > .btn-update.dropdown-toggle {
+         background-color: #1CC88A !important;
+         border: #1CC88A !important;
+         color: #ffffff !important;
+     }
+
+     .btn-update {
+         background-color: #1CC88A;
+         border: #1CC88A;
+         color: #ffffff;
+     }
+
+    .btn-update:hover {
+        background-color: #1CC88A;
+        border: #1CC88A;
+        color: #ffffff;
+    }
+
+    .select-modal select{
+        width: 135px
+    }
+    .modal-table td{
+        vertical-align: middle;
+    }
+
+    .modal-table {
+        margin: auto;
+        table-layout: fixed;
+        width: 100%;
+    }
+    .modal-img img{
+        width:100%;
+    }
+
+    .trip-record-buttons {
+        position: relative;
+    }
+
+    .right-button {
+        float: right;
+        position: absolute;
+        right: 0;
+    }
+</style>
+<div class="card shadow de-inspection masterInfo m-4">
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                <span class="warehouse-name-drs">期間</span>
+                <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
+                <label class="m-1">～</label>
+                <input type="text" id="endOfPeriod" class="form-control pickerDate endDate">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label>荷量の相違ありのみ表示<input type="checkbox" class="ml-3" id="LoadOutputCheckBox" /></label>
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                <div class="input-group-append mr-3">
+                    <a href="#" class="btn btn-secondary btn-icon-split" onclick="onSearchClick()">
+                        <span class="icon text-white-50">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <span class="text">検索</span>
+                    </a>
+                </div>
+                <div class="input-group-append mr-1">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('LoadOutput', '@Model.ViewTitle')" id="exportFile">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-file-export"></i>
+                        </span>
+                        <span class="text">Excel出力</span>
+                    </a>
+                </div>
+                <div class="input-group-append mr-3">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportAllImages()">
+                        <span class="icon text-white-50">
+                            <i class="fa-solid fa-circle-down"></i>
+                        </span>
+                        <span class="text">画像一括出力</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3" id="tripRecordTable">
+        </div>
+    </div>
+</div>
+
+<!--  Detail Modal-->
+<div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content trip-record-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-modal-label"></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-12">
+                    <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <figure class="mb-2 modal-img"><img src="" id="modalImage"/></figure>
+                <div id="tripRecord-buttons"></div>
+                <table class="table table-sm p-2 modal-table">
+                    <tbody id="tripRecord-contatiner">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // 画面ロード時
+    $(document).ready(function () {
+        var model = @Html.Raw(Json.Serialize(Model));
+        tableLength = model.tripRecordList.length + 1;
+        var today = new Date();
+        var oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        $('#endOfPeriod').val(GetDayString(today));
+        $('#startOfPeriod').val(GetDayString(oneWeekAgo));
+        tableDisplay();
+    });
+    // 便実績テーブルの要素数
+    let tableLength = 0;
+    // 便実績テーブルの行情報配列
+    let arrayTrs = [];
+    // 到着荷量画像ボタン押下
+    function OnArrivalLoadImageClick(tripRecordID, button) {
+        // 配列の初期化
+        arrayTrs = [];
+        // 到着
+        var isArrived = true;
+        // テーブルに表示されている便実績のIDをリスト化
+        trs = button.parentNode.parentNode.parentNode.childNodes;
+        for (i = 0; i < trs.length - tableLength; i++){
+            arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
+        }
+        EditModal(tripRecordID, isArrived);
+    }
+
+    // 出発荷量画像ボタン押下
+    function OnDepartureLoadImageClick(tripRecordID, button) {
+        // 配列の初期化
+        arrayTrs = [];
+        // 出発
+        var isArrived = false;
+        // テーブルに表示されている便実績のIDをリスト化
+        trs = button.parentNode.parentNode.parentNode.childNodes;
+        for (i = 0; i < trs.length - tableLength; i++) {
+            arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
+        }
+        EditModal(tripRecordID, isArrived);
+    }
+
+    
+
+    // 荷量画像モーダル作成
+    function EditModal(tripRecordID, isArrived) {
+
+        // LoadOutputModel取得
+        var data = @Html.Raw(Json.Serialize(Model));
+        var tripRecordModel = data.tripRecordList;
+        tripRecordModel.forEach(function (item) {
+            if (item.tripRecordID == tripRecordID) {
+
+                // フォーム情報取得
+                let url = window.location.origin + '@Url.Action("GetModalItems", "LoadOutput")';
+                let method = 'POST';
+                let data = { model: item, isArrived: isArrived };
+
+                // Ajax call
+                $.ajax({
+                    url: url,
+                    method: method,
+                    data: data
+                }).done(function (response) {
+                    var imagePath = "";
+                    var arriveOrDeparture = "";
+                    var arriveOrDepartureDate = "";
+                    var loadStatus = "";
+                    var downloadFileName = "";
+                    var workDayForFile = GetDayStringForFile(new Date(item.workDay));
+                    var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
+                    var truckNumber = item.truckNumber;
+                    if (truckNumber == "0") truckNumber = "-";
+                    if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
+                   
+                    // 到着か出発かで変わる要素の登録
+                    if (isArrived) {
+                        $('#detail-modal-label').text("到着荷量画像");
+                        loadStatus = item.arrivalLoadStatus;
+                        imagePath = response.arrivalLoadImgPath;
+                        arriveOrDeparture = "到着時間";
+                        arriveOrDepartureDate = GetDateString(new Date(item.arrivedAt));
+                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_A_" + loadStatus + ".jpg";
+                    }
+                    else {
+                        $('#detail-modal-label').text("出発荷量画像");
+                        loadStatus = item.departureLoadStatus;
+                        imagePath = response.departureLoadImgPath;
+                        arriveOrDeparture = "出発時間";
+                        arriveOrDepartureDate = GetDateString(new Date(item.departedAt));
+                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_D_" + loadStatus + ".jpg";
+                    }
+
+                    $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
+
+                    var workDay = GetDayString(new Date(item.workDay));
+
+                    // 表示している行の上下の行の便実績ID取得
+                    var tripRecordIDIndex = arrayTrs.indexOf(tripRecordID);
+                    var previousTripRecordID = arrayTrs[tripRecordIDIndex - 1];
+                    var nextTripRecordID = arrayTrs[tripRecordIDIndex + 1];
+
+
+                    // ボタンの追加
+                    var buttons = $("#tripRecord-buttons");
+                    buttons.empty();
+                    let div = "<div class=\"d-flex xs-block justify-content-start align-items-center p-0 mb-2 trip-record-buttons\">"
+                        + "<div class=\"input-group-append mr-3\" >"
+                        + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherModalClick('" + previousTripRecordID  + "','" + isArrived + "')\" >"
+                        + "<span class=\"text\" >▲上へ</span>"
+                        + "</a>"
+                        + "</div>"
+                        + "<div class=\"input-group-append mr-3\" >"
+                        + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherModalClick('" + nextTripRecordID + "','" + isArrived + "')\" >"
+                        + "<span class=\"text\" >▼下へ</span>"
+                        + "</a>"
+                        + "</div>"
+                        + "<div class=\"input-group-append mr-3 right-button\" >"
+                        + " <a href=\"data:image/jpeg;base64,"+ imagePath +"\", download=\""+ downloadFileName +"\" class=\"btn btn-info btn-icon-split\"  >"
+                        + "<span class=\"icon text-white-50\" >"
+                        + "<i class=\"fa-solid fa-circle-down\" > </i>"
+                        + "</span>"
+                        + "<span class=\"text\" >画像出力</span>"
+                        + "</a>"
+                        + "</div>";
+                    buttons.append(div);
+
+                    // テーブルの追加
+                    var container = $("#tripRecord-contatiner");
+                    container.empty();
+                    let tr = "<tr>"
+                        + "<td>荷量</td>"
+                        + "<td>" + loadStatus + "%</td>"
+                        + "</tr><tr>"
+                        + "<td>荷量の相違あり</td>"
+                        + "<td>"
+                        + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">"
+                        + "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" id=\"loadStatusSelect\" >"
+                        + "<option value=\"\" hidden></option>"
+                        + "<option value=\"1\">0%</option>"
+                        + "<option value=\"3\">1-10%</option>"
+                        + "<option value=\"4\">11-20%</option>"
+                        + "<option value=\"5\">21-30%</option>"
+                        + "<option value=\"6\">31-40%</option>"
+                        + "<option value=\"7\">41-50%</option>"
+                        + "<option value=\"8\">51-60%</option>"
+                        + "<option value=\"9\">61-70%</option>"
+                        + "<option value=\"10\">71-80%</option>"
+                        + "<option value=\"11\">81-90%</option>"
+                        + "<option value=\"12\">91-100%</option>"
+                        + "</select>"
+                        + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "')\" id=\"verificationRequired\">"
+                        + "<span class=\"text\">要検証</span>"
+                        + "</a>"
+                        + "</div>"
+                        + "</td>"
+                        + "</tr><tr>"
+                        + "<td>便名称_便枝番</td>"
+                        + "<td>" + tripNameAndBranchSeq + "</td>"
+                        + "</tr><tr>"
+                        + "<td>乗務員</td>"
+                        + "<td>" + item.driverName + "</td>"
+                        + "</tr><tr>"
+                        + "<td>ステーションID</td>"
+                        + "<td>" + item.stationID + "</td>"
+                        + "</tr><tr>"
+                        + "<td>車両番号</td>"
+                        + "<td>" + truckNumber + "</td>"
+                        + "</tr><tr>"
+                        + "<td>識別番号</td>"
+                        + "<td>" + item.identifyNumber + "</td>"
+                        + "</tr><tr>"
+                        + "<td>稼働日</td>"
+                        + "<td>" + workDay + "</td>"
+                        + "</tr><tr>"
+                        + "<td>" + arriveOrDeparture + "</td>"
+                        + "<td>" + arriveOrDepartureDate + "</td>"
+                        + "</tr>";
+                    container.append(tr);
+                    $('#loadStatusSelect').val(response.annotationLoadClass);
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status === 404) {
+                        var errorMessage = jqXHR.responseJSON.errorMessage;
+                        $("#edit-modal-error-message").text(errorMessage);
+                    } else {
+                        var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                        $("#edit-modal-error-message").text(errorMessage);
+                    }
+                });
+
+            }
+        });
+    }
+
+    // モーダル内の「上へ」「下へ」ボタン押下時
+    function onOtherModalClick(otherTripRecordID, isArrived) {
+        if (isArrived == "true") {
+            isArrived = true;
+        } else {
+            isArrived = false;
+        }
+        EditModal(otherTripRecordID, isArrived);
+    }
+
+    // 要検証ボタン押下時
+    function onVerificationRequiredClick(tripRecordID, isArrived) {
+        var loadStatus = $('[name=loadStatusSelect]').val();
+        if (loadStatus != "") {
+
+            DeleteErrorMessages();
+
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("InsertOrUpdateAnnotationLoads", "LoadOutput")';
+            let method = 'POST';
+            let data = { tripRecordID: tripRecordID, loadStatus: loadStatus, isArrived: isArrived };
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#detail-modal').hide();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#edit-modal-error-message").text(errorMessage);
+                }
+            });
+        }
+    }
+
+
+    // 時刻の表示形式変換(HH:mm)
+    function GetTimeString(date) {
+        var hour = date.getHours();
+        if (hour < 10) {
+            hour = "0" + hour;
+        }
+        var minute = date.getMinutes();
+        if (minute < 10) {
+            minute = "0" + minute;
+        }
+        return hour + ":" + minute;
+    }
+    // 日付の表示形式変換(yyyy/MM/dd)
+    function GetDayString(date){
+        var day = date.toLocaleDateString("ja-JP", {
+            year: "numeric", month: "2-digit",
+            day: "2-digit"
+        });
+        return day;
+    }
+
+    // 日時の表示形式変換(yyyy/MM/dd hh:mm)
+    function GetDateString(date) {
+        var day = GetDayString(date);
+        var time = GetTimeString(date);
+        return day + " " + time;
+    }
+
+    // 日付の表示形式変換(yyyyMMdd)
+    function GetDayStringForFile(date) {
+        var year = date.getFullYear().toString();
+        var month = (date.getMonth() + 1).toString();
+        var day = date.getDate().toString();
+        return year + month + day;
+    }
+
+    // チェックボックス押下時
+    $('input[type="checkbox"]').change(function () {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    });
+
+    // 検索ボタン押下時
+    function onSearchClick(){
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+    // 期間が90日以内か否か
+    function isWithin90Days() {
+        var startOfPeriod = new Date($('#startOfPeriod').val());
+        var endOfPeriod = new Date($('#endOfPeriod').val());
+        var diffMilliSec = endOfPeriod - startOfPeriod;
+        var diffDays = parseInt(diffMilliSec / 1000 / 60 / 60 / 24);
+        if (diffDays <= 90) {
+            return true;
+        } 
+        else 
+        {
+            return false;
+        }
+    }
+
+    // 便実績テーブル表示
+    function tableDisplay() {
+        // チェックボックスの入力情報取得
+        var checkBox = false;
+        $('input:checked').each(function () {
+            checkBox = $(this).prop('checked');
+        });
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("SearchData", "LoadOutput")';
+        let method = 'Post';
+        let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, isOnlyHasAmountDefference: checkBox };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            var tableHTML = response.searchedTripRecordHTML;
+            tableLength = response.searchedTripRecordLength + 1;
+            $('#tripRecordTable').empty().html(tableHTML);
+            // 日本語表示
+            const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+
+            // ID(2列目)昇順
+            $("#tripRecordDataTable").DataTable({
+                "language": {
+                    "url": language_url
+                },
+                lengthChange: true,     // 件数切替
+                info: false,            // 総件数
+                scrollX: true,          // 横スクロール可
+                scrollCollapse: true,   // 縦スクロール表示
+                order: [[1, "asc"],[9,"asc"],[2,"asc"]],    // ID昇順
+            });
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    }
+
+    // Excel出力
+    async function onExportFileTrips(page, gamenName) {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+            event.preventDefault();
+            $('#div-error-message').text("");
+
+            // チェックボックスの入力情報取得
+            var checkBox = false;
+            $('input:checked').each(function () {
+                checkBox = $(this).prop('checked');
+            });
+
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+            const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&startOfPeriod=' + startOfPeriod + '&endOfPeriod=' + endOfPeriod + "&isOnlyHasAmountDefference=" + checkBox, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+            var { data, errorMessage } = await response.json();
+
+            if (errorMessage) {
+                $("#div-error-message").show();
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var { contentType, fileContents, fileDownloadName } = data;
+                {
+                    const link = document.createElement("a");
+                    link.href = `data:${contentType};base64,${fileContents}`;
+                    link.download = fileDownloadName;
+                    link.click();
+                }
+            }
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+    // 画像一括出力ボタン押下
+    function onExportAllImages(){
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+            // チェックボックスの入力情報取得
+            var checkBox = false;
+            $('input:checked').each(function () {
+                checkBox = $(this).prop('checked');
+            });
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("ZipDownload", "LoadOutput")';
+            let method = 'GET';
+            data = { download: "download", startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, isOnlyHasAmountDefference: checkBox };
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                var { contentType, fileContents, fileDownloadName } = response.data;
+                {
+                    const link = document.createElement("a");
+                    link.href = `data:${contentType};base64,${fileContents}`;
+                    link.download = fileDownloadName;
+                    link.click();
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
+</script>

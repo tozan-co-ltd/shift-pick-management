@@ -103,7 +103,7 @@ namespace ai_truck_load_measurement.Controllers
                     model.TruckExist = true;
                     int lowerLimit = (loadClass - 3) * 10 + 1;
                     int upperLimit = (loadClass - 2) * 10;
-                    truckStatus = ($"{lowerLimit}~{upperLimit}%");
+                    truckStatus = ($"{lowerLimit}-{upperLimit}%");
                 }
                 model.TruckStatus = truckStatus;
             }
