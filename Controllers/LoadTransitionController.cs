@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ai_truck_load_measurement.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -6,7 +7,8 @@ namespace ai_truck_load_measurement.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            var model = new LoadTransitionModel();
+            return View(model);
         }
     }
 }
