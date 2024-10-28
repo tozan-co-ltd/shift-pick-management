@@ -68,17 +68,27 @@
                 adjustCanvasHeight();
 
                 var myScatterChart = new Chart(ctx, {
-                    type: 'scatter',
+                    type: 'line',
                     data: {
                         //labels: ['15:24', '17:08'],
                         datasets: [{
-                            label: 'Data1',
+                            label: '豊鉄大型常傭便3_1',
                             borderColor: 'Green',
                             fill: false,
-                            data: [{ x: '03:58', y: 22 }, { x: '15:24', y: 55 }, { x: '17:08', y: 40 }, { x: '23:59', y: 84 }],
+                            data: [{ x: '2024-10-21T00:00:00', y: 65 }, { x: '2024-10-22T00:00:00', y: 85 }, { x: '2024-10-23T00:00:00', y: 85 }, { x: '2024-10-24T00:00:00', y: 85 }, { x: '2024-10-25T00:00:00', y: 95 }],
                             tension: 0,
                             pointRadius: '5',
                             backgroundColor: 'Green',
+
+                        },
+                        {
+                            label: '豊鉄大型常傭便3_2',
+                            borderColor: 'Red',
+                            fill: false,
+                            data: [{ x: '2024-10-21T00:00:00', y: 85 }, { x: '2024-10-22T00:00:00', y: 85 }, { x: '2024-10-23T00:00:00', y: 85 }, { x: '2024-10-24T00:00:00', y: 75 }, { x: '2024-10-25T00:00:00', y: 75 }],
+                            tension: 0,
+                            pointRadius: '5',
+                            backgroundColor: 'Red',
 
                         }]
                     },
@@ -90,26 +100,10 @@
                         scales: {
                             //X軸
                             xAxes: [{
-                                //軸ラベル表示
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'サンプル1',
-                                    fontSize: 24
-                                },
-                                //ここで軸を時間を設定する
+                                //ここで軸を時間に設定する
                                 type: 'time',
                                 time: {
-                                    parser: 'HH:mm',
-                                    unit: 'hour',
-                                    stepSize: 1,
-                                    displayFormats: {
-                                        'hour': 'HH:mm'
-                                    }
-                                },
-                                //X軸の範囲を指定
-                                ticks: {
-                                    min: "00:00",
-                                    max: "23:59"
+                                    unit: 'day',
                                 }
                             }],
                             //Y軸
@@ -126,10 +120,6 @@
                                     max: 100.0
                                 }
                             }]
-                        },
-                        title: {
-                            display: true,
-                            text: '野畑/宮崎(1234)'
                         }
                     }
                 });
