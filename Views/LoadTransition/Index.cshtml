@@ -57,7 +57,6 @@
                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                     <span class="warehouse-name-drs">便枝番</span>
                     <select type="text" class="form-select " id="tripBranchSeq">
-                        <option value="1">1</option>
                     </select>
                 </div>
             </div>
@@ -146,9 +145,45 @@
         console.log(model);
     })
 
+    // 便名称選択時
     $('[name=TripName]').change(function () {
         var tripName = $('[name=TripName]').val();
         console.log(tripName);
+
+        // 便枝番の選択肢を全削除
+        var select = $('#tripBranchSeq')[0];
+        while (select.firstChild) {
+            select.removeChild(select.firstChild);
+        }
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripBranchSeqFromTripName", "LoadTransition")';
+        let method = 'Post';
+        let data = { tripName: tripName };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            console.log(response);
+            for (var i = 0; i < response.length; i++) {
+                var option = document.createElement("option");
+                option.text = response[i];
+                option.value = response[i];
+                select.appendChild(option);
+            }
+            
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
+            }
+        });
     });
 </script>
                                   

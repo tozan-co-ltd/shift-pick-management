@@ -12,12 +12,10 @@ namespace ai_truck_load_measurement.Controllers
         public IActionResult Index()
         {
             var model = new LoadTransitionModel();
-            var today = DateTime.Now;
-            var oneWeekAgo = today.AddDays(-7);
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadTransitionConnectController.CreatSQLToSelectTripNameFromPeriod(oneWeekAgo, today);
+                var sql = LoadTransitionConnectController.CreateSQLToSelectTripNameFromPeriod();
                 // DB接続
                 List<SelectListItem> tripRecordList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql, "AI-truck-load-measurement_test");
 
@@ -29,6 +27,26 @@ namespace ai_truck_load_measurement.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
+            }
+        }
+
+        public List<int> GetTripBranchSeqFromTripName(string tripName)
+        {
+            List<int> tripBranchSeqList = new();
+            try
+            {
+                // 便実績情報取得SQL作成
+                var sql = LoadTransitionConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName);
+                // DB接続
+                tripBranchSeqList = LoadTransitionConnectController.ConnectTTripRecordsForTripBranchSeq(sql, "AI-truck-load-measurement_test");
+
+                return tripBranchSeqList;
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return tripBranchSeqList;
             }
         }
     }
