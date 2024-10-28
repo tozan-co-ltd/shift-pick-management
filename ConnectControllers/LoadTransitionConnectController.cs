@@ -3,21 +3,22 @@ using ai_truck_load_measurement.Commons;
 using ai_truck_load_measurement.Models;
 using System.Data.SqlClient;
 using System.Data;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ai_truck_load_measurement.ConnectControllers
 {
     public class LoadTransitionConnectController 
     {
         /// <summary>
-        /// 便実績情報取得
+        /// 便名称取得
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static List<LoadTransitionModel> ConnectTTripRecords(string sql, string databaseName)
+        public static List<SelectListItem> ConnectTTripRecordsForTripName(string sql, string databaseName)
         {
             // 戻り値
-            List<LoadTransitionModel> strList = new();
+            List<SelectListItem> strList = new();
 
             // DB接続
             try
@@ -30,7 +31,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     connection.ConnectionString = connectionString;
                     connection.Open();
                     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<LoadTransitionModel>(sql).ToList();
+                    strList = connection.Query<SelectListItem>(sql).ToList();
                 }
                 return strList;
             }
@@ -243,45 +244,17 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreatSQLToSelectTripRecordFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference)
+        public static string CreatSQLToSelectTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
             var sql = $@"
                 SELECT DISTINCT
-                    t_trip_records.trip_record_id,
-	                trip_name,
-	                trip_branch_seq,
-	                driver_name,
-	                station_id,
-	                truck_number,
-	                identify_number,
-	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
-	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
-	                work_day,
-	                arrived_at,
-	                departed_at,
-	                arrival_load_class,
-	                departure_load_class,
-	                arrival_load_img_path,
-	                departure_load_img_path
-                ";
-            if (isOnlyHasAmountDeference)
-            {
-                sql += $@"
-                FROM t_annotation_loads
-                INNER JOIN t_trip_records
-                ON t_annotation_loads.trip_record_id = t_trip_records.trip_record_id
-                ";
-            }
-            else
-            {
-                sql += $@"
-                FROM t_trip_records";
-            }
-            sql += $@"
+	                trip_name AS Value,
+	                trip_name AS Text
+                FROM t_trip_records
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
-                ORDER BY arrived_at";
+            ";
             return sql;
         }
 

@@ -1,4 +1,6 @@
-﻿namespace ai_truck_load_measurement.Models
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace ai_truck_load_measurement.Models
 {
     public class LoadTransitionModel : CommonModel
     {
@@ -22,5 +24,6 @@
         public string? ArrivalLoadImgPath {  get; set; }
         public string? DepartureLoadImgPath { get;set; }
         public List<LoadTransitionModel>? LoadTransitionList { get; set; }
+        public List<SelectListItem>? TripNameList { get; set; }
     }
 }

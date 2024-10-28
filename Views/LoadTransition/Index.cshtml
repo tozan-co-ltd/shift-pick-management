@@ -4,6 +4,9 @@
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
+<style>
+
+</style>
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
         @ViewData["Title"]
@@ -35,22 +38,31 @@
             }
         </div>
 
-        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
-            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                <span class="warehouse-name-drs">期間</span>
-                <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
-                <label class="m-1">～</label>
-                <input type="text" id="endOfPeriod" class="form-control pickerDate endDate">
+        <form id="loadTransitionForm">
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                    <span class="warehouse-name-drs">期間</span>
+                    <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
+                    <label class="m-1">～</label>
+                    <input type="text" id="endOfPeriod" class="form-control pickerDate endDate">
+                </div>
             </div>
-        </div>
-        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
-            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                <span class="warehouse-name-drs">便名称</span>
-                <select type="text"  class="form-control "></select>
-                <label class="m-1">便枝番</label>
-                <select type="text" id="endOfPeriod" class="form-control"></select>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                    <span class="warehouse-name-drs">便名称</span>
+                    <select type="text" class="form-select " name="TripName" asp-for="TripName" asp-items="@Model.TripNameList" required id="TruckID"></select>
+                </div>
             </div>
-        </div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                    <span class="warehouse-name-drs">便枝番</span>
+                    <select type="text" class="form-select " id="tripBranchSeq">
+                        <option value="1">1</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+        
         <div class="chartjs-graph">
             <canvas id="binedabanChartArrival"></canvas>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
@@ -75,7 +87,7 @@
                             label: '豊鉄大型常傭便3_1',
                             borderColor: 'Green',
                             fill: false,
-                            data: [{ x: '2024-10-21T00:00:00', y: 65 }, { x: '2024-10-22T00:00:00', y: 85 }, { x: '2024-10-23T00:00:00', y: 85 }, { x: '2024-10-24T00:00:00', y: 85 }, { x: '2024-10-25T00:00:00', y: 95 }],
+                            data: [{ x: '2024-10-21T00:00:00', y: 5 }, { x: '2024-10-22T00:00:00', y: 55 }, { x: '2024-10-23T00:00:00', y: 45 }, { x: '2024-10-24T00:00:00', y: 25 }, { x: '2024-10-25T00:00:00', y: 65 }],
                             tension: 0,
                             pointRadius: '5',
                             backgroundColor: 'Green',
@@ -85,7 +97,7 @@
                             label: '豊鉄大型常傭便3_2',
                             borderColor: 'Red',
                             fill: false,
-                            data: [{ x: '2024-10-21T00:00:00', y: 85 }, { x: '2024-10-22T00:00:00', y: 85 }, { x: '2024-10-23T00:00:00', y: 85 }, { x: '2024-10-24T00:00:00', y: 75 }, { x: '2024-10-25T00:00:00', y: 75 }],
+                            data: [{ x: '2024-10-21T00:00:00', y: 95 }, { x: '2024-10-22T00:00:00', y: 75 }, { x: '2024-10-23T00:00:00', y: 25 }, { x: '2024-10-24T00:00:00', y: 55 }, { x: '2024-10-25T00:00:00', y: 15 }],
                             tension: 0,
                             pointRadius: '5',
                             backgroundColor: 'Red',
@@ -127,3 +139,16 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        var model = @Html.Raw(Json.Serialize(Model));
+        console.log(model);
+    })
+
+    $('[name=TripName]').change(function () {
+        var tripName = $('[name=TripName]').val();
+        console.log(tripName);
+    });
+</script>
+                                  
