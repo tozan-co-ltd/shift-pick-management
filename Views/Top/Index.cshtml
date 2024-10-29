@@ -159,10 +159,10 @@
 
             $('#truck-status' + i).text(cardModel.truckStatus);
             
-            $('#image' + i).attr("src", "data:image/jpeg;base64," + cardModel.imagePath);
+            $('#image' + i).attr("src", cardModel.imageBase64);
 
-            var createdAt = GetDateString(new Date(cardModel.createdAt));
-            $('#created-at' + i).text("取得日時：" + createdAt);
+            var updatedAt = GetDateString(new Date(cardModel.updatedAt));
+            $('#created-at' + i).text("取得日時：" + updatedAt);
         }
     }
 
