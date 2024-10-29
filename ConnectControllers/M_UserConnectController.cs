@@ -375,37 +375,7 @@ namespace ai_truck_load_measurement.Commons
             }
         }
 
-        /// <summary>
-        /// ユーザーマスターのパスワード更新
-        /// </summary>
-        /// <param name="model">更新ユーザー情報</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns></returns>
-        public static int UpdateMUserPassword(ChangePasswordModel model, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(loginUser.DatabaseName);
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToUpdateMUserPassword(model, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
-
-                    return count;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
+        
 
         /// <summary>
         /// 重複ユーザー情報取得SQL作成
@@ -645,28 +615,7 @@ namespace ai_truck_load_measurement.Commons
             return sql;
         }
 
-        /// <summary>
-        /// ユーザーマスターパスワード更新SQL作成
-        /// </summary>
-        /// <param name="model">更新情報</param>
-        /// <param name="updatedAt">システムタイム</param>
-        /// <param name="updatedBy">ユーザーID</param>
-        /// <returns>SQL文</returns>
-        public static string CreateSQLToUpdateMUserPassword(ChangePasswordModel model, DateTime updatedAt, string updatedBy)
-        {
-            var sql = $@"
-
-                UPDATE M_User
-                SET 
-                    Password = '{model.Password}',
-                    Salt = '{model.Salt}',
-                    UpdatedAt = '{updatedAt}',
-                    UpdatedBy = '{updatedBy}'
-                WHERE
-                    UserId = {model.UserID}; 
-            ";
-            return sql;
-        }
+        
 
         /// <summary>
         /// ユーザーマスター削除SQL作成
