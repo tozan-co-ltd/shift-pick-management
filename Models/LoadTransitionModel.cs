@@ -5,7 +5,7 @@ namespace ai_truck_load_measurement.Models
     public class LoadTransitionModel : CommonModel
     {
         public string? TripName {  get; set; }
-        public string? TripBranchSeq {  get; set; }
+        public int TripBranchSeq {  get; set; }
         public string? DriverName {  get; set; }
         public int StationID {  get; set; }
         public string? TruckNumber {  get; set; }

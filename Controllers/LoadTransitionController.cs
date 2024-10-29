@@ -49,5 +49,32 @@ namespace ai_truck_load_measurement.Controllers
                 return tripBranchSeqList;
             }
         }
+
+        public List<LoadTransitionModel> SearchTrips(List<LoadTransitionModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
+        {
+            List<LoadTransitionModel> selectedList = new();
+            foreach(var model in models)
+            {
+                var tripName = model.TripName;
+                var tripBranchSeq = model.TripBranchSeq;
+                try
+                {
+                    // 便実績情報取得SQL作成
+                    var sql = LoadTransitionConnectController.CreateSQLToSelectLoadClassFromSearchConditions(tripName, tripBranchSeq, startOfPeriod, endOfPeriod);
+                    // DB接続
+                    var loadTransitionList = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+
+                    model.LoadTransitionList = loadTransitionList;
+                    selectedList.Add(model);
+                }
+                catch (Exception ex)
+                {
+                    var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                    ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                    return selectedList;
+                }
+            }
+            return selectedList;
+        }
     }
 }
