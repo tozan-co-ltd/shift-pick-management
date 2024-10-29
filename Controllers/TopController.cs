@@ -119,14 +119,14 @@ namespace ai_truck_load_measurement.Controllers
         {
             foreach (var model in models)
             {
-                string imagePath = model.ImagePath;
+                string imagePath = model.ImageBase64;
                 // 画像パスに画像がないかパスが不正な場合はダミー画像を表示する
                 if (!IsValidImage(imagePath))
                 {
                     var rootPath = Directory.GetCurrentDirectory();
                     imagePath = Path.Combine(rootPath, @"wwwroot\images\NoImage.png");
                 }
-                model.ImagePath = ImageToBase64(imagePath);
+                model.ImagePath = model.ImageBase64;
             }
             return models;
         }

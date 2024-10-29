@@ -13,8 +13,12 @@ namespace ai_truck_load_measurement.Models
         public int StationID {  get; set; }
         // 荷量クラス
         public int LoadClass {  get; set; }
+        // base64画像
+        public string ImageBase64 { get; set; }
         // 作成日時
         public DateTime CreatedAt { get; set; }
+        // 更新日時
+        public DateTime UpdatedAt { get; set; }
         // 画像パス
         public string? ImagePath {  get; set; }
         // 車両の存在有無
