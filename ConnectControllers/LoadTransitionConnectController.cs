@@ -151,6 +151,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         {
             var sql = $@"
                 SELECT 
+                    work_day,
 	                arrival_load_class,
 	                departure_load_class
                 FROM t_trip_records

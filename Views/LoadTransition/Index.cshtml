@@ -71,7 +71,7 @@
         </form>
 
         <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
-            <button type="submit" class="btn btn-secondary btn-icon-split" id="search-btn">
+            <button type="submit" class="btn btn-secondary btn-icon-split" id="search-btn" onclick="onSearchClick()">
                 <span class="icon text-white-50">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
@@ -157,8 +157,11 @@
 </div>
 
 <script>
+    let model;
+
     $(document).ready(function () {
-        var model = @Html.Raw(Json.Serialize(Model));
+        model = @Html.Raw(Json.Serialize(Model));
+        model.loadTransitionList = [];
         console.log(model); 
         var today = new Date();
         var oneWeekAgo = new Date();
@@ -170,7 +173,6 @@
     // 便名称選択時
     $('[name=TripName]').change(function () {
         var tripName = $('[name=TripName]').val();
-        console.log(tripName);
 
         // 便枝番の選択肢を全削除
         var select = $('#tripBranchSeq')[0];
@@ -189,7 +191,6 @@
             method: method,
             data: data
         }).done(function (response) {
-            console.log(response);
             for (var i = 0; i < response.length; i++) {
                 var option = document.createElement("option");
                 option.text = response[i];
@@ -237,10 +238,101 @@
         selectedTripLabel.innerText = selectedTripName;
         selectedTripLabel.className += "mr-3";
         selectedTrips.appendChild(selectedTripLabel);
-        
-
-        console.log(arrayTrips);
     }
+
+    // 検索ボタン押下時
+    function onSearchClick() {
+
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // グラフの初期化
+        myScatterChart.data.datasets = [];
+
+        for(var i=0; i < arrayTrips.length; i++){
+            var tripName = arrayTrips[i].tripName;
+            var tripBranchSeq = arrayTrips[i].tripBranchSeq
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("SearchTrips", "LoadTransition")';
+            let method = 'Post';
+            let data = { tripName: tripName, tripBranchSeq: tripBranchSeq, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data,
+                async: false
+            }).done(function (response) {
+                // 荷量クラスをパーセントとして取得
+                var arrivalLoadStatuses = [];
+                var departureLoadStatuses = [];
+                response.forEach(function (item) {
+                    if (item.arrivalLoadStatus != "") {
+                        arrivalLoadStatuses.push({ x: item.workDay, y: item.arrivalLoadStatus });
+                    }
+                    
+                    departureLoadStatuses.push({ x: item.workDay, y: item.deapartureLoadStatus });
+                })
+
+                // データセット作成、登録
+                var datasets = createChartDatasets(i);
+                datasets.data = arrivalLoadStatuses;
+                datasets.label = tripName + "_" + tripBranchSeq;
+                myScatterChart.data.datasets.push(datasets);
+
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
+        }
+        // グラフの更新
+        myScatterChart.update();
+    }
+
+    function createChartDatasets(dataNumber){
+        var datasets = {
+            label: '',
+            borderColor: graphColors[dataNumber],
+            fill: false,
+            data: [],
+            tension: 0,
+            pointRadius: '5',
+            backgroundColor: graphColors[dataNumber],
+        }
+        return datasets;
+    }
+
+    // グラフ凡例で用いるカラーコード
+    const graphColors = [
+       'rgba(255, 204, 204, 1)', 
+        'rgba(255, 229, 204, 1)', 
+        'rgba(255, 255, 204, 1)', 
+        'rgba(204, 255, 204, 1)',
+        'rgba(204, 255, 229, 1)',
+        'rgba(204, 255, 255, 1)',
+        'rgba(204, 229, 255, 1)',
+        'rgba(204, 204, 255, 1)',
+        'rgba(229, 204, 255, 1)',
+        'rgba(255, 204, 255, 1)',
+        'rgba(153, 204, 153, 1)',
+        'rgba(102, 153, 102, 1)',
+        'rgba(102, 153, 204, 1)',
+        'rgba(51, 102, 153, 1)',
+        'rgba(128, 0, 128, 1)',
+        'rgba(0, 0, 128, 1)',
+        'rgba(180, 180, 180, 1)',
+        'rgba(200, 200, 200, 1)',
+        'rgba(220, 220, 220, 1)',
+        'rgba(240, 240, 240, 1)'
+    ]
 
     // 日付の表示形式変換(yyyy/MM/dd)
     function GetDayString(date) {

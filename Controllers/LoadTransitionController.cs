@@ -50,31 +50,50 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-        public List<LoadTransitionModel> SearchTrips(List<LoadTransitionModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
+        public List<RequestLoadStatus> SearchTrips(string tripName, int tripBranchSeq, DateTime startOfPeriod, DateTime endOfPeriod)
         {
-            List<LoadTransitionModel> selectedList = new();
-            foreach(var model in models)
+            List<RequestLoadStatus> loadStatuses = new ();
+            try
             {
-                var tripName = model.TripName;
-                var tripBranchSeq = model.TripBranchSeq;
-                try
-                {
-                    // 便実績情報取得SQL作成
-                    var sql = LoadTransitionConnectController.CreateSQLToSelectLoadClassFromSearchConditions(tripName, tripBranchSeq, startOfPeriod, endOfPeriod);
-                    // DB接続
-                    var loadTransitionList = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                // 便実績情報取得SQL作成
+                var sql = LoadTransitionConnectController.CreateSQLToSelectLoadClassFromSearchConditions(tripName, tripBranchSeq, startOfPeriod, endOfPeriod);
+                // DB接続
+                var loadClasses = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
 
-                    model.LoadTransitionList = loadTransitionList;
-                    selectedList.Add(model);
-                }
-                catch (Exception ex)
+                foreach ( var loadClass in loadClasses)
                 {
-                    var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
-                    ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                    return selectedList;
+                    var loadStatus = new RequestLoadStatus
+                    {
+                        WorkDay = loadClass.WorkDay,
+                        ArrivalLoadStatus = ConversionLoadClassToLoadStatus(loadClass.ArrivalLoadClass),
+                        DepartureLoadStatus = ConversionLoadClassToLoadStatus(loadClass.DepartureLoadClass)
+                    };
+                    loadStatuses.Add(loadStatus);
                 }
+                return loadStatuses;
             }
-            return selectedList;
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return loadStatuses;
+            }
+        }
+
+
+        /// <summary>
+        /// 荷量クラスからパーセント表示に変換
+        /// </summary>
+        /// <param name="loadClass">荷量クラス</param>
+        /// <returns></returns>
+        private string ConversionLoadClassToLoadStatus(int loadClass)
+        {
+            var loadStatus = "";
+            if (loadClass >= 3)
+            { 
+                loadStatus = ((loadClass - 3) * 10 + 5).ToString() ;
+            }
+            return loadStatus;
         }
     }
 }
