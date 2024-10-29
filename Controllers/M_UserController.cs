@@ -206,105 +206,105 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult Edit(int id)
-        {
-            M_UserEditModel editModel = new();
-            try
-            {
-                // ログイン中ユーザー情報取得
-                var user = ClaimsLoginUserData();
+        //public IActionResult Edit(int id)
+        //{
+        //    M_UserEditModel editModel = new();
+        //    try
+        //    {
+        //        // ログイン中ユーザー情報取得
+        //        var user = ClaimsLoginUserData();
 
-                // IDが一致するユーザー情報取得
-                // SQL作成
-                var userListSql = M_UserConnectController.CreateSQLToSelectMUserByUserId(id);
-                // DB接続
-                List<M_UserModel> userList = M_UserConnectController.ConnectMUsers(userListSql, user.DatabaseName);
-                if (userList.Count != 1)
-                {
-                    ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
-                    return View(editModel);
-                }
-                M_UserModel editUser = userList[0];
+        //        // IDが一致するユーザー情報取得
+        //        // SQL作成
+        //        var userListSql = M_UserConnectController.CreateSQLToSelectMUserByUserId(id);
+        //        // DB接続
+        //        List<M_UserModel> userList = M_UserConnectController.ConnectMUsers(userListSql, user.DatabaseName);
+        //        if (userList.Count != 1)
+        //        {
+        //            ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
+        //            return View(editModel);
+        //        }
+        //        M_UserModel editUser = userList[0];
 
-                // 倉庫マスター情報取得
-                // SQL作成
-                var depoListSql = M_DepoConnectController.CreateSQLToSelectMDepos();
-                // DB接続
-                List<M_DepoModel> depoList = M_DepoConnectController.ConnectMDepos(depoListSql, user.DatabaseName);
-                foreach (var depo in depoList)
-                {
-                    SelectListItem depoItem = new()
-                    {
-                        Text = depo.DepoName,
-                        Value = Convert.ToString(depo.DepoID),
-                        Selected = false
-                    };
+        //        // 倉庫マスター情報取得
+        //        // SQL作成
+        //        var depoListSql = M_DepoConnectController.CreateSQLToSelectMDepos();
+        //        // DB接続
+        //        List<M_DepoModel> depoList = M_DepoConnectController.ConnectMDepos(depoListSql, user.DatabaseName);
+        //        foreach (var depo in depoList)
+        //        {
+        //            SelectListItem depoItem = new()
+        //            {
+        //                Text = depo.DepoName,
+        //                Value = Convert.ToString(depo.DepoID),
+        //                Selected = false
+        //            };
 
-                    editUser.DepoSelectList.Add(depoItem);
-                }
+        //            editUser.DepoSelectList.Add(depoItem);
+        //        }
 
-                // ハンディメニューマスター情報取得
-                // SQL作成
-                var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToSelectMHandyMenuList();
-                // DB接続
-                List<M_HandyMenuModel> handyMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(handyMenuListSql, user.DatabaseName);
-                foreach (var handyMenu in handyMenuList)
-                {
-                    SelectListItem menuItem = new()
-                    {
-                        Text = handyMenu.HandyMenuName,
-                        Value = Convert.ToString(handyMenu.HandyMenuID),
-                        Selected = false
-                    };
+        //        // ハンディメニューマスター情報取得
+        //        // SQL作成
+        //        var handyMenuListSql = M_HandyMenuConnectController.CreateSQLToSelectMHandyMenuList();
+        //        // DB接続
+        //        List<M_HandyMenuModel> handyMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(handyMenuListSql, user.DatabaseName);
+        //        foreach (var handyMenu in handyMenuList)
+        //        {
+        //            SelectListItem menuItem = new()
+        //            {
+        //                Text = handyMenu.HandyMenuName,
+        //                Value = Convert.ToString(handyMenu.HandyMenuID),
+        //                Selected = false
+        //            };
 
-                    editUser.HandyMenuSelectList.Add(menuItem);
-                }
+        //            editUser.HandyMenuSelectList.Add(menuItem);
+        //        }
 
-                // IDが一致するユーザー倉庫中間リスト取得
-                var userDepoListSql = M_UserConnectController.CreateSQLToSelectRUserDepoList(editUser.UserID);
-                var userDepoList = M_DepoConnectController.ConnectMDepos(userDepoListSql, user.DatabaseName);
-                if (userDepoList.Count > 0)
-                {
-                    foreach (var userDepo in userDepoList)
-                    {
-                        var checkItem = editUser.DepoSelectList.FirstOrDefault(item => item.Value == Convert.ToString(userDepo.DepoID));
-                        if (checkItem != null)
-                        {
-                            checkItem.Selected = true;
-                        }
-                    }
-                }
+        //        // IDが一致するユーザー倉庫中間リスト取得
+        //        var userDepoListSql = M_UserConnectController.CreateSQLToSelectRUserDepoList(editUser.UserID);
+        //        var userDepoList = M_DepoConnectController.ConnectMDepos(userDepoListSql, user.DatabaseName);
+        //        if (userDepoList.Count > 0)
+        //        {
+        //            foreach (var userDepo in userDepoList)
+        //            {
+        //                var checkItem = editUser.DepoSelectList.FirstOrDefault(item => item.Value == Convert.ToString(userDepo.DepoID));
+        //                if (checkItem != null)
+        //                {
+        //                    checkItem.Selected = true;
+        //                }
+        //            }
+        //        }
 
-                // IDが一致するユーザー-ハンディメニュー中間リスト取得
-                var userHandyMenuSql = M_UserConnectController.CreateSQLToSelectRUserHandyMenuList(id);
-                var userMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(userHandyMenuSql, user.DatabaseName);
-                if (userMenuList.Count > 0)
-                {
-                    foreach (var menu in userMenuList)
-                    {
-                        var checkItem = editUser.HandyMenuSelectList.FirstOrDefault(item => item.Value == Convert.ToString(menu.HandyMenuID));
-                        if (checkItem != null)
-                        {
-                            checkItem.Selected = true;
-                        }
-                    }
-                }
+        //        // IDが一致するユーザー-ハンディメニュー中間リスト取得
+        //        var userHandyMenuSql = M_UserConnectController.CreateSQLToSelectRUserHandyMenuList(id);
+        //        var userMenuList = M_HandyMenuConnectController.ConnectMHandyMenus(userHandyMenuSql, user.DatabaseName);
+        //        if (userMenuList.Count > 0)
+        //        {
+        //            foreach (var menu in userMenuList)
+        //            {
+        //                var checkItem = editUser.HandyMenuSelectList.FirstOrDefault(item => item.Value == Convert.ToString(menu.HandyMenuID));
+        //                if (checkItem != null)
+        //                {
+        //                    checkItem.Selected = true;
+        //                }
+        //            }
+        //        }
 
-                var config = new MapperConfiguration(
-                    cfg => cfg.CreateMap<M_UserModel, M_UserEditModel>()
-                            .ForMember(dest => dest.M_UserList, opt => opt.Ignore())
-                );
-                IMapper mapper = config.CreateMapper();
-                editModel = mapper.Map<M_UserEditModel>(editUser);
+        //        var config = new MapperConfiguration(
+        //            cfg => cfg.CreateMap<M_UserModel, M_UserEditModel>()
+        //                    .ForMember(dest => dest.M_UserList, opt => opt.Ignore())
+        //        );
+        //        IMapper mapper = config.CreateMapper();
+        //        editModel = mapper.Map<M_UserEditModel>(editUser);
 
-                return View(editModel);
-            }
-            catch (Exception)
-            {
-                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
-                return View(editModel);
-            }
-        }
+        //        return View(editModel);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
+        //        return View(editModel);
+        //    }
+        //}
 
         /// <summary>
         /// ユーザーマスター更新
