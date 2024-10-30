@@ -81,13 +81,11 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 現在時刻取得
                 var dateTime = DateTime.Now;
-                string timeStamp = dateTime.ToString();
 
                 // クレーム作成
                 // ユーザー情報をクレームに追加
                 var claims = new[] {
                     new Claim("UserName", loginUserModel.UserName),
-                    new Claim("TimeStamp", timeStamp),
                 };
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
