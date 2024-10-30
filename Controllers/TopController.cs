@@ -92,13 +92,10 @@ namespace ai_truck_load_measurement.Controllers
                 // 荷量クラスと車両の存在有無により分岐
                 var loadClass = model.LoadClass;
                 var truckExist = model.TruckExist;
-                var truckStatus = string.Empty;
+                var truckStatus = "　";
 
-                if(loadClass < 3)
-                {
-                    truckStatus = "　";
-                }
-                else
+                if (loadClass == 2) truckStatus = "0%";
+                if (loadClass >= 3)
                 {
                     model.TruckExist = true;
                     int lowerLimit = (loadClass - 3) * 10 + 1;
