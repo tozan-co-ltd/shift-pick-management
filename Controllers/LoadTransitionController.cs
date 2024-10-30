@@ -3,6 +3,7 @@ using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NPOI.SS.Formula.Functions;
 using X.PagedList;
 
 namespace ai_truck_load_measurement.Controllers
@@ -12,10 +13,12 @@ namespace ai_truck_load_measurement.Controllers
         public IActionResult Index()
         {
             var model = new LoadTransitionModel();
+            var today = DateTime.Now;
+            var oneWeekAgo = today.AddDays(-7);
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadTransitionConnectController.CreateSQLToSelectTripNameFromPeriod();
+                var sql = LoadTransitionConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today);
                 // DB接続
                 List<SelectListItem> tripRecordList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql, "AI-truck-load-measurement_test");
 
@@ -30,13 +33,33 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-        public List<int> GetTripBranchSeqFromTripName(string tripName)
+        public List<SelectListItem> GetTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
+        {
+            List<SelectListItem> tripRecordList = new();
+            try
+            {
+                // 便実績情報取得SQL作成
+                var sql = LoadTransitionConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod);
+                // DB接続
+                tripRecordList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql, "AI-truck-load-measurement_test");
+
+                return tripRecordList;
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return tripRecordList;
+            }
+        }
+
+        public List<int> GetTripBranchSeqFromTripName(string tripName, DateTime startOfPeriod, DateTime endOfPeriod)
         {
             List<int> tripBranchSeqList = new();
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadTransitionConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName);
+                var sql = LoadTransitionConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName, startOfPeriod, endOfPeriod);
                 // DB接続
                 tripBranchSeqList = LoadTransitionConnectController.ConnectTTripRecordsForTripBranchSeq(sql, "AI-truck-load-measurement_test");
 

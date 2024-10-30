@@ -331,9 +331,70 @@
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
     })
 
+    // 期間の開始日付変更時
+    $('#startOfPeriod').change(function () {
+        periodChange();
+    });
+
+    // 期間の終了日時変更時
+    $('#endOfPeriod').change(function(){
+        periodChange();
+    })
+
+    // 期間変更時
+    function periodChange() {
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // 便名称の選択肢を全削除
+        var select = $('#tripName')[0];
+        while (select.firstChild) {
+            select.removeChild(select.firstChild);
+        }
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripNameFromPeriod", "LoadTransition")';
+        let method = 'Post';
+        let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            for (var i = 0; i < response.length; i++) {
+                var option = document.createElement("option");
+                if (response[i].text == null) {
+                    option.text = "";
+                }
+                else {
+                    option.text = response[i].text;
+                }
+                option.value = response[i].value;
+                select.appendChild(option);
+            }
+
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
+            }
+        });
+    }
+
     // 便名称選択時
     $('[name=TripName]').change(function () {
+        // 便名称取得
         var tripName = $('[name=TripName]').val();
+
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
         // 便枝番の選択肢を全削除
         var select = $('#tripBranchSeq')[0];
@@ -344,7 +405,7 @@
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetTripBranchSeqFromTripName", "LoadTransition")';
         let method = 'Post';
-        let data = { tripName: tripName };
+        let data = { tripName: tripName, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
 
         // Ajax call
         $.ajax({
@@ -539,6 +600,51 @@
             day: "2-digit"
         });
         return day;
+    }
+
+    // 便実績テーブル表示
+    function tableDisplay() {
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("SearchData", "LoadTransition")';
+        let method = 'Post';
+        let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod};
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            var tableHTML = response.searchedTripRecordHTML;
+            tableLength = response.searchedTripRecordLength + 1;
+            $('#tripRecordTable').empty().html(tableHTML);
+            // 日本語表示
+            const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+
+            // ID(2列目)昇順
+            $("#tripRecordDataTable").DataTable({
+                "language": {
+                    "url": language_url
+                },
+                lengthChange: true,     // 件数切替
+                info: false,            // 総件数
+                scrollX: true,          // 横スクロール可
+                scrollCollapse: true,   // 縦スクロール表示
+                order: [[1, "asc"], [9, "asc"], [2, "asc"]],    // ID昇順
+            });
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
     }
 </script>
                                   

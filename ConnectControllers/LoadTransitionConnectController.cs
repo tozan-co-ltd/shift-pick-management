@@ -110,15 +110,17 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="startOfPeriod">期間開始日</param>
         /// <param name="endOfPeriod">期間終了日</param>
-        /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectTripNameFromPeriod()
+        public static string CreateSQLToSelectTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
         {
+            string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
+            string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
             var sql = $@"
                 SELECT DISTINCT
 	                trip_name AS Value,
 	                trip_name AS Text
                 FROM t_trip_records
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
             ";
             return sql;
         }
@@ -128,13 +130,16 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="tripName">便名称</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectTripBranchSeqFromTripName(string tripName)
+        public static string CreateSQLToSelectTripBranchSeqFromTripName(string tripName, DateTime startOfPeriod, DateTime endOfPeriod)
         {
+            string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
+            string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
             var sql = $@"
                 SELECT DISTINCT
                     trip_branch_seq
                 FROM t_trip_records
                 WHERE trip_name = '{tripName}'
+                AND work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
             ";
             return sql;
         }
