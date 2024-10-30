@@ -142,12 +142,6 @@ namespace ai_truck_load_measurement.Controllers
                 // レスポンスから認証クッキーを削除
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-                // 強制ログアウトの場合はエラーメッセージ表示
-                //if (param == "autologout")
-                //{
-                //    return RedirectToAction("Index", new { param = "autologout" });
-                //}
-
                 // ログイン画面へリダイレクト
                 return RedirectToAction("Index");
             }
@@ -157,35 +151,6 @@ namespace ai_truck_load_measurement.Controllers
                 ViewData["ErrorMessage"] = errorMessage;
 
                 return RedirectToAction("Index");
-            }
-        }
-
-        /// <summary>
-        /// URLから会社WEBアプリパス取得
-        /// </summary>
-        /// <returns>会社WEBアプリパス</returns>
-        private string GetCompanyWebPathByURL()
-        {
-            string companyWebPath = "";
-            try
-            {
-                // URLからパスを取得(https://www.tozan.co.jp/の直後１つ目のパス)
-                // var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
-                var urlWebPath = "https://wbtzn/sumaken-web-MRq2xg5_test";
-
-                // 会社WEBアプリパスを取得("sumaken-web-***"の"***"のみ)
-                string pattern = "sumaken-web-";
-
-                int num = urlWebPath.IndexOf(pattern);
-                if (num != -1)
-                {
-                    companyWebPath = urlWebPath.Substring(num + pattern.Length);
-                }
-                return companyWebPath;
-            }
-            catch (Exception)
-            {
-                throw;
             }
         }
 
