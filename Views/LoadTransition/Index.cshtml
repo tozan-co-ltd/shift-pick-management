@@ -71,6 +71,7 @@
     .label-delete{
         color: red;
     }
+
 </style>
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
@@ -154,170 +155,170 @@
                     <input type="radio" id="departureChartButton" name="chartRadios" value="departure"/>
                     <label for="departureChartButton">出発荷量</label>
                 </div>
-                <button type="submit" class="btn btn-primary" id="search-btn" onclick="onSearchClick()">
+                <button class="btn btn-primary print-btn" id="search-btn" >
                     <span class="text">印刷</span>
                 </button>
             </div>
 
-            <div class="chartjs-graph chartjs-arrival" id="arrivalChart">
-                <canvas id="binedabanChartArrival"></canvas>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
+            <div class="print-area">
+                <div class="chartjs-graph chartjs-arrival" id="arrivalChart">
+                    <canvas id="binedabanChartArrival"></canvas>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
 
-                <script>
-                    var ctx = document.getElementById("binedabanChartArrival");
-                    function adjustCanvasHeight() {
-                        var canvas = document.getElementById("binedabanChartArrival");
-                        var width = window.innerWidth;
-                        canvas.height = 60;
-                    }
-
-                    window.addEventListener('resize', adjustCanvasHeight);
-
-                    adjustCanvasHeight();
-
-                    var arrivalChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            //labels: ['15:24', '17:08'],
-                            datasets: [{
-                                label: '豊鉄大型常傭便3_1',
-                                borderColor: 'Green',
-                                fill: false,
-                                data: [{ x: '2024-10-21T00:00:00', y: 5 }, { x: '2024-10-22T00:00:00', y: 55 }, { x: '2024-10-23T00:00:00', y: 45 }, { x: '2024-10-24T00:00:00', y: 25 }, { x: '2024-10-25T00:00:00', y: 65 }],
-                                tension: 0,
-                                pointRadius: '5',
-                                backgroundColor: 'Green',
-
-                            },
-                            {
-                                label: '豊鉄大型常傭便3_2',
-                                borderColor: 'Red',
-                                fill: false,
-                                data: [{ x: '2024-10-21T00:00:00', y: 95 }, { x: '2024-10-22T00:00:00', y: 75 }, { x: '2024-10-23T00:00:00', y: 25 }, { x: '2024-10-24T00:00:00', y: 55 }, { x: '2024-10-25T00:00:00', y: 15 }],
-                                tension: 0,
-                                pointRadius: '5',
-                                backgroundColor: 'Red',
-
-                            }]
-                        },
-                        options: {
-                            //凡例は表示
-                            legend: {
-                                display: true
-                            },
-                            scales: {
-                                //X軸
-                                xAxes: [{
-                                    //ここで軸を時間に設定する
-                                    type: 'time',
-                                    time: {
-                                        unit: 'day',
-                                    },
-                                    ticks: {
-                                        min: $('#startOfPeriod').val(),
-                                        max: $('#endOfPeriod').val()
-                                    }
-                                }],
-                                //Y軸
-                                yAxes: [{
-                                    //軸ラベル表示
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: '到着荷量(%)',
-                                        fontSize: 24
-                                    },
-                                    //Y軸の範囲を指定
-                                    ticks: {
-                                        min: 0.0,
-                                        max: 100.0
-                                    }
-                                }]
-                            }
+                    <script>
+                        var ctx = document.getElementById("binedabanChartArrival");
+                        function adjustCanvasHeight() {
+                            var canvas = document.getElementById("binedabanChartArrival");
+                            var width = window.innerWidth;
+                            canvas.height = 60;
                         }
-                    });
-                </script>
-            </div>
-            <div class="chartjs-graph chartjs-departure" id="departureChart">
-                <canvas id="binedabanChartDeparture"></canvas>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
 
-                <script>
-                    var ctx = document.getElementById("binedabanChartDeparture");
-                    function adjustCanvasHeight() {
-                        var canvas = document.getElementById("binedabanChartDeparture");
-                        var width = window.innerWidth;
-                        canvas.height = 60;
-                    }
+                        window.addEventListener('resize', adjustCanvasHeight);
 
-                    window.addEventListener('resize', adjustCanvasHeight);
+                        adjustCanvasHeight();
 
-                    adjustCanvasHeight();
+                        var arrivalChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                //labels: ['15:24', '17:08'],
+                                datasets: [{
+                                    label: '豊鉄大型常傭便3_1',
+                                    borderColor: 'Green',
+                                    fill: false,
+                                    data: [{ x: '2024-10-21T00:00:00', y: 5 }, { x: '2024-10-22T00:00:00', y: 55 }, { x: '2024-10-23T00:00:00', y: 45 }, { x: '2024-10-24T00:00:00', y: 25 }, { x: '2024-10-25T00:00:00', y: 65 }],
+                                    tension: 0,
+                                    pointRadius: '5',
+                                    backgroundColor: 'Green',
 
-                    var departureChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            //labels: ['15:24', '17:08'],
-                            datasets: [{
-                                label: '豊鉄大型常傭便3_1',
-                                borderColor: 'Green',
-                                fill: false,
-                                data: [{ x: '2024-10-21T00:00:00', y: 5 }, { x: '2024-10-22T00:00:00', y: 55 }, { x: '2024-10-23T00:00:00', y: 45 }, { x: '2024-10-24T00:00:00', y: 25 }, { x: '2024-10-25T00:00:00', y: 65 }],
-                                tension: 0,
-                                pointRadius: '5',
-                                backgroundColor: 'Green',
+                                },
+                                {
+                                    label: '豊鉄大型常傭便3_2',
+                                    borderColor: 'Red',
+                                    fill: false,
+                                    data: [{ x: '2024-10-21T00:00:00', y: 95 }, { x: '2024-10-22T00:00:00', y: 75 }, { x: '2024-10-23T00:00:00', y: 25 }, { x: '2024-10-24T00:00:00', y: 55 }, { x: '2024-10-25T00:00:00', y: 15 }],
+                                    tension: 0,
+                                    pointRadius: '5',
+                                    backgroundColor: 'Red',
 
-                            },
-                            {
-                                label: '豊鉄大型常傭便3_2',
-                                borderColor: 'Red',
-                                fill: false,
-                                data: [{ x: '2024-10-21T00:00:00', y: 95 }, { x: '2024-10-22T00:00:00', y: 75 }, { x: '2024-10-23T00:00:00', y: 25 }, { x: '2024-10-24T00:00:00', y: 55 }, { x: '2024-10-25T00:00:00', y: 15 }],
-                                tension: 0,
-                                pointRadius: '5',
-                                backgroundColor: 'Red',
-
-                            }]
-                        },
-                        options: {
-                            //凡例は表示
-                            legend: {
-                                display: true
-                            },
-                            scales: {
-                                //X軸
-                                xAxes: [{
-                                    //ここで軸を時間に設定する
-                                    type: 'time',
-                                    time: {
-                                        unit: 'day',
-                                    },
-                                    ticks: {
-                                        min: $('#startOfPeriod').val(),
-                                        max: $('#endOfPeriod').val()
-                                    }
-                                }],
-                                //Y軸
-                                yAxes: [{
-                                    //軸ラベル表示
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: '出発荷量(%)',
-                                        fontSize: 24
-                                    },
-                                    //Y軸の範囲を指定
-                                    ticks: {
-                                        min: 0.0,
-                                        max: 100.0
-                                    }
                                 }]
+                            },
+                            options: {
+                                //凡例は表示
+                                legend: {
+                                    display: true
+                                },
+                                scales: {
+                                    //X軸
+                                    xAxes: [{
+                                        //ここで軸を時間に設定する
+                                        type: 'time',
+                                        time: {
+                                            unit: 'day',
+                                        },
+                                        ticks: {
+                                            min: $('#startOfPeriod').val(),
+                                            max: $('#endOfPeriod').val()
+                                        }
+                                    }],
+                                    //Y軸
+                                    yAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '到着荷量(%)',
+                                            fontSize: 24
+                                        },
+                                        //Y軸の範囲を指定
+                                        ticks: {
+                                            min: 0.0,
+                                            max: 100.0
+                                        }
+                                    }]
+                                }
                             }
+                        });
+                    </script>
+                </div>
+                <div class="chartjs-graph chartjs-departure" id="departureChart">
+                    <canvas id="binedabanChartDeparture"></canvas>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
+
+                    <script>
+                        var ctx = document.getElementById("binedabanChartDeparture");
+                        function adjustCanvasHeight() {
+                            var canvas = document.getElementById("binedabanChartDeparture");
+                            var width = window.innerWidth;
+                            canvas.height = 60;
                         }
-                    });
-                </script>
+
+                        window.addEventListener('resize', adjustCanvasHeight);
+
+                        adjustCanvasHeight();
+
+                        var departureChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                //labels: ['15:24', '17:08'],
+                                datasets: [{
+                                    label: '豊鉄大型常傭便3_1',
+                                    borderColor: 'Green',
+                                    fill: false,
+                                    data: [{ x: '2024-10-21T00:00:00', y: 5 }, { x: '2024-10-22T00:00:00', y: 55 }, { x: '2024-10-23T00:00:00', y: 45 }, { x: '2024-10-24T00:00:00', y: 25 }, { x: '2024-10-25T00:00:00', y: 65 }],
+                                    tension: 0,
+                                    pointRadius: '5',
+                                    backgroundColor: 'Green',
+
+                                },
+                                {
+                                    label: '豊鉄大型常傭便3_2',
+                                    borderColor: 'Red',
+                                    fill: false,
+                                    data: [{ x: '2024-10-21T00:00:00', y: 95 }, { x: '2024-10-22T00:00:00', y: 75 }, { x: '2024-10-23T00:00:00', y: 25 }, { x: '2024-10-24T00:00:00', y: 55 }, { x: '2024-10-25T00:00:00', y: 15 }],
+                                    tension: 0,
+                                    pointRadius: '5',
+                                    backgroundColor: 'Red',
+
+                                }]
+                            },
+                            options: {
+                                //凡例は表示
+                                legend: {
+                                    display: true
+                                },
+                                scales: {
+                                    //X軸
+                                    xAxes: [{
+                                        //ここで軸を時間に設定する
+                                        type: 'time',
+                                        time: {
+                                            unit: 'day',
+                                        },
+                                        ticks: {
+                                            min: $('#startOfPeriod').val(),
+                                            max: $('#endOfPeriod').val()
+                                        }
+                                    }],
+                                    //Y軸
+                                    yAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '出発荷量(%)',
+                                            fontSize: 24
+                                        },
+                                        //Y軸の範囲を指定
+                                        ticks: {
+                                            min: 0.0,
+                                            max: 100.0
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    </script>
+                </div>
             </div>
         </div>
-                
-        
     </div>
 </div>
 
@@ -457,6 +458,10 @@
         var selectedTripName = tripName + "_" + tripBranchSeq;
 
         // 重複チェック
+        const tripNames = arrayTrips.map(d => d.selectedTripName);
+        if (tripNames.includes(selectedTripName)) {
+            return;
+        }
 
         // 選択された便に追加
         arrayTrips.push({tripName, tripBranchSeq, selectedTripName});
@@ -465,7 +470,6 @@
         selectedTripLabel.innerHTML += "<a href=\"#\" class=\"labelDelete ml-1\" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
         selectedTripLabel.className += "mr-3";
         selectedTrips.appendChild(selectedTripLabel);
-        console.log(arrayTrips);
     }
 
     // 選択された便の×ボタン押下時
@@ -474,7 +478,6 @@
         const tripNames = arrayTrips.map(d => d.selectedTripName);
         var deleteIndex = tripNames.indexOf(selectedTripName);
         arrayTrips.splice(deleteIndex, 1);
-        console.log(arrayTrips);
     }
 
     // 検索ボタン押下時
@@ -661,5 +664,7 @@
             }
         });
     }
+
+    });
 </script>
                                   
