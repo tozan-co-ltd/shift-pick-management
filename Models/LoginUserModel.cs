@@ -9,10 +9,5 @@
         /// ユーザー名
         /// </summary>
         public String UserName { get; set; }
-
-        /// <summary>
-        /// タイムスタンプ
-        /// </summary>
-        public DateTime TimeStamp { get; set; }
     }
 }

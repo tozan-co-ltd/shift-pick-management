@@ -16,8 +16,7 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     var loginUserModel = new LoginUserModel
                     {
-                        UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
-                        TimeStamp = Convert.ToDateTime(claimsLoginUserList.Where(x => x.Type == "TimeStamp").First().Value)
+                        UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value
                     };
                     return loginUserModel;
                 }
