@@ -912,7 +912,3 @@ select[readonly] {
     border: solid 1px #000;
     padding: 5px;
 }
-
-@media print{
-    .print-off{display:none}
-}

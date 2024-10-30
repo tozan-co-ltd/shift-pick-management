@@ -155,12 +155,12 @@
                     <input type="radio" id="departureChartButton" name="chartRadios" value="departure"/>
                     <label for="departureChartButton">出発荷量</label>
                 </div>
-                <button class="btn btn-primary print-btn" id="search-btn" >
+                <button class="btn btn-primary print-btn" id="search-btn" onclick="window.print()" >
                     <span class="text">印刷</span>
                 </button>
             </div>
 
-            <div class="print-area">
+            <div class="print-area" id="print-area">
                 <div class="chartjs-graph chartjs-arrival" id="arrivalChart">
                     <canvas id="binedabanChartArrival"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
@@ -665,6 +665,5 @@
         });
     }
 
-    });
 </script>
                                   
