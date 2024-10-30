@@ -11,11 +11,6 @@
         public String DatabaseName { get; set; }
 
         /// <summary>
-        /// ユーザーID
-        /// </summary>
-        public int UserID { get; set; }
-
-        /// <summary>
         /// ユーザー名
         /// </summary>
         public String UserName { get; set; }

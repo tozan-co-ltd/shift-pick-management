@@ -17,7 +17,6 @@ namespace ai_truck_load_measurement.Controllers
                     var loginUserModel = new LoginUserModel
                     {
                         DatabaseName = claimsLoginUserList.Where(x => x.Type == "DatabaseName").First().Value,
-                        UserID = Convert.ToInt32(claimsLoginUserList.Where(x => x.Type == "UserID").First().Value),
                         UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
                         Role = Convert.ToInt32(claimsLoginUserList.Where(x => x.Type == "Role").First().Value),
                         TimeStamp = Convert.ToDateTime(claimsLoginUserList.Where(x => x.Type == "TimeStamp").First().Value)
