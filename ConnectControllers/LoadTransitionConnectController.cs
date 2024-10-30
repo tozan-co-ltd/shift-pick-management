@@ -106,6 +106,34 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// 便実績情報取得SQL
+        /// </summary>
+        /// <returns></returns>
+        public static string CreatSQLToSelectTripRecord()
+        {
+            var sql = $@"
+                SELECT
+                    trip_record_id,
+	                trip_name,
+	                trip_branch_seq,
+	                driver_name,
+	                station_id,
+	                truck_number,
+	                identify_number,
+	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
+	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+	                work_day,
+	                arrived_at,
+	                departed_at,
+	                arrival_load_class,
+	                departure_load_class,
+	                arrival_load_img_path,
+	                departure_load_img_path
+                FROM t_trip_records";
+            return sql;
+        }
+
+        /// <summary>
         /// 便名称取得SQL
         /// </summary>
         /// <param name="startOfPeriod">期間開始日</param>
@@ -166,6 +194,41 @@ namespace ai_truck_load_measurement.ConnectControllers
             ";
             return sql;
         }
+
+        /// <summary>
+        /// 指定した期間の便実績情報取得SQL
+        /// </summary>
+        /// <param name="startOfPeriod">期間開始日</param>
+        /// <param name="endOfPeriod">期間終了日</param>
+        /// <returns></returns>
+        public static string CreatSQLToSelectTripRecordFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
+        {
+            string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
+            string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
+            var sql = $@"
+                SELECT DISTINCT
+                    t_trip_records.trip_record_id,
+	                trip_name,
+	                trip_branch_seq,
+	                driver_name,
+	                station_id,
+	                truck_number,
+	                identify_number,
+	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
+	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+	                work_day,
+	                arrived_at,
+	                departed_at,
+	                arrival_load_class,
+	                departure_load_class,
+	                arrival_load_img_path,
+	                departure_load_img_path
+                FROM t_trip_records
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
+                ORDER BY arrived_at";
+            return sql;
+        }
+
     }
 }
 
