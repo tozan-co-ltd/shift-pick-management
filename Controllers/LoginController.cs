@@ -96,7 +96,6 @@ namespace ai_truck_load_measurement.Controllers
                 // クレーム作成
                 // ユーザー情報をクレームに追加
                 var claims = new[] {
-                    new Claim("DatabaseName", loginUserModel.DatabaseName),
                     new Claim("UserName", loginUserModel.UserName),
                     new Claim("TimeStamp", timeStamp),
                 };
@@ -221,7 +220,6 @@ namespace ai_truck_load_measurement.Controllers
 
                 LoginUserModel loginUserModel = new()
                 {
-                    DatabaseName = "warehouse_2_test",
                     UserName = authenticateUserName,
                 };
 

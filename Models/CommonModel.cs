@@ -81,11 +81,9 @@ namespace ai_truck_load_measurement.Models
         /// <param name="viewContext">ViewContext</param>
         public void GetBaseView(ClaimsPrincipal claimsPrincipal, ViewContext viewContext)
         {
-            DataBaseName = claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
             ControllerName = viewContext.RouteData.Values["controller"].ToString();
             CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();
-            MDepoList = GetMDepoList(DataBaseName);
             MTruckList = GetMTruckList("AI-truck-load-measurement_test");
         }
 

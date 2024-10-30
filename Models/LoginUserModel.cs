@@ -6,11 +6,6 @@
     public class LoginUserModel
     {
         /// <summary>
-        /// データベース名
-        /// </summary>
-        public String DatabaseName { get; set; }
-
-        /// <summary>
         /// ユーザー名
         /// </summary>
         public String UserName { get; set; }

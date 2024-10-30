@@ -42,10 +42,9 @@
 @{
     /* 開発環境はナビゲーションバーを紫色に変更 */
     var wrapperClass = Model.DataBaseName;
-    if (wrapperClass.Contains("_test"))
-    {
-        wrapperClass = "navbar-dark-test";
-    }
+#if DEBUG
+    wrapperClass = "navbar-dark-test";
+#endif
 
     var bodyClass = Context.Request.Cookies["Sidebar"];
     if (string.IsNullOrWhiteSpace(bodyClass))
