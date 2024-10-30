@@ -5,7 +5,68 @@
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 <style>
+    .tab-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 20px 0;
+    }
 
+    .tab-wrap:after {
+        content: '';
+        width: 100%;
+        height: 3px;
+        background: DeepSkyBlue;
+        display: block;
+        order: -1;
+    }
+
+    .tab-label {
+        color: White;
+        background: LightGray;
+        font-weight: bold;
+        text-shadow: 0 -1px 0 rgba(0,0,0,.2);
+        white-space: nowrap;
+        text-align: center;
+        padding: 10px .5em;
+        order: -1;
+        position: relative;
+        z-index: 1;
+        cursor: pointer;
+        border-radius: 5px 5px 0 0;
+        flex: 1;
+    }
+
+    .tab-label:not(:last-of-type) {
+        margin-right: 5px;
+    }
+
+    .tab-content {
+        width: 100%;
+        height: 0;
+        overflow: hidden;
+        opacity: 0;
+    }
+    /* アクティブなタブ */
+    .tab-switch:checked + .tab-label {
+        background: DeepSkyBlue;
+    }
+
+    .tab-switch:checked + .tab-label + .tab-content {
+        height: auto;
+        overflow: auto;
+        padding: 15px;
+        opacity: 1;
+        transition: .5s opacity;
+        box-shadow: 0 0 3px rgba(0,0,0,.2);
+    }
+
+    .chartjs-departure{
+        display:none;
+    }
+
+    .graph-and-table {
+        display:none;
+    }
 </style>
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
@@ -78,81 +139,181 @@
                 <span class="text">検索</span>
             </button>
         </div>
-        
-        <div class="chartjs-graph">
-            <canvas id="binedabanChartArrival"></canvas>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
 
-            <script>
-                var ctx = document.getElementById("binedabanChartArrival");
-                function adjustCanvasHeight() {
-                    var canvas = document.getElementById("binedabanChartArrival");
-                    var width = window.innerWidth;
-                    canvas.height = 60;
-                }
+        <div class="graph-and-table" id="graphAndTable">
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                <div class="mr-3">
+                    <input type="radio" id="arrivalChartButton" name="chartRadios" value="arrival" checked/>
+                    <label for="arrivalChartButton">到着荷量</label>
+                </div>
+                <div class="mr-3">
+                    <input type="radio" id="departureChartButton" name="chartRadios" value="departure"/>
+                    <label for="departureChartButton">出発荷量</label>
+                </div>
+                <button type="submit" class="btn btn-primary" id="search-btn" onclick="onSearchClick()">
+                    <span class="text">印刷</span>
+                </button>
+            </div>
 
-                window.addEventListener('resize', adjustCanvasHeight);
+            <div class="chartjs-graph chartjs-arrival" id="arrivalChart">
+                <canvas id="binedabanChartArrival"></canvas>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
 
-                adjustCanvasHeight();
-
-                var myScatterChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        //labels: ['15:24', '17:08'],
-                        datasets: [{
-                            label: '豊鉄大型常傭便3_1',
-                            borderColor: 'Green',
-                            fill: false,
-                            data: [{ x: '2024-10-21T00:00:00', y: 5 }, { x: '2024-10-22T00:00:00', y: 55 }, { x: '2024-10-23T00:00:00', y: 45 }, { x: '2024-10-24T00:00:00', y: 25 }, { x: '2024-10-25T00:00:00', y: 65 }],
-                            tension: 0,
-                            pointRadius: '5',
-                            backgroundColor: 'Green',
-
-                        },
-                        {
-                            label: '豊鉄大型常傭便3_2',
-                            borderColor: 'Red',
-                            fill: false,
-                            data: [{ x: '2024-10-21T00:00:00', y: 95 }, { x: '2024-10-22T00:00:00', y: 75 }, { x: '2024-10-23T00:00:00', y: 25 }, { x: '2024-10-24T00:00:00', y: 55 }, { x: '2024-10-25T00:00:00', y: 15 }],
-                            tension: 0,
-                            pointRadius: '5',
-                            backgroundColor: 'Red',
-
-                        }]
-                    },
-                    options: {
-                        //凡例は表示
-                        legend: {
-                            display: true
-                        },
-                        scales: {
-                            //X軸
-                            xAxes: [{
-                                //ここで軸を時間に設定する
-                                type: 'time',
-                                time: {
-                                    unit: 'day',
-                                }
-                            }],
-                            //Y軸
-                            yAxes: [{
-                                //軸ラベル表示
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: '到着荷量(%)',
-                                    fontSize: 24
-                                },
-                                //Y軸の範囲を指定
-                                ticks: {
-                                    min: 0.0,
-                                    max: 100.0
-                                }
-                            }]
-                        }
+                <script>
+                    var ctx = document.getElementById("binedabanChartArrival");
+                    function adjustCanvasHeight() {
+                        var canvas = document.getElementById("binedabanChartArrival");
+                        var width = window.innerWidth;
+                        canvas.height = 60;
                     }
-                });
-            </script>
+
+                    window.addEventListener('resize', adjustCanvasHeight);
+
+                    adjustCanvasHeight();
+
+                    var arrivalChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            //labels: ['15:24', '17:08'],
+                            datasets: [{
+                                label: '豊鉄大型常傭便3_1',
+                                borderColor: 'Green',
+                                fill: false,
+                                data: [{ x: '2024-10-21T00:00:00', y: 5 }, { x: '2024-10-22T00:00:00', y: 55 }, { x: '2024-10-23T00:00:00', y: 45 }, { x: '2024-10-24T00:00:00', y: 25 }, { x: '2024-10-25T00:00:00', y: 65 }],
+                                tension: 0,
+                                pointRadius: '5',
+                                backgroundColor: 'Green',
+
+                            },
+                            {
+                                label: '豊鉄大型常傭便3_2',
+                                borderColor: 'Red',
+                                fill: false,
+                                data: [{ x: '2024-10-21T00:00:00', y: 95 }, { x: '2024-10-22T00:00:00', y: 75 }, { x: '2024-10-23T00:00:00', y: 25 }, { x: '2024-10-24T00:00:00', y: 55 }, { x: '2024-10-25T00:00:00', y: 15 }],
+                                tension: 0,
+                                pointRadius: '5',
+                                backgroundColor: 'Red',
+
+                            }]
+                        },
+                        options: {
+                            //凡例は表示
+                            legend: {
+                                display: true
+                            },
+                            scales: {
+                                //X軸
+                                xAxes: [{
+                                    //ここで軸を時間に設定する
+                                    type: 'time',
+                                    time: {
+                                        unit: 'day',
+                                    },
+                                    ticks: {
+                                        min: $('#startOfPeriod').val(),
+                                        max: $('#endOfPeriod').val()
+                                    }
+                                }],
+                                //Y軸
+                                yAxes: [{
+                                    //軸ラベル表示
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: '到着荷量(%)',
+                                        fontSize: 24
+                                    },
+                                    //Y軸の範囲を指定
+                                    ticks: {
+                                        min: 0.0,
+                                        max: 100.0
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                </script>
+            </div>
+            <div class="chartjs-graph chartjs-departure" id="departureChart">
+                <canvas id="binedabanChartDeparture"></canvas>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
+
+                <script>
+                    var ctx = document.getElementById("binedabanChartDeparture");
+                    function adjustCanvasHeight() {
+                        var canvas = document.getElementById("binedabanChartDeparture");
+                        var width = window.innerWidth;
+                        canvas.height = 60;
+                    }
+
+                    window.addEventListener('resize', adjustCanvasHeight);
+
+                    adjustCanvasHeight();
+
+                    var departureChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            //labels: ['15:24', '17:08'],
+                            datasets: [{
+                                label: '豊鉄大型常傭便3_1',
+                                borderColor: 'Green',
+                                fill: false,
+                                data: [{ x: '2024-10-21T00:00:00', y: 5 }, { x: '2024-10-22T00:00:00', y: 55 }, { x: '2024-10-23T00:00:00', y: 45 }, { x: '2024-10-24T00:00:00', y: 25 }, { x: '2024-10-25T00:00:00', y: 65 }],
+                                tension: 0,
+                                pointRadius: '5',
+                                backgroundColor: 'Green',
+
+                            },
+                            {
+                                label: '豊鉄大型常傭便3_2',
+                                borderColor: 'Red',
+                                fill: false,
+                                data: [{ x: '2024-10-21T00:00:00', y: 95 }, { x: '2024-10-22T00:00:00', y: 75 }, { x: '2024-10-23T00:00:00', y: 25 }, { x: '2024-10-24T00:00:00', y: 55 }, { x: '2024-10-25T00:00:00', y: 15 }],
+                                tension: 0,
+                                pointRadius: '5',
+                                backgroundColor: 'Red',
+
+                            }]
+                        },
+                        options: {
+                            //凡例は表示
+                            legend: {
+                                display: true
+                            },
+                            scales: {
+                                //X軸
+                                xAxes: [{
+                                    //ここで軸を時間に設定する
+                                    type: 'time',
+                                    time: {
+                                        unit: 'day',
+                                    },
+                                    ticks: {
+                                        min: $('#startOfPeriod').val(),
+                                        max: $('#endOfPeriod').val()
+                                    }
+                                }],
+                                //Y軸
+                                yAxes: [{
+                                    //軸ラベル表示
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: '出発荷量(%)',
+                                        fontSize: 24
+                                    },
+                                    //Y軸の範囲を指定
+                                    ticks: {
+                                        min: 0.0,
+                                        max: 100.0
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                </script>
+            </div>
         </div>
+                
+        
     </div>
 </div>
 
@@ -242,14 +403,28 @@
 
     // 検索ボタン押下時
     function onSearchClick() {
+        // グラフとテーブルの表示
+        $('#graphAndTable').css('display', 'block');
+
+        // 初期表示は到着荷量
+        $('input[value="arrival"]').prop('checked', true);
+        $('#arrivalChart').css('display', 'block');
+        $('#departureChart').css('display', 'none');
 
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
         // グラフの初期化
-        myScatterChart.data.datasets = [];
+        arrivalChart.data.datasets = [];
+        departureChart.data.datasets = [];
+        // グラフの表示期間設定
+        arrivalChart.options.scales.xAxes[0].ticks.min = startOfPeriod;
+        arrivalChart.options.scales.xAxes[0].ticks.max = endOfPeriod;
+        departureChart.options.scales.xAxes[0].ticks.min = startOfPeriod;
+        departureChart.options.scales.xAxes[0].ticks.max = endOfPeriod;
 
+        // 追加された便、便枝番について
         for(var i=0; i < arrayTrips.length; i++){
             var tripName = arrayTrips[i].tripName;
             var tripBranchSeq = arrayTrips[i].tripBranchSeq
@@ -273,15 +448,21 @@
                     if (item.arrivalLoadStatus != "") {
                         arrivalLoadStatuses.push({ x: item.workDay, y: item.arrivalLoadStatus });
                     }
-                    
-                    departureLoadStatuses.push({ x: item.workDay, y: item.deapartureLoadStatus });
+                    if (item.departureLoadStatus != "") {
+                        departureLoadStatuses.push({ x: item.workDay, y: item.departureLoadStatus });
+                    }
                 })
 
                 // データセット作成、登録
-                var datasets = createChartDatasets(i);
-                datasets.data = arrivalLoadStatuses;
-                datasets.label = tripName + "_" + tripBranchSeq;
-                myScatterChart.data.datasets.push(datasets);
+                var arrivalDatasets = createChartDatasets(i);
+                arrivalDatasets.data = arrivalLoadStatuses;
+                arrivalDatasets.label = tripName + "_" + tripBranchSeq;
+                arrivalChart.data.datasets.push(arrivalDatasets);
+
+                var departureDatasets = createChartDatasets(i);
+                departureDatasets.data = departureLoadStatuses;
+                departureDatasets.label = tripName + "_" + tripBranchSeq;
+                departureChart.data.datasets.push(departureDatasets);
 
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
@@ -294,9 +475,11 @@
             });
         }
         // グラフの更新
-        myScatterChart.update();
+        arrivalChart.update();
+        departureChart.update();
     }
 
+    // chartjs用のデータセット作成
     function createChartDatasets(dataNumber){
         var datasets = {
             label: '',
@@ -312,9 +495,9 @@
 
     // グラフ凡例で用いるカラーコード
     const graphColors = [
-       'rgba(255, 204, 204, 1)', 
-        'rgba(255, 229, 204, 1)', 
-        'rgba(255, 255, 204, 1)', 
+        'rgba(255, 204, 204, 1)',
+        'rgba(255, 229, 204, 1)',
+        'rgba(255, 255, 204, 1)',
         'rgba(204, 255, 204, 1)',
         'rgba(204, 255, 229, 1)',
         'rgba(204, 255, 255, 1)',
@@ -333,6 +516,21 @@
         'rgba(220, 220, 220, 1)',
         'rgba(240, 240, 240, 1)'
     ]
+
+    // ラジオボタン切り替え時
+    $(function () {
+        $('input[name="chartRadios"]:radio').change(function () {
+            var radioval = $(this).val();
+            if (radioval == "arrival") {
+                $('#arrivalChart').css('display', 'block');
+                $('#departureChart').css('display', 'none');
+            }
+            else{
+                $('#departureChart').css('display', 'block');
+                $('#arrivalChart').css('display', 'none');
+            }
+        })
+    })
 
     // 日付の表示形式変換(yyyy/MM/dd)
     function GetDayString(date) {
