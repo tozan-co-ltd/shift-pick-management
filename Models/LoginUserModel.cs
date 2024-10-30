@@ -41,21 +41,6 @@
         public int Role { get; set; }
 
         /// <summary>
-        /// メイン倉庫ID
-        /// </summary>
-        public int MainDepoID { get; set; }
-
-        /// <summary>
-        /// メイン倉庫名
-        /// </summary>
-        public String MainDepoName { get; set; }
-
-        /// <summary>
-        /// 管理権限区分
-        /// </summary>
-        public int AuthorizedKubun { get; set; }
-
-        /// <summary>
         /// タイムスタンプ
         /// </summary>
         public DateTime TimeStamp { get; set; }

@@ -23,9 +23,6 @@ namespace ai_truck_load_measurement.Controllers
                         UserID = Convert.ToInt32(claimsLoginUserList.Where(x => x.Type == "UserID").First().Value),
                         UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
                         Role = Convert.ToInt32(claimsLoginUserList.Where(x => x.Type == "Role").First().Value),
-                        MainDepoID = Convert.ToInt32(claimsLoginUserList.Where(x => x.Type == "MainDepoID").First().Value),
-                        MainDepoName = claimsLoginUserList.Where(x => x.Type == "MainDepoName").First().Value,
-                        AuthorizedKubun = Convert.ToInt32(claimsLoginUserList.Where(x => x.Type == "AuthorizedKubun").First().Value),
                         TimeStamp = Convert.ToDateTime(claimsLoginUserList.Where(x => x.Type == "TimeStamp").First().Value)
                     };
                     return loginUserModel;

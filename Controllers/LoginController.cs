@@ -103,9 +103,6 @@ namespace ai_truck_load_measurement.Controllers
                     new Claim("UserID", loginUserModel.UserID.ToString()),
                     new Claim("UserName", loginUserModel.UserName),
                     new Claim("Role", loginUserModel.Role.ToString()),
-                    new Claim("MainDepoID", loginUserModel.MainDepoID.ToString()),
-                    new Claim("MainDepoName", loginUserModel.MainDepoName),
-                    new Claim("AuthorizedKubun", loginUserModel.AuthorizedKubun.ToString()),
                     new Claim("TimeStamp", timeStamp),
                 };
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -235,10 +232,7 @@ namespace ai_truck_load_measurement.Controllers
                     DatabaseName = "warehouse_2_test",
                     UserID = 0,
                     UserName = authenticateUserName,
-                    Role = 1,
-                    MainDepoID = 1,
-                    MainDepoName = "testDepoName",
-                    AuthorizedKubun = 1
+                    Role = 1
                 };
 
                 return loginUserModel;

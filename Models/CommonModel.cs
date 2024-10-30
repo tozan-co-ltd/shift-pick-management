@@ -85,13 +85,11 @@ namespace ai_truck_load_measurement.Models
             DataBaseName = claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
             UserID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_UserID).First().Value);
             Role = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_Role).First().Value);
-            AuthorizedKubun = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_AuthorizedKubun).First().Value);
             ControllerName = viewContext.RouteData.Values["controller"].ToString();
             CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();
             MDepoList = GetMDepoList(DataBaseName);
             MTruckList = GetMTruckList("AI-truck-load-measurement_test");
-            SelectedDepoID = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_MainDepoID).First().Value);
         }
 
         /// <summary>
