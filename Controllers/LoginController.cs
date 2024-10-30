@@ -98,7 +98,6 @@ namespace ai_truck_load_measurement.Controllers
                 var claims = new[] {
                     new Claim("DatabaseName", loginUserModel.DatabaseName),
                     new Claim("UserName", loginUserModel.UserName),
-                    new Claim("Role", loginUserModel.Role.ToString()),
                     new Claim("TimeStamp", timeStamp),
                 };
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -224,7 +223,6 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     DatabaseName = "warehouse_2_test",
                     UserName = authenticateUserName,
-                    Role = 1
                 };
 
                 return loginUserModel;

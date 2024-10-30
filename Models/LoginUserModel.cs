@@ -16,11 +16,6 @@
         public String UserName { get; set; }
 
         /// <summary>
-        /// ロール
-        /// </summary>
-        public int Role { get; set; }
-
-        /// <summary>
         /// タイムスタンプ
         /// </summary>
         public DateTime TimeStamp { get; set; }

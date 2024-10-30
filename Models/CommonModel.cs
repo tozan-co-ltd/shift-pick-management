@@ -82,7 +82,6 @@ namespace ai_truck_load_measurement.Models
         public void GetBaseView(ClaimsPrincipal claimsPrincipal, ViewContext viewContext)
         {
             DataBaseName = claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
-            Role = Convert.ToInt32(claimsPrincipal.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_Role).First().Value);
             ControllerName = viewContext.RouteData.Values["controller"].ToString();
             CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();

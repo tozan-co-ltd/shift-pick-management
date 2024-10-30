@@ -103,14 +103,8 @@ namespace ai_truck_load_measurement.Models
             {
                 var menuList = new List<M_WebMenu>();
 
-                if (Role != 0)
-                {
-                    var userRole = Role;
-                    string userRoleName = "Role" + userRole;
-
-                    // WEBメニューリストを取得
-                    menuList = GetWebMenuList(userRoleName, category);
-                }
+                // WEBメニューリストを取得
+                menuList = GetWebMenuList(category);
                 return menuList;
             }
             catch (Exception)
@@ -121,11 +115,10 @@ namespace ai_truck_load_measurement.Models
 
         /// <summary>
         /// WEBメニューリストを取得
-        /// <param name="userRoleName"></param>
         /// <param name="mWebMenuCategory"></param>
         /// </summary>
         /// <returns>WEBメニューリスト</returns>
-        public List<M_WebMenu> GetWebMenuList(string userRoleName, M_WebMenuCategory mWebMenuCategory)
+        public List<M_WebMenu> GetWebMenuList(M_WebMenuCategory mWebMenuCategory)
         {
             try
             {
@@ -138,13 +131,7 @@ namespace ai_truck_load_measurement.Models
                     categoryID = mWebMenuCategory.CategoryID;
                 }
 
-                //// SQL作成
-                //var sql = WebMenuConnectController.CreateSQLToSelectMWebMenu(CompanyID, userRoleName, categoryID);
-                //// DB接続
-                //webMenuList = WebMenuConnectController.ConnectMWebMenu(sql, CompanyID, categoryID);
-
-               
-
+                              
                 if(categoryID == 0)
                 {
                     webMenuList = referenceList;
