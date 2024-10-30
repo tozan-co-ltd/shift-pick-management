@@ -96,9 +96,6 @@ namespace ai_truck_load_measurement.Controllers
                 // クレーム作成
                 // ユーザー情報をクレームに追加
                 var claims = new[] {
-                    new Claim("CompanyID", loginUserModel.CompanyID.ToString()),
-                    new Claim("CompanyCode", loginUserModel.CompanyCode),
-                    new Claim("CompanyName", loginUserModel.CompanyName),
                     new Claim("DatabaseName", loginUserModel.DatabaseName),
                     new Claim("UserID", loginUserModel.UserID.ToString()),
                     new Claim("UserName", loginUserModel.UserName),
@@ -226,9 +223,6 @@ namespace ai_truck_load_measurement.Controllers
 
                 LoginUserModel loginUserModel = new()
                 {
-                    CompanyID = 5,
-                    CompanyCode = "testCompanyCode",
-                    CompanyName = "testCompany",
                     DatabaseName = "warehouse_2_test",
                     UserID = 0,
                     UserName = authenticateUserName,

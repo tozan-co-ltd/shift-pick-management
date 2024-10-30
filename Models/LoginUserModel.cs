@@ -6,21 +6,6 @@
     public class LoginUserModel
     {
         /// <summary>
-        /// 会社ID
-        /// </summary>
-        public int CompanyID { get; set; }
-
-        /// <summary>
-        /// 会社コード
-        /// </summary>
-        public String CompanyCode { get; set; }
-
-        /// <summary>
-        /// 会社名
-        /// </summary>
-        public String CompanyName { get; set; }
-
-        /// <summary>
         /// データベース名
         /// </summary>
         public String DatabaseName { get; set; }
