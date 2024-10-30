@@ -67,6 +67,10 @@
     .graph-and-table {
         display:none;
     }
+
+    .label-delete{
+        color: red;
+    }
 </style>
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
@@ -455,11 +459,22 @@
         // 重複チェック
 
         // 選択された便に追加
-        arrayTrips.push({tripName, tripBranchSeq});
+        arrayTrips.push({tripName, tripBranchSeq, selectedTripName});
         var selectedTripLabel = document.createElement("label");
         selectedTripLabel.innerText = selectedTripName;
+        selectedTripLabel.innerHTML += "<a href=\"#\" class=\"labelDelete ml-1\" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
         selectedTripLabel.className += "mr-3";
         selectedTrips.appendChild(selectedTripLabel);
+        console.log(arrayTrips);
+    }
+
+    // 選択された便の×ボタン押下時
+    function onLabelDeleteClick(selectedTripName){
+        $('label').remove(':contains("' + selectedTripName + '")');
+        const tripNames = arrayTrips.map(d => d.selectedTripName);
+        var deleteIndex = tripNames.indexOf(selectedTripName);
+        arrayTrips.splice(deleteIndex, 1);
+        console.log(arrayTrips);
     }
 
     // 検索ボタン押下時
