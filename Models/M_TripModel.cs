@@ -55,7 +55,7 @@ namespace ai_truck_load_measurement.Models
         /// 識別番号
         /// </summary>
         [Display(Name = "識別番号")]
-        public int IdentifyNumber {  get; set; }
+        public string? IdentifyNumber {  get; set; }
 
         /// <summary>
         /// 昼勤開始時間  

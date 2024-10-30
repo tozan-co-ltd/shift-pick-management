@@ -223,7 +223,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="truckID">車両ID</param>
         /// <returns></returns>
-        public static int SelectIdentifyNumberByTruckId(int truckID)
+        public static string SelectIdentifyNumberByTruckId(int truckID)
         {
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
@@ -238,7 +238,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 try
                 {
                     string sql = CreateSQLToSelectIdentifyNumberByTruckId(truckID);
-                    var identifyNumber = Convert.ToInt32(connection.ExecuteScalar(sql));
+                    var identifyNumber = Convert.ToString(connection.ExecuteScalar(sql));
 
                     return identifyNumber;
                 }
