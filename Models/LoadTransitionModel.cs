@@ -29,6 +29,7 @@ namespace ai_truck_load_measurement.Models
         public IPagedList<LoadTransitionModel>? TripRecordList { get; set; }
         public List<SelectListItem>? TripNameList { get; set; }
         public int AnnotationLoadClass {  get; set; }
+        public string? ArrivalDepartureClass {  get; set; }
     }
 
     public class RequestLoadStatus

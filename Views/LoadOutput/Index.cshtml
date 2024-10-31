@@ -460,51 +460,7 @@
         });
     }
 
-    // Excel出力
-    async function onExportFileTrips(page, gamenName) {
-        DeleteErrorMessages();
-        if (isWithin90Days()) {
-            tableDisplay();
-            event.preventDefault();
-            $('#div-error-message').text("");
-
-            // チェックボックスの入力情報取得
-            var checkBox = false;
-            $('input:checked').each(function () {
-                checkBox = $(this).prop('checked');
-            });
-
-            // 期間の開始、終了日付の取得
-            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
-            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
-
-            const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&startOfPeriod=' + startOfPeriod + '&endOfPeriod=' + endOfPeriod + "&isOnlyHasAmountDefference=" + checkBox, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            });
-            var { data, errorMessage } = await response.json();
-
-            if (errorMessage) {
-                $("#div-error-message").show();
-                $("#div-error-message").text(errorMessage);
-            } else {
-                var { contentType, fileContents, fileDownloadName } = data;
-                {
-                    const link = document.createElement("a");
-                    link.href = `data:${contentType};base64,${fileContents}`;
-                    link.download = fileDownloadName;
-                    link.click();
-                }
-            }
-        }
-        else {
-            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
-            $("#div-error-message").text(errorMessage);
-        }
-    }
-
+   
     // 画像一括出力ボタン押下
     function onExportAllImages(){
         DeleteErrorMessages();

@@ -318,6 +318,26 @@
                     </script>
                 </div>
             </div>
+            <div class="mg-bot-20 mt-3">
+                <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                    <div class="input-group-append mr-1">
+                        <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('LoadTransition', '@Model.ViewTitle')" id="exportFile">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-file-export"></i>
+                            </span>
+                            <span class="text">Excel出力</span>
+                        </a>
+                    </div>
+                    <div class="input-group-append mr-3">
+                        <a href="#" class="btn btn-info btn-icon-split" onclick="onExportAllImages()">
+                            <span class="icon text-white-50">
+                                <i class="fa-solid fa-circle-down"></i>
+                            </span>
+                            <span class="text">画像一括出力</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
             <div class="mt-3" id="tripRecordTable"></div>
         </div>
     </div>
@@ -951,6 +971,74 @@
         var month = (date.getMonth() + 1).toString();
         var day = date.getDate().toString();
         return year + month + day;
+    }
+
+    // エラーメッセージ削除
+    function DeleteErrorMessages() {
+        $('#div-error-message').text('');
+        $('#edit-modal-error-message').text('');
+        $('#delete-modal-error-message').text('');
+        $('.text-danger').text('');
+        $('input').removeClass('input-validation-error');
+    }
+
+    // 期間が90日以内か否か
+    function isWithin90Days() {
+        var startOfPeriod = new Date($('#startOfPeriod').val());
+        var endOfPeriod = new Date($('#endOfPeriod').val());
+        var diffMilliSec = endOfPeriod - startOfPeriod;
+        var diffDays = parseInt(diffMilliSec / 1000 / 60 / 60 / 24);
+        if (diffDays <= 90) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // 画像一括出力ボタン押下
+    function onExportAllImages() {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("ZipDownload", "LoadTransition")';
+            let method = 'GET';
+            data = { download: "download", startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                var { contentType, fileContents, fileDownloadName } = response.data;
+                {
+                    const link = document.createElement("a");
+                    link.href = `data:${contentType};base64,${fileContents}`;
+                    link.download = fileDownloadName;
+                    link.click();
+                    console.log("success");
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
     }
 </script>
                                   
