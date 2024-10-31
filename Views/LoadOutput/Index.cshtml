@@ -460,6 +460,66 @@
         });
     }
 
+    // Excel出力
+    async function onExportFileTrips(page, gamenName) {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+            event.preventDefault();
+            $('#div-error-message').text("");
+
+            // チェックボックスの入力情報取得
+            var checkBox = false;
+            $('input:checked').each(function () {
+                checkBox = $(this).prop('checked');
+            });
+
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+            // フォーム情報取得
+            let url = window.location.origin + '/' + page + '/ExportFile';
+            let method = 'Post';
+            let data = {
+                "gamenName": gamenName,
+                "startofPeriod": startOfPeriod,
+                "endOfPeriod": endOfPeriod,
+                "isOnlyHasAmountDefference": checkBox,
+            };
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                console.log(response);
+                var { contentType, fileContents, fileDownloadName } = response.data;
+                {
+                    const link = document.createElement("a");
+                    link.href = `data:${contentType};base64,${fileContents}`;
+                    link.download = fileDownloadName;
+                    link.click();
+                }
+
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").show();
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").show();
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
    
     // 画像一括出力ボタン押下
     function onExportAllImages(){

@@ -162,14 +162,14 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod)
+        public JsonResult SearchData(List<LoadTransitionModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
         {
             var searchData = string.Empty;
             IEnumerable<LoadTransitionModel> tripRecordList;
             try
             {
                 // 指定した期間の便マスター情報取得SQL作成
-                var sql = LoadTransitionConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod);
+                var sql = LoadTransitionConnectController.CreateSQLToSelectLoadClassFromSearchConditionsForTable(models, startOfPeriod, endOfPeriod);
                 // DB接続
                 tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に、画像パスをBase64に変換
@@ -419,7 +419,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
+        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, List<LoadTransitionModel> arrayTrips)
         {
             string? errorMessage;
             string startDate = startOfPeriod.ToString("yyyyMMdd");
@@ -431,9 +431,19 @@ namespace ai_truck_load_measurement.Controllers
                 searchConditionDT.Columns.Add("項目名");
                 searchConditionDT.Columns.Add("検索条件");
                 searchConditionDT.Rows.Add("期間", $"{startDate}～{endDate}");
+                var selectedTripNames = "";
+                for(int i=0; i<arrayTrips.Count; i++)
+                {
+                    if(i != 0)
+                    {
+                        selectedTripNames += ", ";
+                    }
+                    selectedTripNames += arrayTrips[i].SelectedTripName;
+                }
+                searchConditionDT.Rows.Add("選択された便", selectedTripNames);
 
                 // 便実績情報取得
-                var tTripRecordSql = LoadTransitionConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod);
+                var tTripRecordSql = LoadTransitionConnectController.CreateSQLToSelectTripRecordForDataTable(arrayTrips, startOfPeriod, endOfPeriod);
                 DataTable tTripRecordDT = LoadTransitionConnectController.ConnectTTripRecordToDataTable(tTripRecordSql, "AI-truck-load-measurement_test");
 
                 // 荷量のクラスを数値化
@@ -566,13 +576,13 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみのデータか</param>
         /// <returns></returns>
-        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod)
+        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, List<LoadTransitionModel> arrayTrips)
         {
             // ダウンロードボタンが押された際の処理
             if (download == "download")
             {
                 // 指定した期間の便実績情報取得SQL作成
-                var sql = LoadTransitionConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod);
+                var sql = LoadTransitionConnectController.CreatSQLToSelectTripRecordForImage(arrayTrips, startOfPeriod, endOfPeriod);
                 // DB接続
                 IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
 
@@ -628,7 +638,18 @@ namespace ai_truck_load_measurement.Controllers
                             System.Text.Encoding.GetEncoding("shift_jis")))
                         {
                             //書き込む
-                            sw.Write($"期間：{startDate}～{endDate}");
+                            sw.WriteLine($"期間：{startDate}～{endDate}");
+                            // 選択された便の羅列
+                            var selectedTripNames = "";
+                            for (int i = 0; i < arrayTrips.Count; i++)
+                            {
+                                if (i != 0)
+                                {
+                                    selectedTripNames += ", ";
+                                }
+                                selectedTripNames += arrayTrips[i].SelectedTripName;
+                            }
+                            sw.WriteLine($"選択された便：{selectedTripNames}");
                         }
                     }
 

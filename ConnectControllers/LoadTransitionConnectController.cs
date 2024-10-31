@@ -230,6 +230,56 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// 検索条件から荷量クラスを取得するSQL
+        /// </summary>
+        /// <param name="tripName">便名称</param>
+        /// <param name="tripBranchSeq">便枝番</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectLoadClassFromSearchConditionsForTable(List<LoadTransitionModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
+        {
+            var selectedTrips= SelectedTripsSQL(models);
+            var sql = $@"
+                SELECT 
+                    trip_record_id,
+	                trip_name,
+	                trip_branch_seq,
+	                driver_name,
+	                station_id,
+	                truck_number,
+	                identify_number,
+	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
+	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+	                work_day,
+	                arrived_at,
+	                departed_at,
+	                arrival_load_class,
+	                departure_load_class,
+	                arrival_load_img_path,
+	                departure_load_img_path
+                FROM t_trip_records
+                WHERE ({selectedTrips})
+                AND work_day BETWEEN '{startOfPeriod}' AND '{endOfPeriod}'
+            ";
+            return sql;
+        }
+
+        private static string SelectedTripsSQL(List<LoadTransitionModel> models)
+        {
+            var selectedTrips = "";
+            for (int i = 0; i < models.Count; i++)
+            {
+                if (i != 0)
+                {
+                    selectedTrips += " OR ";
+                }
+                selectedTrips += @$"(trip_name = '{models[i].TripName}' AND trip_branch_seq = '{models[i].TripBranchSeq}')";
+            }
+            return selectedTrips;
+        }
+
+        /// <summary>
         /// 指定した期間の便実績情報取得SQL
         /// </summary>
         /// <param name="startOfPeriod">期間開始日</param>
@@ -270,10 +320,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectTripRecordForDataTable(DateTime startOfPeriod, DateTime endOfPeriod)
+        public static string CreateSQLToSelectTripRecordForDataTable(List<LoadTransitionModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
+            var selectedTrips = SelectedTripsSQL(models);
             var sql = $@"
                 SELECT
 	                trip_name,
@@ -291,9 +342,9 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departure_load_class,
 	                arrival_load_img_path,
 	                departure_load_img_path
-                
                 FROM t_trip_records
-                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
+                WHERE ({selectedTrips})
+                AND work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 ORDER BY trip_name, work_day, trip_branch_seq
             ";
             return sql;
@@ -306,10 +357,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreatSQLToSelectTripRecordForImage(DateTime startOfPeriod, DateTime endOfPeriod)
+        public static string CreatSQLToSelectTripRecordForImage(List<LoadTransitionModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
+            var selectedTrips = SelectedTripsSQL(models);
             var sql = $@"
                 SELECT
                     t_trip_records.trip_record_id,
@@ -328,9 +380,9 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departure_load_class,
 	                arrival_load_img_path,
 	                departure_load_img_path
-                
                 FROM t_trip_records
-                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
+                WHERE ({selectedTrips})
+                AND work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 ORDER BY arrived_at";
             return sql;
         }

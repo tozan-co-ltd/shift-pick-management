@@ -30,6 +30,7 @@ namespace ai_truck_load_measurement.Models
         public List<SelectListItem>? TripNameList { get; set; }
         public int AnnotationLoadClass {  get; set; }
         public string? ArrivalDepartureClass {  get; set; }
+        public string? SelectedTripName {  get; set; }
     }
 
     public class RequestLoadStatus
@@ -38,4 +39,5 @@ namespace ai_truck_load_measurement.Models
         public string? DepartureLoadStatus { get; set; }
         public DateTime WorkDay { get; set; }
     }
+
 }
