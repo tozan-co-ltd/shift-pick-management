@@ -514,6 +514,7 @@
         selectedTripLabel.innerText = selectedTripName;
         selectedTripLabel.innerHTML += "<a href=\"#\" class=\"labelDelete ml-1\" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
         selectedTripLabel.className += "mr-3";
+        selectedTripLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
         selectedTrips.appendChild(selectedTripLabel);
     }
 
@@ -527,6 +528,15 @@
 
     // 検索ボタン押下時
     function onSearchClick() {
+        DeleteErrorMessages();
+
+        // 90日を超えるデータは検索不可
+        if (!isWithin90Days()) {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+            return;
+        }
+
         // グラフとテーブルの表示
         $('#graphAndTable').css('display', 'block');
         tableDisplay();
