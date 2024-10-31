@@ -151,6 +151,10 @@ namespace ai_truck_load_measurement.Controllers
             if (loadClass >= 3)
             { 
                 loadStatus = ((loadClass - 3) * 10 + 5).ToString() ;
+            } 
+            else if(loadClass == 2)
+            {
+                loadStatus = "0";
             }
             return loadStatus;
         }
@@ -321,6 +325,10 @@ namespace ai_truck_load_measurement.Controllers
                 int lowerLimit = (loadClass - 3) * 10 + 1;
                 int upperLimit = (loadClass - 2) * 10;
                 loadStatus = ($"{lowerLimit}-{upperLimit}");
+            }
+            else if (loadClass == 2)
+            {
+                loadStatus = "0";
             }
             return loadStatus;
         }
