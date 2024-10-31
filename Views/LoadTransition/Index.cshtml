@@ -488,7 +488,8 @@
     function addTrips(){
         // 20件の便が選択されているとき
         if (20 <= arrayTrips.length) {
-            var errorMessage = 'E1008: 選択できる稼働日は最大20日です。20日を超えないように選択してください。';
+            var errorMessage = 'E1008: 選択できる便数は最大20件です。20件を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
             return;
         }
         // 便名称と便枝番取得
