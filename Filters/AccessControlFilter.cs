@@ -41,36 +41,36 @@ namespace ai_truck_load_measurement.Filters
             else
             {
                 // 表示しているメニューのController名一覧を取得
-                WebMenuModel webMenuModel = new()
-                {
-                    CompanyID = int.Parse(context.HttpContext.User.FindFirstValue(CustomClaimTypes.ClaimType_CampanyID)),
-                    Role = int.Parse(context.HttpContext.User.FindFirstValue(CustomClaimTypes.ClaimType_Role))
-                };
-                var viewMenuList = webMenuModel.MenuList(null);
+                //WebMenuModel webMenuModel = new()
+                //{
+                //    CompanyID = int.Parse(context.HttpContext.User.FindFirstValue(CustomClaimTypes.ClaimType_CampanyID)),
+                //    Role = int.Parse(context.HttpContext.User.FindFirstValue(CustomClaimTypes.ClaimType_Role))
+                //};
+                //var viewMenuList = webMenuModel.MenuList(null);
 
-                // アクセスするController名が表示しているメニューに含まれている場合はアクセス制御しない
-                bool IsAccessible = false;
-                foreach (var viewMenu in viewMenuList)
-                {
-                    var viewController = viewMenu.Controller.ToLower();
+                //// アクセスするController名が表示しているメニューに含まれている場合はアクセス制御しない
+                //bool IsAccessible = false;
+                //foreach (var viewMenu in viewMenuList)
+                //{
+                //    var viewController = viewMenu.Controller.ToLower();
 
-                    if (accessController == viewController)
-                    {
-                        IsAccessible = true;
-                        break;
-                    };
-                }
+                //    if (accessController == viewController)
+                //    {
+                //        IsAccessible = true;
+                //        break;
+                //    };
+                //}
 
-                // アクセスするController名が表示しているメニューに含まれていない場合はアクセス拒否ページ(Shared/AccessDenied)へ遷移
-                if (!IsAccessible)
-                {
-                    var viewResult = new ViewResult
-                    {
-                        ViewName = "AccessDenied"
-                    };
-                    context.Result = viewResult;
-                    return;
-                }
+                //// アクセスするController名が表示しているメニューに含まれていない場合はアクセス拒否ページ(Shared/AccessDenied)へ遷移
+                //if (!IsAccessible)
+                //{
+                //    var viewResult = new ViewResult
+                //    {
+                //        ViewName = "AccessDenied"
+                //    };
+                //    context.Result = viewResult;
+                //    return;
+                //}
 
                 //// 2.同一ユーザーによる複数端末での同時ログインを禁止する
                 ////   先にログインしたユーザーがログアウト(ログイン画面へリダイレクト)される
