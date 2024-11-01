@@ -119,20 +119,27 @@
                     <select type="text" class="form-select " name="TripName" asp-for="TripName" asp-items="@Model.TripNameList" required id="tripName"></select>
                 </div>
                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3">
-                    <span class="warehouse-name-drs">便枝番</span>
+                    <span style="width:50px; min-width:50px" class="mr-3">便枝番</span>
                     <select type="text" class="form-select " id="tripBranchSeq" name="TripBranchSeq">
                     </select>
                 </div>
                 <div class="mr-3">
-                    <a href="#" class="btn btn-primary " onclick="addTrips()">
+                    <a href="#" class="btn btn-primary d-flex align-items-center mb-3 mr-3" onclick="addTrips()">
                         <span class="text">追加</span>
                     </a>
                 </div>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
-                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3" id="selectedTrips">
-                    <span class="warehouse-name-drs">選択された便</span>
-                </div>
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips0">
+                <span class="warehouse-name-drs">選択された便</span>
+            </div>
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips1" >
+                <span class="warehouse-name-drs"></span>
+            </div>
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips2"  >
+                <span class="warehouse-name-drs"></span>
+            </div>
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips3" >
+                <span class="warehouse-name-drs"></span>
             </div>
         </form>
 
@@ -170,7 +177,6 @@
                         function adjustCanvasHeight() {
                             var canvas = document.getElementById("binedabanChartArrival");
                             var width = window.innerWidth;
-                            canvas.height = 60;
                         }
 
                         window.addEventListener('resize', adjustCanvasHeight);
@@ -180,7 +186,7 @@
                         var arrivalChart = new Chart(ctx, {
                             type: 'line',
                             data: {
-                                //labels: ['15:24', '17:08'],
+                                labels: [],
                                 datasets: [{
                                     label: '豊鉄大型常傭便3_1',
                                     borderColor: 'Green',
@@ -210,14 +216,8 @@
                                 scales: {
                                     //X軸
                                     xAxes: [{
-                                        //ここで軸を時間に設定する
-                                        type: 'time',
-                                        time: {
-                                            unit: 'day',
-                                        },
                                         ticks: {
-                                            min: $('#startOfPeriod').val(),
-                                            max: $('#endOfPeriod').val()
+                                            fontSize: 20
                                         }
                                     }],
                                     //Y軸
@@ -231,7 +231,8 @@
                                         //Y軸の範囲を指定
                                         ticks: {
                                             min: 0.0,
-                                            max: 100.0
+                                            max: 100.0,
+                                            fontSize: 20
                                         }
                                     }]
                                 }
@@ -248,7 +249,6 @@
                         function adjustCanvasHeight() {
                             var canvas = document.getElementById("binedabanChartDeparture");
                             var width = window.innerWidth;
-                            canvas.height = 60;
                         }
 
                         window.addEventListener('resize', adjustCanvasHeight);
@@ -258,7 +258,7 @@
                         var departureChart = new Chart(ctx, {
                             type: 'line',
                             data: {
-                                //labels: ['15:24', '17:08'],
+                                labels: [],
                                 datasets: [{
                                     label: '豊鉄大型常傭便3_1',
                                     borderColor: 'Green',
@@ -288,14 +288,8 @@
                                 scales: {
                                     //X軸
                                     xAxes: [{
-                                        //ここで軸を時間に設定する
-                                        type: 'time',
-                                        time: {
-                                            unit: 'day',
-                                        },
                                         ticks: {
-                                            min: $('#startOfPeriod').val(),
-                                            max: $('#endOfPeriod').val()
+                                            fontSize:20
                                         }
                                     }],
                                     //Y軸
@@ -309,7 +303,8 @@
                                         //Y軸の範囲を指定
                                         ticks: {
                                             min: 0.0,
-                                            max: 100.0
+                                            max: 100.0,
+                                            fontSize:20
                                         }
                                     }]
                                 }
@@ -495,7 +490,6 @@
         // 便名称と便枝番取得
         var tripName = $('[name=TripName]').val();
         var tripBranchSeq = $('[name=TripBranchSeq]').val();
-        var selectedTrips = $('#selectedTrips')[0];
 
         // 入力されていない場合、エラー出力
         if(tripName == "" || tripBranchSeq == ""){
@@ -509,22 +503,45 @@
             return;
         }
 
+        // 選択された便を追加する行を設定
+        var selectedTripsNumber = Math.floor(arrayTrips.length / 5);
+        var selectedTrips = $('#selectedTrips' + selectedTripsNumber)[0];
+
         // 選択された便に追加
         arrayTrips.push({tripName, tripBranchSeq, selectedTripName});
+        pushLabelToSelectedTrips(selectedTrips, selectedTripName);
+    }
+
+    // 選択された便ラベルを作成、指定した親要素の子として登録
+    function pushLabelToSelectedTrips(selectedTrips, selectedTripName) {
         var selectedTripLabel = document.createElement("label");
         selectedTripLabel.innerText = selectedTripName;
-        selectedTripLabel.innerHTML += "<a href=\"#\" class=\"labelDelete ml-1\" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
-        selectedTripLabel.className += "mr-3";
+        selectedTripLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1\" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
+        selectedTripLabel.className += "mr-2 selected-trip-label";
         selectedTripLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
+        selectedTripLabel.style.padding = "0.5em";
         selectedTrips.appendChild(selectedTripLabel);
     }
 
     // 選択された便の×ボタン押下時
     function onLabelDeleteClick(selectedTripName){
-        $('label').remove(':contains("' + selectedTripName + '")');
+        // ラベル全削除
+        $('.selected-trip-label').remove();
+
+        // 配列から削除
         const tripNames = arrayTrips.map(d => d.selectedTripName);
         var deleteIndex = tripNames.indexOf(selectedTripName);
         arrayTrips.splice(deleteIndex, 1);
+
+        // 選択された便の再表示
+        for(var i=0; i< arrayTrips.length; i++){
+            // 選択された便を追加する行を設定
+            var selectedTripsNumber = Math.floor(i / 5);
+            var selectedTrips = $('#selectedTrips' + selectedTripsNumber)[0];
+
+            var selectedTripName = arrayTrips[i].selectedTripName;
+            pushLabelToSelectedTrips(selectedTrips, selectedTripName);
+        }
     }
 
     // 検索ボタン押下時
@@ -551,14 +568,28 @@
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
+        // 選択期間の日数を取得
+        var startDate = new Date($('#startOfPeriod').val());
+        var endDate = new Date($('#endOfPeriod').val());
+        var diffMilliSec = endDate - startDate;
+        var diffDays = parseInt(diffMilliSec / 1000 / 60 / 60 / 24);
+
+        var selectedDates = [];
+        var currentDate = startDate;
+
+        for(var i=0; i<diffDays; i++){
+            var dateForChart = GetDayStringForChart(currentDate);
+            selectedDates.push(dateForChart);
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
         // グラフの初期化
         arrivalChart.data.datasets = [];
         departureChart.data.datasets = [];
+        
         // グラフの表示期間設定
-        arrivalChart.options.scales.xAxes[0].ticks.min = startOfPeriod;
-        arrivalChart.options.scales.xAxes[0].ticks.max = endOfPeriod;
-        departureChart.options.scales.xAxes[0].ticks.min = startOfPeriod;
-        departureChart.options.scales.xAxes[0].ticks.max = endOfPeriod;
+        arrivalChart.data.labels = selectedDates;
+        departureChart.data.labels = selectedDates;
 
         // 追加された便、便枝番について
         for(var i=0; i < arrayTrips.length; i++){
@@ -582,10 +613,10 @@
                 var departureLoadStatuses = [];
                 response.forEach(function (item) {
                     if (item.arrivalLoadStatus != "") {
-                        arrivalLoadStatuses.push({ x: item.workDay, y: item.arrivalLoadStatus });
+                        arrivalLoadStatuses.push(item.arrivalLoadStatus );
                     }
                     if (item.departureLoadStatus != "") {
-                        departureLoadStatuses.push({ x: item.workDay, y: item.departureLoadStatus });
+                        departureLoadStatuses.push(item.departureLoadStatus );
                     }
                 })
 
@@ -982,6 +1013,13 @@
         var month = (date.getMonth() + 1).toString();
         var day = date.getDate().toString();
         return year + month + day;
+    }
+
+    // 日付の表示形式変換(yyyyMMdd)
+    function GetDayStringForChart(date) {
+        var month = (date.getMonth() + 1).toString();
+        var day = date.getDate().toString();
+        return month + "月" + day + "日";
     }
 
     // エラーメッセージ削除
