@@ -2,35 +2,42 @@
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using NPOI.SS.Formula.Functions;
+using System.Data.SqlClient;
 using System.Drawing.Imaging;
 using X.PagedList;
 using System.Drawing;
-using System.Data.SqlClient;
 using ai_truck_load_measurement.Commons;
 using System.Data;
-using System.Formats.Asn1;
 using System.IO.Compression;
-using System.Text;
-using NPOI.SS.Formula.Functions;
+using System.Collections.Generic;
 
 namespace ai_truck_load_measurement.Controllers
 {
-    public class LoadOutputController : BaseController
+    public class LoadTransitionController : BaseController
     {
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         public IActionResult Index()
         {
-            // 戻り値
-            LoadOutputModel model = new();
-
+            var model = new LoadTransitionModel();
+            var today = DateTime.Now;
+            var oneWeekAgo = today.AddDays(-7);
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadRecordConnectController.CreatSQLToSelectTripRecord();
+                var sql = LoadTransitionConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today);
                 // DB接続
-                IEnumerable<LoadOutputModel> tripRecordList =LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                List<SelectListItem> tripNameList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql, "AI-truck-load-measurement_test");
+
+                model.TripNameList = tripNameList;
+
+                // 便実績情報取得SQL作成
+                var sql2 = LoadRecordConnectController.CreatSQLToSelectTripRecord();
+                // DB接続
+                IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql2, "AI-truck-load-measurement_test");
                 // テーブル情報を変換
-                tripRecordList = (IEnumerable<LoadOutputModel>)LoadRecordController.ConversionForTable(tripRecordList);
+                tripRecordList = (IEnumerable<LoadTransitionModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
                 return View(model);
@@ -43,112 +50,94 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-
         /// <summary>
-        /// テーブル情報を変換
+        /// 指定した期間内に存在する便名称のリストを取得してセレクトリストアイテム化する
         /// </summary>
-        /// <param name="models">変換元</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
         /// <returns></returns>
-        private IEnumerable<LoadOutputModel> ConversionForTable(IEnumerable<LoadOutputModel> models)
+        public List<SelectListItem> GetTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
         {
-            foreach (var model in models)
-            {
-                var arrivalLoadClass = model.ArrivalLoadClass;
-                var departureLoadClass = model.DepartureLoadClass;
-
-                // 到着荷量クラスと出発荷量クラスをそれぞれ変換
-                model.ArrivalLoadStatus = ConversionLoadClassToLoadStatus(arrivalLoadClass);
-                model.DepartureLoadStatus = ConversionLoadClassToLoadStatus(departureLoadClass);
-
-                // テーブルの空欄を"-"に変換
-                if (string.IsNullOrEmpty(model.TripName)) model.TripName = "-";
-                if (string.IsNullOrEmpty(model.TripBranchSeq)) model.TripBranchSeq = "-";
-                if (string.IsNullOrEmpty(model.DriverName)) model.DriverName = "-";
-
-                model.IdentifyNumber = ConvertNumberToFourDigitOrHyphen(model.IdentifyNumber);
-            }
-            return models;
-        }
-
-        /// <summary>
-        /// 荷量クラスからパーセント表示に変換
-        /// </summary>
-        /// <param name="loadClass">荷量クラス</param>
-        /// <returns></returns>
-        private string ConversionLoadClassToLoadStatus(int loadClass)
-        {
-            var loadStatus = "-";
-            if (loadClass == 2) loadStatus = "0";
-            if (loadClass >= 3)
-            {
-                int lowerLimit = (loadClass - 3) * 10 + 1;
-                int upperLimit = (loadClass - 2) * 10;
-                loadStatus = ($"{lowerLimit}-{upperLimit}");
-            }
-            return loadStatus;
-        }
-
-        /// <summary>
-        /// 画像のパスが正しいかどうかのチェックとパスの変換
-        /// </summary>
-        /// <param name="imagePath">画像パス</param>
-        /// <returns></returns>
-        private string CheckAndConvertImagePath(string imagePath)
-        {
-            // 画像パスに画像がないかパスが不正な場合はダミー画像を表示する
-            if (!IsValidImage(imagePath))
-            {
-                var rootPath = Directory.GetCurrentDirectory();
-                imagePath = Path.Combine(rootPath, @"wwwroot\images\NoImage.png");
-            }
-            var imagePathToBase64 = ImageToBase64(imagePath);
-            return imagePathToBase64;
-        }
-
-        /// <summary>
-        /// 画像のパスをBase64文字列に変換する
-        /// </summary>
-        /// <param name="imagePath">変換したい画像のパス</param>
-        /// <returns></returns>
-        private static string ImageToBase64(string imagePath)
-        {
-            using (Image image = Image.FromFile(imagePath))
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    image.Save(memoryStream, ImageFormat.Jpeg); // 画像フォーマットを指定（ここではJPEG）
-                    byte[] imageBytes = memoryStream.ToArray();
-                    return Convert.ToBase64String(imageBytes);
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// 画像のパスが正しいかどうか確認する
-        /// </summary>
-        /// <param name="imagePath">確認したい画像パス</param>
-        /// <returns></returns>        
-        public bool IsValidImage(string imagePath)
-        {
-            // 画像パスがここに含まれたフォーマットの場合trueを返す
-            var imageFormats = new List<ImageFormat>()
-                  {
-                    ImageFormat.Jpeg,
-                    ImageFormat.Png,
-                  };
+            List<SelectListItem> tripRecordList = new();
             try
             {
+                // 便実績情報取得SQL作成
+                var sql = LoadTransitionConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod);
+                // DB接続
+                tripRecordList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql, "AI-truck-load-measurement_test");
 
-                using (FileStream fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
-                using (Image targetImage = Image.FromStream(fileStream))
-                {
-                    return imageFormats.Contains(targetImage.RawFormat);
-                }
+                return tripRecordList;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return tripRecordList;
+            }
+        }
+
+        /// <summary>
+        /// 便名称から指定した期間内の便枝番のリストを取得する
+        /// </summary>
+        /// <param name="tripName">便名称</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <returns></returns>
+        public List<int> GetTripBranchSeqFromTripName(string tripName, DateTime startOfPeriod, DateTime endOfPeriod)
+        {
+            List<int> tripBranchSeqList = new();
+            try
+            {
+                // 便実績情報取得SQL作成
+                var sql = LoadTransitionConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName, startOfPeriod, endOfPeriod);
+                // DB接続
+                tripBranchSeqList = LoadTransitionConnectController.ConnectTTripRecordsForTripBranchSeq(sql, "AI-truck-load-measurement_test");
+
+                return tripBranchSeqList;
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return tripBranchSeqList;
+            }
+        }
+
+        /// <summary>
+        /// 期間内で便名称と便枝番が一致する便実績データのリストを取得する
+        /// </summary>
+        /// <param name="tripName">便名称</param>
+        /// <param name="tripBranchSeq">便枝番</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <returns></returns>
+        public List<RequestLoadStatus> SearchTrips(string tripName, int tripBranchSeq, DateTime startOfPeriod, DateTime endOfPeriod)
+        {
+            List<RequestLoadStatus> loadStatuses = new ();
+            try
+            {
+                // 便実績情報取得SQL作成
+                var sql = LoadTransitionConnectController.CreateSQLToSelectLoadClassFromSearchConditions(tripName, tripBranchSeq, startOfPeriod, endOfPeriod);
+                // DB接続
+                var loadClasses = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+
+                foreach ( var loadClass in loadClasses)
+                {
+                    var loadStatus = new RequestLoadStatus
+                    {
+                        WorkDay = loadClass.WorkDay,
+                        ArrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.ArrivalLoadClass),
+                        DepartureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.DepartureLoadClass)
+                    };
+                    loadStatuses.Add(loadStatus);
+                }
+                return loadStatuses;
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return loadStatuses;
             }
         }
 
@@ -159,18 +148,18 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
+        public JsonResult SearchData(List<LoadTransitionModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
         {
             var searchData = string.Empty;
-            IEnumerable<LoadOutputModel> tripRecordList;
+            IEnumerable<LoadTransitionModel> tripRecordList;
             try
             {
                 // 指定した期間の便マスター情報取得SQL作成
-                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
+                var sql = LoadTransitionConnectController.CreateSQLToSelectLoadClassFromSearchConditionsForTable(models, startOfPeriod, endOfPeriod);
                 // DB接続
-                tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に、画像パスをBase64に変換
-                tripRecordList = (IEnumerable<LoadOutputModel>)LoadRecordController.ConversionForTable(tripRecordList);
+                tripRecordList = (IEnumerable<LoadTransitionModel>)LoadRecordController.ConversionForTable(tripRecordList);
                 searchData += $@"
                     <div class=""mt-3"">
                         <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
@@ -206,7 +195,7 @@ namespace ai_truck_load_measurement.Controllers
                         var arrivalScheduledTime = item.ArrivalScheduledTime.ToString("HH:mm");
                         if (arrivalScheduledTime == "00:00") arrivalScheduledTime = "-";
                         var departureScheduledTime = item.DepartureScheduledTime.ToString("HH:mm");
-                        if(departureScheduledTime == "00:00") departureScheduledTime = "-";
+                        if (departureScheduledTime == "00:00") departureScheduledTime = "-";
                         searchData += $@"
                             <tr>
                                 <td hidden>{item.TripRecordID}</td>
@@ -265,97 +254,15 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
-        /// ファイル出力
-        /// </summary>
-        /// <param name="gamenName">現在の画面名</param>
-        /// <param name="startOfPeriod">期間の開始日時</param>
-        /// <param name="endOfPeriod">期間の終了日時</param>
-        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
-        /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
-        {
-            string? errorMessage;
-            string startDate = startOfPeriod.ToString("yyyyMMdd");
-            string endDate = endOfPeriod.ToString("yyyyMMdd");
-            try
-            {
-                // 検索条件シート用データテーブル作成
-                DataTable searchConditionDT = new DataTable();
-                searchConditionDT.Columns.Add("項目名");
-                searchConditionDT.Columns.Add("検索条件");
-                searchConditionDT.Rows.Add("期間",$"{startDate}～{endDate}");
-
-                // 便実績情報取得
-                var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
-                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql, "AI-truck-load-measurement_test");
-
-                // 荷量のクラスを数値化
-                tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
-
-                // ファイル名
-                var tmpFilename = $"荷量実績_{startDate}-{endDate}.xlsx";
-                // 2シートあり
-                bool sheetTwo = true;
-
-                // シート名
-                string sheetNameOne = "検索条件シート";
-                string sheetNameTwo = "荷量実績シート";
-
-
-                try
-                {
-                    // Excelファイル作成チェック
-                    var createRs = CreateFile.CheckCreateExcel(searchConditionDT, tTripRecordDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
-
-                    if (createRs.Item1)
-                    {
-                        var file = System.IO.File.ReadAllBytes(createRs.Item2);
-
-
-                        return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
-                    }
-                    else
-                    {
-                        // エラーメッセージ取得
-                        // 「ファイルが存在しません。」
-                        errorMessage = ErrorMessagesResources.E9999;
-
-                        return Json(new { res = "NG", error = errorMessage });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // エラーメッセージ取得
-                    // 「NASに接続できませんでした。」
-                    errorMessage = ErrorMessagesResources.E9999;
-
-                    // log取得
-                    var exceptionMessage = ex.Message;
-                    return Json(new { res = "NG", error = errorMessage + exceptionMessage });
-                }
-            }
-            catch (Exception ex)
-            {
-                // エラーメッセージ取得
-                // 「予期せぬエラーが発⽣しました。」
-                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
-
-                // log取得
-                var exceptionMessage = ex.Message;
-                return Json(new { res = "NG", error = errorMessage + exceptionMessage });
-            }
-
-        }
-
-        /// <summary>
         /// 荷量画像モーダルに表示する値の取得
         /// </summary>
         /// <param name="model">モーダルに表示するモデル</param>
         /// <param name="isArrived">到着か否か</param>
         /// <returns></returns>
-        public LoadRecordModel GetModalItems(LoadOutputModel model, bool isArrived)
+        public LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
         {
             var modalItems = LoadRecordController.GetModalItems(model, isArrived);
+
             return modalItems;
         }
 
@@ -419,6 +326,99 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
+        /// ファイル出力
+        /// </summary>
+        /// <param name="gamenName">現在の画面名</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
+        /// <returns></returns>
+        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, List<LoadTransitionModel> arrayTrips)
+        {
+            string? errorMessage;
+            string startDate = startOfPeriod.ToString("yyyyMMdd");
+            string endDate = endOfPeriod.ToString("yyyyMMdd");
+            try
+            {
+                // 検索条件シート用データテーブル作成
+                DataTable searchConditionDT = new DataTable();
+                searchConditionDT.Columns.Add("項目名");
+                searchConditionDT.Columns.Add("検索条件");
+                searchConditionDT.Rows.Add("期間", $"{startDate}～{endDate}");
+                var selectedTripNames = "";
+                for(int i=0; i<arrayTrips.Count; i++)
+                {
+                    if(i != 0)
+                    {
+                        selectedTripNames += ", ";
+                    }
+                    selectedTripNames += arrayTrips[i].SelectedTripName;
+                }
+                searchConditionDT.Rows.Add("選択された便", selectedTripNames);
+
+                // 便実績情報取得
+                var tTripRecordSql = LoadTransitionConnectController.CreateSQLToSelectTripRecordForDataTable(arrayTrips, startOfPeriod, endOfPeriod);
+                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql, "AI-truck-load-measurement_test");
+
+                // 荷量のクラスを数値化
+                tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
+
+                // ファイル名
+                var tmpFilename = $"荷量実績_{startDate}-{endDate}.xlsx";
+                // 2シートあり
+                bool sheetTwo = true;
+
+                // シート名
+                string sheetNameOne = "検索条件シート";
+                string sheetNameTwo = "荷量実績シート";
+
+
+                try
+                {
+                    // Excelファイル作成チェック
+                    var createRs = CreateFile.CheckCreateExcel(searchConditionDT, tTripRecordDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
+
+                    if (createRs.Item1)
+                    {
+                        var file = System.IO.File.ReadAllBytes(createRs.Item2);
+
+
+                        return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+                    }
+                    else
+                    {
+                        // エラーメッセージ取得
+                        // 「ファイルが存在しません。」
+                        errorMessage = ErrorMessagesResources.E9999;
+
+                        return Json(new { res = "NG", error = errorMessage });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // エラーメッセージ取得
+                    // 「NASに接続できませんでした。」
+                    errorMessage = ErrorMessagesResources.E9999;
+
+                    // log取得
+                    var exceptionMessage = ex.Message;
+                    return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+                }
+            }
+            catch (Exception ex)
+            {
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+
+                // log取得
+                var exceptionMessage = ex.Message;
+                return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+            }
+
+        }
+
+        /// <summary>
         /// 画像一括ダウンロード
         /// </summary>
         /// <param name="download"></param>
@@ -426,15 +426,15 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみのデータか</param>
         /// <returns></returns>
-        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
+        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, List<LoadTransitionModel> arrayTrips)
         {
             // ダウンロードボタンが押された際の処理
             if (download == "download")
             {
                 // 指定した期間の便実績情報取得SQL作成
-                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
+                var sql = LoadTransitionConnectController.CreatSQLToSelectTripRecordForImage(arrayTrips, startOfPeriod, endOfPeriod);
                 // DB接続
-                IEnumerable<LoadOutputModel> tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");
                 var endDate = endOfPeriod.ToString("yyyyMMdd");
@@ -460,46 +460,52 @@ namespace ai_truck_load_measurement.Controllers
                             var tripName = tripRecord.TripName;
                             if (string.IsNullOrEmpty(tripName)) tripName = "-";
                             var tripBranchSeq = tripRecord.TripBranchSeq;
-                            if(string.IsNullOrEmpty(tripBranchSeq)) tripBranchSeq = "-";
+                            if (string.IsNullOrEmpty(tripBranchSeq)) tripBranchSeq = "-";
 
-                        
-                                // ファイルネームの指定
+
+                            // ファイルネームの指定
                             var FileNameArrive = string.Format($"{tripName}_{tripBranchSeq}_{date}_A_{arrivalLoadStatus}.jpg");
                             var FileNameDeparture = string.Format($"{tripName}_{tripBranchSeq}_{date}_D_{departureLoadStatus}.jpg");
 
                             // 到着の画像をzipストリームに書き込む
-                            if (!isOnlyHasAmountDefference || tripRecord.ArrivalDepartureClass == "arrival")
+                            var zipEntry = archive.CreateEntry(FileNameArrive, CompressionLevel.Fastest);
+                            using (var zipStream = zipEntry.Open())
                             {
-                                var zipEntry = archive.CreateEntry(FileNameArrive, CompressionLevel.Fastest);
-                                using (var zipStream = zipEntry.Open())
-                                {
-                                    zipStream.Write(arrivalLoadImgBytes, 0, arrivalLoadImgBytes.Length);
-                                }
+                                zipStream.Write(arrivalLoadImgBytes, 0, arrivalLoadImgBytes.Length);
                             }
-                            
+
                             // 出発の画像をzipストリームに書き込む
-                            if(!isOnlyHasAmountDefference || tripRecord.ArrivalDepartureClass == "departure")
+                            
+                            var zipEntry2 = archive.CreateEntry(FileNameDeparture, CompressionLevel.Fastest);
+                            using (var zipStream = zipEntry2.Open())
                             {
-                                var zipEntry2 = archive.CreateEntry(FileNameDeparture, CompressionLevel.Fastest);
-                                using (var zipStream = zipEntry2.Open())
-                                {
-                                    zipStream.Write(departureLoadImgBytes, 0, departureLoadImgBytes.Length);
-                                }
+                                zipStream.Write(departureLoadImgBytes, 0, departureLoadImgBytes.Length);
                             }
                         }
                         // 検索条件のテキストファイルを追加
-                        var zipEntryText = archive.CreateEntry("検索条件.txt"); 
+                        var zipEntryText = archive.CreateEntry("検索条件.txt");
                         using (StreamWriter sw = new StreamWriter(zipEntryText.Open(),
                             System.Text.Encoding.GetEncoding("shift_jis")))
                         {
                             //書き込む
-                            sw.Write($"期間：{startDate}～{endDate}");
+                            sw.WriteLine($"期間：{startDate}～{endDate}");
+                            // 選択された便の羅列
+                            var selectedTripNames = "";
+                            for (int i = 0; i < arrayTrips.Count; i++)
+                            {
+                                if (i != 0)
+                                {
+                                    selectedTripNames += ", ";
+                                }
+                                selectedTripNames += arrayTrips[i].SelectedTripName;
+                            }
+                            sw.WriteLine($"選択された便：{selectedTripNames}");
                         }
                     }
-                    
+
 
                     // メモリストリームを配列に変換してViewに渡す
-                    return Json(new { data = File(ms.ToArray(), "application/zip", $"荷量画像_{startDate}-{endDate}")});
+                    return Json(new { data = File(ms.ToArray(), "application/zip", $"荷量画像_{startDate}-{endDate}") });
                 }
             }
             // エラーメッセージ取得

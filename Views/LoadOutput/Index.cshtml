@@ -4,52 +4,6 @@
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
-<style>
-     .btn-update:not(:disabled):not(.disabled):active, .btn-update:not(:disabled):not(.disabled).active,
-     .show > .btn-update.dropdown-toggle {
-         background-color: #1CC88A !important;
-         border: #1CC88A !important;
-         color: #ffffff !important;
-     }
-
-     .btn-update {
-         background-color: #1CC88A;
-         border: #1CC88A;
-         color: #ffffff;
-     }
-
-    .btn-update:hover {
-        background-color: #1CC88A;
-        border: #1CC88A;
-        color: #ffffff;
-    }
-
-    .select-modal select{
-        width: 135px
-    }
-    .modal-table td{
-        vertical-align: middle;
-    }
-
-    .modal-table {
-        margin: auto;
-        table-layout: fixed;
-        width: 100%;
-    }
-    .modal-img img{
-        width:100%;
-    }
-
-    .trip-record-buttons {
-        position: relative;
-    }
-
-    .right-button {
-        float: right;
-        position: absolute;
-        right: 0;
-    }
-</style>
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
         @ViewData["Title"]
@@ -149,10 +103,13 @@
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
         tableDisplay();
     });
+
     // 便実績テーブルの要素数
     let tableLength = 0;
+
     // 便実績テーブルの行情報配列
     let arrayTrs = [];
+
     // 到着荷量画像ボタン押下
     function OnArrivalLoadImageClick(tripRecordID, button) {
         // 配列の初期化
@@ -521,26 +478,41 @@
             var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
-            const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&startOfPeriod=' + startOfPeriod + '&endOfPeriod=' + endOfPeriod + "&isOnlyHasAmountDefference=" + checkBox, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            });
-            var { data, errorMessage } = await response.json();
-
-            if (errorMessage) {
-                $("#div-error-message").show();
-                $("#div-error-message").text(errorMessage);
-            } else {
-                var { contentType, fileContents, fileDownloadName } = data;
+            // フォーム情報取得
+            let url = window.location.origin + '/' + page + '/ExportFile';
+            let method = 'Post';
+            let data = {
+                "gamenName": gamenName,
+                "startofPeriod": startOfPeriod,
+                "endOfPeriod": endOfPeriod,
+                "isOnlyHasAmountDefference": checkBox,
+            };
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                console.log(response);
+                var { contentType, fileContents, fileDownloadName } = response.data;
                 {
                     const link = document.createElement("a");
                     link.href = `data:${contentType};base64,${fileContents}`;
                     link.download = fileDownloadName;
                     link.click();
                 }
-            }
+
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").show();
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").show();
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
         }
         else {
             var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
@@ -548,6 +520,7 @@
         }
     }
 
+   
     // 画像一括出力ボタン押下
     function onExportAllImages(){
         DeleteErrorMessages();
