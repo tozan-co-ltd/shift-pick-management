@@ -2,6 +2,8 @@
 using System.Drawing.Imaging;
 using System.Drawing;
 using System.Data;
+using ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.ConnectControllers;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -10,6 +12,32 @@ namespace ai_truck_load_measurement.Controllers
     /// </summary>
     public class LoadRecordController
     {
+
+        /// <summary>
+        /// テーブル情報を変換
+        /// </summary>
+        /// <param name="models">変換元</param>
+        /// <returns></returns>
+        public static IEnumerable<LoadRecordModel> ConversionForTable(IEnumerable<LoadRecordModel> models)
+        {
+            foreach (var model in models)
+            {
+                var arrivalLoadClass = model.ArrivalLoadClass;
+                var departureLoadClass = model.DepartureLoadClass;
+
+                // 到着荷量クラスと出発荷量クラスをそれぞれ変換
+                model.ArrivalLoadStatus =　ConversionLoadClassToLoadStatus(arrivalLoadClass);
+                model.DepartureLoadStatus = ConversionLoadClassToLoadStatus(departureLoadClass);
+
+                // テーブルの空欄を"-"に変換
+                if (string.IsNullOrEmpty(model.TripName)) model.TripName = "-";
+                if (string.IsNullOrEmpty(model.TripBranchSeq)) model.TripBranchSeq = "-";
+                if (string.IsNullOrEmpty(model.DriverName)) model.DriverName = "-";
+
+                model.IdentifyNumber = ConvertNumberToFourDigitOrHyphen(model.IdentifyNumber);
+            }
+            return models;
+        }
 
         /// <summary>
         /// データテーブルの荷量クラスを数値に変換
@@ -129,6 +157,30 @@ namespace ai_truck_load_measurement.Controllers
             {
                 row[afterColumnName] = row[beforeColumnName].ToString();
             }
+        }
+
+
+        /// <summary>
+        /// 荷量画像モーダルに表示する値の取得
+        /// </summary>
+        /// <param name="model">モーダルに表示するモデル</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        public static LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
+        {
+            // 「荷量の相違あり」で保存した値が既に存在するか
+            var isSameAnnotationLoadsExist = LoadOutputConnectController.IsSameAnnotationLoadsExist(model.TripRecordID, isArrived);
+            if (isSameAnnotationLoadsExist)
+            {
+                var annotationLoadClass = LoadOutputConnectController.GetAnnotationLoadClassByTripRecordIDAndIsArrived(model.TripRecordID, isArrived, "AI-truck-load-measurement_test");
+                model.AnnotationLoadClass = annotationLoadClass;
+            }
+
+            // ステーションの画像取得
+            model.ArrivalLoadImgPath = CheckAndConvertImagePath(model.ArrivalLoadImgPath);
+            model.DepartureLoadImgPath = CheckAndConvertImagePath(model.DepartureLoadImgPath);
+
+            return model;
         }
 
         /// <summary>

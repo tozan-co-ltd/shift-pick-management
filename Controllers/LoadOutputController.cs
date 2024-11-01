@@ -30,7 +30,7 @@ namespace ai_truck_load_measurement.Controllers
                 // DB接続
                 IEnumerable<LoadOutputModel> tripRecordList =LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // テーブル情報を変換
-                tripRecordList = ConversionForTable(tripRecordList);
+                tripRecordList = (IEnumerable<LoadOutputModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
                 return View(model);
@@ -41,32 +41,6 @@ namespace ai_truck_load_measurement.Controllers
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
             }
-        }
-
-        /// <summary>
-        /// テーブル情報を変換
-        /// </summary>
-        /// <param name="models">変換元</param>
-        /// <returns></returns>
-        private IEnumerable<LoadOutputModel> ConversionForTable(IEnumerable<LoadOutputModel> models)
-        {
-            foreach (var model in models)
-            {
-                var arrivalLoadClass = model.ArrivalLoadClass;
-                var departureLoadClass = model.DepartureLoadClass;
-
-                // 到着荷量クラスと出発荷量クラスをそれぞれ変換
-                model.ArrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(arrivalLoadClass);
-                model.DepartureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(departureLoadClass);
-
-                // テーブルの空欄を"-"に変換
-                if (string.IsNullOrEmpty(model.TripName)) model.TripName = "-";
-                if (string.IsNullOrEmpty(model.TripBranchSeq)) model.TripBranchSeq = "-";
-                if (string.IsNullOrEmpty(model.DriverName)) model.DriverName = "-";
-
-                model.IdentifyNumber = LoadRecordController.ConvertNumberToFourDigitOrHyphen(model.IdentifyNumber);
-            }
-            return models;
         }
 
 
@@ -88,7 +62,7 @@ namespace ai_truck_load_measurement.Controllers
                 // DB接続
                 tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に、画像パスをBase64に変換
-                tripRecordList = ConversionForTable(tripRecordList);
+                tripRecordList = (IEnumerable<LoadOutputModel>)LoadRecordController.ConversionForTable(tripRecordList);
                 searchData += $@"
                     <div class=""mt-3"">
                         <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
@@ -271,21 +245,10 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="model">モーダルに表示するモデル</param>
         /// <param name="isArrived">到着か否か</param>
         /// <returns></returns>
-        public LoadOutputModel GetModalItems(LoadOutputModel model, bool isArrived)
+        public LoadRecordModel GetModalItems(LoadOutputModel model, bool isArrived)
         {
-            // 「荷量の相違あり」で保存した値が既に存在するか
-            var isSameAnnotationLoadsExist = LoadOutputConnectController.IsSameAnnotationLoadsExist(model.TripRecordID, isArrived);
-            if (isSameAnnotationLoadsExist)
-            {
-                var annotationLoadClass = LoadOutputConnectController.GetAnnotationLoadClassByTripRecordIDAndIsArrived(model.TripRecordID, isArrived, "AI-truck-load-measurement_test");
-                model.AnnotationLoadClass = annotationLoadClass;
-            }
-
-            // ステーションの画像取得
-            model.ArrivalLoadImgPath = LoadRecordController.CheckAndConvertImagePath(model.ArrivalLoadImgPath);
-            model.DepartureLoadImgPath = LoadRecordController.CheckAndConvertImagePath(model.DepartureLoadImgPath);
-            
-            return model;
+            var modalItems = LoadRecordController.GetModalItems(model, isArrived);
+            return modalItems;
         }
 
         /// <summary>
