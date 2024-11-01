@@ -65,7 +65,7 @@ namespace ai_truck_load_measurement.Controllers
                 if (string.IsNullOrEmpty(model.TripBranchSeq)) model.TripBranchSeq = "-";
                 if (string.IsNullOrEmpty(model.DriverName)) model.DriverName = "-";
 
-                model.IdentifyNumber = ConvertNumberToFourDigitOrHyphen(model.IdentifyNumber);
+                model.IdentifyNumber = LoadRecordController.ConvertNumberToFourDigitOrHyphen(model.IdentifyNumber);
             }
             return models;
         }
