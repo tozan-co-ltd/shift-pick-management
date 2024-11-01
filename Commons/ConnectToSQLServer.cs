@@ -9,20 +9,6 @@ namespace ai_truck_load_measurement.Commons
     public static class ConnectToSQLServer
     {
         /// <summary>
-        /// SQLServer接続文字列取得(共通マスター)
-        /// </summary>
-        /// <returns></returns>
-        public static string GetSQLServerConnectionStringForMaster()
-        {
-            var databaseName = "WarehouseMaster";
-            var builder = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: false);
-            var configuration = builder.Build();
-            return configuration.GetSection("connectionString").GetValue<string>(databaseName);
-        }
-
-        /// <summary>
         /// SQLServer接続文字列取得
         /// </summary>
         /// <param name="databaseName"></param>

@@ -49,19 +49,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         {
             var sql = $@"
                 SELECT 
-	                detect_records.load_detect_record_id,
-	                detect_records.station_id,
+	                station_id,
 	                load_class,
-	                created_at,
-	                image_path
-                FROM t_load_detect_records detect_records
-                JOIN (
-                    SELECT station_id, MAX(created_at) AS latest_create
-                    FROM t_load_detect_records
-                    GROUP BY station_id
-                ) latest_detect_recprds
-                ON detect_records.station_id = latest_detect_recprds.station_id 
-                AND detect_records.created_at = latest_detect_recprds.latest_create
+	                image_base64,
+	                updated_at
+                FROM t_tmp_station_status
             ";
             return sql;
         }

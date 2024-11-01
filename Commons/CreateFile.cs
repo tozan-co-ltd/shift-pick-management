@@ -14,46 +14,6 @@ namespace ai_truck_load_measurement.Commons
     public static class CreateFile
     {
         /// <summary>
-        /// CSVファイルデータ読取
-        /// </summary>
-        /// <param name="csvModel">入力モデル</param>
-        /// <param name="gamenName">画面名</param>
-        /// <returns></returns>
-        public async static Task<(string, List<string[]>?, string)> ReadCsv(CsvFileInputModel csvModel, string gamenName)
-        {
-            var message = string.Empty;
-            var lines = new List<string[]>();
-
-            try
-            {
-                // CSV拡張子チェック
-                if (!IsCsvExtension(csvModel.FileName))
-                {
-                    return ("E1013: " + ErrorMessagesResources.E1013, null, string.Empty);
-                };
-
-                // ファイルコピー
-                string importFilePath = await CopyCsvFile(csvModel.ImportFile, gamenName);
-
-                // CSVファイルデータ読み取り
-                lines = ReadCsvFile(importFilePath, csvModel.HeaderColumnCount);
-
-                // CSVファイルデータチェック
-                bool isValidCsv = CheckCsvData(lines, csvModel.HeaderSettings);
-                if (!isValidCsv)
-                {
-                    return ("E1014: " + ErrorMessagesResources.E1014, null, importFilePath);
-                }
-
-                return (message, lines, importFilePath);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// DataTableをCSV形式の文字列に変換
         /// </summary>
         /// <param name="dataTable">データテーブル</param>

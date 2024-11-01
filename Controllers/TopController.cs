@@ -92,13 +92,10 @@ namespace ai_truck_load_measurement.Controllers
                 // 荷量クラスと車両の存在有無により分岐
                 var loadClass = model.LoadClass;
                 var truckExist = model.TruckExist;
-                var truckStatus = string.Empty;
+                var truckStatus = "　";
 
-                if(loadClass < 3)
-                {
-                    truckStatus = "　";
-                }
-                else
+                if (loadClass == 2) truckStatus = "0%";
+                if (loadClass >= 3)
                 {
                     model.TruckExist = true;
                     int lowerLimit = (loadClass - 3) * 10 + 1;
@@ -119,14 +116,14 @@ namespace ai_truck_load_measurement.Controllers
         {
             foreach (var model in models)
             {
-                string imagePath = model.ImagePath;
-                // 画像パスに画像がないかパスが不正な場合はダミー画像を表示する
-                if (!IsValidImage(imagePath))
+                string imageBase64 = model.ImageBase64;
+                // 不正な画像の場合はダミー画像を表示する
+                if (!CanDecodeImageBase64(imageBase64))
                 {
                     var rootPath = Directory.GetCurrentDirectory();
-                    imagePath = Path.Combine(rootPath, @"wwwroot\images\NoImage.png");
+                    var imagePath = Path.Combine(rootPath, @"wwwroot\images\NoImage.png");
+                    model.ImageBase64 = "data:image/jpeg;base64," + ImageToBase64(imagePath);
                 }
-                model.ImagePath = ImageToBase64(imagePath);
             }
             return models;
         }
@@ -151,31 +148,24 @@ namespace ai_truck_load_measurement.Controllers
 
 
         /// <summary>
-        /// 画像のパスが正しいかどうか確認する
+        /// Base64でデコードできるか判定する
         /// </summary>
-        /// <param name="imagePath"></param>
+        /// <param name="imageBase64">Base64変換文字列</param>
         /// <returns></returns>        
-        public bool IsValidImage(string imagePath)
-        {
-            // 画像パスがここに含まれたフォーマットの場合trueを返す
-            var imageFormats = new List<ImageFormat>()
-                  {
-                    ImageFormat.Jpeg,
-                    ImageFormat.Png,
-                  };
+        public bool CanDecodeImageBase64(string imageBase64)
+        {   
             try
             {
-
-                using (FileStream fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
-                using (Image targetImage = Image.FromStream(fileStream))
-                {
-                    return imageFormats.Contains(targetImage.RawFormat);
-                }
+                string base64String = imageBase64.Split(',')[1];
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+                return true;
             }
             catch (Exception)
             {
                 return false;
             }
         }
+
+
     }
 }

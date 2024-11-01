@@ -45,6 +45,114 @@ namespace ai_truck_load_measurement.Controllers
 
 
         /// <summary>
+        /// テーブル情報を変換
+        /// </summary>
+        /// <param name="models">変換元</param>
+        /// <returns></returns>
+        private IEnumerable<LoadOutputModel> ConversionForTable(IEnumerable<LoadOutputModel> models)
+        {
+            foreach (var model in models)
+            {
+                var arrivalLoadClass = model.ArrivalLoadClass;
+                var departureLoadClass = model.DepartureLoadClass;
+
+                // 到着荷量クラスと出発荷量クラスをそれぞれ変換
+                model.ArrivalLoadStatus = ConversionLoadClassToLoadStatus(arrivalLoadClass);
+                model.DepartureLoadStatus = ConversionLoadClassToLoadStatus(departureLoadClass);
+
+                // テーブルの空欄を"-"に変換
+                if (string.IsNullOrEmpty(model.TripName)) model.TripName = "-";
+                if (string.IsNullOrEmpty(model.TripBranchSeq)) model.TripBranchSeq = "-";
+                if (string.IsNullOrEmpty(model.DriverName)) model.DriverName = "-";
+
+                model.IdentifyNumber = ConvertNumberToFourDigitOrHyphen(model.IdentifyNumber);
+            }
+            return models;
+        }
+
+        /// <summary>
+        /// 荷量クラスからパーセント表示に変換
+        /// </summary>
+        /// <param name="loadClass">荷量クラス</param>
+        /// <returns></returns>
+        private string ConversionLoadClassToLoadStatus(int loadClass)
+        {
+            var loadStatus = "-";
+            if (loadClass == 2) loadStatus = "0";
+            if (loadClass >= 3)
+            {
+                int lowerLimit = (loadClass - 3) * 10 + 1;
+                int upperLimit = (loadClass - 2) * 10;
+                loadStatus = ($"{lowerLimit}-{upperLimit}");
+            }
+            return loadStatus;
+        }
+
+        /// <summary>
+        /// 画像のパスが正しいかどうかのチェックとパスの変換
+        /// </summary>
+        /// <param name="imagePath">画像パス</param>
+        /// <returns></returns>
+        private string CheckAndConvertImagePath(string imagePath)
+        {
+            // 画像パスに画像がないかパスが不正な場合はダミー画像を表示する
+            if (!IsValidImage(imagePath))
+            {
+                var rootPath = Directory.GetCurrentDirectory();
+                imagePath = Path.Combine(rootPath, @"wwwroot\images\NoImage.png");
+            }
+            var imagePathToBase64 = ImageToBase64(imagePath);
+            return imagePathToBase64;
+        }
+
+        /// <summary>
+        /// 画像のパスをBase64文字列に変換する
+        /// </summary>
+        /// <param name="imagePath">変換したい画像のパス</param>
+        /// <returns></returns>
+        private static string ImageToBase64(string imagePath)
+        {
+            using (Image image = Image.FromFile(imagePath))
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    image.Save(memoryStream, ImageFormat.Jpeg); // 画像フォーマットを指定（ここではJPEG）
+                    byte[] imageBytes = memoryStream.ToArray();
+                    return Convert.ToBase64String(imageBytes);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 画像のパスが正しいかどうか確認する
+        /// </summary>
+        /// <param name="imagePath">確認したい画像パス</param>
+        /// <returns></returns>        
+        public bool IsValidImage(string imagePath)
+        {
+            // 画像パスがここに含まれたフォーマットの場合trueを返す
+            var imageFormats = new List<ImageFormat>()
+                  {
+                    ImageFormat.Jpeg,
+                    ImageFormat.Png,
+                  };
+            try
+            {
+
+                using (FileStream fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                using (Image targetImage = Image.FromStream(fileStream))
+                {
+                    return imageFormats.Contains(targetImage.RawFormat);
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 便実績情報テーブル非同期更新用
         /// </summary>
         /// <param name="startOfPeriod">期間の開始日時</param>
