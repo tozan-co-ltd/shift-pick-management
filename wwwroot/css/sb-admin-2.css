@@ -12247,5 +12247,6 @@ body.sidebar-toggled footer.sticky-footer {
         position: absolute;
         top: 0;
         left: 0;
+        zoom:0.8;
     }
 }
