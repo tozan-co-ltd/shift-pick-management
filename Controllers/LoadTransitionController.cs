@@ -31,7 +31,7 @@ namespace ai_truck_load_measurement.Controllers
                 model.TripNameList = tripNameList;
 
                 // 便実績情報取得SQL作成
-                var sql2 = LoadTransitionConnectController.CreatSQLToSelectTripRecord();
+                var sql2 = LoadRecordConnectController.CreatSQLToSelectTripRecord();
                 // DB接続
                 IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql2, "AI-truck-load-measurement_test");
                 // テーブル情報を変換
@@ -335,7 +335,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 便実績情報取得
                 var tTripRecordSql = LoadTransitionConnectController.CreateSQLToSelectTripRecordForDataTable(arrayTrips, startOfPeriod, endOfPeriod);
-                DataTable tTripRecordDT = LoadTransitionConnectController.ConnectTTripRecordToDataTable(tTripRecordSql, "AI-truck-load-measurement_test");
+                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql, "AI-truck-load-measurement_test");
 
                 // 荷量のクラスを数値化
                 tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
