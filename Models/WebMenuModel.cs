@@ -10,14 +10,14 @@ namespace ai_truck_load_measurement.Models
     public class WebMenuModel : CommonModel
     {
         private readonly List<M_WebMenu> referenceList = new List<M_WebMenu>()
-                {
-                    new M_WebMenu{CategoryID = 1, MenuID = 1, MenuName = "荷量分布", Controller = "", Action = "Index"},
-                    new M_WebMenu{CategoryID = 1, MenuID = 2, MenuName = "荷量推移", Controller = "", Action = "Index"},
-                    new M_WebMenu{CategoryID = 1, MenuID = 3, MenuName = "荷量と運行実績", Controller = "", Action = "Index"},
-                    new M_WebMenu{CategoryID = 1, MenuID = 4, MenuName = "実績出力", Controller = "LoadOutput", Action = "Index"},
-                    new M_WebMenu{CategoryID = 2, MenuID = 1, MenuName = "車両マスター", Controller = "M_Truck", Action = "Index"},
-                    new M_WebMenu{CategoryID = 2, MenuID = 2, MenuName = "便マスター", Controller = "M_Trip", Action = "Index"},
-                };
+        {
+            new M_WebMenu{CategoryID = 1, MenuID = 1, MenuName = "荷量分布", Controller = "", Action = "Index"},
+            new M_WebMenu{CategoryID = 1, MenuID = 2, MenuName = "荷量推移", Controller = "LoadTransition", Action = "Index"},
+            new M_WebMenu{CategoryID = 1, MenuID = 3, MenuName = "荷量と運行実績", Controller = "", Action = "Index"},
+            new M_WebMenu{CategoryID = 1, MenuID = 4, MenuName = "実績出力", Controller = "LoadOutput", Action = "Index"},
+            new M_WebMenu{CategoryID = 2, MenuID = 1, MenuName = "車両マスター", Controller = "M_Truck", Action = "Index"},
+            new M_WebMenu{CategoryID = 2, MenuID = 2, MenuName = "便マスター", Controller = "M_Trip", Action = "Index"},
+        };
 
         /// <summary>
         /// WEBカテゴリーリスト取得
