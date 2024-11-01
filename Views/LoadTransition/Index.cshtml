@@ -956,9 +956,8 @@
                 method: method,
                 data: data
             }).done(function (response) {
-                $('#detail-modal').hide();
                 // 完了モーダル表示
-                AlertMessage('', '完了', '登録が完了しました。', null, null);
+                alert('登録が完了しました。');
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
                     var errorMessage = jqXHR.responseJSON.errorMessage;
