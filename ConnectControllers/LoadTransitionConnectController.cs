@@ -266,6 +266,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 選択された便名称と便枝番からSQLの検索条件箇所を作成する
+        /// </summary>
+        /// <param name="models">選択された便名称と便枝番のリスト</param>
+        /// <returns>SQL文</returns>
         private static string SelectedTripsSQL(List<LoadTransitionModel> models)
         {
             var selectedTrips = "";
