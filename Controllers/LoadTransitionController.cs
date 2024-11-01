@@ -11,6 +11,7 @@ using System.Drawing;
 using ai_truck_load_measurement.Commons;
 using System.Data;
 using System.IO.Compression;
+using System.Collections.Generic;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -35,7 +36,7 @@ namespace ai_truck_load_measurement.Controllers
                 // DB接続
                 IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql2, "AI-truck-load-measurement_test");
                 // テーブル情報を変換
-                tripRecordList = ConversionForTable(tripRecordList);
+                tripRecordList = (IEnumerable<LoadTransitionModel>)ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
                 return View(model);
@@ -157,7 +158,7 @@ namespace ai_truck_load_measurement.Controllers
                 // DB接続
                 tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
                 // 荷量のクラスを数値に、画像パスをBase64に変換
-                tripRecordList = ConversionForTable(tripRecordList);
+                tripRecordList = (IEnumerable<LoadTransitionModel>)ConversionForTable(tripRecordList);
                 searchData += $@"
                     <div class=""mt-3"">
                         <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
@@ -256,7 +257,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="models">変換元</param>
         /// <returns></returns>
-        private IEnumerable<LoadTransitionModel> ConversionForTable(IEnumerable<LoadTransitionModel> models)
+        private IEnumerable<LoadRecordModel> ConversionForTable(IEnumerable<LoadRecordModel> models)
         {
             foreach (var model in models)
             {
