@@ -368,12 +368,13 @@
 
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
-        console.log(model); 
         var today = new Date();
         var oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
+        // 便枝番のセレクトリスト更新
+        tripBranchSeqSetToSelectList();
     })
 
     // 期間の開始日付変更時
@@ -434,6 +435,12 @@
 
     // 便名称選択時
     $('[name=TripName]').change(function () {
+        // 便枝番のセレクトリスト更新
+        tripBranchSeqSetToSelectList();
+    });
+
+    // 便枝番のセレクトリスト更新
+    function tripBranchSeqSetToSelectList(){
         // 便名称取得
         var tripName = $('[name=TripName]').val();
 
@@ -464,7 +471,7 @@
                 option.value = response[i];
                 select.appendChild(option);
             }
-            
+
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -474,7 +481,7 @@
                 $("#div-error-message").text(errorMessage);
             }
         });
-    });
+    }
 
     // 選択された便の配列
     let arrayTrips = [];

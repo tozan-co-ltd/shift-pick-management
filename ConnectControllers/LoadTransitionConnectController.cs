@@ -183,6 +183,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                trip_name AS Text
                 FROM t_trip_records
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
+                AND trip_name IS NOT NULL
             ";
             return sql;
         }
