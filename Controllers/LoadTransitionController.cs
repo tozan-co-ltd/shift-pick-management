@@ -166,21 +166,21 @@ namespace ai_truck_load_measurement.Controllers
                             <thead>
                                 <tr align=""center"">
                                     <th hidden>便実績ID</th>
-                                    <th class=""font-weight-bold"">便名称</th>
+                                    <th class=""font-weight-bold"">便名称<br></th>
                                     <th class=""font-weight-bold"">便枝番</th>
                                     <th class=""font-weight-bold"">乗務員</th>
-                                    <th class=""font-weight-bold"">ステーションID</th>
-                                    <th class=""font-weight-bold"">車両番号</th>
-                                    <th class=""font-weight-bold"">識別番号</th>
-                                    <th class=""font-weight-bold"">到着予定時間</th>
-                                    <th class=""font-weight-bold"">出発予定時間</th>
+                                    <th class=""font-weight-bold"">ステーション<br>ID</th>
+                                    <th class=""font-weight-bold"">車両<br>番号</th>
+                                    <th class=""font-weight-bold"">識別<br>番号</th>
+                                    <th class=""font-weight-bold"">到着<br>予定</th>
+                                    <th class=""font-weight-bold"">出発<br>予定</th>
                                     <th class=""font-weight-bold"">稼働日</th>
                                     <th class=""font-weight-bold"">到着日時</th>
                                     <th class=""font-weight-bold"">出発日時</th>
-                                    <th class=""font-weight-bold"">到着荷量(%)</th>
-                                    <th class=""font-weight-bold"">出発荷量(%)</th>
-                                    <th class=""font-weight-bold"">到着荷量画像</th>
-                                    <th class=""font-weight-bold"">出発荷量画像</th>
+                                    <th class=""font-weight-bold"">到着荷量<br>(%)</th>
+                                    <th class=""font-weight-bold"">出発荷量<br>(%)</th>
+                                    <th class=""font-weight-bold"">到着荷量<br>画像</th>
+                                    <th class=""font-weight-bold"">出発荷量<br>画像</th>
                                 </tr>
                             </thead>
                             <tbody>
