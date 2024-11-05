@@ -44,7 +44,7 @@ namespace ai_truck_load_measurement.Models
             ControllerName = viewContext.RouteData.Values["controller"].ToString();
             CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();
-            MTruckList = GetMTruckList("AI-truck-load-measurement_test");
+            MTruckList = GetMTruckList();
         }
 
         /// <summary>
@@ -87,14 +87,14 @@ namespace ai_truck_load_measurement.Models
         /// 車両リスト取得
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<SelectListItem> GetMTruckList(string databaseName)
+        public IEnumerable<SelectListItem> GetMTruckList()
         {
             var selectListItem = new List<SelectListItem>();
 
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();

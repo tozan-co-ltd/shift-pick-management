@@ -50,11 +50,11 @@ namespace ai_truck_load_measurement.Controllers
                 // 最新のステーション状況取得SQL作成
                 var latestStationStatusSQL = TopConnectController.CreateSQLToSelectLatestStationStatus();
                 // 最新のステーション状況取得
-                List<TopModel> topModelList = TopConnectController.ConnectTops(latestStationStatusSQL, "AI-truck-load-measurement_test");
+                List<TopModel> topModelList = TopConnectController.ConnectTops(latestStationStatusSQL);
                 // トラック有無取得SQL作成
                 var isExistTrucksSQL = TopConnectController.CreateSQLToSelectIsExistTrucksPerStationID();
                 // トラック有無取得
-                IEnumerable<TopModel> isExistTrucksList = TopConnectController.ConnectTops(isExistTrucksSQL, "AI-truck-load-measurement_test");
+                IEnumerable<TopModel> isExistTrucksList = TopConnectController.ConnectTops(isExistTrucksSQL);
                 foreach (var item in topModelList)
                 {
                     var isExistTruck = isExistTrucksList.Where(x => x.StationID == item.StationID).ToList();
