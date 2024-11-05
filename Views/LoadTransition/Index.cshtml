@@ -619,11 +619,12 @@
                 var arrivalLoadStatuses = [];
                 var departureLoadStatuses = [];
                 response.forEach(function (item) {
+                    var workDay = GetDayStringForChart(new Date(item.workDay));
                     if (item.arrivalLoadStatus != "") {
-                        arrivalLoadStatuses.push(item.arrivalLoadStatus );
+                        arrivalLoadStatuses.push({ x: workDay, y: item.arrivalLoadStatus } );
                     }
                     if (item.departureLoadStatus != "") {
-                        departureLoadStatuses.push(item.departureLoadStatus );
+                        departureLoadStatuses.push({ x: workDay, y: item.departureLoadStatus } );
                     }
                 })
 
@@ -778,6 +779,8 @@
 
     // 荷量画像モーダル作成
     function EditModal(tripRecordID, isArrived) {
+        // デフォルトの操作を無効化
+        event.preventDefault();
 
         // LoadOutputModel取得
         var data = @Html.Raw(Json.Serialize(Model));
