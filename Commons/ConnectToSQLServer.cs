@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 using System.Data.SqlClient;
 
 namespace ai_truck_load_measurement.Commons
@@ -16,6 +17,9 @@ namespace ai_truck_load_measurement.Commons
         public static string GetSQLServerConnectionString()
         {
             var databaseName = "AITruckLoadMeasurementMaster";
+#if DEBUG
+            databaseName = "AITruckLoadMeasurementMasterTest";
+#endif
             var builder = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json", optional: false);
