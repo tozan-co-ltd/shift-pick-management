@@ -75,7 +75,7 @@ namespace ai_truck_load_measurement.Filters
                 //// 2.同一ユーザーによる複数端末での同時ログインを禁止する
                 ////   先にログインしたユーザーがログアウト(ログイン画面へリダイレクト)される
                 //var controller = context.Controller as Controller;
-                //var databaseName = controller.User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_DatabaseName).First().Value;
+                //var  = controller.User.Claims.Where(x => x.Type == CustomClaimTypes.ClaimType_).First().Value;
 
                 //// ログイン中ユーザー情報取得
                 //var loginUserModel = new LoginUserModel();
@@ -90,7 +90,7 @@ namespace ai_truck_load_measurement.Filters
                 //    // SQL作成
                 //    var sql = LoginConnectController.CreateSQLToSelectMUserByLastLoginDatetime(userID, lastLoginDatetime);
                 //    // DB接続
-                //    IsMatched = M_UserConnectController.ConnectMUserWithMatchingLastLoginDatetime(sql, databaseName);
+                //    IsMatched = M_UserConnectController.ConnectMUserWithMatchingLastLoginDatetime(sql, );
                 //}
 
                 //// 一致するユーザー情報がない場合はログイン画面へリダイレクト

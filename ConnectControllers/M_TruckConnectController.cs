@@ -16,9 +16,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 車両情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
-        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static List<M_TruckModel> ConnectMTrucks(string sql, string databaseName)
+        public static List<M_TruckModel> ConnectMTrucks(string sql)
         {
             // 戻り値
             List<M_TruckModel> strList = new();
@@ -27,7 +26,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {
@@ -49,9 +48,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 車両情報をデータテーブルとして取得
         /// </summary>
         /// <param name="sql">SQL文</param>
-        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static DataTable ConnectMTrucksToDataTable(string sql, string databaseName)
+        public static DataTable ConnectMTrucksToDataTable(string sql)
         {
             // 戻り値
            DataTable dataTable = new DataTable();
@@ -60,7 +58,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {
@@ -88,7 +86,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         public static int InsertMTruck(M_TruckModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -120,7 +118,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         public static int UpdateMTruck(M_TruckModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -153,7 +151,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         public static int DeleteMTruck(int truckId, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {

@@ -28,14 +28,14 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadTransitionConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today);
                 // DB接続
-                List<SelectListItem> tripNameList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql, "AI-truck-load-measurement_test");
+                List<SelectListItem> tripNameList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql);
 
                 model.TripNameList = tripNameList;
 
                 // 便実績情報取得SQL作成
                 var sql2 = LoadRecordConnectController.CreatSQLToSelectTripRecord();
                 // DB接続
-                IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql2, "AI-truck-load-measurement_test");
+                IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql2);
                 // テーブル情報を変換
                 tripRecordList = (IEnumerable<LoadTransitionModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
@@ -64,7 +64,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadTransitionConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod);
                 // DB接続
-                tripRecordList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql, "AI-truck-load-measurement_test");
+                tripRecordList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql);
 
                 return tripRecordList;
             }
@@ -91,7 +91,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadTransitionConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName, startOfPeriod, endOfPeriod);
                 // DB接続
-                tripBranchSeqList = LoadTransitionConnectController.ConnectTTripRecordsForTripBranchSeq(sql, "AI-truck-load-measurement_test");
+                tripBranchSeqList = LoadTransitionConnectController.ConnectTTripRecordsForTripBranchSeq(sql);
 
                 return tripBranchSeqList;
             }
@@ -119,7 +119,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadTransitionConnectController.CreateSQLToSelectLoadClassFromSearchConditions(tripName, tripBranchSeq, startOfPeriod, endOfPeriod);
                 // DB接続
-                var loadClasses = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                var loadClasses = LoadTransitionConnectController.ConnectTTripRecords(sql);
 
                 foreach ( var loadClass in loadClasses)
                 {
@@ -157,7 +157,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 指定した期間の便マスター情報取得SQL作成
                 var sql = LoadTransitionConnectController.CreateSQLToSelectLoadClassFromSearchConditionsForTable(models, startOfPeriod, endOfPeriod);
                 // DB接続
-                tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql);
                 // 荷量のクラスを数値に、画像パスをBase64に変換
                 tripRecordList = (IEnumerable<LoadTransitionModel>)LoadRecordController.ConversionForTable(tripRecordList);
                 searchData += $@"
@@ -295,12 +295,12 @@ namespace ai_truck_load_measurement.Controllers
                 if (isSameAnnotationLoadsExist)
                 {
                     // 更新
-                    LoadOutputConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user, "AI-truck-load-measurement_test");
+                    LoadOutputConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
                 }
                 else
                 {
                     // 新規保存
-                    LoadOutputConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user, "AI-truck-load-measurement_test");
+                    LoadOutputConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
                 }
 
                 return Ok();
@@ -358,7 +358,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 便実績情報取得
                 var tTripRecordSql = LoadTransitionConnectController.CreateSQLToSelectTripRecordForDataTable(arrayTrips, startOfPeriod, endOfPeriod);
-                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql, "AI-truck-load-measurement_test");
+                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
 
                 // 荷量のクラスを数値化
                 tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
@@ -434,7 +434,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 指定した期間の便実績情報取得SQL作成
                 var sql = LoadTransitionConnectController.CreatSQLToSelectTripRecordForImage(arrayTrips, startOfPeriod, endOfPeriod);
                 // DB接続
-                IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql);
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");
                 var endDate = endOfPeriod.ToString("yyyyMMdd");

@@ -11,9 +11,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便実績情報をデータテーブルとして取得
         /// </summary>
         /// <param name="sql">SQL文</param>
-        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static DataTable ConnectTTripRecordToDataTable(string sql, string databaseName)
+        public static DataTable ConnectTTripRecordToDataTable(string sql)
         {
             // 戻り値
             DataTable dataTable = new DataTable();
@@ -22,7 +21,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {

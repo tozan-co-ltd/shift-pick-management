@@ -28,7 +28,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadRecordConnectController.CreatSQLToSelectTripRecord();
                 // DB接続
-                IEnumerable<LoadOutputModel> tripRecordList =LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                IEnumerable<LoadOutputModel> tripRecordList =LoadOutputConnectController.ConnectTTripRecords(sql);
                 // テーブル情報を変換
                 tripRecordList = (IEnumerable<LoadOutputModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
@@ -168,7 +168,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 指定した期間の便マスター情報取得SQL作成
                 var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
                 // DB接続
-                tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql);
                 // 荷量のクラスを数値に、画像パスをBase64に変換
                 tripRecordList = (IEnumerable<LoadOutputModel>)LoadRecordController.ConversionForTable(tripRecordList);
                 searchData += $@"
@@ -287,7 +287,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 便実績情報取得
                 var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
-                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql, "AI-truck-load-measurement_test");
+                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
 
                 // 荷量のクラスを数値化
                 tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
@@ -388,12 +388,12 @@ namespace ai_truck_load_measurement.Controllers
                 if (isSameAnnotationLoadsExist)
                 {
                     // 更新
-                    LoadOutputConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user, "AI-truck-load-measurement_test");
+                    LoadOutputConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
                 }
                 else
                 {
                     // 新規保存
-                    LoadOutputConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user, "AI-truck-load-measurement_test");
+                    LoadOutputConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
                 }
 
                 return Ok();
@@ -434,7 +434,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 指定した期間の便実績情報取得SQL作成
                 var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
                 // DB接続
-                IEnumerable<LoadOutputModel> tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql, "AI-truck-load-measurement_test");
+                IEnumerable<LoadOutputModel> tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql);
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");
                 var endDate = endOfPeriod.ToString("yyyyMMdd");

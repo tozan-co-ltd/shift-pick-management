@@ -13,9 +13,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便実績情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
-        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static List<LoadTransitionModel> ConnectTTripRecords(string sql, string databaseName)
+        public static List<LoadTransitionModel> ConnectTTripRecords(string sql)
         {
             // 戻り値
             List<LoadTransitionModel> strList = new();
@@ -24,7 +23,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {
@@ -45,9 +44,9 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便名称取得
         /// </summary>
         /// <param name="sql">SQL文</param>
-        /// <param name="databaseName">データベース名</param>
+        /// <param name="">データベース名</param>
         /// <returns></returns>
-        public static List<SelectListItem> ConnectTTripRecordsForTripName(string sql, string databaseName)
+        public static List<SelectListItem> ConnectTTripRecordsForTripName(string sql)
         {
             // 戻り値
             List<SelectListItem> strList = new();
@@ -56,7 +55,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {
@@ -77,9 +76,9 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便枝番リスト取得
         /// </summary>
         /// <param name="sql">SQL文</param>
-        /// <param name="databaseName">データベース名</param>
+        /// <param name="">データベース名</param>
         /// <returns></returns>
-        public static List<int> ConnectTTripRecordsForTripBranchSeq(string sql, string databaseName)
+        public static List<int> ConnectTTripRecordsForTripBranchSeq(string sql)
         {
             // 戻り値
             List<int> strList = new();
@@ -88,7 +87,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {

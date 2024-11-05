@@ -14,9 +14,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
-        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static List<M_TripModel> ConnectMTrips(string sql, string databaseName)
+        public static List<M_TripModel> ConnectMTrips(string sql)
         {
             // 戻り値
             List<M_TripModel> strList = new();
@@ -25,7 +24,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {
@@ -51,7 +50,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         public static int InsertMTripAndMTripHistory(M_TripModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -78,7 +77,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         public static int UpdateMTrip(M_TripModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -226,7 +225,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         public static string SelectIdentifyNumberByTruckId(int truckID)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -253,9 +252,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便情報をデータテーブルとして取得
         /// </summary>
         /// <param name="sql">SQL文</param>
-        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static DataTable ConnectMTripsToDataTable(string sql, string databaseName)
+        public static DataTable ConnectMTripsToDataTable(string sql)
         {
             // 戻り値
             DataTable dataTable = new DataTable();
@@ -264,7 +262,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {

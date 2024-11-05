@@ -14,9 +14,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便実績情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
-        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static List<LoadOutputModel> ConnectTTripRecords(string sql, string databaseName)
+        public static List<LoadOutputModel> ConnectTTripRecords(string sql)
         {
             // 戻り値
             List<LoadOutputModel> strList = new();
@@ -25,7 +24,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {
@@ -53,7 +52,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var isAnnotationLoadsExist = false;
 
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -86,10 +85,10 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="isArrived">到着か否か</param>
         /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>インサート数</returns>
-        public static int InsertAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser, string databaseName)
+        public static int InsertAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -119,10 +118,10 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="isArrived">到着か否か</param>
         /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>インサート数</returns>
-        public static int UpdateAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser, string databaseName)
+        public static int UpdateAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -149,12 +148,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="tripRecordID">便実績ID</param>
         /// <param name="isArrived">到着か否か</param>
-        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static int GetAnnotationLoadClassByTripRecordIDAndIsArrived(int  tripRecordID, bool isArrived, string databaseName)
+        public static int GetAnnotationLoadClassByTripRecordIDAndIsArrived(int  tripRecordID, bool isArrived)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
