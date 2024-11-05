@@ -60,38 +60,10 @@ label{
 }
 
 .icon-categoryid-1::before {
-    content: '\f109';
+    content: '\f0d1';
 }
 
 .icon-categoryid-2::before {
-    content: '\f0ae';
-}
-
-.icon-categoryid-3::before {
-    content: '\f468';
-}
-
-.icon-categoryid-4::before {
-    content: '\f0ad';
-}
-
-.icon-categoryid-5::before {
-    content: '\f474';
-}
-
-.icon-categoryid-6::before {
-    content: '\f0d1';
-}
-
-.icon-categoryid-7::before {
-    content: '\f0ad';
-}
-
-.icon-categoryid-11::before {
-    content: '\f0d1';
-}
-
-.icon-categoryid-12::before {
     content: '\f0ad';
 }
 
@@ -905,6 +877,53 @@ select[readonly] {
 /*Å@-------------- Modal ---------------*/
 .modalLabel a{
     white-space: nowrap;
+}
+
+.btn-update:not(:disabled):not(.disabled):active, .btn-update:not(:disabled):not(.disabled).active,
+.show > .btn-update.dropdown-toggle {
+    background-color: #1CC88A !important;
+    border: #1CC88A !important;
+    color: #ffffff !important;
+}
+
+.btn-update {
+    background-color: #1CC88A;
+    border: #1CC88A;
+    color: #ffffff;
+}
+
+    .btn-update:hover {
+        background-color: #1CC88A;
+        border: #1CC88A;
+        color: #ffffff;
+    }
+
+.select-modal select {
+    width: 135px
+}
+
+.modal-table td {
+    vertical-align: middle;
+}
+
+.modal-table {
+    margin: auto;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.modal-img img {
+    width: 100%;
+}
+
+.trip-record-buttons {
+    position: relative;
+}
+
+.right-button {
+    float: right;
+    position: absolute;
+    right: 0;
 }
 /*Å@-------------- Modal ---------------*/
 

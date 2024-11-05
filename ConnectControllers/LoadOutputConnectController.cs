@@ -14,9 +14,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便実績情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
-        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static List<LoadOutputModel> ConnectTTripRecords(string sql, string databaseName)
+        public static List<LoadOutputModel> ConnectTTripRecords(string sql)
         {
             // 戻り値
             List<LoadOutputModel> strList = new();
@@ -25,7 +24,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             try
             {
                 // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
                 // SQLServer接続
                 using (var connection = new SqlConnection())
                 {
@@ -43,41 +42,6 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 便実績情報をデータテーブルとして取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <param name="databaseName">データベース名</param>
-        /// <returns></returns>
-        public static DataTable ConnectTTripRecordToDataTable(string sql, string databaseName)
-        {
-            // 戻り値
-            DataTable dataTable = new DataTable();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandText = sql;
-                    var adapter = new SqlDataAdapter(command);
-                    adapter.Fill(dataTable);
-                }
-                return dataTable;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
-        /// <summary>
         ///「荷量の相違あり」で保存した値があるか
         /// </summary>
         /// <param name="tripRecordID">便実績ID</param>
@@ -88,7 +52,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var isAnnotationLoadsExist = false;
 
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString("AI-truck-load-measurement_test");
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -121,10 +85,10 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="isArrived">到着か否か</param>
         /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>インサート数</returns>
-        public static int InsertAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser, string databaseName)
+        public static int InsertAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -154,10 +118,10 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="isArrived">到着か否か</param>
         /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>インサート数</returns>
-        public static int UpdateAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser, string databaseName)
+        public static int UpdateAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -184,12 +148,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="tripRecordID">便実績ID</param>
         /// <param name="isArrived">到着か否か</param>
-        /// <param name="databaseName">データベース名</param>
         /// <returns></returns>
-        public static int GetAnnotationLoadClassByTripRecordIDAndIsArrived(int  tripRecordID, bool isArrived, string databaseName)
+        public static int GetAnnotationLoadClassByTripRecordIDAndIsArrived(int  tripRecordID, bool isArrived)
         {
             // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString(databaseName);
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
             // SQLServer接続
             using (var connection = new SqlConnection())
             {
@@ -208,34 +171,6 @@ namespace ai_truck_load_measurement.ConnectControllers
                 }
 
             }
-        }
-
-        /// <summary>
-        /// 便実績情報取得SQL
-        /// </summary>
-        /// <returns></returns>
-        public static string CreatSQLToSelectTripRecord()
-        {
-            var sql = $@"
-                SELECT
-                    trip_record_id,
-	                trip_name,
-	                trip_branch_seq,
-	                driver_name,
-	                station_id,
-	                truck_number,
-	                identify_number,
-	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
-	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
-	                work_day,
-	                arrived_at,
-	                departed_at,
-	                arrival_load_class,
-	                departure_load_class,
-	                arrival_load_img_path,
-	                departure_load_img_path
-                FROM t_trip_records";
-            return sql;
         }
 
         /// <summary>

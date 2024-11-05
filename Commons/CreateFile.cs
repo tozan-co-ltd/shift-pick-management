@@ -14,46 +14,6 @@ namespace ai_truck_load_measurement.Commons
     public static class CreateFile
     {
         /// <summary>
-        /// CSVファイルデータ読取
-        /// </summary>
-        /// <param name="csvModel">入力モデル</param>
-        /// <param name="gamenName">画面名</param>
-        /// <returns></returns>
-        public async static Task<(string, List<string[]>?, string)> ReadCsv(CsvFileInputModel csvModel, string gamenName)
-        {
-            var message = string.Empty;
-            var lines = new List<string[]>();
-
-            try
-            {
-                // CSV拡張子チェック
-                if (!IsCsvExtension(csvModel.FileName))
-                {
-                    return ("E1013: " + ErrorMessagesResources.E1013, null, string.Empty);
-                };
-
-                // ファイルコピー
-                string importFilePath = await CopyCsvFile(csvModel.ImportFile, gamenName);
-
-                // CSVファイルデータ読み取り
-                lines = ReadCsvFile(importFilePath, csvModel.HeaderColumnCount);
-
-                // CSVファイルデータチェック
-                bool isValidCsv = CheckCsvData(lines, csvModel.HeaderSettings);
-                if (!isValidCsv)
-                {
-                    return ("E1014: " + ErrorMessagesResources.E1014, null, importFilePath);
-                }
-
-                return (message, lines, importFilePath);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// DataTableをCSV形式の文字列に変換
         /// </summary>
         /// <param name="dataTable">データテーブル</param>
@@ -766,6 +726,10 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("項目名"); 
                     headerList.Add("検索条件");
                     break;
+                case "荷量推移":
+                    headerList.Add("項目名");
+                    headerList.Add("検索条件");
+                    break;
             }
             return headerList;
         }
@@ -805,6 +769,23 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("便枝番マスター更新者");
                     break;
                 case "実績出力":
+                    headerList.Add("便名称");
+                    headerList.Add("便枝番");
+                    headerList.Add("乗務員");
+                    headerList.Add("ステーションID");
+                    headerList.Add("車両番号");
+                    headerList.Add("識別番号");
+                    headerList.Add("到着予定時間");
+                    headerList.Add("出発予定時間");
+                    headerList.Add("稼働日");
+                    headerList.Add("到着日時");
+                    headerList.Add("出発日時");
+                    headerList.Add("到着荷量(%)");
+                    headerList.Add("出発荷量(%)");
+                    headerList.Add("到着荷量画像パス");
+                    headerList.Add("出発荷量画像パス");
+                    break;
+                case "荷量推移":
                     headerList.Add("便名称");
                     headerList.Add("便枝番");
                     headerList.Add("乗務員");

@@ -50,11 +50,11 @@ namespace ai_truck_load_measurement.Controllers
                 // 最新のステーション状況取得SQL作成
                 var latestStationStatusSQL = TopConnectController.CreateSQLToSelectLatestStationStatus();
                 // 最新のステーション状況取得
-                List<TopModel> topModelList = TopConnectController.ConnectTops(latestStationStatusSQL, "AI-truck-load-measurement_test");
+                List<TopModel> topModelList = TopConnectController.ConnectTops(latestStationStatusSQL);
                 // トラック有無取得SQL作成
                 var isExistTrucksSQL = TopConnectController.CreateSQLToSelectIsExistTrucksPerStationID();
                 // トラック有無取得
-                IEnumerable<TopModel> isExistTrucksList = TopConnectController.ConnectTops(isExistTrucksSQL, "AI-truck-load-measurement_test");
+                IEnumerable<TopModel> isExistTrucksList = TopConnectController.ConnectTops(isExistTrucksSQL);
                 foreach (var item in topModelList)
                 {
                     var isExistTruck = isExistTrucksList.Where(x => x.StationID == item.StationID).ToList();
@@ -92,13 +92,10 @@ namespace ai_truck_load_measurement.Controllers
                 // 荷量クラスと車両の存在有無により分岐
                 var loadClass = model.LoadClass;
                 var truckExist = model.TruckExist;
-                var truckStatus = string.Empty;
+                var truckStatus = "　";
 
-                if(loadClass < 3)
-                {
-                    truckStatus = "　";
-                }
-                else
+                if (loadClass == 2) truckStatus = "0%";
+                if (loadClass >= 3)
                 {
                     model.TruckExist = true;
                     int lowerLimit = (loadClass - 3) * 10 + 1;

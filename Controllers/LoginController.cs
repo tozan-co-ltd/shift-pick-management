@@ -28,20 +28,12 @@ namespace ai_truck_load_measurement.Controllers
         {
             try
             {
-                // 強制ログアウトの場合はエラーメッセージ表示
-                //if (param == "autologout")
-                //{
-                //    ViewData["ErrorMessage"] = "E1016: " + ErrorMessagesResources.E1016;
-                //}
-
-                // 開発環境("_test"が含まれている)の場合はViewDataに"true"を代入し、
+                // 開発環境の場合はViewDataに"true"を代入し、
                 // _LayoutLogin.cshtmlで背景の色を変更(薄紫#EFEDFF)
                 ViewData["IsDevelopment"] = null;
-                string companyWebPath = GetCompanyWebPathByURL();
-                if (companyWebPath.Contains("_test"))
-                {
-                    ViewData["IsDevelopment"] = "true";
-                }
+#if DEBUG
+                ViewData["IsDevelopment"] = "true";
+#endif
 
                 return View();
             }
@@ -73,13 +65,11 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     ViewData["ErrorMessage"] = "E1002: " + ErrorMessagesResources.E1002;
 
-                    // 開発環境("_test"が含まれている)の場合はViewDataに"true"を代入し、
+                    // 開発環境の場合はViewDataに"true"を代入し、
                     // _LayoutLogin.cshtmlで背景の色を変更(薄紫#EFEDFF)
-                    string companyWebPath = GetCompanyWebPathByURL();
-                    if (companyWebPath.Contains("_test"))
-                    {
-                        ViewData["IsDevelopment"] = "true";
-                    }
+#if DEBUG
+                    ViewData["IsDevelopment"] = "true";
+#endif
 
                     // log取得
                     errorMessage = "E1002: " + ErrorMessagesResources.E1002;
@@ -91,22 +81,11 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 現在時刻取得
                 var dateTime = DateTime.Now;
-                string timeStamp = dateTime.ToString();
 
                 // クレーム作成
                 // ユーザー情報をクレームに追加
                 var claims = new[] {
-                    new Claim("CompanyID", loginUserModel.CompanyID.ToString()),
-                    new Claim("CompanyCode", loginUserModel.CompanyCode),
-                    new Claim("CompanyName", loginUserModel.CompanyName),
-                    new Claim("DatabaseName", loginUserModel.DatabaseName),
-                    new Claim("UserID", loginUserModel.UserID.ToString()),
                     new Claim("UserName", loginUserModel.UserName),
-                    new Claim("Role", loginUserModel.Role.ToString()),
-                    new Claim("MainDepoID", loginUserModel.MainDepoID.ToString()),
-                    new Claim("MainDepoName", loginUserModel.MainDepoName),
-                    new Claim("AuthorizedKubun", loginUserModel.AuthorizedKubun.ToString()),
-                    new Claim("TimeStamp", timeStamp),
                 };
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
@@ -161,12 +140,6 @@ namespace ai_truck_load_measurement.Controllers
                 // レスポンスから認証クッキーを削除
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-                // 強制ログアウトの場合はエラーメッセージ表示
-                //if (param == "autologout")
-                //{
-                //    return RedirectToAction("Index", new { param = "autologout" });
-                //}
-
                 // ログイン画面へリダイレクト
                 return RedirectToAction("Index");
             }
@@ -176,35 +149,6 @@ namespace ai_truck_load_measurement.Controllers
                 ViewData["ErrorMessage"] = errorMessage;
 
                 return RedirectToAction("Index");
-            }
-        }
-
-        /// <summary>
-        /// URLから会社WEBアプリパス取得
-        /// </summary>
-        /// <returns>会社WEBアプリパス</returns>
-        private string GetCompanyWebPathByURL()
-        {
-            string companyWebPath = "";
-            try
-            {
-                // URLからパスを取得(https://www.tozan.co.jp/の直後１つ目のパス)
-                // var urlWebPath = HttpContext.Request.PathBase.ToString().Substring(1);
-                var urlWebPath = "https://wbtzn/sumaken-web-MRq2xg5_test";
-
-                // 会社WEBアプリパスを取得("sumaken-web-***"の"***"のみ)
-                string pattern = "sumaken-web-";
-
-                int num = urlWebPath.IndexOf(pattern);
-                if (num != -1)
-                {
-                    companyWebPath = urlWebPath.Substring(num + pattern.Length);
-                }
-                return companyWebPath;
-            }
-            catch (Exception)
-            {
-                throw;
             }
         }
 
@@ -229,16 +173,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 LoginUserModel loginUserModel = new()
                 {
-                    CompanyID = 5,
-                    CompanyCode = "testCompanyCode",
-                    CompanyName = "testCompany",
-                    DatabaseName = "warehouse_2_test",
-                    UserID = 0,
                     UserName = authenticateUserName,
-                    Role = 1,
-                    MainDepoID = 1,
-                    MainDepoName = "testDepoName",
-                    AuthorizedKubun = 1
                 };
 
                 return loginUserModel;

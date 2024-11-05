@@ -31,7 +31,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 車両マスター情報取得SQL作成
                 var sql = M_TruckConnectController.CreateSQLToSelectMTrucks();
                 // DB接続
-                IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(sql, "AI-truck-load-measurement_test");
+                IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(sql);
 
                 model.M_TruckList = truckList.ToPagedList();
 
@@ -237,7 +237,7 @@ namespace ai_truck_load_measurement.Controllers
             { 
                 // 車両マスター情報取得
                 var sql = M_TruckConnectController.CreateSQLToSelectMTrucksForDataTable();
-                DataTable dt = M_TruckConnectController.ConnectMTrucksToDataTable(sql, "AI-truck-load-measurement_test");
+                DataTable dt = M_TruckConnectController.ConnectMTrucksToDataTable(sql);
 
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(null, gamenName);
@@ -319,9 +319,9 @@ namespace ai_truck_load_measurement.Controllers
         private string? TrackCodeDuplicateCheck(M_TruckModel model)
         {
                 var sqlTruckNumber = M_TruckConnectController.CreateSQLToSelectDuplicateMTruck(model);
-                bool isExistedTruckNumber = ConnectToSQLServer.IsExistedSameRecord(sqlTruckNumber, "AI-truck-load-measurement_test");
+                bool isExistedTruckNumber = ConnectToSQLServer.IsExistedSameRecord(sqlTruckNumber);
                 var sqlIdentifyNumber = M_TruckConnectController.CreateSQLToSelectDuplicateMTruckIdentifyNumber(model);
-                bool isExistedIdentifyNumber = ConnectToSQLServer.IsExistedSameRecord(sqlIdentifyNumber, "AI-truck-load-measurement_test");
+                bool isExistedIdentifyNumber = ConnectToSQLServer.IsExistedSameRecord(sqlIdentifyNumber);
                 if (isExistedTruckNumber || isExistedIdentifyNumber)
                 {
                     string displayName = "";
