@@ -778,6 +778,8 @@
 
     // 荷量画像モーダル作成
     function EditModal(tripRecordID, isArrived) {
+        // デフォルトの操作を無効化
+        event.preventDefault();
 
         // LoadOutputModel取得
         var data = @Html.Raw(Json.Serialize(Model));
