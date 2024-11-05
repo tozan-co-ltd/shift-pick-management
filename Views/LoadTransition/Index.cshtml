@@ -619,11 +619,12 @@
                 var arrivalLoadStatuses = [];
                 var departureLoadStatuses = [];
                 response.forEach(function (item) {
+                    var workDay = GetDayStringForChart(new Date(item.workDay));
                     if (item.arrivalLoadStatus != "") {
-                        arrivalLoadStatuses.push(item.arrivalLoadStatus );
+                        arrivalLoadStatuses.push({ x: workDay, y: item.arrivalLoadStatus } );
                     }
                     if (item.departureLoadStatus != "") {
-                        departureLoadStatuses.push(item.departureLoadStatus );
+                        departureLoadStatuses.push({ x: workDay, y: item.departureLoadStatus } );
                     }
                 })
 
