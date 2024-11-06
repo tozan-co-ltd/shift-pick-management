@@ -19,34 +19,38 @@
         color: red;
     }
 
-    .buttonGroup input[type="radio"] {
-        display: none;
+    .radio-group {
+        display: flex;
+        margin-bottom: 0.5rem;
+        padding: 0.5rem 0.3rem;
     }
 
-    .buttonGroup label {
-        border-top: solid 1px #999999;
-        border-bottom: solid 1px #999999;
-        border-right: solid 1px #999999;
-        background-color: #ffffff;
-        padding: 5px;
-        margin:0;
+    .radio-area input[type=radio] {
+        position: absolute;
+        -webkit-appearance: none;
+        appearance: none;
     }
 
-    .buttonGroup > label:first-of-type {
-        border-left: solid 1px #999999;
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
+    .radio-area label {
+        cursor: pointer;
+        padding: 1rem;
+           color: #fff;
+          background-color: #6a94b7;
+        transition: .5s;
     }
 
-    .buttonGroup > label:last-of-type {
-        border-left: solid 1px #999999;
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
+    .radio-area:first-child label {
+        border-top-left-radius: 0.5rem;
+        border-bottom-left-radius: 0.5rem;
     }
 
-    .buttonGroup input[type="radio"]:checked + label {
-        background-color: #4e73df;
-        color: #ffffff;
+    .radio-area:last-child label {
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+
+    .radio-area input[type=radio]:checked + label {
+        background-color: #3079b5;
     }
 
 </style>
@@ -131,17 +135,22 @@
 
         <div class="graph-and-table" id="graphAndTable">
             <hr />
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                <div class="buttonGroup mr-3">
-                    <input type="radio" id="arrivalChartButton" name="chartRadios" value="arrival" checked />
-                    <label for="arrivalChartButton">到着荷量</label>
-                    <input type="radio" id="departureChartButton" name="chartRadios" value="departure" />
-                    <label for="departureChartButton">出発荷量</label>
+            <div class="col-16 d-flex align-items-center mb-3 unset-pdl">
+                <div class="radio-group mr-3">
+                    <div class="radio-area">
+                        <input type="radio" id="arrivalChartButton" name="chartRadios" value="arrival" checked />
+                        <label for="arrivalChartButton">到着荷量</label>
+                    </div>
+                    <div class="radio-area">
+                        <input type="radio" id="departureChartButton" name="chartRadios" value="departure" />
+                        <label for="departureChartButton">出発荷量</label>
+                    </div>
                 </div>
-                <button class="btn btn-primary print-btn" id="search-btn" onclick="window.print()" >
+                <button class="btn btn-secondary print-btn mr-4" id="search-btn" onclick="window.print()" style="margin-left: auto;">
                     <span class="text"><i class="fa-solid fa-print"></i></span>
                 </button>
             </div>
+            
 
             <div class="print-area" id="print-area">
                 <div class="chartjs-graph chartjs-arrival" id="arrivalChart">
@@ -275,6 +284,12 @@
                                 scales: {
                                     //X軸
                                     xAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '稼働日',
+                                            fontSize: 24
+                                        },
                                         ticks: {
                                             fontSize:20
                                         }
