@@ -1037,8 +1037,8 @@
     // 日付の表示形式変換(yyyyMMdd)
     function GetDayStringForFile(date) {
         var year = date.getFullYear().toString();
-        var month = (date.getMonth() + 1).toString();
-        var day = date.getDate().toString();
+        var month = ("00" + (date.getMonth() + 1)).slice(-2);
+        var day = ("00" + date.getDate()).slice(-2);
         return year + month + day;
     }
 
@@ -1139,7 +1139,7 @@
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
             // フォーム情報取得
-            let url = window.location.origin + '/' + page + '/ExportFile';
+            let url = window.location.origin + '@Url.Action("ExportFile", "LoadTransition")';
             let method = 'Post';
             let data = {
                 "gamenName": gamenName,

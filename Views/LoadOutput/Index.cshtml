@@ -22,7 +22,7 @@
 
         <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
             <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                <span class="warehouse-name-drs">期間</span>
+                <span class="warehouse-name-drs">稼働日</span>
                 <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
                 <label class="m-1">～</label>
                 <input type="text" id="endOfPeriod" class="form-control pickerDate endDate">
@@ -368,8 +368,8 @@
     // 日付の表示形式変換(yyyyMMdd)
     function GetDayStringForFile(date) {
         var year = date.getFullYear().toString();
-        var month = (date.getMonth() + 1).toString();
-        var day = date.getDate().toString();
+        var month = ("00" + (date.getMonth() + 1)).slice(-2);
+        var day = ("00" + date.getDate()).slice(-2);
         return year + month + day;
     }
 
@@ -481,7 +481,7 @@
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
             // フォーム情報取得
-            let url = window.location.origin + '/' + page + '/ExportFile';
+            let url = window.location.origin + '@Url.Action("ExportFile", "LoadTransition")';
             let method = 'Post';
             let data = {
                 "gamenName": gamenName,
