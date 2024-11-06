@@ -58,12 +58,10 @@ namespace ai_truck_load_measurement.Controllers
                 foreach (var item in topModelList)
                 {
                     var isExistTruck = isExistTrucksList.Where(x => x.StationID == item.StationID).ToList();
-                    if (isExistTruck.Count != 1)
+                    if (isExistTruck.Count == 1)
                     {
-                        ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
-                        throw new Exception();
+                        item.TruckExist = isExistTruck[0].TruckExist;
                     }
-                    item.TruckExist = isExistTruck[0].TruckExist;
                 }
                 // 取得値の変換
                 topModelList = ConversionOfGetValues(topModelList);
