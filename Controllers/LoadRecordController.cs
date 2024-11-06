@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Data;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.ConnectControllers;
+using ai_truck_load_measurement.Properties;
+using System.Data.SqlClient;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -245,6 +247,105 @@ namespace ai_truck_load_measurement.Controllers
                     return Convert.ToBase64String(imageBytes);
                 }
             }
+        }
+
+
+        /// <summary>
+        /// 便実績情報テーブル非同期更新用
+        /// </summary>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
+        /// <returns></returns>
+        public static SearchedTripRecordListModel SearchData(string sql)
+        {
+            var searchData = string.Empty;
+            IEnumerable<LoadRecordModel> tripRecordList;
+            // DB接続
+            tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
+            // 荷量のクラスを数値に、画像パスをBase64に変換
+            tripRecordList = ConversionForTable(tripRecordList);
+            searchData += $@"
+                <div class=""mt-3"">
+                    <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
+                        <thead>
+                            <tr align=""center"">
+                                <th hidden>便実績ID</th>
+                                <th class=""font-weight-bold"">便名称<br></th>
+                                <th class=""font-weight-bold"">便枝番</th>
+                                <th class=""font-weight-bold"">乗務員</th>
+                                <th class=""font-weight-bold"">ステーション<br>ID</th>
+                                <th class=""font-weight-bold"">車両<br>番号</th>
+                                <th class=""font-weight-bold"">識別<br>番号</th>
+                                <th class=""font-weight-bold"">到着<br>予定</th>
+                                <th class=""font-weight-bold"">出発<br>予定</th>
+                                <th class=""font-weight-bold"">稼働日</th>
+                                <th class=""font-weight-bold"">到着日時</th>
+                                <th class=""font-weight-bold"">出発日時</th>
+                                <th class=""font-weight-bold"">到着荷量<br>(%)</th>
+                                <th class=""font-weight-bold"">出発荷量<br>(%)</th>
+                                <th class=""font-weight-bold"">到着荷量<br>画像</th>
+                                <th class=""font-weight-bold"">出発荷量<br>画像</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            ";
+            // 新しい便情報テーブルのhtml作成
+            if (tripRecordList.Count() > 0)
+            {
+                foreach (var item in tripRecordList)
+                {
+                    var truckNumber = item.TruckNumber.ToString();
+                    if (truckNumber == "0") truckNumber = "-";
+                    var arrivalScheduledTime = item.ArrivalScheduledTime.ToString("HH:mm");
+                    if (arrivalScheduledTime == "00:00") arrivalScheduledTime = "-";
+                    var departureScheduledTime = item.DepartureScheduledTime.ToString("HH:mm");
+                    if (departureScheduledTime == "00:00") departureScheduledTime = "-";
+                    searchData += $@"
+                        <tr>
+                            <td hidden>{item.TripRecordID}</td>
+                            <td>{item.TripName}</td>
+                            <td>{item.TripBranchSeq}</td>
+                            <td>{item.DriverName}</td>
+                            <td>{item.StationID}</td>
+                            <td>{truckNumber}</td>
+                            <td>{item.IdentifyNumber}</td>
+                            <td>{arrivalScheduledTime}</td>
+                            <td>{departureScheduledTime}</td>
+                            <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
+                            <td>{item.ArrivedAt.ToString("yyyy/MM/dd HH:mm")}</td>
+                            <td>{item.DepartedAt.ToString("yyyy/MM/dd HH:mm")}</td>
+                            <td>{item.ArrivalLoadStatus}</td>
+                            <td>{item.DepartureLoadStatus}</td>
+                            <td>
+                                <a class=""btn btn-success btn-icon-split ml-1 mr-1""
+                                    onclick=""OnArrivalLoadImageClick('{item.TripRecordID}', this)"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                    <i class=""fa-solid fa-truck""></i>
+                                </a>
+                            </td>
+                            <td>
+                                <a class=""btn btn-success btn-icon-split ml-1 mr-1""
+                                    onclick=""OnDepartureLoadImageClick('{item.TripRecordID}', this)"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                    <i class=""fa-solid fa-truck""></i>
+                                </a>
+                            </td>
+                        </tr>
+                ";
+                }
+            }
+            searchData += $@"
+                        </tbody>
+                    </table>
+                </div>
+            ";
+
+            var searchedTripRecordListModel = new SearchedTripRecordListModel()
+            {
+                searchedTripRecordHTML = searchData,
+                searchedTripRecordLength = tripRecordList.Count()
+            };
+
+            return searchedTripRecordListModel;
         }
     }
 }

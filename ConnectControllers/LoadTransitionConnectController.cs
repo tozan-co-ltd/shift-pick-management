@@ -177,7 +177,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="startOfPeriod">期間の開始日時</param>
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectLoadClassFromSearchConditionsForTable(List<LoadTransitionModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
+        public static string CreateSQLToSelectLoadClassFromSearchConditionsForTable(List<LoadRecordModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
         {
             var selectedTrips= SelectedTripsSQL(models);
             var sql = $@"
@@ -210,7 +210,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="models">選択された便名称と便枝番のリスト</param>
         /// <returns>SQL文</returns>
-        private static string SelectedTripsSQL(List<LoadTransitionModel> models)
+        private static string SelectedTripsSQL(List<LoadRecordModel> models)
         {
             var selectedTrips = "";
             for (int i = 0; i < models.Count; i++)
@@ -230,7 +230,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectTripRecordForDataTable(List<LoadTransitionModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
+        public static string CreateSQLToSelectTripRecordForDataTable(List<LoadRecordModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
@@ -267,7 +267,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreatSQLToSelectTripRecordForImage(List<LoadTransitionModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
+        public static string CreatSQLToSelectTripRecordForImage(List<LoadRecordModel> models, DateTime startOfPeriod, DateTime endOfPeriod)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");

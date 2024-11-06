@@ -2,11 +2,44 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Data;
+using ai_truck_load_measurement.Models;
+using Dapper;
 
 namespace ai_truck_load_measurement.ConnectControllers
 {
     public class LoadRecordConnectController
     {
+        /// <summary>
+        /// 便実績情報取得
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <returns></returns>
+        public static List<LoadRecordModel> ConnectTTripRecords(string sql)
+        {
+            // 戻り値
+            List<LoadRecordModel> strList = new();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                    strList = connection.Query<LoadRecordModel>(sql).ToList();
+                }
+                return strList;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         /// <summary>
         /// 便実績情報をデータテーブルとして取得
         /// </summary>

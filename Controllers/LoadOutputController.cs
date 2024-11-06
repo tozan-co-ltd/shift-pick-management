@@ -167,89 +167,7 @@ namespace ai_truck_load_measurement.Controllers
             {
                 // 指定した期間の便マスター情報取得SQL作成
                 var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
-                // DB接続
-                tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql);
-                // 荷量のクラスを数値に、画像パスをBase64に変換
-                tripRecordList = (IEnumerable<LoadOutputModel>)LoadRecordController.ConversionForTable(tripRecordList);
-                searchData += $@"
-                    <div class=""mt-3"">
-                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
-                            <thead>
-                                <tr align=""center"">
-                                    <th hidden>便実績ID</th>
-                                    <th class=""font-weight-bold"">便名称</th>
-                                    <th class=""font-weight-bold"">便枝番</th>
-                                    <th class=""font-weight-bold"">乗務員</th>
-                                    <th class=""font-weight-bold"">ステーションID</th>
-                                    <th class=""font-weight-bold"">車両番号</th>
-                                    <th class=""font-weight-bold"">識別番号</th>
-                                    <th class=""font-weight-bold"">到着予定時間</th>
-                                    <th class=""font-weight-bold"">出発予定時間</th>
-                                    <th class=""font-weight-bold"">稼働日</th>
-                                    <th class=""font-weight-bold"">到着日時</th>
-                                    <th class=""font-weight-bold"">出発日時</th>
-                                    <th class=""font-weight-bold"">到着荷量(%)</th>
-                                    <th class=""font-weight-bold"">出発荷量(%)</th>
-                                    <th class=""font-weight-bold"">到着荷量画像</th>
-                                    <th class=""font-weight-bold"">出発荷量画像</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                ";
-                // 新しい便情報テーブルのhtml作成
-                if (tripRecordList.Count() > 0)
-                {
-                    foreach (var item in tripRecordList)
-                    {
-                        var truckNumber = item.TruckNumber.ToString();
-                        if (truckNumber == "0") truckNumber = "-";
-                        var arrivalScheduledTime = item.ArrivalScheduledTime.ToString("HH:mm");
-                        if (arrivalScheduledTime == "00:00") arrivalScheduledTime = "-";
-                        var departureScheduledTime = item.DepartureScheduledTime.ToString("HH:mm");
-                        if(departureScheduledTime == "00:00") departureScheduledTime = "-";
-                        searchData += $@"
-                            <tr>
-                                <td hidden>{item.TripRecordID}</td>
-                                <td>{item.TripName}</td>
-                                <td>{item.TripBranchSeq}</td>
-                                <td>{item.DriverName}</td>
-                                <td>{item.StationID}</td>
-                                <td>{truckNumber}</td>
-                                <td>{item.IdentifyNumber}</td>
-                                <td>{arrivalScheduledTime}</td>
-                                <td>{departureScheduledTime}</td>
-                                <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
-                                <td>{item.ArrivedAt.ToString("yyyy/MM/dd HH:mm")}</td>
-                                <td>{item.DepartedAt.ToString("yyyy/MM/dd HH:mm")}</td>
-                                <td>{item.ArrivalLoadStatus}</td>
-                                <td>{item.DepartureLoadStatus}</td>
-                                <td>
-                                    <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                       onclick=""OnArrivalLoadImageClick('{item.TripRecordID}', this)"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
-                                        <i class=""fa-solid fa-truck""></i>
-                                    </a>
-                                </td>
-                                <td>
-                                    <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                       onclick=""OnDepartureLoadImageClick('{item.TripRecordID}', this)"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
-                                        <i class=""fa-solid fa-truck""></i>
-                                    </a>
-                                </td>
-                            </tr>
-                    ";
-                    }
-                }
-                searchData += $@"
-                            </tbody>
-                        </table>
-                    </div>
-                ";
-
-                var searchedTripRecordListModel = new SearchedTripRecordListModel()
-                {
-                    searchedTripRecordHTML = searchData,
-                    searchedTripRecordLength = tripRecordList.Count()
-                };
+                var searchedTripRecordListModel = LoadRecordController.SearchData(sql);
 
                 return Json(searchedTripRecordListModel);
             }
@@ -493,7 +411,7 @@ namespace ai_truck_load_measurement.Controllers
                             System.Text.Encoding.GetEncoding("shift_jis")))
                         {
                             //書き込む
-                            sw.Write($"期間：{startDate}～{endDate}");
+                            sw.Write($"稼働日：{startDate}～{endDate}");
                         }
                     }
                     
