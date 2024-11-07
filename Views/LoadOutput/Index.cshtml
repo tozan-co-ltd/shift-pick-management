@@ -22,7 +22,7 @@
 
         <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
             <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                <span class="warehouse-name-drs">期間</span>
+                <span class="warehouse-name-drs">稼働日</span>
                 <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
                 <label class="m-1">～</label>
                 <input type="text" id="endOfPeriod" class="form-control pickerDate endDate">
@@ -368,8 +368,8 @@
     // 日付の表示形式変換(yyyyMMdd)
     function GetDayStringForFile(date) {
         var year = date.getFullYear().toString();
-        var month = (date.getMonth() + 1).toString();
-        var day = date.getDate().toString();
+        var month = ("00" + (date.getMonth() + 1)).slice(-2);
+        var day = ("00" + date.getDate()).slice(-2);
         return year + month + day;
     }
 
@@ -438,7 +438,11 @@
             tableLength = response.searchedTripRecordLength + 1;
             $('#tripRecordTable').empty().html(tableHTML);
             // 日本語表示
-            const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+            // var projectName = window.location.pathname.split('/')[1];
+            // var original_url = window.location.origin + '/' + projectName + '/';
+            const language_url = '/lib/datatables/Japanese.json';
+            const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
+            console.log(language_url);
 
             // ID(2列目)昇順
             $("#tripRecordDataTable").DataTable({
@@ -446,10 +450,19 @@
                     "url": language_url
                 },
                 lengthChange: true,     // 件数切替
-                info: false,            // 総件数
+                info: true,            // 総件数
                 scrollX: true,          // 横スクロール可
                 scrollCollapse: true,   // 縦スクロール表示
+                searchHighlight: true,  // 検索ハイライト
                 order: [[1, "asc"],[9,"asc"],[2,"asc"]],    // ID昇順
+                dom: dom_structure
+            });
+            var table = $("#tripRecordDataTable").DataTable();
+            table.on('draw', function () {
+                var body = $(table.table().body());
+
+                body.unhighlight();
+                body.highlight(table.search());
             });
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
@@ -481,7 +494,7 @@
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
             // フォーム情報取得
-            let url = window.location.origin + '/' + page + '/ExportFile';
+            let url = window.location.origin + '@Url.Action("ExportFile", "LoadTransition")';
             let method = 'Post';
             let data = {
                 "gamenName": gamenName,
