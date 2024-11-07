@@ -43,7 +43,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 車両ID
         /// </summary>
-        public int TruckID {  get; set; }
+        public string? TruckID { get; set; }
 
         /// <summary>
         /// 車両番号

@@ -257,7 +257,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 FROM 
                     m_trucks
                 WHERE
-                    truck_number = {model.TruckNumber}
+                    truck_number = '{model.TruckNumber}'
                     AND truck_id <> {model.TruckID}
                     AND is_deleted = 0
             ";
@@ -278,7 +278,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 FROM 
                     m_trucks
                 WHERE
-                    identify_number = {model.IdentifyNumber}
+                    identify_number = '{model.IdentifyNumber}'
                     AND truck_id <> {model.TruckID}
                     AND is_deleted = 0
             ";
