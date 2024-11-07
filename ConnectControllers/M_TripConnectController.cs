@@ -546,7 +546,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     '{model.TripID}',
                     '{model.TruckID}',
                     '{model.DriverName}',
-                    '{model.DayShiftStartTime}',
+                    '1900/01/01 {model.RegistDayShiftStartTime}:00',
                     '{model.ApplicableStartDateTime}',
                     '{model.ApplicableEndDateTime}',
                     '{formatCreatedAt}',

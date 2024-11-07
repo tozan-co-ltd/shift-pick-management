@@ -66,6 +66,11 @@ namespace ai_truck_load_measurement.Models
         public DateTime DayShiftStartTime {  get; set; }
 
         /// <summary>
+        /// 昼勤開始時間登録用
+        /// </summary>
+        public string? RegistDayShiftStartTime { get; set; }
+
+        /// <summary>
         ///  適用開始日時
         /// </summary>
         [Display(Name = "適用開始日時")]
