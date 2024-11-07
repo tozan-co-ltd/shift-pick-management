@@ -31,10 +31,13 @@
     <!-- sb-admin-2 -->
     <link href="~/css/sb-admin-2.css?@DateTime.Now" rel="stylesheet">
     <!-- dataTables-->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="~/lib/datatables/jquery.dataTables.min.css">
+    <!-- FixedColumns CSS -->
+    <link rel="stylesheet" type="text/css" href="~/lib/datatables/fixedColumns.dataTables.min.css">
     <!-- 内部ファイル -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
+    <!-- 日本語表示 -->
+    <link rel="stylesheet" type="application/json" href="~/lib/datatables/Japanese.json">
     <!-- jquery-->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
@@ -180,7 +183,11 @@
     <script src="~/lib/jquery-detetimepicker/datetimepicker.js"></script>
 
     <!--dataTables↓-->
-    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="~/lib/datatables/datatables.min.js"></script>
+    <script type="text/javascript" src="~/lib/datatables/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="~/lib/datatables/dataTables.fixedColumns.min.js"></script>
+    <script type="text/javascript" src="~/lib/jquery-highlight/jquery.highlight.js"></script>
+    <script type="text/javascript" src="~/lib/datatables/dataTables.searchHighlight.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>

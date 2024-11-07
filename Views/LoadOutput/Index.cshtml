@@ -438,7 +438,11 @@
             tableLength = response.searchedTripRecordLength + 1;
             $('#tripRecordTable').empty().html(tableHTML);
             // 日本語表示
-            const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+            // var projectName = window.location.pathname.split('/')[1];
+            // var original_url = window.location.origin + '/' + projectName + '/';
+            const language_url = '/lib/datatables/Japanese.json';
+            const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
+            console.log(language_url);
 
             // ID(2列目)昇順
             $("#tripRecordDataTable").DataTable({
@@ -446,10 +450,19 @@
                     "url": language_url
                 },
                 lengthChange: true,     // 件数切替
-                info: false,            // 総件数
+                info: true,            // 総件数
                 scrollX: true,          // 横スクロール可
                 scrollCollapse: true,   // 縦スクロール表示
+                searchHighlight: true,  // 検索ハイライト
                 order: [[1, "asc"],[9,"asc"],[2,"asc"]],    // ID昇順
+                dom: dom_structure
+            });
+            var table = $("#tripRecordDataTable").DataTable();
+            table.on('draw', function () {
+                var body = $(table.table().body());
+
+                body.unhighlight();
+                body.highlight(table.search());
             });
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {

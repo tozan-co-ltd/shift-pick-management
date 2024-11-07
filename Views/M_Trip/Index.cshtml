@@ -379,6 +379,7 @@
             $('#m_tripTable').empty().html(response);
             // 日本語表示
             const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+            const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
 
             // ID(2列目)昇順
             $("#tripTable").DataTable({
@@ -386,13 +387,15 @@
                     "url": language_url
                 },
                 lengthChange: true,     // 件数切替
-                info: false,            // 総件数
+                info: true,            // 総件数
                 scrollX: true,          // 横スクロール可
                 scrollCollapse: true,   // 縦スクロール表示
                 order: [[1, "asc"]],    // ID昇順
+                searchHighlight: true,  // 検索ハイライト
                 columnDefs: [
                     { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
-                ]
+                ],
+                dom: dom_structure
             });
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
