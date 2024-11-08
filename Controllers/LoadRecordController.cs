@@ -295,7 +295,7 @@ namespace ai_truck_load_measurement.Controllers
             {
                 foreach (var item in tripRecordList)
                 {
-                    var truckNumber = item.TruckNumber.ToString();
+                    var truckNumber = item.TruckNumber;
                     if (truckNumber == "0") truckNumber = "-";
                     var arrivalScheduledTime = item.ArrivalScheduledTime.ToString("HH:mm");
                     if (arrivalScheduledTime == "00:00") arrivalScheduledTime = "-";

@@ -240,7 +240,7 @@ namespace ai_truck_load_measurement.Controllers
                 DataTable dt = M_TruckConnectController.ConnectMTrucksToDataTable(sql);
 
                 // ファイル名
-                var tmpFilename = CreateFile.CreateFileName(null, gamenName);
+                var tmpFilename = CreateFile.CreateFileName(gamenName);
                 // 2シートあり
                 bool sheetTwo = false;
 
