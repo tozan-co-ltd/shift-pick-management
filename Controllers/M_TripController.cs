@@ -362,7 +362,7 @@ namespace ai_truck_load_measurement.Controllers
                 var mTripBranchConsecutiveDT = SortDataTableFromBranchConsecutiveNumber(mTripBranchDT);
 
                 // ファイル名
-                var tmpFilename = CreateFile.CreateFileName(null, gamenName);
+                var tmpFilename = CreateFile.CreateFileName(gamenName);
                 // 2シートあり
                 bool sheetTwo = true;
 

@@ -16,7 +16,7 @@ namespace ai_truck_load_measurement.Models
         // ステーションID
         public int StationID { get; set; }
         // 車両番号
-        public int TruckNumber { get; set; }
+        public string? TruckNumber { get; set; }
         // 識別番号
         public string? IdentifyNumber { get; set; }
         // 到着予定時間
@@ -55,5 +55,7 @@ namespace ai_truck_load_measurement.Models
         public int AnnotationLoadClass { get; set; }
         // 到着か出発か
         public string? ArrivalDepartureClass { get; set; }
+        // 選択された便名称
+        public string? SelectedTripName { get; set; }
     }
 }

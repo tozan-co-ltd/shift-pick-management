@@ -26,7 +26,7 @@ namespace ai_truck_load_measurement.Models
         [Display(Name="車両番号")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [RegularExpression(@"^[0-9]{1,4}$", ErrorMessage ="最大4桁の半角数字で入力してください。")]
-        public int TruckNumber {  get; set; }
+        public string? TruckNumber { get; set; }
 
         /// <summary>
         /// 識別番号

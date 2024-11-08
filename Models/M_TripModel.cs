@@ -43,7 +43,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 車両ID
         /// </summary>
-        public int TruckID {  get; set; }
+        public string? TruckID { get; set; }
 
         /// <summary>
         /// 車両番号
@@ -60,10 +60,15 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 昼勤開始時間  
         /// </summary>
+        public DateTime DayShiftStartTime {  get; set; }
+
+        /// <summary>
+        /// 昼勤開始時間登録用
+        /// </summary>
         [Display(Name = "昼勤開始時間")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        [Range(typeof(DateTime), "00:00","23:59", ErrorMessage = "hh:mmで入力してください。")]
-        public DateTime DayShiftStartTime {  get; set; }
+        [RegularExpression(@"^([0-1][0-9]|[2][0-3]):[0-5][0-9]$", ErrorMessage = "hh:mmで入力してください。")]
+        public string? RegistDayShiftStartTime { get; set; }
 
         /// <summary>
         ///  適用開始日時

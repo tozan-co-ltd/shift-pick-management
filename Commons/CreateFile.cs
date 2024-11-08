@@ -140,51 +140,15 @@ namespace ai_truck_load_measurement.Commons
         /// <param name="searchModel">検索モデル</param>
         /// <param name="gamenName">画面名</param>
         /// <returns></returns>
-        public static string CreateFileName(SearchConditionModel? searchModel, string gamenName)
+        public static string CreateFileName(string gamenName)
         {
             string fileName = string.Empty;
             try
             {
                 // Trim object
                 gamenName = gamenName == null ? string.Empty : gamenName.Trim();
-                if (searchModel != null)
-                {
-                    searchModel.DepoName = searchModel.DepoName == null ? string.Empty : searchModel.DepoName.Trim().Replace(" ", "");
-                    searchModel.CompanyName = searchModel.CompanyName == null ? string.Empty : searchModel.CompanyName.Trim().Replace(" ", "");
-                    searchModel.SupplierProductNumber = searchModel.SupplierProductNumber == null ? string.Empty : searchModel.SupplierProductNumber.Trim().Replace(" ", "");
-                }
 
-                // SearchConditionListがnullの場合
-                if (searchModel == null)
-                {
-                    return string.Concat(fileName, gamenName, ".xlsx");
-                }
-
-                // 日付
-                string start = Utils.ConvertToYYYYMMDD(searchModel.SearchStartDate).Replace("/", "");
-                string end = Utils.ConvertToYYYYMMDD(searchModel.SearchEndDate).Replace("/", "");
-
-                string seachDate = start; //入庫日
-                if (!gamenName.Contains("在庫照会"))
-                {
-                    seachDate = string.Concat(start, "_", end); //入庫日開始_入庫日終了
-                }
-                fileName = string.Concat(gamenName, "_", searchModel.DepoName, "_", searchModel.CompanyName, "_", seachDate);
-
-                // 仕入先品番
-                if (searchModel.SupplierProductNumber != string.Empty)
-                {
-                    fileName = string.Concat(fileName, "_", searchModel.SupplierProductNumber);
-                }
-
-                // 便
-                if (searchModel.BinList != null)
-                {
-
-                    fileName = string.Concat(fileName, string.Join("_", searchModel.BinList));
-                }
-
-                return string.Concat(fileName, ".csv"); ;
+                return string.Concat(fileName, gamenName, ".xlsx");
             }
             catch (Exception ex)
             {
@@ -369,7 +333,7 @@ namespace ai_truck_load_measurement.Commons
             }
             catch (Exception)
             {
-                throw; 
+                throw;
             }
         }
 
@@ -481,7 +445,7 @@ namespace ai_truck_load_measurement.Commons
             {
                 return false;
             }
-           
+
             // 既にファイルが存在している場合は削除する
             if (File.Exists(exportfileFullPath))
             {
@@ -608,7 +572,7 @@ namespace ai_truck_load_measurement.Commons
             {
                 return false;
             }
-            
+
             // 既にファイルが存在している場合は削除する
             if (File.Exists(exportfileFullPath))
             {
@@ -723,7 +687,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("更新者");
                     break;
                 case "実績出力":
-                    headerList.Add("項目名"); 
+                    headerList.Add("項目名");
                     headerList.Add("検索条件");
                     break;
                 case "荷量推移":
