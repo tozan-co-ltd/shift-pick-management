@@ -74,6 +74,26 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// 選択された便名称と便枝番からSQLの検索条件箇所を作成する
+        /// </summary>
+        /// <param name="models">選択された便名称と便枝番のリスト</param>
+        /// <returns>SQL文</returns>
+        public static string SelectedTripsSQL(List<LoadRecordModel> models)
+        {
+            var selectedTrips = "";
+            for (int i = 0; i < models.Count; i++)
+            {
+                if (i != 0)
+                {
+                    selectedTrips += " OR ";
+                }
+                selectedTrips += @$"(trip_name = '{models[i].TripName}' AND trip_branch_seq = '{models[i].TripBranchSeq}')";
+            }
+            return selectedTrips;
+        }
+
+
+        /// <summary>
         /// 便実績情報取得SQL
         /// </summary>
         /// <returns></returns>
