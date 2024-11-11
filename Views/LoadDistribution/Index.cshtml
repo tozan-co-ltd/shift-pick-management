@@ -496,7 +496,7 @@
         var tripBranchSeq = $('[name=TripBranchSeq]').val();
 
         // 入力されていない場合、エラー出力
-        if (tripName == "" || tripBranchSeq == "") {
+        if (tripName == "" || tripBranchSeq == "" || tripName == null || tripBranchSeq == null) {
             return;
         }
         var selectedTripName = tripName + "_" + tripBranchSeq;
