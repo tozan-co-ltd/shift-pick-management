@@ -17,8 +17,7 @@
                     <div class="card-body">
                         <ul class="mb-0">
                             <li>最長90日の期間が検索できます。</li>
-                            <li>便枝番とは、便が複数回SyncBaceを訪問する際の各回の呼称です。
-                                昼勤開始時間を起点とし1,2,3・・・と番号を割り当てます。</li>
+                            <li>便枝番とは、便がSyncBaceへ訪問した回数を示すために昼勤開始時間から順に割り当てた番号です。</li>
                             <li>最大20件の便を選択できます。</li>
                         </ul>
                     </div>
@@ -457,7 +456,7 @@
         var tripBranchSeq = $('[name=TripBranchSeq]').val();
 
         // 入力されていない場合、エラー出力
-        if(tripName == "" || tripBranchSeq == ""){
+        if (tripName == "" || tripBranchSeq == "" || tripName == null || tripBranchSeq == null) {
             return;
         }
         var selectedTripName = tripName + "_" + tripBranchSeq;
