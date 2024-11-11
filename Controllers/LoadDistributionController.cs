@@ -266,7 +266,7 @@ namespace ai_truck_load_measurement.Controllers
                 searchConditionDT.Columns.Add("項目名");
                 searchConditionDT.Columns.Add("検索条件");
                 // 期間の設定
-                searchConditionDT.Rows.Add("期間", $"{startDate}～{endDate}");
+                searchConditionDT.Rows.Add("稼働日", $"{startDate}～{endDate}");
                 // 選択された便の設定
                 var selectedTripNames = "";
                 for (int i = 0; i < arrayTrips.Count; i++)
@@ -433,7 +433,7 @@ namespace ai_truck_load_measurement.Controllers
                             System.Text.Encoding.GetEncoding("shift_jis")))
                         {
                             //書き込む
-                            sw.WriteLine($"期間：{startDate}～{endDate}");
+                            sw.WriteLine($"稼働日：{startDate}～{endDate}");
                             // 選択された便の羅列
                             var selectedTripNames = "";
                             for (int i = 0; i < arrayTrips.Count; i++)
