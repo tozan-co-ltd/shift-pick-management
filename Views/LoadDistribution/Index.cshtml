@@ -1,9 +1,10 @@
-﻿@using ai_truck_load_measurement.Commons;
-@model ai_truck_load_measurement.Models.LoadTransitionModel;
+﻿﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.LoadDistributionModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
+
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
         @ViewData["Title"]
@@ -17,8 +18,10 @@
                     <div class="card-body">
                         <ul class="mb-0">
                             <li>最長90日の期間が検索できます。</li>
-                            <li>便枝番とは、便が複数回SyncBaceを訪問する際の各回の呼称です。
-                                昼勤開始時間を起点とし1,2,3・・・と番号を割り当てます。</li>
+                            <li>
+                                便枝番とは、便が複数回SyncBaceを訪問する際の各回の呼称です。
+                                昼勤開始時間を起点とし1,2,3・・・と番号を割り当てます。
+                            </li>
                             <li>最大20件の便を選択できます。</li>
                         </ul>
                     </div>
@@ -35,7 +38,7 @@
             }
         </div>
 
-        <form id="loadTransitionForm">
+        <form id="LoadDistributionForm">
             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                     <span class="warehouse-name-drs">稼働日</span>
@@ -63,14 +66,46 @@
             <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips0">
                 <span class="warehouse-name-drs">選択された便</span>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips1" >
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips1">
                 <span class="warehouse-name-drs"></span>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips2"  >
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips2">
                 <span class="warehouse-name-drs"></span>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips3" >
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips3">
                 <span class="warehouse-name-drs"></span>
+            </div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                    <span class="warehouse-name-drs">荷量範囲</span>
+                    <select type="text" id="minLoadStatus" class="form-select" name="minLoadStatus" style="width: 100px">
+                        <option value="2" selected>0%</option>
+                        <option value="3">1%</option>
+                        <option value="4">11%</option>
+                        <option value="5">21%</option>
+                        <option value="6">31%</option>
+                        <option value="7">41%</option>
+                        <option value="8">51%</option>
+                        <option value="9">61%</option>
+                        <option value="10">71%</option>
+                        <option value="11">81%</option>
+                        <option value="12">91%</option>
+                    </select>
+                    <label class="m-1">～</label>
+                    <select type="text" id="maxLoadStatus" class="form-select" name="maxLoadStatus" style="width: 100px">
+                        <option value="2">0%</option>
+                        <option value="3">10%</option>
+                        <option value="4">20%</option>
+                        <option value="5">30%</option>
+                        <option value="6">40%</option>
+                        <option value="7">50%</option>
+                        <option value="8">60%</option>
+                        <option value="9">70%</option>
+                        <option value="10">80%</option>
+                        <option value="11">90%</option>
+                        <option value="12" selected>100%</option>
+                    </select>
+                </div>
             </div>
         </form>
 
@@ -100,7 +135,6 @@
                     <span class="text"><i class="fa-solid fa-print"></i></span>
                 </button>
             </div>
-            
 
             <div class="print-area" id="print-area">
                 <div class="chartjs-graph chartjs-arrival" id="arrivalChart">
@@ -119,7 +153,7 @@
                         adjustCanvasHeight();
 
                         var arrivalChart = new Chart(ctx, {
-                            type: 'line',
+                            type: 'bar',
                             data: {
                                 labels: [],
                                 datasets: [{
@@ -130,7 +164,7 @@
                                     tension: 0,
                                     pointRadius: '5',
                                     backgroundColor: 'Green',
-                                    
+
                                 },
                                 {
                                     label: '豊鉄大型常傭便3_2',
@@ -154,7 +188,7 @@
                                         //軸ラベル表示
                                         scaleLabel: {
                                             display: true,
-                                            labelString: '稼働日',
+                                            labelString: '到着荷量(%)',
                                             fontSize: 24
                                         },
                                         ticks: {
@@ -166,20 +200,20 @@
                                         //軸ラベル表示
                                         scaleLabel: {
                                             display: true,
-                                            labelString: '到着荷量(%)',
+                                            labelString: '回数',
                                             fontSize: 24
                                         },
                                         //Y軸の範囲を指定
                                         ticks: {
                                             min: 0.0,
-                                            max: 100.0,
+                                            stepSize: 1.0,
                                             fontSize: 20
                                         }
                                     }]
                                 },
-                                title:{
+                                title: {
                                     display: true,
-                                    text: '実績-荷量推移',
+                                    text: '実績-荷量分布',
                                     fontSize: 30
                                 }
                             }
@@ -202,7 +236,7 @@
                         adjustCanvasHeight();
 
                         var departureChart = new Chart(ctx, {
-                            type: 'line',
+                            type: 'bar',
                             data: {
                                 labels: [],
                                 datasets: [{
@@ -237,11 +271,11 @@
                                         //軸ラベル表示
                                         scaleLabel: {
                                             display: true,
-                                            labelString: '稼働日',
+                                            labelString: '出発荷量(%)',
                                             fontSize: 24
                                         },
                                         ticks: {
-                                            fontSize:20
+                                            fontSize: 20
                                         }
                                     }],
                                     //Y軸
@@ -249,20 +283,20 @@
                                         //軸ラベル表示
                                         scaleLabel: {
                                             display: true,
-                                            labelString: '出発荷量(%)',
+                                            labelString: '回数',
                                             fontSize: 24
                                         },
                                         //Y軸の範囲を指定
                                         ticks: {
                                             min: 0.0,
-                                            max: 100.0,
-                                            fontSize:20
+                                            stepSize: 1.0,
+                                            fontSize: 20
                                         }
                                     }]
                                 },
                                 title: {
                                     display: true,
-                                    text: '実績-荷量推移',
+                                    text: '実績-荷量分布',
                                     fontSize: 30
                                 }
                             }
@@ -274,7 +308,7 @@
             <div class="mg-bot-20 mt-3">
                 <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                     <div class="input-group-append mr-1">
-                        <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('LoadTransition', '@Model.ViewTitle')" id="exportFile">
+                        <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileTrips('LoadDistribution', '@Model.ViewTitle')" id="exportFile">
                             <span class="icon text-white-50">
                                 <i class="fas fa-file-export"></i>
                             </span>
@@ -310,7 +344,7 @@
                 <div class="col-12 col-md-12">
                     <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
-                <figure class="mb-2 modal-img"><img src="" id="modalImage"/></figure>
+                <figure class="mb-2 modal-img"><img src="" id="modalImage" /></figure>
                 <div id="tripRecord-buttons"></div>
                 <table class="table table-sm p-2 modal-table">
                     <tbody id="tripRecord-contatiner">
@@ -322,6 +356,10 @@
 </div>
 
 <script>
+
+    const aryMax = function (a, b) { return Math.max(a, b); }
+    const aryMin = function (a, b) { return Math.min(a, b); }
+
     let model;
 
     $(document).ready(function () {
@@ -341,7 +379,7 @@
     });
 
     // 期間の終了日時変更時
-    $('#endOfPeriod').change(function(){
+    $('#endOfPeriod').change(function () {
         periodChange();
     })
 
@@ -398,7 +436,7 @@
     });
 
     // 便枝番のセレクトリスト更新
-    function tripBranchSeqSetToSelectList(){
+    function tripBranchSeqSetToSelectList() {
         // 便名称取得
         var tripName = $('[name=TripName]').val();
 
@@ -445,7 +483,8 @@
     let arrayTrips = [];
 
     // 追加ボタン押下時
-    function addTrips(){
+    function addTrips() {
+        event.preventDefault();
         // 20件の便が選択されているとき
         if (20 <= arrayTrips.length) {
             var errorMessage = 'E1008: 選択できる便数は最大20件です。20件を超えないように選択してください。';
@@ -457,7 +496,7 @@
         var tripBranchSeq = $('[name=TripBranchSeq]').val();
 
         // 入力されていない場合、エラー出力
-        if(tripName == "" || tripBranchSeq == ""){
+        if (tripName == "" || tripBranchSeq == "") {
             return;
         }
         var selectedTripName = tripName + "_" + tripBranchSeq;
@@ -473,7 +512,7 @@
         var selectedTrips = $('#selectedTrips' + selectedTripsNumber)[0];
 
         // 選択された便に追加
-        arrayTrips.push({tripName, tripBranchSeq, selectedTripName});
+        arrayTrips.push({ tripName, tripBranchSeq, selectedTripName });
         pushLabelToSelectedTrips(selectedTrips, selectedTripName);
     }
 
@@ -489,7 +528,8 @@
     }
 
     // 選択された便の×ボタン押下時
-    function onLabelDeleteClick(selectedTripName){
+    function onLabelDeleteClick(selectedTripName) {
+        event.preventDefault();
         // ラベル全削除
         $('.selected-trip-label').remove();
 
@@ -499,7 +539,7 @@
         arrayTrips.splice(deleteIndex, 1);
 
         // 選択された便の再表示
-        for(var i=0; i< arrayTrips.length; i++){
+        for (var i = 0; i < arrayTrips.length; i++) {
             // 選択された便を追加する行を設定
             var selectedTripsNumber = Math.floor(i / 5);
             var selectedTrips = $('#selectedTrips' + selectedTripsNumber)[0];
@@ -511,6 +551,7 @@
 
     // 検索ボタン押下時
     function onSearchClick() {
+        event.preventDefault();
         DeleteErrorMessages();
 
         // 90日を超えるデータは検索不可
@@ -523,7 +564,6 @@
         // グラフとテーブルの表示
         $('#graphAndTable').css('display', 'block');
         tableDisplay();
-        console.log($('#tripRecordDataTable_filter'));
 
         // 初期表示は到着荷量
         $('input[value="arrival"]').prop('checked', true);
@@ -534,38 +574,43 @@
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
-        // 選択期間の日数を取得
-        var startDate = new Date($('#startOfPeriod').val());
-        var endDate = new Date($('#endOfPeriod').val());
-        var diffMilliSec = endDate - startDate;
-        var diffDays = parseInt(diffMilliSec / 1000 / 60 / 60 / 24);
-
-        var selectedDates = [];
-        var currentDate = startDate;
-
-        for(var i=0; i<=diffDays; i++){
-            var dateForChart = GetDayStringForChart(currentDate);
-            selectedDates.push(dateForChart);
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
+        // 選択された荷量範囲を取得
+        var minLoadClass = parseInt($('[name=minLoadStatus]').val());
+        var maxLoadClass = parseInt($('[name=maxLoadStatus]').val());
 
         // グラフの初期化
         arrivalChart.data.datasets = [];
         departureChart.data.datasets = [];
-        
-        // グラフの表示期間設定
-        arrivalChart.data.labels = selectedDates;
-        departureChart.data.labels = selectedDates;
 
-        // 追加された便、便枝番について
-        for(var i=0; i < arrayTrips.length; i++){
+        // グラフの表示期間設定
+        var selectedStatuses = [];
+        for (var i = minLoadClass; i <= maxLoadClass; i++) {
+            if (i == 2) {
+                selectedStatuses.push("0");
+            }
+            else {
+                var loadStatusMin = (i - 3) * 10 + 1;
+                var loadStatusMax = (i - 2) * 10;
+                var loadStatus = loadStatusMin + "～" + loadStatusMax;
+                selectedStatuses.push(loadStatus);
+            }
+        }
+        arrivalChart.data.labels = selectedStatuses;
+        departureChart.data.labels = selectedStatuses;
+
+        // グラフの上部余白用
+        var allArrivalDatasCount = [];
+        var allDepartureDatasCount = [];
+
+        // 選択された便、便枝番について
+        for (var i = 0; i < arrayTrips.length; i++) {
             var tripName = arrayTrips[i].tripName;
             var tripBranchSeq = arrayTrips[i].tripBranchSeq
 
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("SearchTrips", "LoadTransition")';
+            let url = window.location.origin + '@Url.Action("SearchDistributions", "LoadDistribution")';
             let method = 'Post';
-            let data = { tripName: tripName, tripBranchSeq: tripBranchSeq, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+            let data = { tripName: tripName, tripBranchSeq: tripBranchSeq, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, minLoadClass: minLoadClass, maxLoadClass: maxLoadClass };
 
             // Ajax call
             $.ajax({
@@ -574,52 +619,40 @@
                 data: data,
                 async: false
             }).done(function (response) {
-                // 荷量クラスをパーセントとして取得
-                var arrivalLoadStatuses = [];
-                var departureLoadStatuses = [];
-                // response.forEach(function (item) {
-                //     var workDay = GetDayStringForChart(new Date(item.workDay));
-                //     if (item.arrivalLoadStatus != "") {
-                //         arrivalLoadStatuses.push({ x: workDay, y: item.arrivalLoadStatus } );
-                //     }
-                //     if (item.departureLoadStatus != "") {
-                //         departureLoadStatuses.push({ x: workDay, y: item.departureLoadStatus } );
-                //     }
-                // })
+                var arrivalLoadClasses = response.arrivalLoadClasses;
+                var departureLoadClasses = response.departureLoadClasses;
+                var arrivalLoadDatas = [];
+                var departureLoadDatas = [];
 
-                selectedDates.forEach(function (day) {
-                    if (response.find(item => GetDayStringForChart(new Date(item.workDay)) == day)) {
-                        var arrivalLoadStatus = response.find(item => GetDayStringForChart(new Date(item.workDay)) == day).arrivalLoadStatus;
-                        var departureLoadStatus = response.find(item => GetDayStringForChart(new Date(item.workDay)) == day).departureLoadStatus;
-                        if (arrivalLoadStatus != "") {
-                            arrivalLoadStatuses.push({ x: day, y: arrivalLoadStatus });
-                        }
-                        else {
-                            arrivalLoadStatuses.push({ x: day, y: null });
-                        }
-
-                        if (departureLoadStatus != "") {
-                            departureLoadStatuses.push({ x: day, y: departureLoadStatus });
-                        }
-                        else {
-                            departureLoadStatuses.push({ x: day, y: null });
-                        }
+                // 荷量クラスごとに配列に登録
+                for (var j = minLoadClass; j <= maxLoadClass; j++) {
+                    // 到着荷量の場合
+                    if (arrivalLoadClasses.find(item => item.arrivalLoadClass == j)) {
+                        var arrivalLoadClassCount = arrivalLoadClasses.find(item => item.arrivalLoadClass == j).arrivalLoadClassCount;
+                        arrivalLoadDatas.push(arrivalLoadClassCount);
+                        allArrivalDatasCount.push(arrivalLoadClassCount);
                     }
                     else {
-                        arrivalLoadStatuses.push({ x: day, y: null });
-                        departureLoadStatuses.push({ x: day, y: null });
+                        arrivalLoadDatas.push("");
                     }
-                })
+                    // 出発荷量の場合
+                    if (departureLoadClasses.find(item => item.departureLoadClass == j)) {
+                        var departureLoadClassCount = departureLoadClasses.find(item => item.departureLoadClass == j).departureLoadClassCount;
+                        departureLoadDatas.push(departureLoadClassCount);
+                        allDepartureDatasCount.push(departureLoadClassCount);
+                    }
+                    else {
+                        departureLoadDatas.push("");
+                    }
+                }
 
                 // データセット作成、登録
                 var arrivalDatasets = createChartDatasets(i);
-                arrivalDatasets.data = arrivalLoadStatuses;
+                arrivalDatasets.data = arrivalLoadDatas;
                 arrivalDatasets.label = tripName + "_" + tripBranchSeq;
                 arrivalChart.data.datasets.push(arrivalDatasets);
-                console.log(arrivalDatasets);
-
                 var departureDatasets = createChartDatasets(i);
-                departureDatasets.data = departureLoadStatuses;
+                departureDatasets.data = departureLoadDatas;
                 departureDatasets.label = tripName + "_" + tripBranchSeq;
                 departureChart.data.datasets.push(departureDatasets);
 
@@ -633,22 +666,28 @@
                 }
             });
         }
+        // グラフの上部に余白作成
+        if (allArrivalDatasCount.length > 0) {
+            var maxCountArrivalData = allArrivalDatasCount.reduce(aryMax);
+            arrivalChart.options.scales.yAxes[0].ticks.max = maxCountArrivalData + 1;
+        }
+        if (allDepartureDatasCount.length > 0) {
+            var maxCountDepartureData = allDepartureDatasCount.reduce(aryMax);
+            departureChart.options.scales.yAxes[0].ticks.max = maxCountDepartureData + 1;
+        }
+
         // グラフの更新
         arrivalChart.update();
         departureChart.update();
     }
 
     // chartjs用のデータセット作成
-    function createChartDatasets(dataNumber){
+    function createChartDatasets(dataNumber) {
         var datasets = {
             label: '',
             borderColor: graphColors[dataNumber],
-            fill: false,
             data: [],
-            tension: 0,
-            pointRadius: '5',
             backgroundColor: graphColors[dataNumber],
-            spanGaps: true,
         }
         return datasets;
     }
@@ -656,15 +695,13 @@
     // ラジオボタン切り替え時
     $(function () {
         $('input[name="chartRadios"]:radio').change(function () {
-            // デフォルトの操作を無効化
             event.preventDefault();
-
             var radioval = $(this).val();
             if (radioval == "arrival") {
                 $('#arrivalChart').css('display', 'block');
                 $('#departureChart').css('display', 'none');
             }
-            else{
+            else {
                 $('#departureChart').css('display', 'block');
                 $('#arrivalChart').css('display', 'none');
             }
@@ -686,10 +723,14 @@
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
+        // 選択された荷量範囲を取得
+        var minLoadClass = parseInt($('[name=minLoadStatus]').val());
+        var maxLoadClass = parseInt($('[name=maxLoadStatus]').val());
+
         // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("SearchData", "LoadTransition")';
+        let url = window.location.origin + '@Url.Action("SearchData", "LoadDistribution")';
         let method = 'Post';
-        let data = {models: arrayTrips, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod};
+        let data = { models: arrayTrips, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, minLoadClass: minLoadClass, maxLoadClass: maxLoadClass };
 
         // Ajax call
         $.ajax({
@@ -713,10 +754,9 @@
                 info: true,            // 総件数
                 scrollX: true,          // 横スクロール可
                 scrollCollapse: true,   // 縦スクロール表示
-                searchHighlight: true,  // 検索ハイライト
                 order: [[1, "asc"], [9, "asc"], [2, "asc"]],    // ID昇順
                 "oLanguage": {
-                    "sSearch": "フリーワード(全件)"
+                "sSearch": "フリーワード(全件)"
                 },
                 dom: dom_structure
             });
@@ -773,8 +813,6 @@
 
     // 荷量画像モーダル作成
     function EditModal(tripRecordID, isArrived) {
-        // デフォルトの操作を無効化
-        event.preventDefault();
 
         // LoadOutputModel取得
         var data = @Html.Raw(Json.Serialize(Model));
@@ -926,6 +964,7 @@
 
     // モーダル内の「上へ」「下へ」ボタン押下時
     function onOtherModalClick(otherTripRecordID, isArrived) {
+        event.preventDefault();
         if (isArrived == "true") {
             isArrived = true;
         } else {
@@ -990,16 +1029,16 @@
     // 日付の表示形式変換(yyyyMMdd)
     function GetDayStringForFile(date) {
         var year = date.getFullYear().toString();
-        var month = ("00" + (date.getMonth() + 1)).slice(-2);
-        var day = ("00" + date.getDate()).slice(-2);
+        var month = (date.getMonth() + 1).toString();
+        var day = date.getDate().toString();
         return year + month + day;
     }
 
-    // 日付の表示形式変換(MM/dd)
+    // 日付の表示形式変換(yyyyMMdd)
     function GetDayStringForChart(date) {
         var month = (date.getMonth() + 1).toString();
         var day = date.getDate().toString();
-        return month + "/" + day;
+        return month + "月" + day + "日";
     }
 
     // エラーメッセージ削除
@@ -1027,6 +1066,7 @@
 
     // 画像一括出力ボタン押下
     function onExportAllImages() {
+        event.preventDefault();
         DeleteErrorMessages();
         if (isWithin90Days()) {
             tableDisplay();
@@ -1034,15 +1074,22 @@
             // 期間の開始、終了日付の取得
             var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
-            console.log(arrayTrips);
+
+            // 選択された荷量範囲を取得
+            var minLoadClass = parseInt($('[name=minLoadStatus]').val());
+            var maxLoadClass = parseInt($('[name=maxLoadStatus]').val());
 
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("ZipDownload", "LoadTransition")';
+            let url = window.location.origin + '@Url.Action("ZipDownload", "LoadDistribution")';
             let method = 'POST';
-                data = { download: "download", 
-                startOfPeriod: startOfPeriod, 
-                endOfPeriod: endOfPeriod, 
-                "arrayTrips": arrayTrips };
+            data = {
+                download: "download",
+                startOfPeriod: startOfPeriod,
+                endOfPeriod: endOfPeriod,
+                "arrayTrips": arrayTrips,
+                minLoadClass: minLoadClass,
+                maxLoadClass: maxLoadClass
+            };
 
             // Ajax call
             $.ajax({
@@ -1091,15 +1138,21 @@
             var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
+            // 選択された荷量範囲を取得
+            var minLoadClass = parseInt($('[name=minLoadStatus]').val());
+            var maxLoadClass = parseInt($('[name=maxLoadStatus]').val());
+
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("ExportFile", "LoadTransition")';
+            let url = '@Url.Action("ExportFile", "LoadDistribution")';
             let method = 'Post';
             let data = {
                 "gamenName": gamenName,
                 "startofPeriod": startOfPeriod,
                 "endOfPeriod": endOfPeriod,
                 "isOnlyHasAmountDefference": checkBox,
-                "arrayTrips": arrayTrips
+                "arrayTrips": arrayTrips,
+                "minLoadClass": minLoadClass,
+                "maxLoadClass": maxLoadClass
             };
 
             // Ajax call
@@ -1135,4 +1188,3 @@
         }
     }
 </script>
-                                  
