@@ -967,3 +967,19 @@ select[readonly] {
     background-color: #00A0DC;
 }
 /*Å@-------------- radio button to toggle ---------------*/
+
+/*Å@-------------- chart.js ---------------*/
+.chartjs-departure {
+    display: none;
+}
+
+.graph-and-table {
+    display: none;
+}
+
+/*Å@-------------- chart.js ---------------*/
+
+
+.label-delete {
+    color: red;
+}
