@@ -145,9 +145,11 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 便実績情報テーブル非同期更新用
         /// </summary>
+        /// <param name="models">選択された便情報保持クラス</param>
         /// <param name="startOfPeriod">期間の開始日時</param>
         /// <param name="endOfPeriod">期間の終了日時</param>
-        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
+        /// <param name="minLoadClass">荷量クラスの最低値</param>
+        /// <param name="maxLoadClass">荷量クラスの最大値</param>
         /// <returns></returns>
         public JsonResult SearchData(List<LoadRecordModel> models, DateTime startOfPeriod, DateTime endOfPeriod, int minLoadClass, int maxLoadClass)
         {

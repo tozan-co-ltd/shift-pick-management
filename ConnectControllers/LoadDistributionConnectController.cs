@@ -44,7 +44,6 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便名称取得
         /// </summary>
         /// <param name="sql">SQL文</param>
-        /// <param name="">データベース名</param>
         /// <returns></returns>
         public static List<SelectListItem> ConnectTTripRecordsForTripName(string sql)
         {
@@ -94,12 +93,14 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 選択された期間、荷量範囲内の到着荷量をクラスごとにカウントするSQL
+        /// 選択された条件の到着荷量をクラスごとにカウントするSQL
         /// </summary>
-        /// <param name="startOfPeriod"></param>
-        /// <param name="endOfPeriod"></param>
-        /// <param name="minLoadClass"></param>
-        /// <param name="maxLoadClass"></param>
+        /// <param name="tripName">便名称</param>
+        /// <param name="tripBranchSeq">便枝番</param>
+        /// <param name="startOfPeriod">期間開始日</param>
+        /// <param name="endOfPeriod">期間終了日param>
+        /// <param name="minLoadClass">荷量クラスの最低値</param>
+        /// <param name="maxLoadClass">荷量クラスの最大値</param>
         /// <returns></returns>
         public static string CreateSQLToSelectArrivalLoadClassFromSearchConditions(string tripName, int tripBranchSeq, DateTime startOfPeriod, DateTime endOfPeriod, int minLoadClass, int maxLoadClass)
         {
@@ -119,12 +120,14 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 選択された期間、荷量範囲内の到着荷量をクラスごとにカウントするSQL
+        /// 選択された条件の出発荷量をクラスごとにカウントするSQL
         /// </summary>
-        /// <param name="startOfPeriod"></param>
-        /// <param name="endOfPeriod"></param>
-        /// <param name="minLoadClass"></param>
-        /// <param name="maxLoadClass"></param>
+        /// <param name="tripName">便名称</param>
+        /// <param name="tripBranchSeq">便枝番</param>
+        /// <param name="startOfPeriod">期間開始日</param>
+        /// <param name="endOfPeriod">期間終了日param>
+        /// <param name="minLoadClass">荷量クラスの最低値</param>
+        /// <param name="maxLoadClass">荷量クラスの最大値</param>
         /// <returns></returns>
         public static string CreateSQLToSelectDepartureLoadClassFromSearchConditions(string tripName, int tripBranchSeq, DateTime startOfPeriod, DateTime endOfPeriod, int minLoadClass, int maxLoadClass)
         {
@@ -145,8 +148,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 検索条件から便情報を取得するSQL
         /// </summary>
+        /// <param name="models">選択された便情報保持クラス</param>
         /// <param name="startOfPeriod">期間の開始日時</param>
         /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="minLoadClass">荷量クラスの最低値</param>
+        /// <param name="maxLoadClass">荷量クラスの最大値</param>
         /// <returns></returns>
         public static string CreateSQLToSelectLoadClassFromSearchConditionsForTable(List<LoadRecordModel> models, DateTime startOfPeriod, DateTime endOfPeriod, int minLoadClass, int maxLoadClass)
         {
@@ -181,9 +187,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// データベース用便実績情報取得SQL
         /// </summary>
-        /// <param name="startOfPeriod">期間開始日</param>
-        /// <param name="endOfPeriod">期間終了日</param>
-        /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
+        /// <param name="models">選択された便情報保持クラス</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="minLoadClass">荷量クラスの最低値</param>
+        /// <param name="maxLoadClass">荷量クラスの最大値</param>
         /// <returns></returns>
         public static string CreateSQLToSelectTripRecordForDataTable(List<LoadRecordModel> models, DateTime startOfPeriod, DateTime endOfPeriod, int minLoadClass, int maxLoadClass)
         {
@@ -220,9 +228,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 画像出力用の便実績情報取得SQL
         /// </summary>
-        /// <param name="startOfPeriod">期間開始日</param>
-        /// <param name="endOfPeriod">期間終了日</param>
-        /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
+        /// <param name="models">選択された便情報保持クラス</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="minLoadClass">荷量クラスの最低値</param>
+        /// <param name="maxLoadClass">荷量クラスの最大値</param>
         /// <returns></returns>
         public static string CreatSQLToSelectTripRecordForImage(List<LoadRecordModel> models, DateTime startOfPeriod, DateTime endOfPeriod, int minLoadClass, int maxLoadClass)
         {
