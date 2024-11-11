@@ -5,10 +5,6 @@ namespace ai_truck_load_measurement.Models
 {
     public class LoadTransitionModel : LoadRecordModel
     {
-        // 便名称のリスト
-        public List<SelectListItem>? TripNameList { get; set; }
-        // 選択された便名称
-        public string? SelectedTripName {  get; set; }
     }
 
     /// <summary>

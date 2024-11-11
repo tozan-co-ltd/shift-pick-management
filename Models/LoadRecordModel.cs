@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using X.PagedList;
 
 namespace ai_truck_load_measurement.Models
@@ -55,6 +56,8 @@ namespace ai_truck_load_measurement.Models
         public int AnnotationLoadClass { get; set; }
         // 到着か出発か
         public string? ArrivalDepartureClass { get; set; }
+        // 便名称のリスト
+        public List<SelectListItem>? TripNameList { get; set; }
         // 選択された便名称
         public string? SelectedTripName { get; set; }
     }

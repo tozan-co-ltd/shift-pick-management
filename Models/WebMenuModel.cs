@@ -11,7 +11,7 @@ namespace ai_truck_load_measurement.Models
     {
         private readonly List<M_WebMenu> referenceList = new List<M_WebMenu>()
         {
-            new M_WebMenu{CategoryID = 1, MenuID = 1, MenuName = "荷量分布", Controller = "", Action = "Index"},
+            new M_WebMenu{CategoryID = 1, MenuID = 1, MenuName = "荷量分布", Controller = "LoadDistribution", Action = "Index"},
             new M_WebMenu{CategoryID = 1, MenuID = 2, MenuName = "荷量推移", Controller = "LoadTransition", Action = "Index"},
             new M_WebMenu{CategoryID = 1, MenuID = 3, MenuName = "荷量と運行実績", Controller = "", Action = "Index"},
             new M_WebMenu{CategoryID = 1, MenuID = 4, MenuName = "実績出力", Controller = "LoadOutput", Action = "Index"},
