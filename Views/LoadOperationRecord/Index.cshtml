@@ -36,19 +36,19 @@
             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                     <span class="warehouse-name-drs">稼働日</span>
-                    <input type="text" id="workDay" class="form-control pickerDate">
+                    <input type="text" id="workDay" class="form-control  pickerDate">
                 </div>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips0">
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedWorkDays0">
                 <span class="warehouse-name-drs">選択された稼働日</span>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips1">
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedWorkDays1">
                 <span class="warehouse-name-drs"></span>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips2">
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedWorkDays2">
                 <span class="warehouse-name-drs"></span>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips3">
+            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedWorkDays3">
                 <span class="warehouse-name-drs"></span>
             </div>
             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
@@ -59,6 +59,7 @@
             </div>
             
         </form>
+
 
         <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
             <button type="submit" class="btn btn-secondary btn-icon-split" id="search-btn" onclick="onSearchClick()">
@@ -105,7 +106,7 @@
                         adjustCanvasHeight();
 
                         var arrivalChart = new Chart(ctx, {
-                            type: 'line',
+                            type: 'scatter',
                             data: {
                                 labels: [],
                                 datasets: [{
@@ -144,8 +145,19 @@
                                             fontSize: 24
                                         },
                                         ticks: {
-                                            fontSize: 20
-                                        }
+                                            fontSize: 20,
+                                            min: '00:00',
+                                            max: '23:59'
+                                        },
+                                        type: 'time',
+                                        time: {
+                                            parser: 'HH:mm',
+                                            unit: 'hour',
+                                            stepSize: 1,
+                                            displayFormats: {
+                                                'hour': 'HH:mm'
+                                            }
+                                        },
                                     }],
                                     //Y軸
                                     yAxes: [{
@@ -188,7 +200,7 @@
                         adjustCanvasHeight();
 
                         var departureChart = new Chart(ctx, {
-                            type: 'line',
+                            type: 'scatter',
                             data: {
                                 labels: [],
                                 datasets: [{
@@ -227,8 +239,19 @@
                                             fontSize: 24
                                         },
                                         ticks: {
-                                            fontSize: 20
-                                        }
+                                            fontSize: 20,
+                                            min: '00:00',
+                                            max: '23:59'
+                                        },
+                                        type: 'time',
+                                        time: {
+                                            parser: 'HH:mm',
+                                            unit: 'hour',
+                                            stepSize: 1,
+                                            displayFormats: {
+                                                'hour': 'HH:mm'
+                                            }
+                                        },
                                     }],
                                     //Y軸
                                     yAxes: [{
@@ -315,23 +338,35 @@
         console.log(model);
         var today = new Date();
         $('#workDay').val(GetDayString(today));
+        var y = today.getFullYear();
     })
 
     // 稼働日の日付変更時
     $('#workDay').change(function () {
+        // 稼働日の取得
+        var workDay = new Date($('#workDay').val());
+        var workDayString = GetDayString(workDay);
+        addWorkDays(workDayString);
         periodChange();
     });
 
+    // 選択された稼働日の配列
+    let arrayWorkDays = [];
 
     // 稼働日変更時
     function periodChange() {
-        // 稼働日の取得
-        var workDay = GetDayString(new Date($('#workDay').val()));
+        
+
+        // 便名称の選択肢を全削除
+        var select = $('#tripName')[0];
+        while (select.firstChild) {
+            select.removeChild(select.firstChild);
+        }
 
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetTripNameFromWorkDay", "LoadOperationRecord")';
         let method = 'Post';
-        let data = { workDay: workDay };
+        let data = { workDays: arrayWorkDays};
 
         // Ajax call
         $.ajax({
@@ -362,84 +397,69 @@
         });
     }
 
-    // 選択された便の配列
-    let arrayTrips = [];
+    
 
     // 追加ボタン押下時
-    function addTrips() {
+    function addWorkDays(workDay) {
         // 20件の便が選択されているとき
-        if (20 <= arrayTrips.length) {
-            var errorMessage = 'E1008: 選択できる便数は最大20件です。20件を超えないように選択してください。';
+        if (20 <= arrayWorkDays.length) {
+            var errorMessage = 'E1008: 選択できる稼働日は最大20件です。20件を超えないように選択してください。';
             $("#div-error-message").text(errorMessage);
             return;
         }
-        // 便名称と便枝番取得
-        var tripName = $('[name=TripName]').val();
-        var tripBranchSeq = $('[name=TripBranchSeq]').val();
-
-        // 入力されていない場合、エラー出力
-        if (tripName == "" || tripBranchSeq == "") {
-            return;
-        }
-        var selectedTripName = tripName + "_" + tripBranchSeq;
-
+       
         // 重複チェック
-        const tripNames = arrayTrips.map(d => d.selectedTripName);
-        if (tripNames.includes(selectedTripName)) {
+        if (arrayWorkDays.find(x => x == workDay)) {
             return;
         }
 
-        // 選択された便を追加する行を設定
-        var selectedTripsNumber = Math.floor(arrayTrips.length / 5);
-        var selectedTrips = $('#selectedTrips' + selectedTripsNumber)[0];
+        // 選択された稼働日を追加する行を設定
+        var selectedWorkDaysNumber = Math.floor(arrayWorkDays.length / 5);
+        var selectedWorkDays = $('#selectedWorkDays' + selectedWorkDaysNumber)[0];
 
-        // 選択された便に追加
-        arrayTrips.push({ tripName, tripBranchSeq, selectedTripName });
-        pushLabelToSelectedTrips(selectedTrips, selectedTripName);
+        // 選択された稼働日に追加
+        arrayWorkDays.push(workDay);
+        pushLabelToSelectedWorkDays(selectedWorkDays, workDay);
     }
 
     // 選択された便ラベルを作成、指定した親要素の子として登録
-    function pushLabelToSelectedTrips(selectedTrips, selectedTripName) {
-        var selectedTripLabel = document.createElement("label");
-        selectedTripLabel.innerText = selectedTripName;
-        selectedTripLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1\" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
-        selectedTripLabel.className += "mr-2 selected-trip-label";
-        selectedTripLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
-        selectedTripLabel.style.padding = "0.5em";
-        selectedTrips.appendChild(selectedTripLabel);
+    function pushLabelToSelectedWorkDays(selectedWorkDays, workDay) {
+        var selectedWorkDayLabel = document.createElement("label");
+        selectedWorkDayLabel.innerText = workDay;
+        selectedWorkDayLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1\" onclick=\"onLabelDeleteClick('" + workDay + "')\" id=\"\">×</a>";
+        selectedWorkDayLabel.className += "mr-2 selected-trip-label";
+        selectedWorkDayLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
+        selectedWorkDayLabel.style.padding = "0.5em";
+        selectedWorkDays.appendChild(selectedWorkDayLabel);
     }
 
     // 選択された便の×ボタン押下時
-    function onLabelDeleteClick(selectedTripName) {
+    function onLabelDeleteClick(workDayString) {
         // ラベル全削除
         $('.selected-trip-label').remove();
 
         // 配列から削除
-        const tripNames = arrayTrips.map(d => d.selectedTripName);
-        var deleteIndex = tripNames.indexOf(selectedTripName);
-        arrayTrips.splice(deleteIndex, 1);
+        var deleteIndex = arrayWorkDays.indexOf(workDayString);
+        arrayWorkDays.splice(deleteIndex, 1);
 
         // 選択された便の再表示
-        for (var i = 0; i < arrayTrips.length; i++) {
+        for (var i = 0; i < arrayWorkDays.length; i++) {
             // 選択された便を追加する行を設定
-            var selectedTripsNumber = Math.floor(i / 5);
-            var selectedTrips = $('#selectedTrips' + selectedTripsNumber)[0];
+            var selectedWorkDaysNumber = Math.floor(i / 5);
+            var selectedWorkDays = $('#selectedWorkDays' + selectedWorkDaysNumber)[0];
 
-            var selectedTripName = arrayTrips[i].selectedTripName;
-            pushLabelToSelectedTrips(selectedTrips, selectedTripName);
+            var selectedWorkDayName = arrayWorkDays[i];
+            pushLabelToSelectedWorkDays(selectedWorkDays, selectedWorkDayName);
         }
+
+        // セレクトリスト更新
+        periodChange();
     }
 
     // 検索ボタン押下時
     function onSearchClick() {
         DeleteErrorMessages();
 
-        // 90日を超えるデータは検索不可
-        if (!isWithin90Days()) {
-            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
-            $("#div-error-message").text(errorMessage);
-            return;
-        }
 
         // グラフとテーブルの表示
         $('#graphAndTable').css('display', 'block');
@@ -451,42 +471,23 @@
         $('#arrivalChart').css('display', 'block');
         $('#departureChart').css('display', 'none');
 
-        // 期間の開始、終了日付の取得
-        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
-        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+        // 便名称取得
+        var tripName = $('[name=TripName]').val();
 
-        // 選択期間の日数を取得
-        var startDate = new Date($('#startOfPeriod').val());
-        var endDate = new Date($('#endOfPeriod').val());
-        var diffMilliSec = endDate - startDate;
-        var diffDays = parseInt(diffMilliSec / 1000 / 60 / 60 / 24);
-
-        var selectedDates = [];
-        var currentDate = startDate;
-
-        for (var i = 0; i <= diffDays; i++) {
-            var dateForChart = GetDayStringForChart(currentDate);
-            selectedDates.push(dateForChart);
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
 
         // グラフの初期化
         arrivalChart.data.datasets = [];
         departureChart.data.datasets = [];
 
-        // グラフの表示期間設定
-        arrivalChart.data.labels = selectedDates;
-        departureChart.data.labels = selectedDates;
 
         // 追加された便、便枝番について
-        for (var i = 0; i < arrayTrips.length; i++) {
-            var tripName = arrayTrips[i].tripName;
-            var tripBranchSeq = arrayTrips[i].tripBranchSeq
+        for (var i = 0; i < arrayWorkDays.length; i++) {
+            var workDay = arrayWorkDays[i];
 
             // フォーム情報取得
             let url = window.location.origin + '@Url.Action("SearchTrips", "LoadOperationRecord")';
             let method = 'Post';
-            let data = { tripName: tripName, tripBranchSeq: tripBranchSeq, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+            let data = { workDay: workDay, tripName: tripName };
 
             // Ajax call
             $.ajax({
@@ -498,50 +499,36 @@
                 // 荷量クラスをパーセントとして取得
                 var arrivalLoadStatuses = [];
                 var departureLoadStatuses = [];
-                // response.forEach(function (item) {
-                //     var workDay = GetDayStringForChart(new Date(item.workDay));
-                //     if (item.arrivalLoadStatus != "") {
-                //         arrivalLoadStatuses.push({ x: workDay, y: item.arrivalLoadStatus } );
-                //     }
-                //     if (item.departureLoadStatus != "") {
-                //         departureLoadStatuses.push({ x: workDay, y: item.departureLoadStatus } );
-                //     }
-                // })
+               
+                console.log(response);
 
-                selectedDates.forEach(function (day) {
-                    if (response.find(item => GetDayStringForChart(new Date(item.workDay)) == day)) {
-                        var arrivalLoadStatus = response.find(item => GetDayStringForChart(new Date(item.workDay)) == day).arrivalLoadStatus;
-                        var departureLoadStatus = response.find(item => GetDayStringForChart(new Date(item.workDay)) == day).departureLoadStatus;
+                response.forEach(function (loadRecord) {
+                        console.log(loadRecord);
+                        var arrivalLoadStatus = loadRecord.arrivalLoadStatus;
+                        var departureLoadStatus = loadRecord.departureLoadStatus;
                         if (arrivalLoadStatus != "") {
-                            arrivalLoadStatuses.push({ x: day, y: arrivalLoadStatus });
-                        }
-                        else {
-                            arrivalLoadStatuses.push({ x: day, y: null });
+                            var arrivedAt = GetTimeString(new Date(loadRecord.arrivedAt));
+                            arrivalLoadStatuses.push({ x: arrivedAt, y: arrivalLoadStatus });
                         }
 
                         if (departureLoadStatus != "") {
-                            departureLoadStatuses.push({ x: day, y: departureLoadStatus });
+                            var departedAt = GetTimeString(new Date(loadRecord.departedAt));
+                            departureLoadStatuses.push({ x: departedAt, y: departureLoadStatus });
                         }
-                        else {
-                            departureLoadStatuses.push({ x: day, y: null });
-                        }
-                    }
-                    else {
-                        arrivalLoadStatuses.push({ x: day, y: null });
-                        departureLoadStatuses.push({ x: day, y: null });
-                    }
                 })
 
-                // データセット作成、登録
+                console.log(arrivalLoadStatuses);
+
+                // // データセット作成、登録
                 var arrivalDatasets = createChartDatasets(i);
                 arrivalDatasets.data = arrivalLoadStatuses;
-                arrivalDatasets.label = tripName + "_" + tripBranchSeq;
+                arrivalDatasets.label = GetDayString(new Date(workDay));
                 arrivalChart.data.datasets.push(arrivalDatasets);
                 console.log(arrivalDatasets);
 
                 var departureDatasets = createChartDatasets(i);
                 departureDatasets.data = departureLoadStatuses;
-                departureDatasets.label = tripName + "_" + tripBranchSeq;
+                departureDatasets.label = GetDayString(new Date(workDay));
                 departureChart.data.datasets.push(departureDatasets);
 
             }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -603,14 +590,13 @@
 
     // 便実績テーブル表示
     function tableDisplay() {
-        // 期間の開始、終了日付の取得
-        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
-        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+        // 便名称取得
+        var tripName = $('[name=TripName]').val();
 
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "LoadOperationRecord")';
         let method = 'Post';
-        let data = { models: arrayTrips, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+        let data = { workDays: arrayWorkDays, tripName: tripName };
 
         // Ajax call
         $.ajax({
@@ -949,112 +935,90 @@
     // 画像一括出力ボタン押下
     function onExportAllImages() {
         DeleteErrorMessages();
-        if (isWithin90Days()) {
-            tableDisplay();
+        tableDisplay();
 
-            // 期間の開始、終了日付の取得
-            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
-            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
-            console.log(arrayTrips);
+        // 便名称取得
+        var tripName = $('[name=TripName]').val();
 
-            // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("ZipDownload", "LoadOperationRecord")';
-            let method = 'POST';
-            data = {
-                download: "download",
-                startOfPeriod: startOfPeriod,
-                endOfPeriod: endOfPeriod,
-                "arrayTrips": arrayTrips
-            };
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("ZipDownload", "LoadOperationRecord")';
+        let method = 'POST';
+        data = {
+            download: "download",
+            workDays: arrayWorkDays,
+            selectedTripName: tripName
+        };
 
-            // Ajax call
-            $.ajax({
-                url: url,
-                method: method,
-                data: data
-            }).done(function (response) {
-                var { contentType, fileContents, fileDownloadName } = response.data;
-                {
-                    const link = document.createElement("a");
-                    link.href = `data:${contentType};base64,${fileContents}`;
-                    link.download = fileDownloadName;
-                    link.click();
-                }
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 404) {
-                    var errorMessage = jqXHR.responseJSON.errorMessage;
-                    $("#div-error-message").text(errorMessage);
-                } else {
-                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#div-error-message").text(errorMessage);
-                }
-            });
-        }
-        else {
-            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
-            $("#div-error-message").text(errorMessage);
-        }
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            var { contentType, fileContents, fileDownloadName } = response.data;
+            {
+                const link = document.createElement("a");
+                link.href = `data:${contentType};base64,${fileContents}`;
+                link.download = fileDownloadName;
+                link.click();
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
+            }
+        });
+        
     }
 
     // Excel出力
     async function onExportFileTrips(page, gamenName) {
         DeleteErrorMessages();
-        if (isWithin90Days()) {
-            tableDisplay();
-            event.preventDefault();
-            $('#div-error-message').text("");
+        tableDisplay();
+        event.preventDefault();
+        $('#div-error-message').text("");
 
-            // チェックボックスの入力情報取得
-            var checkBox = false;
-            $('input:checked').each(function () {
-                checkBox = $(this).prop('checked');
-            });
 
-            // 期間の開始、終了日付の取得
-            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
-            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+        // 便名称取得
+        var tripName = $('[name=TripName]').val();
 
-            // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("ExportFile", "LoadOperationRecord")';
-            let method = 'Post';
-            let data = {
-                "gamenName": gamenName,
-                "startofPeriod": startOfPeriod,
-                "endOfPeriod": endOfPeriod,
-                "isOnlyHasAmountDefference": checkBox,
-                "arrayTrips": arrayTrips
-            };
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("ExportFile", "LoadOperationRecord")';
+        let method = 'Post';
+        let data = {
+            "gamenName": gamenName,
+            workDays: arrayWorkDays,
+            tripName: tripName
+        };
 
-            // Ajax call
-            $.ajax({
-                url: url,
-                method: method,
-                data: data
-            }).done(function (response) {
-                console.log(response);
-                var { contentType, fileContents, fileDownloadName } = response.data;
-                {
-                    const link = document.createElement("a");
-                    link.href = `data:${contentType};base64,${fileContents}`;
-                    link.download = fileDownloadName;
-                    link.click();
-                }
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            console.log(response);
+            var { contentType, fileContents, fileDownloadName } = response.data;
+            {
+                const link = document.createElement("a");
+                link.href = `data:${contentType};base64,${fileContents}`;
+                link.download = fileDownloadName;
+                link.click();
+            }
 
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 404) {
-                    var errorMessage = jqXHR.responseJSON.errorMessage;
-                    $("#div-error-message").show();
-                    $("#div-error-message").text(errorMessage);
-                } else {
-                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#div-error-message").show();
-                    $("#div-error-message").text(errorMessage);
-                }
-            });
-        }
-        else {
-            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
-            $("#div-error-message").text(errorMessage);
-        }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").show();
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").show();
+                $("#div-error-message").text(errorMessage);
+            }
+        });
     }
 </script>

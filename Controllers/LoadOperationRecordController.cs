@@ -1,9 +1,14 @@
-﻿using ai_truck_load_measurement.ConnectControllers;
+﻿using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data.SqlClient;
+using System.Data;
 using X.PagedList;
+using Aspose.Cells;
+using System.IO.Compression;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -13,10 +18,12 @@ namespace ai_truck_load_measurement.Controllers
         {
             var model = new LoadOperationRecordModel();
             var today = DateTime.Now;
+            List<DateTime> dates = new();
+            dates.Add(today);
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(today);
+                var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(dates);
                 // DB接続
                 List<SelectListItem> tripNameList = LoadDistributionConnectController.ConnectTTripRecordsForTripName(sql);
 
@@ -40,19 +47,19 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-            /// <summary>
-            /// 指定した期間内に存在する便名称のリストを取得してセレクトリストアイテム化する
-            /// </summary>
-            /// <param name="startOfPeriod">期間の開始日時</param>
-            /// <param name="endOfPeriod">期間の終了日時</param>
-            /// <returns></returns>
-            public List<SelectListItem> GetTripNameFromWorkDays(DateTime workDay)
+        /// <summary>
+        /// 指定した期間内に存在する便名称のリストを取得してセレクトリストアイテム化する
+        /// </summary>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <returns></returns>
+        public List<SelectListItem> GetTripNameFromWorkDay(List<DateTime> workDays)
         {
             List<SelectListItem> tripRecordList = new();
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(workDay);
+                var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(workDays);
                 // DB接続
                 tripRecordList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql);
 
@@ -64,6 +71,272 @@ namespace ai_truck_load_measurement.Controllers
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return tripRecordList;
             }
+        }
+
+
+
+        /// <summary>
+        /// 期間内で便名称と便枝番が一致する便実績データのリストを取得する
+        /// </summary>
+        /// <param name="tripName">便名称</param>
+        /// <param name="tripBranchSeq">便枝番</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <returns></returns>
+        public List<LoadRecordModel> SearchTrips(DateTime workDay, string tripName)
+        {
+            List<LoadRecordModel> loadStatuses = new();
+            try
+            {
+                // 便実績情報取得SQL作成
+                var sql = LoadOperationRecordConnectController.CreateSQLToSelectLoadClassFromSearchConditions(tripName, workDay);
+                // DB接続
+                var loadClasses = LoadRecordConnectController.ConnectTTripRecords(sql);
+
+                foreach (var loadClass in loadClasses)
+                {
+                    var loadStatus = new LoadRecordModel
+                    {
+                        WorkDay = workDay,
+                        ArrivedAt = loadClass.ArrivedAt,
+                        DepartedAt = loadClass.DepartedAt,
+                        ArrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.ArrivalLoadClass),
+                        DepartureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.DepartureLoadClass)
+                    };
+                    loadStatuses.Add(loadStatus);
+                }
+
+                return loadStatuses;
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return loadStatuses;
+            }
+        }
+
+
+        /// <summary>
+        /// 便実績情報テーブル非同期更新用
+        /// </summary>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
+        /// <returns></returns>
+        public JsonResult SearchData(List<DateTime> workDays, string tripName)
+        {
+            try
+            {
+                // 指定した期間の便マスター情報取得SQL作成
+                var sql = LoadOperationRecordConnectController.CreateSQLToSelectLoadClassFromSearchConditionsForTable(workDays, tripName);
+                var searchedTripRecordListModel = LoadRecordController.SearchData(sql);
+
+                return Json(searchedTripRecordListModel);
+            }
+            catch (SqlException)
+            {
+                return Json(new { res = "NG", errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                return Json(new { res = "NG", errorMessage = errorMessage });
+            }
+        }
+
+        /// <summary>
+        /// 荷量画像モーダルに表示する値の取得
+        /// </summary>
+        /// <param name="model">モーダルに表示するモデル</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        public LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
+        {
+            var modalItems = LoadRecordController.GetModalItems(model, isArrived);
+
+            return modalItems;
+        }
+
+        /// <summary>
+        /// ファイル出力
+        /// </summary>
+        /// <param name="gamenName">現在の画面名</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
+        /// <returns></returns>
+        public JsonResult ExportFile(string gamenName, List<DateTime> workDays, string tripName)
+        {
+            string? errorMessage;
+            try
+            {
+                // 検索条件シート用データテーブル作成
+                DataTable searchConditionDT = new DataTable();
+                searchConditionDT.Columns.Add("項目名");
+                searchConditionDT.Columns.Add("検索条件");
+                var selectedWorkDays = SelectedWorkDays(workDays);
+                searchConditionDT.Rows.Add("選択された稼働日", selectedWorkDays);
+
+
+                // 便実績情報取得
+                var tTripRecordSql = LoadOperationRecordConnectController.CreateSQLToSelectTripRecordForDataTable(workDays, tripName);
+                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
+
+                // 荷量のクラスを数値化
+                tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
+
+                // ファイル名
+                var tmpFilename = $"荷量実績_{tripName}.xlsx";
+                // 2シートあり
+                bool sheetTwo = true;
+
+                // シート名
+                string sheetNameOne = "検索条件シート";
+                string sheetNameTwo = "荷量実績シート";
+
+
+                try
+                {
+                    // Excelファイル作成チェック
+                    var createRs = CreateFile.CheckCreateExcel(searchConditionDT, tTripRecordDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
+
+                    if (createRs.Item1)
+                    {
+                        var file = System.IO.File.ReadAllBytes(createRs.Item2);
+
+
+                        return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+                    }
+                    else
+                    {
+                        // エラーメッセージ取得
+                        // 「ファイルが存在しません。」
+                        errorMessage = ErrorMessagesResources.E9999;
+
+                        return Json(new { res = "NG", error = errorMessage });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // エラーメッセージ取得
+                    // 「NASに接続できませんでした。」
+                    errorMessage = ErrorMessagesResources.E9999;
+
+                    // log取得
+                    var exceptionMessage = ex.Message;
+                    return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+                }
+            }
+            catch (Exception ex)
+            {
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+
+                // log取得
+                var exceptionMessage = ex.Message;
+                return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+            }
+
+        }
+
+        private string SelectedWorkDays(List<DateTime> workDays)
+        {
+            var selectedWorkDays = "";
+            for (int i = 0; i < workDays.Count; i++)
+            {
+                if (i != 0)
+                {
+                    selectedWorkDays += ",";
+                }
+                selectedWorkDays += workDays[i].ToString("yyyyMMdd");
+            }
+            return selectedWorkDays;
+        }
+
+        /// <summary>
+        /// 画像一括ダウンロード
+        /// </summary>
+        /// <param name="download"></param>
+        /// <param name="startOfPeriod">期間開始日</param>
+        /// <param name="endOfPeriod">期間終了日</param>
+        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみのデータか</param>
+        /// <returns></returns>
+        public JsonResult ZipDownload(string download, List<DateTime> workDays, string selectedTripName)
+        {
+            // ダウンロードボタンが押された際の処理
+            if (download == "download")
+            {
+                // 指定した期間の便実績情報取得SQL作成
+                var sql = LoadOperationRecordConnectController.CreatSQLToSelectTripRecordForImage(workDays, selectedTripName);
+                // DB接続
+                IEnumerable<LoadRecordModel> tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
+
+                // 空のメモリストリームを生成
+                using (var ms = new MemoryStream())
+                {// メモリストリームを指定してZipArchiveを作成
+                    using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
+                    {
+                        var date = string.Empty;
+                        foreach (var tripRecord in tripRecordList)
+                        {
+                            // ステーションの画像取得
+                            var arrivalLoadImgPath = LoadRecordController.CheckAndConvertImagePath(tripRecord.ArrivalLoadImgPath);
+                            var departureLoadImgPath = LoadRecordController.CheckAndConvertImagePath(tripRecord.DepartureLoadImgPath);
+                            byte[] arrivalLoadImgBytes = Convert.FromBase64String(arrivalLoadImgPath);
+                            byte[] departureLoadImgBytes = Convert.FromBase64String(departureLoadImgPath);
+                            // 荷量取得
+                            var arrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(tripRecord.ArrivalLoadClass);
+                            var departureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(tripRecord.DepartureLoadClass);
+                            date = tripRecord.WorkDay.ToString("yyyyMMdd");
+                            // 便名称と便枝番が空欄の時の処理
+                            var tripName = tripRecord.TripName;
+                            if (string.IsNullOrEmpty(tripName)) tripName = "-";
+                            var tripBranchSeq = tripRecord.TripBranchSeq;
+                            if (string.IsNullOrEmpty(tripBranchSeq)) tripBranchSeq = "-";
+
+
+                            // ファイルネームの指定
+                            var FileNameArrive = string.Format($"{tripName}_{tripBranchSeq}_{date}_A_{arrivalLoadStatus}.jpg");
+                            var FileNameDeparture = string.Format($"{tripName}_{tripBranchSeq}_{date}_D_{departureLoadStatus}.jpg");
+
+                            // 到着の画像をzipストリームに書き込む
+                            var zipEntry = archive.CreateEntry(FileNameArrive, CompressionLevel.Fastest);
+                            using (var zipStream = zipEntry.Open())
+                            {
+                                zipStream.Write(arrivalLoadImgBytes, 0, arrivalLoadImgBytes.Length);
+                            }
+
+                            // 出発の画像をzipストリームに書き込む
+
+                            var zipEntry2 = archive.CreateEntry(FileNameDeparture, CompressionLevel.Fastest);
+                            using (var zipStream = zipEntry2.Open())
+                            {
+                                zipStream.Write(departureLoadImgBytes, 0, departureLoadImgBytes.Length);
+                            }
+                        }
+                        // 検索条件のテキストファイルを追加
+                        var zipEntryText = archive.CreateEntry("検索条件.txt");
+                        using (StreamWriter sw = new StreamWriter(zipEntryText.Open(),
+                            System.Text.Encoding.GetEncoding("shift_jis")))
+                        {
+                            var selectedWorkDays = SelectedWorkDays(workDays);
+                            sw.WriteLine($"選択された稼働日:{selectedWorkDays}");
+                            sw.WriteLine($"便名称：{selectedTripName}");
+                        }
+                    }
+
+
+                    // メモリストリームを配列に変換してViewに渡す
+                    return Json(new { data = File(ms.ToArray(), "application/zip", $"荷量画像_{selectedTripName}") });
+                }
+            }
+            // エラーメッセージ取得
+            // 「ファイルが存在しません。」
+            var errorMessage = ErrorMessagesResources.E9999;
+
+            return Json(new { res = "NG", error = errorMessage });
         }
     }
 }
