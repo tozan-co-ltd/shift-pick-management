@@ -73,16 +73,16 @@
         <div class="graph-and-table" id="graphAndTable">
             <hr />
             <div class="col-16 d-flex align-items-center mb-3 unset-pdl">
-                <div class="radio-group mr-3">
-                    <div class="radio-area">
-                        <input type="radio" id="arrivalChartButton" name="chartRadios" value="arrival" checked />
-                        <label for="arrivalChartButton">到着荷量</label>
-                    </div>
-                    <div class="radio-area">
-                        <input type="radio" id="departureChartButton" name="chartRadios" value="departure" />
-                        <label for="departureChartButton">出発荷量</label>
-                    </div>
+                <div class="mr-3"> 
+                    <input type="checkbox" id="arrivalChartButton" name="chartCheckBoxes" value="arrival" checked />
+                    <label for="arrivalChartButton">到着荷量</label>
                 </div>
+
+                <div>
+                    <input type="checkbox" id="departureChartButton" name="chartCheckBoxes" value="departure" />
+                    <label for="departureChartButton">出発荷量</label>
+                </div>
+
                 <button class="btn btn-secondary print-btn mr-4" id="search-btn" onclick="window.print()" style="margin-left: auto;">
                     <span class="text"><i class="fa-solid fa-print"></i></span>
                 </button>
@@ -298,7 +298,197 @@
                         });
                     </script>
                 </div>
+                <div class="chartjs-graph chartjs-all" id="allChart">
+                    <canvas id="binedabanChartAll"></canvas>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
+                    <script src='https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js'></script>
+
+                    <script>
+                        var ctx = document.getElementById("binedabanChartAll");
+                        function adjustCanvasHeight() {
+                            var canvas = document.getElementById("binedabanChartAll");
+                            var width = window.innerWidth;
+                        }
+
+                        window.addEventListener('resize', adjustCanvasHeight);
+
+                        adjustCanvasHeight();
+
+                        var allChart = new Chart(ctx, {
+                            type: 'scatter',
+                            data: {
+                                labels: [],
+                                datasets: [{
+                                    label: '豊鉄大型常傭便3_1',
+                                    borderColor: 'Green',
+                                    fill: false,
+                                    data: [{ x: '2024-10-21T00:00:00', y: 5 }, { x: '2024-10-22T00:00:00', y: 55 }, { x: '2024-10-23T00:00:00', y: 45 }, { x: '2024-10-24T00:00:00', y: 25 }, { x: '2024-10-25T00:00:00', y: 65 }],
+                                    tension: 0,
+                                    pointRadius: '5',
+                                    backgroundColor: 'Green',
+
+                                },
+                                {
+                                    label: '豊鉄大型常傭便3_2',
+                                    borderColor: 'Red',
+                                    fill: false,
+                                    data: [{ x: '2024-10-21T00:00:00', y: 95 }, { x: '2024-10-22T00:00:00', y: 75 }, { x: '2024-10-23T00:00:00', y: 25 }, { x: '2024-10-24T00:00:00', y: 55 }, { x: '2024-10-25T00:00:00', y: 15 }],
+                                    tension: 0,
+                                    pointRadius: '5',
+                                    backgroundColor: 'Red',
+
+                                }]
+                            },
+                            options: {
+                                //凡例は表示
+                                legend: {
+                                    display: true
+                                },
+                                scales: {
+                                    //X軸
+                                    xAxes: [{
+                                        id: 'x軸',
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '稼働日',
+                                            fontSize: 24
+                                        },
+                                        ticks: {
+                                            fontSize: 20,
+                                            min: '00:00',
+                                            max: '23:59'
+                                        },
+                                        type: 'time',
+                                        time: {
+                                            parser: 'HH:mm',
+                                            unit: 'hour',
+                                            stepSize: 1,
+                                            displayFormats: {
+                                                'hour': 'HH:mm'
+                                            }
+                                        },
+                                    }],
+                                    //Y軸
+                                    yAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '荷量(%)',
+                                            fontSize: 24
+                                        },
+                                        //Y軸の範囲を指定
+                                        ticks: {
+                                            min: 0.0,
+                                            max: 100.0,
+                                            fontSize: 20
+                                        }
+                                    }]
+                                },
+                                annotation: {
+                                    annotations: [{
+                                        type: 'line', // 線分を指定
+                                        drawTime: 'afterDraw',
+                                        id: 'a-line-1', // 線のid名を指定（他の線と区別するため）
+                                        mode: 'vertical', // 垂直を指定
+                                        scaleID: 'x軸', // 基準とする軸のid名
+                                        value: '12:00', // 引きたい線の数値（始点）
+                                        borderColor: 'black', // 線の色
+                                        borderWidth: 3, // 線の幅（太さ）
+                                        borderDash: [2, 2],
+                                        borderDashOffset: 1,
+                                    }]
+                                },
+                                title: {
+                                    display: true,
+                                    text: '実績-荷量推移',
+                                    fontSize: 30
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+                <div class="chartjs-graph chartjs-clear" id="clearChart">
+                    <canvas id="binedabanChartClear"></canvas>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
+                    <script src='https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js'></script>
+                    <script>
+                        var ctx = document.getElementById("binedabanChartClear");
+                        function adjustCanvasHeight() {
+                            var canvas = document.getElementById("binedabanChartClear");
+                            var width = window.innerWidth;
+                        }
+
+                        window.addEventListener('resize', adjustCanvasHeight);
+
+                        adjustCanvasHeight();
+
+                        var clearChart = new Chart(ctx, {
+                            type: 'scatter',
+                            data: {
+                                labels: [],
+                                datasets: []
+                            },
+                            options: {
+                                //凡例は表示
+                                legend: {
+                                    display: true
+                                },
+                                scales: {
+                                    //X軸
+                                    xAxes: [{
+                                        id: 'x軸',
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '稼働日',
+                                            fontSize: 24
+                                        },
+                                        ticks: {
+                                            fontSize: 20,
+                                            min: '00:00',
+                                            max: '23:59'
+                                        },
+                                        type: 'time',
+                                        time: {
+                                            parser: 'HH:mm',
+                                            unit: 'hour',
+                                            stepSize: 1,
+                                            displayFormats: {
+                                                'hour': 'HH:mm'
+                                            }
+                                        },
+                                    }],
+                                    //Y軸
+                                    yAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '荷量(%)',
+                                            fontSize: 24
+                                        },
+                                        //Y軸の範囲を指定
+                                        ticks: {
+                                            min: 0.0,
+                                            max: 100.0,
+                                            fontSize: 20
+                                        }
+                                    }]
+                                },
+                                annotation: {
+                                    annotations: []
+                                },
+                                title: {
+                                    display: true,
+                                    text: '実績-荷量推移',
+                                    fontSize: 30
+                                }
+                            }
+                        });
+                    </script>
+                </div>
             </div>
+            
             <hr />
             <div class="mg-bot-20 mt-3">
                 <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
@@ -482,6 +672,12 @@
     function onSearchClick() {
         DeleteErrorMessages();
 
+        // 便名称取得
+        var tripName = $('[name=TripName]').val();
+
+        if(tripName == null){
+            return;
+        }
 
         // グラフとテーブルの表示
         $('#graphAndTable').css('display', 'block');
@@ -490,18 +686,19 @@
 
         // 初期表示は到着荷量
         $('input[value="arrival"]').prop('checked', true);
+        $('input[value="departure"]').prop('checked', false);
         $('#arrivalChart').css('display', 'block');
         $('#departureChart').css('display', 'none');
+        $('#allChart').css('display', 'none');
+        $('#clearChart').css('display', 'none');
 
-        // 便名称取得
-        var tripName = $('[name=TripName]').val();
+        // 昼勤開始時間保存用
         var dayShiftStartTime = "";
-
 
         // グラフの初期化
         arrivalChart.data.datasets = [];
         departureChart.data.datasets = [];
-
+        allChart.data.datasets = [];
 
         // 追加された便、便枝番について
         for (var i = 0; i < arrayWorkDays.length; i++) {
@@ -522,6 +719,7 @@
                 // 荷量クラスをパーセントとして取得
                 var arrivalLoadStatuses = [];
                 var departureLoadStatuses = [];
+                var allLoadStatuses = [];
 
                 response.forEach(function (loadRecord) {
                     var arrivalLoadStatus = loadRecord.arrivalLoadStatus;
@@ -529,11 +727,13 @@
                     if (arrivalLoadStatus != "") {
                         var arrivedAt = GetTimeString(new Date(loadRecord.arrivedAt));
                         arrivalLoadStatuses.push({ x: arrivedAt, y: arrivalLoadStatus });
+                        allLoadStatuses.push({ x: arrivedAt, y: arrivalLoadStatus });
                     }
 
                     if (departureLoadStatus != "") {
                         var departedAt = GetTimeString(new Date(loadRecord.departedAt));
                         departureLoadStatuses.push({ x: departedAt, y: departureLoadStatus });
+                        allLoadStatuses.push({ x: departedAt, y: departureLoadStatus })
                     }
 
                     dayShiftStartTime = GetTimeString(new Date(loadRecord.dayShiftStartTime));
@@ -551,6 +751,14 @@
                 departureDatasets.label = GetDayString(new Date(workDay));
                 departureChart.data.datasets.push(departureDatasets);
 
+                var allDatasets = createChartDatasets(i);
+                allDatasets.data = allLoadStatuses;
+                allDatasets.label = GetDayString(new Date(workDay));
+                allChart.data.datasets.push(allDatasets);
+                
+                var clearDatasets = createChartDatasets(i);
+                clearDatasets.label = GetDayString(new Date(workDay));
+                clearChart.data.datasets.push(clearDatasets);
                
 
             }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -567,17 +775,30 @@
         // 昼勤開始時間の線の初期化
         arrivalChart.options.annotation.annotations = []; 
         departureChart.options.annotation.annotations = [];
+        allChart.options.annotation.annotations = [];
 
         // 昼勤開始時間の線描画用データ作成
         var annotationLine = createChartAnnotation(dayShiftStartTime, labelAppearedTime);
+        labelAppearedTime++;
 
         // 昼勤開始時間の線追加
         arrivalChart.options.annotation.annotations.push(annotationLine);
         departureChart.options.annotation.annotations.push(annotationLine);
+        allChart.options.annotation.annotations.push(annotationLine);
+        clearChart.options.annotation.annotations.push(annotationLine);
+
+        // グラフのタイトル設定
+        arrivalChart.options.title.text = tripName;
+        departureChart.options.title.text = tripName; 
+        allChart.options.title.text = tripName;
+        clearChart.options.title.text = tripName;
+
 
         // グラフの更新
         arrivalChart.update();
         departureChart.update();
+        allChart.update();
+        clearChart.update();
     }
 
     // chartjs用のデータセット作成
@@ -609,24 +830,45 @@
             // borderDash: [2, 2],
             // borderDashOffset: 1,
         };
-        labelAppearedTime++;
         return annotationLine;
     }
 
-    // ラジオボタン切り替え時
+    // チェックボックス切り替え時
     $(function () {
-        $('input[name="chartRadios"]:radio').change(function () {
+        $('input[name="chartCheckBoxes"]:checkBox').change(function () {
             // デフォルトの操作を無効化
             event.preventDefault();
 
-            var radioval = $(this).val();
-            if (radioval == "arrival") {
+            var checkBoxVal = "";
+
+            $('input:checked').each(function () {
+                var r = $(this).val();
+                checkBoxVal += r;
+                console.log(r);
+            })
+            if (checkBoxVal == "arrival") {
                 $('#arrivalChart').css('display', 'block');
                 $('#departureChart').css('display', 'none');
+                $('#allChart').css('display', 'none');
+                $('#clearChart').css('display', 'none');
             }
-            else {
+            else if (checkBoxVal == "departure") {
                 $('#departureChart').css('display', 'block');
                 $('#arrivalChart').css('display', 'none');
+                $('#allChart').css('display', 'none');
+                $('#clearChart').css('display', 'none');
+            }
+            else if(checkBoxVal == "arrivaldeparture"){
+                $('#arrivalChart').css('display', 'none');
+                $('#departureChart').css('display', 'none');
+                $('#allChart').css('display', 'block');
+                $('#clearChart').css('display', 'none');
+            }
+            else{
+                $('#arrivalChart').css('display', 'none');
+                $('#departureChart').css('display', 'none');
+                $('#allChart').css('display', 'none');
+                $('#clearChart').css('display', 'block');
             }
         })
     })
