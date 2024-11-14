@@ -72,29 +72,33 @@
 
         <div class="graph-and-table" id="graphAndTable">
             <hr />
-            <div class="col-16 d-flex align-items-center mb-3 unset-pdl">
-                <div class="mr-3"> 
-                    <input type="checkbox" id="arrivalChartButton" name="chartCheckBoxes" value="arrival" checked />
-                    <label for="arrivalChartButton">到着荷量</label>
-                </div>
-
-                <div>
-                    <input type="checkbox" id="departureChartButton" name="chartCheckBoxes" value="departure" />
-                    <label for="departureChartButton">出発荷量</label>
-                </div>
-
-                <button class="btn btn-secondary print-btn mr-4" id="search-btn" onclick="window.print()" style="margin-left: auto;">
-                    <span class="text"><i class="fa-solid fa-print"></i></span>
-                </button>
-            </div>
-
-
             <div class="print-area" id="print-area">
+                <div class="col-16 d-flex align-items-center mb-3 unset-pdl">
+                    <div class="mr-3"> 
+                        <input type="checkbox" id="arrivalChartButton" name="chartCheckBoxes" value="arrival" checked />
+                        <label for="arrivalChartButton">到着荷量</label>
+                    </div>
+
+                    <div>
+                        <input type="checkbox" id="departureChartButton" name="chartCheckBoxes" value="departure" />
+                        <label for="departureChartButton">出発荷量</label>
+                    </div>
+
+                    <div id="not-print-area" style="margin-left: auto;">
+                        <button class="btn btn-secondary print-btn mr-4" id="search-btn" onclick="window.print()" >
+                            <span class="text"><i class="fa-solid fa-print"></i></span>
+                        </button>
+                    </div>
+                </div>
+
+                <p style="text-align:right">
+                    縦線：昼勤開始時間
+                </p>
+
                 <div class="chartjs-graph chartjs-arrival" id="arrivalChart">
                     <canvas id="binedabanChartArrival"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
                     <script src='https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js'></script>
-
                     <script>
                         var ctx = document.getElementById("binedabanChartArrival");
                         function adjustCanvasHeight() {
