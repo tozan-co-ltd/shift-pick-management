@@ -40,6 +40,9 @@
         columnDefs: [
             { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
         ],
+        "oLanguage": {
+            "sSearch": "フリーワード(全件)"
+        },
         dom: dom_structure
     });
 
