@@ -83,25 +83,26 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="startOfPeriod">期間の開始日時</param>
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <returns></returns>
-        public List<LoadRecordModel> SearchTrips(DateTime workDay, string tripName)
+        public List<LoadOperationRecordModel> SearchTrips(DateTime workDay, string tripName)
         {
-            List<LoadRecordModel> loadStatuses = new();
+            List<LoadOperationRecordModel> loadStatuses = new();
             try
             {
                 // 便実績情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreateSQLToSelectLoadClassFromSearchConditions(tripName, workDay);
                 // DB接続
-                var loadClasses = LoadRecordConnectController.ConnectTTripRecords(sql);
+                var loadClasses = LoadOperationRecordConnectController.ConnectTTripRecords(sql);
 
                 foreach (var loadClass in loadClasses)
                 {
-                    var loadStatus = new LoadRecordModel
+                    var loadStatus = new LoadOperationRecordModel
                     {
                         WorkDay = workDay,
                         ArrivedAt = loadClass.ArrivedAt,
                         DepartedAt = loadClass.DepartedAt,
                         ArrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.ArrivalLoadClass),
-                        DepartureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.DepartureLoadClass)
+                        DepartureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.DepartureLoadClass),
+                        DayShiftStartTime = loadClass.DayShiftStartTime,
                     };
                     loadStatuses.Add(loadStatus);
                 }

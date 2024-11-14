@@ -2,5 +2,6 @@
 {
     public class LoadOperationRecordModel : LoadRecordModel
     {
+        public DateTime? DayShiftStartTime { get; set; }
     }
 }

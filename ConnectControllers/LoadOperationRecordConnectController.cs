@@ -1,9 +1,44 @@
-﻿using ai_truck_load_measurement.Models;
+﻿using ai_truck_load_measurement.Commons;
+using System.Data.SqlClient;
+using ai_truck_load_measurement.Models;
+using Dapper;
+
 
 namespace ai_truck_load_measurement.ConnectControllers
 {
     public class LoadOperationRecordConnectController 
     {
+        /// <summary>
+        /// 便実績情報取得
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <returns></returns>
+        public static List<LoadOperationRecordModel> ConnectTTripRecords(string sql)
+        {
+            // 戻り値
+            List<LoadOperationRecordModel> strList = new();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                    strList = connection.Query<LoadOperationRecordModel>(sql).ToList();
+                }
+                return strList;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public static string CreateSQLToSelectTripNameFromWorkDays(List<DateTime> workDays)
         {
             var selectedDays = SelectedDaysSQL(workDays);
@@ -39,10 +74,15 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                arrival_load_class,
 	                departure_load_class,
 	                arrived_at,
-	                departed_at
-                FROM t_trip_records
+	                departed_at,
+                    CONVERT(DATETIME, histories.day_shift_start_time) AS day_shift_start_time
+                FROM t_trip_records AS trip_records
+                INNER JOIN m_trips AS trips
+                ON trip_records.trip_name = trips.trip_name
+                INNER JOIN m_trip_histories AS histories
+                ON trips.trip_id = histories.trip_id
                 WHERE work_day = '{workDay.ToString("yyyy/MM/dd")}'
-                AND trip_name = '{tripName}'
+                AND trip_records.trip_name = '{tripName}'
             ";
             return sql;
         }

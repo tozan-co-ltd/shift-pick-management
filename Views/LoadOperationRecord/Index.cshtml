@@ -93,6 +93,7 @@
                 <div class="chartjs-graph chartjs-arrival" id="arrivalChart">
                     <canvas id="binedabanChartArrival"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
+                    <script src='https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js'></script>
 
                     <script>
                         var ctx = document.getElementById("binedabanChartArrival");
@@ -138,6 +139,7 @@
                                 scales: {
                                     //X軸
                                     xAxes: [{
+                                        id: 'x軸',
                                         //軸ラベル表示
                                         scaleLabel: {
                                             display: true,
@@ -174,6 +176,20 @@
                                             fontSize: 20
                                         }
                                     }]
+                                }, 
+                                annotation: {
+                                    annotations: [{           
+                                        type: 'line', // 線分を指定
+                                        drawTime: 'afterDraw',
+                                        id: 'a-line-1', // 線のid名を指定（他の線と区別するため）
+                                        mode: 'vertical', // 垂直を指定
+                                        scaleID: 'x軸', // 基準とする軸のid名
+                                        value: '12:00', // 引きたい線の数値（始点）
+                                        borderColor: 'black', // 線の色
+                                        borderWidth: 3, // 線の幅（太さ）
+                                        borderDash: [2, 2],
+                                        borderDashOffset: 1,
+                                    }]
                                 },
                                 title: {
                                     display: true,
@@ -187,7 +203,7 @@
                 <div class="chartjs-graph chartjs-departure" id="departureChart">
                     <canvas id="binedabanChartDeparture"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
-
+                    <script src='https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js'></script>
                     <script>
                         var ctx = document.getElementById("binedabanChartDeparture");
                         function adjustCanvasHeight() {
@@ -232,6 +248,7 @@
                                 scales: {
                                     //X軸
                                     xAxes: [{
+                                        id: 'x軸',
                                         //軸ラベル表示
                                         scaleLabel: {
                                             display: true,
@@ -268,6 +285,9 @@
                                             fontSize: 20
                                         }
                                     }]
+                                },
+                                annotation: {
+                                    annotations:[]
                                 },
                                 title: {
                                     display: true,
@@ -456,6 +476,8 @@
         periodChange();
     }
 
+    let labelAppearedTime = 0;
+
     // 検索ボタン押下時
     function onSearchClick() {
         DeleteErrorMessages();
@@ -473,6 +495,7 @@
 
         // 便名称取得
         var tripName = $('[name=TripName]').val();
+        var dayShiftStartTime = "";
 
 
         // グラフの初期化
@@ -499,37 +522,36 @@
                 // 荷量クラスをパーセントとして取得
                 var arrivalLoadStatuses = [];
                 var departureLoadStatuses = [];
-               
-                console.log(response);
 
                 response.forEach(function (loadRecord) {
-                        console.log(loadRecord);
-                        var arrivalLoadStatus = loadRecord.arrivalLoadStatus;
-                        var departureLoadStatus = loadRecord.departureLoadStatus;
-                        if (arrivalLoadStatus != "") {
-                            var arrivedAt = GetTimeString(new Date(loadRecord.arrivedAt));
-                            arrivalLoadStatuses.push({ x: arrivedAt, y: arrivalLoadStatus });
-                        }
+                    var arrivalLoadStatus = loadRecord.arrivalLoadStatus;
+                    var departureLoadStatus = loadRecord.departureLoadStatus;
+                    if (arrivalLoadStatus != "") {
+                        var arrivedAt = GetTimeString(new Date(loadRecord.arrivedAt));
+                        arrivalLoadStatuses.push({ x: arrivedAt, y: arrivalLoadStatus });
+                    }
 
-                        if (departureLoadStatus != "") {
-                            var departedAt = GetTimeString(new Date(loadRecord.departedAt));
-                            departureLoadStatuses.push({ x: departedAt, y: departureLoadStatus });
-                        }
+                    if (departureLoadStatus != "") {
+                        var departedAt = GetTimeString(new Date(loadRecord.departedAt));
+                        departureLoadStatuses.push({ x: departedAt, y: departureLoadStatus });
+                    }
+
+                    dayShiftStartTime = GetTimeString(new Date(loadRecord.dayShiftStartTime));
                 })
 
-                console.log(arrivalLoadStatuses);
 
                 // // データセット作成、登録
                 var arrivalDatasets = createChartDatasets(i);
                 arrivalDatasets.data = arrivalLoadStatuses;
                 arrivalDatasets.label = GetDayString(new Date(workDay));
                 arrivalChart.data.datasets.push(arrivalDatasets);
-                console.log(arrivalDatasets);
 
                 var departureDatasets = createChartDatasets(i);
                 departureDatasets.data = departureLoadStatuses;
                 departureDatasets.label = GetDayString(new Date(workDay));
                 departureChart.data.datasets.push(departureDatasets);
+
+               
 
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
@@ -540,7 +562,19 @@
                     $("#div-error-message").text(errorMessage);
                 }
             });
-        }
+        } 
+
+        // 昼勤開始時間の線の初期化
+        arrivalChart.options.annotation.annotations = []; 
+        departureChart.options.annotation.annotations = [];
+
+        // 昼勤開始時間の線描画用データ作成
+        var annotationLine = createChartAnnotation(dayShiftStartTime, labelAppearedTime);
+
+        // 昼勤開始時間の線追加
+        arrivalChart.options.annotation.annotations.push(annotationLine);
+        departureChart.options.annotation.annotations.push(annotationLine);
+
         // グラフの更新
         arrivalChart.update();
         departureChart.update();
@@ -559,6 +593,24 @@
             spanGaps: true,
         }
         return datasets;
+    }
+
+    // chartjs用の線描画用データ作成
+    function createChartAnnotation(dayShiftStartTime, labelAppearedTime){
+        var annotationLine = {
+            type: 'line', // 線分を指定
+            drawTime: 'afterDatasetsDraw',
+            id: labelAppearedTime.toString(), // 線のid名を指定（他の線と区別するため）
+            mode: 'vertical', // 垂直を指定
+            scaleID: 'x軸', // 基準とする軸のid名
+            value: dayShiftStartTime, // 引きたい線の数値（始点）
+            borderColor: 'black', // 線の色
+            borderWidth: 3, // 線の幅（太さ）
+            // borderDash: [2, 2],
+            // borderDashOffset: 1,
+        };
+        labelAppearedTime++;
+        return annotationLine;
     }
 
     // ラジオボタン切り替え時
