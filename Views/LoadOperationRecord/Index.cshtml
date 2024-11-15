@@ -568,7 +568,9 @@
 
     // 稼働日変更時
     function periodChange() {
-        
+
+        // 便名称取得
+        var tripName = $('[name=TripName]').val();
 
         // 便名称の選択肢を全削除
         var select = $('#tripName')[0];
@@ -588,6 +590,7 @@
             data: data
         }).done(function (response) {
             for (var i = 0; i < response.length; i++) {
+                // セレクトボックスの選択肢生成
                 var option = document.createElement("option");
                 if (response[i].text == null) {
                     option.text = "";
@@ -596,8 +599,15 @@
                     option.text = response[i].text;
                 }
                 option.value = response[i].value;
+
+                // 更新前に選択していた便名称が存在する場合、選択済みに設定
+                if (tripName == option.value) {
+                    option.selected = true;
+                }
+                // セレクトボックスに追加
                 select.appendChild(option);
             }
+            
 
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
@@ -612,9 +622,9 @@
 
     
 
-    // 追加ボタン押下時
+    // 稼働日選択時時
     function addWorkDays(workDay) {
-        // 20件の便が選択されているとき
+        // 20件の稼働日が選択されているとき
         if (20 <= arrayWorkDays.length) {
             var errorMessage = 'E1008: 選択できる稼働日は最大20件です。20件を超えないように選択してください。';
             $("#div-error-message").text(errorMessage);
