@@ -172,8 +172,6 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 検索条件から荷量クラスを取得するSQL
         /// </summary>
-        /// <param name="tripName">便名称</param>
-        /// <param name="tripBranchSeq">便枝番</param>
         /// <param name="startOfPeriod">期間の開始日時</param>
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <returns></returns>

@@ -12,7 +12,7 @@ namespace ai_truck_load_measurement.Controllers
     /// <summary>
     /// 各実績画面の共通処理用コントローラー
     /// </summary>
-    public class LoadRecordController
+    public class LoadRecordController : BaseController
     {
 
         /// <summary>
@@ -346,6 +346,65 @@ namespace ai_truck_load_measurement.Controllers
             };
 
             return searchedTripRecordListModel;
+        }
+
+        /// <summary>
+        /// 荷量の相違ありテーブルの設定値を保存する
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="loadStatus">荷量クラス</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        public IActionResult InsertOrUpdateAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived)
+        {
+            string? errorMessage;
+            NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+            try
+            {
+                // 初期値でクリックした場合は何も起こらない
+                if (loadStatus == 0)
+                {
+                    return NotFound();
+                }
+
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 「荷量の相違あり」で保存した値が既に存在するか
+                var isSameAnnotationLoadsExist = LoadOutputConnectController.IsSameAnnotationLoadsExist(tripRecordID, isArrived);
+
+                // 「荷量の相違あり」の設定値を更新、保存
+                if (isSameAnnotationLoadsExist)
+                {
+                    // 更新
+                    LoadOutputConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
+                }
+                else
+                {
+                    // 新規保存
+                    LoadOutputConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
+                }
+
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+            catch (Exception ex)
+            {
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
         }
     }
 }

@@ -304,6 +304,7 @@
 
     // 要検証ボタン押下時
     function onVerificationRequiredClick(tripRecordID, isArrived) {
+        event.preventDefault();
         var loadStatus = $('[name=loadStatusSelect]').val();
         if (loadStatus != "") {
 
@@ -311,7 +312,7 @@
 
 
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("InsertOrUpdateAnnotationLoads", "LoadOutput")';
+            let url = window.location.origin + '@Url.Action("InsertOrUpdateAnnotationLoads", "LoadRecord")';
             let method = 'POST';
             let data = { tripRecordID: tripRecordID, loadStatus: loadStatus, isArrived: isArrived };
 
@@ -321,9 +322,8 @@
                 method: method,
                 data: data
             }).done(function (response) {
-                $('#detail-modal').hide();
                 // 完了モーダル表示
-                AlertMessage('', '完了', '登録が完了しました。', null, null);
+                alert('登録が完了しました。');
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
                     var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -454,7 +454,10 @@
                 scrollX: true,          // 横スクロール可
                 scrollCollapse: true,   // 縦スクロール表示
                 searchHighlight: true,  // 検索ハイライト
-                order: [[1, "asc"],[9,"asc"],[2,"asc"]],    // ID昇順
+                order: [[1, "asc"], [9, "asc"], [2, "asc"]],    // ID昇順
+                "oLanguage": {
+                    "sSearch": "フリーワード(全件)"
+                },
                 dom: dom_structure
             });
             var table = $("#tripRecordDataTable").DataTable();
@@ -537,7 +540,8 @@
 
    
     // 画像一括出力ボタン押下
-    function onExportAllImages(){
+    function onExportAllImages() {
+        event.preventDefault();
         DeleteErrorMessages();
         if (isWithin90Days()) {
             tableDisplay();
