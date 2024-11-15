@@ -39,6 +39,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
         }
 
+        /// <summary>
+        /// 稼働日から便名称を取得するSQL
+        /// </summary>
+        /// <param name="workDays"></param>
+        /// <returns></returns>
         public static string CreateSQLToSelectTripNameFromWorkDays(List<DateTime> workDays)
         {
             var selectedDays = SelectedDaysSQL(workDays);
@@ -53,6 +58,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 稼働日のリストをSQLのWHERE文に変換する
+        /// </summary>
+        /// <param name="days"></param>
+        /// <returns></returns>
         private static string SelectedDaysSQL(List<DateTime> days)
         {
             var selectedDays = "";
@@ -67,6 +77,12 @@ namespace ai_truck_load_measurement.ConnectControllers
             return selectedDays;
         }
 
+        /// <summary>
+        /// 条件から荷量クラスと昼勤開始時間を取得するSQL
+        /// </summary>
+        /// <param name="tripName">便名称</param>
+        /// <param name="workDay">稼働日</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectLoadClassFromSearchConditions(string tripName, DateTime workDay)
         {
             var sql = $@"
@@ -88,10 +104,10 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 検索条件から荷量クラスを取得するSQL
+        /// 検索条件から便実績を取得するSQL
         /// </summary>
-        /// <param name="startOfPeriod">期間の開始日時</param>
-        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="workDays">稼働日</param>
+        /// <param name="tripName">便名称</param>
         /// <returns></returns>
         public static string CreateSQLToSelectLoadClassFromSearchConditionsForTable(List<DateTime> workDays, string tripName)
         {
@@ -122,11 +138,10 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// データベース用便実績情報取得SQL
+        /// データテーブル用便実績情報取得SQL
         /// </summary>
-        /// <param name="startOfPeriod">期間開始日</param>
-        /// <param name="endOfPeriod">期間終了日</param>
-        /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
+        /// <param name="workDays">稼働日</param>
+        /// <param name="tripName">便名称</param>
         /// <returns></returns>
         public static string CreateSQLToSelectTripRecordForDataTable(List<DateTime> workDays, string tripName)
         {
@@ -159,9 +174,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 画像出力用の便実績情報取得SQL
         /// </summary>
-        /// <param name="startOfPeriod">期間開始日</param>
-        /// <param name="endOfPeriod">期間終了日</param>
-        /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
+        /// <param name="workDays">稼働日</param>
+        /// <param name="tripName">便名称</param>
         /// <returns></returns>
         public static string CreatSQLToSelectTripRecordForImage(List<DateTime> workDays, string tripName)
         {

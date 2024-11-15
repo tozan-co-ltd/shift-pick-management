@@ -549,7 +549,6 @@
 
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
-        console.log(model);
         var today = new Date();
         $('#workDay').val(GetDayString(today));
         var y = today.getFullYear();
@@ -670,6 +669,7 @@
         periodChange();
     }
 
+    // 昼勤開始時間の縦線ID用変数
     let labelAppearedTime = 0;
 
     // 検索ボタン押下時
@@ -686,7 +686,6 @@
         // グラフとテーブルの表示
         $('#graphAndTable').css('display', 'block');
         tableDisplay();
-        console.log($('#tripRecordDataTable_filter'));
 
         // 初期表示は到着荷量
         $('input[value="arrival"]').prop('checked', true);
@@ -721,11 +720,12 @@
                 data: data,
                 async: false
             }).done(function (response) {
-                // 荷量クラスをパーセントとして取得
+                // 荷量クラスをパーセントとして保存する用の配列
                 var arrivalLoadStatuses = [];
                 var departureLoadStatuses = [];
                 var allLoadStatuses = [];
 
+                // 荷量クラスをパーセントとして保存
                 response.forEach(function (loadRecord) {
                     var arrivalLoadStatus = loadRecord.arrivalLoadStatus;
                     var departureLoadStatus = loadRecord.departureLoadStatus;
@@ -845,12 +845,13 @@
             event.preventDefault();
 
             var checkBoxVal = "";
-
+            // 入力があるチェックボックス取得
             $('input:checked').each(function () {
                 var r = $(this).val();
                 checkBoxVal += r;
-                console.log(r);
             })
+
+            // 入力内容によって表示させるグラフを切り替える
             if (checkBoxVal == "arrival") {
                 $('#arrivalChart').css('display', 'block');
                 $('#departureChart').css('display', 'none');
@@ -948,7 +949,6 @@
 
     // 到着荷量画像ボタン押下
     function OnArrivalLoadImageClick(tripRecordID, button) {
-        console.log("test");
         // 配列の初期化
         arrayTrs = [];
         // 到着
@@ -999,7 +999,6 @@
                     method: method,
                     data: data
                 }).done(function (response) {
-                    console.log(response)
                     var imagePath = "";
                     var arriveOrDeparture = "";
                     var arriveOrDepartureDate = "";
@@ -1299,7 +1298,6 @@
             method: method,
             data: data
         }).done(function (response) {
-            console.log(response);
             var { contentType, fileContents, fileDownloadName } = response.data;
             {
                 const link = document.createElement("a");

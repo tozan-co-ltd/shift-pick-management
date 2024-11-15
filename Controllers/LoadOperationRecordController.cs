@@ -76,12 +76,10 @@ namespace ai_truck_load_measurement.Controllers
 
 
         /// <summary>
-        /// 期間内で便名称と便枝番が一致する便実績データのリストを取得する
+        /// 稼働日と便名称が一致する便実績を取得する
         /// </summary>
-        /// <param name="tripName">便名称</param>
-        /// <param name="tripBranchSeq">便枝番</param>
-        /// <param name="startOfPeriod">期間の開始日時</param>
-        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="workDay"></param>
+        /// <param name="tripName"></param>
         /// <returns></returns>
         public List<LoadOperationRecordModel> SearchTrips(DateTime workDay, string tripName)
         {
@@ -121,15 +119,14 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 便実績情報テーブル非同期更新用
         /// </summary>
-        /// <param name="startOfPeriod">期間の開始日時</param>
-        /// <param name="endOfPeriod">期間の終了日時</param>
-        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
+        /// <param name="workDays">稼働日</param>
+        /// <param name="tripName">便名称</param>
         /// <returns></returns>
         public JsonResult SearchData(List<DateTime> workDays, string tripName)
         {
             try
             {
-                // 指定した期間の便マスター情報取得SQL作成
+                // 指定し稼働日と便名称の便マスター情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreateSQLToSelectLoadClassFromSearchConditionsForTable(workDays, tripName);
                 var searchedTripRecordListModel = LoadRecordController.SearchData(sql);
 
@@ -159,13 +156,13 @@ namespace ai_truck_load_measurement.Controllers
             return modalItems;
         }
 
+
         /// <summary>
         /// ファイル出力
         /// </summary>
-        /// <param name="gamenName">現在の画面名</param>
-        /// <param name="startOfPeriod">期間の開始日時</param>
-        /// <param name="endOfPeriod">期間の終了日時</param>
-        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
+        /// <param name="gamenName">画面名</param>
+        /// <param name="workDays">稼働日</param>
+        /// <param name="tripName">便名称</param>
         /// <returns></returns>
         public JsonResult ExportFile(string gamenName, List<DateTime> workDays, string tripName)
         {
@@ -242,6 +239,11 @@ namespace ai_truck_load_measurement.Controllers
 
         }
 
+        /// <summary>
+        /// 選択された稼働日を1行にまとめる
+        /// </summary>
+        /// <param name="workDays"></param>
+        /// <returns></returns>
         private string SelectedWorkDays(List<DateTime> workDays)
         {
             var selectedWorkDays = "";
@@ -260,9 +262,8 @@ namespace ai_truck_load_measurement.Controllers
         /// 画像一括ダウンロード
         /// </summary>
         /// <param name="download"></param>
-        /// <param name="startOfPeriod">期間開始日</param>
-        /// <param name="endOfPeriod">期間終了日</param>
-        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみのデータか</param>
+        /// <param name="workDays">稼働日</param>
+        /// <param name="selectedTripName">選択された便名称</param>
         /// <returns></returns>
         public JsonResult ZipDownload(string download, List<DateTime> workDays, string selectedTripName)
         {
