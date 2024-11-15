@@ -77,8 +77,8 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 稼働日と便名称が一致する便実績を取得する
         /// </summary>
-        /// <param name="workDay"></param>
-        /// <param name="tripName"></param>
+        /// <param name="workDay">稼働日</param>
+        /// <param name="tripName">便名称</param>
         /// <returns></returns>
         public List<LoadOperationRecordModel> SearchTrips(DateTime workDay, string tripName)
         {
