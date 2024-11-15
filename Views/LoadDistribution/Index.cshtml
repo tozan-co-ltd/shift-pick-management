@@ -388,6 +388,9 @@
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
+        // 選択中の便名称取得
+        var tripName = $('[name=TripName]').val();
+
         // 便名称の選択肢を全削除
         var select = $('#tripName')[0];
         while (select.firstChild) {
@@ -414,6 +417,9 @@
                     option.text = response[i].text;
                 }
                 option.value = response[i].value;
+                if (option.text == tripName) {
+                    option.selected = true;
+                }
                 select.appendChild(option);
             }
 
