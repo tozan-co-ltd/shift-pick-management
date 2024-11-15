@@ -1141,6 +1141,7 @@
 
     // 要検証ボタン押下時
     function onVerificationRequiredClick(tripRecordID, isArrived) {
+        event.preventDefault();
         var loadStatus = $('[name=loadStatusSelect]').val();
         if (loadStatus != "") {
 
@@ -1148,7 +1149,7 @@
 
 
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("InsertOrUpdateAnnotationLoads", "LoadOperationRecord")';
+            let url = window.location.origin + '@Url.Action("InsertOrUpdateAnnotationLoads", "LoadRecord")';
             let method = 'POST';
             let data = { tripRecordID: tripRecordID, loadStatus: loadStatus, isArrived: isArrived };
 
@@ -1159,7 +1160,7 @@
                 data: data
             }).done(function (response) {
                 // 完了モーダル表示
-                alert('登録が完了しました。');
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
                     var errorMessage = jqXHR.responseJSON.errorMessage;
