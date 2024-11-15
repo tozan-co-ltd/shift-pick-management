@@ -42,7 +42,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 稼働日から便名称を取得するSQL
         /// </summary>
-        /// <param name="workDays"></param>
+        /// <param name="workDays">稼働日のリスト</param>
         /// <returns></returns>
         public static string CreateSQLToSelectTripNameFromWorkDays(List<DateTime> workDays)
         {
@@ -61,7 +61,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <summary>
         /// 稼働日のリストをSQLのWHERE文に変換する
         /// </summary>
-        /// <param name="days"></param>
+        /// <param name="days">稼働日のリスト</param>
         /// <returns></returns>
         private static string SelectedDaysSQL(List<DateTime> days)
         {

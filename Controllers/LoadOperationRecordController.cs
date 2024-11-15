@@ -50,8 +50,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 指定した期間内に存在する便名称のリストを取得してセレクトリストアイテム化する
         /// </summary>
-        /// <param name="startOfPeriod">期間の開始日時</param>
-        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="workDays">指定した稼働日</param>
         /// <returns></returns>
         public List<SelectListItem> GetTripNameFromWorkDay(List<DateTime> workDays)
         {
@@ -243,7 +242,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 選択された稼働日を1行にまとめる
         /// </summary>
-        /// <param name="workDays"></param>
+        /// <param name="workDays">指定された稼働日</param>
         /// <returns></returns>
         private string SelectedWorkDays(List<DateTime> workDays)
         {
@@ -262,7 +261,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 画像一括ダウンロード
         /// </summary>
-        /// <param name="download"></param>
+        /// <param name="download">判定用</param>
         /// <param name="workDays">稼働日</param>
         /// <param name="selectedTripName">選択された便名称</param>
         /// <returns></returns>
