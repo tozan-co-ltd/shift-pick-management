@@ -968,14 +968,6 @@ select[readonly] {
 }
 /*Å@-------------- radio button to toggle ---------------*/
 
-/*Å@-------------- chart.js ---------------*/
-
-.graph-and-table {
-    display: none;
-}
-
-/*Å@-------------- chart.js ---------------*/
-
 
 .label-delete {
     color: red;
