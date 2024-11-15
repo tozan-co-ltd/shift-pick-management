@@ -70,7 +70,7 @@
             </button>
         </div>
 
-        <div class="graph-and-table" id="graphAndTable">
+        <div class="graph-and-table" id="graphAndTable" style="display: block !important">
             <hr />
             <div class="print-area" id="print-area">
                 <div class="col-16 d-flex align-items-center mb-3 unset-pdl">
@@ -552,6 +552,7 @@
         var today = new Date();
         $('#workDay').val(GetDayString(today));
         var y = today.getFullYear();
+        $('#graphAndTable').css('display', 'none');
     })
 
     // 稼働日の日付変更時
@@ -791,6 +792,7 @@
         arrivalChart.options.annotation.annotations = []; 
         departureChart.options.annotation.annotations = [];
         allChart.options.annotation.annotations = [];
+        clearChart.options.annotation.annotations = [];
 
         // 昼勤開始時間の線描画用データ作成
         var annotationLine = createChartAnnotation(dayShiftStartTime, labelAppearedTime);
@@ -1170,7 +1172,7 @@
                 data: data
             }).done(function (response) {
                 // 完了モーダル表示
-                AlertMessage('', '完了', '登録が完了しました。', null, null);
+                alert('登録が完了しました。');
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
                     var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -1243,6 +1245,7 @@
 
     // 画像一括出力ボタン押下
     function onExportAllImages() {
+        event.preventDefault();
         DeleteErrorMessages();
         tableDisplay();
 
