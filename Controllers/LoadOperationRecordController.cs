@@ -175,6 +175,7 @@ namespace ai_truck_load_measurement.Controllers
                 searchConditionDT.Columns.Add("検索条件");
                 var selectedWorkDays = SelectedWorkDays(workDays);
                 searchConditionDT.Rows.Add("選択された稼働日", selectedWorkDays);
+                searchConditionDT.Rows.Add("便名称", tripName);
 
 
                 // 便実績情報取得
