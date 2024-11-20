@@ -1,0 +1,165 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.M_TripBranchNumberModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = "マスター - 便マスター - 便枝番マスター";
+}
+<div class="card shadow de-inspection masterInfo m-4">
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="card border-left-custom">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>適用期間内の便枝番が初期表示されます。</li>
+                            <li>"枝連番を表示させる"にチェックを入れると基準日時時点の連番が表示されます。</li>
+                            <li>適用開始日時は、適用開始日の前日の夜勤が終了する予定日時を入力してください。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="h2">
+            <label>便名称：@Model.TripName</label>
+        </div>
+
+        <div class="mg-bot-20 mb-3">
+            <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                <div class="input-group-append mr-3">
+                    <label><input type="checkbox" id="isBeforeApplicablePeriod" /> 適用終了日時を過ぎた便も表示</label>
+                </div>
+                <div class="input-group-append mr-3">
+                    <label><input type="checkbox" id="m_tripCheckBox" /> 枝連番を表示</label>
+                </div>
+                <div class="nput-group-append">
+                    <div class="mr-3">
+                        <label>基準日時<input type="datetime-local" id="referenceDate" class="ml-3"/></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                <div class="input-group-append mr-3">
+                    <a class="btn btn-secondary btn-icon-split" asp-controller="M_Trip" asp-action="Index" asp-route-isChecked="@Model.IsCheckedBeforeApplicablePeriod">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-arrow-left-long"></i>
+                        </span>
+                        <span class="text">戻る</span>
+                    </a>
+                </div>
+                <div class="input-group-append mr-3">
+                    <a href="#" class="btn btn-primary btn-icon-split btn-register" onclick="onRegisterClick('M_TripBranchNumber', @Model.TripID)">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">新規作成</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div id="m_tripBranchNumberTable">
+        </div>
+    </div>
+</div>
+<script>
+    // 画面ロード時
+    let model;
+    $(document).ready(function () {
+        // 今日の日付を取得
+        var today = new Date();
+        today.setDate(today.getDate());
+        var yyyy = today.getFullYear();
+        var MM = ("0" + (today.getMonth() + 1)).slice(-2);
+        var dd = ("0" + today.getDate()).slice(-2);
+        var hh = ("0" + today.getHours()).slice(-2);
+        var mm = ("0" + today.getMinutes()).slice(-2);;
+
+        $('#referenceDate').val(yyyy + '-' + MM + '-' + dd + "T" + hh + ":" + mm);
+
+        model = @Html.Raw(Json.Serialize(Model));
+        console.log(model);
+        // テーブル表示
+        tableDisplay();
+    });
+
+    // 便テーブルの表示
+    function tableDisplay() {
+        // チェックボックスの入力情報取得
+        var checkBox = $('#isBeforeApplicablePeriod').prop('checked');
+
+        var tripId = model.tripID;
+        var referenceDate = $('#referenceDate').val();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("SearchData", "M_TripBranchNumber")';
+        let method = 'Post';
+        let data = {tripId: tripId, isBeforeApplicablePeriod: checkBox, applicablePeriod: referenceDate};
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+
+            $('#m_tripBranchNumberTable').empty().html(response);
+            // 日本語表示
+            const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+            const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
+
+            // ID(2列目)昇順
+            $("#tripTable").DataTable({
+                "language": {
+                    "url": language_url
+                },
+                lengthChange: true,     // 件数切替
+                info: true,            // 総件数
+                scrollX: true,          // 横スクロール可
+                scrollCollapse: true,   // 縦スクロール表示
+                order: [[1, "asc"]],    // ID昇順
+                searchHighlight: true,  // 検索ハイライト
+                columnDefs: [
+                    { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
+                ],
+                "oLanguage": {
+                    "sSearch": "フリーワード(全件)"
+                },
+                dom: dom_structure
+            });
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
+            }
+        });
+
+    }
+
+    // 新規登録ボタン押下時
+    function onRegisterClick(page, tripID) {
+        event.preventDefault();
+        // チェックボックスの入力情報取得
+        var checkBox = $('#isBeforeApplicablePeriod').prop('checked');
+        location.href = "" + page + "/Register?isChecked=" + checkBox + "&id=" + tripID;
+    }
+</script>

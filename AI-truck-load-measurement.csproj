@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\M_TripBranchNumber\Register.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Aspose.Cells" Version="24.9.0" />
     <PackageReference Include="AutoMapper" Version="13.0.0" />
     <PackageReference Include="Dapper" Version="2.1.28" />
@@ -42,6 +46,18 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ErrorMessagesResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\M_TripBranchNumber\Register.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\M_TripBranchNumber\Register.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\M_TripBranchNumber\Register.cshtml" />
   </ItemGroup>
 
 </Project>
