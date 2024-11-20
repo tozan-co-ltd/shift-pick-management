@@ -42,7 +42,7 @@ namespace ai_truck_load_measurement.Controllers
                 // DB接続
                 IEnumerable<M_TripBranchNumberModel> tripList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(sql);
 
-                model.M_TripList = tripList.ToPagedList();
+                model.M_TripBranchNumberList = tripList.ToPagedList();
 
                 return View(model);
             }
@@ -116,7 +116,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <tr>
                                     <td>
                                         <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                           onclick=""OnEditClick('{@item.TripName}')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
+                                           onclick=""OnEditClick('{@item.TripBranchNumberID}')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
                                             <i class=""fa-solid fa-pen""></i>
                                         </a>
                                     </td>

@@ -14,7 +14,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 便枝番リスト
         /// </summary>
-        public IPagedList<M_TripBranchNumberModel>? M_TripList { get; set; }
+        public IPagedList<M_TripBranchNumberModel>? M_TripBranchNumberList { get; set; }
 
         /// <summary>
         /// 便ID
