@@ -73,7 +73,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
         }
 
-        public static string CreateSQLToSelectMTripBranchNumbers(int tripId, bool isBeforeApplicablePeriod, DateTime? applicablePeriod)
+        public static string CreateSQLToSelectMTripBranchNumbers(int tripId, bool isBeforeApplicablePeriod)
         {
             var sql = $@"
                 SELECT
@@ -89,10 +89,34 @@ namespace ai_truck_load_measurement.ConnectControllers
             ";
             if (!isBeforeApplicablePeriod)
             {
+                DateTime today = DateTime.Now;
+                string formatToday = today.ToString("yyyy/MM/dd HH:mm:ss");
                 sql += $@"
-                AND applicable_end_datetime > '{applicablePeriod.Value.ToString("yyyy/MM/dd")}'
+                AND applicable_end_datetime > '{formatToday}'
                 ";
             }
+            return sql;
+        }
+
+        public static string CreateSQLToSelectMTripBranchNumbersWithBranceSeq(int tripId, DateTime refferenceDate)
+        {
+            var sql = $@"
+                SELECT
+                    trip_branch_number_id,
+                    CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
+                    CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+                    BranchNumbers.applicable_start_datetime,
+                    BranchNumbers.applicable_end_datetime,
+                    BranchNumbers.updated_at,
+                    BranchNumbers.updated_by,
+	                CONVERT(DATETIME, day_shift_start_time) AS day_shift_start_time
+                FROM m_trip_branch_numbers AS BranchNumbers
+                INNER JOIN m_trip_histories AS TripHistories
+                ON BranchNumbers.trip_id = TripHistories.trip_id
+                WHERE BranchNumbers.trip_id = {tripId}
+                AND TripHistories.applicable_end_datetime > '{refferenceDate.ToString("yyyy/MM/dd HH:mm:ss")}'
+                ORDER BY arrival_scheduled_time
+            ";
             return sql;
         }
 

@@ -1,9 +1,11 @@
 ﻿using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
+using MathNet.Numerics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NPOI.SS.Formula.Functions;
+using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
 
@@ -13,7 +15,6 @@ namespace ai_truck_load_measurement.Controllers
     {
         public IActionResult Index(int tripId, bool? isChecked)
         {
-            var today = DateTime.Now;
             M_TripBranchNumberModel model = new();
             bool isBeforeApplicablePeriod = true;
 
@@ -35,7 +36,7 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // 便マスター情報取得SQL作成
-                var sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, isBeforeApplicablePeriod, today);
+                var sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, isBeforeApplicablePeriod);
                 // DB接続
                 IEnumerable<M_TripBranchNumberModel> tripList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(sql);
 
@@ -57,24 +58,45 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
         /// <returns></returns>
-        public IActionResult SearchData(int tripId, bool isBeforeApplicablePeriod, DateTime applicablePeriod )
+        public IActionResult SearchData(int tripId, bool isBeforeApplicablePeriod, bool isAppearedBranchSeq, DateTime refferenceDate )
         {
             var searchData = string.Empty;
             try
             {
                 // 便マスター情報取得SQL作成
-                var sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, isBeforeApplicablePeriod, applicablePeriod);
-                // DB接続
-                IEnumerable<M_TripBranchNumberModel> tripList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(sql);
+                var sql = "";
+                if (isAppearedBranchSeq)
+                {
+                    sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbersWithBranceSeq(tripId, refferenceDate);
+                }
+                else
+                {
+                    sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, isBeforeApplicablePeriod);
+                }
 
+                // DB接続
+                List<M_TripBranchNumberModel> tripBranchNumberList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(sql);
+                // 枝連番列を追加
+                if (isAppearedBranchSeq)
+                {
+                    tripBranchNumberList = AddTripBranchSeq(tripBranchNumberList);
+                }
+
+
+                // 新しい便情報テーブルのhtml作成
                 searchData += $@"
                     <div class=""mt-3"">
                         <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripTable"">
                             <thead>
                                 <tr align=""center"">
                                     <th width=""40""></th>
-                                    <th class=""font-weight-bold"">便枝番ID</th>
-                                    <th class=""font-weight-bold"">到着予定時間</th>
+                                    <th class=""font-weight-bold"">便枝番ID</th>";
+                if (isAppearedBranchSeq)
+                {
+                    searchData += $@"<th class=""font-weight-bold"">枝連番</th>";
+
+                }
+                 searchData +=   $@"<th class=""font-weight-bold"">到着予定時間</th>
                                     <th class=""font-weight-bold"">出発予定時間</th>
                                     <th class=""font-weight-bold"">適用開始日時</th>
                                     <th class=""font-weight-bold"">適用終了日時</th>
@@ -84,28 +106,34 @@ namespace ai_truck_load_measurement.Controllers
                             </thead>
                             <tbody>
                 ";
-                // 新しい便情報テーブルのhtml作成
-                if (tripList.Count() > 0)
+                if (tripBranchNumberList.Count() > 0)
                 {
-                    foreach (var item in tripList)
+                    foreach (var item in tripBranchNumberList)
                     {
                         searchData += $@"
-                            <tr>
-                                <td>
-                                    <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                       onclick=""OnEditClick('{@item.TripName}')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
-                                        <i class=""fa-solid fa-pen""></i>
-                                    </a>
-                                </td>
-                                <td>{@item.TripBranchNumberID}</td>
-                                <td>{@item.ArrivalScheduledTime.ToString("HH:mm")}</td>
-                                <td>{@item.DepartureScheduledTime.ToString("HH:mm")}</td>
-                                <td>{@item.ApplicableStartDateTime.ToString("yyyy/MM/dd HH:mm")}</td>
-                                <td>{@item.ApplicableEndDateTime.ToString("yyyy/MM/dd HH:mm")}</td>
-                                <td>{@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")}</td>
-                                <td>{@item.UpdatedBy}</td>
-                            </tr>
-                    ";
+                                <tr>
+                                    <td>
+                                        <a class=""btn btn-success btn-icon-split ml-1 mr-1""
+                                           onclick=""OnEditClick('{@item.TripName}')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
+                                            <i class=""fa-solid fa-pen""></i>
+                                        </a>
+                                    </td>
+                                    <td>{@item.TripBranchNumberID}</td>
+                        ";
+                        if (isAppearedBranchSeq)
+                        {
+                            searchData += $@"<td>{item.TripBranchSeq}</td>";
+
+                        }
+                        searchData += $@"
+                                    <td>{@item.ArrivalScheduledTime.ToString("HH:mm")}</td>
+                                    <td>{@item.DepartureScheduledTime.ToString("HH:mm")}</td>
+                                    <td>{@item.ApplicableStartDateTime.ToString("yyyy/MM/dd HH:mm")}</td>
+                                    <td>{@item.ApplicableEndDateTime.ToString("yyyy/MM/dd HH:mm")}</td>
+                                    <td>{@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")}</td>
+                                    <td>{@item.UpdatedBy}</td>
+                                </tr>
+                        ";
                     }
                 }
                 searchData += $@"
@@ -125,6 +153,45 @@ namespace ai_truck_load_measurement.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 return Content(errorMessage);
             }
+        }
+
+        private List<M_TripBranchNumberModel> AddTripBranchSeq(List<M_TripBranchNumberModel> tripBranchNumberList)
+        {
+            var countBeforeShiftStartTimeRow = 0; // 到着予定時間が昼勤開始時間より早い行の数
+            var tripBranchSeq = 1; // 枝連番
+
+            for (int i = 0; i < tripBranchNumberList.Count; i++)
+            {
+
+                var tripBranchNumber = tripBranchNumberList[i];
+                var dayShiftStartTime = tripBranchNumber.DayShiftStartTime;
+                var arrivalScheduledTime = tripBranchNumber.ArrivalScheduledTime;
+
+                // 到着予定時間が昼勤開始時間以降のデータの場合、枝連番付与
+                // それ以外の場合、昼勤開始時間以前の行数のカウントを1増やす
+                if (arrivalScheduledTime > dayShiftStartTime)
+                {
+                    tripBranchNumber.TripBranchSeq = tripBranchSeq;
+                    tripBranchSeq++;
+                }
+                else
+                {
+                    countBeforeShiftStartTimeRow++;
+                }
+            }
+
+            // 到着予定時間が昼勤開始時間以前のデータに枝連番付与
+            if (countBeforeShiftStartTimeRow > 0)
+            {
+                for (int i = 0; i < countBeforeShiftStartTimeRow; i++)
+                {
+                    var tripBranchNumber = tripBranchNumberList[i];
+                    tripBranchNumber.TripBranchSeq = tripBranchSeq;
+                    tripBranchSeq++;
+                }
+            }
+
+            return tripBranchNumberList;
         }
 
         /// <summary>

@@ -44,7 +44,7 @@
                     <label><input type="checkbox" id="isBeforeApplicablePeriod" /> 適用終了日時を過ぎた便も表示</label>
                 </div>
                 <div class="input-group-append mr-3">
-                    <label><input type="checkbox" id="m_tripCheckBox" /> 枝連番を表示</label>
+                    <label><input type="checkbox" id="isAppearedBranchSeq" /> 枝連番を表示</label>
                 </div>
                 <div class="nput-group-append">
                     <div class="mr-3">
@@ -102,7 +102,8 @@
     // 便テーブルの表示
     function tableDisplay() {
         // チェックボックスの入力情報取得
-        var checkBox = $('#isBeforeApplicablePeriod').prop('checked');
+        var isBeforeApplicablePeriod = $('#isBeforeApplicablePeriod')[0].checked;
+        var isAppearedBranchSeq = $('#isAppearedBranchSeq')[0].checked;
 
         var tripId = model.tripID;
         var referenceDate = $('#referenceDate').val();
@@ -110,7 +111,7 @@
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "M_TripBranchNumber")';
         let method = 'Post';
-        let data = {tripId: tripId, isBeforeApplicablePeriod: checkBox, applicablePeriod: referenceDate};
+        let data = { tripId: tripId, isBeforeApplicablePeriod: isBeforeApplicablePeriod, isAppearedBranchSeq: isAppearedBranchSeq, refferenceDate: referenceDate };
 
         // Ajax call
         $.ajax({
@@ -163,9 +164,40 @@
         location.href = "" + page + "/Register?isChecked=" + checkBox + "&id=" + tripID + "&tripName=" + tripName;
     }
 
+    let isInChangeFunction = false;
+
+    $('#isAppearedBranchSeq').change(function () {
+        if (isInChangeFunction)
+            return;
+
+        isInChangeFunction = true;
+
+        // 枝連番表示チェックボックスの値を取得
+        var isAppearedBranchSeq = $('#isAppearedBranchSeq')[0].checked;
+        if (isAppearedBranchSeq) {
+            console.log("test");
+            $('#isBeforeApplicablePeriod').removeAttr("checked", false).prop('checked', false).change();
+        }
+
+        isInChangeFunction = false;
+         tableDisplay();
+    });
+
     // チェックボックス押下時
-    $('input').change(function () {
-        console.log("change");
-        // tableDisplay();
+    $('#isBeforeApplicablePeriod').change(function () {
+        if (isInChangeFunction)
+            return;
+
+        isInChangeFunction = true;
+
+        // 枝連番表示チェックボックスの値を取得
+        var isBeforeApplicablePeriod = $('#isBeforeApplicablePeriod')[0].checked;
+        if (isBeforeApplicablePeriod) {
+            console.log("test");
+            $('#isAppearedBranchSeq').removeAttr("checked", false).prop('checked', false).change();
+        }
+
+        isInChangeFunction = false;
+         tableDisplay();
     });
 </script>

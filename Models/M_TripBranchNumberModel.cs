@@ -1,5 +1,6 @@
 ﻿using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Spire.Xls;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
@@ -25,6 +26,11 @@ namespace ai_truck_load_measurement.Models
         /// 便枝番ID
         /// </summary>
         public int TripBranchNumberID { get; set; }
+
+        /// <summary>
+        /// 枝連番
+        /// </summary>
+        public int TripBranchSeq {  get; set; }
 
         /// <summary>
         /// 便名称
@@ -98,9 +104,10 @@ namespace ai_truck_load_measurement.Models
         public string? UpdatedBy { get; set; }
 
         /// <summary>
-        /// 枝連番
+        /// 昼勤開始時間
         /// </summary>
-        public int TripBranchSerialNumber {  get; set; }
+        public DateTime DayShiftStartTime { get; set; }
+
 
         public List<SelectListItem> TruckSelectList { get; set; } = new List<SelectListItem>();
 
