@@ -35,7 +35,8 @@
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
-                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="mTripForm">
+                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="mTripBranchNumberForm">
+                    <input hidden type="text" asp-for="TripID" id="tripID" required />
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
                             <label>@Html.DisplayName("TripName")：</label>
@@ -106,3 +107,50 @@
         </div>
     </div>
 </div>
+<script>
+
+    // 登録ボタン押下
+    function OnRegister() {
+
+        var form = $("#mTripBranchNumberForm");
+
+        form.submit(function (event) {
+
+            $("#div-error-message").text("");
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Register", "M_TripBranchNumber")';
+            let method = 'POST';
+            let formId = 'mTripBranchNumberForm';
+            let data = form.serializeArray();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#' + formId)[0].reset();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                if (jqXHR.status === 404) {
+                    // データが見つからなかった場合
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    // その他のエラーの場合
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
+        });
+    }
+</script>

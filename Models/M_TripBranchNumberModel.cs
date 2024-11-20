@@ -36,7 +36,6 @@ namespace ai_truck_load_measurement.Models
         /// 便名称
         /// </summary>
         [Display(Name = "便名称")]
-        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? TripName { get; set; }
 
         /// <summary>
