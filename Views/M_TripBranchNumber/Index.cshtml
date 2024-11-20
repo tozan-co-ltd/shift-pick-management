@@ -94,7 +94,8 @@
                     <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
-                    <form class="col-md-12" id="mTripForm">
+                    <form class="col-md-12" id="mTripBranchNumberForm">
+                        <input type="hidden" asp-for="TripBranchNumberID" value="@Model.TripBranchNumberID" />
                         <input type="hidden" asp-for="TripID" value="@Model.TripID" />
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
@@ -296,7 +297,8 @@
             var applicableStartDateTime = GetDateString(new Date(item.applicableStartDateTime));
             var applicableEndDateTime = GetDateString(new Date(item.applicableEndDateTime));
             if (item.tripBranchNumberID == tripBranchNumberID) {
-                $("#TripID").val(item.tripID);
+                $("#TripBranchNumberID").val(item.tripBranchNumberID);
+                $("#TripID").val(model.tripID);
                 $("#TripName").val(model.tripName);
                 $("#RegistArrivalScheduledTime").val(arrivalScheduledTime);
                 $("#RegistDepartureScheduledTime").val(departureScheduledTime);
@@ -327,6 +329,44 @@
         });
         var time = GetTimeString(date);
         return day + " " + time;
+    }
+
+    // 更新ボタン押下
+    function OnExecuteEdit() {
+        $('#mTripBranchNumberForm').submit(function (event) {
+            DeleteErrorMessages();
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Edit", "M_TripBranchNumber")';
+            let method = 'POST';
+            let formId = 'mTripBranchNumberForm';
+            let data = $('#' + formId).serializeArray();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#edit-modal').hide();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#edit-modal-error-message").text(errorMessage);
+                }
+            });
+        });
     }
 
     // エラーメッセージ削除

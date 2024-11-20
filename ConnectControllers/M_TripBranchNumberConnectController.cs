@@ -105,6 +105,40 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
         }
 
+        /// <summary>
+        /// 便枝番情報更新
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns>更新件数</returns>
+        public static int UpdateMTripBranchNumber(M_TripBranchNumberModel model, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+
+                    // 便履歴テーブル更新
+                    string sql = CreateSQLToUpdateMTripBranchNumber(model, sysDate, loginUser.UserName);
+                    var count = connection.Execute(sql);
+                    return count;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
         public static string CreateSQLToSelectMTripBranchNumbers(int tripId, bool isBeforeApplicablePeriod)
         {
             var sql = $@"
@@ -189,6 +223,31 @@ namespace ai_truck_load_measurement.ConnectControllers
                     '{createdBy}'
                 );
 ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 便枝番テーブル更新SQL作成
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToUpdateMTripBranchNumber(M_TripBranchNumberModel model, DateTime updatedAt, string updatedBy)
+        {
+            string formatupdatedAt = updatedAt.ToString("yyyy/MM/dd HH:mm:ss");
+            var sql = $@"
+                UPDATE m_trip_branch_numbers
+                SET 
+                    trip_id = '{model.TripID}',
+	                arrival_scheduled_time = '1900/01/01 {model.RegistArrivalScheduledTime}:00',
+	                departure_scheduled_time = '1900/01/01 {model.RegistDepartureScheduledTime}:00',
+	                applicable_start_datetime = '{model.ApplicableStartDateTime}',
+	                applicable_end_datetime = '{model.ApplicableEndDateTime}',
+                    updated_at = '{formatupdatedAt}',
+                    updated_by = '{updatedBy}'
+                WHERE trip_branch_number_id = {model.TripBranchNumberID}
+            ";
             return sql;
         }
     }

@@ -157,6 +157,11 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
+        /// <summary>
+        /// 便枝番リストに枝連番を追加する
+        /// </summary>
+        /// <param name="tripBranchNumberList">枝連番を追加する対象便枝番リスト</param>
+        /// <returns></returns>
         private List<M_TripBranchNumberModel> AddTripBranchSeq(List<M_TripBranchNumberModel> tripBranchNumberList)
         {
             var countBeforeShiftStartTimeRow = 0; // 到着予定時間が昼勤開始時間より早い行の数
@@ -194,6 +199,57 @@ namespace ai_truck_load_measurement.Controllers
             }
 
             return tripBranchNumberList;
+        }
+
+        /// <summary>
+        /// 便枝番マスター更新
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        [HttpPost]
+        public IActionResult Edit(M_TripBranchNumberModel model)
+        {
+            string? errorMessage;
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 入力規則チェック
+                if (!ModelState.IsValid)
+                {
+                    // log取得
+                    errorMessage = "E1011: " + ErrorMessagesResources.E1011;
+                    _logger.Error($"便マスター更新失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
+                }
+
+                // 便マスター更新
+                M_TripBranchNumberConnectController.UpdateMTripBranchNumber(model, user);
+
+                // log取得
+                _logger.Info($"便マスター更新成功 便名称:{model.TripName}");
+
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+            catch (Exception ex)
+            {
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
         }
 
         /// <summary>
