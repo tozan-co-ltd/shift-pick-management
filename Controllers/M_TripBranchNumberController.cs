@@ -2,6 +2,7 @@
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using NPOI.SS.Formula.Functions;
 using System.Data.SqlClient;
 using X.PagedList;
@@ -10,7 +11,7 @@ namespace ai_truck_load_measurement.Controllers
 {
     public class M_TripBranchNumberController : BaseController
     {
-        public IActionResult Index(int tripId, string? tripName, bool? isChecked)
+        public IActionResult Index(int tripId, bool? isChecked)
         {
             var today = DateTime.Now;
             M_TripBranchNumberModel model = new();
@@ -23,14 +24,13 @@ namespace ai_truck_load_measurement.Controllers
             }
 
             // デバッグ用
-            if (string.IsNullOrEmpty(tripName))
+            if (tripId == 0)
             {
                 tripId = 3;
-                tripName = "豊鉄8t常傭便1";
             }
 
             model.TripID = tripId;
-            model.TripName = tripName;
+            model.TripName = M_TripBranchNumberConnectController.ConnectMTripForTripNameFromTripID(tripId);
 
             try
             {
@@ -50,6 +50,7 @@ namespace ai_truck_load_measurement.Controllers
                 return View(model);
             }
         }
+
 
         /// <summary>
         /// 便情報テーブル非同期更新用
@@ -123,6 +124,32 @@ namespace ai_truck_load_measurement.Controllers
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 return Content(errorMessage);
+            }
+        }
+
+        /// <summary>
+        /// 便マスター登録画面表示
+        /// </summary>
+        /// <param name="id">便履歴ID、新しい適用期間の作成時に値が入る</param>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult Register(bool isChecked, int id, string tripName)
+        {
+            M_TripBranchNumberModel model = new();
+            try
+            {
+                model.TripID = id;
+                model.TripName = tripName;
+
+                // 適用終了日時を過ぎた便を表示するチェックボックスの入力
+                model.IsCheckedBeforeApplicablePeriod = isChecked;
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
+                return View(model);
             }
         }
     }

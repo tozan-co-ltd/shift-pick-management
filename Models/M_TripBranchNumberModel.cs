@@ -41,7 +41,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 到着予定時間登録用
         /// </summary>
-        [Display(Name = "昼勤開始時間")]
+        [Display(Name = "到着予定時間")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [RegularExpression(@"^([0-1][0-9]|[2][0-3]):[0-5][0-9]$", ErrorMessage = "hh:mmで入力してください。")]
         public string? RegistArrivalScheduledTime { get; set; }
@@ -54,7 +54,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 出発予定時間登録用
         /// </summary>
-        [Display(Name = "昼勤開始時間")]
+        [Display(Name = "出発予定時間")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [RegularExpression(@"^([0-1][0-9]|[2][0-3]):[0-5][0-9]$", ErrorMessage = "hh:mmで入力してください。")]
         public string? RegistDepartureScheduledTime { get; set; }

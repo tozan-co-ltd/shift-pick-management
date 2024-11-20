@@ -65,7 +65,7 @@
                     </a>
                 </div>
                 <div class="input-group-append mr-3">
-                    <a href="#" class="btn btn-primary btn-icon-split btn-register" onclick="onRegisterClick('M_TripBranchNumber', @Model.TripID)">
+                    <a href="#" class="btn btn-primary btn-icon-split btn-register" onclick="onRegisterClick('M_TripBranchNumber', @Model.TripID, '@Model.TripName')">
                         <span class="icon text-white-50">
                             <i class="fas fa-plus"></i>
                         </span>
@@ -156,10 +156,16 @@
     }
 
     // 新規登録ボタン押下時
-    function onRegisterClick(page, tripID) {
+    function onRegisterClick(page, tripID, tripName) {
         event.preventDefault();
         // チェックボックスの入力情報取得
         var checkBox = $('#isBeforeApplicablePeriod').prop('checked');
-        location.href = "" + page + "/Register?isChecked=" + checkBox + "&id=" + tripID;
+        location.href = "" + page + "/Register?isChecked=" + checkBox + "&id=" + tripID + "&tripName=" + tripName;
     }
+
+    // チェックボックス押下時
+    $('input').change(function () {
+        console.log("change");
+        // tableDisplay();
+    });
 </script>
