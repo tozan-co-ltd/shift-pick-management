@@ -32,7 +32,7 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // 便マスター情報取得SQL作成
-                var sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, isChecked);
+                var sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, true);
                 // DB接続
                 IEnumerable<M_TripBranchNumberModel> tripList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(sql);
 
