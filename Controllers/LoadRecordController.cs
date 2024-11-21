@@ -6,6 +6,7 @@ using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Properties;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -169,9 +170,8 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="model">モーダルに表示するモデル</param>
         /// <param name="isArrived">到着か否か</param>
         /// <returns></returns>
-        public static LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
+        public LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
         {
-            // 「荷量の相違あり」で保存した値が既に存在するか
             var isSameAnnotationLoadsExist = LoadRecordConnectController.IsSameAnnotationLoadsExist(model.TripRecordID, isArrived);
             if (isSameAnnotationLoadsExist)
             {
@@ -182,7 +182,6 @@ namespace ai_truck_load_measurement.Controllers
             // ステーションの画像取得
             model.ArrivalLoadImgPath = CheckAndConvertImagePath(model.ArrivalLoadImgPath);
             model.DepartureLoadImgPath = CheckAndConvertImagePath(model.DepartureLoadImgPath);
-
             return model;
         }
 
@@ -405,6 +404,60 @@ namespace ai_truck_load_measurement.Controllers
                 _logger.Error($"{exceptionMessage} {errorMessage}");
 
                 return NotFound(new { errorMessage });
+            }
+        }
+
+
+        /// <summary>
+        /// 指定した期間内に存在する便名称のリストを取得してセレクトリストアイテム化する
+        /// </summary>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <returns></returns>
+        public List<SelectListItem> GetTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
+        {
+            List<SelectListItem> tripRecordList = new();
+            try
+            {
+                // 便実績情報取得SQL作成
+                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod);
+                // DB接続
+                tripRecordList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
+
+                return tripRecordList;
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return tripRecordList;
+            }
+        }
+
+        /// <summary>
+        /// 便名称から指定した期間内の便枝番のリストを取得する
+        /// </summary>
+        /// <param name="tripName">便名称</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <returns></returns>
+        public List<int> GetTripBranchSeqFromTripName(string tripName, DateTime startOfPeriod, DateTime endOfPeriod)
+        {
+            List<int> tripBranchSeqList = new();
+            try
+            {
+                // 便実績情報取得SQL作成
+                var sql = LoadRecordConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName, startOfPeriod, endOfPeriod);
+                // DB接続
+                tripBranchSeqList = LoadRecordConnectController.ConnectTTripRecordsForTripBranchSeq(sql);
+
+                return tripBranchSeqList;
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return tripBranchSeqList;
             }
         }
     }

@@ -142,19 +142,6 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-        /// <summary>
-        /// 荷量画像モーダルに表示する値の取得
-        /// </summary>
-        /// <param name="model">モーダルに表示するモデル</param>
-        /// <param name="isArrived">到着か否か</param>
-        /// <returns></returns>
-        public LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
-        {
-            var modalItems = LoadRecordController.GetModalItems(model, isArrived);
-
-            return modalItems;
-        }
-
 
         /// <summary>
         /// ファイル出力

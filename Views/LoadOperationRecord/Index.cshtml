@@ -922,7 +922,7 @@
             if (item.tripRecordID == tripRecordID) {
 
                 // フォーム情報取得
-                let url = window.location.origin + '@Url.Action("GetModalItems", "LoadOperationRecord")';
+                let url = window.location.origin + '@Url.Action("GetModalItems", "LoadRecord")';
                 let method = 'POST';
                 let data = { model: item, isArrived: isArrived };
 

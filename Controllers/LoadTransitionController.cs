@@ -51,59 +51,6 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
-        /// 指定した期間内に存在する便名称のリストを取得してセレクトリストアイテム化する
-        /// </summary>
-        /// <param name="startOfPeriod">期間の開始日時</param>
-        /// <param name="endOfPeriod">期間の終了日時</param>
-        /// <returns></returns>
-        public List<SelectListItem> GetTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
-        {
-            List<SelectListItem> tripRecordList = new();
-            try
-            {
-                // 便実績情報取得SQL作成
-                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod);
-                // DB接続
-                tripRecordList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
-
-                return tripRecordList;
-            }
-            catch (Exception ex)
-            {
-                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
-                ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return tripRecordList;
-            }
-        }
-
-        /// <summary>
-        /// 便名称から指定した期間内の便枝番のリストを取得する
-        /// </summary>
-        /// <param name="tripName">便名称</param>
-        /// <param name="startOfPeriod">期間の開始日時</param>
-        /// <param name="endOfPeriod">期間の終了日時</param>
-        /// <returns></returns>
-        public List<int> GetTripBranchSeqFromTripName(string tripName, DateTime startOfPeriod, DateTime endOfPeriod)
-        {
-            List<int> tripBranchSeqList = new();
-            try
-            {
-                // 便実績情報取得SQL作成
-                var sql = LoadRecordConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName, startOfPeriod, endOfPeriod);
-                // DB接続
-                tripBranchSeqList = LoadRecordConnectController.ConnectTTripRecordsForTripBranchSeq(sql);
-
-                return tripBranchSeqList;
-            }
-            catch (Exception ex)
-            {
-                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
-                ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return tripBranchSeqList;
-            }
-        }
-
-        /// <summary>
         /// 期間内で便名称と便枝番が一致する便実績データのリストを取得する
         /// </summary>
         /// <param name="tripName">便名称</param>
@@ -168,20 +115,6 @@ namespace ai_truck_load_measurement.Controllers
                 return Json(new { res = "NG", errorMessage = errorMessage });
             }
         }
-
-        /// <summary>
-        /// 荷量画像モーダルに表示する値の取得
-        /// </summary>
-        /// <param name="model">モーダルに表示するモデル</param>
-        /// <param name="isArrived">到着か否か</param>
-        /// <returns></returns>
-        public LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
-        {
-            var modalItems = LoadRecordController.GetModalItems(model, isArrived);
-
-            return modalItems;
-        }
-
 
         /// <summary>
         /// ファイル出力
