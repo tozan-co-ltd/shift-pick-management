@@ -17,7 +17,7 @@
                     <div class="card-body">
                         <ul class="mb-0">
                             <li>適用期間内の便枝番が初期表示されます。</li>
-                            <li>"枝連番を表示させる"にチェックを入れると基準日時時点の連番が表示されます。</li>
+                            <li>"枝連番を表示"にチェックを入れると基準日時時点の連番が表示されます。</li>
                             <li>適用開始日時は、適用開始日の前日の夜勤が終了する予定日時を入力してください。</li>
                         </ul>
                     </div>
@@ -41,7 +41,7 @@
         <div class="mg-bot-20 mb-3">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-3">
-                    <label><input type="checkbox" id="isBeforeApplicablePeriod" /> 適用終了日時を過ぎた便も表示</label>
+                    <label><input type="checkbox" id="isBeforeApplicablePeriod" /> 適用終了日時を過ぎた便枝番も表示</label>
                 </div>
                 <div class="input-group-append mr-3">
                     <label><input type="checkbox" id="isAppearedBranchSeq" /> 枝連番を表示</label>
@@ -180,6 +180,7 @@
 
         model = @Html.Raw(Json.Serialize(Model));
         console.log(model);
+        $('#isBeforeApplicablePeriod').prop('checked', model.isCheckedBeforeApplicablePeriod);
         // テーブル表示
         tableDisplay();
     });

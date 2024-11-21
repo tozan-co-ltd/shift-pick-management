@@ -15,22 +15,16 @@ namespace ai_truck_load_measurement.Controllers
     {
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public IActionResult Index(int tripId, bool? isChecked)
+        /// <summary>
+        /// 便枝番マスター画面表示
+        /// </summary>
+        /// <param name="tripId">便ID</param>
+        /// <param name="isChecked"></param>
+        /// <returns></returns>
+        public IActionResult Index(int tripId, bool isChecked)
         {
             M_TripBranchNumberModel model = new();
             bool isBeforeApplicablePeriod = true;
-
-            if (isChecked != null)
-            {
-                model.IsCheckedBeforeApplicablePeriod = isChecked.Value;
-                isBeforeApplicablePeriod = isChecked.Value;
-            }
-
-            // デバッグ用
-            if (tripId == 0)
-            {
-                tripId = 3;
-            }
 
             model.TripID = tripId;
             model.TripName = M_TripBranchNumberConnectController.ConnectMTripForTripNameFromTripID(tripId);
