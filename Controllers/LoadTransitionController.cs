@@ -58,33 +58,22 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="startOfPeriod">期間の開始日時</param>
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <returns></returns>
-        public List<RequestLoadStatus> SearchTrips(string tripName, int tripBranchSeq, DateTime startOfPeriod, DateTime endOfPeriod)
+        public List<LoadRecordModel> SearchTrips(string tripName, int tripBranchSeq, DateTime startOfPeriod, DateTime endOfPeriod)
         {
-            List<RequestLoadStatus> loadStatuses = new ();
             try
             {
                 // 便実績情報取得SQL作成
                 var sql = LoadTransitionConnectController.CreateSQLToSelectLoadClassFromSearchConditions(tripName, tripBranchSeq, startOfPeriod, endOfPeriod);
                 // DB接続
-                var loadClasses = LoadRecordConnectController.ConnectTTripRecords(sql);
+                var loadStatuses = LoadRecordController.CommonSearchTrips(sql);
 
-                foreach ( var loadClass in loadClasses)
-                {
-                    var loadStatus = new RequestLoadStatus
-                    {
-                        WorkDay = loadClass.WorkDay,
-                        ArrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.ArrivalLoadClass),
-                        DepartureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.DepartureLoadClass)
-                    };
-                    loadStatuses.Add(loadStatus);
-                }
                 return loadStatuses;
             }
             catch (Exception ex)
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return loadStatuses;
+                return null;
             }
         }
 

@@ -80,29 +80,15 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="workDay">稼働日</param>
         /// <param name="tripName">便名称</param>
         /// <returns></returns>
-        public List<LoadOperationRecordModel> SearchTrips(DateTime workDay, string tripName)
+        public List<LoadRecordModel> SearchTrips(DateTime workDay, string tripName)
         {
-            List<LoadOperationRecordModel> loadStatuses = new();
+            List<LoadRecordModel> loadStatuses = new();
             try
             {
                 // 便実績情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreateSQLToSelectLoadClassFromSearchConditions(tripName, workDay);
                 // DB接続
-                var loadClasses = LoadOperationRecordConnectController.ConnectTTripRecords(sql);
-
-                foreach (var loadClass in loadClasses)
-                {
-                    var loadStatus = new LoadOperationRecordModel
-                    {
-                        WorkDay = workDay,
-                        ArrivedAt = loadClass.ArrivedAt,
-                        DepartedAt = loadClass.DepartedAt,
-                        ArrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.ArrivalLoadClass),
-                        DepartureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.DepartureLoadClass),
-                        DayShiftStartTime = loadClass.DayShiftStartTime,
-                    };
-                    loadStatuses.Add(loadStatus);
-                }
+                loadStatuses = LoadRecordController.CommonSearchTrips(sql);
 
                 return loadStatuses;
             }

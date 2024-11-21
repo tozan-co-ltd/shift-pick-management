@@ -60,5 +60,7 @@ namespace ai_truck_load_measurement.Models
         public List<SelectListItem>? TripNameList { get; set; }
         // 選択された便名称
         public string? SelectedTripName { get; set; }
+        // 昼勤開始時間
+        public DateTime? DayShiftStartTime { get; set; }
     }
 }

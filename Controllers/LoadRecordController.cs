@@ -7,6 +7,7 @@ using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Properties;
 using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -459,6 +460,25 @@ namespace ai_truck_load_measurement.Controllers
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return tripBranchSeqList;
             }
+        }
+
+        /// <summary>
+        /// SearchTripsの共通処理
+        /// </summary>
+        /// <param name="sql">sql文</param>
+        /// <returns></returns>
+        public static List<LoadRecordModel> CommonSearchTrips (string sql)
+        {
+            // DB接続
+            var loadClasses = LoadRecordConnectController.ConnectTTripRecords(sql);
+            // 荷量クラスをパーセント表示に変換
+            foreach (var loadClass in loadClasses)
+            {
+                loadClass.ArrivalLoadStatus = ConversionLoadClassToLoadStatusForChart(loadClass.ArrivalLoadClass);
+                loadClass.DepartureLoadStatus = ConversionLoadClassToLoadStatusForChart(loadClass.DepartureLoadClass);
+            }
+
+            return loadClasses;
         }
     }
 }
