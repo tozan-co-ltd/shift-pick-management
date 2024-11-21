@@ -19,7 +19,7 @@ namespace ai_truck_load_measurement.Controllers
         /// 便枝番マスター画面表示
         /// </summary>
         /// <param name="tripId">便ID</param>
-        /// <param name="isChecked"></param>
+        /// <param name="isChecked">便マスター画面の適用日時チェックボックスの入力</param>
         /// <returns></returns>
         public IActionResult Index(int tripId, bool isChecked)
         {
@@ -31,7 +31,7 @@ namespace ai_truck_load_measurement.Controllers
 
             try
             {
-                // 便マスター情報取得SQL作成
+                // 便枝番マスター情報取得SQL作成
                 var sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, true);
                 // DB接続
                 IEnumerable<M_TripBranchNumberModel> tripList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(sql);
@@ -52,14 +52,17 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 便情報テーブル非同期更新用
         /// </summary>
+        /// <param name="tripId">便ID</param>
         /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
+        /// <param name="isAppearedBranchSeq">枝連番を表示するか</param>
+        /// <param name="refferenceDate">枝連番の基準日時</param>
         /// <returns></returns>
         public IActionResult SearchData(int tripId, bool isBeforeApplicablePeriod, bool isAppearedBranchSeq, DateTime refferenceDate )
         {
             var searchData = string.Empty;
             try
             {
-                // 便マスター情報取得SQL作成
+                // 便枝番マスター情報取得SQL作成
                 var sql = "";
                 if (isAppearedBranchSeq)
                 {
@@ -213,7 +216,7 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     // log取得
                     errorMessage = "E1011: " + ErrorMessagesResources.E1011;
-                    _logger.Error($"便マスター更新失敗 {errorMessage}");
+                    _logger.Error($"便枝番マスター更新失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
                 }
@@ -224,16 +227,16 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     // log取得
                     errorMessage = "E1012: " + ErrorMessagesResources.E1012;
-                    _logger.Error($"便マスター登録失敗 {errorMessage}");
+                    _logger.Error($"便枝番マスター登録失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
                 }
 
-                // 便マスター更新
+                // 便枝番マスター更新
                 M_TripBranchNumberConnectController.UpdateMTripBranchNumber(model, user);
 
                 // log取得
-                _logger.Info($"便マスター更新成功 便名称:{model.TripName}");
+                _logger.Info($"便枝番マスター更新成功 便名称:{model.TripName}");
 
                 return Ok();
             }
@@ -260,7 +263,9 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 便枝番マスター登録画面表示
         /// </summary>
-        /// <param name="id">便履歴ID、新しい適用期間の作成時に値が入る</param>
+        /// <param name="isChecked">前画面の適用期間チェックボックスの入力</param>
+        /// <param name="id">便ID</param>
+        /// <param name="tripName">便名称</param>
         /// <returns></returns>
         [HttpGet]
         public IActionResult Register(bool isChecked, int id, string tripName)
@@ -312,16 +317,16 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     // log取得
                     errorMessage = "E1012: " + ErrorMessagesResources.E1012;
-                    _logger.Error($"便マスター登録失敗 {errorMessage}");
+                    _logger.Error($"便枝番マスター登録失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
                 }
 
-                // 便マスター登録
+                // 便枝番マスター登録
                 M_TripBranchNumberConnectController.InsertMTripBranchNumber(model, user);
 
                 // log取得
-                _logger.Info($"便マスター登録成功 便名称:{model.TripName}");
+                _logger.Info($"便枝番マスター登録成功 便名称:{model.TripName}");
                 return Ok();
             }
             catch (SqlException ex)

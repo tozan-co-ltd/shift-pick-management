@@ -127,7 +127,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 {
                     DateTime sysDate = DateTime.Now;
 
-                    // 便履歴テーブル更新
+                    // 便枝番テーブル更新
                     string sql = CreateSQLToUpdateMTripBranchNumber(model, sysDate, loginUser.UserName);
                     var count = connection.Execute(sql);
                     return count;
