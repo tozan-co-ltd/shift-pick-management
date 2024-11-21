@@ -510,7 +510,7 @@
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("ExportFile", "LoadTransition")';
+            let url = window.location.origin + '@Url.Action("ExportFile", "LoadOutput")';
             let method = 'Post';
             let data = {
                 "gamenName": gamenName,
