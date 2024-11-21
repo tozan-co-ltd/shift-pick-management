@@ -192,7 +192,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                 INNER JOIN m_trip_histories AS TripHistories
                 ON BranchNumbers.trip_id = TripHistories.trip_id
                 WHERE BranchNumbers.trip_id = {tripId}
-                AND TripHistories.applicable_end_datetime > '{refferenceDate.ToString("yyyy/MM/dd HH:mm:ss")}'
+                AND BranchNumbers.applicable_end_datetime > '{refferenceDate.ToString("yyyy/MM/dd HH:mm:ss")}'
+                AND BranchNumbers.applicable_start_datetime < '{refferenceDate.ToString("yyyy/MM/dd HH:mm:ss")}'
                 ORDER BY arrival_scheduled_time
             ";
             return sql;

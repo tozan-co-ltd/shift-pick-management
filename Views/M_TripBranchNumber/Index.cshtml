@@ -48,7 +48,7 @@
                 </div>
                 <div class="nput-group-append">
                     <div class="mr-3">
-                        <label>基準日時<input type="datetime-local" id="referenceDate" class="ml-3"/></label>
+                        <label>基準日時<input type="datetime-local" id="referenceDate" class="ml-3" readonly style="background-color: lightgray"/></label>
                     </div>
                 </div>
             </div>
@@ -179,7 +179,6 @@
         $('#referenceDate').val(yyyy + '-' + MM + '-' + dd + "T" + hh + ":" + mm);
 
         model = @Html.Raw(Json.Serialize(Model));
-        console.log(model);
         $('#isBeforeApplicablePeriod').prop('checked', model.isCheckedBeforeApplicablePeriod);
         // テーブル表示
         tableDisplay();
@@ -252,36 +251,45 @@
 
     let isInChangeFunction = false;
 
+    // 枝連番表示チェックボックス押下時
     $('#isAppearedBranchSeq').change(function () {
         if (isInChangeFunction)
             return;
 
         isInChangeFunction = true;
 
-        // 枝連番表示チェックボックスの値を取得
-        var isAppearedBranchSeq = $('#isAppearedBranchSeq')[0].checked;
-        if (isAppearedBranchSeq) {
-            console.log("test");
-            $('#isBeforeApplicablePeriod').removeAttr("checked", false).prop('checked', false).change();
+        // 適用終了日時チェックボックスのチェックを外す
+        $('#isBeforeApplicablePeriod').removeAttr("checked", false).prop('checked', false).change();
+
+        var branchSeqBox = $('#isAppearedBranchSeq');
+
+        // 基準日時の選択可否の切り替え
+        if (branchSeqBox[0].checked) {
+            $('#referenceDate').attr('readonly', false);
+            $('#referenceDate').css({ 'background-color': '#ffffff' });
+        }
+        else{
+            $('#referenceDate').attr('readonly', true);
+            $('#referenceDate').css({ 'background-color': 'lightgray' });
         }
 
         isInChangeFunction = false;
          tableDisplay();
     });
 
-    // チェックボックス押下時
+    // 適用終了日時チェックボックス押下時
     $('#isBeforeApplicablePeriod').change(function () {
         if (isInChangeFunction)
             return;
 
         isInChangeFunction = true;
 
-        // 枝連番表示チェックボックスの値を取得
-        var isBeforeApplicablePeriod = $('#isBeforeApplicablePeriod')[0].checked;
-        if (isBeforeApplicablePeriod) {
-            console.log("test");
-            $('#isAppearedBranchSeq').removeAttr("checked", false).prop('checked', false).change();
-        }
+        // 枝連番表示チェックボックスのチェックを外す
+        $('#isAppearedBranchSeq').removeAttr("checked", false).prop('checked', false).change();
+
+        // 基準日時を選択不可に
+        $('#referenceDate').attr('readonly', true);
+        $('#referenceDate').css({ 'background-color': 'lightgray' });
 
         isInChangeFunction = false;
          tableDisplay();
@@ -378,4 +386,9 @@
         $('.text-danger').text('');
         $('input').removeClass('input-validation-error');
     }
+
+    // 基準日時変更時
+    $('input[type=datetime-local]').change(function () {
+        tableDisplay();
+    });
 </script>
