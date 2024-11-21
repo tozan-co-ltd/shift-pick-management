@@ -139,6 +139,12 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
         }
 
+        /// <summary>
+        /// 便枝番情報取得SQL作成
+        /// </summary>
+        /// <param name="tripId">便ID</param>
+        /// <param name="isBeforeApplicablePeriod">適用期間を過ぎた便を表示するか</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectMTripBranchNumbers(int tripId, bool isBeforeApplicablePeriod)
         {
             var sql = $@"
@@ -164,6 +170,12 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 基準日時以降の便枝番情報を取得するSQL作成
+        /// </summary>
+        /// <param name="tripId">便ID</param>
+        /// <param name="refferenceDate">基準日時</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectMTripBranchNumbersWithBranceSeq(int tripId, DateTime refferenceDate)
         {
             var sql = $@"
@@ -186,6 +198,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 便IDから便名称を取得するSQL作成
+        /// </summary>
+        /// <param name="tripID">便ID</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectTripNameFromTripID(int tripID)
         {
             var sql = $@"
@@ -196,6 +213,13 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 便枝番情報登録SQL作成
+        /// </summary>
+        /// <param name="model">便枝番情報</param>
+        /// <param name="createdAt">作成日時</param>
+        /// <param name="createdBy">作成者</param>
+        /// <returns></returns>
         public static string CreateSQLToInsertMTripBranchNumber(M_TripBranchNumberModel model, DateTime createdAt, string createdBy)
         {
             var formatCreatedAt =createdAt.ToString("yyyy/MM/dd HH:mm:ss");
@@ -230,8 +254,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便枝番テーブル更新SQL作成
         /// </summary>
         /// <param name="model">更新情報</param>
-        /// <param name="updatedAt">システムタイム</param>
-        /// <param name="updatedBy">ユーザー名</param>
+        /// <param name="updatedAt">更新日時</param>
+        /// <param name="updatedBy">更新者</param>
         /// <returns>SQL文</returns>
         private static string CreateSQLToUpdateMTripBranchNumber(M_TripBranchNumberModel model, DateTime updatedAt, string updatedBy)
         {
@@ -248,6 +272,28 @@ namespace ai_truck_load_measurement.ConnectControllers
                     updated_by = '{updatedBy}'
                 WHERE trip_branch_number_id = {model.TripBranchNumberID}
             ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 同じ便IDの適用期間と出発、到着予定時間を取得するSQL作成
+        /// </summary>
+        /// <param name="model">参照する便枝番情報</param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectTimesFromDuplicateTripID(M_TripBranchNumberModel model)
+        {
+            var sql = $@"
+                SELECT 
+                    CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
+                    CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+	                applicable_start_datetime,
+	                applicable_end_datetime
+                FROM m_trip_branch_numbers
+                WHERE
+	                trip_id = '{model.TripID}'
+                AND trip_branch_number_id <> {model.TripBranchNumberID}
+            ";
+
             return sql;
         }
     }

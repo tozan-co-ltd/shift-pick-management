@@ -218,6 +218,17 @@ namespace ai_truck_load_measurement.Controllers
                     return NotFound(new { errorMessage });
                 }
 
+                // 適用期間重複チェック
+                var isDupulicated = IsDupulicatedApplicablePeriod(model);
+                if (isDupulicated)
+                {
+                    // log取得
+                    errorMessage = "E1012: " + ErrorMessagesResources.E1012;
+                    _logger.Error($"便マスター登録失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
+                }
+
                 // 便マスター更新
                 M_TripBranchNumberConnectController.UpdateMTripBranchNumber(model, user);
 
@@ -295,6 +306,16 @@ namespace ai_truck_load_measurement.Controllers
                     return NotFound(new { errorMessage });
                 }
 
+                // 適用期間と到着、出発予定時間の重複チェック
+                var isDupulicated = IsDupulicatedApplicablePeriod(model);
+                if (isDupulicated)
+                {
+                    // log取得
+                    errorMessage = "E1012: " + ErrorMessagesResources.E1012;
+                    _logger.Error($"便マスター登録失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
+                }
 
                 // 便マスター登録
                 M_TripBranchNumberConnectController.InsertMTripBranchNumber(model, user);
@@ -321,6 +342,39 @@ namespace ai_truck_load_measurement.Controllers
 
                 return NotFound(new { errorMessage });
             }
+        }
+
+        /// <summary>
+        /// 適用期間と到着、出発予定時間の重複チェック
+        /// </summary>
+        /// <param name="model">便枝番マスターモデル</param>
+        /// <returns></returns>
+        private bool IsDupulicatedApplicablePeriod(M_TripBranchNumberModel model)
+        {
+            // 便IDが重複している便履歴の取得
+            var duplicateTripIDSql = M_TripBranchNumberConnectController.CreateSQLToSelectTimesFromDuplicateTripID(model);
+            var duplicateMTripNameList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(duplicateTripIDSql);
+
+            // 適用期間重複チェック
+            bool isDupulicated = false;
+            foreach (var item in duplicateMTripNameList)
+            {
+                var arrivalTime = item.ArrivalScheduledTime;
+                var departureTime = item.DepartureScheduledTime;
+                var startTime = item.ApplicableStartDateTime;
+                var endTime = item.ApplicableEndDateTime;
+                var modelArrivalTime = DateTime.Parse($"1900/01/01 {model.RegistArrivalScheduledTime}:00");
+                var modelDepartureTime = DateTime.Parse($"1900/01/01 {model.RegistDepartureScheduledTime}:00");
+                var modelStartTime = model.ApplicableStartDateTime;
+                var modelEndTime = model.ApplicableEndDateTime;
+                if (modelDepartureTime > arrivalTime && departureTime > modelArrivalTime &&
+                    modelEndTime > startTime && endTime > modelStartTime)
+                {
+                    isDupulicated = true;
+                    break;
+                }
+            }
+            return isDupulicated;
         }
     }
 }
