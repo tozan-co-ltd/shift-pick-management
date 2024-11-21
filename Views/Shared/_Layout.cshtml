@@ -120,7 +120,10 @@
                                                 <div class="bg-white py-2 collapse-inner rounded">
                                                     @foreach (var obj in menuList)
                                                     {
-                                                        <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                        @if(obj.MenuName != "便枝番マスター")
+                                                        {
+                                                            <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                        }
                                                     }
                                                 </div>
                                             </div>
@@ -131,7 +134,10 @@
                                                 <div class="bg-white py-2 collapse-inner rounded">
                                                     @foreach (var obj in menuList)
                                                     {
-                                                        <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                        @if (obj.MenuName != "便枝番マスター")
+                                                        {
+                                                            <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                        }
                                                     }
                                                 </div>
                                             </div>
