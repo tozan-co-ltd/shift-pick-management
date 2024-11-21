@@ -24,15 +24,15 @@ namespace ai_truck_load_measurement.Controllers
         public IActionResult Index(int tripId, bool isChecked)
         {
             M_TripBranchNumberModel model = new();
-            bool isBeforeApplicablePeriod = true;
 
             model.TripID = tripId;
+            model.IsCheckedBeforeApplicablePeriod = isChecked;
             model.TripName = M_TripBranchNumberConnectController.ConnectMTripForTripNameFromTripID(tripId);
 
             try
             {
                 // 便マスター情報取得SQL作成
-                var sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, isBeforeApplicablePeriod);
+                var sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, isChecked);
                 // DB接続
                 IEnumerable<M_TripBranchNumberModel> tripList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(sql);
 
