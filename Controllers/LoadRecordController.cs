@@ -32,6 +32,7 @@ namespace ai_truck_load_measurement.Controllers
                 model.DepartureLoadStatus = ConversionLoadClassToLoadStatus(departureLoadClass);
 
                 // テーブルの空欄を"-"に変換
+                if (string.IsNullOrEmpty(model.TruckNumber)) model.TruckNumber = "-";
                 if (string.IsNullOrEmpty(model.TripName)) model.TripName = "-";
                 if (string.IsNullOrEmpty(model.TripBranchSeq)) model.TripBranchSeq = "-";
                 if (string.IsNullOrEmpty(model.DriverName)) model.DriverName = "-";
