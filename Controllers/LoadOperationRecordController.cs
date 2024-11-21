@@ -25,16 +25,16 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(dates);
                 // DB接続
-                List<SelectListItem> tripNameList = LoadDistributionConnectController.ConnectTTripRecordsForTripName(sql);
+                List<SelectListItem> tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
 
                 model.TripNameList = tripNameList;
 
                 // 便実績情報取得SQL作成
                 var sql2 = LoadRecordConnectController.CreatSQLToSelectTripRecord();
                 // DB接続
-                IEnumerable<LoadDistributionModel> tripRecordList = LoadDistributionConnectController.ConnectTTripRecords(sql2);
+                IEnumerable<LoadRecordModel> tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql2);
                 // テーブル情報を変換
-                tripRecordList = (IEnumerable<LoadDistributionModel>)LoadRecordController.ConversionForTable(tripRecordList);
+                tripRecordList = LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
                 return View(model);
@@ -60,7 +60,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(workDays);
                 // DB接続
-                tripRecordList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql);
+                tripRecordList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
 
                 return tripRecordList;
             }

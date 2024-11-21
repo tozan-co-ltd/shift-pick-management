@@ -44,53 +44,6 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
-        /// 画像のパスをBase64文字列に変換する
-        /// </summary>
-        /// <param name="imagePath">変換したい画像のパス</param>
-        /// <returns></returns>
-        private static string ImageToBase64(string imagePath)
-        {
-            using (Image image = Image.FromFile(imagePath))
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    image.Save(memoryStream, ImageFormat.Jpeg); // 画像フォーマットを指定（ここではJPEG）
-                    byte[] imageBytes = memoryStream.ToArray();
-                    return Convert.ToBase64String(imageBytes);
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// 画像のパスが正しいかどうか確認する
-        /// </summary>
-        /// <param name="imagePath">確認したい画像パス</param>
-        /// <returns></returns>        
-        public bool IsValidImage(string imagePath)
-        {
-            // 画像パスがここに含まれたフォーマットの場合trueを返す
-            var imageFormats = new List<ImageFormat>()
-                  {
-                    ImageFormat.Jpeg,
-                    ImageFormat.Png,
-                  };
-            try
-            {
-
-                using (FileStream fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
-                using (Image targetImage = Image.FromStream(fileStream))
-                {
-                    return imageFormats.Contains(targetImage.RawFormat);
-                }
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
         /// 便実績情報テーブル非同期更新用
         /// </summary>
         /// <param name="startOfPeriod">期間の開始日時</param>

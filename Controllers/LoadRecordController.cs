@@ -172,10 +172,10 @@ namespace ai_truck_load_measurement.Controllers
         public static LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
         {
             // 「荷量の相違あり」で保存した値が既に存在するか
-            var isSameAnnotationLoadsExist = LoadOutputConnectController.IsSameAnnotationLoadsExist(model.TripRecordID, isArrived);
+            var isSameAnnotationLoadsExist = LoadRecordConnectController.IsSameAnnotationLoadsExist(model.TripRecordID, isArrived);
             if (isSameAnnotationLoadsExist)
             {
-                var annotationLoadClass = LoadOutputConnectController.GetAnnotationLoadClassByTripRecordIDAndIsArrived(model.TripRecordID, isArrived);
+                var annotationLoadClass = LoadRecordConnectController.GetAnnotationLoadClassByTripRecordIDAndIsArrived(model.TripRecordID, isArrived);
                 model.AnnotationLoadClass = annotationLoadClass;
             }
 
@@ -372,18 +372,18 @@ namespace ai_truck_load_measurement.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 「荷量の相違あり」で保存した値が既に存在するか
-                var isSameAnnotationLoadsExist = LoadOutputConnectController.IsSameAnnotationLoadsExist(tripRecordID, isArrived);
+                var isSameAnnotationLoadsExist = LoadRecordConnectController.IsSameAnnotationLoadsExist(tripRecordID, isArrived);
 
                 // 「荷量の相違あり」の設定値を更新、保存
                 if (isSameAnnotationLoadsExist)
                 {
                     // 更新
-                    LoadOutputConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
+                    LoadRecordConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
                 }
                 else
                 {
                     // 新規保存
-                    LoadOutputConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
+                    LoadRecordConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
                 }
 
                 return Ok();

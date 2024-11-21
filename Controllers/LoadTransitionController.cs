@@ -26,9 +26,9 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadTransitionConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today);
+                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today);
                 // DB接続
-                List<SelectListItem> tripNameList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql);
+                List<SelectListItem> tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
 
                 model.TripNameList = tripNameList;
 
@@ -62,9 +62,9 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadTransitionConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod);
+                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod);
                 // DB接続
-                tripRecordList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql);
+                tripRecordList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
 
                 return tripRecordList;
             }
@@ -89,9 +89,9 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadTransitionConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName, startOfPeriod, endOfPeriod);
+                var sql = LoadRecordConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName, startOfPeriod, endOfPeriod);
                 // DB接続
-                tripBranchSeqList = LoadTransitionConnectController.ConnectTTripRecordsForTripBranchSeq(sql);
+                tripBranchSeqList = LoadRecordConnectController.ConnectTTripRecordsForTripBranchSeq(sql);
 
                 return tripBranchSeqList;
             }
@@ -119,7 +119,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadTransitionConnectController.CreateSQLToSelectLoadClassFromSearchConditions(tripName, tripBranchSeq, startOfPeriod, endOfPeriod);
                 // DB接続
-                var loadClasses = LoadTransitionConnectController.ConnectTTripRecords(sql);
+                var loadClasses = LoadRecordConnectController.ConnectTTripRecords(sql);
 
                 foreach ( var loadClass in loadClasses)
                 {
