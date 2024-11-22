@@ -12243,6 +12243,10 @@ body.sidebar-toggled footer.sticky-footer {
         visibility: visible;
     }
 
+    #not-print-area *{
+        visibility: hidden !important;
+    }
+
     #print-area {
         position: absolute;
         top: 0;

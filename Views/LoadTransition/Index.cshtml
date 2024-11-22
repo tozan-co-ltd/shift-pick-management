@@ -121,26 +121,7 @@
                             type: 'line',
                             data: {
                                 labels: [],
-                                datasets: [{
-                                    label: '豊鉄大型常傭便3_1',
-                                    borderColor: 'Green',
-                                    fill: false,
-                                    data: [{ x: '2024-10-21T00:00:00', y: 5 }, { x: '2024-10-22T00:00:00', y: 55 }, { x: '2024-10-23T00:00:00', y: 45 }, { x: '2024-10-24T00:00:00', y: 25 }, { x: '2024-10-25T00:00:00', y: 65 }],
-                                    tension: 0,
-                                    pointRadius: '5',
-                                    backgroundColor: 'Green',
-                                    
-                                },
-                                {
-                                    label: '豊鉄大型常傭便3_2',
-                                    borderColor: 'Red',
-                                    fill: false,
-                                    data: [{ x: '2024-10-21T00:00:00', y: 95 }, { x: '2024-10-22T00:00:00', y: 75 }, { x: '2024-10-23T00:00:00', y: 25 }, { x: '2024-10-24T00:00:00', y: 55 }, { x: '2024-10-25T00:00:00', y: 15 }],
-                                    tension: 0,
-                                    pointRadius: '5',
-                                    backgroundColor: 'Red',
-
-                                }]
+                                datasets: []
                             },
                             options: {
                                 //凡例は表示
@@ -204,26 +185,7 @@
                             type: 'line',
                             data: {
                                 labels: [],
-                                datasets: [{
-                                    label: '豊鉄大型常傭便3_1',
-                                    borderColor: 'Green',
-                                    fill: false,
-                                    data: [{ x: '2024-10-21T00:00:00', y: 5 }, { x: '2024-10-22T00:00:00', y: 55 }, { x: '2024-10-23T00:00:00', y: 45 }, { x: '2024-10-24T00:00:00', y: 25 }, { x: '2024-10-25T00:00:00', y: 65 }],
-                                    tension: 0,
-                                    pointRadius: '5',
-                                    backgroundColor: 'Green',
-
-                                },
-                                {
-                                    label: '豊鉄大型常傭便3_2',
-                                    borderColor: 'Red',
-                                    fill: false,
-                                    data: [{ x: '2024-10-21T00:00:00', y: 95 }, { x: '2024-10-22T00:00:00', y: 75 }, { x: '2024-10-23T00:00:00', y: 25 }, { x: '2024-10-24T00:00:00', y: 55 }, { x: '2024-10-25T00:00:00', y: 15 }],
-                                    tension: 0,
-                                    pointRadius: '5',
-                                    backgroundColor: 'Red',
-
-                                }]
+                                datasets: []
                             },
                             options: {
                                 //凡例は表示
@@ -332,6 +294,8 @@
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
         // 便枝番のセレクトリスト更新
         tripBranchSeqSetToSelectList();
+        // グラフ非表示
+        $('#graphAndTable').css('display', 'none');
     })
 
     // 期間の開始日付変更時
@@ -350,6 +314,9 @@
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
+        // 選択中の便名称取得
+        var tripName = $('[name=TripName]').val();
+
         // 便名称の選択肢を全削除
         var select = $('#tripName')[0];
         while (select.firstChild) {
@@ -357,7 +324,7 @@
         }
 
         // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetTripNameFromPeriod", "LoadTransition")';
+        let url = window.location.origin + '@Url.Action("GetTripNameFromPeriod", "LoadRecord")';
         let method = 'Post';
         let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
 
@@ -376,6 +343,9 @@
                     option.text = response[i].text;
                 }
                 option.value = response[i].value;
+                if(option.text == tripName){
+                    option.selected = true;
+                }
                 select.appendChild(option);
             }
 
@@ -412,7 +382,7 @@
         }
 
         // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetTripBranchSeqFromTripName", "LoadTransition")';
+        let url = window.location.origin + '@Url.Action("GetTripBranchSeqFromTripName", "LoadRecord")';
         let method = 'Post';
         let data = { tripName: tripName, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
 
@@ -782,7 +752,7 @@
             if (item.tripRecordID == tripRecordID) {
 
                 // フォーム情報取得
-                let url = window.location.origin + '@Url.Action("GetModalItems", "LoadTransition")';
+                let url = window.location.origin + '@Url.Action("GetModalItems", "LoadRecord")';
                 let method = 'POST';
                 let data = { model: item, isArrived: isArrived };
 
@@ -935,6 +905,7 @@
 
     // 要検証ボタン押下時
     function onVerificationRequiredClick(tripRecordID, isArrived) {
+        event.preventDefault();
         var loadStatus = $('[name=loadStatusSelect]').val();
         if (loadStatus != "") {
 
@@ -942,7 +913,7 @@
 
 
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("InsertOrUpdateAnnotationLoads", "LoadTransition")';
+            let url = window.location.origin + '@Url.Action("InsertOrUpdateAnnotationLoads", "LoadRecord")';
             let method = 'POST';
             let data = { tripRecordID: tripRecordID, loadStatus: loadStatus, isArrived: isArrived };
 
@@ -1026,6 +997,7 @@
 
     // 画像一括出力ボタン押下
     function onExportAllImages() {
+        event.preventDefault();
         DeleteErrorMessages();
         if (isWithin90Days()) {
             tableDisplay();

@@ -43,115 +43,6 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-
-        /// <summary>
-        /// テーブル情報を変換
-        /// </summary>
-        /// <param name="models">変換元</param>
-        /// <returns></returns>
-        private IEnumerable<LoadOutputModel> ConversionForTable(IEnumerable<LoadOutputModel> models)
-        {
-            foreach (var model in models)
-            {
-                var arrivalLoadClass = model.ArrivalLoadClass;
-                var departureLoadClass = model.DepartureLoadClass;
-
-                // 到着荷量クラスと出発荷量クラスをそれぞれ変換
-                model.ArrivalLoadStatus = ConversionLoadClassToLoadStatus(arrivalLoadClass);
-                model.DepartureLoadStatus = ConversionLoadClassToLoadStatus(departureLoadClass);
-
-                // テーブルの空欄を"-"に変換
-                if (string.IsNullOrEmpty(model.TripName)) model.TripName = "-";
-                if (string.IsNullOrEmpty(model.TripBranchSeq)) model.TripBranchSeq = "-";
-                if (string.IsNullOrEmpty(model.DriverName)) model.DriverName = "-";
-
-                model.IdentifyNumber = LoadRecordController.ConvertNumberToFourDigitOrHyphen(model.IdentifyNumber);
-            }
-            return models;
-        }
-
-        /// <summary>
-        /// 荷量クラスからパーセント表示に変換
-        /// </summary>
-        /// <param name="loadClass">荷量クラス</param>
-        /// <returns></returns>
-        private string ConversionLoadClassToLoadStatus(int loadClass)
-        {
-            var loadStatus = "-";
-            if (loadClass == 2) loadStatus = "0";
-            if (loadClass >= 3)
-            {
-                int lowerLimit = (loadClass - 3) * 10 + 1;
-                int upperLimit = (loadClass - 2) * 10;
-                loadStatus = ($"{lowerLimit}-{upperLimit}");
-            }
-            return loadStatus;
-        }
-
-        /// <summary>
-        /// 画像のパスが正しいかどうかのチェックとパスの変換
-        /// </summary>
-        /// <param name="imagePath">画像パス</param>
-        /// <returns></returns>
-        private string CheckAndConvertImagePath(string imagePath)
-        {
-            // 画像パスに画像がないかパスが不正な場合はダミー画像を表示する
-            if (!IsValidImage(imagePath))
-            {
-                var rootPath = Directory.GetCurrentDirectory();
-                imagePath = Path.Combine(rootPath, @"wwwroot\images\NoImage.png");
-            }
-            var imagePathToBase64 = ImageToBase64(imagePath);
-            return imagePathToBase64;
-        }
-
-        /// <summary>
-        /// 画像のパスをBase64文字列に変換する
-        /// </summary>
-        /// <param name="imagePath">変換したい画像のパス</param>
-        /// <returns></returns>
-        private static string ImageToBase64(string imagePath)
-        {
-            using (Image image = Image.FromFile(imagePath))
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    image.Save(memoryStream, ImageFormat.Jpeg); // 画像フォーマットを指定（ここではJPEG）
-                    byte[] imageBytes = memoryStream.ToArray();
-                    return Convert.ToBase64String(imageBytes);
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// 画像のパスが正しいかどうか確認する
-        /// </summary>
-        /// <param name="imagePath">確認したい画像パス</param>
-        /// <returns></returns>        
-        public bool IsValidImage(string imagePath)
-        {
-            // 画像パスがここに含まれたフォーマットの場合trueを返す
-            var imageFormats = new List<ImageFormat>()
-                  {
-                    ImageFormat.Jpeg,
-                    ImageFormat.Png,
-                  };
-            try
-            {
-
-                using (FileStream fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
-                using (Image targetImage = Image.FromStream(fileStream))
-                {
-                    return imageFormats.Contains(targetImage.RawFormat);
-                }
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
         /// <summary>
         /// 便実績情報テーブル非同期更新用
         /// </summary>
@@ -202,6 +93,16 @@ namespace ai_truck_load_measurement.Controllers
                 searchConditionDT.Columns.Add("項目名");
                 searchConditionDT.Columns.Add("検索条件");
                 searchConditionDT.Rows.Add("稼働日",$"{startDate}～{endDate}");
+                var amountCondition = "";
+                if (isOnlyHasAmountDefference)
+                {
+                    amountCondition = "YES";
+                }
+                else
+                {
+                    amountCondition = "NO";
+                }
+                searchConditionDT.Rows.Add("荷量の相違ありのみか",amountCondition);
 
                 // 便実績情報取得
                 var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
@@ -265,76 +166,8 @@ namespace ai_truck_load_measurement.Controllers
 
         }
 
-        /// <summary>
-        /// 荷量画像モーダルに表示する値の取得
-        /// </summary>
-        /// <param name="model">モーダルに表示するモデル</param>
-        /// <param name="isArrived">到着か否か</param>
-        /// <returns></returns>
-        public LoadRecordModel GetModalItems(LoadOutputModel model, bool isArrived)
-        {
-            var modalItems = LoadRecordController.GetModalItems(model, isArrived);
-            return modalItems;
-        }
+        
 
-
-        /// <summary>
-        /// 荷量の相違ありテーブルの設定値を保存する
-        /// </summary>
-        /// <param name="tripRecordID">便実績ID</param>
-        /// <param name="loadStatus">荷量クラス</param>
-        /// <param name="isArrived">到着か否か</param>
-        /// <returns></returns>
-        public IActionResult InsertOrUpdateAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived)
-        {
-            string? errorMessage;
-            try
-            {
-                // 初期値でクリックした場合は何も起こらない
-                if (loadStatus == 0)
-                {
-                    return NotFound();
-                }
-
-                // ログイン中ユーザー情報取得
-                var user = ClaimsLoginUserData();
-
-                // 「荷量の相違あり」で保存した値が既に存在するか
-                var isSameAnnotationLoadsExist = LoadOutputConnectController.IsSameAnnotationLoadsExist(tripRecordID, isArrived);
-
-                // 「荷量の相違あり」の設定値を更新、保存
-                if (isSameAnnotationLoadsExist)
-                {
-                    // 更新
-                    LoadOutputConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
-                }
-                else
-                {
-                    // 新規保存
-                    LoadOutputConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
-                }
-
-                return Ok();
-            }
-            catch (SqlException ex)
-            {
-                // log取得
-                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
-                var exceptionMessage = ex.Message;
-                _logger.Error($"{exceptionMessage} {errorMessage}");
-
-                return NotFound(new { errorMessage });
-            }
-            catch (Exception ex)
-            {
-                // log取得
-                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
-                var exceptionMessage = ex.Message;
-                _logger.Error($"{exceptionMessage} {errorMessage}");
-
-                return NotFound(new { errorMessage });
-            }
-        }
 
         /// <summary>
         /// 画像一括ダウンロード
@@ -411,7 +244,17 @@ namespace ai_truck_load_measurement.Controllers
                             System.Text.Encoding.GetEncoding("shift_jis")))
                         {
                             //書き込む
-                            sw.Write($"稼働日：{startDate}～{endDate}");
+                            sw.WriteLine($"稼働日：{startDate}～{endDate}");
+                            var amountCondition = "";
+                            if (isOnlyHasAmountDefference)
+                            {
+                                amountCondition = "YES";
+                            }
+                            else
+                            {
+                                amountCondition = "NO";
+                            }
+                            sw.Write($"荷量の相違ありのみか：{amountCondition}");
                         }
                     }
                     

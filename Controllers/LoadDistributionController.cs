@@ -24,7 +24,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadDistributionConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today);
                 // DB接続
-                List<SelectListItem> tripNameList = LoadDistributionConnectController.ConnectTTripRecordsForTripName(sql);
+                List<SelectListItem> tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
 
                 model.TripNameList = tripNameList;
 
@@ -43,59 +43,6 @@ namespace ai_truck_load_measurement.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
-            }
-        }
-
-        /// <summary>
-        /// 指定した期間内に存在する便名称のリストを取得してセレクトリストアイテム化する
-        /// </summary>
-        /// <param name="startOfPeriod">期間の開始日時</param>
-        /// <param name="endOfPeriod">期間の終了日時</param>
-        /// <returns></returns>
-        public List<SelectListItem> GetTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
-        {
-            List<SelectListItem> tripRecordList = new();
-            try
-            {
-                // 便実績情報取得SQL作成
-                var sql = LoadTransitionConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod);
-                // DB接続
-                tripRecordList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql);
-
-                return tripRecordList;
-            }
-            catch (Exception ex)
-            {
-                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
-                ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return tripRecordList;
-            }
-        }
-
-        /// <summary>
-        /// 便名称から指定した期間内の便枝番のリストを取得する
-        /// </summary>
-        /// <param name="tripName">便名称</param>
-        /// <param name="startOfPeriod">期間の開始日時</param>
-        /// <param name="endOfPeriod">期間の終了日時</param>
-        /// <returns></returns>
-        public List<int> GetTripBranchSeqFromTripName(string tripName, DateTime startOfPeriod, DateTime endOfPeriod)
-        {
-            List<int> tripBranchSeqList = new();
-            try
-            {
-                // 便実績情報取得SQL作成
-                var sql = LoadTransitionConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName, startOfPeriod, endOfPeriod);
-                // DB接続
-                tripBranchSeqList = LoadTransitionConnectController.ConnectTTripRecordsForTripBranchSeq(sql);
-
-                return tripBranchSeqList;
-            }
-            catch (Exception ex)
-            {
-                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
-                ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return tripBranchSeqList;
             }
         }
 
@@ -172,78 +119,6 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
     
-        /// <summary>
-        /// 荷量画像モーダルに表示する値の取得
-        /// </summary>
-        /// <param name="model">モーダルに表示するモデル</param>
-        /// <param name="isArrived">到着か否か</param>
-        /// <returns></returns>
-        public LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
-        {
-            var modalItems = LoadRecordController.GetModalItems(model, isArrived);
-
-            return modalItems;
-        }
-
-
-        /// <summary>
-        /// 荷量の相違ありテーブルの設定値を保存する
-        /// </summary>
-        /// <param name="tripRecordID">便実績ID</param>
-        /// <param name="loadStatus">荷量クラス</param>
-        /// <param name="isArrived">到着か否か</param>
-        /// <returns></returns>
-        public IActionResult InsertOrUpdateAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived)
-        {
-            string? errorMessage;
-            try
-            {
-                // 初期値でクリックした場合は何も起こらない
-                if (loadStatus == 0)
-                {
-                    return NotFound();
-                }
-
-                // ログイン中ユーザー情報取得
-                var user = ClaimsLoginUserData();
-
-                // 「荷量の相違あり」で保存した値が既に存在するか
-                var isSameAnnotationLoadsExist = LoadOutputConnectController.IsSameAnnotationLoadsExist(tripRecordID, isArrived);
-
-                // 「荷量の相違あり」の設定値を更新、保存
-                if (isSameAnnotationLoadsExist)
-                {
-                    // 更新
-                    LoadOutputConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
-                }
-                else
-                {
-                    // 新規保存
-                    LoadOutputConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
-                }
-
-                return Ok();
-            }
-            catch (SqlException ex)
-            {
-                // log取得
-                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
-                var exceptionMessage = ex.Message;
-                _logger.Error($"{exceptionMessage} {errorMessage}");
-
-                return NotFound(new { errorMessage });
-            }
-            catch (Exception ex)
-            {
-                // log取得
-                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
-                var exceptionMessage = ex.Message;
-                _logger.Error($"{exceptionMessage} {errorMessage}");
-
-                return NotFound(new { errorMessage });
-            }
-        }
-
         /// <summary>
         /// ファイル出力
         /// </summary>

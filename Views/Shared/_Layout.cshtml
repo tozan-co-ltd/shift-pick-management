@@ -26,6 +26,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <!-- datetimepicker-->
     <link href="~/css/datetimepicker.css" rel="stylesheet" />
+    <!-- multidatespicker-->
+    <link href="~/css/jquery-ui.multidatespicker.css" rel="stylesheet" />
     <!-- bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <!-- sb-admin-2 -->
@@ -118,7 +120,10 @@
                                                 <div class="bg-white py-2 collapse-inner rounded">
                                                     @foreach (var obj in menuList)
                                                     {
-                                                        <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                        @if(obj.MenuName != "便枝番マスター")
+                                                        {
+                                                            <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                        }
                                                     }
                                                 </div>
                                             </div>
@@ -129,7 +134,10 @@
                                                 <div class="bg-white py-2 collapse-inner rounded">
                                                     @foreach (var obj in menuList)
                                                     {
-                                                        <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                        @if (obj.MenuName != "便枝番マスター")
+                                                        {
+                                                            <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                        }
                                                     }
                                                 </div>
                                             </div>
@@ -181,6 +189,10 @@
 
     <!--datepicker↓-->
     <script src="~/lib/jquery-detetimepicker/datetimepicker.js"></script>
+
+    <!--multidatespicker↓-->
+    <script src="~/lib/jquery-detetimepicker/jquery-ui.multidatespicker.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
 
     <!--dataTables↓-->
     <script type="text/javascript" src="~/lib/datatables/datatables.min.js"></script>

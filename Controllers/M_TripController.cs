@@ -103,7 +103,7 @@ namespace ai_truck_load_measurement.Controllers
                                         <i class=""fa-regular fa-copy""></i>
                                     </a>
                                 </td>
-                                <td>{@item.TripID}</td>
+                                <td><a class=""btn"" href=""M_TripBranchNumber?tripId={item.TripID}&isChecked={isBeforeApplicablePeriod}""><span style=""color:deepskyblue"">{@item.TripID}</a></td>
                                 <td>{@item.TripName}</td>
                                 <td>{@item.DriverName}</td>
                                 <td>{@item.TruckNumber}</td>

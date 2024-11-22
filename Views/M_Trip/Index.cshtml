@@ -35,7 +35,7 @@
         </div>
 
         <div class="mb-3">
-            <label><input type="checkbox" id="m_tripCheckBox"/> 適用終了日時を過ぎた便も表示する</label>
+            <label><input type="checkbox" id="m_tripCheckBox"/> 適用終了日時を過ぎた便も表示</label>
         </div>
 
         <div class="mg-bot-20">
@@ -393,6 +393,9 @@
                 columnDefs: [
                     { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
                 ],
+                "oLanguage": {
+                    "sSearch": "フリーワード(全件)"
+                },
                 dom: dom_structure
             });
         }).fail(function (jqXHR, textStatus, errorThrown) {
