@@ -93,6 +93,16 @@ namespace ai_truck_load_measurement.Controllers
                 searchConditionDT.Columns.Add("項目名");
                 searchConditionDT.Columns.Add("検索条件");
                 searchConditionDT.Rows.Add("稼働日",$"{startDate}～{endDate}");
+                var amountCondition = "";
+                if (isOnlyHasAmountDefference)
+                {
+                    amountCondition = "YES";
+                }
+                else
+                {
+                    amountCondition = "NO";
+                }
+                searchConditionDT.Rows.Add("荷量の相違ありのみか",amountCondition);
 
                 // 便実績情報取得
                 var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
@@ -234,7 +244,17 @@ namespace ai_truck_load_measurement.Controllers
                             System.Text.Encoding.GetEncoding("shift_jis")))
                         {
                             //書き込む
-                            sw.Write($"稼働日：{startDate}～{endDate}");
+                            sw.WriteLine($"稼働日：{startDate}～{endDate}");
+                            var amountCondition = "";
+                            if (isOnlyHasAmountDefference)
+                            {
+                                amountCondition = "YES";
+                            }
+                            else
+                            {
+                                amountCondition = "NO";
+                            }
+                            sw.Write($"荷量の相違ありのみか：{amountCondition}");
                         }
                     }
                     
