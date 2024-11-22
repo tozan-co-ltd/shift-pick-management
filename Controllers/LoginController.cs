@@ -26,6 +26,7 @@ namespace ai_truck_load_measurement.Controllers
         [AllowAnonymous]
         public IActionResult Index(string param)
         {
+            LoginModel model = new();
             try
             {
                 // 開発環境の場合はViewDataに"true"を代入し、
@@ -35,13 +36,13 @@ namespace ai_truck_load_measurement.Controllers
                 ViewData["IsDevelopment"] = "true";
 #endif
 
-                return View();
+                return View(model);
             }
             catch (Exception ex)
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message;
                 ViewData["ErrorMessage"] = errorMessage;
-                return View();
+                return View(model);
             }
         }
 
