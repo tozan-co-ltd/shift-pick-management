@@ -362,7 +362,7 @@
         }
 
         // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetTripNameFromPeriod", "LoadTransition")';
+        let url = window.location.origin + '@Url.Action("GetTripNameFromPeriod", "LoadRecord")';
         let method = 'Post';
         let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
 
@@ -420,7 +420,7 @@
         }
 
         // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetTripBranchSeqFromTripName", "LoadTransition")';
+        let url = window.location.origin + '@Url.Action("GetTripBranchSeqFromTripName", "LoadRecord")';
         let method = 'Post';
         let data = { tripName: tripName, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
 
@@ -791,7 +791,7 @@
             if (item.tripRecordID == tripRecordID) {
 
                 // フォーム情報取得
-                let url = window.location.origin + '@Url.Action("GetModalItems", "LoadTransition")';
+                let url = window.location.origin + '@Url.Action("GetModalItems", "LoadRecord")';
                 let method = 'POST';
                 let data = { model: item, isArrived: isArrived };
 

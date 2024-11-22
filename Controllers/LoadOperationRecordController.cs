@@ -25,16 +25,16 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(dates);
                 // DB接続
-                List<SelectListItem> tripNameList = LoadDistributionConnectController.ConnectTTripRecordsForTripName(sql);
+                List<SelectListItem> tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
 
                 model.TripNameList = tripNameList;
 
                 // 便実績情報取得SQL作成
                 var sql2 = LoadRecordConnectController.CreatSQLToSelectTripRecord();
                 // DB接続
-                IEnumerable<LoadDistributionModel> tripRecordList = LoadDistributionConnectController.ConnectTTripRecords(sql2);
+                IEnumerable<LoadRecordModel> tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql2);
                 // テーブル情報を変換
-                tripRecordList = (IEnumerable<LoadDistributionModel>)LoadRecordController.ConversionForTable(tripRecordList);
+                tripRecordList = LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
                 return View(model);
@@ -60,7 +60,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(workDays);
                 // DB接続
-                tripRecordList = LoadTransitionConnectController.ConnectTTripRecordsForTripName(sql);
+                tripRecordList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
 
                 return tripRecordList;
             }
@@ -80,29 +80,15 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="workDay">稼働日</param>
         /// <param name="tripName">便名称</param>
         /// <returns></returns>
-        public List<LoadOperationRecordModel> SearchTrips(DateTime workDay, string tripName)
+        public List<LoadRecordModel> SearchTrips(DateTime workDay, string tripName)
         {
-            List<LoadOperationRecordModel> loadStatuses = new();
+            List<LoadRecordModel> loadStatuses = new();
             try
             {
                 // 便実績情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreateSQLToSelectLoadClassFromSearchConditions(tripName, workDay);
                 // DB接続
-                var loadClasses = LoadOperationRecordConnectController.ConnectTTripRecords(sql);
-
-                foreach (var loadClass in loadClasses)
-                {
-                    var loadStatus = new LoadOperationRecordModel
-                    {
-                        WorkDay = workDay,
-                        ArrivedAt = loadClass.ArrivedAt,
-                        DepartedAt = loadClass.DepartedAt,
-                        ArrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.ArrivalLoadClass),
-                        DepartureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatusForChart(loadClass.DepartureLoadClass),
-                        DayShiftStartTime = loadClass.DayShiftStartTime,
-                    };
-                    loadStatuses.Add(loadStatus);
-                }
+                loadStatuses = LoadRecordController.CommonSearchTrips(sql);
 
                 return loadStatuses;
             }
@@ -140,19 +126,6 @@ namespace ai_truck_load_measurement.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 return Json(new { res = "NG", errorMessage = errorMessage });
             }
-        }
-
-        /// <summary>
-        /// 荷量画像モーダルに表示する値の取得
-        /// </summary>
-        /// <param name="model">モーダルに表示するモデル</param>
-        /// <param name="isArrived">到着か否か</param>
-        /// <returns></returns>
-        public LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
-        {
-            var modalItems = LoadRecordController.GetModalItems(model, isArrived);
-
-            return modalItems;
         }
 
 
