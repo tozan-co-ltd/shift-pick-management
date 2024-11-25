@@ -69,7 +69,6 @@
                 <span class="text">検索</span>
             </button>
         </div>
-        <div id="tooltip" style="position:absolute;"></div>
 
         <div class="graph-and-table" id="graphAndTable" style="display: block !important">
             <hr />
@@ -95,6 +94,16 @@
                 <p style="text-align:right">
                     縦線：昼勤開始時間
                 </p>
+
+                <div id="tooltip" style="position:absolute; display:none">
+                    @* <input type="color" id="color-picker" list="color-picker" />
+                    <datalist id="color-picker">
+                        <option>#ff0000</option>
+                        <option>#123456</option>
+                        <option>#0000ff</option>
+                    </datalist> *@
+
+                </div>
 
                 <div class="chartjs-graph chartjs-arrival" id="arrivalChart">
                     <canvas id="binedabanChartArrival"></canvas>
@@ -187,19 +196,29 @@
                                 var dataLabelRGB = arrivalChart.data.datasets[index].backgroundColor;
                                 var dataLabel = rgbaToHex(dataLabelRGB);
                                 // カラーピッカー作成
-                                var colorPickerName = "color-picker-" + index;
-                                tooltip.innerHTML = '<input type=\"color\" value=\"' + dataLabel + '\" id=\"color-picker-' + index + '\">';
-                                var colorPicker = document.querySelector("#" + colorPickerName)
+                                var colorPickerHTML = '<input type=\"color\" value=\"' + dataLabel + '\" id=\"color-picker\" list=\"chart-pick\"/>';
+                                colorPickerHTML += '<datalist id=\"chart-pick\">'
+                                graphColors.forEach(function (color) {
+                                    var colorHex = rgbaToHex(color);
+                                    colorPickerHTML += '<option value=\"' + colorHex + '\"/>';
+                                });
+                                colorPickerHTML += '</datalist>'
+                                tooltip.innerHTML = colorPickerHTML;
+                                // クリックイベント作成
+                                var colorPicker = document.querySelector("#color-picker");
+                                console.log(colorPicker);
                                 colorPicker.addEventListener("change", { index: index, legendItem: item, handleEvent: updateBGColorAll }, false);
+                                // カラーピッカーの位置設定
                                 var rect = e.target.getBoundingClientRect();
                                 var left = e.x - rect.left;
                                 var top = e.pageY - 100;
+                                tooltip.style.display = 'block';
                                 tooltip.style.left = left + "px";
                                 tooltip.style.top = top + "px";
 
                             // それ以外をクリックした場合
                             } else {
-                                tooltip.innerHTML = "";
+                                $('#color-picker').css('display', 'none');
                             }
                         }
 
@@ -225,19 +244,19 @@
                         // 全部のグラフの色を変更する
                         function updateBGColorAll(event) {
                             var color = event.target.value
-                            updateBGColor(arrivalChart, color);
-                            updateBGColor(departureChart, color);
-                            updateBGColor(allChart, color);
-                            updateBGColor(clearChart, color);
+                            updateBGColor(arrivalChart, color, this.index);
+                            updateBGColor(departureChart, color, this.index);
+                            updateBGColor(allChart, color, this.index);
+                            updateBGColor(clearChart, color, this.index);
                             // カラーピッカー非表示
-                            var tooltip = document.getElementById("tooltip");
-                            tooltip.innerHTML = "";
+                            $('#color-picker').innerHTML = "";
                         }
 
                         // グラフの色を変更する
-                        function updateBGColor(targetChart, color){
-                            targetChart.data.datasets[this.index].backgroundColor = color;
-                            targetChart.data.datasets[this.index].borderColor = color;
+                        function updateBGColor(targetChart, color, index){
+                            console.log(index);
+                            targetChart.data.datasets[index].backgroundColor = color;
+                            targetChart.data.datasets[index].borderColor = color;
                             targetChart.update();
                         }
 
@@ -776,34 +795,16 @@
             });
         } 
 
-        // 昼勤開始時間の線の初期化
-        arrivalChart.options.annotation.annotations = []; 
-        departureChart.options.annotation.annotations = [];
-        allChart.options.annotation.annotations = [];
-        clearChart.options.annotation.annotations = [];
-
         // 昼勤開始時間の線描画用データ作成
         var annotationLine = createChartAnnotation(dayShiftStartTime, labelAppearedTime);
         labelAppearedTime++;
 
-        // 昼勤開始時間の線追加
-        arrivalChart.options.annotation.annotations.push(annotationLine);
-        departureChart.options.annotation.annotations.push(annotationLine);
-        allChart.options.annotation.annotations.push(annotationLine);
-        clearChart.options.annotation.annotations.push(annotationLine);
 
-        // グラフのタイトル設定
-        arrivalChart.options.title.text = tripName;
-        departureChart.options.title.text = tripName; 
-        allChart.options.title.text = tripName;
-        clearChart.options.title.text = tripName;
-
-
-        // グラフの更新
-        arrivalChart.update();
-        departureChart.update();
-        allChart.update();
-        clearChart.update();
+        // 各chartjsの線、タイトルの設定とアップデート
+        setChart(arrivalChart, annotationLine, tripName);
+        setChart(departureChart, annotationLine, tripName);
+        setChart(allChart, annotationLine, tripName);
+        setChart(clearChart, annotationLine, tripName);
     }
 
     // データセットの作成、登録
@@ -846,6 +847,14 @@
         return annotationLine;
     }
 
+    // chartjsの線、タイトルの設定とアップデート
+    function setChart(targetChart, annotationLine, tripName) {
+        targetChart.options.annotation.annotations = [];
+        targetChart.options.annotation.annotations.push(annotationLine);
+        targetChart.options.title.text = tripName;
+        targetChart.update();
+    }
+
     // チェックボックス切り替え時
     $(function () {
         $('input[name="chartCheckBoxes"]:checkBox').change(function () {
@@ -853,8 +862,7 @@
             event.preventDefault();
 
             // カラーピッカーを非表示に
-            var tooltip = document.getElementById("tooltip");
-            tooltip.innerHTML = "";
+            $('#color-picker').innerHTML = "";
 
             var checkBoxVal = "";
             // 入力があるチェックボックス取得
