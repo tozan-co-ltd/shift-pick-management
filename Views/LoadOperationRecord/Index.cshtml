@@ -36,7 +36,7 @@
             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                     <span class="warehouse-name-drs">稼働日</span>
-                    <input type="text" id="workDay" class="form-control  pickerDate">
+                    <input type="text" id="workDay" class="form-control pickerDateForLoadOperationRecord">
                 </div>
             </div>
             <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedWorkDays0">
@@ -94,6 +94,16 @@
                 <p style="text-align:right">
                     縦線：昼勤開始時間
                 </p>
+
+                <div id="tooltip" style="position:absolute; display:none">
+                    @* <input type="color" id="color-picker" list="color-picker" />
+                    <datalist id="color-picker">
+                        <option>#ff0000</option>
+                        <option>#123456</option>
+                        <option>#0000ff</option>
+                    </datalist> *@
+
+                </div>
 
                 <div class="chartjs-graph chartjs-arrival" id="arrivalChart">
                     <canvas id="binedabanChartArrival"></canvas>
@@ -169,9 +179,87 @@
                                     display: true,
                                     text: '実績-荷量推移',
                                     fontSize: 30
+                                },
+                                onClick: function (e, item) {
+                                    chartClick(e, item);
                                 }
                             }
                         });
+
+                        // チャート押下時のイベント
+                        function chartClick(e, item){
+                            var tooltip = document.getElementById("tooltip");
+                            // 分布の点をクリックした場合
+                            if (item[0] != null) {
+                                // クリックした点のデータ取得
+                                var index = item[0]._datasetIndex;
+                                var dataLabelRGB = arrivalChart.data.datasets[index].backgroundColor;
+                                var dataLabel = rgbaToHex(dataLabelRGB);
+                                // カラーピッカー作成
+                                var colorPickerHTML = '<input type=\"color\" value=\"' + dataLabel + '\" id=\"color-picker\" list=\"chart-pick\"/>';
+                                colorPickerHTML += '<datalist id=\"chart-pick\">'
+                                graphColors.forEach(function (color) {
+                                    var colorHex = rgbaToHex(color);
+                                    colorPickerHTML += '<option value=\"' + colorHex + '\"/>';
+                                });
+                                colorPickerHTML += '</datalist>'
+                                tooltip.innerHTML = colorPickerHTML;
+                                // クリックイベント作成
+                                var colorPicker = document.querySelector("#color-picker");
+                                console.log(colorPicker);
+                                colorPicker.addEventListener("change", { index: index, legendItem: item, handleEvent: updateBGColorAll }, false);
+                                // カラーピッカーの位置設定
+                                var rect = e.target.getBoundingClientRect();
+                                var left = e.x - rect.left;
+                                var top = e.pageY - 100;
+                                tooltip.style.display = 'block';
+                                tooltip.style.left = left + "px";
+                                tooltip.style.top = top + "px";
+
+                            // それ以外をクリックした場合
+                            } else {
+                                $('#color-picker').css('display', 'none');
+                            }
+                        }
+
+                        // rgbaから16進数に変換
+                        function rgbaToHex(rgba) {
+                            if (/^rgba\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*(\d*(\.\d+)?)\)$/.test(rgba)) {
+                                var a = parseFloat(rgba.replace(/^rgba?\(|\s+|\)$/g, '').split(',')[3]);
+                                var r = parseInt(rgba.replace(/^rgba?\(|\s+|\)$/g, '').split(',')[0]);
+                                var g = parseInt(rgba.replace(/^rgba?\(|\s+|\)$/g, '').split(',')[1]);
+                                var b = parseInt(rgba.replace(/^rgba?\(|\s+|\)$/g, '').split(',')[2]);
+                                if (a < 1) {
+                                }
+                                r = Math.round(r * a);
+                                g = Math.round(g * a);
+                                b = Math.round(b * a);
+                                var hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                                return hex;
+                            } else {
+                                return rgba;
+                            }
+                        }
+
+                        // 全部のグラフの色を変更する
+                        function updateBGColorAll(event) {
+                            var color = event.target.value
+                            updateBGColor(arrivalChart, color, this.index);
+                            updateBGColor(departureChart, color, this.index);
+                            updateBGColor(allChart, color, this.index);
+                            updateBGColor(clearChart, color, this.index);
+                            // カラーピッカー非表示
+                            $('#color-picker').innerHTML = "";
+                        }
+
+                        // グラフの色を変更する
+                        function updateBGColor(targetChart, color, index){
+                            console.log(index);
+                            targetChart.data.datasets[index].backgroundColor = color;
+                            targetChart.data.datasets[index].borderColor = color;
+                            targetChart.update();
+                        }
+
                     </script>
                 </div>
                 <div class="chartjs-graph chartjs-departure" id="departureChart">
@@ -248,9 +336,13 @@
                                     display: true,
                                     text: '実績-荷量推移',
                                     fontSize: 30
+                                },
+                                onClick: function (e, item) {
+                                    chartClick(e, item);
                                 }
                             }
                         });
+
                     </script>
                 </div>
                 <div class="chartjs-graph chartjs-all" id="allChart">
@@ -328,6 +420,9 @@
                                     display: true,
                                     text: '実績-荷量推移',
                                     fontSize: 30
+                                },
+                                onClick: function (e, item) {
+                                    chartClick(e, item);
                                 }
                             }
                         });
@@ -407,6 +502,9 @@
                                     display: true,
                                     text: '実績-荷量推移',
                                     fontSize: 30
+                                },
+                                onClick: function (e, item) {
+                                    chartClick(e, item);
                                 }
                             }
                         });
@@ -677,25 +775,13 @@
                 })
 
 
-                // // データセット作成、登録
-                var arrivalDatasets = createChartDatasets(i);
-                arrivalDatasets.data = arrivalLoadStatuses;
-                arrivalDatasets.label = GetDayString(new Date(workDay));
-                arrivalChart.data.datasets.push(arrivalDatasets);
-
-                var departureDatasets = createChartDatasets(i);
-                departureDatasets.data = departureLoadStatuses;
-                departureDatasets.label = GetDayString(new Date(workDay));
-                departureChart.data.datasets.push(departureDatasets);
-
-                var allDatasets = createChartDatasets(i);
-                allDatasets.data = allLoadStatuses;
-                allDatasets.label = GetDayString(new Date(workDay));
-                allChart.data.datasets.push(allDatasets);
-                
-                var clearDatasets = createChartDatasets(i);
-                clearDatasets.label = GetDayString(new Date(workDay));
-                clearChart.data.datasets.push(clearDatasets);
+                // // 各チャートのデータセット作成、登録
+                var chartColor = graphColors[i];
+                var label = GetDayString(new Date(workDay));
+                createAndPushDatasets(arrivalChart, chartColor, arrivalLoadStatuses, label);
+                createAndPushDatasets(departureChart, chartColor, departureLoadStatuses, label);
+                createAndPushDatasets(allChart, chartColor, allLoadStatuses, label);
+                createAndPushDatasets(clearChart, chartColor, null, label);
                
 
             }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -709,46 +795,36 @@
             });
         } 
 
-        // 昼勤開始時間の線の初期化
-        arrivalChart.options.annotation.annotations = []; 
-        departureChart.options.annotation.annotations = [];
-        allChart.options.annotation.annotations = [];
-        clearChart.options.annotation.annotations = [];
-
         // 昼勤開始時間の線描画用データ作成
         var annotationLine = createChartAnnotation(dayShiftStartTime, labelAppearedTime);
         labelAppearedTime++;
 
-        // 昼勤開始時間の線追加
-        arrivalChart.options.annotation.annotations.push(annotationLine);
-        departureChart.options.annotation.annotations.push(annotationLine);
-        allChart.options.annotation.annotations.push(annotationLine);
-        clearChart.options.annotation.annotations.push(annotationLine);
 
-        // グラフのタイトル設定
-        arrivalChart.options.title.text = tripName;
-        departureChart.options.title.text = tripName; 
-        allChart.options.title.text = tripName;
-        clearChart.options.title.text = tripName;
+        // 各chartjsの線、タイトルの設定とアップデート
+        setChart(arrivalChart, annotationLine, tripName);
+        setChart(departureChart, annotationLine, tripName);
+        setChart(allChart, annotationLine, tripName);
+        setChart(clearChart, annotationLine, tripName);
+    }
 
-
-        // グラフの更新
-        arrivalChart.update();
-        departureChart.update();
-        allChart.update();
-        clearChart.update();
+    // データセットの作成、登録
+    function createAndPushDatasets(targetChart, color, data, label) {
+        var datasets = createChartDatasets(color);
+        datasets.data = data;
+        datasets.label = label;
+        targetChart.data.datasets.push(datasets);
     }
 
     // chartjs用のデータセット作成
-    function createChartDatasets(dataNumber) {
+    function createChartDatasets(chartColor) {
         var datasets = {
             label: '',
-            borderColor: graphColors[dataNumber],
+            borderColor: chartColor,
             fill: false,
             data: [],
             tension: 0,
             pointRadius: '5',
-            backgroundColor: graphColors[dataNumber],
+            backgroundColor: chartColor,
             spanGaps: true,
         }
         return datasets;
@@ -771,11 +847,22 @@
         return annotationLine;
     }
 
+    // chartjsの線、タイトルの設定とアップデート
+    function setChart(targetChart, annotationLine, tripName) {
+        targetChart.options.annotation.annotations = [];
+        targetChart.options.annotation.annotations.push(annotationLine);
+        targetChart.options.title.text = tripName;
+        targetChart.update();
+    }
+
     // チェックボックス切り替え時
     $(function () {
         $('input[name="chartCheckBoxes"]:checkBox').change(function () {
             // デフォルトの操作を無効化
             event.preventDefault();
+
+            // カラーピッカーを非表示に
+            $('#color-picker').innerHTML = "";
 
             var checkBoxVal = "";
             // 入力があるチェックボックス取得
