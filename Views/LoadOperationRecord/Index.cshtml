@@ -158,6 +158,7 @@
                                     }],
                                     //Y軸
                                     yAxes: [{
+                                        id: 'y軸',
                                         //軸ラベル表示
                                         scaleLabel: {
                                             display: true,
@@ -177,7 +178,7 @@
                                 },
                                 title: {
                                     display: true,
-                                    text: '実績-荷量推移',
+                                    text: '',
                                     fontSize: 30
                                 },
                                 onClick: function (e, item) {
@@ -334,7 +335,7 @@
                                 },
                                 title: {
                                     display: true,
-                                    text: '実績-荷量推移',
+                                    text: '',
                                     fontSize: 30
                                 },
                                 onClick: function (e, item) {
@@ -418,7 +419,7 @@
                                 },
                                 title: {
                                     display: true,
-                                    text: '実績-荷量推移',
+                                    text: '',
                                     fontSize: 30
                                 },
                                 onClick: function (e, item) {
@@ -500,7 +501,7 @@
                                 },
                                 title: {
                                     display: true,
-                                    text: '実績-荷量推移',
+                                    text: '',
                                     fontSize: 30
                                 },
                                 onClick: function (e, item) {
@@ -734,6 +735,11 @@
         allChart.data.datasets = [];
         clearChart.data.datasets = [];
 
+        arrivalChart.options.annotation.annotations = [];
+        departureChart.options.annotation.annotations = [];
+        allChart.options.annotation.annotations = [];
+        clearChart.options.annotation.annotations = [];
+
         // 追加された便、便枝番について
         for (var i = 0; i < arrayWorkDays.length; i++) {
             var workDay = arrayWorkDays[i];
@@ -759,6 +765,7 @@
                 response.forEach(function (loadRecord) {
                     var arrivalLoadStatus = loadRecord.arrivalLoadStatus;
                     var departureLoadStatus = loadRecord.departureLoadStatus;
+                    console.log(loadRecord.arrivalScheduledTime);
                     if (arrivalLoadStatus != "") {
                         var arrivedAt = GetTimeString(new Date(loadRecord.arrivedAt));
                         arrivalLoadStatuses.push({ x: arrivedAt, y: arrivalLoadStatus });
@@ -772,12 +779,31 @@
                     }
 
                     dayShiftStartTime = GetTimeString(new Date(loadRecord.dayShiftStartTime));
+                    // 出発、到着予定時間を取得
+                    var arrivalScheduledTime = GetTimeString(new Date(loadRecord.arrivalScheduledTime));
+                    var departureScheduledTime = GetTimeString(new Date(loadRecord.departureScheduledTime));
+                    // 到着、出発予定時刻で囲った範囲を登録
+                    var scheduleBox = createScheduleBox(arrivalScheduledTime, departureScheduledTime);
+                    // 範囲の重複チェック
+                    var duplicated = false;
+                    arrivalChart.options.annotation.annotations.forEach(function (item) {
+                        if(item.id == scheduleBox.id){
+                            duplicated = true;
+                        }
+                    });
+                    if (!duplicated) {
+                        arrivalChart.options.annotation.annotations.push(scheduleBox);
+                        departureChart.options.annotation.annotations.push(scheduleBox);
+                        allChart.options.annotation.annotations.push(scheduleBox);
+                        clearChart.options.annotation.annotations.push(scheduleBox);
+                    }
                 })
 
 
                 // // 各チャートのデータセット作成、登録
                 var chartColor = graphColors[i];
                 var label = GetDayString(new Date(workDay));
+                
                 createAndPushDatasets(arrivalChart, chartColor, arrivalLoadStatuses, label);
                 createAndPushDatasets(departureChart, chartColor, departureLoadStatuses, label);
                 createAndPushDatasets(allChart, chartColor, allLoadStatuses, label);
@@ -830,6 +856,28 @@
         return datasets;
     }
 
+
+    let scheduleBoxID = 0;
+
+    function createScheduleBox(arrivalScheduledTime, departureScheduledTime){
+        var annotationBox = {
+            type: 'box', // 矩形を指定
+            drawTime: 'afterDatasetsDraw',
+            id: arrivalScheduledTime + departureScheduledTime, // 矩形のid名を指定（他と区別するため）
+            xScaleID: 'x軸', // 基準とするx軸のid名
+            yScaleID: 'y軸',// 基準とするy軸のid名
+            xMin: arrivalScheduledTime, // 基準とするx軸の値（始点）
+            xMax: departureScheduledTime, // 基準とするx軸の値（終点）
+            yMin: 0, // 基準とするy軸の値（始点）
+            yMax: 100, // 基準とするy軸の値（終点）
+            backgroundColor: 'rgba(100,100,180,.2)',
+            borderWidth: 0,
+            borderColor: 'rgba(180,100,180,0)'
+        }
+        scheduleBoxID++;
+        return annotationBox;
+    }
+
     // chartjs用の線描画用データ作成
     function createChartAnnotation(dayShiftStartTime, labelAppearedTime){
         var annotationLine = {
@@ -849,7 +897,6 @@
 
     // chartjsの線、タイトルの設定とアップデート
     function setChart(targetChart, annotationLine, tripName) {
-        targetChart.options.annotation.annotations = [];
         targetChart.options.annotation.annotations.push(annotationLine);
         targetChart.options.title.text = tripName;
         targetChart.update();
