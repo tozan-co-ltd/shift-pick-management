@@ -87,6 +87,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         {
             var sql = $@"
                 SELECT
+	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
+	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
                     work_day,
 	                arrival_load_class,
 	                departure_load_class,

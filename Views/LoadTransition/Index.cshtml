@@ -546,15 +546,6 @@
                 // 荷量クラスをパーセントとして取得
                 var arrivalLoadStatuses = [];
                 var departureLoadStatuses = [];
-                // response.forEach(function (item) {
-                //     var workDay = GetDayStringForChart(new Date(item.workDay));
-                //     if (item.arrivalLoadStatus != "") {
-                //         arrivalLoadStatuses.push({ x: workDay, y: item.arrivalLoadStatus } );
-                //     }
-                //     if (item.departureLoadStatus != "") {
-                //         departureLoadStatuses.push({ x: workDay, y: item.departureLoadStatus } );
-                //     }
-                // })
 
                 selectedDates.forEach(function (day) {
                     if (response.find(item => GetDayStringForChart(new Date(item.workDay)) == day)) {
