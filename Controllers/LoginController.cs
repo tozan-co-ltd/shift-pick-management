@@ -77,7 +77,7 @@ namespace ai_truck_load_measurement.Controllers
                     errorCause = "入力規則エラー";
                     _logger.Error($"{errorMessage} {errorCause} 入力値:{model.LoginId}, {model.Password}");
 
-                    return View();
+                    return View(model);
                 }
 
                 // 現在時刻取得
@@ -121,7 +121,7 @@ namespace ai_truck_load_measurement.Controllers
                 var exceptionMessage = ex.Message;
                 _logger.Error($"{exceptionMessage} {errorMessage}");
 
-                return View();
+                return View(model);
             }
         }
 
