@@ -29,10 +29,10 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// トップ画面表示
         /// </summary>
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             // トップ画面モデル取得
-            TopModel topModel = GetTopModel();
+            TopModel topModel = await GetTopModel();
             return View(topModel);
         }
 
@@ -40,7 +40,7 @@ namespace ai_truck_load_measurement.Controllers
         /// トップ画面モデル取得
         /// </summary>
         /// <returns></returns>
-        public TopModel GetTopModel()
+        public async Task<TopModel> GetTopModel()
         {
             TopModel topModel = new();
             try
@@ -64,7 +64,7 @@ namespace ai_truck_load_measurement.Controllers
                     }
                 }
                 // 取得値の変換
-                topModelList = ConversionOfGetValues(topModelList);
+                topModelList = await ConversionOfGetValues(topModelList);
                 // ステーションの画像取得
                 topModelList = GetStationImage(topModelList);
                 topModel.TopModelList = topModelList;
@@ -83,7 +83,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="models">対象のトップ画面モデルリスト</param>
         /// <returns></returns>
-        private List<TopModel> ConversionOfGetValues(List<TopModel> models)
+        private async Task<List<TopModel>> ConversionOfGetValues(List<TopModel> models)
         {
             foreach (var model in models)
             {
@@ -101,6 +101,11 @@ namespace ai_truck_load_measurement.Controllers
                     truckStatus = ($"{lowerLimit}-{upperLimit}%");
                 }
                 model.TruckStatus = truckStatus;
+                var imagePathEnd = 29 + model.StationID;
+                var imagePath = ($"http://192.168.17.{imagePathEnd}/jpg/image.jpg");
+                var test = await GetImageAPI(imagePath);
+                //model.ImageBase64 = imagePath64;
+
             }
             return models;
         }
@@ -164,6 +169,11 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-
+        public async Task<IActionResult> GetImageAPI(string imagePath) { 
+            var client = new HttpClient();
+            var result = await client.GetAsync(imagePath);
+            var json = await result.Content.ReadAsStringAsync();
+            return Json(json);
+        }
     }
 }
