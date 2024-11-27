@@ -368,7 +368,7 @@ namespace ai_truck_load_measurement.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 初期値でクリックした場合は何も起こらない
-                if (loadStatus == 0 || (user.UserName != "服部　正次" && user.UserName != "林　恭佑"))
+                if (loadStatus == 0)
                 {
                     return NotFound();
                 }
