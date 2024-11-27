@@ -565,9 +565,10 @@
 
 <script>
     let model;
-
+    let userName = "";
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
+        userName = model.userName;
         var today = new Date();
         $('#workDay').val(GetDayString(today));
         var y = today.getFullYear();
@@ -1091,25 +1092,30 @@
                         + "</tr><tr>"
                         + "<td>荷量の相違あり</td>"
                         + "<td>"
-                        + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">"
-                        + "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" id=\"loadStatusSelect\" >"
-                        + "<option value=\"\" hidden></option>"
-                        + "<option value=\"1\">0%</option>"
-                        + "<option value=\"3\">1-10%</option>"
-                        + "<option value=\"4\">11-20%</option>"
-                        + "<option value=\"5\">21-30%</option>"
-                        + "<option value=\"6\">31-40%</option>"
-                        + "<option value=\"7\">41-50%</option>"
-                        + "<option value=\"8\">51-60%</option>"
-                        + "<option value=\"9\">61-70%</option>"
-                        + "<option value=\"10\">71-80%</option>"
-                        + "<option value=\"11\">81-90%</option>"
-                        + "<option value=\"12\">91-100%</option>"
-                        + "</select>"
-                        + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "')\" id=\"verificationRequired\">"
-                        + "<span class=\"text\">要検証</span>"
-                        + "</a>"
-                        + "</div>"
+                        + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">";
+                    if (!(userName == "服部 正次" || userName == "林 恭佑")) {
+                        tr += "<label id=\"loadStatusSelect\" ></label>";
+                    } else {
+                        tr += "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" id=\"loadStatusSelect\" >"
+                            + "<option value=\"\" hidden></option>"
+                            + "<option value=\"1\">0%</option>"
+                            + "<option value=\"3\">1-10%</option>"
+                            + "<option value=\"4\">11-20%</option>"
+                            + "<option value=\"5\">21-30%</option>"
+                            + "<option value=\"6\">31-40%</option>"
+                            + "<option value=\"7\">41-50%</option>"
+                            + "<option value=\"8\">51-60%</option>"
+                            + "<option value=\"9\">61-70%</option>"
+                            + "<option value=\"10\">71-80%</option>"
+                            + "<option value=\"11\">81-90%</option>"
+                            + "<option value=\"12\">91-100%</option>"
+                            + "</select>"
+                            + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "')\" id=\"verificationRequired\">"
+                            + "<span class=\"text\">要検証</span>"
+                            + "</a>";
+                    }
+
+                    tr += "</div>"
                         + "</td>"
                         + "</tr><tr>"
                         + "<td>便名称_便枝番</td>"
@@ -1134,7 +1140,15 @@
                         + "<td>" + arriveOrDepartureDate + "</td>"
                         + "</tr>";
                     container.append(tr);
-                    $('#loadStatusSelect').val(response.annotationLoadClass);
+                    console.log(data);
+                    if (userName == "服部 正次" || userName == "林 恭佑") {
+                        $('#loadStatusSelect').val(response.annotationLoadClass);
+                    } else if (response.annotationLoadStatus != null) {
+                        $('#loadStatusSelect').text(response.annotationLoadStatus + "%");
+                    } else {
+                        $('#loadStatusSelect').text("-");
+                    }
+
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                     if (jqXHR.status === 404) {
                         var errorMessage = jqXHR.responseJSON.errorMessage;
