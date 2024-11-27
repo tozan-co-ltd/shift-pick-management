@@ -178,6 +178,8 @@ namespace ai_truck_load_measurement.Controllers
             {
                 var annotationLoadClass = LoadRecordConnectController.GetAnnotationLoadClassByTripRecordIDAndIsArrived(model.TripRecordID, isArrived);
                 model.AnnotationLoadClass = annotationLoadClass;
+                var annotationLoadStatus = ConversionLoadClassToLoadStatus(annotationLoadClass);
+                model.AnnotationLoadStatus = annotationLoadStatus;
             }
 
             // ステーションの画像取得
@@ -362,14 +364,14 @@ namespace ai_truck_load_measurement.Controllers
             NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
             try
             {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
                 // 初期値でクリックした場合は何も起こらない
                 if (loadStatus == 0)
                 {
                     return NotFound();
                 }
-
-                // ログイン中ユーザー情報取得
-                var user = ClaimsLoginUserData();
 
                 // 「荷量の相違あり」で保存した値が既に存在するか
                 var isSameAnnotationLoadsExist = LoadRecordConnectController.IsSameAnnotationLoadsExist(tripRecordID, isArrived);

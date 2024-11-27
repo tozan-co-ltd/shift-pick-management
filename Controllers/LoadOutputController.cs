@@ -23,6 +23,9 @@ namespace ai_truck_load_measurement.Controllers
             // 戻り値
             LoadOutputModel model = new();
 
+            // ログイン中ユーザー情報取得
+            var user = ClaimsLoginUserData();
+            model.UserName = user.UserName;
             try
             {
                 // 便実績情報取得SQL作成
