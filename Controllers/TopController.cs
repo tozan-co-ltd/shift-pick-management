@@ -11,6 +11,7 @@ using System.IO;
 using System.Drawing;
 using System;
 using SixLabors.ImageSharp.Formats;
+using System.Collections;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -101,11 +102,13 @@ namespace ai_truck_load_measurement.Controllers
                     truckStatus = ($"{lowerLimit}-{upperLimit}%");
                 }
                 model.TruckStatus = truckStatus;
-                var imagePathEnd = 29 + model.StationID;
-                var imagePath = ($"http://192.168.17.{imagePathEnd}/jpg/image.jpg");
-                var test = await GetImageAPI(imagePath);
-                //model.ImageBase64 = imagePath64;
 
+                // 表示する画像をAPIから取得してbase64に変換
+                var urlEnd = 29 + model.StationID;
+                var imageUrl = ($"http://root:password@192.168.17.{urlEnd}/jpg/image.jpg");
+                var imagePath64 = await GetImageBase64FromAPI(imageUrl);
+                model.ImageBase64 = "data:image/jpeg;base64," + imagePath64;
+                model.UpdatedAt = DateTime.Now;
             }
             return models;
         }
@@ -169,11 +172,36 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-        public async Task<IActionResult> GetImageAPI(string imagePath) { 
-            var client = new HttpClient();
-            var result = await client.GetAsync(imagePath);
-            var json = await result.Content.ReadAsStringAsync();
-            return Json(json);
+        /// <summary>
+        /// 画像をAPIから取得する
+        /// </summary>
+        /// <param name="url">APIのurl</param>
+        /// <returns></returns>
+        public async Task<string> GetImageBase64FromAPI(string url) { 
+            var client = GetDigestClient(url);
+            var result = await client.GetAsync(url);
+            var imageBytes = await result.Content.ReadAsByteArrayAsync();
+            return Convert.ToBase64String(imageBytes);
+        }
+
+        /// <summary>
+        /// HttpClientにダイジェスト認証を設定する
+        /// </summary>
+        /// <param name="url">digest認証のurl</param>
+        /// <returns></returns>
+        private HttpClient GetDigestClient(string url)
+        {
+            //'CredentialCacheの作成
+            var cache = new System.Net.CredentialCache();
+            //'Digest認証の情報を追加
+            cache.Add(new Uri(url), "Digest", new System.Net.NetworkCredential("root", "password"));
+
+            var myClientHandler = new HttpClientHandler();
+            myClientHandler.Credentials = cache;
+
+            var client = new HttpClient(myClientHandler);
+            client.Timeout = new TimeSpan(0, 0, 0, 0, 5000);
+            return client;
         }
     }
 }

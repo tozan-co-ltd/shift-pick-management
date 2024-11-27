@@ -49,9 +49,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 SELECT 
 	                station_id,
-	                load_class,
-	                image_base64,
-	                updated_at
+	                load_class
                 FROM t_tmp_station_status
             ";
             return sql;
