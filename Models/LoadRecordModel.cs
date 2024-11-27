@@ -54,6 +54,8 @@ namespace ai_truck_load_measurement.Models
         public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
         // 訂正後荷量クラス
         public int AnnotationLoadClass { get; set; }
+        // 訂正後荷量の%表示
+        public string? AnnotationLoadStatus { get; set; }
         // 到着か出発か
         public string? ArrivalDepartureClass { get; set; }
         // 便名称のリスト
@@ -62,5 +64,7 @@ namespace ai_truck_load_measurement.Models
         public string? SelectedTripName { get; set; }
         // 昼勤開始時間
         public DateTime? DayShiftStartTime { get; set; }
+        // ユーザー名
+        public string? UserName {  get; set; }
     }
 }
