@@ -104,8 +104,7 @@ namespace ai_truck_load_measurement.Controllers
                 model.TruckStatus = truckStatus;
 
                 // 表示する画像をAPIから取得してbase64に変換
-                var urlEnd = 29 + model.StationID;
-                var imageUrl = ($"http://root:password@192.168.17.{urlEnd}/jpg/image.jpg");
+                var imageUrl = ($"http://root:password@{model.IPAdress}/jpg/image.jpg");
                 var imagePath64 = await GetImageBase64FromAPI(imageUrl);
                 model.ImageBase64 = "data:image/jpeg;base64," + imagePath64;
                 model.UpdatedAt = DateTime.Now;

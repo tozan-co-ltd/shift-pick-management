@@ -48,8 +48,9 @@ namespace ai_truck_load_measurement.ConnectControllers
         {
             var sql = $@"
                 SELECT 
-                     detect_records.station_id,
-                     load_class
+                    detect_records.station_id,
+                    load_class,
+                    ip_adress
                  FROM t_load_detect_records AS detect_records
                  JOIN (
                     SELECT station_id, MAX(created_at) AS latest_create
@@ -58,6 +59,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ) latest_detect_records
                 ON detect_records.station_id = latest_detect_records.station_id 
                 AND detect_records.created_at = latest_detect_records.latest_create
+                JOIN m_devices
+                ON detect_records.station_id = m_devices.station_id
             ";
             return sql;
         }

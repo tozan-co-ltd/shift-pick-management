@@ -21,5 +21,7 @@ namespace ai_truck_load_measurement.Models
         public List<TopModel>? TopModelList { get; set; }
         // トラックの状況
         public string? TruckStatus {  get; set; }
+        // 画像取得先APIのIPアドレス
+        public string? IPAdress {  get; set; }
     }
 }
