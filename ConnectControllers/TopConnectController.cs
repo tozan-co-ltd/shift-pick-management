@@ -48,11 +48,19 @@ namespace ai_truck_load_measurement.ConnectControllers
         {
             var sql = $@"
                 SELECT 
-	                station_id,
-	                load_class,
-	                image_base64,
-	                updated_at
-                FROM t_tmp_station_status
+                    detect_records.station_id,
+                    load_class,
+                    ip_adress
+                 FROM t_load_detect_records AS detect_records
+                 JOIN (
+                    SELECT station_id, MAX(created_at) AS latest_create
+                    FROM t_load_detect_records
+                    GROUP BY station_id
+                ) latest_detect_records
+                ON detect_records.station_id = latest_detect_records.station_id 
+                AND detect_records.created_at = latest_detect_records.latest_create
+                JOIN m_devices
+                ON detect_records.station_id = m_devices.station_id
             ";
             return sql;
         }
@@ -71,9 +79,9 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                SELECT station_id, MAX(created_at) AS latest_create
 	                FROM t_truck_sensor_records
 	                GROUP BY station_id
-                ) latest_detect_recprds
-                ON truck_sensor_records.station_id = latest_detect_recprds.station_id 
-                AND truck_sensor_records.created_at = latest_detect_recprds.latest_create
+                ) latest_detect_records
+                ON truck_sensor_records.station_id = latest_detect_records.station_id 
+                AND truck_sensor_records.created_at = latest_detect_records.latest_create
             ";
             return sql;
         }
