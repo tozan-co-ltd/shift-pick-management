@@ -109,7 +109,8 @@
         {
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
-        <p class="mb-2 top-title">SyncBace ステーション状況</p>
+        <p class="mb-3 top-title">SyncBace ステーション状況</p>
+        <p class="mb-2" id="updateAt">更新日時:@DateTime.Now.ToString("yyyy/MM/dd hh:mm")</p>
         <button class="btn btn-update" onclick="onUpdateClick()" id="updateStation">更新</button>
 
         <div id="cardlayout-wrap">
@@ -119,21 +120,18 @@
                 <h2 class="card-title" id="card-title1">停車</h2>
                 <p class="truck-status" id="truck-status1">11~20%</p>
                 <figure class="card-figure"><img src="" id="image1"></figure>
-                <p class="created-at mb-3" id="created-at1">登録日時：</p>
             </section>
             <section class="card-list">
                 <p class="station-number">ステーション2</p>
                 <h2 class="card-title" id="card-title2">停車</h2>
                 <p class="truck-status" id="truck-status2">11~20%</p>
                 <figure class="card-figure"><img src="" id="image2"></figure>
-                <p class="created-at mb-3" id="created-at2">登録日時：</p>
             </section>
             <section class="card-list">
                 <p class="station-number">ステーション3</p>
                 <h2 class="card-title" id="card-title3">停車</h2>
                 <p class="truck-status" id="truck-status3">11~20%</p>
                 <figure class="card-figure"><img src="" id="image3"></figure>
-                <p class="created-at mb-3" id="created-at3">登録日時：</p>
             </section>
         </div>
             <!-- カードレイアウトをラッピング -->
@@ -147,6 +145,8 @@
     });
 
     function viewCards(top_model) {
+        var now = GetDateString(new Date());
+        $('#updateAt').text("更新日時:" + now);
         for (var i = 1; i <= 3; i++) {
             var cardModel = top_model.topModelList.find(x => x.stationID == i);
             if (cardModel.truckExist) {
@@ -161,9 +161,6 @@
             $('#truck-status' + i).text(cardModel.truckStatus);
             
             $('#image' + i).attr("src", cardModel.imageBase64);
-
-            var updatedAt = GetDateString(new Date(cardModel.updatedAt));
-            $('#created-at' + i).text("取得日時：" + updatedAt);
         }
     }
 
@@ -179,7 +176,6 @@
             url: url,
             method: method
         }).done(function (response) {
-            console.log(response);
             viewCards(response);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {

@@ -13,8 +13,6 @@ namespace ai_truck_load_measurement.Models
         public int LoadClass {  get; set; }
         // base64画像
         public string ImageBase64 { get; set; }
-        // 更新日時
-        public DateTime UpdatedAt { get; set; }
         // 車両の存在有無
         public bool TruckExist {  get; set; }
         // トップ画面モデルリスト
