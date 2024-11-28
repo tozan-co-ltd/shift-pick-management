@@ -152,16 +152,22 @@ namespace ai_truck_load_measurement.Controllers
 
 
         /// <summary>
-        /// Base64でデコードできるか判定する
+        /// Base64でデコード、その後画像に変換できるか判定する
         /// </summary>
         /// <param name="imageBase64">Base64変換文字列</param>
         /// <returns></returns>        
         public bool CanDecodeImageBase64(string imageBase64)
-        {   
+        {
             try
             {
+                // Base64でデコードできるか
                 string base64String = imageBase64.Split(',')[1];
                 byte[] imageBytes = Convert.FromBase64String(base64String);
+                // デコードしたものを画像に変換できるか
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    Image image = Image.FromStream(ms);
+                }
                 return true;
             }
             catch (Exception)
@@ -175,7 +181,8 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="url">APIのurl</param>
         /// <returns></returns>
-        public async Task<string> GetImageBase64FromAPI(string url) { 
+        public async Task<string> GetImageBase64FromAPI(string url)
+        {
             var client = GetDigestClient(url);
             var result = await client.GetAsync(url);
             var imageBytes = await result.Content.ReadAsByteArrayAsync();
