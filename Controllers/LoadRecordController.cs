@@ -328,7 +328,7 @@ namespace ai_truck_load_measurement.Controllers
                             </td>
                             <td>
                                 <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                    onclick=""OnDepartureLoadImageClick('{item.TripRecordID}', this, '{page}'"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                    onclick=""OnDepartureLoadImageClick('{item.TripRecordID}', this, '{page}')"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
                                     <i class=""fa-solid fa-truck""></i>
                                 </a>
                             </td>
