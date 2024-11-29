@@ -104,7 +104,7 @@ namespace ai_truck_load_measurement.Controllers
             {
                 // 指定した期間の便マスター情報取得SQL作成
                 var sql = LoadDistributionConnectController.CreateSQLToSelectLoadClassFromSearchConditionsForTable(models, startOfPeriod, endOfPeriod, minLoadClass, maxLoadClass);
-                var searchedTripRecordListModel = LoadRecordController.SearchData(sql);
+                var searchedTripRecordListModel = LoadRecordController.SearchData(sql, "LoadDistribution");
 
                 return Json(searchedTripRecordListModel);
             }

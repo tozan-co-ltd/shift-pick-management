@@ -145,7 +145,7 @@ async function onExportFile(page, gamenName) {
 function onExportFileTripsCommon(page, data) {
 
     // フォーム情報取得
-    let url = window.location.origin + '/' + page + '/ExportFile';
+    let url = window.location.href + '/ExportFile';
     let method = 'Post';
     tableDisplay(page);
     event.preventDefault();
@@ -315,7 +315,7 @@ let tableLength = 0;
 let arrayTrs = [];
 
 // 到着荷量画像ボタン押下
-function OnArrivalLoadImageClick(tripRecordID, button) {
+function OnArrivalLoadImageClick(tripRecordID, button, page) {
     // 配列の初期化
     arrayTrs = [];
     // 到着
@@ -325,11 +325,11 @@ function OnArrivalLoadImageClick(tripRecordID, button) {
     for (i = 0; i < trs.length - tableLength; i++) {
         arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
     }
-    EditModal(tripRecordID, isArrived);
+    EditModal(tripRecordID, isArrived, page);
 }
 
 // 出発荷量画像ボタン押下
-function OnDepartureLoadImageClick(tripRecordID, button) {
+function OnDepartureLoadImageClick(tripRecordID, button, page) {
     // 配列の初期化
     arrayTrs = [];
     // 出発
@@ -339,7 +339,7 @@ function OnDepartureLoadImageClick(tripRecordID, button) {
     for (i = 0; i < trs.length - tableLength; i++) {
         arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
     }
-    EditModal(tripRecordID, isArrived);
+    EditModal(tripRecordID, isArrived, page);
 }
 
 // 荷量画像モーダル作成
@@ -407,12 +407,12 @@ function EditModal(tripRecordID, isArrived, page) {
                 buttons.empty();
                 let div = "<div class=\"d-flex xs-block justify-content-start align-items-center p-0 mb-2 trip-record-buttons\">"
                     + "<div class=\"input-group-append mr-3\" >"
-                    + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherModalClick('" + previousTripRecordID + "','" + isArrived + "')\" >"
+                    + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherModalClick('" + previousTripRecordID + "','" + isArrived + "','" + page + "')\" >"
                     + "<span class=\"text\" >▲上へ</span>"
                     + "</a>"
                     + "</div>"
                     + "<div class=\"input-group-append mr-3\" >"
-                    + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherModalClick('" + nextTripRecordID + "','" + isArrived + "')\" >"
+                    + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherModalClick('" + nextTripRecordID + "','" + isArrived + "','" + page + "')\" >"
                     + "<span class=\"text\" >▼下へ</span>"
                     + "</a>"
                     + "</div>"
@@ -453,7 +453,7 @@ function EditModal(tripRecordID, isArrived, page) {
                         + "<option value=\"11\">81-90%</option>"
                         + "<option value=\"12\">91-100%</option>"
                         + "</select>"
-                        + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "')\" id=\"verificationRequired\">"
+                        + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "', '" + page + "')\" id=\"verificationRequired\">"
                         + "<span class=\"text\">要検証</span>"
                         + "</a>";
                 }
@@ -506,27 +506,26 @@ function EditModal(tripRecordID, isArrived, page) {
 }
 
 // モーダル内の「上へ」「下へ」ボタン押下時
-function onOtherModalClick(otherTripRecordID, isArrived) {
+function onOtherModalClick(otherTripRecordID, isArrived, page) {
     event.preventDefault();
     if (isArrived == "true") {
         isArrived = true;
     } else {
         isArrived = false;
     }
-    EditModal(otherTripRecordID, isArrived);
+    EditModal(otherTripRecordID, isArrived, page);
 }
 
 // 要検証ボタン押下時
-function onVerificationRequiredClick(tripRecordID, isArrived) {
+function onVerificationRequiredClick(tripRecordID, isArrived, page) {
     event.preventDefault();
     var loadStatus = $('[name=loadStatusSelect]').val();
     if (loadStatus != "") {
 
-        DeleteErrorMessages();
-
-
+        DeleteErrorMessages()
         // フォーム情報取得
-        let url = window.location.origin + '/LoadRecord/InsertOrUpdateAnnotationLoads';
+        let url = window.location.href + '/InsertOrUpdateAnnotationLoads';
+        url = url.replace(page, 'LoadRecord');
         let method = 'POST';
         let data = { tripRecordID: tripRecordID, loadStatus: loadStatus, isArrived: isArrived };
 
@@ -572,7 +571,7 @@ function isWithin90Days() {
 function tableDisplayCommon(page, data) {
 
     // フォーム情報取得
-    let url = window.location.origin + '/' + page + '/SearchData';
+    let url = window.location.href + '/SearchData';
     let method = 'Post';
 
     // Ajax call

@@ -90,7 +90,7 @@ namespace ai_truck_load_measurement.Controllers
             {
                 // 指定した期間の便マスター情報取得SQL作成
                 var sql = LoadTransitionConnectController.CreateSQLToSelectLoadClassFromSearchConditionsForTable(models, startOfPeriod, endOfPeriod);
-                var searchedTripRecordListModel = LoadRecordController.SearchData(sql);
+                var searchedTripRecordListModel = LoadRecordController.SearchData(sql, "LoadTransition");
 
                 return Json(searchedTripRecordListModel);
             }
