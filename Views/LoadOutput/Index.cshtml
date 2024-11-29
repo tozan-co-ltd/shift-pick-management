@@ -43,9 +43,9 @@
         </div>
 
         <div class="mb-3">
-            <label><input type="checkbox" class=" mr-2" id="LoadOutputCheckBox" />荷量の相違あり</label>
-            <label><input type="checkbox" class="ml-3 mr-2" id="LoadOutputCheckBox" />便名称あり</label>
-            <label><input type="checkbox" class="ml-3 mr-2" id="LoadOutputCheckBox" />識別番号あり</label>
+            <label><input type="checkbox" class=" mr-2" id="isOnlyHasAmountDefference" />荷量の相違あり</label>
+            <label><input type="checkbox" class="ml-3 mr-2" id="hasTripName" />便名称あり</label>
+            <label><input type="checkbox" class="ml-3 mr-2" id="hasIdentifyNumber" />識別番号あり</label>
         </div>
 
         <div class="mg-bot-20">
@@ -150,16 +150,21 @@
     // 便実績テーブル表示
     function tableDisplay(page) {
         // チェックボックスの入力情報取得
-        var checkBox = false;
-        $('input:checked').each(function () {
-            checkBox = $(this).prop('checked');
-        });
+        var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+        var hasTripName = $('#hasTripName')[0].checked;
+        var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
+
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
         // テーブル表示用データ作成
-        let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, isOnlyHasAmountDefference: checkBox };
+        let data = { startOfPeriod: startOfPeriod,
+            endOfPeriod: endOfPeriod, 
+            isOnlyHasAmountDefference: isOnlyHasAmountDefference, 
+            hasTripName: hasTripName,
+            hasIdentifyNumber: hasIdentifyNumber
+        };
 
         tableDisplayCommon(page, data);
     }
@@ -170,10 +175,9 @@
         if (isWithin90Days()) {
 
             // チェックボックスの入力情報取得
-            var checkBox = false;
-            $('input:checked').each(function () {
-                checkBox = $(this).prop('checked');
-            });
+            var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+            var hasTripName = $('#hasTripName')[0].checked;
+            var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
 
             // 期間の開始、終了日付の取得
             var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
@@ -184,7 +188,9 @@
                 "gamenName": gamenName,
                 "startofPeriod": startOfPeriod,
                 "endOfPeriod": endOfPeriod,
-                "isOnlyHasAmountDefference": checkBox,
+                "isOnlyHasAmountDefference": isOnlyHasAmountDefference,
+                hasTripName: hasTripName,
+                hasIdentifyNumber: hasIdentifyNumber
             };
 
             // Excel出力共通処理
@@ -203,15 +209,21 @@
         DeleteErrorMessages();
         if (isWithin90Days()) {
             // チェックボックスの入力情報取得
-            var checkBox = false;
-            $('input:checked').each(function () {
-                checkBox = $(this).prop('checked');
-            });
+            var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+            var hasTripName = $('#hasTripName')[0].checked;
+            var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
             // 期間の開始、終了日付の取得
             var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
-            let data = { download: "download", startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, isOnlyHasAmountDefference: checkBox };
+            let data = { 
+                download: "download", 
+                startOfPeriod: startOfPeriod, 
+                endOfPeriod: endOfPeriod, 
+                isOnlyHasAmountDefference: isOnlyHasAmountDefference,
+                hasTripName: hasTripName,
+                hasIdentifyNumber: hasIdentifyNumber
+            };
 
             onExportAllImagesCommon(page, data);
         }
