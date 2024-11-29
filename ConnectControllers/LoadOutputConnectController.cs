@@ -50,7 +50,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreatSQLToSelectTripRecordFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference)
+        public static string CreatSQLToSelectTripRecordFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference, bool hasTripName, bool hasIdentifyNumber)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
@@ -87,8 +87,17 @@ namespace ai_truck_load_measurement.ConnectControllers
                 FROM t_trip_records";
             }
             sql += $@"
-                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
-                ORDER BY arrived_at";
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
+            if (hasTripName)
+            {
+                sql += $@"
+                AND NOT trip_name IS NULL";
+            }
+            if (hasIdentifyNumber)
+            {
+                sql += $@"
+                AND NOT identify_number IS NULL";
+            }
             return sql;
         }
 
@@ -99,7 +108,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreatSQLToSelectTripRecordForImage(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference)
+        public static string CreatSQLToSelectTripRecordForImage(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference, bool hasTripName, bool hasIdentifyNumber)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
@@ -137,8 +146,19 @@ namespace ai_truck_load_measurement.ConnectControllers
                 FROM t_trip_records";
             }
             sql += $@"
-                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
-                ORDER BY arrived_at";
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
+            if (hasTripName)
+            {
+                sql += $@"
+                AND NOT trip_name IS NULL";
+            }
+            if (hasIdentifyNumber)
+            {
+                sql += $@"
+                AND NOT identify_number IS NULL";
+            }
+            sql += $@"
+            ORDER BY arrived_at";
             return sql;
         }
 
@@ -149,7 +169,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectTripRecordForDataTable(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference)
+        public static string CreateSQLToSelectTripRecordForDataTable(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference, bool hasTripName, bool hasIdentifyNumber)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
@@ -186,9 +206,20 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
 
             sql += $@"
-                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
-                ORDER BY trip_name, work_day, trip_branch_seq
-";
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
+            if (hasTripName)
+            {
+                sql += $@"
+                AND NOT trip_name IS NULL";
+            }
+            if (hasIdentifyNumber)
+            {
+                sql += $@"
+                AND NOT identify_number IS NULL";
+            }
+            sql += $@"
+            ORDER BY trip_name, work_day, trip_branch_seq
+            ";
             return sql;
         }
 
