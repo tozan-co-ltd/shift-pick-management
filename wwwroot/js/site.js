@@ -223,47 +223,6 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect, isNotReload
 //--------------------------------------------------------//
 
 
-// 入力必須項目チェック
-function CheckPairValueMSupplierKanban(id1, id2, required = false) {
-    var checkFlag = true;
-    var length = $("#" + id1);
-    var startIndex = $("#" + id2);
-    var lengthValue = parseInt(length.val(), 10);
-    var startIndexValue = parseInt(startIndex.val(), 10);
-
-    // 空白の場合は0に変換
-    if (Number.isNaN(lengthValue)) {
-        length.val(0);
-    }
-    if (Number.isNaN(startIndexValue)) {
-        startIndex.val(0);
-    }
-
-    // どちらかが0の場合はエラー
-    if (lengthValue > 0 && (startIndexValue <= 0 || Number.isNaN(startIndexValue))) {
-        startIndex.addClass("input-validation-error");
-        checkFlag = false;
-    }
-    if ((lengthValue <= 0 || Number.isNaN(lengthValue)) && startIndexValue > 0) {
-        length.addClass("input-validation-error");
-        checkFlag = false;
-    }
-
-    // 必須項目が0未満の場合はエラー
-    if (required) {
-        if (Number.isNaN(lengthValue) || lengthValue <= 0) {
-            length.addClass("input-validation-error");
-            checkFlag = false;
-        }
-        if (Number.isNaN(startIndexValue) || startIndexValue <= 0) {
-            startIndex.addClass("input-validation-error");
-            checkFlag = false;
-        }
-    }
-    return checkFlag;
-}
-//--------------------------------------------------------//
-
 //------------------- バリデーションチェック ------------------//
 // 小数点とMaxLengthチェック
 function CheckInputNumber() {
