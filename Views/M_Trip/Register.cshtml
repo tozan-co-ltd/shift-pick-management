@@ -129,7 +129,6 @@
         // M_TripModel取得
         var tripModel = @Html.Raw(Json.Serialize(Model));
         getIdentifyNumber(tripModel.truckID);
-        console.log(tripModel);
         if (tripModel.truckID == 0) {
             $('#DayShiftStartTime').val("");
             $('#ApplicableStartDateTime').val("");
@@ -141,19 +140,6 @@
             $('#DayShiftStartTime').val(startTimeHHmm);
         }
     })
-
-    // 時刻の表示形式変換(HH:mm)
-    function GetTimeString(date) {
-        var hour = date.getHours();
-        if (hour < 10) {
-            hour = "0" + hour;
-        }
-        var minute = date.getMinutes();
-        if (minute < 10) {
-            minute = "0" + minute;
-        }
-        return hour + ":" + minute;
-    }
 
     // 識別番号取得、反映処理
     function getIdentifyNumber(truckID) {
@@ -174,7 +160,6 @@
             data: data
         }).done(function (response) {
             $('#identifyNumber').val(response);
-            console.log(response);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -190,8 +175,6 @@
     function OnRegister() {
 
         var form = $("#mTripForm");
-
-
 
         form.submit(function (event) {
 
@@ -219,7 +202,6 @@
                 // 完了モーダル表示
                 AlertMessage('', '完了', '登録が完了しました。', null, null);
             }).fail(function (jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR);
                 if (jqXHR.status === 404) {
                     // データが見つからなかった場合
                     var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -236,7 +218,6 @@
     // 車両番号選択時の処理
     $('[name=TruckID]').change(function () {
         var truckID = $('[name=TruckID]').val();
-        console.log(truckID);
         getIdentifyNumber(truckID);
     });
 </script>

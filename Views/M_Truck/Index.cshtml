@@ -253,7 +253,6 @@
 
     // 削除ボタン押下
     function OnDeleteClick(truckID) {
-        console.log("OnDeleteClick", truckID)
         // M_TruckModel取得
         var truckModel = @Html.Raw(Json.Serialize(Model));
         truckModel.m_TruckList.forEach(function (item) {
@@ -295,12 +294,4 @@
         });
     }
 
-    // エラーメッセージ削除
-    function DeleteErrorMessages() {
-        $('#div-error-message').text('');
-        $('#edit-modal-error-message').text('');
-        $('#delete-modal-error-message').text('');
-        $('.text-danger').text('');
-        $('input').removeClass('input-validation-error');
-    }
 </script>

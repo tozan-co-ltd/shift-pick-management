@@ -170,7 +170,6 @@
 
 <script>
     // 画面ロード時
-    let model;
     $(document).ready(function () {
         // 今日の日付を取得
         var today = new Date();
@@ -321,30 +320,6 @@
             }
         });
     }
-
-    // 時刻の表示形式変換(HH:mm)
-    function GetTimeString(date) {
-        var hour = date.getHours();
-        if (hour < 10) {
-            hour = "0" + hour;
-        }
-        var minute = date.getMinutes();
-        if (minute < 10) {
-            minute = "0" + minute;
-        }
-        return hour + ":" + minute;
-    }
-
-    // 日付の表示形式変換(yyyy/MM/dd hh:mm)
-    function GetDateString(date) {
-        var day = date.toLocaleDateString("ja-JP", {
-            year: "numeric", month: "2-digit",
-            day: "2-digit"
-        });
-        var time = GetTimeString(date);
-        return day + " " + time;
-    }
-
     // 更新ボタン押下
     function OnExecuteEdit() {
         $('#mTripBranchNumberForm').submit(function (event) {
@@ -381,15 +356,6 @@
                 }
             });
         });
-    }
-
-    // エラーメッセージ削除
-    function DeleteErrorMessages() {
-        $('#div-error-message').text('');
-        $('#edit-modal-error-message').text('');
-        $('#delete-modal-error-message').text('');
-        $('.text-danger').text('');
-        $('input').removeClass('input-validation-error');
     }
 
     // 基準日時変更時
