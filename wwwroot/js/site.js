@@ -353,7 +353,8 @@ function EditModal(tripRecordID, isArrived, page) {
         if (item.tripRecordID == tripRecordID) {
 
             // フォーム情報取得
-            let url = window.location.origin + '/LoadRecord/GetModalItems';
+            let url = window.location.href + '/GetModalItems';
+            url = url.replace(page, 'LoadRecord');
             let method = 'POST';
             let data = { model: item, isArrived: isArrived };
 
