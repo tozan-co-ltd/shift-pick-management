@@ -789,3 +789,12 @@ function onLabelDeleteClick(selectedTripName) {
         pushLabelToSelectedTrips(selectedTrips, selectedTripName);
     }
 }
+
+// 追加した選択肢の一括クリアボタン押下時
+function clearTrips() {
+    event.preventDefault();
+    // ラベルと配列から全削除
+    $('.selected-trip-label').remove();
+    arrayTrips = [];
+    arrayWorkDays = [];
+}
