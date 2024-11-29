@@ -673,7 +673,7 @@
     function pushLabelToSelectedWorkDays(selectedWorkDays, workDay) {
         var selectedWorkDayLabel = document.createElement("label");
         selectedWorkDayLabel.innerText = workDay;
-        selectedWorkDayLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1\" onclick=\"onLabelDeleteClick('" + workDay + "')\" id=\"\">×</a>";
+        selectedWorkDayLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1\" onclick=\"onDayLabelDeleteClick('" + workDay + "')\" id=\"\">×</a>";
         selectedWorkDayLabel.className += "mr-2 selected-trip-label";
         selectedWorkDayLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
         selectedWorkDayLabel.style.padding = "0.5em";
@@ -681,7 +681,7 @@
     }
 
     // 選択された便の×ボタン押下時
-    function onLabelDeleteClick(workDayString) {
+    function onDayLabelDeleteClick(workDayString) {
         // ラベル全削除
         $('.selected-trip-label').remove();
 
