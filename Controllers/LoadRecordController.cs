@@ -260,7 +260,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static SearchedTripRecordListModel SearchData(string sql)
+        public static SearchedTripRecordListModel SearchData(string sql, string page)
         {
             var searchData = string.Empty;
             IEnumerable<LoadRecordModel> tripRecordList;
@@ -322,13 +322,13 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{item.DepartureLoadStatus}</td>
                             <td>
                                 <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                    onclick=""OnArrivalLoadImageClick('{item.TripRecordID}', this)"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                    onclick=""OnArrivalLoadImageClick('{item.TripRecordID}', this, '{page}')"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
                                     <i class=""fa-solid fa-truck""></i>
                                 </a>
                             </td>
                             <td>
                                 <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                    onclick=""OnDepartureLoadImageClick('{item.TripRecordID}', this)"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                    onclick=""OnDepartureLoadImageClick('{item.TripRecordID}', this, '{page}')"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
                                     <i class=""fa-solid fa-truck""></i>
                                 </a>
                             </td>
