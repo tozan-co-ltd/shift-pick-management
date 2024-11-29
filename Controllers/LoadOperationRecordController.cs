@@ -113,7 +113,7 @@ namespace ai_truck_load_measurement.Controllers
             {
                 // 指定し稼働日と便名称の便マスター情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreateSQLToSelectLoadClassFromSearchConditionsForTable(workDays, tripName);
-                var searchedTripRecordListModel = LoadRecordController.SearchData(sql);
+                var searchedTripRecordListModel = LoadRecordController.SearchData(sql, "LoadOperationRecord");
 
                 return Json(searchedTripRecordListModel);
             }
