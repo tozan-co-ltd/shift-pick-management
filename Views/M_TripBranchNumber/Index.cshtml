@@ -41,7 +41,12 @@
         <div class="mg-bot-20 mb-3">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-3">
-                    <label><input type="checkbox" id="isBeforeApplicablePeriod" /> 適用終了日時を過ぎた便枝番も表示</label>
+                    <label><input type="radio" id="isAppearedBranchSeq" name="branchNumberRadios" value="branchSeq" checked/> 枝連番を表示</label>
+                </div>
+                <div class="nput-group-append">
+                    <div class="mr-3">
+                        <label>基準日時<input type="datetime-local" id="referenceDate" class="ml-3" style="background-color: white" /></label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -49,12 +54,7 @@
         <div class="mg-bot-20 mb-3">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-3">
-                    <label><input type="checkbox" id="isAppearedBranchSeq" /> 枝連番を表示</label>
-                </div>
-                <div class="nput-group-append">
-                    <div class="mr-3">
-                        <label>基準日時<input type="datetime-local" id="referenceDate" class="ml-3" readonly style="background-color: lightgray" /></label>
-                    </div>
+                    <label><input type="radio" id="isBeforeApplicablePeriod" name="branchNumberRadios" value="beforeApplicablePeriod" /> 適用終了日時を過ぎた便枝番も表示</label>
                 </div>
             </div>
         </div>
@@ -169,6 +169,7 @@
 </div>
 
 <script>
+    let model;
     // 画面ロード時
     $(document).ready(function () {
         // 今日の日付を取得
@@ -184,6 +185,10 @@
 
         model = @Html.Raw(Json.Serialize(Model));
         $('#isBeforeApplicablePeriod').prop('checked', model.isCheckedBeforeApplicablePeriod);
+        if(model.isCheckedBeforeApplicablePeriod){
+            $('#referenceDate').attr('readonly', true);
+            $('#referenceDate').css({ 'background-color': 'lightgray' });
+        }
         // テーブル表示
         tableDisplay();
     });
@@ -253,51 +258,26 @@
         location.href = "" + page + "/Register?isChecked=" + checkBox + "&id=" + tripID + "&tripName=" + tripName;
     }
 
-    let isInChangeFunction = false;
+    // ラジオボタン切り替え時
+    $(function () {
+        $('input[name="branchNumberRadios"]:radio').change(function () {
+            // デフォルトの操作を無効化
+            event.preventDefault();
 
-    // 枝連番表示チェックボックス押下時
-    $('#isAppearedBranchSeq').change(function () {
-        if (isInChangeFunction)
-            return;
-
-        isInChangeFunction = true;
-
-        // 適用終了日時チェックボックスのチェックを外す
-        $('#isBeforeApplicablePeriod').removeAttr("checked", false).prop('checked', false).change();
-
-        var branchSeqBox = $('#isAppearedBranchSeq');
-
-        // 基準日時の選択可否の切り替え
-        if (branchSeqBox[0].checked) {
-            $('#referenceDate').attr('readonly', false);
-            $('#referenceDate').css({ 'background-color': '#ffffff' });
-        }
-        else{
-            $('#referenceDate').attr('readonly', true);
-            $('#referenceDate').css({ 'background-color': 'lightgray' });
-        }
-
-        isInChangeFunction = false;
-         tableDisplay();
-    });
-
-    // 適用終了日時チェックボックス押下時
-    $('#isBeforeApplicablePeriod').change(function () {
-        if (isInChangeFunction)
-            return;
-
-        isInChangeFunction = true;
-
-        // 枝連番表示チェックボックスのチェックを外す
-        $('#isAppearedBranchSeq').removeAttr("checked", false).prop('checked', false).change();
-
-        // 基準日時を選択不可に
-        $('#referenceDate').attr('readonly', true);
-        $('#referenceDate').css({ 'background-color': 'lightgray' });
-
-        isInChangeFunction = false;
-         tableDisplay();
-    });
+            // 基準日時のcss切り替え
+            var radioval = $(this).val();
+            if (radioval == "beforeApplicablePeriod") {
+                $('#referenceDate').attr('readonly', true);
+                $('#referenceDate').css({ 'background-color': 'lightgray' });
+            }
+            else {
+                $('#referenceDate').attr('readonly', false);
+                $('#referenceDate').css({ 'background-color': '#ffffff' });
+            }
+            // テーブル表示
+            tableDisplay();
+        })
+    })
 
     // 編集ボタン押下
     function OnEditClick(tripBranchNumberID) {
