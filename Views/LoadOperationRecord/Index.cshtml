@@ -118,6 +118,9 @@
                     <canvas id="binedabanChartArrival"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
                     <script src='https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js'></script>
+                    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.7.7/chartjs-plugin-zoom.min.js" integrity="sha512-8E9fPF4pjWxI0dpprpn4WYeciAMo2kh6xN0COFxvTfurMttjZzih/sBp+Fxu49Zr6IUSp4sqWY6KLecnqOCwxA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                   
                     <script>
                         var ctx = document.getElementById("binedabanChartArrival");
                         function adjustCanvasHeight() {
@@ -129,72 +132,116 @@
 
                         adjustCanvasHeight();
 
-                        var arrivalChart = new Chart(ctx, {
-                            type: 'scatter',
-                            data: {
-                                labels: [],
-                                datasets: []
-                            },
-                            options: {
-                                //凡例は表示
-                                legend: {
-                                    display: true
+                        var arrivalChart = new Chart(ctx, chartSetting('到着'));
+
+                        // chart.jsの設定
+                        function chartSetting(yLabel) {
+                            var setting = {
+                                type: 'scatter',
+                                data: {
+                                    labels: [],
+                                    datasets: []
                                 },
-                                scales: {
-                                    //X軸
-                                    xAxes: [{
-                                        id: 'x軸',
-                                        //軸ラベル表示
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: '到着時間',
-                                            fontSize: 24
-                                        },
-                                        ticks: {
-                                            fontSize: 20,
-                                            min: '00:00',
-                                            max: '23:59'
-                                        },
-                                        type: 'time',
-                                        time: {
-                                            parser: 'HH:mm',
-                                            unit: 'hour',
-                                            stepSize: 1,
-                                            displayFormats: {
-                                                'hour': 'HH:mm'
+                                options: {
+                                    //凡例は表示
+                                    legend: {
+                                        display: true
+                                    },
+                                    scales: {
+                                        //X軸
+                                        xAxes: [{
+                                            id: 'x軸',
+                                            //軸ラベル表示
+                                            scaleLabel: {
+                                                display: true,
+                                                labelString: '到着時間',
+                                                fontSize: 24
+                                            },
+                                            ticks: {
+                                                fontSize: 20,
+                                                min: new Date('1900/01/01 00:00:00').getTime(),
+                                                max: new Date('1900/01/01 23:59:00').getTime()
+                                            },
+                                            type: 'time',
+                                            time: {
+                                                parser: 'HH:mm',
+                                                unit: 'hour',
+                                                stepSize: 1,
+                                                displayFormats: {
+                                                    'hour': 'HH:mm'
+                                                }
+                                            },
+                                        }],
+                                        //Y軸
+                                        yAxes: [{
+                                            id: 'y軸',
+                                            //軸ラベル表示
+                                            scaleLabel: {
+                                                display: true,
+                                                labelString: yLabel + '荷量(%)',
+                                                fontSize: 24
+                                            },
+                                            //Y軸の範囲を指定
+                                            ticks: {
+                                                min: 0.0,
+                                                max: 100.0,
+                                                fontSize: 20
                                             }
-                                        },
-                                    }],
-                                    //Y軸
-                                    yAxes: [{
-                                        id: 'y軸',
-                                        //軸ラベル表示
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: '到着荷量(%)',
-                                            fontSize: 24
-                                        },
-                                        //Y軸の範囲を指定
-                                        ticks: {
-                                            min: 0.0,
-                                            max: 100.0,
-                                            fontSize: 20
+                                        }]
+                                    },
+                                    annotation: {
+                                        annotations: []
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: '',
+                                        fontSize: 30
+                                    },
+                                    onClick: function (e, item) {
+                                        chartClick(e, item);
+                                    },
+                                    plugins: {
+                                        // ズーム設定
+                                        zoom: {
+                                            pan: {
+                                                enabled: true,
+                                                mode: "x",
+                                                rangeMax: {
+                                                    x: new Date('1900/01/01 23:59:00').getTime(),
+                                                    y: 100.0
+                                                },
+                                                rangeMin: {
+                                                    x: new Date('1900/01/01 00:00:00').getTime(),
+                                                    y: 0.0
+                                                }
+                                            },
+                                            zoom: {
+                                                enabled: true,
+                                                mode: 'x',
+                                                rangeMax: {
+                                                    x: new Date('1900/01/01 23:59:00').getTime(),
+                                                    y: 100.0
+                                                },
+                                                rangeMin: {
+                                                    x: new Date('1900/01/01 00:00:00').getTime(),
+                                                    y: 0.0
+                                                },
+                                                speed: 0.5
+                                            }
                                         }
-                                    }]
-                                }, 
-                                annotation: {
-                                    annotations: []
-                                },
-                                title: {
-                                    display: true,
-                                    text: '',
-                                    fontSize: 30
-                                },
-                                onClick: function (e, item) {
-                                    chartClick(e, item);
+                                    },
+                                    tooltips: {
+                                        // ツールチップのテキスト設定
+                                        callbacks: {
+                                            label: function (tooltipItem, data) {
+                                                return [data.datasets[tooltipItem.datasetIndex].label + " " + GetTimeString(new Date(tooltipItem.xLabel)) + ' : ' + Math.round(tooltipItem.yLabel) + '%']
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                        });
+                            return setting;
+                        }
 
                         // チャート押下時のイベント
                         function chartClick(e, item){
@@ -274,6 +321,8 @@
                     <canvas id="binedabanChartDeparture"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
                     <script src='https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js'></script>
+                    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.7.7/chartjs-plugin-zoom.min.js" integrity="sha512-8E9fPF4pjWxI0dpprpn4WYeciAMo2kh6xN0COFxvTfurMttjZzih/sBp+Fxu49Zr6IUSp4sqWY6KLecnqOCwxA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
                     <script>
                         var ctx = document.getElementById("binedabanChartDeparture");
                         function adjustCanvasHeight() {
@@ -285,71 +334,7 @@
 
                         adjustCanvasHeight();
 
-                        var departureChart = new Chart(ctx, {
-                            type: 'scatter',
-                            data: {
-                                labels: [],
-                                datasets: []
-                            },
-                            options: {
-                                //凡例は表示
-                                legend: {
-                                    display: true
-                                },
-                                scales: {
-                                    //X軸
-                                    xAxes: [{
-                                        id: 'x軸',
-                                        //軸ラベル表示
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: '出発時間',
-                                            fontSize: 24
-                                        },
-                                        ticks: {
-                                            fontSize: 20,
-                                            min: '00:00',
-                                            max: '23:59'
-                                        },
-                                        type: 'time',
-                                        time: {
-                                            parser: 'HH:mm',
-                                            unit: 'hour',
-                                            stepSize: 1,
-                                            displayFormats: {
-                                                'hour': 'HH:mm'
-                                            }
-                                        },
-                                    }],
-                                    //Y軸
-                                    yAxes: [{
-                                        //軸ラベル表示
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: '出発荷量(%)',
-                                            fontSize: 24
-                                        },
-                                        //Y軸の範囲を指定
-                                        ticks: {
-                                            min: 0.0,
-                                            max: 100.0,
-                                            fontSize: 20
-                                        }
-                                    }]
-                                },
-                                annotation: {
-                                    annotations:[]
-                                },
-                                title: {
-                                    display: true,
-                                    text: '',
-                                    fontSize: 30
-                                },
-                                onClick: function (e, item) {
-                                    chartClick(e, item);
-                                }
-                            }
-                        });
+                        var departureChart = new Chart(ctx, chartSetting('出発'));
 
                     </script>
                 </div>
@@ -357,6 +342,8 @@
                     <canvas id="binedabanChartAll"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
                     <script src='https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js'></script>
+                    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.7.7/chartjs-plugin-zoom.min.js" integrity="sha512-8E9fPF4pjWxI0dpprpn4WYeciAMo2kh6xN0COFxvTfurMttjZzih/sBp+Fxu49Zr6IUSp4sqWY6KLecnqOCwxA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
                     <script>
                         var ctx = document.getElementById("binedabanChartAll");
@@ -369,77 +356,16 @@
 
                         adjustCanvasHeight();
 
-                        var allChart = new Chart(ctx, {
-                            type: 'scatter',
-                            data: {
-                                labels: [],
-                                datasets: []
-                            },
-                            options: {
-                                //凡例は表示
-                                legend: {
-                                    display: true
-                                },
-                                scales: {
-                                    //X軸
-                                    xAxes: [{
-                                        id: 'x軸',
-                                        //軸ラベル表示
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: '時間',
-                                            fontSize: 24
-                                        },
-                                        ticks: {
-                                            fontSize: 20,
-                                            min: '00:00',
-                                            max: '23:59'
-                                        },
-                                        type: 'time',
-                                        time: {
-                                            parser: 'HH:mm',
-                                            unit: 'hour',
-                                            stepSize: 1,
-                                            displayFormats: {
-                                                'hour': 'HH:mm'
-                                            }
-                                        },
-                                    }],
-                                    //Y軸
-                                    yAxes: [{
-                                        //軸ラベル表示
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: '荷量(%)',
-                                            fontSize: 24
-                                        },
-                                        //Y軸の範囲を指定
-                                        ticks: {
-                                            min: 0.0,
-                                            max: 100.0,
-                                            fontSize: 20
-                                        }
-                                    }]
-                                },
-                                annotation: {
-                                    annotations: []
-                                },
-                                title: {
-                                    display: true,
-                                    text: '',
-                                    fontSize: 30
-                                },
-                                onClick: function (e, item) {
-                                    chartClick(e, item);
-                                }
-                            }
-                        });
+                        var allChart = new Chart(ctx, chartSetting());
                     </script>
                 </div>
                 <div class="chartjs-graph chartjs-clear" id="clearChart">
                     <canvas id="binedabanChartClear"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
                     <script src='https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js'></script>
+                    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.7.7/chartjs-plugin-zoom.min.js" integrity="sha512-8E9fPF4pjWxI0dpprpn4WYeciAMo2kh6xN0COFxvTfurMttjZzih/sBp+Fxu49Zr6IUSp4sqWY6KLecnqOCwxA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
                     <script>
                         var ctx = document.getElementById("binedabanChartClear");
                         function adjustCanvasHeight() {
@@ -451,71 +377,7 @@
 
                         adjustCanvasHeight();
 
-                        var clearChart = new Chart(ctx, {
-                            type: 'scatter',
-                            data: {
-                                labels: [],
-                                datasets: []
-                            },
-                            options: {
-                                //凡例は表示
-                                legend: {
-                                    display: true
-                                },
-                                scales: {
-                                    //X軸
-                                    xAxes: [{
-                                        id: 'x軸',
-                                        //軸ラベル表示
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: '時間',
-                                            fontSize: 24
-                                        },
-                                        ticks: {
-                                            fontSize: 20,
-                                            min: '00:00',
-                                            max: '23:59'
-                                        },
-                                        type: 'time',
-                                        time: {
-                                            parser: 'HH:mm',
-                                            unit: 'hour',
-                                            stepSize: 1,
-                                            displayFormats: {
-                                                'hour': 'HH:mm'
-                                            }
-                                        },
-                                    }],
-                                    //Y軸
-                                    yAxes: [{
-                                        //軸ラベル表示
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: '荷量(%)',
-                                            fontSize: 24
-                                        },
-                                        //Y軸の範囲を指定
-                                        ticks: {
-                                            min: 0.0,
-                                            max: 100.0,
-                                            fontSize: 20
-                                        }
-                                    }]
-                                },
-                                annotation: {
-                                    annotations: []
-                                },
-                                title: {
-                                    display: true,
-                                    text: '',
-                                    fontSize: 30
-                                },
-                                onClick: function (e, item) {
-                                    chartClick(e, item);
-                                }
-                            }
-                        });
+                        var clearChart = new Chart(ctx, chartSetting());
                     </script>
                 </div>
             </div>
@@ -733,6 +595,12 @@
         $('#allChart').css('display', 'none');
         $('#clearChart').css('display', 'none');
 
+        // ズームのリセット
+        arrivalChart.resetZoom();
+        departureChart.resetZoom();
+        allChart.resetZoom();
+        clearChart.resetZoom();
+
         // 昼勤開始時間保存用
         var dayShiftStartTime = "";
 
@@ -773,21 +641,21 @@
                     var arrivalLoadStatus = loadRecord.arrivalLoadStatus;
                     var departureLoadStatus = loadRecord.departureLoadStatus;
                     if (arrivalLoadStatus != "") {
-                        var arrivedAt = GetTimeString(new Date(loadRecord.arrivedAt));
+                        var arrivedAt = new Date("1900-01-01T" + GetTimeString(new Date(loadRecord.arrivedAt)) + ":00");
                         arrivalLoadStatuses.push({ x: arrivedAt, y: arrivalLoadStatus });
                         allLoadStatuses.push({ x: arrivedAt, y: arrivalLoadStatus });
                     }
 
                     if (departureLoadStatus != "") {
-                        var departedAt = GetTimeString(new Date(loadRecord.departedAt));
+                        var departedAt = new Date("1900-01-01T" + GetTimeString(new Date(loadRecord.departedAt)) + ":00");
                         departureLoadStatuses.push({ x: departedAt, y: departureLoadStatus });
                         allLoadStatuses.push({ x: departedAt, y: departureLoadStatus })
                     }
 
-                    dayShiftStartTime = GetTimeString(new Date(loadRecord.dayShiftStartTime));
+                    dayShiftStartTime = new Date("1900-01-01T" + GetTimeString(new Date(loadRecord.dayShiftStartTime)) + ":00");
                     // 出発、到着予定時間を取得
-                    var arrivalScheduledTime = GetTimeString(new Date(loadRecord.arrivalScheduledTime));
-                    var departureScheduledTime = GetTimeString(new Date(loadRecord.departureScheduledTime));
+                    var arrivalScheduledTime = new Date("1900-01-01T" + GetTimeString(new Date(loadRecord.arrivalScheduledTime)) + ":00");
+                    var departureScheduledTime = new Date("1900-01-01T" + GetTimeString(new Date(loadRecord.departureScheduledTime)) + ":00");
 
                     // 到着、出発予定時刻で囲った範囲を登録
                     var scheduleBox = createScheduleBox(arrivalScheduledTime, departureScheduledTime);
