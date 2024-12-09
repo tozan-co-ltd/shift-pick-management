@@ -29,7 +29,8 @@
     // ID(2列目)昇順
     $('.datatable-normal').DataTable({
         "language": {
-            "url": language_url
+            "url": language_url,
+            searchPlaceholder: "フリーワード(全件)"
         },
         lengthChange: true,     // 件数切替
         info: true,            // 総件数
@@ -41,7 +42,7 @@
             { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
         ],
         "oLanguage": {
-            "sSearch": "フリーワード(全件)"
+            "sSearch": ""
         },
         dom: dom_structure
     });
@@ -591,16 +592,17 @@ function tableDisplayCommon(page, data) {
         // ID(2列目)昇順
         $("#tripRecordDataTable").DataTable({
             "language": {
-                "url": language_url
+                "url": language_url,
+                searchPlaceholder: "フリーワード(全件)"
             },
             lengthChange: true,     // 件数切替
             info: true,            // 総件数
             scrollX: true,          // 横スクロール可
             scrollCollapse: true,   // 縦スクロール表示
             searchHighlight: true,  // 検索ハイライト
-            order: [[1, "asc"], [9, "asc"], [2, "asc"]],    // ID昇順
+            order: [[1, "desc"], [9, "asc"], [2, "asc"]],    // ID昇順
             "oLanguage": {
-                "sSearch": "フリーワード(全件)"
+                "sSearch": ""
             },
             dom: dom_structure
         });
