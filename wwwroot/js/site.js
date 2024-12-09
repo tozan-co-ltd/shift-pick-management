@@ -600,11 +600,12 @@ function tableDisplayCommon(page, data) {
             scrollX: true,          // 横スクロール可
             scrollCollapse: true,   // 縦スクロール表示
             searchHighlight: true,  // 検索ハイライト
-            order: [[1, "desc"], [9, "asc"], [2, "asc"]],    // ID昇順
+            orderFixed: [1, "asc"],
+            order: [[2, "asc"] , [9, "asc"], [3, "asc"]],    // ID昇順
             "oLanguage": {
                 "sSearch": ""
             },
-            dom: dom_structure
+            dom: dom_structure,
         });
         var table = $("#tripRecordDataTable").DataTable();
         table.on('draw', function () {
@@ -623,6 +624,7 @@ function tableDisplayCommon(page, data) {
         }
     });
 }
+
 //-------------------------------------------------------------------//
 
 //-------------------------------------------------------------------//
