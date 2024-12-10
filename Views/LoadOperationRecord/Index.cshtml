@@ -132,6 +132,8 @@
 
                         // chart.jsの設定
                         function chartSetting(yLabel) {
+                            if (yLabel == null)
+                                yLabel = "";
                             var setting = {
                                 type: 'scatter',
                                 data: {
