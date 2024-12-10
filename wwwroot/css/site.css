@@ -993,3 +993,19 @@ table.dataTable span.column_highlight {
     display: block;
     border: solid .5px rgba(0,0,0,.2);
 }
+
+.border-box {
+    height: 20px;
+    width: 50px;
+    background-color: #ffffff;
+    display: block;
+    border: solid .5px rgba(0,0,0, .3);
+    text-align: center;
+}
+
+.border-box-line {
+    display: inline-block;
+    width: 3px;
+    height: 100%;
+    background-color: #000;
+}

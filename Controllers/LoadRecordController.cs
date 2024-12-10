@@ -274,6 +274,7 @@ namespace ai_truck_load_measurement.Controllers
                         <thead>
                             <tr align=""center"">
                                 <th hidden>便実績ID</th>
+                                <th hidden>便名称有無</th>
                                 <th class=""font-weight-bold"">便名称<br></th>
                                 <th class=""font-weight-bold"">便枝番</th>
                                 <th class=""font-weight-bold"">乗務員</th>
@@ -304,9 +305,12 @@ namespace ai_truck_load_measurement.Controllers
                     if (arrivalScheduledTime == "00:00") arrivalScheduledTime = "-";
                     var departureScheduledTime = item.DepartureScheduledTime.ToString("HH:mm");
                     if (departureScheduledTime == "00:00") departureScheduledTime = "-";
+                    var hasTripName = 0;
+                    if(item.TripName == "-") hasTripName = 1;
                     searchData += $@"
                         <tr>
                             <td hidden>{item.TripRecordID}</td>
+                            <td hidden>{hasTripName}</td>
                             <td>{item.TripName}</td>
                             <td>{item.TripBranchSeq}</td>
                             <td>{item.DriverName}</td>

@@ -38,17 +38,18 @@
                     <span class="warehouse-name-drs">稼働日</span>
                     <input type="text" id="workDay" class="form-control pickerDateForLoadOperationRecord">
                 </div>
-                <div class="mr-3">
-                    <a href="#" class="btn btn-danger d-flex align-items-center mb-3 mr-3" onclick="clearTrips()">
-                        <span class="text">一括クリア</span>
-                    </a>
-                </div>
             </div>
             <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedWorkDays0">
                 <span class="warehouse-name-drs">選択された稼働日</span>
             </div>
             <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedWorkDays1">
-                <span class="warehouse-name-drs"></span>
+                <span class="warehouse-name-drs">
+                    <div class="mr-3">
+                        <a href="#" class="btn btn-danger d-flex align-items-center" onclick="clearTrips()">
+                            <span class="text">一括クリア</span>
+                        </a>
+                    </div>
+                </span>
             </div>
             <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedWorkDays2">
                 <span class="warehouse-name-drs"></span>
@@ -96,22 +97,17 @@
                     </div>
                 </div>
 
-                <p style="text-align:right">
-                    縦線：昼勤開始時間
-                    <label class="d-flex justify-content-end align-items-center">
-                        <span class="color-box"></span>：到着～出発予定時間
-                    </label>
+                <p class="justify-content-end " style="text-align:left">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <div class="border-box"><span class="border-box-line"></span></div>：昼勤開始　　　
+                    </div>
+                    <div class="d-flex justify-content-end align-items-center">
+                        <div class="color-box"></div>：到着～出発予定
+                    </div> 
 
                 </p>
 
                 <div id="tooltip" style="position:absolute; display:none">
-                    @* <input type="color" id="color-picker" list="color-picker" />
-                    <datalist id="color-picker">
-                        <option>#ff0000</option>
-                        <option>#123456</option>
-                        <option>#0000ff</option>
-                    </datalist> *@
-
                 </div>
 
                 <div class="chartjs-graph chartjs-arrival" id="arrivalChart">
@@ -136,6 +132,8 @@
 
                         // chart.jsの設定
                         function chartSetting(yLabel) {
+                            if (yLabel == null)
+                                yLabel = "";
                             var setting = {
                                 type: 'scatter',
                                 data: {
@@ -543,6 +541,7 @@
         selectedWorkDayLabel.className += "mr-2 selected-trip-label";
         selectedWorkDayLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
         selectedWorkDayLabel.style.padding = "0.5em";
+        selectedWorkDayLabel.style.borderRadius = "5px";
         selectedWorkDays.appendChild(selectedWorkDayLabel);
     }
 
