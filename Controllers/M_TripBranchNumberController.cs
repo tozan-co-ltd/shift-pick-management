@@ -57,26 +57,26 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="isAppearedBranchSeq">枝連番を表示するか</param>
         /// <param name="refferenceDate">枝連番の基準日時</param>
         /// <returns></returns>
-        public IActionResult SearchData(int tripId, bool isBeforeApplicablePeriod, bool isAppearedBranchSeq, DateTime refferenceDate )
+        public IActionResult SearchData(int tripId, bool isBeforeApplicablePeriod,  DateTime refferenceDate )
         {
             var searchData = string.Empty;
             try
             {
                 // 便枝番マスター情報取得SQL作成
                 var sql = "";
-                if (isAppearedBranchSeq)
+                if (isBeforeApplicablePeriod)
                 {
-                    sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbersWithBranceSeq(tripId, refferenceDate);
+                    sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, isBeforeApplicablePeriod);
                 }
                 else
                 {
-                    sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, isBeforeApplicablePeriod);
+                    sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbersWithBranceSeq(tripId, refferenceDate);
                 }
 
                 // DB接続
                 List<M_TripBranchNumberModel> tripBranchNumberList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(sql);
                 // 枝連番列を追加
-                if (isAppearedBranchSeq)
+                if (!isBeforeApplicablePeriod)
                 {
                     tripBranchNumberList = AddTripBranchSeq(tripBranchNumberList);
                 }
@@ -90,7 +90,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <tr align=""center"">
                                     <th width=""40""></th>
                                     <th class=""font-weight-bold"">便枝番ID</th>";
-                if (isAppearedBranchSeq)
+                if (!isBeforeApplicablePeriod)
                 {
                     searchData += $@"<th class=""font-weight-bold"">枝連番</th>";
 
@@ -119,7 +119,7 @@ namespace ai_truck_load_measurement.Controllers
                                     </td>
                                     <td>{@item.TripBranchNumberID}</td>
                         ";
-                        if (isAppearedBranchSeq)
+                        if (!isBeforeApplicablePeriod)
                         {
                             searchData += $@"<td>{item.TripBranchSeq}</td>";
 
