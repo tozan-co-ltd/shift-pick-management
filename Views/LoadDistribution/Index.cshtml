@@ -4,6 +4,98 @@
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
+<style>
+    .dropdown-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-button {
+        background: #007bff;
+        color: #fff;
+        padding: 8px 16px;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .dropdown-content {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: #fff;
+        border: 1px solid #ccc;
+        width: 300px;
+        padding: 10px;
+        box-sizing: border-box;
+        display: none;
+        z-index: 999;
+    }
+
+    .dropdown-container.show .dropdown-content {
+        display: block;
+    }
+
+    .large-item {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+
+    .medium-item {
+        margin-left: 20px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .medium-header {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .medium-header span {
+            margin-left: 5px;
+        }
+
+    .small-items {
+        margin-left: 40px;
+        margin-top: 5px;
+        display: none;
+    }
+
+        .small-items.show {
+            display: block;
+        }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+    /* アイコン用（任意）*/
+    .toggle-icon {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #333;
+        border-bottom: 2px solid #333;
+        transform: rotate(45deg);
+        transition: transform 0.3s;
+        margin-left: 5px;
+    }
+
+        .toggle-icon.collapsed {
+            transform: rotate(-135deg);
+        }
+
+</style>
 
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
@@ -46,32 +138,45 @@
                     <input type="text" id="endOfPeriod" class="form-control pickerDate endDate">
                 </div>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
-                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3">
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
+                <div class="d-flex justify-content-start align-items-center unset-pdl mr-3">
                     <span class="warehouse-name-drs">便名称</span>
-                    <select type="text" class="form-select " name="TripName" asp-for="TripName" asp-items="@Model.TripNameList" required id="tripName"></select>
+                    <select type="text" class="form-select " name="TripName" asp-for="TripName" asp-items="@Model.TripNameList" required id="tripName" ></select>
                 </div>
-                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3">
+                <div class="d-flex justify-content-start align-items-center unset-pdl mr-3">
                     <span style="width:50px; min-width:50px" class="mr-3">便枝番</span>
                     <select type="text" class="form-select " id="tripBranchSeq" name="TripBranchSeq">
                     </select>
                 </div>
-                <div class="">
-                    <a href="#" class="btn btn-primary d-flex align-items-center mb-3 mr-3" onclick="addTrips()">
-                        <span class="text">追加</span>
+                <div class="input-group-append mr-3">
+                    <a href="#" class="btn btn-primary btn-icon-split btn-register" onclick="addTrips()">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">追加　</span>
                     </a>
                 </div>
-                <div class="mr-3">
-                    <a href="#" class="btn btn-danger d-flex align-items-center mb-3 mr-3" onclick="clearTrips()">
-                        <span class="text">一括クリア</span>
-                    </a>
+                
+            </div>
+            <div class="dropdown-container" id="dropdownContainer">
+                <button class="dropdown-button" id="dropdownButton">設定</button>
+                <div class="dropdown-content" id="dropdownContent">
+                    <div id="createToggleCheckBox"></div>
                 </div>
             </div>
+
             <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips0">
                 <span class="warehouse-name-drs">選択された便</span>
             </div>
             <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips1">
-                <span class="warehouse-name-drs"></span>
+                <div class="warehouse-name-drs">
+                    <a href="#" class="btn btn-danger btn-icon-split btn-register" onclick="clearTrips()">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                        <span class="text">一括クリア</span>
+                    </a>
+                </div>
             </div>
             <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips2">
                 <span class="warehouse-name-drs"></span>
@@ -358,12 +463,12 @@
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
         // 選択中の便名称取得
-        var tripName = $('[name=TripName]').val();
+        var currentTripName = $('[name=TripName]').val();
 
         // 便名称の選択肢を全削除
-        var select = $('#tripName')[0];
-        while (select.firstChild) {
-            select.removeChild(select.firstChild);
+        var select = $('#tripName');
+        while (select[0].firstChild) {
+            select[0].removeChild(select[0].firstChild);
         }
 
         // フォーム情報取得
@@ -377,20 +482,81 @@
             method: method,
             data: data
         }).done(function (response) {
+            console.log(response);
+            if (response[0] == null)
+                return;
+
+            var opts = new Array();
+            var tripName = response[0].tripName;
+            var optgroup;
             for (var i = 0; i < response.length; i++) {
+                if(i == 0)
+                    optgroup = $('<optgroup>', { label: response[i].tripName });
+
+                if (tripName != response[i].tripName && i != 0) {
+                    tripName = response[i].tripName;
+                    select.append(optgroup);
+                    optgroup = $('<optgroup>', { label: response[i].tripName });
+                }
+                
+
                 var option = document.createElement("option");
-                if (response[i].text == null) {
+                if (response[i].tripBranchSeq == null) {
                     option.text = "";
                 }
                 else {
-                    option.text = response[i].text;
+                    option.text = response[i].tripName + "_" + response[i].tripBranchSeq;
                 }
-                option.value = response[i].value;
-                if (option.text == tripName) {
+                option.value = response[i].tripName + "_" + response[i].tripBranchSeq;
+                if (option.value == currentTripName) {
                     option.selected = true;
                 }
-                select.appendChild(option);
+                optgroup.append(option);
             }
+
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
+            }
+        });
+
+        createToggleSelectCheckBox(startOfPeriod, endOfPeriod);
+    }
+
+    function createToggleSelectCheckBox(startOfPeriod, endOfPeriod){
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripNameAndBranchSeqHTML", "LoadRecord")';
+        let method = 'Post';
+        let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            $('#createToggleCheckBox').empty().html(response);
+            // 中項目のヘッダーをクリックで小項目を表示/非表示
+            let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+            mediumHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    console.log("test");
+                    const smallItems = header.nextElementSibling;
+                    const toggleIcon = header.querySelector('.toggle-icon');
+                    if (smallItems.classList.contains('show')) {
+                        smallItems.classList.remove('show');
+                        toggleIcon.classList.add('collapsed');
+                    } else {
+                        smallItems.classList.add('show');
+                        toggleIcon.classList.remove('collapsed');
+                    }
+                });
+            });
 
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
@@ -690,4 +856,25 @@
             $("#div-error-message").text(errorMessage);
         }
     }
+
+    const dropdownButton = document.getElementById('dropdownButton');
+    const dropdownContainer = document.getElementById('dropdownContainer');
+    const dropdownContent = document.getElementById('dropdownContent');
+
+    // ドロップダウンの表示・非表示
+    dropdownButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropdownContainer.classList.toggle('show');
+    });
+
+    // コンテンツ外をクリックした場合、プルダウンを閉じる
+    document.addEventListener('click', (e) => {
+        if (!dropdownContainer.contains(e.target)) {
+            dropdownContainer.classList.remove('show');
+        }
+    });
+
+   
+
 </script>

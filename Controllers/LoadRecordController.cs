@@ -421,15 +421,15 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="startOfPeriod">期間の開始日時</param>
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <returns></returns>
-        public List<SelectListItem> GetTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
+        public List<LoadRecordModel> GetTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
         {
-            List<SelectListItem> tripRecordList = new();
+            List<LoadRecordModel> tripRecordList = new();
             try
             {
                 // 便実績情報取得SQL作成
                 var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod);
                 // DB接続
-                tripRecordList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
+                tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
 
                 return tripRecordList;
             }
@@ -439,6 +439,59 @@ namespace ai_truck_load_measurement.Controllers
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return tripRecordList;
             }
+        }
+
+
+        public string GetTripNameAndBranchSeqHTML(DateTime startOfPeriod, DateTime endOfPeriod)
+        {
+            var tripRecordList = GetTripNameFromPeriod(startOfPeriod,endOfPeriod);
+            var html = CreateSelectTripNameAndBranchSeqHTML(tripRecordList);
+            return html;
+        }
+
+        private string CreateSelectTripNameAndBranchSeqHTML(List<LoadRecordModel> tripRecordList)
+        {
+            var html = "";
+            var tripName = tripRecordList[0].TripName;
+            for (var i = 0; i < tripRecordList.Count; i++)
+            {
+                var selectValue = tripRecordList[i].TripName + "_" + tripRecordList[i].TripBranchSeq;
+                if (i == 0)
+                {
+                    html += $@" 
+                    <div class=""medium-item"">
+                        <div class=""medium-header"">
+                            <div class=""toggle-icon collapsed""></div>
+                            <span>{tripRecordList[i].TripName}</span>
+                        </div>
+                        <div class=""small-items"">
+                    ";
+                }
+                if (tripName != tripRecordList[i].TripName && i != 0)
+                {
+                    tripName = tripRecordList[i].TripName;
+                    html += $@"
+                        </div>
+                    </div>
+                    <div class=""medium-item"">
+                        <div class=""medium-header"">
+                            <div class=""toggle-icon collapsed""></div>
+                            <span>{tripRecordList[i].TripName}</span>
+                        </div>
+                        <div class=""small-items"">
+                    ";
+                }
+
+                html += $@"
+                        <label class=""checkbox-item""><input type=""checkbox"" value=""{selectValue}"">{selectValue}</label>
+                ";
+            }
+        
+            html += $@"
+                        </div>
+                    </div>
+            ";
+            return html;
         }
 
         /// <summary>
