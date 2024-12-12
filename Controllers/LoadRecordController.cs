@@ -452,6 +452,9 @@ namespace ai_truck_load_measurement.Controllers
         private string CreateSelectTripNameAndBranchSeqHTML(List<LoadRecordModel> tripRecordList)
         {
             var html = "";
+            if (tripRecordList.Count == 0)
+                return html;
+
             var tripName = tripRecordList[0].TripName;
             for (var i = 0; i < tripRecordList.Count; i++)
             {
