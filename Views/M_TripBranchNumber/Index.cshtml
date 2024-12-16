@@ -40,10 +40,7 @@
 
         <div class="mg-bot-20 mb-3">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
-                <div class="input-group-append mr-3">
-                    <label><input type="radio" id="isAppearedBranchSeq" name="branchNumberRadios" value="branchSeq" checked/> 枝連番を表示</label>
-                </div>
-                <div class="nput-group-append">
+                <div class="input-group-append">
                     <div class="mr-3">
                         <label>基準日時<input type="datetime-local" id="referenceDate" class="ml-3" style="background-color: white" /></label>
                     </div>
@@ -54,7 +51,7 @@
         <div class="mg-bot-20 mb-3">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-3">
-                    <label><input type="radio" id="isBeforeApplicablePeriod" name="branchNumberRadios" value="beforeApplicablePeriod" /> 適用終了日時を過ぎた便枝番も表示</label>
+                    <label><input type="checkbox" id="isBeforeApplicablePeriod" value="beforeApplicablePeriod" /> 全てのデータを表示</label>
                 </div>
             </div>
         </div>
@@ -169,7 +166,7 @@
 </div>
 
 <script>
-    let model;
+    // let model;
     // 画面ロード時
     $(document).ready(function () {
         // 今日の日付を取得
@@ -197,7 +194,6 @@
     function tableDisplay() {
         // チェックボックスの入力情報取得
         var isBeforeApplicablePeriod = $('#isBeforeApplicablePeriod')[0].checked;
-        var isAppearedBranchSeq = $('#isAppearedBranchSeq')[0].checked;
 
         var tripId = model.tripID;
         var referenceDate = $('#referenceDate').val();
@@ -205,7 +201,7 @@
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "M_TripBranchNumber")';
         let method = 'Post';
-        let data = { tripId: tripId, isBeforeApplicablePeriod: isBeforeApplicablePeriod, isAppearedBranchSeq: isAppearedBranchSeq, refferenceDate: referenceDate };
+        let data = { tripId: tripId, isBeforeApplicablePeriod: isBeforeApplicablePeriod, refferenceDate: referenceDate };
 
         // Ajax call
         $.ajax({
@@ -222,7 +218,8 @@
             // ID(2列目)昇順
             $("#tripTable").DataTable({
                 "language": {
-                    "url": language_url
+                    "url": language_url,
+                    searchPlaceholder: "フリーワード(全件)"
                 },
                 lengthChange: true,     // 件数切替
                 info: true,            // 総件数
@@ -234,7 +231,7 @@
                     { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
                 ],
                 "oLanguage": {
-                    "sSearch": "フリーワード(全件)"
+                    "sSearch": ""
                 },
                 dom: dom_structure
             });
@@ -258,26 +255,6 @@
         location.href = "" + page + "/Register?isChecked=" + checkBox + "&id=" + tripID + "&tripName=" + tripName;
     }
 
-    // ラジオボタン切り替え時
-    $(function () {
-        $('input[name="branchNumberRadios"]:radio').change(function () {
-            // デフォルトの操作を無効化
-            event.preventDefault();
-
-            // 基準日時のcss切り替え
-            var radioval = $(this).val();
-            if (radioval == "beforeApplicablePeriod") {
-                $('#referenceDate').attr('readonly', true);
-                $('#referenceDate').css({ 'background-color': 'lightgray' });
-            }
-            else {
-                $('#referenceDate').attr('readonly', false);
-                $('#referenceDate').css({ 'background-color': '#ffffff' });
-            }
-            // テーブル表示
-            tableDisplay();
-        })
-    })
 
     // 編集ボタン押下
     function OnEditClick(tripBranchNumberID) {
@@ -342,4 +319,21 @@
     $('input[type=datetime-local]').change(function () {
         tableDisplay();
     });
+
+    $('input[type=checkbox]').change(function () {
+        // チェックボックスの入力情報取得
+        var isBeforeApplicablePeriod = $('#isBeforeApplicablePeriod')[0].checked;
+        // デフォルトの操作を無効化
+        event.preventDefault();
+        if (isBeforeApplicablePeriod) {
+            $('#referenceDate').attr('readonly', true);
+            $('#referenceDate').css({ 'background-color': 'lightgray' });
+        }
+        else {
+            $('#referenceDate').attr('readonly', false);
+            $('#referenceDate').css({ 'background-color': '#ffffff' });
+        }
+        // テーブル表示
+        tableDisplay();
+    })
 </script>
