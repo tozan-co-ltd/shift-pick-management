@@ -453,7 +453,10 @@ namespace ai_truck_load_measurement.Controllers
         {
             var html = "";
             if (tripRecordList.Count == 0)
+            {
+                html = "選択された稼働日にデータがありません";
                 return html;
+            }
 
             var tripName = tripRecordList[0].TripName;
             for (var i = 0; i < tripRecordList.Count; i++)
@@ -462,6 +465,14 @@ namespace ai_truck_load_measurement.Controllers
                 if (i == 0)
                 {
                     html += $@" 
+                    <div style=""margin-left: auto;"">
+                        <button class=""btn btn-secondary mb-2"" id=""search-btn"" onclick=""allToggleOpen()"" >
+                            <span class=""text"">全ての見出しを開く</i></span>
+                        </button>
+                        <button class=""btn btn-secondary mb-2"" id=""search-btn"" onclick=""allToggleClose()"" >
+                            <span class=""text"">全ての見出しを閉じる</i></span>
+                        </button>
+                    </div>
                     <div class=""medium-item"">
                         <div class=""medium-header"">
                             <div class=""toggle-icon collapsed""></div>
@@ -486,7 +497,7 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 html += $@"
-                        <label class=""checkbox-item""><input type=""checkbox"" value=""{selectValue}"">{selectValue}</label>
+                        <label class=""checkbox-item""><input type=""checkbox"" onclick=""onSelectClick()"" name=""tripNameAndBranchSeq"" id=""{selectValue}"" value=""{selectValue}"">{selectValue}</label>
                 ";
             }
         

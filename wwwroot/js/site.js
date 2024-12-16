@@ -728,7 +728,7 @@ function GetDayStringForChart(date) {
 let arrayTrips = [];
 
 // 追加ボタン押下時
-function addTrips() {
+function addTrips(selectedTripName) {
     event.preventDefault();
     // 20件の便が選択されているとき
     if (20 <= arrayTrips.length) {
@@ -736,15 +736,19 @@ function addTrips() {
         $("#div-error-message").text(errorMessage);
         return;
     }
+
+    console.log("nunu");
+
+    var tripNameAndBranchSeq = selectedTripName.split("_");
+
     // 便名称と便枝番取得
-    var tripName = $('[name=TripName]').val();
-    var tripBranchSeq = $('[name=TripBranchSeq]').val();
+    var tripName = tripNameAndBranchSeq[0];
+    var tripBranchSeq = tripNameAndBranchSeq[1];
 
     // 入力されていない場合、エラー出力
     if (tripName == "" || tripBranchSeq == "" || tripName == null || tripBranchSeq == null) {
         return;
     }
-    var selectedTripName = tripName + "_" + tripBranchSeq;
 
     // 重複チェック
     const tripNames = arrayTrips.map(d => d.selectedTripName);
@@ -783,6 +787,8 @@ function onLabelDeleteClick(selectedTripName) {
     var deleteIndex = tripNames.indexOf(selectedTripName);
     arrayTrips.splice(deleteIndex, 1);
 
+    $('#' + selectedTripName).prop('checked', false);
+
     // 選択された便の再表示
     for (var i = 0; i < arrayTrips.length; i++) {
         // 選択された便を追加する行を設定
@@ -799,6 +805,7 @@ function clearTrips() {
     event.preventDefault();
     // ラベルと配列から全削除
     $('.selected-trip-label').remove();
+    $('[name="tripNameAndBranchSeq"]').prop('checked', false);
     arrayTrips = [];
     arrayWorkDays = [];
 }
