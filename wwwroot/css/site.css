@@ -986,6 +986,7 @@ table.dataTable span.column_highlight {
 }
 /*------------------Search Highlight CSS------------------------------*/
 
+/*-------------------------------------------------------------------------*/
 .color-box {
     height: 20px;
     width: 50px;
@@ -1009,3 +1010,87 @@ table.dataTable span.column_highlight {
     height: 100%;
     background-color: #000;
 }
+/*-------------------------------------------------------------------------*/
+/*-------------------------------Drop down menu ---------------------------------*/
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    width: 300px;
+    padding: 10px;
+    box-sizing: border-box;
+    display: none;
+    z-index: 999;
+}
+
+.dropdown-container.show .dropdown-content {
+    display: block;
+}
+
+.large-item {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.medium-item {
+    margin-left: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.medium-header {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+    .medium-header span {
+        margin-left: 5px;
+    }
+
+.small-items {
+    margin-left: 40px;
+    margin-top: 5px;
+    display: none;
+}
+
+    .small-items.show {
+        display: block;
+    }
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+    .checkbox-item input[type="checkbox"] {
+        margin-right: 8px;
+    }
+
+/* アイコン用（任意）*/
+.toggle-icon {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #333;
+    border-bottom: 2px solid #333;
+    transform: rotate(45deg);
+    transition: transform 0.3s;
+    margin-left: 5px;
+}
+
+    .toggle-icon.collapsed {
+        transform: rotate(-135deg);
+    }
+
+/*-------------------------------Drop down menu ---------------------------------*/

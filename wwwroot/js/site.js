@@ -809,3 +809,111 @@ function clearTrips() {
     arrayTrips = [];
     arrayWorkDays = [];
 }
+
+// 期間変更時
+function periodChange(page) {
+    // 期間の開始、終了日付の取得
+    var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+    var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+    // 選択中の便名称取得
+    var currentTripName = $('[name=TripName]').val();
+
+    // 便選択の選択肢の生成
+    createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page);
+}
+
+// 便選択の選択肢の生成
+function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page) {
+
+    // フォーム情報取得
+    let url = window.location.href + '/GetTripNameAndBranchSeqHTML';
+    url = url.replace(page, 'LoadRecord');
+    let method = 'Post';
+    let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+
+    // Ajax call
+    $.ajax({
+        url: url,
+        method: method,
+        data: data
+    }).done(function (response) {
+        $('#createToggleCheckBox').empty().html(response);
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const smallItems = header.nextElementSibling;
+                const toggleIcon = header.querySelector('.toggle-icon');
+                if (smallItems.classList.contains('show')) {
+                    smallItems.classList.remove('show');
+                    toggleIcon.classList.add('collapsed');
+                } else {
+                    smallItems.classList.add('show');
+                    toggleIcon.classList.remove('collapsed');
+                }
+            });
+        });
+
+        // チェックボックス切り替え時のイベント設定
+        $(function () {
+            $('input').change(function () {
+                // デフォルトの操作を無効化
+                event.preventDefault();
+
+                var checkBox = $(this).prop('checked');
+                var selectedTripName = $(this).val();
+
+                // イベントの発火元取得
+                // チェックボックスの状態取得
+                if (checkBox) {
+                    // 便追加
+                    addTrips(selectedTripName);
+
+                } else {
+                    // 便削除
+                    onLabelDeleteClick(selectedTripName);
+                }
+
+            })
+        });
+
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status === 404) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        } else {
+            var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+            $("#div-error-message").text(errorMessage);
+        }
+    });
+
+
+    function allToggleOpen() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (!smallItems.classList.contains('show')) {
+                smallItems.classList.add('show');
+                toggleIcon.classList.remove('collapsed');
+            }
+        });
+    }
+
+    function allToggleClose() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (smallItems.classList.contains('show')) {
+                smallItems.classList.remove('show');
+                toggleIcon.classList.add('collapsed');
+            }
+        });
+    }
+}

@@ -448,14 +448,14 @@
         var workDay = new Date($('#workDay').val());
         var workDayString = GetDayString(workDay);
         addWorkDays(workDayString);
-        periodChange();
+        periodChangeOperationLecord();
     });
 
     // 選択された稼働日の配列
     let arrayWorkDays = [];
 
     // 稼働日変更時
-    function periodChange() {
+    function periodChangeOperationLecord() {
 
         // 便名称取得
         var tripName = $('[name=TripName]').val();
@@ -565,7 +565,7 @@
         }
 
         // セレクトリスト更新
-        periodChange();
+        periodChangeOperationLecord();
     }
 
     // 昼勤開始時間の縦線ID用変数
