@@ -773,6 +773,7 @@ function pushLabelToSelectedTrips(selectedTrips, selectedTripName) {
     selectedTripLabel.className += "mr-2 selected-trip-label";
     selectedTripLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
     selectedTripLabel.style.padding = "0.5em";
+    selectedTripLabel.style.borderRadius = "5px";
     selectedTrips.appendChild(selectedTripLabel);
 }
 

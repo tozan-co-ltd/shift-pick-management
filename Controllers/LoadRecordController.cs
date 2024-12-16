@@ -497,7 +497,7 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 html += $@"
-                        <label class=""checkbox-item""><input type=""checkbox"" onclick=""onSelectClick()"" name=""tripNameAndBranchSeq"" id=""{selectValue}"" value=""{selectValue}"">{selectValue}</label>
+                        <label class=""checkbox-item""><input type=""checkbox"" name=""tripNameAndBranchSeq"" id=""{selectValue}"" value=""{selectValue}"">{selectValue}</label>
                 ";
             }
         
