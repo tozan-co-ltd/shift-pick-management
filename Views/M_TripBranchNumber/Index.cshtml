@@ -40,8 +40,10 @@
 
         <div class="mg-bot-20 mb-3">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
-                <div class="input-group-append mr-3">
-                    <label><input type="checkbox" id="isBeforeApplicablePeriod" /> 適用終了日時を過ぎた便枝番も表示</label>
+                <div class="input-group-append">
+                    <div class="mr-3">
+                        <label>基準日時<input type="datetime-local" id="referenceDate" class="ml-3" style="background-color: white" /></label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -49,12 +51,7 @@
         <div class="mg-bot-20 mb-3">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-3">
-                    <label><input type="checkbox" id="isAppearedBranchSeq" /> 枝連番を表示</label>
-                </div>
-                <div class="nput-group-append">
-                    <div class="mr-3">
-                        <label>基準日時<input type="datetime-local" id="referenceDate" class="ml-3" readonly style="background-color: lightgray" /></label>
-                    </div>
+                    <label><input type="checkbox" id="isBeforeApplicablePeriod" value="beforeApplicablePeriod" /> 全てのデータを表示</label>
                 </div>
             </div>
         </div>
@@ -169,8 +166,8 @@
 </div>
 
 <script>
+    // let model;
     // 画面ロード時
-    let model;
     $(document).ready(function () {
         // 今日の日付を取得
         var today = new Date();
@@ -185,6 +182,10 @@
 
         model = @Html.Raw(Json.Serialize(Model));
         $('#isBeforeApplicablePeriod').prop('checked', model.isCheckedBeforeApplicablePeriod);
+        if(model.isCheckedBeforeApplicablePeriod){
+            $('#referenceDate').attr('readonly', true);
+            $('#referenceDate').css({ 'background-color': 'lightgray' });
+        }
         // テーブル表示
         tableDisplay();
     });
@@ -193,7 +194,6 @@
     function tableDisplay() {
         // チェックボックスの入力情報取得
         var isBeforeApplicablePeriod = $('#isBeforeApplicablePeriod')[0].checked;
-        var isAppearedBranchSeq = $('#isAppearedBranchSeq')[0].checked;
 
         var tripId = model.tripID;
         var referenceDate = $('#referenceDate').val();
@@ -201,7 +201,7 @@
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "M_TripBranchNumber")';
         let method = 'Post';
-        let data = { tripId: tripId, isBeforeApplicablePeriod: isBeforeApplicablePeriod, isAppearedBranchSeq: isAppearedBranchSeq, refferenceDate: referenceDate };
+        let data = { tripId: tripId, isBeforeApplicablePeriod: isBeforeApplicablePeriod, refferenceDate: referenceDate };
 
         // Ajax call
         $.ajax({
@@ -218,7 +218,8 @@
             // ID(2列目)昇順
             $("#tripTable").DataTable({
                 "language": {
-                    "url": language_url
+                    "url": language_url,
+                    searchPlaceholder: "フリーワード(全件)"
                 },
                 lengthChange: true,     // 件数切替
                 info: true,            // 総件数
@@ -230,7 +231,7 @@
                     { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
                 ],
                 "oLanguage": {
-                    "sSearch": "フリーワード(全件)"
+                    "sSearch": ""
                 },
                 dom: dom_structure
             });
@@ -254,51 +255,6 @@
         location.href = "" + page + "/Register?isChecked=" + checkBox + "&id=" + tripID + "&tripName=" + tripName;
     }
 
-    let isInChangeFunction = false;
-
-    // 枝連番表示チェックボックス押下時
-    $('#isAppearedBranchSeq').change(function () {
-        if (isInChangeFunction)
-            return;
-
-        isInChangeFunction = true;
-
-        // 適用終了日時チェックボックスのチェックを外す
-        $('#isBeforeApplicablePeriod').removeAttr("checked", false).prop('checked', false).change();
-
-        var branchSeqBox = $('#isAppearedBranchSeq');
-
-        // 基準日時の選択可否の切り替え
-        if (branchSeqBox[0].checked) {
-            $('#referenceDate').attr('readonly', false);
-            $('#referenceDate').css({ 'background-color': '#ffffff' });
-        }
-        else{
-            $('#referenceDate').attr('readonly', true);
-            $('#referenceDate').css({ 'background-color': 'lightgray' });
-        }
-
-        isInChangeFunction = false;
-         tableDisplay();
-    });
-
-    // 適用終了日時チェックボックス押下時
-    $('#isBeforeApplicablePeriod').change(function () {
-        if (isInChangeFunction)
-            return;
-
-        isInChangeFunction = true;
-
-        // 枝連番表示チェックボックスのチェックを外す
-        $('#isAppearedBranchSeq').removeAttr("checked", false).prop('checked', false).change();
-
-        // 基準日時を選択不可に
-        $('#referenceDate').attr('readonly', true);
-        $('#referenceDate').css({ 'background-color': 'lightgray' });
-
-        isInChangeFunction = false;
-         tableDisplay();
-    });
 
     // 編集ボタン押下
     function OnEditClick(tripBranchNumberID) {
@@ -321,30 +277,6 @@
             }
         });
     }
-
-    // 時刻の表示形式変換(HH:mm)
-    function GetTimeString(date) {
-        var hour = date.getHours();
-        if (hour < 10) {
-            hour = "0" + hour;
-        }
-        var minute = date.getMinutes();
-        if (minute < 10) {
-            minute = "0" + minute;
-        }
-        return hour + ":" + minute;
-    }
-
-    // 日付の表示形式変換(yyyy/MM/dd hh:mm)
-    function GetDateString(date) {
-        var day = date.toLocaleDateString("ja-JP", {
-            year: "numeric", month: "2-digit",
-            day: "2-digit"
-        });
-        var time = GetTimeString(date);
-        return day + " " + time;
-    }
-
     // 更新ボタン押下
     function OnExecuteEdit() {
         $('#mTripBranchNumberForm').submit(function (event) {
@@ -383,17 +315,25 @@
         });
     }
 
-    // エラーメッセージ削除
-    function DeleteErrorMessages() {
-        $('#div-error-message').text('');
-        $('#edit-modal-error-message').text('');
-        $('#delete-modal-error-message').text('');
-        $('.text-danger').text('');
-        $('input').removeClass('input-validation-error');
-    }
-
     // 基準日時変更時
     $('input[type=datetime-local]').change(function () {
         tableDisplay();
     });
+
+    $('input[type=checkbox]').change(function () {
+        // チェックボックスの入力情報取得
+        var isBeforeApplicablePeriod = $('#isBeforeApplicablePeriod')[0].checked;
+        // デフォルトの操作を無効化
+        event.preventDefault();
+        if (isBeforeApplicablePeriod) {
+            $('#referenceDate').attr('readonly', true);
+            $('#referenceDate').css({ 'background-color': 'lightgray' });
+        }
+        else {
+            $('#referenceDate').attr('readonly', false);
+            $('#referenceDate').css({ 'background-color': '#ffffff' });
+        }
+        // テーブル表示
+        tableDisplay();
+    })
 </script>

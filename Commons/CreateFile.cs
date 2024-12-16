@@ -593,7 +593,7 @@ namespace ai_truck_load_measurement.Commons
                 // シート取得
                 using ExcelWorksheet sheet = package.Workbook.Worksheets[sheetName];
                 // フィルター設定
-                sheet.Cells["A1:AM1"].AutoFilter = true;
+                //sheet.Cells["A1:AM1"].AutoFilter = true;
                 // ウィンドウ枠の固定
                 sheet.View.FreezePanes(2, 1);
                 // セル自動選択

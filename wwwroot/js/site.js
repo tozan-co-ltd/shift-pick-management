@@ -29,7 +29,8 @@
     // ID(2列目)昇順
     $('.datatable-normal').DataTable({
         "language": {
-            "url": language_url
+            "url": language_url,
+            searchPlaceholder: "フリーワード(全件)"
         },
         lengthChange: true,     // 件数切替
         info: true,            // 総件数
@@ -41,55 +42,12 @@
             { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
         ],
         "oLanguage": {
-            "sSearch": "フリーワード(全件)"
+            "sSearch": ""
         },
         dom: dom_structure
     });
 
-    // 作成日時(1列目)降順
-    $('.datatable-createdat-desc').DataTable({
-        "language": {
-            "url": language_url
-        },
-        lengthChange: true,     // 件数切替
-        info: false,            // 総件数
-        scrollX: true,          // 横スクロール可
-        scrollCollapse: true,   // 縦スクロール表示
-        order: [[0, "desc"]],   // 作成日時降順
-    });
-
-    // ハンディエラーメッセージ用(作成日時(2列目)降順,縦スクロールあり,件数非表示,検索非表示)
-    $('.datatable-handyErrorMessage').DataTable({
-        "language": {
-            "url": language_url
-        },
-        lengthChange: false,    // 件数切替非表示
-        info: false,            // 総件数非表示
-        searching: false,       // 検索欄非表示
-        paging: false,          // ページング非表示
-        scrollX: true,          // 横スクロール可
-        scrollCollapse: true,   // 縦スクロール表示
-        scrollY: '200px',       // 縦スクロールサイズ
-        order: [[1, "desc"]],   // 作成日時降順
-        columnDefs: [
-            { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
-        ]
-    });
-
-    // 出荷実績照会用(仕入先品番(10列目)昇順)
-    $('.datatable-shipment').DataTable({
-        "language": {
-            "url": language_url
-        },
-        lengthChange: true,     // 件数切替
-        info: false,            // 総件数
-        scrollX: true,          // 横スクロール可
-        scrollCollapse: true,   // 縦スクロール表示
-        order: [[9, "asc"]],    // 仕入先品番日時昇順
-        columnDefs: [
-            { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
-        ]
-    });
+   
     //--------------------------------------------------------//
 
     // ページ上のすべてのファイル入力にfileselectイベント付与
@@ -156,130 +114,9 @@ function toggleSidebar() {
 }
 //--------------------------------------------------------//
 
-//------------------- CSV取込 ------------------//
-function onUploadFile(page) {
-
-    // ページの更新を禁止する
-    event.preventDefault();
-
-    $('#div-error-message').empty;
-
-    var formData = new FormData(document.querySelector('#' + page + ''));
-
-    var fileUpload = document.getElementById('UploadFileList');
-    if (fileUpload.files.length <= 0) {
-        $('#div-error-message').text('E1019: ファイルが選択されていません。');
-        $("#div-error-message").show();
-        return false;
-    }
-
-    var IsFirst = true;
-    for (var file of formData) {
-        if (IsFirst) {
-            if (file[1]["size"] <= 0) {
-                $('#div-error-message').text('E1019: ファイルが選択されていません。');
-                $("#div-error-message").show();
-                return false;
-            }
-            else {
-                $("#div-error-message").hide();
-                IsFirst = false;
-            }
-        }
-
-    }
-
-    const dialog = document.getElementById("import-modal");
-    if (dialog) {
-        dialog.parentNode.removeChild(dialog);
-    }
-
-    $('body').append(
-        '<div class="modal fade" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="importModalCenterTitle" aria-hidden="true">' +
-        '    <div class="modal-dialog modal-dialog-centered" role="document">' +
-        '        <div class="modal-content">' +
-        '            <div class="modal-header">' +
-        '                <h5 class="modal-title" id="importModalCenterTitle">取込</h5>' +
-        '                <button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-        '                    <span aria-hidden="true">&times;</span>' +
-        '                </button>' +
-        '            </div>' +
-        '            <div class="modal-body">' +
-        '                <p>ファイル取込を行います。よろしいですか？</p > ' +
-        '            </div>' +
-        '            <div class="modal-footer">' +
-        '                <button type="button" class="btn btn-secondary cancel" data-dismiss="modal">キャンセル</button>' +
-        '                <button type="button" class="btn btn-primary ok">OK</button>' +
-        '            </div>' +
-        '        </div>' +
-        '    </div>' +
-        '</div>'
-    );
-
-    $('#import-modal').modal('show');
-
-    $('#import-modal .cancel, #import-modal .close').click(function () {
-        $('#import-modal').modal('hide');
-        return false;
-    });
-
-    $('#import-modal .ok').click(function () {
-        $('#import-modal').modal('hide');
-
-        var importUrl = document.getElementById('import_action_url').value;
-        var loginUrl = document.getElementById('login_action_url').value;
-
-        showLoading();
-        $.ajax({
-            url: importUrl,
-            method: 'post',
-            data: formData,
-            processData: false,
-            contentType: false
-        }).done(function (response) {
-            var errorCode = "E1016";
-            // エラーコードを含む戻り値をチェック
-            if (response.indexOf(errorCode) == -1) {
-                hideLoading();
-                AlertMessage('', '取込', '登録が完了しました。', null, null);
-            }
-            else {
-                window.location.href = loginUrl;
-            }
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            hideLoading();
-            if (jqXHR.status === 404) {
-                // データが見つからなかった場合
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#div-error-message").html(errorMessage);
-            } else {
-                // その他のエラーの場合
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#div-error-message").html(errorMessage);
-            }
-            $("#div-error-message").show();
-            $('#' + page + '')[0].reset();
-        });
-    });
-}
-
-function showLoading() {
-    $("#file-upload").addClass('btn-disable')
-    $("#file-upload .text").text("取込中")
-    $("#file-upload i").removeClass('fa-solid fa-file-export')
-    $("#file-upload i").addClass('fas fa-spinner fa-pulse')
-}
-
-function hideLoading() {
-    $("#file-upload").removeClass('btn-disable')
-    $("#file-upload .text").text("取込")
-    $("#file-upload i").addClass('fa-solid fa-file-export')
-    $("#file-upload i").removeClass('fas fa-spinner fa-pulse')
-}
-//--------------------------------------------------------//
 
 
-//------------------- CSV,Excel出力 ------------------//
+//------------------- Excel出力 ------------------//
 async function onExportFile(page, gamenName) {
     event.preventDefault();
     $('#div-error-message').text("");
@@ -306,48 +143,40 @@ async function onExportFile(page, gamenName) {
     }
 }
 
- 
+function onExportFileTripsCommon(page, data) {
 
-
-
-
-// 条件あり
-function onExportCsvByCondition(page, formData) {
-
+    // フォーム情報取得
+    let url = window.location.href + '/ExportFile';
+    let method = 'Post';
+    tableDisplay(page);
+    event.preventDefault();
+    // Ajax call
     $.ajax({
-        url: '' + page + '/ExportCsv',
-        type: 'post',
-        data: formData,
-        contentType: false,
-        processData: false,
+        url: url,
+        method: method,
+        data: data
     }).done(function (response) {
-        if (response.data != null) {
-            var { contentType, fileContents, fileDownloadName } = response.data;
-            {
-                const link = document.createElement("a");
-                link.href = `data:${contentType};base64,${fileContents}`;
-                link.download = fileDownloadName;
-                link.click();
-            }
+        var { contentType, fileContents, fileDownloadName } = response.data;
+        {
+            const link = document.createElement("a");
+            link.href = `data:${contentType};base64,${fileContents}`;
+            link.download = fileDownloadName;
+            link.click();
         }
-        else {
-            $("#div-error-message").show();
-            $("#div-error-message").html(response.errorMessage);
-        }
+
     }).fail(function (jqXHR, textStatus, errorThrown) {
         if (jqXHR.status === 404) {
-            // データが見つからなかった場合
             var errorMessage = jqXHR.responseJSON.errorMessage;
             $("#div-error-message").show();
-            $("#div-error-message").html(errorMessage);
+            $("#div-error-message").text(errorMessage);
         } else {
-            // その他のエラーの場合
+            var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
             $("#div-error-message").show();
-            AlertMessage('bg-danger', 'エラー', 'E3003 サーバーに接続できませんでした。<br> ' + 'HttpRequest : ' + jqXHR.status + '<br> ' + 'textStatus : ' + textStatus, null, null);
+            $("#div-error-message").text(errorMessage);
         }
     });
 }
-//------------------- CSV出力 ------------------//
+//--------------------------------------------------------//
 
 
 //------------------- モーダル表示 ------------------//
@@ -394,112 +223,6 @@ function AlertMessage(type, title, message, isRedirect, urlRedirect, isNotReload
 }
 //--------------------------------------------------------//
 
-//------------------- 数秒待機 ------------------//
-function WaitSeconds() {
-    return new Promise(resolve => {
-        setTimeout(() => resolve(), 2000);
-    });
-}
-//--------------------------------------------------------//
-
-//------------------- 仕入先かんばんマスターバリデーションチェック ------------------//
-function CheckValidationMSupplierKanban() {
-    var checkFlag = true;
-
-    // 識別文字
-    var IdentifyStringStartIndex = $("#IdentifyStringStartIndex");
-    var IdentifyString = $("#IdentifyString");
-    if (IdentifyStringStartIndex.val() <= 0) {
-        IdentifyStringStartIndex.addClass("input-validation-error");
-        checkFlag = false;
-    }
-    if (parseInt(IdentifyString.val().length, 10) <= 0) {
-        IdentifyString.addClass("input-validation-error");
-        checkFlag = false;
-    }
-
-    // 重複許容フラグ
-    var selectedValue = $('input[name="AllowedDuplicatesFlag"]:checked').val();
-    var requiredCheck = false;
-    if (selectedValue == '0') {
-        requiredCheck = true;
-    }
-
-    // 仕入先かんばん名
-    var kanbanName = document.getElementById("SupplierKanbanName");
-    if (kanbanName.value.length <= 0) {
-        kanbanName.classList.add("input-validation-error");
-        checkFlag = false;
-    }
-
-    // 桁数・開始位置
-    var checkProductNumber = CheckPairValueMSupplierKanban("ProductNumberLength", "ProductNumberStartIndex", true);
-    var checkQuantity = CheckPairValueMSupplierKanban("QuantityLength", "QuantityStartIndex");
-    var checkLot = CheckPairValueMSupplierKanban("LotLength", "LotStartIndex");
-    var checkMainProductKey = CheckPairValueMSupplierKanban("MainProductKeyLength", "MainProductKeyStartIndex", requiredCheck);
-    var checkFirstSubProductKey = CheckPairValueMSupplierKanban("FirstSubProductKeyLength", "FirstSubProductKeyStartIndex");
-    var checkSecondSubProductKey = CheckPairValueMSupplierKanban("SecondSubProductKeyLength", "SecondSubProductKeyStartIndex");
-    var checkProductBranchNumber = CheckPairValueMSupplierKanban("ProductBranchNumberLength", "ProductBranchNumberStartIndex");
-    var checkOrderNumber = CheckPairValueMSupplierKanban("OrderNumberLength", "OrderNumberStartIndex");
-
-    if (!checkProductNumber || !checkQuantity || !checkLot || !checkFirstSubProductKey
-        || !checkSecondSubProductKey || !checkProductBranchNumber || !checkOrderNumber) {
-        checkFlag = false;
-    } 
-
-    if (!checkFlag) {
-        $("#div-error-message").text("E1017: 入力値に不正な値があります。正しい値を入力してください。");
-    }
-
-    if (!checkMainProductKey) {
-        $("#duplicate-error-message").text("E1024: 重複許容フラグが0の場合、メインキーは必須項目です。");
-        $(".MainProductKey").addClass("input-validation-error");
-    }
-
-    if (!checkFlag) return false;
-    if (!checkMainProductKey) return false;
-}
-
-// 入力必須項目チェック
-function CheckPairValueMSupplierKanban(id1, id2, required = false) {
-    var checkFlag = true;
-    var length = $("#" + id1);
-    var startIndex = $("#" + id2);
-    var lengthValue = parseInt(length.val(), 10);
-    var startIndexValue = parseInt(startIndex.val(), 10);
-
-    // 空白の場合は0に変換
-    if (Number.isNaN(lengthValue)) {
-        length.val(0);
-    }
-    if (Number.isNaN(startIndexValue)) {
-        startIndex.val(0);
-    }
-
-    // どちらかが0の場合はエラー
-    if (lengthValue > 0 && (startIndexValue <= 0 || Number.isNaN(startIndexValue))) {
-        startIndex.addClass("input-validation-error");
-        checkFlag = false;
-    }
-    if ((lengthValue <= 0 || Number.isNaN(lengthValue)) && startIndexValue > 0) {
-        length.addClass("input-validation-error");
-        checkFlag = false;
-    }
-
-    // 必須項目が0未満の場合はエラー
-    if (required) {
-        if (Number.isNaN(lengthValue) || lengthValue <= 0) {
-            length.addClass("input-validation-error");
-            checkFlag = false;
-        }
-        if (Number.isNaN(startIndexValue) || startIndexValue <= 0) {
-            startIndex.addClass("input-validation-error");
-            checkFlag = false;
-        }
-    }
-    return checkFlag;
-}
-//--------------------------------------------------------//
 
 //------------------- バリデーションチェック ------------------//
 // 小数点とMaxLengthチェック
@@ -522,29 +245,6 @@ function CheckInputNumber() {
 }
 //--------------------------------------------------------//
 
-// --------異なるログインを検出したため自動ログアウトされ、テーブルデータを表示--------//
-function HasOtherLogin(response, url, colNum) {
-    var errorCode = "E1016";
-    // エラーコードを含む戻り値をチェック
-    if (response.indexOf(errorCode) !== -1)
-        window.location.href = url;
-    else {
-        $("#table-datatable tbody").empty();
-        $('#table-datatable').DataTable().destroy();
-        $("#div-table").show();
-        $("#table-datatable tbody").html(response);
-        $("#table-datatable").DataTable({
-            "language": {           // 日本語表示
-                "url": "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json"
-            },
-            lengthChange: true,     // 表示件数
-            info: false,            // 総件数
-            scrollX: true,          // 横スクロール可
-            order: [[colNum, "asc"]],    // 仕入先品番昇順
-        });
-    }
-}
-//--------------------------------------------------------//
 
 // ------------------------Chart.js関連------------------------//
 
@@ -571,6 +271,14 @@ const graphColors = [
     'rgba(134, 187, 182, 1)',
     'rgba(215, 181, 168, 1)'
 ];
+
+// データセットの作成、登録
+function createAndPushDatasets(targetChart, color, data, label) {
+    var datasets = createChartDatasets(color);
+    datasets.data = data;
+    datasets.label = label;
+    targetChart.data.datasets.push(datasets);
+}
 //--------------------------------------------------------//
 
 
@@ -597,3 +305,500 @@ highlightedDates: selectedDates
 
 });
 //--------------------------------------------------------//
+
+//----------------------荷量画像モーダル関連--------------//
+let model;
+
+// 便実績テーブルの要素数
+let tableLength = 0;
+
+// 便実績テーブルの行情報配列
+let arrayTrs = [];
+
+// 到着荷量画像ボタン押下
+function OnArrivalLoadImageClick(tripRecordID, button, page) {
+    // 配列の初期化
+    arrayTrs = [];
+    // 到着
+    var isArrived = true;
+    // テーブルに表示されている便実績のIDをリスト化
+    trs = button.parentNode.parentNode.parentNode.childNodes;
+    for (i = 0; i < trs.length - tableLength; i++) {
+        arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
+    }
+    EditModal(tripRecordID, isArrived, page);
+}
+
+// 出発荷量画像ボタン押下
+function OnDepartureLoadImageClick(tripRecordID, button, page) {
+    // 配列の初期化
+    arrayTrs = [];
+    // 出発
+    var isArrived = false;
+    // テーブルに表示されている便実績のIDをリスト化
+    trs = button.parentNode.parentNode.parentNode.childNodes;
+    for (i = 0; i < trs.length - tableLength; i++) {
+        arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
+    }
+    EditModal(tripRecordID, isArrived, page);
+}
+
+// 荷量画像モーダル作成
+function EditModal(tripRecordID, isArrived, page) {
+    // デフォルトの操作を無効化
+    event.preventDefault();
+
+    // LoadOutputModel取得
+    var tripRecordModel = model.tripRecordList;
+    tripRecordModel.forEach(function (item) {
+        if (item.tripRecordID == tripRecordID) {
+
+            // フォーム情報取得
+            let url = window.location.href + '/GetModalItems';
+            url = url.replace(page, 'LoadRecord');
+            let method = 'POST';
+            let data = { model: item, isArrived: isArrived };
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                var imagePath = "";
+                var arriveOrDeparture = "";
+                var arriveOrDepartureDate = "";
+                var loadStatus = "";
+                var downloadFileName = "";
+                var workDayForFile = GetDayStringForFile(new Date(item.workDay));
+                var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
+                var truckNumber = item.truckNumber;
+                if (truckNumber == "0") truckNumber = "-";
+                if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
+
+                // 到着か出発かで変わる要素の登録
+                if (isArrived) {
+                    $('#detail-modal-label').text("到着荷量画像");
+                    loadStatus = item.arrivalLoadStatus;
+                    imagePath = response.arrivalLoadImgPath;
+                    arriveOrDeparture = "到着時間";
+                    arriveOrDepartureDate = GetDateString(new Date(item.arrivedAt));
+                    downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_A_" + loadStatus + ".jpg";
+                }
+                else {
+                    $('#detail-modal-label').text("出発荷量画像");
+                    loadStatus = item.departureLoadStatus;
+                    imagePath = response.departureLoadImgPath;
+                    arriveOrDeparture = "出発時間";
+                    arriveOrDepartureDate = GetDateString(new Date(item.departedAt));
+                    downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_D_" + loadStatus + ".jpg";
+                }
+
+                $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
+
+                var workDay = GetDayString(new Date(item.workDay));
+
+                // 表示している行の上下の行の便実績ID取得
+                var tripRecordIDIndex = arrayTrs.indexOf(tripRecordID);
+                var previousTripRecordID = arrayTrs[tripRecordIDIndex - 1];
+                var nextTripRecordID = arrayTrs[tripRecordIDIndex + 1];
+
+
+                // ボタンの追加
+                var buttons = $("#tripRecord-buttons");
+                buttons.empty();
+                let div = "<div class=\"d-flex xs-block justify-content-start align-items-center p-0 mb-2 trip-record-buttons\">"
+                    + "<div class=\"input-group-append mr-3\" >"
+                    + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherModalClick('" + previousTripRecordID + "','" + isArrived + "','" + page + "')\" >"
+                    + "<span class=\"text\" >▲上へ</span>"
+                    + "</a>"
+                    + "</div>"
+                    + "<div class=\"input-group-append mr-3\" >"
+                    + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherModalClick('" + nextTripRecordID + "','" + isArrived + "','" + page + "')\" >"
+                    + "<span class=\"text\" >▼下へ</span>"
+                    + "</a>"
+                    + "</div>"
+                    + "<div class=\"input-group-append mr-3 right-button\" >"
+                    + " <a href=\"data:image/jpeg;base64," + imagePath + "\", download=\"" + downloadFileName + "\" class=\"btn btn-info btn-icon-split\"  >"
+                    + "<span class=\"icon text-white-50\" >"
+                    + "<i class=\"fa-solid fa-circle-down\" > </i>"
+                    + "</span>"
+                    + "<span class=\"text\" >画像出力</span>"
+                    + "</a>"
+                    + "</div>";
+                buttons.append(div);
+
+                // テーブルの追加
+                var container = $("#tripRecord-contatiner");
+                container.empty();
+                let tr = "<tr>"
+                    + "<td>荷量</td>"
+                    + "<td>" + loadStatus + "%</td>"
+                    + "</tr><tr>"
+                    + "<td>荷量の相違あり</td>"
+                    + "<td>"
+                    + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">";
+                if (!(userName == "服部 正次" || userName == "林 恭佑")) {
+                    tr += "<label id=\"loadStatusSelect\" ></label>";
+                } else {
+                    tr += "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" id=\"loadStatusSelect\" >"
+                        + "<option value=\"\" hidden></option>"
+                        + "<option value=\"1\">0%</option>"
+                        + "<option value=\"3\">1-10%</option>"
+                        + "<option value=\"4\">11-20%</option>"
+                        + "<option value=\"5\">21-30%</option>"
+                        + "<option value=\"6\">31-40%</option>"
+                        + "<option value=\"7\">41-50%</option>"
+                        + "<option value=\"8\">51-60%</option>"
+                        + "<option value=\"9\">61-70%</option>"
+                        + "<option value=\"10\">71-80%</option>"
+                        + "<option value=\"11\">81-90%</option>"
+                        + "<option value=\"12\">91-100%</option>"
+                        + "</select>"
+                        + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "', '" + page + "')\" id=\"verificationRequired\">"
+                        + "<span class=\"text\">要検証</span>"
+                        + "</a>";
+                }
+
+                tr += "</div>"
+                    + "</td>"
+                    + "</tr><tr>"
+                    + "<td>便名称_便枝番</td>"
+                    + "<td>" + tripNameAndBranchSeq + "</td>"
+                    + "</tr><tr>"
+                    + "<td>乗務員</td>"
+                    + "<td>" + item.driverName + "</td>"
+                    + "</tr><tr>"
+                    + "<td>ステーションID</td>"
+                    + "<td>" + item.stationID + "</td>"
+                    + "</tr><tr>"
+                    + "<td>車両番号</td>"
+                    + "<td>" + truckNumber + "</td>"
+                    + "</tr><tr>"
+                    + "<td>識別番号</td>"
+                    + "<td>" + item.identifyNumber + "</td>"
+                    + "</tr><tr>"
+                    + "<td>稼働日</td>"
+                    + "<td>" + workDay + "</td>"
+                    + "</tr><tr>"
+                    + "<td>" + arriveOrDeparture + "</td>"
+                    + "<td>" + arriveOrDepartureDate + "</td>"
+                    + "</tr>";
+                container.append(tr);
+                if (userName == "服部 正次" || userName == "林 恭佑") {
+                    $('#loadStatusSelect').val(response.annotationLoadClass);
+                } else if (response.annotationLoadStatus != null) {
+                    $('#loadStatusSelect').text(response.annotationLoadStatus + "%");
+                } else {
+                    $('#loadStatusSelect').text("-");
+                }
+
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#edit-modal-error-message").text(errorMessage);
+                }
+            });
+
+        }
+    });
+}
+
+// モーダル内の「上へ」「下へ」ボタン押下時
+function onOtherModalClick(otherTripRecordID, isArrived, page) {
+    event.preventDefault();
+    if (isArrived == "true") {
+        isArrived = true;
+    } else {
+        isArrived = false;
+    }
+    EditModal(otherTripRecordID, isArrived, page);
+}
+
+// 要検証ボタン押下時
+function onVerificationRequiredClick(tripRecordID, isArrived, page) {
+    event.preventDefault();
+    var loadStatus = $('[name=loadStatusSelect]').val();
+    if (loadStatus != "") {
+
+        DeleteErrorMessages()
+        // フォーム情報取得
+        let url = window.location.href + '/InsertOrUpdateAnnotationLoads';
+        url = url.replace(page, 'LoadRecord');
+        let method = 'POST';
+        let data = { tripRecordID: tripRecordID, loadStatus: loadStatus, isArrived: isArrived };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            // 完了モーダル表示
+            alert('登録が完了しました。');
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    }
+}
+//---------------------------------------------------------------------//
+
+
+//-----------------------------期間が90日以内か否か-------------------//
+function isWithin90Days() {
+    var startOfPeriod = new Date($('#startOfPeriod').val());
+    var endOfPeriod = new Date($('#endOfPeriod').val());
+    var diffMilliSec = endOfPeriod - startOfPeriod;
+    var diffDays = parseInt(diffMilliSec / 1000 / 60 / 60 / 24);
+    if (diffDays <= 90) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+//-------------------------------------------------------------------//
+
+//-------------------------------------------------------------------//
+// 便実績テーブル表示の共通部分
+function tableDisplayCommon(page, data) {
+
+    // フォーム情報取得
+    let url = window.location.href + '/SearchData';
+    let method = 'Post';
+
+    // Ajax call
+    $.ajax({
+        url: url,
+        method: method,
+        data: data
+    }).done(function (response) {
+        var tableHTML = response.searchedTripRecordHTML;
+        tableLength = response.searchedTripRecordLength + 1;
+        $('#tripRecordTable').empty().html(tableHTML);
+        // 日本語表示
+        const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+        const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
+
+        // ID(2列目)昇順
+        $("#tripRecordDataTable").DataTable({
+            "language": {
+                "url": language_url,
+                searchPlaceholder: "フリーワード(全件)"
+            },
+            lengthChange: true,     // 件数切替
+            info: true,            // 総件数
+            scrollX: true,          // 横スクロール可
+            scrollCollapse: true,   // 縦スクロール表示
+            searchHighlight: true,  // 検索ハイライト
+            orderFixed: [1, "asc"],
+            order: [[2, "asc"] , [9, "asc"], [3, "asc"]],    // ID昇順
+            "oLanguage": {
+                "sSearch": ""
+            },
+            dom: dom_structure,
+        });
+        var table = $("#tripRecordDataTable").DataTable();
+        table.on('draw', function () {
+            var body = $(table.table().body());
+
+            body.unhighlight();
+            body.highlight(table.search());
+        });
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status === 404) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#edit-modal-error-message").text(errorMessage);
+        } else {
+            var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+            $("#edit-modal-error-message").text(errorMessage);
+        }
+    });
+}
+
+//-------------------------------------------------------------------//
+
+//-------------------------------------------------------------------//
+// 画像一括出力共通処理
+function onExportAllImagesCommon(page, data) {
+
+    // フォーム情報取得
+    let url = window.location.origin + '/' + page + '/ZipDownload';
+    let method = 'POST';
+
+    tableDisplay(page);
+
+    // Ajax call
+    $.ajax({
+        url: url,
+        method: method,
+        data: data
+    }).done(function (response) {
+        var { contentType, fileContents, fileDownloadName } = response.data;
+        {
+            const link = document.createElement("a");
+            link.href = `data:${contentType};base64,${fileContents}`;
+            link.download = fileDownloadName;
+            link.click();
+        }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status === 404) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        } else {
+            var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+            $("#div-error-message").text(errorMessage);
+        }
+    });
+}
+//-------------------------------------------------------------------//
+
+//-------------------------------------------------------------------//
+// エラーメッセージ削除
+function DeleteErrorMessages() {
+    $('#div-error-message').text('');
+    $('#edit-modal-error-message').text('');
+    $('#delete-modal-error-message').text('');
+    $('.text-danger').text('');
+    $('input').removeClass('input-validation-error');
+}
+//-------------------------------------------------------------------//
+
+
+//------------------------------時間の表示形式変換-------------------------------//
+// 日付の表示形式変換(yyyy/MM/dd)
+function GetDayString(date) {
+    var day = date.toLocaleDateString("ja-JP", {
+        year: "numeric", month: "2-digit",
+        day: "2-digit"
+    });
+    return day;
+}
+
+
+// 時刻の表示形式変換(HH:mm)
+function GetTimeString(date) {
+    var hour = date.getHours();
+    if (hour < 10) {
+        hour = "0" + hour;
+    }
+    var minute = date.getMinutes();
+    if (minute < 10) {
+        minute = "0" + minute;
+    }
+    return hour + ":" + minute;
+}
+
+// 日時の表示形式変換(yyyy/MM/dd hh:mm)
+function GetDateString(date) {
+    var day = GetDayString(date);
+    var time = GetTimeString(date);
+    return day + " " + time;
+}
+
+
+// 日付の表示形式変換(yyyyMMdd)
+function GetDayStringForFile(date) {
+    var year = date.getFullYear().toString();
+    var month = ("00" + (date.getMonth() + 1)).slice(-2);
+    var day = ("00" + date.getDate()).slice(-2);
+    return year + month + day;
+}
+
+
+// 日付の表示形式変換(MM/dd)
+function GetDayStringForChart(date) {
+    var month = (date.getMonth() + 1).toString();
+    var day = date.getDate().toString();
+    return month + "/" + day;
+}
+//-------------------------------------------------------------------//
+
+
+// 選択された便の配列
+let arrayTrips = [];
+
+// 追加ボタン押下時
+function addTrips() {
+    event.preventDefault();
+    // 20件の便が選択されているとき
+    if (20 <= arrayTrips.length) {
+        var errorMessage = 'E1008: 選択できる便数は最大20件です。20件を超えないように選択してください。';
+        $("#div-error-message").text(errorMessage);
+        return;
+    }
+    // 便名称と便枝番取得
+    var tripName = $('[name=TripName]').val();
+    var tripBranchSeq = $('[name=TripBranchSeq]').val();
+
+    // 入力されていない場合、エラー出力
+    if (tripName == "" || tripBranchSeq == "" || tripName == null || tripBranchSeq == null) {
+        return;
+    }
+    var selectedTripName = tripName + "_" + tripBranchSeq;
+
+    // 重複チェック
+    const tripNames = arrayTrips.map(d => d.selectedTripName);
+    if (tripNames.includes(selectedTripName)) {
+        return;
+    }
+
+    // 選択された便を追加する行を設定
+    var selectedTripsNumber = Math.floor(arrayTrips.length / 5);
+    var selectedTrips = $('#selectedTrips' + selectedTripsNumber)[0];
+
+    // 選択された便に追加
+    arrayTrips.push({ tripName, tripBranchSeq, selectedTripName });
+    pushLabelToSelectedTrips(selectedTrips, selectedTripName);
+}
+
+// 選択された便ラベルを作成、指定した親要素の子として登録
+function pushLabelToSelectedTrips(selectedTrips, selectedTripName) {
+    var selectedTripLabel = document.createElement("label");
+    selectedTripLabel.innerText = selectedTripName;
+    selectedTripLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1\" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
+    selectedTripLabel.className += "mr-2 selected-trip-label";
+    selectedTripLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
+    selectedTripLabel.style.padding = "0.5em";
+    selectedTrips.appendChild(selectedTripLabel);
+}
+
+// 選択された便の×ボタン押下時
+function onLabelDeleteClick(selectedTripName) {
+    event.preventDefault();
+    // ラベル全削除
+    $('.selected-trip-label').remove();
+
+    // 配列から削除
+    const tripNames = arrayTrips.map(d => d.selectedTripName);
+    var deleteIndex = tripNames.indexOf(selectedTripName);
+    arrayTrips.splice(deleteIndex, 1);
+
+    // 選択された便の再表示
+    for (var i = 0; i < arrayTrips.length; i++) {
+        // 選択された便を追加する行を設定
+        var selectedTripsNumber = Math.floor(i / 5);
+        var selectedTrips = $('#selectedTrips' + selectedTripsNumber)[0];
+
+        var selectedTripName = arrayTrips[i].selectedTripName;
+        pushLabelToSelectedTrips(selectedTrips, selectedTripName);
+    }
+}
+
+// 追加した選択肢の一括クリアボタン押下時
+function clearTrips() {
+    event.preventDefault();
+    // ラベルと配列から全削除
+    $('.selected-trip-label').remove();
+    arrayTrips = [];
+    arrayWorkDays = [];
+}

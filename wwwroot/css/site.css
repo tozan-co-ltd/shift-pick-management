@@ -985,3 +985,27 @@ table.dataTable span.column_highlight {
     border-radius: 0.28571429rem;
 }
 /*------------------Search Highlight CSS------------------------------*/
+
+.color-box {
+    height: 20px;
+    width: 50px;
+    background-color: rgba(100,100,180,.2);
+    display: block;
+    border: solid .5px rgba(0,0,0,.2);
+}
+
+.border-box {
+    height: 20px;
+    width: 50px;
+    background-color: #ffffff;
+    display: block;
+    border: solid .5px rgba(0,0,0, .3);
+    text-align: center;
+}
+
+.border-box-line {
+    display: inline-block;
+    width: 3px;
+    height: 100%;
+    background-color: #000;
+}

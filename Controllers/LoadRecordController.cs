@@ -260,7 +260,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static SearchedTripRecordListModel SearchData(string sql)
+        public static SearchedTripRecordListModel SearchData(string sql, string page)
         {
             var searchData = string.Empty;
             IEnumerable<LoadRecordModel> tripRecordList;
@@ -274,6 +274,7 @@ namespace ai_truck_load_measurement.Controllers
                         <thead>
                             <tr align=""center"">
                                 <th hidden>便実績ID</th>
+                                <th hidden>便名称有無</th>
                                 <th class=""font-weight-bold"">便名称<br></th>
                                 <th class=""font-weight-bold"">便枝番</th>
                                 <th class=""font-weight-bold"">乗務員</th>
@@ -304,9 +305,12 @@ namespace ai_truck_load_measurement.Controllers
                     if (arrivalScheduledTime == "00:00") arrivalScheduledTime = "-";
                     var departureScheduledTime = item.DepartureScheduledTime.ToString("HH:mm");
                     if (departureScheduledTime == "00:00") departureScheduledTime = "-";
+                    var hasTripName = 0;
+                    if(item.TripName == "-") hasTripName = 1;
                     searchData += $@"
                         <tr>
                             <td hidden>{item.TripRecordID}</td>
+                            <td hidden>{hasTripName}</td>
                             <td>{item.TripName}</td>
                             <td>{item.TripBranchSeq}</td>
                             <td>{item.DriverName}</td>
@@ -322,13 +326,13 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{item.DepartureLoadStatus}</td>
                             <td>
                                 <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                    onclick=""OnArrivalLoadImageClick('{item.TripRecordID}', this)"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                    onclick=""OnArrivalLoadImageClick('{item.TripRecordID}', this, '{page}')"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
                                     <i class=""fa-solid fa-truck""></i>
                                 </a>
                             </td>
                             <td>
                                 <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                    onclick=""OnDepartureLoadImageClick('{item.TripRecordID}', this)"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                    onclick=""OnDepartureLoadImageClick('{item.TripRecordID}', this, '{page}')"" data-id=""{item.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
                                     <i class=""fa-solid fa-truck""></i>
                                 </a>
                             </td>

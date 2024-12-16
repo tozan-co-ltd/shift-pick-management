@@ -56,15 +56,29 @@ namespace ai_truck_load_measurement.ConnectControllers
             {
                 connection.ConnectionString = connectionString;
                 connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                using(var command = connection.CreateCommand())
+                {
+                    // トランザクションの開始
+                    command.Transaction = connection.BeginTransaction();
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                    int insertedCount;
 
-                // 便名称の便ID取得と重複チェックおよび新規登録
-                model.TripID = GetMTripIDAndDuplicateChecksAndInsertsForTripName(connection, model.TripName); 
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                    try
+                    {
+                        // 便名称の便ID取得と重複チェックおよび新規登録
+                        model.TripID = GetMTripIDAndDuplicateChecksAndInsertsForTripName(connection, command, model.TripName);
 
-                // 便履歴テーブルに登録
-                var insertedCount = InsertMTripHistoryTable(connection, model, loginUser.UserName);
-
-                return insertedCount;
+                        // 便履歴テーブルに登録
+                        insertedCount = InsertMTripHistoryTable(connection, command, model, loginUser.UserName);
+                    }
+                    catch (Exception) { 
+                        command.Transaction.Rollback();
+                        throw;
+                    }
+                    command.Transaction.Commit();
+                    return insertedCount;
+                }
             }
         }
 
@@ -83,25 +97,34 @@ namespace ai_truck_load_measurement.ConnectControllers
             {
                 connection.ConnectionString = connectionString;
                 connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
+                using(var command = connection.CreateCommand())
                 {
-                    DateTime sysDate = DateTime.Now;
+                    // トランザクションの開始
+                    command.Transaction = connection.BeginTransaction();
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                    int count;
 
-                    // 便名称の便ID取得と重複チェックおよび新規登録
-                    model.TripID = GetMTripIDAndDuplicateChecksAndInsertsForTripName(connection, model.TripName);
+                    // DB接続
+                    try
+                    {
+                        DateTime sysDate = DateTime.Now;
 
-                    // 便履歴テーブル更新
-                    string sql = CreateSQLToUpdateMTripHistory(model, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
+                        // 便名称の便ID取得と重複チェックおよび新規登録
+                        model.TripID = GetMTripIDAndDuplicateChecksAndInsertsForTripName(connection, command, model.TripName);
+
+                        // 便履歴テーブル更新
+                        string sql = CreateSQLToUpdateMTripHistory(model, sysDate, loginUser.UserName);
+                        count = connection.Execute(sql, new {}, command.Transaction);
+                    }
+                    catch (Exception)
+                    {
+                        command.Transaction.Rollback();
+                        throw;
+                    }
+                    command.Transaction.Commit();
                     return count;
                 }
-                catch (Exception)
-                {
-                    throw;
-                }
+                
             }
         }
 
@@ -111,7 +134,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="connection"></param>
         /// <param name="tripName">便名称</param>
         /// <returns></returns>
-        private static bool IsSameTripNameExist(SqlConnection connection, string tripName)
+        private static bool IsSameTripNameExist(SqlConnection connection, SqlCommand command, string tripName)
         {
             // 戻り値
             var isTripExist = false;
@@ -120,7 +143,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             {
                 string sql = CreateSQLToExistMTripName(tripName);
                 // 同じ便名称のデータが存在する場合、値が代入される
-                var reader = connection.ExecuteScalar(sql);
+                var reader = connection.ExecuteScalar(sql,new { }, command.Transaction);
                 if (reader != null)
                 {
                     isTripExist = true;
@@ -138,12 +161,12 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="tripName"></param>
-        private static void InsertMTripTable(SqlConnection connection, string tripName)
+        private static void InsertMTripTable(SqlConnection connection, SqlCommand command, string tripName)
         {
             try
             {
                 string sql = CreateSQLToInsertMTrip(tripName);
-                connection.Execute(sql);
+                connection.Execute(sql, new {}, command.Transaction);
             }
             catch (Exception)
             {
@@ -157,12 +180,12 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="connection"></param>
         /// <param name="tripName">便名称</param>
         /// <returns></returns>
-        private static int SelectMTripID(SqlConnection connection, string tripName)
+        private static int SelectMTripID(SqlConnection connection, SqlCommand command, string tripName)
         {
             try
             {
                 string sql = CreateSQLToSelectMTripID(tripName);
-                var tripID = Convert.ToInt32(connection.ExecuteScalar(sql));
+                var tripID = Convert.ToInt32(connection.ExecuteScalar(sql, new { }, command.Transaction));
                 return tripID;
             }
             catch (Exception)
@@ -178,13 +201,13 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="model">便履歴モデル</param>
         /// <param name="userName">登録者名</param>
         /// <returns></returns>
-        private static int InsertMTripHistoryTable(SqlConnection connection, M_TripModel model, string userName)
+        private static int InsertMTripHistoryTable(SqlConnection connection, SqlCommand command, M_TripModel model, string userName)
         {
             try
             {
                 DateTime sysDate = DateTime.Now;
                 string sql = CreateSQLToInsertMTripHistory(model, sysDate, userName);
-                var insertedCount = connection.Execute(sql);
+                var insertedCount = connection.Execute(sql, new {}, command.Transaction);
                 return insertedCount;
             }
             catch (Exception)
@@ -199,20 +222,20 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="connection"></param>
         /// <param name="tripName"></param>
         /// <returns></returns>
-        private static int GetMTripIDAndDuplicateChecksAndInsertsForTripName(SqlConnection connection, string tripName)
+        private static int GetMTripIDAndDuplicateChecksAndInsertsForTripName(SqlConnection connection, SqlCommand command, string tripName)
         {
             // 同じ便名称のデータが便マスターに登録されているか
-            var isTripExist = IsSameTripNameExist(connection, tripName);
+            var isTripExist = IsSameTripNameExist(connection, command, tripName);
 
             // 便名称が便マスターに登録されていない場合
             // 便テーブルに新規登録
             if (!isTripExist)
             {
-                InsertMTripTable(connection, tripName);
+                InsertMTripTable(connection, command, tripName);
             }
 
             // 便名称から便ID取得
-            var tripID = SelectMTripID(connection, tripName);
+            var tripID = SelectMTripID(connection, command, tripName);
             return tripID;
         }
 

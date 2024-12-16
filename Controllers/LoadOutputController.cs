@@ -53,15 +53,15 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
+        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber)
         {
             var searchData = string.Empty;
             IEnumerable<LoadOutputModel> tripRecordList;
             try
             {
                 // 指定した期間の便マスター情報取得SQL作成
-                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
-                var searchedTripRecordListModel = LoadRecordController.SearchData(sql);
+                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber);
+                var searchedTripRecordListModel = LoadRecordController.SearchData(sql, "LoadOutput");
 
                 return Json(searchedTripRecordListModel);
             }
@@ -84,7 +84,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
+        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber)
         {
             string? errorMessage;
             string startDate = startOfPeriod.ToString("yyyyMMdd");
@@ -96,19 +96,12 @@ namespace ai_truck_load_measurement.Controllers
                 searchConditionDT.Columns.Add("項目名");
                 searchConditionDT.Columns.Add("検索条件");
                 searchConditionDT.Rows.Add("稼働日",$"{startDate}～{endDate}");
-                var amountCondition = "";
-                if (isOnlyHasAmountDefference)
-                {
-                    amountCondition = "YES";
-                }
-                else
-                {
-                    amountCondition = "NO";
-                }
-                searchConditionDT.Rows.Add("荷量の相違ありのみか",amountCondition);
+                // 絞り込み条件作成
+                var shiborikomiCondition = ShiborikomiCondition(isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber);
+                searchConditionDT.Rows.Add("絞り込み条件：",shiborikomiCondition);
 
                 // 便実績情報取得
-                var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
+                var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber);
                 DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
 
                 // 荷量のクラスを数値化
@@ -169,7 +162,46 @@ namespace ai_truck_load_measurement.Controllers
 
         }
 
-        
+        /// <summary>
+        /// 絞り込み条件作成
+        /// </summary>
+        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみか</param>
+        /// <param name="hasTripName">便名称ありのみか</param>
+        /// <param name="hasIdentifyNumber">識別番号ありのみか</param>
+        /// <returns></returns>
+        private string ShiborikomiCondition(bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber)
+        {
+            var shiborikomiCondition = "";
+            var hasCondition = false;
+            if (isOnlyHasAmountDefference)
+            {
+                shiborikomiCondition = "荷量の相違ありのみ";
+                hasCondition = true;
+            }
+            if (hasTripName)
+            {
+                if (!string.IsNullOrEmpty(shiborikomiCondition))
+                {
+                    shiborikomiCondition += ",";
+                }
+                shiborikomiCondition += "便名称ありのみ";
+                hasCondition = true;
+            }
+            if (hasIdentifyNumber)
+            {
+                if (!string.IsNullOrEmpty(shiborikomiCondition))
+                {
+                    shiborikomiCondition += ",";
+                }
+                shiborikomiCondition += "識別番号ありのみ";
+                hasCondition = true;
+            }
+            if (!hasCondition)
+            {
+                shiborikomiCondition = "なし";
+            }
+            return shiborikomiCondition;
+        }
 
 
         /// <summary>
@@ -180,13 +212,13 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみのデータか</param>
         /// <returns></returns>
-        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference)
+        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber)
         {
             // ダウンロードボタンが押された際の処理
             if (download == "download")
             {
                 // 指定した期間の便実績情報取得SQL作成
-                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference);
+                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber);
                 // DB接続
                 IEnumerable<LoadOutputModel> tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql);
 
@@ -248,16 +280,8 @@ namespace ai_truck_load_measurement.Controllers
                         {
                             //書き込む
                             sw.WriteLine($"稼働日：{startDate}～{endDate}");
-                            var amountCondition = "";
-                            if (isOnlyHasAmountDefference)
-                            {
-                                amountCondition = "YES";
-                            }
-                            else
-                            {
-                                amountCondition = "NO";
-                            }
-                            sw.Write($"荷量の相違ありのみか：{amountCondition}");
+                            var shiborikomiConditioin = ShiborikomiCondition(isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber);
+                            sw.Write($"絞り込み条件：{shiborikomiConditioin}");
                         }
                     }
                     

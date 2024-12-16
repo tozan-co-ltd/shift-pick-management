@@ -56,9 +56,14 @@
                     <select type="text" class="form-select " id="tripBranchSeq" name="TripBranchSeq">
                     </select>
                 </div>
-                <div class="mr-3">
+                <div class="">
                     <a href="#" class="btn btn-primary d-flex align-items-center mb-3 mr-3" onclick="addTrips()">
                         <span class="text">追加</span>
+                    </a>
+                </div>
+                <div class="mr-3">
+                    <a href="#" class="btn btn-danger d-flex align-items-center mb-3 mr-3" onclick="clearTrips()">
+                        <span class="text">一括クリア</span>
                     </a>
                 </div>
             </div>
@@ -109,7 +114,7 @@
         </form>
 
         <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
-            <button type="submit" class="btn btn-secondary btn-icon-split" id="search-btn" onclick="onSearchClick()">
+            <button type="submit" class="btn btn-secondary btn-icon-split" id="search-btn" onclick="onSearchClick('LoadDistribution')">
                 <span class="icon text-white-50">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
@@ -193,7 +198,7 @@
                                 },
                                 title: {
                                     display: true,
-                                    text: '',
+                                    text: '荷量分布',
                                     fontSize: 30
                                 }
                             }
@@ -257,7 +262,7 @@
                                 },
                                 title: {
                                     display: true,
-                                    text: '',
+                                    text: '荷量分布',
                                     fontSize: 30
                                 }
                             }
@@ -277,7 +282,7 @@
                         </a>
                     </div>
                     <div class="input-group-append mr-3">
-                        <a href="#" class="btn btn-info btn-icon-split" onclick="onExportAllImages()">
+                        <a href="#" class="btn btn-info btn-icon-split" onclick="onExportAllImages('LoadDistribution')">
                             <span class="icon text-white-50">
                                 <i class="fa-solid fa-circle-down"></i>
                             </span>
@@ -321,7 +326,6 @@
     const aryMax = function (a, b) { return Math.max(a, b); }
     const aryMin = function (a, b) { return Math.min(a, b); }
 
-    let model;
     let userName = "";
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
@@ -449,78 +453,8 @@
         });
     }
 
-    // 選択された便の配列
-    let arrayTrips = [];
-
-    // 追加ボタン押下時
-    function addTrips() {
-        event.preventDefault();
-        // 20件の便が選択されているとき
-        if (20 <= arrayTrips.length) {
-            var errorMessage = 'E1008: 選択できる便数は最大20件です。20件を超えないように選択してください。';
-            $("#div-error-message").text(errorMessage);
-            return;
-        }
-        // 便名称と便枝番取得
-        var tripName = $('[name=TripName]').val();
-        var tripBranchSeq = $('[name=TripBranchSeq]').val();
-
-        // 入力されていない場合、エラー出力
-        if (tripName == "" || tripBranchSeq == "" || tripName == null || tripBranchSeq == null) {
-            return;
-        }
-        var selectedTripName = tripName + "_" + tripBranchSeq;
-
-        // 重複チェック
-        const tripNames = arrayTrips.map(d => d.selectedTripName);
-        if (tripNames.includes(selectedTripName)) {
-            return;
-        }
-
-        // 選択された便を追加する行を設定
-        var selectedTripsNumber = Math.floor(arrayTrips.length / 5);
-        var selectedTrips = $('#selectedTrips' + selectedTripsNumber)[0];
-
-        // 選択された便に追加
-        arrayTrips.push({ tripName, tripBranchSeq, selectedTripName });
-        pushLabelToSelectedTrips(selectedTrips, selectedTripName);
-    }
-
-    // 選択された便ラベルを作成、指定した親要素の子として登録
-    function pushLabelToSelectedTrips(selectedTrips, selectedTripName) {
-        var selectedTripLabel = document.createElement("label");
-        selectedTripLabel.innerText = selectedTripName;
-        selectedTripLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1\" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
-        selectedTripLabel.className += "mr-2 selected-trip-label";
-        selectedTripLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
-        selectedTripLabel.style.padding = "0.5em";
-        selectedTrips.appendChild(selectedTripLabel);
-    }
-
-    // 選択された便の×ボタン押下時
-    function onLabelDeleteClick(selectedTripName) {
-        event.preventDefault();
-        // ラベル全削除
-        $('.selected-trip-label').remove();
-
-        // 配列から削除
-        const tripNames = arrayTrips.map(d => d.selectedTripName);
-        var deleteIndex = tripNames.indexOf(selectedTripName);
-        arrayTrips.splice(deleteIndex, 1);
-
-        // 選択された便の再表示
-        for (var i = 0; i < arrayTrips.length; i++) {
-            // 選択された便を追加する行を設定
-            var selectedTripsNumber = Math.floor(i / 5);
-            var selectedTrips = $('#selectedTrips' + selectedTripsNumber)[0];
-
-            var selectedTripName = arrayTrips[i].selectedTripName;
-            pushLabelToSelectedTrips(selectedTrips, selectedTripName);
-        }
-    }
-
     // 検索ボタン押下時
-    function onSearchClick() {
+    function onSearchClick(page) {
         event.preventDefault();
         DeleteErrorMessages();
 
@@ -533,7 +467,7 @@
 
         // グラフとテーブルの表示
         $('#graphAndTable').css('display', 'block');
-        tableDisplay();
+        tableDisplay(page);
 
         // 初期表示は到着荷量
         $('input[value="arrival"]').prop('checked', true);
@@ -617,14 +551,10 @@
                 }
 
                 // データセット作成、登録
-                var arrivalDatasets = createChartDatasets(i);
-                arrivalDatasets.data = arrivalLoadDatas;
-                arrivalDatasets.label = tripName + "_" + tripBranchSeq;
-                arrivalChart.data.datasets.push(arrivalDatasets);
-                var departureDatasets = createChartDatasets(i);
-                departureDatasets.data = departureLoadDatas;
-                departureDatasets.label = tripName + "_" + tripBranchSeq;
-                departureChart.data.datasets.push(departureDatasets);
+                var chartColor = graphColors[i];
+                var label = tripName + "_" + tripBranchSeq;
+                createAndPushDatasets(arrivalChart, chartColor, arrivalLoadDatas, label);
+                createAndPushDatasets(departureChart, chartColor, departureLoadDatas, label);
 
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
@@ -652,12 +582,12 @@
     }
 
     // chartjs用のデータセット作成
-    function createChartDatasets(dataNumber) {
+    function createChartDatasets(color) {
         var datasets = {
             label: '',
-            borderColor: graphColors[dataNumber],
+            borderColor: color,
             data: [],
-            backgroundColor: graphColors[dataNumber],
+            backgroundColor: color,
         }
         return datasets;
     }
@@ -678,17 +608,8 @@
         })
     })
 
-    // 日付の表示形式変換(yyyy/MM/dd)
-    function GetDayString(date) {
-        var day = date.toLocaleDateString("ja-JP", {
-            year: "numeric", month: "2-digit",
-            day: "2-digit"
-        });
-        return day;
-    }
-
     // 便実績テーブル表示
-    function tableDisplay() {
+    function tableDisplay(page) {
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
@@ -697,365 +618,16 @@
         var minLoadClass = parseInt($('[name=minLoadStatus]').val());
         var maxLoadClass = parseInt($('[name=maxLoadStatus]').val());
 
-        // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("SearchData", "LoadDistribution")';
-        let method = 'Post';
         let data = { models: arrayTrips, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, minLoadClass: minLoadClass, maxLoadClass: maxLoadClass };
-
-        // Ajax call
-        $.ajax({
-            url: url,
-            method: method,
-            data: data
-        }).done(function (response) {
-            var tableHTML = response.searchedTripRecordHTML;
-            tableLength = response.searchedTripRecordLength + 1;
-            $('#tripRecordTable').empty().html(tableHTML);
-            // 日本語表示
-            const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
-            const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
-
-            // ID(2列目)昇順
-            $("#tripRecordDataTable").DataTable({
-                "language": {
-                    "url": language_url
-                },
-                lengthChange: true,     // 件数切替
-                info: true,            // 総件数
-                scrollX: true,          // 横スクロール可
-                scrollCollapse: true,   // 縦スクロール表示
-                searchHighlight: true,  // 検索ハイライト
-                order: [[1, "asc"], [9, "asc"], [2, "asc"]],    // ID昇順
-                "oLanguage": {
-                "sSearch": "フリーワード(全件)"
-                },
-                dom: dom_structure
-            });
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 404) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#edit-modal-error-message").text(errorMessage);
-            } else {
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#edit-modal-error-message").text(errorMessage);
-            }
-        });
-
-    }
-
-
-
-    // 便実績テーブルの要素数
-    let tableLength = 0;
-
-    // 便実績テーブルの行情報配列
-    let arrayTrs = [];
-
-    // 到着荷量画像ボタン押下
-    function OnArrivalLoadImageClick(tripRecordID, button) {
-        console.log("test");
-        // 配列の初期化
-        arrayTrs = [];
-        // 到着
-        var isArrived = true;
-        // テーブルに表示されている便実績のIDをリスト化
-        trs = button.parentNode.parentNode.parentNode.childNodes;
-        for (i = 0; i < trs.length - tableLength; i++) {
-            arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
-        }
-        EditModal(tripRecordID, isArrived);
-    }
-
-    // 出発荷量画像ボタン押下
-    function OnDepartureLoadImageClick(tripRecordID, button) {
-        // 配列の初期化
-        arrayTrs = [];
-        // 出発
-        var isArrived = false;
-        // テーブルに表示されている便実績のIDをリスト化
-        trs = button.parentNode.parentNode.parentNode.childNodes;
-        for (i = 0; i < trs.length - tableLength; i++) {
-            arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
-        }
-        EditModal(tripRecordID, isArrived);
-    }
-
-
-
-    // 荷量画像モーダル作成
-    function EditModal(tripRecordID, isArrived) {
-
-        // LoadOutputModel取得
-        var data = @Html.Raw(Json.Serialize(Model));
-        var tripRecordModel = data.tripRecordList;
-        tripRecordModel.forEach(function (item) {
-            if (item.tripRecordID == tripRecordID) {
-
-                // フォーム情報取得
-                let url = window.location.origin + '@Url.Action("GetModalItems", "LoadRecord")';
-                let method = 'POST';
-                let data = { model: item, isArrived: isArrived };
-
-                // Ajax call
-                $.ajax({
-                    url: url,
-                    method: method,
-                    data: data
-                }).done(function (response) {
-                    console.log(response)
-                    var imagePath = "";
-                    var arriveOrDeparture = "";
-                    var arriveOrDepartureDate = "";
-                    var loadStatus = "";
-                    var downloadFileName = "";
-                    var workDayForFile = GetDayStringForFile(new Date(item.workDay));
-                    var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
-                    var truckNumber = item.truckNumber;
-                    if (truckNumber == "0") truckNumber = "-";
-                    if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
-
-                    // 到着か出発かで変わる要素の登録
-                    if (isArrived) {
-                        $('#detail-modal-label').text("到着荷量画像");
-                        loadStatus = item.arrivalLoadStatus;
-                        imagePath = response.arrivalLoadImgPath;
-                        arriveOrDeparture = "到着時間";
-                        arriveOrDepartureDate = GetDateString(new Date(item.arrivedAt));
-                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_A_" + loadStatus + ".jpg";
-                    }
-                    else {
-                        $('#detail-modal-label').text("出発荷量画像");
-                        loadStatus = item.departureLoadStatus;
-                        imagePath = response.departureLoadImgPath;
-                        arriveOrDeparture = "出発時間";
-                        arriveOrDepartureDate = GetDateString(new Date(item.departedAt));
-                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_D_" + loadStatus + ".jpg";
-                    }
-
-                    $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
-
-                    var workDay = GetDayString(new Date(item.workDay));
-
-                    // 表示している行の上下の行の便実績ID取得
-                    var tripRecordIDIndex = arrayTrs.indexOf(tripRecordID);
-                    var previousTripRecordID = arrayTrs[tripRecordIDIndex - 1];
-                    var nextTripRecordID = arrayTrs[tripRecordIDIndex + 1];
-
-
-                    // ボタンの追加
-                    var buttons = $("#tripRecord-buttons");
-                    buttons.empty();
-                    let div = "<div class=\"d-flex xs-block justify-content-start align-items-center p-0 mb-2 trip-record-buttons\">"
-                        + "<div class=\"input-group-append mr-3\" >"
-                        + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherModalClick('" + previousTripRecordID + "','" + isArrived + "')\" >"
-                        + "<span class=\"text\" >▲上へ</span>"
-                        + "</a>"
-                        + "</div>"
-                        + "<div class=\"input-group-append mr-3\" >"
-                        + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherModalClick('" + nextTripRecordID + "','" + isArrived + "')\" >"
-                        + "<span class=\"text\" >▼下へ</span>"
-                        + "</a>"
-                        + "</div>"
-                        + "<div class=\"input-group-append mr-3 right-button\" >"
-                        + " <a href=\"data:image/jpeg;base64," + imagePath + "\", download=\"" + downloadFileName + "\" class=\"btn btn-info btn-icon-split\"  >"
-                        + "<span class=\"icon text-white-50\" >"
-                        + "<i class=\"fa-solid fa-circle-down\" > </i>"
-                        + "</span>"
-                        + "<span class=\"text\" >画像出力</span>"
-                        + "</a>"
-                        + "</div>";
-                    buttons.append(div);
-
-                    // テーブルの追加
-                    var container = $("#tripRecord-contatiner");
-                    container.empty();
-                    let tr = "<tr>"
-                        + "<td>荷量</td>"
-                        + "<td>" + loadStatus + "%</td>"
-                        + "</tr><tr>"
-                        + "<td>荷量の相違あり</td>"
-                        + "<td>"
-                        + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">";
-                    if (!(userName == "服部 正次" || userName == "林 恭佑")) {
-                        tr += "<label id=\"loadStatusSelect\" ></label>";
-                    } else {
-                        tr += "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" id=\"loadStatusSelect\" >"
-                            + "<option value=\"\" hidden></option>"
-                            + "<option value=\"1\">0%</option>"
-                            + "<option value=\"3\">1-10%</option>"
-                            + "<option value=\"4\">11-20%</option>"
-                            + "<option value=\"5\">21-30%</option>"
-                            + "<option value=\"6\">31-40%</option>"
-                            + "<option value=\"7\">41-50%</option>"
-                            + "<option value=\"8\">51-60%</option>"
-                            + "<option value=\"9\">61-70%</option>"
-                            + "<option value=\"10\">71-80%</option>"
-                            + "<option value=\"11\">81-90%</option>"
-                            + "<option value=\"12\">91-100%</option>"
-                            + "</select>"
-                            + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "')\" id=\"verificationRequired\">"
-                            + "<span class=\"text\">要検証</span>"
-                            + "</a>";
-                    }
-
-                    tr += "</div>"
-                        + "</td>"
-                        + "</tr><tr>"
-                        + "<td>便名称_便枝番</td>"
-                        + "<td>" + tripNameAndBranchSeq + "</td>"
-                        + "</tr><tr>"
-                        + "<td>乗務員</td>"
-                        + "<td>" + item.driverName + "</td>"
-                        + "</tr><tr>"
-                        + "<td>ステーションID</td>"
-                        + "<td>" + item.stationID + "</td>"
-                        + "</tr><tr>"
-                        + "<td>車両番号</td>"
-                        + "<td>" + truckNumber + "</td>"
-                        + "</tr><tr>"
-                        + "<td>識別番号</td>"
-                        + "<td>" + item.identifyNumber + "</td>"
-                        + "</tr><tr>"
-                        + "<td>稼働日</td>"
-                        + "<td>" + workDay + "</td>"
-                        + "</tr><tr>"
-                        + "<td>" + arriveOrDeparture + "</td>"
-                        + "<td>" + arriveOrDepartureDate + "</td>"
-                        + "</tr>";
-                    container.append(tr);
-                    console.log(data);
-                    if (userName == "服部 正次" || userName == "林 恭佑") {
-                        $('#loadStatusSelect').val(response.annotationLoadClass);
-                    } else if (response.annotationLoadStatus != null) {
-                        $('#loadStatusSelect').text(response.annotationLoadStatus + "%");
-                    } else {
-                        $('#loadStatusSelect').text("-");
-                    }
-
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    if (jqXHR.status === 404) {
-                        var errorMessage = jqXHR.responseJSON.errorMessage;
-                        $("#edit-modal-error-message").text(errorMessage);
-                    } else {
-                        var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                        $("#edit-modal-error-message").text(errorMessage);
-                    }
-                });
-
-            }
-        });
-    }
-
-    // モーダル内の「上へ」「下へ」ボタン押下時
-    function onOtherModalClick(otherTripRecordID, isArrived) {
-        event.preventDefault();
-        if (isArrived == "true") {
-            isArrived = true;
-        } else {
-            isArrived = false;
-        }
-        EditModal(otherTripRecordID, isArrived);
-    }
-
-    // 要検証ボタン押下時
-    function onVerificationRequiredClick(tripRecordID, isArrived) {
-        event.preventDefault();
-        var loadStatus = $('[name=loadStatusSelect]').val();
-        if (loadStatus != "") {
-
-            DeleteErrorMessages();
-
-
-            // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("InsertOrUpdateAnnotationLoads", "LoadRecord")';
-            let method = 'POST';
-            let data = { tripRecordID: tripRecordID, loadStatus: loadStatus, isArrived: isArrived };
-
-            // Ajax call
-            $.ajax({
-                url: url,
-                method: method,
-                data: data
-            }).done(function (response) {
-                // 完了モーダル表示
-                alert('登録が完了しました。');
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 404) {
-                    var errorMessage = jqXHR.responseJSON.errorMessage;
-                    $("#edit-modal-error-message").text(errorMessage);
-                } else {
-                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#edit-modal-error-message").text(errorMessage);
-                }
-            });
-        }
-    }
-
-    // 時刻の表示形式変換(HH:mm)
-    function GetTimeString(date) {
-        var hour = date.getHours();
-        if (hour < 10) {
-            hour = "0" + hour;
-        }
-        var minute = date.getMinutes();
-        if (minute < 10) {
-            minute = "0" + minute;
-        }
-        return hour + ":" + minute;
-    }
-
-    // 日時の表示形式変換(yyyy/MM/dd hh:mm)
-    function GetDateString(date) {
-        var day = GetDayString(date);
-        var time = GetTimeString(date);
-        return day + " " + time;
-    }
-
-    // 日付の表示形式変換(yyyyMMdd)
-    function GetDayStringForFile(date) {
-        var year = date.getFullYear().toString();
-        var month = ("00" + (date.getMonth() + 1)).slice(-2);
-        var day = ("00" + date.getDate()).slice(-2);
-        return year + month + day;
-    }
-
-    // 日付の表示形式変換(yyyyMMdd)
-    function GetDayStringForChart(date) {
-        var month = (date.getMonth() + 1).toString();
-        var day = date.getDate().toString();
-        return month + "月" + day + "日";
-    }
-
-    // エラーメッセージ削除
-    function DeleteErrorMessages() {
-        $('#div-error-message').text('');
-        $('#edit-modal-error-message').text('');
-        $('#delete-modal-error-message').text('');
-        $('.text-danger').text('');
-        $('input').removeClass('input-validation-error');
-    }
-
-    // 期間が90日以内か否か
-    function isWithin90Days() {
-        var startOfPeriod = new Date($('#startOfPeriod').val());
-        var endOfPeriod = new Date($('#endOfPeriod').val());
-        var diffMilliSec = endOfPeriod - startOfPeriod;
-        var diffDays = parseInt(diffMilliSec / 1000 / 60 / 60 / 24);
-        if (diffDays <= 90) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        
+        tableDisplayCommon(page, data)
     }
 
     // 画像一括出力ボタン押下
-    function onExportAllImages() {
+    function onExportAllImages(page) {
         event.preventDefault();
         DeleteErrorMessages();
         if (isWithin90Days()) {
-            tableDisplay();
-
             // 期間の開始、終了日付の取得
             var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
@@ -1064,10 +636,7 @@
             var minLoadClass = parseInt($('[name=minLoadStatus]').val());
             var maxLoadClass = parseInt($('[name=maxLoadStatus]').val());
 
-            // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("ZipDownload", "LoadDistribution")';
-            let method = 'POST';
-            data = {
+            let data = {
                 download: "download",
                 startOfPeriod: startOfPeriod,
                 endOfPeriod: endOfPeriod,
@@ -1075,29 +644,8 @@
                 minLoadClass: minLoadClass,
                 maxLoadClass: maxLoadClass
             };
-
-            // Ajax call
-            $.ajax({
-                url: url,
-                method: method,
-                data: data
-            }).done(function (response) {
-                var { contentType, fileContents, fileDownloadName } = response.data;
-                {
-                    const link = document.createElement("a");
-                    link.href = `data:${contentType};base64,${fileContents}`;
-                    link.download = fileDownloadName;
-                    link.click();
-                }
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 404) {
-                    var errorMessage = jqXHR.responseJSON.errorMessage;
-                    $("#div-error-message").text(errorMessage);
-                } else {
-                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#div-error-message").text(errorMessage);
-                }
-            });
+            
+            onExportAllImagesCommon(page, data);
         }
         else {
             var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
@@ -1109,9 +657,6 @@
     async function onExportFileTrips(page, gamenName) {
         DeleteErrorMessages();
         if (isWithin90Days()) {
-            tableDisplay();
-            event.preventDefault();
-            $('#div-error-message').text("");
 
             // チェックボックスの入力情報取得
             var checkBox = false;
@@ -1128,8 +673,6 @@
             var maxLoadClass = parseInt($('[name=maxLoadStatus]').val());
 
             // フォーム情報取得
-            let url = '@Url.Action("ExportFile", "LoadDistribution")';
-            let method = 'Post';
             let data = {
                 "gamenName": gamenName,
                 "startofPeriod": startOfPeriod,
@@ -1139,33 +682,8 @@
                 "minLoadClass": minLoadClass,
                 "maxLoadClass": maxLoadClass
             };
-
-            // Ajax call
-            $.ajax({
-                url: url,
-                method: method,
-                data: data
-            }).done(function (response) {
-                console.log(response);
-                var { contentType, fileContents, fileDownloadName } = response.data;
-                {
-                    const link = document.createElement("a");
-                    link.href = `data:${contentType};base64,${fileContents}`;
-                    link.download = fileDownloadName;
-                    link.click();
-                }
-
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 404) {
-                    var errorMessage = jqXHR.responseJSON.errorMessage;
-                    $("#div-error-message").show();
-                    $("#div-error-message").text(errorMessage);
-                } else {
-                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#div-error-message").show();
-                    $("#div-error-message").text(errorMessage);
-                }
-            });
+            // Excel出力共通処理
+            onExportFileTripsCommon(page, data);
         }
         else {
             var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';

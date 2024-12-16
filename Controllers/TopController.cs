@@ -11,6 +11,7 @@ using System.IO;
 using System.Drawing;
 using System;
 using SixLabors.ImageSharp.Formats;
+using System.Collections;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -29,10 +30,10 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// トップ画面表示
         /// </summary>
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             // トップ画面モデル取得
-            TopModel topModel = GetTopModel();
+            TopModel topModel = await GetTopModel();
             return View(topModel);
         }
 
@@ -40,7 +41,7 @@ namespace ai_truck_load_measurement.Controllers
         /// トップ画面モデル取得
         /// </summary>
         /// <returns></returns>
-        public TopModel GetTopModel()
+        public async Task<TopModel> GetTopModel()
         {
             TopModel topModel = new();
             try
@@ -64,7 +65,7 @@ namespace ai_truck_load_measurement.Controllers
                     }
                 }
                 // 取得値の変換
-                topModelList = ConversionOfGetValues(topModelList);
+                topModelList = await ConversionOfGetValues(topModelList);
                 // ステーションの画像取得
                 topModelList = GetStationImage(topModelList);
                 topModel.TopModelList = topModelList;
@@ -83,7 +84,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="models">対象のトップ画面モデルリスト</param>
         /// <returns></returns>
-        private List<TopModel> ConversionOfGetValues(List<TopModel> models)
+        private async Task<List<TopModel>> ConversionOfGetValues(List<TopModel> models)
         {
             foreach (var model in models)
             {
@@ -101,6 +102,11 @@ namespace ai_truck_load_measurement.Controllers
                     truckStatus = ($"{lowerLimit}-{upperLimit}%");
                 }
                 model.TruckStatus = truckStatus;
+
+                // 表示する画像をAPIから取得してbase64に変換
+                var imageUrl = ($"http://{model.IPAdress}/jpg/image.jpg");
+                var imagePath64 = await GetImageBase64FromAPI(imageUrl);
+                model.ImageBase64 = "data:image/jpeg;base64," + imagePath64;
             }
             return models;
         }
@@ -146,16 +152,22 @@ namespace ai_truck_load_measurement.Controllers
 
 
         /// <summary>
-        /// Base64でデコードできるか判定する
+        /// Base64でデコード、その後画像に変換できるか判定する
         /// </summary>
         /// <param name="imageBase64">Base64変換文字列</param>
         /// <returns></returns>        
         public bool CanDecodeImageBase64(string imageBase64)
-        {   
+        {
             try
             {
+                // Base64でデコードできるか
                 string base64String = imageBase64.Split(',')[1];
                 byte[] imageBytes = Convert.FromBase64String(base64String);
+                // デコードしたものを画像に変換できるか
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    Image image = Image.FromStream(ms);
+                }
                 return true;
             }
             catch (Exception)
@@ -164,6 +176,37 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
+        /// <summary>
+        /// 画像をAPIから取得する
+        /// </summary>
+        /// <param name="url">APIのurl</param>
+        /// <returns></returns>
+        public async Task<string> GetImageBase64FromAPI(string url)
+        {
+            var client = GetDigestClient(url);
+            var result = await client.GetAsync(url);
+            var imageBytes = await result.Content.ReadAsByteArrayAsync();
+            return Convert.ToBase64String(imageBytes);
+        }
 
+        /// <summary>
+        /// HttpClientにダイジェスト認証を設定する
+        /// </summary>
+        /// <param name="url">digest認証のurl</param>
+        /// <returns></returns>
+        private HttpClient GetDigestClient(string url)
+        {
+            //'CredentialCacheの作成
+            var cache = new System.Net.CredentialCache();
+            //'Digest認証の情報を追加
+            cache.Add(new Uri(url), "Digest", new System.Net.NetworkCredential("root", "password"));
+
+            var myClientHandler = new HttpClientHandler();
+            myClientHandler.Credentials = cache;
+
+            var client = new HttpClient(myClientHandler);
+            client.Timeout = new TimeSpan(0, 0, 0, 0, 5000);
+            return client;
+        }
     }
 }
