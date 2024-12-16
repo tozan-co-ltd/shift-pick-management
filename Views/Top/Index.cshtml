@@ -143,7 +143,10 @@
     $(document).ready(function () {
         // モデル取得
         var top_model = @Html.Raw(Json.Serialize(Model));
-        viewCards(top_model)
+        viewCards(top_model);
+        window.setInterval(function () {
+            onUpdateClick();
+        }, 60000);
     });
 
     function viewCards(top_model) {
