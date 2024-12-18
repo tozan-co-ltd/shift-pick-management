@@ -143,7 +143,14 @@
                                 options: {
                                     //凡例は表示
                                     legend: {
-                                        display: true
+                                        display: true,
+                                        onClick: function (t, legendItem) {
+                                            var index = legendItem.datasetIndex;
+                                            legendHideOrShow(arrivalChart, index);
+                                            legendHideOrShow(departureChart, index);
+                                            legendHideOrShow(allChart, index);
+                                            legendHideOrShow(clearChart, index);
+                                        }
                                     },
                                     scales: {
                                         //X軸
@@ -311,6 +318,12 @@
                             targetChart.data.datasets[index].backgroundColor = color;
                             targetChart.data.datasets[index].borderColor = color;
                             targetChart.update();
+                        }
+
+                        function legendHideOrShow(chart, index){
+                            var meta = chart.getDatasetMeta(index);
+                            meta.hidden = null === meta.hidden ? !chart.data.datasets[index].hidden : null,
+                                chart.update();
                         }
 
                     </script>
@@ -693,6 +706,7 @@
                     $("#div-error-message").text(errorMessage);
                 }
             });
+            console.log(arrivalChart.options.legend)
         } 
 
         // 昼勤開始時間の線描画用データ作成
