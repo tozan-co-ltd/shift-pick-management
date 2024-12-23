@@ -465,19 +465,19 @@ namespace ai_truck_load_measurement.Controllers
                 if (i == 0)
                 {
                     html += $@" 
-                    <div class=""d-flex justify-content-between"">
-                        <a href=""#"" class=""btn btn-secondary mb-2""  onclick=""allToggleOpen()"" >
+                    <div class=""d-flex justify-content-between mb-1"">
+                        <a href=""#"" class=""btn btn-secondary "" onclick=""allToggleOpen()"" >
                             <span class=""text"">全て展開</span>
                         </a>
-                        <a href=""#"" class=""btn btn-secondary mb-2""  onclick=""allToggleClose()"" >
-                            <span class=""text"">全て閉じる</i></span>
+                        <a href=""#"" class=""btn btn-secondary "" onclick=""allToggleClose()"" >
+                            <span class=""text"">全て閉じる</span>
                         </a>
                     </div>
                     <hr />
                     <div class=""medium-item"">
                         <div class=""medium-header"">
                             <div class=""toggle-icon collapsed""></div>
-                            <span>　{tripRecordList[i].TripName}</span>
+                            <strong>　{tripRecordList[i].TripName}</strong>
                         </div>
                         <div class=""small-items"">
                     ";
@@ -491,7 +491,7 @@ namespace ai_truck_load_measurement.Controllers
                     <div class=""medium-item"">
                         <div class=""medium-header"">
                             <div class=""toggle-icon collapsed""></div>
-                            <span>　{tripRecordList[i].TripName}</span>
+                            <strong>　{tripRecordList[i].TripName}</strong>
                         </div>
                         <div class=""small-items"">
                     ";
