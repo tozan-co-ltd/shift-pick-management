@@ -890,31 +890,4 @@ function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page) {
     });
 
 
-    function allToggleOpen() {
-        event.preventDefault();
-        // 中項目のヘッダーをクリックで小項目を表示/非表示
-        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
-        mediumHeaders.forEach(header => {
-            const smallItems = header.nextElementSibling;
-            const toggleIcon = header.querySelector('.toggle-icon');
-            if (!smallItems.classList.contains('show')) {
-                smallItems.classList.add('show');
-                toggleIcon.classList.remove('collapsed');
-            }
-        });
-    }
-
-    function allToggleClose() {
-        event.preventDefault();
-        // 中項目のヘッダーをクリックで小項目を表示/非表示
-        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
-        mediumHeaders.forEach(header => {
-            const smallItems = header.nextElementSibling;
-            const toggleIcon = header.querySelector('.toggle-icon');
-            if (smallItems.classList.contains('show')) {
-                smallItems.classList.remove('show');
-                toggleIcon.classList.add('collapsed');
-            }
-        });
-    }
 }

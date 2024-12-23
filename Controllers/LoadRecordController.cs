@@ -466,12 +466,12 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     html += $@" 
                     <div style=""margin-left: auto;"">
-                        <button class=""btn btn-secondary mb-2"" id=""search-btn"" onclick=""allToggleOpen()"" >
-                            <span class=""text"">全ての見出しを開く</i></span>
-                        </button>
-                        <button class=""btn btn-secondary mb-2"" id=""search-btn"" onclick=""allToggleClose()"" >
-                            <span class=""text"">全ての見出しを閉じる</i></span>
-                        </button>
+                        <a href=""#"" class=""btn btn-secondary mb-2""  onclick=""allToggleOpen()"" >
+                            <span class=""text"">全て展開</span>
+                        </a>
+                        <a href=""#"" class=""btn btn-secondary mb-2""  onclick=""allToggleClose()"" >
+                            <span class=""text"">全て閉じる</i></span>
+                        </a>
                     </div>
                     <div class=""medium-item"">
                         <div class=""medium-header"">

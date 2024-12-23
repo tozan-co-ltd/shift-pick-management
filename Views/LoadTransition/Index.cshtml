@@ -69,6 +69,7 @@
                     </a>
                 </div>
             </div>
+            
             <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips2"  >
                 <span class="warehouse-name-drs"></span>
             </div>
@@ -544,5 +545,34 @@
             dropdownContainer.classList.remove('show');
         }
     });
+
+
+    function allToggleOpen() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (!smallItems.classList.contains('show')) {
+                smallItems.classList.add('show');
+                toggleIcon.classList.remove('collapsed');
+            }
+        });
+    }
+
+    function allToggleClose() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (smallItems.classList.contains('show')) {
+                smallItems.classList.remove('show');
+                toggleIcon.classList.add('collapsed');
+            }
+        });
+    }
 </script>
                                   
