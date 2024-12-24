@@ -454,7 +454,7 @@ namespace ai_truck_load_measurement.Controllers
             var html = "";
             if (tripRecordList.Count == 0)
             {
-                html = "選択された稼働日にデータがありません";
+                html = "<small>選択された稼働日にデータがありません</small>";
                 return html;
             }
 
