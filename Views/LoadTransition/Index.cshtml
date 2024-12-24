@@ -43,39 +43,31 @@
                     <input type="text" id="endOfPeriod" class="form-control pickerDate endDate">
                 </div>
             </div>
-            
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips0">
-                <div class="warehouse-name-drs">
-                    <div class="dropdown-container" id="dropdownContainer">
-                        <button class="dropdown-button btn btn-primary btn-icon-split btn-register" id="dropdownButton">
-                            <span class="icon text-white-50">
-                                <i class="fas fa-plus"></i>
-                            </span>
-                            <span class="text">便選択</span>
-                        </button>
-                        <div class="dropdown-content" id="dropdownContent">
-                            <div id="createToggleCheckBox">選択された稼働日にデータがありません</div>
-                        </div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                <div class="dropdown-container align-items-center mb-3 unset-pdl mr-3" id="dropdownContainer">
+                    <button class="dropdown-button btn btn-primary btn-icon-split btn-register" id="dropdownButton">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">便選択</span>
+                    </button>
+                    <div class="dropdown-content" id="dropdownContent">
+                        <div id="createToggleCheckBox">選択された稼働日にデータがありません</div>
                     </div>
                 </div>
+
+                
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips1" >
-                <div class="warehouse-name-drs">
-                    <a href="#" class="btn btn-danger btn-icon-split btn-register" onclick="clearTrips()">
-                        <span class="icon text-white-50">
-                            <i class="fas fa-trash"></i>
-                        </span>
-                        <span class="text">一括クリア</span>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips2"  >
-                <span class="warehouse-name-drs"></span>
-            </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips3" >
-                <span class="warehouse-name-drs"></span>
-            </div>
+            <div class="col-16 d-flex justify-content-start align-items-center  unset-pdl mr-3 sp-cs-dpl" id="selectedTrips0" ></div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl mr-3 sp-cs-dpl" id="selectedTrips1" ></div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl mr-3 sp-cs-dpl" id="selectedTrips2" ></div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl mr-3 sp-cs-dpl" id="selectedTrips3" ></div>
+            <a href="#" class="btn btn-danger btn-icon-split btn-register align-items-center mb-3 unset-pdl mr-3" onclick="clearTrips()">
+                <span class="icon text-white-50">
+                    <i class="fas fa-trash"></i>
+                </span>
+                <span class="text">一括クリア</span>
+            </a>
         </form>
 
         <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">

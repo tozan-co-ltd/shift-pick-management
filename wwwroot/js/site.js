@@ -769,8 +769,8 @@ function addTrips(selectedTripName) {
 function pushLabelToSelectedTrips(selectedTrips, selectedTripName) {
     var selectedTripLabel = document.createElement("label");
     selectedTripLabel.innerText = selectedTripName;
-    selectedTripLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1\" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
-    selectedTripLabel.className += "mr-2 selected-trip-label";
+    selectedTripLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1 \" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
+    selectedTripLabel.className += "mr-2 mb-3 selected-trip-label";
     selectedTripLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
     selectedTripLabel.style.padding = "0.5em";
     selectedTripLabel.style.borderRadius = "5px";
