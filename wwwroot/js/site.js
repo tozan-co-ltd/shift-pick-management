@@ -732,7 +732,7 @@ function addTrips() {
     event.preventDefault();
     // 20件の便が選択されているとき
     if (20 <= arrayTrips.length) {
-        var errorMessage = 'E1008: 選択できる便数は最大20件です。20件を超えないように選択してください。';
+        var errorMessage = 'E1008: 選択できる便数(便＋枝番)は最大20件です。20件を超えないように選択してください。';
         $("#div-error-message").text(errorMessage);
         return;
     }
