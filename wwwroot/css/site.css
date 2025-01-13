@@ -1094,3 +1094,14 @@ table.dataTable span.column_highlight {
     }
 
 /*-------------------------------Drop down menu ---------------------------------*/
+
+.span-paragraph {
+    border-left: 1em;
+    border-left-style: solid;
+    border-left-width: 0.25em;
+    font-weight: bold;
+    padding-left: 1em;
+    padding-bottom: 0.5em;
+    border-color: gray;
+    padding-bottom: 0.25em;
+}

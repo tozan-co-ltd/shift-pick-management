@@ -750,6 +750,10 @@ function addTrips(selectedTripName) {
         return;
     }
 
+    // 1行目の場合、項目追加
+    if (arrayTrips.length == 0) 
+        document.getElementById("selectedTrips0").innerHTML = "<span class=\"warehouse-name-drs span-paragraph mb-3\">選択された便</span>";
+
     // 重複チェック
     const tripNames = arrayTrips.map(d => d.selectedTripName);
     if (tripNames.includes(selectedTripName)) {
@@ -786,9 +790,19 @@ function onLabelDeleteClick(selectedTripName) {
     // 配列から削除
     const tripNames = arrayTrips.map(d => d.selectedTripName);
     var deleteIndex = tripNames.indexOf(selectedTripName);
+
+    if (deleteIndex < 0)
+        return;
+
     arrayTrips.splice(deleteIndex, 1);
 
     $('#' + selectedTripName).prop('checked', false);
+
+    // 選択された便が1つも無くなった場合
+    if (arrayTrips.length == 0) {
+        document.getElementById("selectedTrips0").innerHTML = "";
+        return;
+    }
 
     // 選択された便の再表示
     for (var i = 0; i < arrayTrips.length; i++) {
@@ -807,6 +821,12 @@ function clearTrips() {
     // ラベルと配列から全削除
     $('.selected-trip-label').remove();
     $('[name="tripNameAndBranchSeq"]').prop('checked', false);
+    var selectedTrips = document.getElementById("selectedTrips0");
+    if (selectedTrips != null)
+        selectedTrips.innerHTML = "";
+    var selectedWorkDays = document.getElementById("selectedWorkDays0");
+    if (selectedWorkDays != null)
+        selectedWorkDays.innerHTML = "";
     arrayTrips = [];
     arrayWorkDays = [];
 }
