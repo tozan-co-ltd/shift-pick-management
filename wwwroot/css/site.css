@@ -582,8 +582,8 @@ select[readonly] {
 
 /*“ü‰×—\’èÆ‰ï*/
 .warehouse-name-drs {
-    width: 150px;
-    min-width: 150px;
+    width: 160px;
+    min-width: 160px;
 }
 
 .form-check-input:checked {
