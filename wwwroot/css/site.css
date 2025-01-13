@@ -1093,8 +1093,10 @@ table.dataTable span.column_highlight {
         transform: rotate(-135deg);
     }
 
+.dropdown-button{
+    width: 140px;
+}
 /*-------------------------------Drop down menu ---------------------------------*/
-
 .span-paragraph {
     border-left: 1em;
     border-left-style: solid;
