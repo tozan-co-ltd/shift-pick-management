@@ -18,7 +18,7 @@
                         <ul class="mb-0">
                             <li>最長90日の期間が検索できます。</li>
                             <li>便枝番とは、便がSyncBaceへ訪問した回数を示すために昼勤開始時間から順に割り当てた番号です。</li>
-                            <li>最大20件の便を選択できます。</li>
+                            <li>最大20件の便(便＋枝番)を選択できます。</li>
                         </ul>
                     </div>
                 </div>
@@ -37,45 +37,46 @@
         <form id="loadTransitionForm">
             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                    <span class="warehouse-name-drs">稼働日</span>
+                    <span class="warehouse-name-drs span-paragraph">稼働日</span>
                     <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
                     <label class="m-1">～</label>
                     <input type="text" id="endOfPeriod" class="form-control pickerDate endDate">
                 </div>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
-                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3">
-                    <span class="warehouse-name-drs">便名称</span>
-                    <select type="text" class="form-select " name="TripName" asp-for="TripName" asp-items="@Model.TripNameList" required id="tripName"></select>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
+                <span class="warehouse-name-drs span-paragraph">便選択</span>
+                <div class="dropdown-container  mr-3" id="dropdownContainer">
+                    <button class="dropdown-button btn btn-primary btn-icon-split btn-register" id="dropdownButton">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">追加　　　</span>
+                    </button>
+                    <div class="dropdown-content" id="dropdownContent">
+                        <div id="createToggleCheckBox">選択された稼働日にデータがありません</div>
+                    </div>
                 </div>
-                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3">
-                    <span style="width:50px; min-width:50px" class="mr-3">便枝番</span>
-                    <select type="text" class="form-select " id="tripBranchSeq" name="TripBranchSeq">
-                    </select>
-                </div>
-                <div class="">
-                    <a href="#" class="btn btn-primary d-flex align-items-center mb-3 mr-3" onclick="addTrips()">
-                        <span class="text">追加</span>
-                    </a>
-                </div>
-                <div class="mr-3">
-                    <a href="#" class="btn btn-danger d-flex align-items-center mb-3 mr-3" onclick="clearTrips()">
-                        <span class="text">一括クリア</span>
-                    </a>
-                </div>
+                <a href="#" class="btn btn-danger btn-icon-split btn-register mr-3" onclick="clearTrips()">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-trash"></i>
+                    </span>
+                    <span class="text">一括クリア</span>
+                </a>
+                
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips0">
-                <span class="warehouse-name-drs">選択された便</span>
-            </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips1" >
+            <div class="col-16 d-flex justify-content-start align-items-center  unset-pdl mr-3 sp-cs-dpl" id="selectedTrips0" >
                 <span class="warehouse-name-drs"></span>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips2"  >
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl mr-3 sp-cs-dpl" id="selectedTrips1">
                 <span class="warehouse-name-drs"></span>
             </div>
-            <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3 sp-cs-dpl" id="selectedTrips3" >
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl mr-3 sp-cs-dpl" id="selectedTrips2">
                 <span class="warehouse-name-drs"></span>
             </div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl mr-3 sp-cs-dpl" id="selectedTrips3">
+                <span class="warehouse-name-drs"></span>
+            </div>
+            
         </form>
 
         <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
@@ -297,123 +298,21 @@
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
-        // 便枝番のセレクトリスト更新
-        tripBranchSeqSetToSelectList();
         // グラフ非表示
         $('#graphAndTable').css('display', 'none');
+        periodChange('LoadTransition');
     })
 
     // 期間の開始日付変更時
     $('#startOfPeriod').change(function () {
-        periodChange();
+        periodChange('LoadTransition');
     });
 
     // 期間の終了日時変更時
     $('#endOfPeriod').change(function(){
-        periodChange();
+        periodChange('LoadTransition');
     })
 
-    // 期間変更時
-    function periodChange() {
-        // 期間の開始、終了日付の取得
-        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
-        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
-
-        // 選択中の便名称取得
-        var tripName = $('[name=TripName]').val();
-
-        // 便名称の選択肢を全削除
-        var select = $('#tripName')[0];
-        while (select.firstChild) {
-            select.removeChild(select.firstChild);
-        }
-
-        // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetTripNameFromPeriod", "LoadRecord")';
-        let method = 'Post';
-        let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
-
-        // Ajax call
-        $.ajax({
-            url: url,
-            method: method,
-            data: data
-        }).done(function (response) {
-            for (var i = 0; i < response.length; i++) {
-                var option = document.createElement("option");
-                if (response[i].text == null) {
-                    option.text = "";
-                }
-                else {
-                    option.text = response[i].text;
-                }
-                option.value = response[i].value;
-                if(option.text == tripName){
-                    option.selected = true;
-                }
-                select.appendChild(option);
-            }
-
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 404) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#div-error-message").text(errorMessage);
-            } else {
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#div-error-message").text(errorMessage);
-            }
-        });
-    }
-
-    // 便名称選択時
-    $('[name=TripName]').change(function () {
-        // 便枝番のセレクトリスト更新
-        tripBranchSeqSetToSelectList();
-    });
-
-    // 便枝番のセレクトリスト更新
-    function tripBranchSeqSetToSelectList(){
-        // 便名称取得
-        var tripName = $('[name=TripName]').val();
-
-        // 期間の開始、終了日付の取得
-        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
-        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
-
-        // 便枝番の選択肢を全削除
-        var select = $('#tripBranchSeq')[0];
-        while (select.firstChild) {
-            select.removeChild(select.firstChild);
-        }
-
-        // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetTripBranchSeqFromTripName", "LoadRecord")';
-        let method = 'Post';
-        let data = { tripName: tripName, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
-
-        // Ajax call
-        $.ajax({
-            url: url,
-            method: method,
-            data: data
-        }).done(function (response) {
-            for (var i = 0; i < response.length; i++) {
-                var option = document.createElement("option");
-                option.text = response[i];
-                option.value = response[i];
-                select.appendChild(option);
-            }
-
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 404) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#div-error-message").text(errorMessage);
-            } else {
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#div-error-message").text(errorMessage);
-            }
-        });
-    }
 
     // 検索ボタン押下時
     function onSearchClick(page) {
@@ -629,6 +528,53 @@
             var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
             $("#div-error-message").text(errorMessage);
         }
+    }
+
+    const dropdownButton = document.getElementById('dropdownButton');
+    const dropdownContainer = document.getElementById('dropdownContainer');
+    const dropdownContent = document.getElementById('dropdownContent');
+
+    // ドロップダウンの表示・非表示
+    dropdownButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropdownContainer.classList.toggle('show');
+    });
+
+    // コンテンツ外をクリックした場合、プルダウンを閉じる
+    document.addEventListener('click', (e) => {
+        if (!dropdownContainer.contains(e.target)) {
+            dropdownContainer.classList.remove('show');
+        }
+    });
+
+
+    function allToggleOpen() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (!smallItems.classList.contains('show')) {
+                smallItems.classList.add('show');
+                toggleIcon.classList.remove('collapsed');
+            }
+        });
+    }
+
+    function allToggleClose() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (smallItems.classList.contains('show')) {
+                smallItems.classList.remove('show');
+                toggleIcon.classList.add('collapsed');
+            }
+        });
     }
 </script>
                                   

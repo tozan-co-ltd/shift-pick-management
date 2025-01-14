@@ -728,23 +728,31 @@ function GetDayStringForChart(date) {
 let arrayTrips = [];
 
 // 追加ボタン押下時
-function addTrips() {
+function addTrips(selectedTripName) {
     event.preventDefault();
     // 20件の便が選択されているとき
     if (20 <= arrayTrips.length) {
-        var errorMessage = 'E1008: 選択できる便数は最大20件です。20件を超えないように選択してください。';
+        var errorMessage = 'E1008: 選択できる便数(便＋枝番)は最大20件です。20件を超えないように選択してください。';
         $("#div-error-message").text(errorMessage);
         return;
     }
+
+    console.log("nunu");
+
+    var tripNameAndBranchSeq = selectedTripName.split("_");
+
     // 便名称と便枝番取得
-    var tripName = $('[name=TripName]').val();
-    var tripBranchSeq = $('[name=TripBranchSeq]').val();
+    var tripName = tripNameAndBranchSeq[0];
+    var tripBranchSeq = tripNameAndBranchSeq[1];
 
     // 入力されていない場合、エラー出力
     if (tripName == "" || tripBranchSeq == "" || tripName == null || tripBranchSeq == null) {
         return;
     }
-    var selectedTripName = tripName + "_" + tripBranchSeq;
+
+    // 1行目の場合、項目追加
+    if (arrayTrips.length == 0) 
+        document.getElementById("selectedTrips0").innerHTML = "<span class=\"warehouse-name-drs span-paragraph mb-3\">選択された便</span>";
 
     // 重複チェック
     const tripNames = arrayTrips.map(d => d.selectedTripName);
@@ -765,10 +773,11 @@ function addTrips() {
 function pushLabelToSelectedTrips(selectedTrips, selectedTripName) {
     var selectedTripLabel = document.createElement("label");
     selectedTripLabel.innerText = selectedTripName;
-    selectedTripLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1\" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
-    selectedTripLabel.className += "mr-2 selected-trip-label";
+    selectedTripLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1 \" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
+    selectedTripLabel.className += "mr-2 mb-3 selected-trip-label";
     selectedTripLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
     selectedTripLabel.style.padding = "0.5em";
+    selectedTripLabel.style.borderRadius = "5px";
     selectedTrips.appendChild(selectedTripLabel);
 }
 
@@ -781,7 +790,19 @@ function onLabelDeleteClick(selectedTripName) {
     // 配列から削除
     const tripNames = arrayTrips.map(d => d.selectedTripName);
     var deleteIndex = tripNames.indexOf(selectedTripName);
+
+    if (deleteIndex < 0)
+        return;
+
     arrayTrips.splice(deleteIndex, 1);
+
+    $('#' + selectedTripName).prop('checked', false);
+
+    // 選択された便が1つも無くなった場合
+    if (arrayTrips.length == 0) {
+        document.getElementById("selectedTrips0").innerHTML = "";
+        return;
+    }
 
     // 選択された便の再表示
     for (var i = 0; i < arrayTrips.length; i++) {
@@ -799,6 +820,94 @@ function clearTrips() {
     event.preventDefault();
     // ラベルと配列から全削除
     $('.selected-trip-label').remove();
+    $('[name="tripNameAndBranchSeq"]').prop('checked', false);
+    var selectedTrips = document.getElementById("selectedTrips0");
+    if (selectedTrips != null)
+        selectedTrips.innerHTML = "";
+    var selectedWorkDays = document.getElementById("selectedWorkDays0");
+    if (selectedWorkDays != null)
+        selectedWorkDays.innerHTML = "";
     arrayTrips = [];
     arrayWorkDays = [];
+}
+
+// 期間変更時
+function periodChange(page) {
+    // 期間の開始、終了日付の取得
+    var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+    var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+    // 選択中の便名称取得
+    var currentTripName = $('[name=TripName]').val();
+
+    // 便選択の選択肢の生成
+    createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page);
+}
+
+// 便選択の選択肢の生成
+function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page) {
+
+    // フォーム情報取得
+    let url = window.location.href + '/GetTripNameAndBranchSeqHTML';
+    url = url.replace(page, 'LoadRecord');
+    let method = 'Post';
+    let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+
+    // Ajax call
+    $.ajax({
+        url: url,
+        method: method,
+        data: data
+    }).done(function (response) {
+        $('#createToggleCheckBox').empty().html(response);
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const smallItems = header.nextElementSibling;
+                const toggleIcon = header.querySelector('.toggle-icon');
+                if (smallItems.classList.contains('show')) {
+                    smallItems.classList.remove('show');
+                    toggleIcon.classList.add('collapsed');
+                } else {
+                    smallItems.classList.add('show');
+                    toggleIcon.classList.remove('collapsed');
+                }
+            });
+        });
+
+        // チェックボックス切り替え時のイベント設定
+        $(function () {
+            $('input').change(function () {
+                // デフォルトの操作を無効化
+                event.preventDefault();
+
+                var checkBox = $(this).prop('checked');
+                var selectedTripName = $(this).val();
+
+                // イベントの発火元取得
+                // チェックボックスの状態取得
+                if (checkBox) {
+                    // 便追加
+                    addTrips(selectedTripName);
+
+                } else {
+                    // 便削除
+                    onLabelDeleteClick(selectedTripName);
+                }
+
+            })
+        });
+
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status === 404) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        } else {
+            var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+            $("#div-error-message").text(errorMessage);
+        }
+    });
+
+
 }

@@ -592,12 +592,10 @@ namespace ai_truck_load_measurement.Commons
                 package.Workbook.Worksheets.Add(sheetName);
                 // シート取得
                 using ExcelWorksheet sheet = package.Workbook.Worksheets[sheetName];
-                // フィルター設定
-                //sheet.Cells["A1:AM1"].AutoFilter = true;
                 // ウィンドウ枠の固定
                 sheet.View.FreezePanes(2, 1);
                 // セル自動選択
-                sheet.Select("A2");
+                sheet.Select("A1");
 
                 // タイトル行が指定されているときは、タイトル行をセットする
                 if (headerList != null && headerList.Count > 0)
@@ -686,11 +684,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("更新日時");
                     headerList.Add("更新者");
                     break;
-                case "実績出力":
-                    headerList.Add("項目名");
-                    headerList.Add("検索条件");
-                    break;
-                case "荷量推移":
+                default:
                     headerList.Add("項目名");
                     headerList.Add("検索条件");
                     break;

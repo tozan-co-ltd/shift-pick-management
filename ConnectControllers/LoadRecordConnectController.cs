@@ -333,8 +333,8 @@ namespace ai_truck_load_measurement.ConnectControllers
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
             var sql = $@"
                 SELECT DISTINCT
-	                trip_name AS Value,
-	                trip_name AS Text
+	                trip_name ,
+	                trip_branch_seq
                 FROM t_trip_records
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 AND trip_name IS NOT NULL
