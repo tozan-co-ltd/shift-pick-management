@@ -314,7 +314,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         {
             var sql = $@"
                 SELECT 
-	                TripHistories.trip_id,
+                    TripHistories.trip_id,
                     TripHistories.trip_history_id,
                     Trips.trip_name,
                     TripHistories.driver_name,
@@ -322,12 +322,14 @@ namespace ai_truck_load_measurement.ConnectControllers
                     Trucks.truck_number,
                     Trucks.identify_number,
                     CONVERT(DATETIME, TripHistories.day_shift_start_time) AS day_shift_start_time,
+	                TripHistories.depo_id,
+	                Depos.name AS depo_name,
                     TripHistories.applicable_start_datetime,
                     TripHistories.applicable_end_datetime,
                     TripHistories.updated_at,
                     TripHistories.updated_by
                 FROM 
-	                m_trip_histories as TripHistories
+                    m_trip_histories as TripHistories
                 INNER JOIN
                     m_trips as Trips
                 ON 
@@ -336,6 +338,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                     m_trucks as Trucks
                 ON
                     TripHistories.truck_id = Trucks.truck_id
+                INNER JOIN 
+	                m_depos as Depos
+                ON
+	                TripHistories.depo_id = Depos.depo_id
             ";
             // 適用終了日時を過ぎた便を表示しない場合
             if (!isBeforeApplicablePeriod)

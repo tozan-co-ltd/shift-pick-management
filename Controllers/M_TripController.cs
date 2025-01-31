@@ -78,6 +78,7 @@ namespace ai_truck_load_measurement.Controllers
                                     <th class=""font-weight-bold"">乗務員</th>
                                     <th class=""font-weight-bold"">車両番号</th>
                                     <th class=""font-weight-bold"">識別番号</th>
+                                    <th class=""font-weight-bold"">デポ</th>
                                     <th class=""font-weight-bold"">昼勤開始時間</th>
                                     <th class=""font-weight-bold"">適用開始日時</th>
                                     <th class=""font-weight-bold"">適用終了日時</th>
@@ -108,6 +109,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{@item.DriverName}</td>
                                 <td>{@item.TruckNumber}</td>
                                 <td>{@item.IdentifyNumber}</td>
+                                <td>{@item.DepoName}</td>
                                 <td>{@item.DayShiftStartTime.ToString("HH:mm")}</td>
                                 <td>{@item.ApplicableStartDateTime.ToString("yyyy/MM/dd HH:mm")}</td>
                                 <td>{@item.ApplicableEndDateTime.ToString("yyyy/MM/dd HH:mm")}</td>
