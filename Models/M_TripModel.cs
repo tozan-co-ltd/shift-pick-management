@@ -121,6 +121,11 @@ namespace ai_truck_load_measurement.Models
 
         public List<SelectListItem> TruckSelectList { get; set; } = new List<SelectListItem>();
 
+        /// <summary>
+        /// 選択肢用のデポリスト
+        /// </summary>
+        public List<SelectListItem>? M_DepoList { get; set; }
+
         // 適用終了日時を過ぎた便を表示するチェックボックスの入力
         public bool IsCheckedBeforeApplicablePeriod {  get; set; } = false;
     }

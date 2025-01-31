@@ -185,6 +185,7 @@
 
         // 適用終了日時を過ぎた便を表示するチェックボックスの値を取得
         var trip_model = @Html.Raw(Json.Serialize(Model));
+        console.log(trip_model);
         $('input').prop('checked', trip_model.isCheckedBeforeApplicablePeriod);
         // テーブル表示
         tableDisplay();
@@ -243,6 +244,7 @@
 
         // M_TripModel取得
         var tripModel = @Html.Raw(Json.Serialize(Model));
+        console.log(tripModel);
         tripModel.m_TripList.forEach(function (item) {
             var dayShiftStartTime = GetTimeString(new Date(item.dayShiftStartTime));
             var applicableStartDateTime = GetDateString(new Date(item.applicableStartDateTime));

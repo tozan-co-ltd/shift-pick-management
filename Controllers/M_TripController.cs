@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
 using ai_truck_load_measurement.Commons;
 using System.Data;
+using Dapper;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -40,6 +41,7 @@ namespace ai_truck_load_measurement.Controllers
                 IEnumerable<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(sql);
 
                 model.M_TripList = tripList.ToPagedList();
+                model.M_DepoList = GetMDepoList();
 
                 return View(model);
             }
@@ -48,6 +50,34 @@ namespace ai_truck_load_measurement.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
+            }
+        }
+
+        private List<SelectListItem> GetMDepoList()
+        {
+            var selectListItem = new List<SelectListItem>();
+
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string commandText = $@"
+                        SELECT
+                            depo_id as Value,
+                            name AS Text
+                        FROM m_depos
+                        ";
+
+                    selectListItem = connection.Query<SelectListItem>(commandText).ToList();
+                }
+                return selectListItem;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
@@ -167,6 +197,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 車両マスター情報取得
                 var truckSql = M_TruckConnectController.CreateSQLToSelectMTrucks();
                 IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(truckSql);
+
                 // 車両番号のセレクトリスト作成
                 foreach (var truck in truckList)
                 {
@@ -179,6 +210,8 @@ namespace ai_truck_load_measurement.Controllers
 
                     model.TruckSelectList.Add(menuItem);
                 }
+
+
 
                 // 適用終了日時を過ぎた便を表示するチェックボックスの入力
                 model.IsCheckedBeforeApplicablePeriod = isChecked;
