@@ -71,6 +71,17 @@ namespace ai_truck_load_measurement.Models
         public string? RegistDayShiftStartTime { get; set; }
 
         /// <summary>
+        /// デポID
+        /// </summary>
+        public string? DepoID { get; set; }
+
+        /// <summary>
+        /// デポ名
+        /// </summary>
+        [Display(Name = "デポ")]
+        public string? DepoName {  get; set; }
+
+        /// <summary>
         ///  適用開始日時
         /// </summary>
         [Display(Name = "適用開始日時")]
