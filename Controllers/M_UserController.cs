@@ -25,7 +25,7 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // 便マスター情報取得SQL作成
-                var sql =　M_UserConnectController.CreateSQLToSelectMUsers();
+                var sql = M_UserConnectController.CreateSQLToSelectMUsers();
                 // DB接続
                 IEnumerable<M_UserModel> userList = M_UserConnectController.ConnectMUsers(sql);
 
@@ -36,6 +36,25 @@ namespace ai_truck_load_measurement.Controllers
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return View(model);
+            }
+        }
+
+        /// <summary>
+        /// ユーザーマスター登録画面表示
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult Register()
+        {
+            M_UserModel model = new();
+            try
+            {
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
                 return View(model);
             }
         }

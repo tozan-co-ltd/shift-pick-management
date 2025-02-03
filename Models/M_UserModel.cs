@@ -1,4 +1,5 @@
-﻿using X.PagedList;
+﻿using System.ComponentModel.DataAnnotations;
+using X.PagedList;
 
 namespace ai_truck_load_measurement.Models
 {
@@ -25,6 +26,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// ユーザーのActiveDirectory名
         /// </summary>
+        [Display(Name = "AD名")]
         public string? ADName {  get; set; }
 
         /// <summary>
@@ -35,11 +37,13 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// メインデポ名
         /// </summary>
+        [Display(Name = "メインデポ")]
         public string? DepoName { get; set; }
 
         /// <summary>
         /// 管理権限区分
         /// </summary>
+        [Display(Name = "管理権限")]
         public int? AuthorizedKubun {  get; set; }
 
         /// <summary>
