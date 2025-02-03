@@ -24,6 +24,12 @@ namespace ai_truck_load_measurement.Controllers
 
             try
             {
+                // 便マスター情報取得SQL作成
+                var sql =　M_UserConnectController.CreateSQLToSelectMUsers();
+                // DB接続
+                IEnumerable<M_UserModel> userList = M_UserConnectController.ConnectMUsers(sql);
+
+                model.M_UserList = userList.ToPagedList();
                 return View(model);
             }
             catch (Exception ex)

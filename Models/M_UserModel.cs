@@ -45,7 +45,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 作成日時
         /// </summary>
-        public DateTime? CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// 作成者
@@ -55,7 +55,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 更新日時
         /// </summary>
-        public DateTime? UpdatedAt {  get; set; }
+        public DateTime UpdatedAt {  get; set; }
 
         /// <summary>
         /// 更新者
