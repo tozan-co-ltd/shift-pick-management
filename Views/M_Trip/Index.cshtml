@@ -134,6 +134,15 @@
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <label>@Html.DisplayNameFor(model => model.DepoName)<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.M_DepoList" required id="DepoID"></select>
+                                <span class="text-danger w-100" asp-validation-for="DepoName"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel">
                                 <label><a>@Html.DisplayName("ApplicableStartDateTime")<span style="color:red">*</span></a></label>
                             </div>

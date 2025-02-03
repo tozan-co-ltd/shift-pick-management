@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using ai_truck_load_measurement.Commons;
 using System.Data;
 using Dapper;
+using DocumentFormat.OpenXml.Office.CustomUI;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -53,9 +54,15 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
+        /// <summary>
+        /// デポのセレクトリスト作成
+        /// </summary>
+        /// <returns></returns>
         private List<SelectListItem> GetMDepoList()
         {
             var selectListItem = new List<SelectListItem>();
+            // 初期選択肢追加
+            selectListItem.Add(new SelectListItem() { Text = "選択してください", Value = "0", Selected = true, Disabled = true });
 
             try
             {
@@ -71,7 +78,12 @@ namespace ai_truck_load_measurement.Controllers
                         FROM m_depos
                         ";
 
-                    selectListItem = connection.Query<SelectListItem>(commandText).ToList();
+                    var getSelectListItem = connection.Query<SelectListItem>(commandText).ToList();
+                    // セレクトリストにデポ情報追加
+                    foreach(var item in getSelectListItem)
+                    {
+                        selectListItem.Add(item);
+                    }
                 }
                 return selectListItem;
             }
@@ -210,6 +222,9 @@ namespace ai_truck_load_measurement.Controllers
 
                     model.TruckSelectList.Add(menuItem);
                 }
+
+                // デポのセレクトリスト作成
+                model.M_DepoList = GetMDepoList();
 
 
 
