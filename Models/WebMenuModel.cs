@@ -18,6 +18,7 @@ namespace ai_truck_load_measurement.Models
             new M_WebMenu{CategoryID = 2, MenuID = 1, MenuName = "車両マスター", Controller = "M_Truck", Action = "Index"},
             new M_WebMenu{CategoryID = 2, MenuID = 2, MenuName = "便マスター", Controller = "M_Trip", Action = "Index"},
             new M_WebMenu{CategoryID = 2, MenuID = 3, MenuName = "便枝番マスター", Controller = "M_TripBranchNumber", Action = "Index"},
+            new M_WebMenu{CategoryID = 2, MenuID = 4, MenuName = "ユーザーマスター", Controller = "M_User", Action = "Index"},
         };
 
         /// <summary>

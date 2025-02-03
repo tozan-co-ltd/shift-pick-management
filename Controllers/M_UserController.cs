@@ -1,0 +1,37 @@
+﻿using ai_truck_load_measurement.ConnectControllers;
+using ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Properties;
+using Microsoft.AspNetCore.Mvc;
+using X.PagedList;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data.SqlClient;
+using ai_truck_load_measurement.Commons;
+using System.Data;
+
+namespace ai_truck_load_measurement.Controllers
+{
+    public class M_UserController : BaseController
+    {
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// ユーザーマスター画面表示
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult Index()
+        {
+            M_UserModel model = new();
+
+            try
+            {
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return View(model);
+            }
+        }
+    }
+}
