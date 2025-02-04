@@ -77,7 +77,7 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     // log取得
                     errorMessage = "E1011: " + ErrorMessagesResources.E1011;
-                    _logger.Error($"車両マスター登録失敗 {errorMessage}");
+                    _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
                 }
@@ -91,11 +91,72 @@ namespace ai_truck_load_measurement.Controllers
                     return NotFound(new { errorMessage });
                 }
 
-                // 車両マスター登録
+                // ユーザーマスター登録
                 M_UserConnectController.InsertMUser(model, user);
 
                 // log取得
-                _logger.Info($"車両マスター登録成功 ユーザー名:{model.ADName}");
+                _logger.Info($"ユーザーマスター登録成功 ユーザー名:{model.ADName}");
+
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+            catch (Exception ex)
+            {
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+        }
+
+
+        /// <summary>
+        /// ユーザーマスター更新
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        [HttpPost]
+        public IActionResult Edit(M_UserModel model)
+        {
+            string? errorMessage;
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 入力規則チェック
+                if (!ModelState.IsValid)
+                {
+                    // log取得
+                    errorMessage = "E1011: " + ErrorMessagesResources.E1011;
+                    _logger.Error($"ユーザーマスター更新失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
+                }
+
+                // ユーザーコード重複チェック
+                var duplicateCheck = ADNameDuplicateCheck(model);
+                if (duplicateCheck != null)
+                {
+                    errorMessage = duplicateCheck;
+
+                    return NotFound(new { errorMessage });
+                }
+
+                // ユーザーマスター更新
+                M_UserConnectController.UpdateMUser(model, user);
+
+                // log取得
+                _logger.Info($"ユーザーマスター更新成功 ユーザーID:{model.UserID}");
 
                 return Ok();
             }
@@ -134,7 +195,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 // log取得
                 var errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, displayName);
-                _logger.Error($"車両マスター登録失敗 {errorMessage}");
+                _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
 
                 return errorMessage;
             }

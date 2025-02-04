@@ -17,6 +17,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// ユーザーID
         /// </summary>
+        [Display(Name = "ユーザーID")]
         public int? UserID { get; set; }
 
         /// <summary>

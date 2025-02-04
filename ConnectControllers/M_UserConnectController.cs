@@ -74,6 +74,39 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// ユーザー情報更新
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns>更新件数</returns>
+        public static int UpdateMUser(M_UserModel model, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+                    string sql = CreateSQLToUpdateMUser(model, sysDate, loginUser.UserName);
+                    var count = connection.Execute(sql);
+
+                    return count;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// ユーザー情報取得用SQL
         /// </summary>
         /// <returns></returns>
@@ -130,6 +163,30 @@ namespace ai_truck_load_measurement.ConnectControllers
                     '{formatCreatedAt}',
                     '{createdBy}'
                 );
+            ";
+            return sql;
+        }
+
+
+        /// <summary>
+        /// ユーザーマスター更新SQL作成
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToUpdateMUser(M_UserModel model, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+                UPDATE m_users
+                SET 
+                    ad_name = '{model.ADName}',
+                    depo_id = '{model.DepoID}',
+                    authorized_kubun = '{model.AuthorizedKubun}',
+                    updated_at = '{updatedAt}',
+                    updated_by = '{updatedBy}'
+                WHERE
+                    user_id = {model.UserID}
             ";
             return sql;
         }
