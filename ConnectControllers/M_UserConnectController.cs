@@ -107,6 +107,39 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// ユーザー情報削除
+        /// </summary>
+        /// <param name="userId">ユーザーID</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns>更新件数</returns>
+        public static int DeleteMUser(int userId, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+                    string sql = CreateSQLToDeleteMUser(userId, sysDate, loginUser.UserName);
+                    var count = connection.Execute(sql);
+
+                    return count;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// ユーザー情報取得用SQL
         /// </summary>
         /// <returns></returns>
@@ -129,6 +162,8 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                m_depos AS Depos
                 ON
 	                Users.depo_id = Depos.depo_id
+                WHERE 
+                    Users.is_deleted = 0
             ";
             return sql;
         }
@@ -187,7 +222,29 @@ namespace ai_truck_load_measurement.ConnectControllers
                     updated_by = '{updatedBy}'
                 WHERE
                     user_id = {model.UserID}
+                    and is_deleted = 0
             ";
+            return sql;
+        }
+
+        /// <summary>
+        /// ユーザーマスター削除SQL作成
+        /// </summary>
+        /// <param name="userId">ユーザーID</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToDeleteMUser(int userId, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+                UPDATE m_users
+                SET 
+                    is_deleted = 1,
+                    updated_at = '{updatedAt}',
+                    updated_by = '{updatedBy}'
+                WHERE 
+                    user_id = {userId}
+            ;";
             return sql;
         }
 
@@ -209,6 +266,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 WHERE
                     ad_name = '{model.ADName}'
                     AND user_id <> {model.UserID}
+                    and is_deleted = 0
             ";
 
             return sql;

@@ -181,6 +181,47 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
+        /// ユーザーマスター削除
+        /// </summary>
+        /// <param name="userId">ユーザーID</param>
+        /// <returns></returns>
+        public IActionResult Delete(int userId)
+        {
+            string? errorMessage;
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // ユーザーマスター削除
+                int deleteAffectedRows = M_UserConnectController.DeleteMUser(userId, user);
+
+                // log取得
+                _logger.Info($"ユーザーマスター削除成功 車両ID:{userId}");
+
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+            catch (Exception ex)
+            {
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+        }
+
+        /// <summary>
         /// AD名重複チェック
         /// </summary>
         /// <param name="model">チェック対象</param>

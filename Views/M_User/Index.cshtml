@@ -168,6 +168,14 @@
                     <div class="col-12 col-md-12">
                         <div class="col-12 d-flex flex-wrap">
                             <div class="col-12 col-sm-4 col-md-4">
+                                <label>ユーザーID</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteUserID" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
                                 <label>AD名</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-8 mb-2">
@@ -180,6 +188,14 @@
                             </div>
                             <div class="col-12 col-sm-8 col-md-8 mb-2">
                                 <input class="form-control" id="deleteDepoName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>管理権限</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteAuthorizedKubun" type="text" disabled>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
@@ -259,6 +275,57 @@
                     $("#edit-modal-error-message").text(errorMessage);
                 }
             });
+        });
+    }
+
+    // 削除ボタン押下
+    function OnDeleteClick(userID) {
+        // M_UserModel取得
+        var userModel = @Html.Raw(Json.Serialize(Model));
+        userModel.m_UserList.forEach(function (item) {
+
+            if (item.userID == userID) {
+                $("#deleteUserID").val(item.userID);
+                $("#deleteADName").val(item.adName);
+                $("#deleteDepoName").val(item.depoName);
+                var authorizedKubun = "";
+                if (item.authorizedKubun == 0) {
+                    authorizedKubun = "管理者";
+                }else if(item.authorizedKubun == 1){
+                    authorizedKubun = "なし";
+                }
+                $("#deleteAuthorizedKubun").val(authorizedKubun);
+            }
+        });
+    }
+
+    // 削除
+    function OnExecuteDelete() {
+        DeleteErrorMessages();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("Delete", "M_User")';
+        let method = 'POST';
+        let data = { "userId": $('#deleteUserID').val() };
+        console.log($('#deleteUserId').val);
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            $('#delete-modal').hide();
+            // 完了モーダル表示
+            AlertMessage('', '完了', '登録が完了しました。', null, null);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#delete-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#delete-modal-error-message").text(errorMessage);
+            }
         });
     }
 </script>
