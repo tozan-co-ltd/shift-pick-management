@@ -139,6 +139,40 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
         }
 
+
+        /// <summary>
+        /// 車両情報をデータテーブルとして取得
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <returns></returns>
+        public static DataTable ConnectMUsersToDataTable(string sql)
+        {
+            // 戻り値
+            DataTable dataTable = new DataTable();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandText = sql;
+                    var adapter = new SqlDataAdapter(command);
+                    adapter.Fill(dataTable);
+                }
+                return dataTable;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         /// <summary>
         /// ユーザー情報取得用SQL
         /// </summary>
@@ -156,6 +190,34 @@ namespace ai_truck_load_measurement.ConnectControllers
                    Users.created_by,
                    Users.updated_at,
                    Users.updated_by
+                FROM 
+                    m_users AS Users
+                INNER JOIN
+	                m_depos AS Depos
+                ON
+	                Users.depo_id = Depos.depo_id
+                WHERE 
+                    Users.is_deleted = 0
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// DataTable用のユーザーマスター情報取得SQL作成
+        /// </summary>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectMUsersForDataTable()
+        {
+            var sql = $@"
+                SELECT 
+                    Users.user_id,
+                    Users.ad_name,
+                    Depos.name AS depo_name,
+                    Users.authorized_kubun,
+                    FORMAT (Users.created_at, 'yyyy/MM/dd HH:mm:ss'),
+                    Users.created_by,
+                    FORMAT (Users.updated_at, 'yyyy/MM/dd HH:mm:ss'),
+                    Users.updated_by
                 FROM 
                     m_users AS Users
                 INNER JOIN

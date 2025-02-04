@@ -222,6 +222,74 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
+        /// ファイル出力
+        /// </summary>
+        /// <param name="gamenName">現在の画面名</param>
+        /// <returns></returns>
+        public JsonResult ExportFile(string gamenName)
+        {
+            string? errorMessage;
+            try
+            {
+                // ユーザーマスター情報取得
+                var sql = M_UserConnectController.CreateSQLToSelectMUsersForDataTable();
+                DataTable dt = M_UserConnectController.ConnectMUsersToDataTable(sql);
+
+                // 管理権限列を数字から文字に変換
+                var conversionedDt = ConvertAuthorizedKubunFromNumberToString(dt);
+
+                // ファイル名
+                var tmpFilename = CreateFile.CreateFileName(gamenName);
+                // 2シートあり
+                bool sheetTwo = false;
+
+
+                try
+                {
+                    // Excelファイル作成チェック
+                    var createRs = CreateFile.CheckCreateExcel(conversionedDt, null, tmpFilename, sheetTwo, null, null, gamenName);
+
+                    if (createRs.Item1)
+                    {
+                        var file = System.IO.File.ReadAllBytes(createRs.Item2);
+
+
+                        return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+                    }
+                    else
+                    {
+                        // エラーメッセージ取得
+                        // 「ファイルが存在しません。」
+                        errorMessage = ErrorMessagesResources.E9999;
+
+                        return Json(new { res = "NG", error = errorMessage });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // エラーメッセージ取得
+                    // 「NASに接続できませんでした。」
+                    errorMessage = ErrorMessagesResources.E9999;
+
+                    // log取得
+                    var exceptionMessage = ex.Message;
+                    return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+                }
+            }
+            catch (Exception ex)
+            {
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+
+                // log取得
+                var exceptionMessage = ex.Message;
+                return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+            }
+
+        }
+
+        /// <summary>
         /// AD名重複チェック
         /// </summary>
         /// <param name="model">チェック対象</param>
@@ -242,6 +310,31 @@ namespace ai_truck_load_measurement.Controllers
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// データテーブルの管理権限列を数字から文字に変換する
+        /// </summary>
+        /// <param name="dt">変換元データテーブル</param>
+        /// <returns></returns>
+        private DataTable ConvertAuthorizedKubunFromNumberToString(DataTable dt)
+        {
+            dt.Columns.Add("authorized_kubun_name").SetOrdinal(4);
+            foreach (DataRow row in dt.Rows)
+            {
+                var authorizedKubun = (int)row["authorized_kubun"];
+                if (authorizedKubun == 0)
+                {
+                    row["authorized_kubun_name"] = "管理者";
+                }
+                else if (authorizedKubun == 1)
+                {
+                    row["authorized_kubun_name"] = "なし";
+                }
+            }
+            dt.Columns.Remove("authorized_kubun");
+
+            return dt;
         }
     }
 }
