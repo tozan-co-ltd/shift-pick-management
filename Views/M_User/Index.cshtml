@@ -71,7 +71,13 @@
                                 <td>@item.UserID</td>
                                 <td>@item.ADName</td>
                                 <td>@item.DepoName</td>
-                                <td>@item.AuthorizedKubun</td>
+                                @if(item.AuthorizedKubun == 0)
+                                {
+                                    <td>管理者</td>
+                                }else if(item.AuthorizedKubun == 1)
+                                {
+                                    <td>なし</td>
+                                }
                                 <td>@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
                                 <td>@item.UpdatedBy</td>
                             </tr>
@@ -130,8 +136,8 @@
                                 <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input type="radio" class="mr-2" asp-for="AuthorizedKubun" autocomplete="off" value="1" name="AuthorizedKubunSelect">権限あり
-                                <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" autocomplete="off" value="0" name="AuthorizedKubunSelect" checked>権限なし
+                                <input type="radio" class="mr-2" asp-for="AuthorizedKubun" value="0" name="AuthorizedKubun">権限あり
+                                <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" value="1" name="AuthorizedKubun" checked>権限なし
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
@@ -228,14 +234,15 @@
 
         // M_UserModel取得
         var userModel = @Html.Raw(Json.Serialize(Model));
-        var radio = document.getElementsByName("AuthorizedKubunSelect");
+        var radio = document.getElementsByName("AuthorizedKubun");
         userModel.m_UserList.forEach(function (item) {
             if (item.userID == userID) {
                 $("#UserID").val(item.userID);
                 $("#ADName").val(item.adName);
                 $("#DepoID").val(item.depoID);
                 var authorizedKubun = item.authorizedKubun;
-                document.getElementsByName("AuthorizedKubunSelect")[authorizedKubun].checked = true;
+                document.getElementsByName("AuthorizedKubun")[authorizedKubun].checked = true;
+                console.log(document.getElementsByName("AuthorizedKubun")[authorizedKubun]);
             }
         });
     }
