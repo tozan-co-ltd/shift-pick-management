@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ai_truck_load_measurement.Properties;
+using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
 namespace ai_truck_load_measurement.Models
@@ -27,17 +28,19 @@ namespace ai_truck_load_measurement.Models
         /// ユーザーのActiveDirectory名
         /// </summary>
         [Display(Name = "AD名")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? ADName {  get; set; }
 
         /// <summary>
         /// メインデポID
         /// </summary>
+        [Display(Name = "メインデポ")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? DepoID {  get; set; }
 
         /// <summary>
         /// メインデポ名
         /// </summary>
-        [Display(Name = "メインデポ")]
         public string? DepoName { get; set; }
 
         /// <summary>

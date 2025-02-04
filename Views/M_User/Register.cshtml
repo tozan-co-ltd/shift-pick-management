@@ -23,24 +23,23 @@
 
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
-                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="mTruckForm">
+                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="mUserForm">
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
                             <label>@Html.DisplayName("ADName")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <input class="form-control" type="text" asp-for="ADName" autocomplete="off" value="" required>
+                            <input class="form-control" type="text" asp-for="ADName" autocomplete="off" value="" required placeholder="例: t_yamada">
                             <small class="form-text text-muted w-100 p-1">Windowsログイン時と同様の名前を使用してください</small>
                             <span class="text-danger w-100" asp-validation-for="ADName"></span>
                         </div>
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayName("DepoName")<span style="color:red">*</span></label>
+                            <label>@Html.DisplayName("DepoID")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <input class="form-control" type="text" asp-for="DepoID" autocomplete="off" value="" required>
-                            <small class="form-text text-muted w-100 p-1"></small>
+                            <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.MDepoList" required id="depoID"></select>
                             <span class="text-danger w-100" asp-validation-for="DepoID"></span>
                         </div>
                     </div>
@@ -49,10 +48,8 @@
                             <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <input type="radio" class="mr-2" asp-for="AuthorizedKubun" autocomplete="off" value="1" name="AuthorizedKubunSelect" required>権限あり
-                            <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" autocomplete="off" value="0" name="AuthorizedKubunSelect" required>権限なし
-                            <small class="form-text text-muted w-100 p-1"></small>
-                            <span class="text-danger w-100" asp-validation-for="DepoID"></span>
+                            <input type="radio" class="mr-2" asp-for="AuthorizedKubun" autocomplete="off" value="1" name="AuthorizedKubunSelect" >権限あり
+                            <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" autocomplete="off" value="0" name="AuthorizedKubunSelect" checked>権限なし
                         </div>
                     </div>
                     <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
@@ -80,7 +77,7 @@
     // 登録ボタン押下
     function OnRegister() {
 
-        var form = $("#mTruckForm");
+        var form = $("#mUserForm");
 
 
 
@@ -95,9 +92,9 @@
             event.stopImmediatePropagation();
 
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("Register", "M_Truck")';
+            let url = window.location.origin + '@Url.Action("Register", "M_User")';
             let method = 'POST';
-            let formId = 'mTruckForm';
+            let formId = 'mUserForm';
             let data = form.serializeArray();
 
             // Ajax call

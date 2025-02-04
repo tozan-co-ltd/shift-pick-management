@@ -42,6 +42,38 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// ユーザー情報登録
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns>インサート数</returns>
+        public static int InsertMUser(M_UserModel model, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                // DB接続
+                try
+                {
+                    DateTime sysDate = DateTime.Now;
+                    string sql = CreateSQLToInsertMUser(model, sysDate, loginUser.UserName);
+                    var insertedCount = connection.Execute(sql);
+                    return insertedCount;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// ユーザー情報取得用SQL
         /// </summary>
         /// <returns></returns>
@@ -65,6 +97,63 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ON
 	                Users.depo_id = Depos.depo_id
             ";
+            return sql;
+        }
+
+        /// <summary>
+        /// ユーザーマスター登録SQL作成
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <param name="createdAt">システムタイム</param>
+        /// <param name="createdBy">ユーザー名</param>
+        /// <returns>SQL文</returns>
+        private static string CreateSQLToInsertMUser(M_UserModel model, DateTime createdAt, string createdBy)
+        {
+            string formatCreatedAt = createdAt.ToString("yyyy/MM/dd HH:mm:ss");
+
+            var sql = $@"
+                INSERT INTO m_users(
+                    ad_name, 
+                    depo_id,
+                    authorized_kubun,
+                    created_at,
+                    created_by,
+                    updated_at,
+                    updated_by
+                )
+                VALUES (
+                    '{model.ADName}',
+                    '{model.DepoID}',
+                    '{model.AuthorizedKubun}',
+                    '{formatCreatedAt}',
+                    '{createdBy}',
+                    '{formatCreatedAt}',
+                    '{createdBy}'
+                );
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 異なるユーザーIDで重複AD名情報取得SQL作成
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectDuplicateADName(M_UserModel model)
+        {
+            if(string.IsNullOrEmpty(model.UserID.ToString()))
+                model.UserID = 0;
+
+            var sql = $@"
+                SELECT
+                    COUNT(*)                      
+                FROM 
+                    m_users
+                WHERE
+                    ad_name = '{model.ADName}'
+                    AND user_id <> {model.UserID}
+            ";
+
             return sql;
         }
     }
