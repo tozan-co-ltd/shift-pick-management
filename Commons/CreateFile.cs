@@ -689,6 +689,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("AD名");
                     headerList.Add("デポ名");
                     headerList.Add("管理権限");
+                    headerList.Add("削除フラグ");
                     headerList.Add("作成日時");
                     headerList.Add("作成者");
                     headerList.Add("更新日時");

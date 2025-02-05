@@ -214,6 +214,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     Users.ad_name,
                     Depos.name AS depo_name,
                     Users.authorized_kubun,
+                    Users.is_deleted,
                     FORMAT (Users.created_at, 'yyyy/MM/dd HH:mm:ss'),
                     Users.created_by,
                     FORMAT (Users.updated_at, 'yyyy/MM/dd HH:mm:ss'),
