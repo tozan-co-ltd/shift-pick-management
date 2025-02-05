@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
 using ai_truck_load_measurement.Commons;
 using System.Data;
+using System.DirectoryServices;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -95,6 +96,17 @@ namespace ai_truck_load_measurement.Controllers
                     return BadRequest(new { errorMessage });
                 }
 
+                // ユーザー名がADに存在するか
+                if (!HasNameInAD(model.ADName))
+                {
+                    string displayName = Utils.GetDisplayName<M_UserModel>("ADName");
+                    // log取得
+                    errorMessage = "E1013: " + string.Format(ErrorMessagesResources.E1013, displayName);
+                    _logger.Error($"ユーザーマスター更新失敗 {errorMessage}");
+
+                    return BadRequest(new { errorMessage });
+                }
+
                 // ユーザーマスター登録
                 M_UserConnectController.InsertMUser(model, user);
 
@@ -147,15 +159,26 @@ namespace ai_truck_load_measurement.Controllers
                     return BadRequest(new { errorMessage });
                 }
 
-                // ユーザーコード重複チェック
-                var duplicateCheck = IsADNameDuplicate(model);
-                if (duplicateCheck)
+
+                // ユーザー名重複チェック
+                if (IsADNameDuplicate(model))
                 {
                     string displayName = Utils.GetDisplayName<M_UserModel>("ADName");
 
                     // log取得
                     errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, displayName);
                     _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
+
+                    return BadRequest(new { errorMessage });
+                }
+
+                // ユーザー名がADに存在するか
+                if (!HasNameInAD(model.ADName))
+                {
+                    string displayName = Utils.GetDisplayName<M_UserModel>("ADName");
+                    // log取得
+                    errorMessage = "E1013: " + string.Format(ErrorMessagesResources.E1013, displayName);
+                    _logger.Error($"ユーザーマスター更新失敗 {errorMessage}");
 
                     return BadRequest(new { errorMessage });
                 }
@@ -336,6 +359,39 @@ namespace ai_truck_load_measurement.Controllers
             dt.Columns.Remove("authorized_kubun");
 
             return dt;
+        }
+
+        /// <summary>
+        /// ADに入力された名前が存在するか
+        /// </summary>
+        /// <param name="userName">ユーザー名</param>
+        /// <returns>認証されたユーザー名</returns>
+        private bool HasNameInAD(string userName)
+        {
+            try
+            {
+                string ldapPath = "LDAP://192.168.1.6/DC=tozan,DC=co,DC=jp";
+                DirectoryEntry directoryEntry = new DirectoryEntry();
+                directoryEntry.Path = ldapPath;
+
+                // Active Directory でユーザーを検索
+                DirectorySearcher searcher = new DirectorySearcher(directoryEntry);
+                searcher.Filter = "(&(objectClass=user)(sAMAccountName=" + userName + "))";
+                searcher.SearchScope = SearchScope.Subtree;
+
+                // ユーザーが見つかったかどうかを確認
+                SearchResult result = searcher.FindOne();
+
+                if (result == null)
+                {
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

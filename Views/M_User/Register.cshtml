@@ -108,15 +108,8 @@
                 // 完了モーダル表示
                 AlertMessage('', '完了', '登録が完了しました。', null, null);
             }).fail(function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 404) {
-                    // データが見つからなかった場合
-                    var errorMessage = jqXHR.responseJSON.errorMessage;
-                    $("#div-error-message").text(errorMessage);
-                } else {
-                    // その他のエラーの場合
-                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#div-error-message").text(errorMessage);
-                }
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
             });
         });
     }
