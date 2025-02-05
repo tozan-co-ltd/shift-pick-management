@@ -83,10 +83,14 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // AD名重複チェック
-                var duplicateCheck = ADNameDuplicateCheck(model);
-                if (duplicateCheck != null)
+                var duplicateCheck = IsADNameDuplicate(model);
+                if (duplicateCheck)
                 {
-                    errorMessage = duplicateCheck;
+                    string displayName = Utils.GetDisplayName<M_UserModel>("ADName");
+
+                    // log取得
+                    errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, displayName);
+                    _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
                 }
@@ -144,10 +148,14 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // ユーザーコード重複チェック
-                var duplicateCheck = ADNameDuplicateCheck(model);
-                if (duplicateCheck != null)
+                var duplicateCheck = IsADNameDuplicate(model);
+                if (duplicateCheck)
                 {
-                    errorMessage = duplicateCheck;
+                    string displayName = Utils.GetDisplayName<M_UserModel>("ADName");
+
+                    // log取得
+                    errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, displayName);
+                    _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
 
                     return NotFound(new { errorMessage });
                 }
@@ -294,22 +302,14 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="model">チェック対象</param>
         /// <returns></returns>
-        private string? ADNameDuplicateCheck(M_UserModel model)
+        private bool IsADNameDuplicate(M_UserModel model)
         {
             var sql = M_UserConnectController.CreateSQLToSelectDuplicateADName(model);
             bool isExistedADName = ConnectToSQLServer.IsExistedSameRecord(sql);
             if (isExistedADName)
-            {
-                string displayName = Utils.GetDisplayName<M_UserModel>("ADName");
+                return true;
 
-                // log取得
-                var errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, displayName);
-                _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
-
-                return errorMessage;
-            }
-
-            return null;
+            return false;
         }
 
         /// <summary>
