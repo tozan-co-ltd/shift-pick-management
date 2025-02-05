@@ -319,7 +319,8 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         private DataTable ConvertAuthorizedKubunFromNumberToString(DataTable dt)
         {
-            dt.Columns.Add("authorized_kubun_name").SetOrdinal(4);
+            var index = dt.Columns.IndexOf("authorized_kubun");
+            dt.Columns.Add("authorized_kubun_name").SetOrdinal(index);
             foreach (DataRow row in dt.Rows)
             {
                 var authorizedKubun = (int)row["authorized_kubun"];
