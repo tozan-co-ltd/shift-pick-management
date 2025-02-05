@@ -141,7 +141,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 
 
         /// <summary>
-        /// 車両情報をデータテーブルとして取得
+        /// ユーザー情報をデータテーブルとして取得
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <returns></returns>
