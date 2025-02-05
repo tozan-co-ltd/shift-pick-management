@@ -79,7 +79,7 @@ namespace ai_truck_load_measurement.Controllers
                     errorMessage = "E1011: " + ErrorMessagesResources.E1011;
                     _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
 
-                    return NotFound(new { errorMessage });
+                    return BadRequest(new { errorMessage });
                 }
 
                 // AD名重複チェック
@@ -92,7 +92,7 @@ namespace ai_truck_load_measurement.Controllers
                     errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, displayName);
                     _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
 
-                    return NotFound(new { errorMessage });
+                    return BadRequest(new { errorMessage });
                 }
 
                 // ユーザーマスター登録
@@ -110,7 +110,7 @@ namespace ai_truck_load_measurement.Controllers
                 var exceptionMessage = ex.Message;
                 _logger.Error($"{exceptionMessage} {errorMessage}");
 
-                return NotFound(new { errorMessage });
+                return BadRequest(new { errorMessage });
             }
             catch (Exception ex)
             {
@@ -119,7 +119,7 @@ namespace ai_truck_load_measurement.Controllers
                 var exceptionMessage = ex.Message;
                 _logger.Error($"{exceptionMessage} {errorMessage}");
 
-                return NotFound(new { errorMessage });
+                return BadRequest(new { errorMessage });
             }
         }
 
@@ -144,7 +144,7 @@ namespace ai_truck_load_measurement.Controllers
                     errorMessage = "E1011: " + ErrorMessagesResources.E1011;
                     _logger.Error($"ユーザーマスター更新失敗 {errorMessage}");
 
-                    return NotFound(new { errorMessage });
+                    return BadRequest(new { errorMessage });
                 }
 
                 // ユーザーコード重複チェック
@@ -157,7 +157,7 @@ namespace ai_truck_load_measurement.Controllers
                     errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, displayName);
                     _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
 
-                    return NotFound(new { errorMessage });
+                    return BadRequest(new { errorMessage });
                 }
 
                 // ユーザーマスター更新
@@ -175,7 +175,7 @@ namespace ai_truck_load_measurement.Controllers
                 var exceptionMessage = ex.Message;
                 _logger.Error($"{exceptionMessage} {errorMessage}");
 
-                return NotFound(new { errorMessage });
+                return BadRequest(new { errorMessage });
             }
             catch (Exception ex)
             {
@@ -184,7 +184,7 @@ namespace ai_truck_load_measurement.Controllers
                 var exceptionMessage = ex.Message;
                 _logger.Error($"{exceptionMessage} {errorMessage}");
 
-                return NotFound(new { errorMessage });
+                return BadRequest(new { errorMessage });
             }
         }
 
@@ -216,7 +216,7 @@ namespace ai_truck_load_measurement.Controllers
                 var exceptionMessage = ex.Message;
                 _logger.Error($"{exceptionMessage} {errorMessage}");
 
-                return NotFound(new { errorMessage });
+                return BadRequest(new { errorMessage });
             }
             catch (Exception ex)
             {
@@ -225,7 +225,7 @@ namespace ai_truck_load_measurement.Controllers
                 var exceptionMessage = ex.Message;
                 _logger.Error($"{exceptionMessage} {errorMessage}");
 
-                return NotFound(new { errorMessage });
+                return BadRequest(new { errorMessage });
             }
         }
 
