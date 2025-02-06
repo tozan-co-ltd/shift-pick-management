@@ -333,22 +333,31 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 SELECT
                     trip_record_id,
-	                trip_name,
-	                trip_branch_seq,
-	                driver_name,
-	                station_id,
-	                truck_number,
-	                identify_number,
-	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
-	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
-	                work_day,
-	                arrived_at,
-	                departed_at,
-	                arrival_load_class,
-	                departure_load_class,
-	                arrival_load_img_path,
-	                departure_load_img_path
-                FROM t_trip_records";
+                    trip_name,
+                    trip_branch_seq,
+                    TripRecords.driver_name,
+                    station_id,
+                    truck_number,
+                    identify_number,
+	                Depos.name AS depo_name,
+                    CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
+                    CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+                    work_day,
+                    arrived_at,
+                    departed_at,
+                    arrival_load_class,
+                    departure_load_class,
+                    arrival_load_img_path,
+                    departure_load_img_path
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+                m_trip_histories AS TripHistories
+                ON
+                TripRecords.trip_id = TripHistories.trip_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                TripHistories.depo_id = Depos.depo_id";
             return sql;
         }
 

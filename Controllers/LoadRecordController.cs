@@ -8,6 +8,7 @@ using ai_truck_load_measurement.Properties;
 using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
+using NPOI.SS.Formula.Functions;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -52,13 +53,13 @@ namespace ai_truck_load_measurement.Controllers
         public static DataTable GetConvertedLoadClassDataTable(DataTable dt)
         {
             // テーブルに値を変換した後の文字列を格納する列を追加
-            dt.Columns.Add("converted_branch_seq", typeof(string)).SetOrdinal(1);
-            dt.Columns.Add("converted_truck_number", typeof(string)).SetOrdinal(5);
-            dt.Columns.Add("converted_identify_number", typeof(string)).SetOrdinal(6);
-            dt.Columns.Add("converted_arrival_scheduled_time", typeof(string)).SetOrdinal(7);
-            dt.Columns.Add("converted_departure_scheduled_time", typeof(string)).SetOrdinal(8);
-            dt.Columns.Add("arrival_load_status", typeof(string)).SetOrdinal(16);
-            dt.Columns.Add("departure_load_status", typeof(string)).SetOrdinal(17);
+            dt.Columns.Add("converted_branch_seq", typeof(string)).SetOrdinal(dt.Columns.IndexOf("trip_branch_seq"));
+            dt.Columns.Add("converted_truck_number", typeof(string)).SetOrdinal(dt.Columns.IndexOf("truck_number"));
+            dt.Columns.Add("converted_identify_number", typeof(string)).SetOrdinal(dt.Columns.IndexOf("identify_number"));
+            dt.Columns.Add("converted_arrival_scheduled_time", typeof(string)).SetOrdinal(dt.Columns.IndexOf("arrival_scheduled_time"));
+            dt.Columns.Add("converted_departure_scheduled_time", typeof(string)).SetOrdinal(dt.Columns.IndexOf("departure_scheduled_time"));
+            dt.Columns.Add("arrival_load_status", typeof(string)).SetOrdinal(dt.Columns.IndexOf("arrival_load_class"));
+            dt.Columns.Add("departure_load_status", typeof(string)).SetOrdinal(dt.Columns.IndexOf("departure_load_class"));
 
             // 各列の値を適切な値に変換
             foreach (DataRow row in dt.Rows)
