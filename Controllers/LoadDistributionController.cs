@@ -36,6 +36,10 @@ namespace ai_truck_load_measurement.Controllers
                 tripRecordList = (IEnumerable<LoadDistributionModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
+
+                var mainDepo = GetMainDepo();
+                model.MainDepoID = mainDepo.DepoID;
+                model.MainDepoName = mainDepo.Name;
                 return View(model);
             }
             catch (Exception ex)

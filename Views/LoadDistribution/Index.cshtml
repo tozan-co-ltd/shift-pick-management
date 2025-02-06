@@ -353,6 +353,7 @@
         $('#graphAndTable').css('display', 'none');
         periodChange('LoadDistribution');
         addDepos(model);
+        depoCheckDisplay(model);
     })
 
     // 期間の開始日付変更時
@@ -654,7 +655,7 @@
             if (depo.value == null)
                return;
             var depoLabel = document.createElement("label");
-            depoLabel.innerHTML += "<input type=\"checkbox\" class=\"mr-2\" name=\"depos\" id=\"depo" + depo.value + "\" checked />" + depo.text;
+            depoLabel.innerHTML += "<input type=\"checkbox\" class=\"mr-2\" name=\"depos\" id=\"depo" + depo.value + "\" />" + depo.text;
             depoLabel.className += "mr-3 ";
             selectDepos.appendChild(depoLabel);
 
@@ -675,8 +676,8 @@
         
     });
 
+    // 各デポチェックボックス押下時
     $(function () {
-        // 各デポチェックボックス押下時
         $('input[name="depos"]').change(function () {
             var depos = $('input[name=depos]');
             for (var i = 0; i < depos.length; i++) {
@@ -687,4 +688,19 @@
             }
         });
     })
+
+    function depoCheckDisplay(model){
+        console.log("start");
+        var mainDepoID = model.mainDepoID;
+        if (mainDepoID == 0)
+            return;
+        var depos = $('input[name=depos]');
+        console.log(mainDepoID);
+        console.log(depos);
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].id == "depo" + mainDepoID) {
+                depos[i].checked = true;
+            }
+        }
+    }
 </script>
