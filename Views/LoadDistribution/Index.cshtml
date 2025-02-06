@@ -45,10 +45,9 @@
                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                     <span class="warehouse-name-drs span-paragraph">デポ</span>
                     <div >
-                        <label><input type="checkbox" class=" mr-2" id="allDepo" />すべて</label>
+                        <label><input type="checkbox" class=" mr-2" id="allDepo" checked/>すべて</label>
                         <br />
-                        <label><input type="checkbox" class="mr-2" id="nawakita" />SyncBace名和北</label>
-                        <label><input type="checkbox" class="ml-3 mr-2" id="funami" />船見</label>
+                        <div id="selectDepos"></div>
                     </div>
                 </div>
             </div>
@@ -353,6 +352,7 @@
         // グラフ非表示
         $('#graphAndTable').css('display', 'none');
         periodChange('LoadDistribution');
+        addDepos(model);
     })
 
     // 期間の開始日付変更時
@@ -570,11 +570,8 @@
         DeleteErrorMessages();
         if (isWithin90Days()) {
 
-            // チェックボックスの入力情報取得
+            // チェックボックスの入力情報
             var checkBox = false;
-            $('input:checked').each(function () {
-                checkBox = $(this).prop('checked');
-            });
 
             // 期間の開始、終了日付の取得
             var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
@@ -649,4 +646,45 @@
             }
         });
     }
+
+    // デポの選択用チェックボックスを生成
+    function addDepos(model) {
+        var selectDepos = $("#selectDepos")[0];
+        model.mDepoList.forEach(depo => {
+            if (depo.value == null)
+               return;
+            var depoLabel = document.createElement("label");
+            depoLabel.innerHTML += "<input type=\"checkbox\" class=\"mr-2\" name=\"depos\" id=\"depo" + depo.value + "\" checked />" + depo.text;
+            depoLabel.className += "mr-3 ";
+            selectDepos.appendChild(depoLabel);
+
+            
+        })
+    }
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        var depos = $('input[name="depos"]');
+        for (var i = 0; i < depos.length; i++) {
+            if ($('input[id=allDepo]')[0].checked) {
+                depos[i].checked = true;
+            } else {
+                  depos[i].checked = false;
+            }
+        }
+        
+    });
+
+    $(function () {
+        // 各デポチェックボックス押下時
+        $('input[name="depos"]').change(function () {
+            var depos = $('input[name=depos]');
+            for (var i = 0; i < depos.length; i++) {
+                if (!depos[i].checked) {
+                    $('input[id=allDepo]')[0].checked = false;
+                    break;
+                }
+            }
+        });
+    })
 </script>

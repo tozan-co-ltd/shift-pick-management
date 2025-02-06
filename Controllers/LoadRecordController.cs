@@ -30,7 +30,7 @@ namespace ai_truck_load_measurement.Controllers
                 var departureLoadClass = model.DepartureLoadClass;
 
                 // 到着荷量クラスと出発荷量クラスをそれぞれ変換
-                model.ArrivalLoadStatus =　ConversionLoadClassToLoadStatus(arrivalLoadClass);
+                model.ArrivalLoadStatus = ConversionLoadClassToLoadStatus(arrivalLoadClass);
                 model.DepartureLoadStatus = ConversionLoadClassToLoadStatus(departureLoadClass);
 
                 // テーブルの空欄を"-"に変換
@@ -281,6 +281,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <th class=""font-weight-bold"">ステーション<br>ID</th>
                                 <th class=""font-weight-bold"">車両<br>番号</th>
                                 <th class=""font-weight-bold"">識別<br>番号</th>
+                                <th class=""font-weight-bold"">デポ</th>
                                 <th class=""font-weight-bold"">到着<br>予定</th>
                                 <th class=""font-weight-bold"">出発<br>予定</th>
                                 <th class=""font-weight-bold"">稼働日</th>
@@ -306,7 +307,7 @@ namespace ai_truck_load_measurement.Controllers
                     var departureScheduledTime = item.DepartureScheduledTime.ToString("HH:mm");
                     if (departureScheduledTime == "00:00") departureScheduledTime = "-";
                     var hasTripName = 0;
-                    if(item.TripName == "-") hasTripName = 1;
+                    if (item.TripName == "-") hasTripName = 1;
                     searchData += $@"
                         <tr>
                             <td hidden>{item.TripRecordID}</td>
@@ -317,6 +318,7 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{item.StationID}</td>
                             <td>{truckNumber}</td>
                             <td>{item.IdentifyNumber}</td>
+                            <td>{item.DepoName}</td>
                             <td>{arrivalScheduledTime}</td>
                             <td>{departureScheduledTime}</td>
                             <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
@@ -444,7 +446,7 @@ namespace ai_truck_load_measurement.Controllers
 
         public string GetTripNameAndBranchSeqHTML(DateTime startOfPeriod, DateTime endOfPeriod)
         {
-            var tripRecordList = GetTripNameFromPeriod(startOfPeriod,endOfPeriod);
+            var tripRecordList = GetTripNameFromPeriod(startOfPeriod, endOfPeriod);
             var html = CreateSelectTripNameAndBranchSeqHTML(tripRecordList);
             return html;
         }
@@ -501,7 +503,7 @@ namespace ai_truck_load_measurement.Controllers
                         <label class=""checkbox-item""><input type=""checkbox"" name=""tripNameAndBranchSeq"" id=""{selectValue}"" value=""{selectValue}"">{selectValue}</label>
                 ";
             }
-        
+
             html += $@"
                         </div>
                     </div>
@@ -541,7 +543,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="sql">sql文</param>
         /// <returns></returns>
-        public static List<LoadRecordModel> CommonSearchTrips (string sql)
+        public static List<LoadRecordModel> CommonSearchTrips(string sql)
         {
             // DB接続
             var loadClasses = LoadRecordConnectController.ConnectTTripRecords(sql);
@@ -555,4 +557,5 @@ namespace ai_truck_load_measurement.Controllers
             return loadClasses;
         }
     }
+
 }

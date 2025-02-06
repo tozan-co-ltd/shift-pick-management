@@ -909,5 +909,5 @@ function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page) {
         }
     });
 
-
+    
 }

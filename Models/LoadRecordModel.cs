@@ -52,6 +52,8 @@ namespace ai_truck_load_measurement.Models
         public string? DepartureLoadImgPath { get; set; }
         // 便実績リスト
         public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
+        // デポリスト
+        public List<M_DepoModel>? DepoList {  get; set; }
         // 訂正後荷量クラス
         public int AnnotationLoadClass { get; set; }
         // 訂正後荷量の%表示
@@ -66,5 +68,9 @@ namespace ai_truck_load_measurement.Models
         public DateTime? DayShiftStartTime { get; set; }
         // ユーザー名
         public string? UserName {  get; set; }
+        // デポID
+        public int DepoID {  get; set; }
+        // デポ名
+        public string? DepoName { get; set; }
     }
 }
