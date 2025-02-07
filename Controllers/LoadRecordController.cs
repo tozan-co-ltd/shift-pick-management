@@ -424,13 +424,13 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="startOfPeriod">期間の開始日時</param>
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <returns></returns>
-        public List<LoadRecordModel> GetTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
+        public List<LoadRecordModel> GetTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             List<LoadRecordModel> tripRecordList = new();
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod);
+                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod, checkedDepos);
                 // DB接続
                 tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
 
@@ -445,9 +445,9 @@ namespace ai_truck_load_measurement.Controllers
         }
 
 
-        public string GetTripNameAndBranchSeqHTML(DateTime startOfPeriod, DateTime endOfPeriod)
+        public string GetTripNameAndBranchSeqHTML(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
-            var tripRecordList = GetTripNameFromPeriod(startOfPeriod, endOfPeriod);
+            var tripRecordList = GetTripNameFromPeriod(startOfPeriod, endOfPeriod, checkedDepos);
             var html = CreateSelectTripNameAndBranchSeqHTML(tripRecordList);
             return html;
         }

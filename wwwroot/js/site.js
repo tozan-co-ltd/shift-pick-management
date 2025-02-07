@@ -831,27 +831,33 @@ function clearTrips() {
     arrayWorkDays = [];
 }
 
+function condtionChange(page) {
+
+}
+
 // 期間変更時
 function periodChange(page) {
     // 期間の開始、終了日付の取得
     var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
     var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
+    var checkedDepos = getCheckedDepos();
+
     // 選択中の便名称取得
     var currentTripName = $('[name=TripName]').val();
 
     // 便選択の選択肢の生成
-    createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page);
+    createToggleSelectCheckBox(startOfPeriod, endOfPeriod, checkedDepos, page);
 }
 
 // 便選択の選択肢の生成
-function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page) {
+function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, checkedDepos, page) {
 
     // フォーム情報取得
     let url = window.location.href + '/GetTripNameAndBranchSeqHTML';
     url = url.replace(page, 'LoadRecord');
     let method = 'Post';
-    let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+    let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, checkedDepos: checkedDepos };
 
     // Ajax call
     $.ajax({

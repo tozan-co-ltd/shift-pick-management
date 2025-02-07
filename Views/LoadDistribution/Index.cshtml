@@ -45,7 +45,7 @@
                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                     <span class="warehouse-name-drs span-paragraph">デポ</span>
                     <div >
-                        <label><input type="checkbox" class=" mr-2" id="allDepo" checked/>すべて</label>
+                        <label><input type="checkbox" class=" mr-2" id="allDepo"/>すべて</label>
                         <br />
                         <div id="selectDepos"></div>
                     </div>
@@ -351,9 +351,9 @@
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
         // グラフ非表示
         $('#graphAndTable').css('display', 'none');
-        periodChange('LoadDistribution');
         addDepos(model);
         depoCheckDisplay(model);
+        periodChange('LoadDistribution');
     })
 
     // 期間の開始日付変更時
@@ -655,7 +655,7 @@
             if (depo.value == null)
                return;
             var depoLabel = document.createElement("label");
-            depoLabel.innerHTML += "<input type=\"checkbox\" class=\"mr-2\" name=\"depos\" id=\"depo" + depo.value + "\" />" + depo.text;
+            depoLabel.innerHTML += "<input type=\"checkbox\" class=\"mr-2\" name=\"depos\" id=\"depo" + depo.value + "\" value=\"" + depo.value + "\" />" + depo.text;
             depoLabel.className += "mr-3 ";
             selectDepos.appendChild(depoLabel);
 
@@ -673,7 +673,7 @@
                   depos[i].checked = false;
             }
         }
-        
+        periodChange('LoadDistribution')
     });
 
     // 各デポチェックボックス押下時
@@ -685,10 +685,12 @@
                     $('input[id=allDepo]')[0].checked = false;
                     break;
                 }
-            }
+            } 
+            periodChange('LoadDistribution')
         });
     })
 
+    // 画面表示時にログインユーザーのメインデポにチェックを入れる
     function depoCheckDisplay(model){
         console.log("start");
         var mainDepoID = model.mainDepoID;
@@ -702,5 +704,18 @@
                 depos[i].checked = true;
             }
         }
+    }
+
+    // 選択されたデポのIDリストを取得する
+    function getCheckedDepos(){
+        var depos = $('input[name=depos]');
+        var checkedDepos = [];
+        for(var i=0; i < depos.length; i++){
+            if(depos[i].checked){
+                checkedDepos.push(depos[i].value);
+            }
+        }
+        console.log(checkedDepos);
+        return checkedDepos;
     }
 </script>

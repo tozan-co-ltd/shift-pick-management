@@ -367,7 +367,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="startOfPeriod">期間開始日</param>
         /// <param name="endOfPeriod">期間終了日</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
+        public static string CreateSQLToSelectTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
@@ -375,10 +375,28 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT DISTINCT
 	                trip_name ,
 	                trip_branch_seq
-                FROM t_trip_records
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+	                m_trip_histories AS TripHistories
+                ON 
+	                TripRecords.trip_id = TripHistories.trip_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 AND trip_name IS NOT NULL
             ";
+            if (checkedDepos[0] !="0")
+            {
+                sql += "AND (";
+                for (int i = 0; i < checkedDepos.Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        sql += $" OR ";
+                    }
+                    sql += $"depo_id = {checkedDepos[i]}";
+                }
+                sql += ")";
+            }
+            
             return sql;
         }
 
@@ -519,6 +537,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
             return arrivalOrDeparture;
         }
+
 
     }
 }

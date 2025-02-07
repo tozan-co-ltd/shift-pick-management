@@ -23,10 +23,13 @@ namespace ai_truck_load_measurement.Controllers
             var model = new LoadTransitionModel();
             var today = DateTime.Now;
             var oneWeekAgo = today.AddDays(-7);
+            var mainDepo = GetMainDepo();
+            List<string> depoList = new();
+            depoList.Add(mainDepo.DepoID.ToString());
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today);
+                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today, depoList);
                 // DB接続
                 List<SelectListItem> tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
 
