@@ -6,7 +6,7 @@ using DocumentFormat.OpenXml.Office.CustomUI;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing.Imaging;
 using X.PagedList;
-using static ai_truck_load_measurement.Models.TopModel;
+using static ai_truck_load_measurement.Models.ViewCardModel;
 using System.IO;
 using System.Drawing;
 using System;
@@ -51,12 +51,12 @@ namespace ai_truck_load_measurement.Controllers
                 // 最新のステーション状況取得SQL作成
                 var latestStationStatusSQL = TopConnectController.CreateSQLToSelectLatestStationStatus();
                 // 最新のステーション状況取得
-                List<TopModel> topModelList = TopConnectController.ConnectTops(latestStationStatusSQL);
+                List<ViewCardModel> viewCardModelList = TopConnectController.ConnectTops(latestStationStatusSQL);
                 // トラック有無取得SQL作成
                 var isExistTrucksSQL = TopConnectController.CreateSQLToSelectIsExistTrucksPerStationID();
                 // トラック有無取得
-                IEnumerable<TopModel> isExistTrucksList = TopConnectController.ConnectTops(isExistTrucksSQL);
-                foreach (var item in topModelList)
+                IEnumerable<ViewCardModel> isExistTrucksList = TopConnectController.ConnectTops(isExistTrucksSQL);
+                foreach (var item in viewCardModelList)
                 {
                     var isExistTruck = isExistTrucksList.Where(x => x.StationID == item.StationID).ToList();
                     if (isExistTruck.Count == 1)
@@ -65,10 +65,14 @@ namespace ai_truck_load_measurement.Controllers
                     }
                 }
                 // 取得値の変換
-                topModelList = await ConversionOfGetValues(topModelList);
+                viewCardModelList = await ConversionOfGetValues(viewCardModelList);
                 // ステーションの画像取得
-                topModelList = GetStationImage(topModelList);
-                topModel.TopModelList = topModelList;
+                viewCardModelList = GetStationImage(viewCardModelList);
+                topModel.ViewCardModelList = viewCardModelList;
+                // ログインユーザーのメインデポ情報取得
+                var mainDepo = GetMainDepo();
+                topModel.MainDepoID = mainDepo.DepoID;
+                topModel.MainDepoName = mainDepo.Name;
                 return topModel;
             }
             catch (Exception ex)
@@ -84,7 +88,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="models">対象のトップ画面モデルリスト</param>
         /// <returns></returns>
-        private async Task<List<TopModel>> ConversionOfGetValues(List<TopModel> models)
+        private async Task<List<ViewCardModel>> ConversionOfGetValues(List<ViewCardModel> models)
         {
             foreach (var model in models)
             {
@@ -116,7 +120,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="models"></param>
         /// <returns></returns>
-        private List<TopModel> GetStationImage(List<TopModel> models)
+        private List<ViewCardModel> GetStationImage(List<ViewCardModel> models)
         {
             foreach (var model in models)
             {

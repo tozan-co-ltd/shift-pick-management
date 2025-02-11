@@ -14,10 +14,10 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <returns></returns>
-        public static List<TopModel> ConnectTops(string sql)
+        public static List<ViewCardModel> ConnectTops(string sql)
         {
             // 戻り値
-            List<TopModel> strList = new();
+            List<ViewCardModel> strList = new();
 
             // DB接続
             try
@@ -30,7 +30,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     connection.ConnectionString = connectionString;
                     connection.Open();
                     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<TopModel>(sql).ToList();
+                    strList = connection.Query<ViewCardModel>(sql).ToList();
                 }
                 return strList;
             }
