@@ -876,11 +876,16 @@
         // 便名称取得
         var tripName = $('[name=TripName]').val();
 
+
+        // デポ情報取得
+        var checkedDepos = getCheckedDepos();
+
         // フォーム情報取得
         let data = {
             download: "download",
             workDays: arrayWorkDays,
-            selectedTripName: tripName
+            selectedTripName: tripName,
+            checkedDepos: checkedDepos
         };
 
         onExportAllImagesCommon(page, data);
@@ -893,11 +898,15 @@
         // 便名称取得
         var tripName = $('[name=TripName]').val();
 
+        // デポ情報取得
+        var checkedDepos = getCheckedDepos();
+
         // フォーム情報取得
         let data = {
             "gamenName": gamenName,
             workDays: arrayWorkDays,
-            tripName: tripName
+            tripName: tripName,
+            checkedDepos: checkedDepos
         };
 
         // Excel出力共通処理

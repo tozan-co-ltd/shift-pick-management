@@ -99,8 +99,10 @@ namespace ai_truck_load_measurement.Controllers
                 DataTable searchConditionDT = new DataTable();
                 searchConditionDT.Columns.Add("項目名");
                 searchConditionDT.Columns.Add("検索条件");
-                var selectedDeposName = SelectedDepos(checkedDepos);
+                // デポの設定
+                var selectedDeposName = LoadRecordController.SelectedDepos(checkedDepos);
                 searchConditionDT.Rows.Add("対象デポ", selectedDeposName);
+                // 稼働日の設定
                 searchConditionDT.Rows.Add("稼働日",$"{startDate}～{endDate}");
 
 
@@ -170,32 +172,6 @@ namespace ai_truck_load_measurement.Controllers
 
         }
 
-        /// <summary>
-        /// 選択されたデポ名リストを1行で
-        /// </summary>
-        /// <param name="checkedDepos">選択されたデポIDリスト</param>
-        /// <returns></returns>
-        private string SelectedDepos(List<string> checkedDepos)
-        {
-            // デポ名リスト作成
-            var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
-            var checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
-
-            var selectedDepos = "";
-
-            if (checkedDeposName.Count > 0)
-            {
-                for (int i = 0; i < checkedDeposName.Count; i++)
-                {
-                    if (i != 0)
-                    {
-                        selectedDepos += ", ";
-                    }
-                    selectedDepos += checkedDeposName[i].DepoName;
-                }
-            }
-            return selectedDepos;
-        }
 
         /// <summary>
         /// 絞り込み条件作成
@@ -321,7 +297,7 @@ namespace ai_truck_load_measurement.Controllers
                         {
                             //書き込む
                             sw.WriteLine($"稼働日：{startDate}～{endDate}");
-                            var selectedDepos = SelectedDepos(checkedDepos);
+                            var selectedDepos = LoadRecordController.SelectedDepos(checkedDepos);
                             sw.WriteLine($"対象デポ：{selectedDepos}");
                             var shiborikomiConditioin = ShiborikomiCondition(isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber);
                             sw.Write($"絞り込み条件：{shiborikomiConditioin}");

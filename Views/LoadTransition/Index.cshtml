@@ -494,11 +494,16 @@
             var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
+
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
+
             // フォーム情報取得
             let data = { download: "download", 
                 startOfPeriod: startOfPeriod, 
                 endOfPeriod: endOfPeriod, 
-                "arrayTrips": arrayTrips 
+                "arrayTrips": arrayTrips,
+                checkedDepos: checkedDepos
             };
 
             onExportAllImagesCommon(page, data);
@@ -524,13 +529,17 @@
             var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
+
             // フォーム情報取得
             let data = {
                 "gamenName": gamenName,
                 "startofPeriod": startOfPeriod,
                 "endOfPeriod": endOfPeriod,
                 "isOnlyHasAmountDefference": checkBox,
-                "arrayTrips": arrayTrips
+                "arrayTrips": arrayTrips,
+                checkedDepos: checkedDepos
             };
 
             // Excel出力共通処理

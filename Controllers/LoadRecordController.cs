@@ -558,6 +558,32 @@ namespace ai_truck_load_measurement.Controllers
             return loadClasses;
         }
 
+        /// <summary>
+        /// 選択されたデポ名リストを1行で
+        /// </summary>
+        /// <param name="checkedDepos">選択されたデポIDリスト</param>
+        /// <returns></returns>
+        public static string SelectedDepos(List<string> checkedDepos)
+        {
+            // デポ名リスト作成
+            var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
+            var checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
+
+            var selectedDepos = "";
+
+            if (checkedDeposName.Count > 0)
+            {
+                for (int i = 0; i < checkedDeposName.Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        selectedDepos += ", ";
+                    }
+                    selectedDepos += checkedDeposName[i].DepoName;
+                }
+            }
+            return selectedDepos;
+        }
     }
 
 }

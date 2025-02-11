@@ -143,7 +143,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="workDays">稼働日</param>
         /// <param name="tripName">便名称</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, List<DateTime> workDays, string tripName)
+        public JsonResult ExportFile(string gamenName, List<DateTime> workDays, string tripName, List<string> checkedDepos)
         {
             string? errorMessage;
             try
@@ -152,6 +152,11 @@ namespace ai_truck_load_measurement.Controllers
                 DataTable searchConditionDT = new DataTable();
                 searchConditionDT.Columns.Add("項目名");
                 searchConditionDT.Columns.Add("検索条件");
+
+                // デポの設定
+                var selectedDeposName = LoadRecordController.SelectedDepos(checkedDepos);
+                searchConditionDT.Rows.Add("対象デポ", selectedDeposName);
+                // 稼働日の設定
                 var selectedWorkDays = SelectedWorkDays(workDays);
                 searchConditionDT.Rows.Add("選択された稼働日", selectedWorkDays);
                 searchConditionDT.Rows.Add("便名称", tripName);
@@ -245,7 +250,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="workDays">稼働日</param>
         /// <param name="selectedTripName">選択された便名称</param>
         /// <returns></returns>
-        public JsonResult ZipDownload(string download, List<DateTime> workDays, string selectedTripName)
+        public JsonResult ZipDownload(string download, List<DateTime> workDays, string selectedTripName, List<string> checkedDepos)
         {
             // ダウンロードボタンが押された際の処理
             if (download == "download")
@@ -304,6 +309,8 @@ namespace ai_truck_load_measurement.Controllers
                             System.Text.Encoding.GetEncoding("shift_jis")))
                         {
                             var selectedWorkDays = SelectedWorkDays(workDays);
+                            var selectedDepos = LoadRecordController.SelectedDepos(checkedDepos);
+                            sw.WriteLine($"対象デポ：{selectedDepos}");
                             sw.WriteLine($"選択された稼働日:{selectedWorkDays}");
                             sw.WriteLine($"便名称：{selectedTripName}");
                         }

@@ -549,13 +549,17 @@
             var minLoadClass = parseInt($('[name=minLoadStatus]').val());
             var maxLoadClass = parseInt($('[name=maxLoadStatus]').val());
 
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
+
             let data = {
                 download: "download",
                 startOfPeriod: startOfPeriod,
                 endOfPeriod: endOfPeriod,
                 "arrayTrips": arrayTrips,
                 minLoadClass: minLoadClass,
-                maxLoadClass: maxLoadClass
+                maxLoadClass: maxLoadClass,
+                checkedDepos: checkedDepos
             };
             
             onExportAllImagesCommon(page, data);
@@ -582,6 +586,9 @@
             var minLoadClass = parseInt($('[name=minLoadStatus]').val());
             var maxLoadClass = parseInt($('[name=maxLoadStatus]').val());
 
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
+
             // フォーム情報取得
             let data = {
                 "gamenName": gamenName,
@@ -590,7 +597,8 @@
                 "isOnlyHasAmountDefference": checkBox,
                 "arrayTrips": arrayTrips,
                 "minLoadClass": minLoadClass,
-                "maxLoadClass": maxLoadClass
+                "maxLoadClass": maxLoadClass,
+                "checkedDepos": checkedDepos
             };
             // Excel出力共通処理
             onExportFileTripsCommon(page, data);
