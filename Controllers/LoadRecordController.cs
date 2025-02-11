@@ -557,6 +557,7 @@ namespace ai_truck_load_measurement.Controllers
 
             return loadClasses;
         }
+
     }
 
 }

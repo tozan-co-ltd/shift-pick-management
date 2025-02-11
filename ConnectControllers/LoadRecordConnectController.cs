@@ -538,6 +538,29 @@ namespace ai_truck_load_measurement.ConnectControllers
             return arrivalOrDeparture;
         }
 
-
+        /// <summary>
+        /// デポIDリストからデポ名リストを取得するSQLを生成する
+        /// </summary>
+        /// <param name="depoIDs">デポIDリスト</param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectDepoNameFromDepoID(List<string> depoIDs)
+        {
+            var sql = $@"
+                SELECT
+                    name AS depo_name
+                FROM
+                    m_depos
+                WHERE
+            ";
+            for(int i = 0; i<depoIDs.Count; i++)
+            {
+                if (i != 0)
+                {
+                    sql += " OR ";
+                }
+                sql += $@"depo_id = {depoIDs[i]}";
+            }
+            return sql;
+        }
     }
 }

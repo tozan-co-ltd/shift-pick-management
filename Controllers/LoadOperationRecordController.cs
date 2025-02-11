@@ -20,10 +20,14 @@ namespace ai_truck_load_measurement.Controllers
             var today = DateTime.Now;
             List<DateTime> dates = new();
             dates.Add(today);
+            // ログインユーザーのメインデポ情報取得
+            var mainDepo = GetMainDepo();
+            List<string> depoList = new();
+            depoList.Add(mainDepo.DepoID.ToString());
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(dates);
+                var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(dates, depoList);
                 // DB接続
                 List<SelectListItem> tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
 
@@ -37,6 +41,9 @@ namespace ai_truck_load_measurement.Controllers
                 tripRecordList = LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
+                
+                model.MainDepoID = mainDepo.DepoID;
+                model.MainDepoName = mainDepo.Name;
                 return View(model);
             }
             catch (Exception ex)
@@ -52,13 +59,13 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="workDays">指定した稼働日</param>
         /// <returns></returns>
-        public List<SelectListItem> GetTripNameFromWorkDay(List<DateTime> workDays)
+        public List<SelectListItem> GetTripNameFromWorkDay(List<DateTime> workDays, List<string> checkedDepos)
         {
             List<SelectListItem> tripRecordList = new();
             try
             {
                 // 便実績情報取得SQL作成
-                var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(workDays);
+                var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(workDays, checkedDepos);
                 // DB接続
                 tripRecordList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
 
