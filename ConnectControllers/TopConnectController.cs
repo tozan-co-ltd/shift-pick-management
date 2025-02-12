@@ -44,13 +44,14 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 最新のステーション状況取得SQL
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectLatestStationStatus()
+        public static string CreateSQLToSelectLatestStationStatus(int depoID)
         {
             var sql = $@"
                 SELECT 
                     detect_records.station_id,
                     load_class,
-                    ip_adress
+                    ip_adress,
+                    station_seq
                  FROM t_load_detect_records AS detect_records
                  JOIN (
                     SELECT station_id, MAX(created_at) AS latest_create
@@ -61,6 +62,9 @@ namespace ai_truck_load_measurement.ConnectControllers
                 AND detect_records.created_at = latest_detect_records.latest_create
                 JOIN m_devices
                 ON detect_records.station_id = m_devices.station_id
+                JOIN m_stations
+                 ON detect_records.station_id = m_stations.station_id
+                 WHERE depo_id = {depoID}
             ";
             return sql;
         }

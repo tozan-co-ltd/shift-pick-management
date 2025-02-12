@@ -128,25 +128,6 @@
 
         <div id="cardlayout-wrap">
             <!-- カードレイアウトをラッピング -->
-            <section class="card-list">
-                <p class="station-number">ステーション1</p>
-                <h2 class="card-title" id="card-title1"></h2>
-                <p class="truck-status" id="truck-status1"></p>
-                <figure class="card-figure"><img src="" id="image1"></figure>
-            </section>
-            <section class="card-list">
-                <p class="station-number">ステーション2</p>
-                <h2 class="card-title" id="card-title2"></h2>
-                <p class="truck-status" id="truck-status2"></p>
-                <figure class="card-figure"><img src="" id="image2"></figure>
-            </section>
-            <section class="card-list">
-                <p class="station-number">ステーション3</p>
-                <h2 class="card-title" id="card-title3"></h2>
-                <p class="truck-status" id="truck-status3"></p>
-                <figure class="card-figure"><img src="" id="image3"></figure>
-            </section>
-            
         </div>
             <!-- カードレイアウトをラッピング -->
     </div>
@@ -168,9 +149,23 @@
 
     function viewCards(top_model) {
         var now = GetDateString(new Date());
+        // 更新日時の更新
         $('#updateAt').text("更新日時:" + now + ':' + ('0' + new Date().getSeconds()).slice(-2));
-        for (var i = 1; i <= 3; i++) {
-            var cardModel = top_model.viewCardModelList.find(x => x.stationID == i);
+        // カード要素の初期化
+        $("#cardlayout-wrap")[0].innerHTML = "";
+        for (var i = 1; i <= top_model.viewCardModelList.length; i++) {
+            var cardModel = top_model.viewCardModelList.find(x => x.stationSeq == i);
+
+            // カード要素生成
+            $("#cardlayout-wrap")[0].innerHTML += 
+                    "<section class=\"card-list\">"
+                 +      "<p class=\"station-number\" > ステーション" + i + " </p>"
+                 +      "<h2 class=\"card-title\" id = \"card-title" + i + "\" > </h2>"
+                 +      "<p class=\"truck-status\" id = \"truck-status" + i + "\" > </p>"
+                 +      "<figure class=\"card-figure\" > <img src=\"\" id = \"image" + i +"\" > </figure>"
+                 +  "</section>";
+
+            // カード要素設定
             if (cardModel.truckExist) {
                 $('#card-title' + i).text("停車");
                 $('#card-title' + i).css("color", "#000000");
@@ -189,14 +184,18 @@
     function onUpdateClick(){
         DeleteErrorMessages();
 
+        var depoID = $('select[id="selectDepo"]')[0].value;
+
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetTopModel", "Top")';
         let method = 'Get';
+        let data = { depoID: depoID };
 
         // Ajax call
         $.ajax({
             url: url,
-            method: method
+            method: method,
+            data: data
         }).done(function (response) {
             viewCards(response);
         }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -222,6 +221,7 @@
                     console.log(selectedDepoID);
                 }
             }
+            onUpdateClick();
 
         });
     })

@@ -32,8 +32,10 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         public async Task<IActionResult> Index()
         {
+            // ログインユーザーのメインデポ情報取得
+            var mainDepo = GetMainDepo();
             // トップ画面モデル取得
-            TopModel topModel = await GetTopModel();
+            TopModel topModel = await GetTopModel(mainDepo.DepoID);
             return View(topModel);
         }
 
@@ -41,7 +43,7 @@ namespace ai_truck_load_measurement.Controllers
         /// トップ画面モデル取得
         /// </summary>
         /// <returns></returns>
-        public async Task<TopModel> GetTopModel()
+        public async Task<TopModel> GetTopModel(int depoID)
         {
             TopModel topModel = new();
             try
@@ -49,7 +51,7 @@ namespace ai_truck_load_measurement.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
                 // 最新のステーション状況取得SQL作成
-                var latestStationStatusSQL = TopConnectController.CreateSQLToSelectLatestStationStatus();
+                var latestStationStatusSQL = TopConnectController.CreateSQLToSelectLatestStationStatus(depoID);
                 // 最新のステーション状況取得
                 List<ViewCardModel> viewCardModelList = TopConnectController.ConnectTops(latestStationStatusSQL);
                 // トラック有無取得SQL作成

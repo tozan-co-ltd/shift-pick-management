@@ -32,5 +32,7 @@ namespace ai_truck_load_measurement.Models
         public string? TruckStatus { get; set; }
         // 画像のIPアドレス
         public string? IPAdress { get; set; }
+        // デポごとのステーション連番
+        public int StationSeq {  get; set; }
     }
 }
