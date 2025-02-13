@@ -109,7 +109,7 @@
         {
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
-        <p class="mb-3 top-title" id="stationTitle">SyncBace ステーション状況</p>
+        <p class="mb-3 top-title" id="stationTitle"></p>
         <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
             <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                 <span class="warehouse-name-drs span-paragraph">デポ選択</span>
@@ -143,7 +143,7 @@
         $("#selectDepo").find("option[value='" + top_model.mainDepoID + "']").attr("selected", "selected");
         if(top_model.mainDepoName != ""){
             console.log($("#stationTitle"));
-            $("#stationTitle")[0].innerText = top_model.mainDepoName + "　ステーション状況";
+            $("#stationTitle")[0].innerText = getStationTitle(top_model.mainDepoName);
         }
     });
 
@@ -216,7 +216,7 @@
             var selectedDepoID = 0;
             for(var i=0; i < depo.length; i++){
                 if(depo[i].selected){
-                    $("#stationTitle")[0].innerText = depo[i].innerText + "　ステーション状況";
+                    $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
                     selectedDepoID = depo[i].value;
                     console.log(selectedDepoID);
                 }
@@ -225,6 +225,15 @@
 
         });
     })
+
+    function getStationTitle(depoName){
+        if(depoName == null){
+            return "ステーション状況";
+        }
+        else{
+            return depoName + "　ステーション状況";
+        }
+    }
 
 </script>
 

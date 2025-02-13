@@ -124,7 +124,7 @@ namespace ai_truck_load_measurement.Models
         }
 
         /// <summary>
-        /// ユーザーリスト取得
+        /// デポリスト取得
         /// </summary>
         /// <returns></returns>
         public IEnumerable<SelectListItem> GetMDepoList()
@@ -147,7 +147,7 @@ namespace ai_truck_load_measurement.Models
 
                     selectListItem = connection.Query<SelectListItem>(commandText).ToList();
                 }
-                var firstItem = new SelectListItem() { Text = "選択してください", Disabled = true, Selected = true };
+                var firstItem = new SelectListItem() { Text = "選択してください", Disabled = false, Selected = true };
                 selectListItem.Insert(0, firstItem);
                 return selectListItem;
             }
