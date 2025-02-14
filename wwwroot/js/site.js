@@ -884,7 +884,7 @@ function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, checkedDepos, pa
 
         // チェックボックス切り替え時のイベント設定
         $(function () {
-            $('input').change(function () {
+            $('input[name="tripNameAndBranchSeq"]').change(function () {
                 // デフォルトの操作を無効化
                 event.preventDefault();
 

@@ -444,7 +444,13 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-
+        /// <summary>
+        /// 便枝番セレクトリストのHTML取得
+        /// </summary>
+        /// <param name="startOfPeriod">便の期間開始日</param>
+        /// <param name="endOfPeriod">便の期間終了日</param>
+        /// <param name="checkedDepos">選択されたデポ</param>
+        /// <returns></returns>
         public string GetTripNameAndBranchSeqHTML(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             var tripRecordList = GetTripNameFromPeriod(startOfPeriod, endOfPeriod, checkedDepos);
@@ -452,6 +458,11 @@ namespace ai_truck_load_measurement.Controllers
             return html;
         }
 
+        /// <summary>
+        /// 便枝番セレクトリストのHTML作成
+        /// </summary>
+        /// <param name="tripRecordList">便実績リスト</param>
+        /// <returns></returns>
         private string CreateSelectTripNameAndBranchSeqHTML(List<LoadRecordModel> tripRecordList)
         {
             var html = "";
