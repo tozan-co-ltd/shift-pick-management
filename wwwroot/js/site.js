@@ -494,13 +494,8 @@ function EditModal(tripRecordID, isArrived, page) {
                 }
 
             }).fail(function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 404) {
-                    var errorMessage = jqXHR.responseJSON.errorMessage;
-                    $("#edit-modal-error-message").text(errorMessage);
-                } else {
-                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#edit-modal-error-message").text(errorMessage);
-                }
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
             });
 
         }
@@ -540,13 +535,8 @@ function onVerificationRequiredClick(tripRecordID, isArrived, page) {
             // 完了モーダル表示
             alert('登録が完了しました。');
         }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 404) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#edit-modal-error-message").text(errorMessage);
-            } else {
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#edit-modal-error-message").text(errorMessage);
-            }
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#edit-modal-error-message").text(errorMessage);
         });
     }
 }
@@ -615,13 +605,8 @@ function tableDisplayCommon(page, data) {
             body.highlight(table.search());
         });
     }).fail(function (jqXHR, textStatus, errorThrown) {
-        if (jqXHR.status === 404) {
-            var errorMessage = jqXHR.responseJSON.errorMessage;
-            $("#edit-modal-error-message").text(errorMessage);
-        } else {
-            var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-            $("#edit-modal-error-message").text(errorMessage);
-        }
+        var errorMessage = jqXHR.responseJSON.errorMessage;
+        $("#edit-modal-error-message").text(errorMessage);
     });
 }
 
@@ -651,13 +636,8 @@ function onExportAllImagesCommon(page, data) {
             link.click();
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
-        if (jqXHR.status === 404) {
-            var errorMessage = jqXHR.responseJSON.errorMessage;
-            $("#div-error-message").text(errorMessage);
-        } else {
-            var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-            $("#div-error-message").text(errorMessage);
-        }
+        var errorMessage = jqXHR.responseJSON.errorMessage;
+        $("#div-error-message").text(errorMessage);
     });
 }
 //-------------------------------------------------------------------//

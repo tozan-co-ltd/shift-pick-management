@@ -506,16 +506,20 @@ namespace ai_truck_load_measurement.ConnectControllers
                     name AS depo_name
                 FROM
                     m_depos
-                WHERE
             ";
-            for(int i = 0; i<depoIDs.Count; i++)
+            if (depoIDs.Count != 0)
             {
-                if (i != 0)
+                sql +="WHERE ";
+                for (int i = 0; i < depoIDs.Count; i++)
                 {
-                    sql += " OR ";
+                    if (i != 0)
+                    {
+                        sql += " OR ";
+                    }
+                    sql += $@"depo_id = {depoIDs[i]}";
                 }
-                sql += $@"depo_id = {depoIDs[i]}";
             }
+            
             return sql;
         }
     }

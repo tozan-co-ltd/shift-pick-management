@@ -256,7 +256,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         private static string SQLOfCheckedDepos(List<string> checkedDepos)
         {
             var sql = "";
-            if (checkedDepos[0] != "0")
+            if (checkedDepos.Count > 0)
             {
                 sql += "AND (";
                 for (int i = 0; i < checkedDepos.Count; i++)
@@ -268,6 +268,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                     sql += $"TripHistories.depo_id = {checkedDepos[i]}";
                 }
                 sql += ")";
+            }
+            else
+            {
+                sql = "AND 1=0";
             }
             return sql;
         }

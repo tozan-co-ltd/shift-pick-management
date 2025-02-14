@@ -60,12 +60,17 @@ namespace ai_truck_load_measurement.Controllers
         public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber, List<string> checkedDepos)
         {
             var searchData = string.Empty;
-            IEnumerable<LoadOutputModel> tripRecordList;
+            SearchedTripRecordListModel searchedTripRecordListModel = new();
             try
             {
+                if (checkedDepos.Count == 0)
+                {
+                    return Json(searchedTripRecordListModel);
+                }
+
                 // 指定した期間の便マスター情報取得SQL作成
                 var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
-                var searchedTripRecordListModel = LoadRecordController.SearchData(sql, "LoadOutput");
+                searchedTripRecordListModel = LoadRecordController.SearchData(sql, "LoadOutput");
 
                 return Json(searchedTripRecordListModel);
             }
@@ -234,10 +239,13 @@ namespace ai_truck_load_measurement.Controllers
                 // DB接続
                 IEnumerable<LoadOutputModel> tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql);
 
-
+                var checkedDeposName =  new List<LoadRecordModel>();
                 // デポ名リスト作成
-                var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
-                var checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
+                if (checkedDepos.Count > 0)
+                {
+                    var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
+                    checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
+                }
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");
                 var endDate = endOfPeriod.ToString("yyyyMMdd");
