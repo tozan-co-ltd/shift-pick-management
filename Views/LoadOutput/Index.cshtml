@@ -169,6 +169,7 @@
         var hasTripName = $('#hasTripName')[0].checked;
         var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
 
+
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
@@ -320,7 +321,6 @@
         for (var i = 0; i < depos.length; i++) {
             if (depos[i].checked) {
                 checkedDepos.push(depos[i].value);
-                console.log(depos[i]);
             }
         }
         return checkedDepos;
