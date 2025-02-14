@@ -292,37 +292,6 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
         }
 
-        /// <summary>
-        /// デポ情報取得
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <returns></returns>
-        public static List<M_DepoModel> ConnectMDepos(string sql)
-        {
-            // 戻り値
-            List<M_DepoModel> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<M_DepoModel>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
 
         /// <summary>
         /// 便実績情報取得SQL
@@ -503,22 +472,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
-        /// <summary>
-        /// デポ情報取得SQL
-        /// </summary>
-        /// <returns></returns>
-        public static string CreateSQLToSelectMDepos()
-        {
-            var sql = $@"
-                SELECT
-                    depo_id,
-                    name
-                FROM
-                    m_depos
-            ";
-            return sql;
-        }
-
+       
         /// <summary>
         /// 荷量の相違ありテーブルの到着出発クラスに保存する値
         /// </summary>
