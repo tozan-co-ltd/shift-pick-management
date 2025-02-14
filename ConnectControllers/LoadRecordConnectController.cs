@@ -352,20 +352,22 @@ namespace ai_truck_load_measurement.ConnectControllers
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 AND trip_name IS NOT NULL
             ";
-            if (checkedDepos[0] !="0")
+            if(checkedDepos.Count != 0 )
             {
-                sql += "AND (";
-                for (int i = 0; i < checkedDepos.Count; i++)
+                if (checkedDepos[0] != "0")
                 {
-                    if (i != 0)
+                    sql += "AND (";
+                    for (int i = 0; i < checkedDepos.Count; i++)
                     {
-                        sql += $" OR ";
+                        if (i != 0)
+                        {
+                            sql += $" OR ";
+                        }
+                        sql += $"depo_id = {checkedDepos[i]}";
                     }
-                    sql += $"depo_id = {checkedDepos[i]}";
+                    sql += ")";
                 }
-                sql += ")";
             }
-            
             return sql;
         }
 

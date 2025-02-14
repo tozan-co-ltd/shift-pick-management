@@ -429,6 +429,10 @@ namespace ai_truck_load_measurement.Controllers
             List<LoadRecordModel> tripRecordList = new();
             try
             {
+                // デポが何も選択されていない場合、空のリストを返す
+                if (checkedDepos.Count == 0)
+                    return tripRecordList;
+
                 // 便実績情報取得SQL作成
                 var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod, checkedDepos);
                 // DB接続
