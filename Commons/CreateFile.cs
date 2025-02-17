@@ -684,6 +684,17 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("更新日時");
                     headerList.Add("更新者");
                     break;
+                case "ユーザーマスター":
+                    headerList.Add("ユーザーID");
+                    headerList.Add("AD名");
+                    headerList.Add("デポ名");
+                    headerList.Add("管理権限");
+                    headerList.Add("削除フラグ");
+                    headerList.Add("作成日時");
+                    headerList.Add("作成者");
+                    headerList.Add("更新日時");
+                    headerList.Add("更新者");
+                    break;
                 default:
                     headerList.Add("項目名");
                     headerList.Add("検索条件");
@@ -733,6 +744,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("ステーションID");
                     headerList.Add("車両番号");
                     headerList.Add("識別番号");
+                    headerList.Add("デポ名");
                     headerList.Add("到着予定時間");
                     headerList.Add("出発予定時間");
                     headerList.Add("稼働日");

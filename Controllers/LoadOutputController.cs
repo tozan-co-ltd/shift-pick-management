@@ -36,6 +36,10 @@ namespace ai_truck_load_measurement.Controllers
                 tripRecordList = (IEnumerable<LoadOutputModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
+                // ログインユーザーのメインデポ情報取得
+                var mainDepo = GetMainDepo();
+                model.MainDepoID = mainDepo.DepoID;
+                model.MainDepoName = mainDepo.Name;
                 return View(model);
             }
             catch (Exception ex)
@@ -53,15 +57,20 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber)
+        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber, List<string> checkedDepos)
         {
             var searchData = string.Empty;
-            IEnumerable<LoadOutputModel> tripRecordList;
+            SearchedTripRecordListModel searchedTripRecordListModel = new();
             try
             {
+                if (checkedDepos.Count == 0)
+                {
+                    return Json(searchedTripRecordListModel);
+                }
+
                 // 指定した期間の便マスター情報取得SQL作成
-                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber);
-                var searchedTripRecordListModel = LoadRecordController.SearchData(sql, "LoadOutput");
+                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
+                searchedTripRecordListModel = LoadRecordController.SearchData(sql, "LoadOutput");
 
                 return Json(searchedTripRecordListModel);
             }
@@ -84,7 +93,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber)
+        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber, List<string> checkedDepos)
         {
             string? errorMessage;
             string startDate = startOfPeriod.ToString("yyyyMMdd");
@@ -95,17 +104,27 @@ namespace ai_truck_load_measurement.Controllers
                 DataTable searchConditionDT = new DataTable();
                 searchConditionDT.Columns.Add("項目名");
                 searchConditionDT.Columns.Add("検索条件");
+                // デポの設定
+                var selectedDeposName = LoadRecordController.SelectedDepos(checkedDepos);
+                searchConditionDT.Rows.Add("対象デポ", selectedDeposName);
+                // 稼働日の設定
                 searchConditionDT.Rows.Add("稼働日",$"{startDate}～{endDate}");
+
+
                 // 絞り込み条件作成
                 var shiborikomiCondition = ShiborikomiCondition(isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber);
                 searchConditionDT.Rows.Add("絞り込み条件：",shiborikomiCondition);
 
                 // 便実績情報取得
-                var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber);
-                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
+                DataTable tTripRecordDT = new DataTable();
+                if (checkedDepos.Count > 0)
+                {
+                    var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
+                    tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
 
-                // 荷量のクラスを数値化
-                tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
+                    // 荷量のクラスを数値化
+                    tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
+                }
 
                 // ファイル名
                 var tmpFilename = $"荷量実績_{startDate}-{endDate}.xlsx";
@@ -162,6 +181,7 @@ namespace ai_truck_load_measurement.Controllers
 
         }
 
+
         /// <summary>
         /// 絞り込み条件作成
         /// </summary>
@@ -173,9 +193,10 @@ namespace ai_truck_load_measurement.Controllers
         {
             var shiborikomiCondition = "";
             var hasCondition = false;
+            
             if (isOnlyHasAmountDefference)
             {
-                shiborikomiCondition = "荷量の相違ありのみ";
+                shiborikomiCondition += "荷量の相違ありのみ";
                 hasCondition = true;
             }
             if (hasTripName)
@@ -212,15 +233,28 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみのデータか</param>
         /// <returns></returns>
-        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber)
+        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber, List<string> checkedDepos)
         {
             // ダウンロードボタンが押された際の処理
             if (download == "download")
             {
-                // 指定した期間の便実績情報取得SQL作成
-                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber);
-                // DB接続
-                IEnumerable<LoadOutputModel> tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql);
+                IEnumerable<LoadOutputModel> tripRecordList = new List<LoadOutputModel>();
+
+                if(checkedDepos.Count > 0)
+                {
+                    // 指定した期間の便実績情報取得SQL作成
+                    var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
+                    // DB接続
+                    tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql);
+                }
+
+                var checkedDeposName =  new List<LoadRecordModel>();
+                // デポ名リスト作成
+                if (checkedDepos.Count > 0)
+                {
+                    var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
+                    checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
+                }
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");
                 var endDate = endOfPeriod.ToString("yyyyMMdd");
@@ -280,6 +314,8 @@ namespace ai_truck_load_measurement.Controllers
                         {
                             //書き込む
                             sw.WriteLine($"稼働日：{startDate}～{endDate}");
+                            var selectedDepos = LoadRecordController.SelectedDepos(checkedDepos);
+                            sw.WriteLine($"対象デポ：{selectedDepos}");
                             var shiborikomiConditioin = ShiborikomiCondition(isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber);
                             sw.Write($"絞り込み条件：{shiborikomiConditioin}");
                         }

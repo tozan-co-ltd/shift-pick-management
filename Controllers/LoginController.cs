@@ -87,6 +87,7 @@ namespace ai_truck_load_measurement.Controllers
                 // ユーザー情報をクレームに追加
                 var claims = new[] {
                     new Claim("UserName", loginUserModel.UserName),
+                    new Claim("ADName", model.LoginId),
                 };
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);

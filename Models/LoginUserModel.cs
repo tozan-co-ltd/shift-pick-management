@@ -9,5 +9,9 @@
         /// ユーザー名
         /// </summary>
         public String UserName { get; set; }
+        /// <summary>
+        /// ユーザーのAD名
+        /// </summary>
+        public String ADName {  get; set; }
     }
 }

@@ -169,7 +169,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   CSV形式でないファイルが含まれているため登録できません。 に類似しているローカライズされた文字列を検索します。
+        ///   この{0}はAD内に存在しないため登録できません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1013 {
             get {

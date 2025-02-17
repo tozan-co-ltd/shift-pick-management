@@ -23,13 +23,22 @@ namespace ai_truck_load_measurement.Controllers
             var model = new LoadTransitionModel();
             var today = DateTime.Now;
             var oneWeekAgo = today.AddDays(-7);
+            var mainDepo = GetMainDepo();
+            List<string> depoList = new();
+            depoList.Add(mainDepo.DepoID.ToString());
             try
             {
-                // 便実績情報取得SQL作成
-                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today);
-                // DB接続
-                List<SelectListItem> tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
+                List<SelectListItem> tripNameList = new();
 
+                // メインデポが設定されている場合
+                if (depoList.Count != 0)
+                {
+                    // 便実績情報取得SQL作成
+                    var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today, depoList);
+                    // DB接続
+                    tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
+                }
+                
                 model.TripNameList = tripNameList;
 
                 // 便実績情報取得SQL作成
@@ -40,6 +49,9 @@ namespace ai_truck_load_measurement.Controllers
                 tripRecordList = (IEnumerable<LoadTransitionModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
+
+                model.MainDepoID = mainDepo.DepoID;
+                model.MainDepoName = mainDepo.Name;
                 return View(model);
             }
             catch (Exception ex)
@@ -113,7 +125,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, List<LoadRecordModel> arrayTrips)
+        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, List<LoadRecordModel> arrayTrips, List<string> checkedDepos)
         {
             string? errorMessage;
             string startDate = startOfPeriod.ToString("yyyyMMdd");
@@ -124,6 +136,10 @@ namespace ai_truck_load_measurement.Controllers
                 DataTable searchConditionDT = new DataTable();
                 searchConditionDT.Columns.Add("項目名");
                 searchConditionDT.Columns.Add("検索条件");
+                // デポの設定
+                var selectedDeposName = LoadRecordController.SelectedDepos(checkedDepos);
+                searchConditionDT.Rows.Add("対象デポ", selectedDeposName);
+                // 稼働日の設定
                 searchConditionDT.Rows.Add("稼働日", $"{startDate}～{endDate}");
                 var selectedTripNames = "";
                 for(int i=0; i<arrayTrips.Count; i++)
@@ -206,7 +222,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみのデータか</param>
         /// <returns></returns>
-        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, List<LoadRecordModel> arrayTrips)
+        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, List<LoadRecordModel> arrayTrips, List<string> checkedDepos)
         {
             // ダウンロードボタンが押された際の処理
             if (download == "download")
@@ -268,6 +284,8 @@ namespace ai_truck_load_measurement.Controllers
                             System.Text.Encoding.GetEncoding("shift_jis")))
                         {
                             //書き込む
+                            var selectedDepos = LoadRecordController.SelectedDepos(checkedDepos);
+                            sw.WriteLine($"対象デポ：{selectedDepos}");
                             sw.WriteLine($"稼働日：{startDate}～{endDate}");
                             // 選択された便の羅列
                             var selectedTripNames = "";

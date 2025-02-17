@@ -1,0 +1,117 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.M_UserModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "登録";
+}
+
+<div class="card shadow masterInfo m-4">
+
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="mUserForm">
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("ADName")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="text" asp-for="ADName" autocomplete="off" value="" required placeholder="例: t_yamada">
+                            <small class="form-text text-muted w-100 p-1">Windowsログイン時と同様の名前を使用してください</small>
+                            <span class="text-danger w-100" asp-validation-for="ADName"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("DepoID")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.MDepoList" required id="depoID"></select>
+                            <span class="text-danger w-100" asp-validation-for="DepoID"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input type="radio" class="mr-2" asp-for="AuthorizedKubun" autocomplete="off" value="0" name="AuthorizedKubun" >権限あり
+                            <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" autocomplete="off" value="1" name="AuthorizedKubun" checked>権限なし
+                        </div>
+                    </div>
+                    <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                        <div class="input-group-append mr-4">
+                            <a class="btn btn-secondary btn-icon-split" asp-controller="M_User" asp-action="Index">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-arrow-left-long"></i>
+                                </span>
+                                <span class="text">戻る</span>
+                            </a>
+                        </div>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary btn-icon-split" style="min-width: 80px" onclick="OnRegister()">
+                                <span class="text">登録</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // 登録ボタン押下
+    function OnRegister() {
+
+        var form = $("#mUserForm");
+
+
+
+        form.submit(function (event) {
+
+            $("#div-error-message").text("");
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Register", "M_User")';
+            let method = 'POST';
+            let formId = 'mUserForm';
+            let data = form.serializeArray();
+            console.log(data);
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#' + formId)[0].reset();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            });
+        });
+    }
+
+</script>

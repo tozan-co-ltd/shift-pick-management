@@ -36,6 +36,11 @@ namespace ai_truck_load_measurement.Controllers
                 tripRecordList = (IEnumerable<LoadDistributionModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
+
+                // ログインユーザーのメインデポ情報取得
+                var mainDepo = GetMainDepo();
+                model.MainDepoID = mainDepo.DepoID;
+                model.MainDepoName = mainDepo.Name;
                 return View(model);
             }
             catch (Exception ex)
@@ -129,7 +134,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="minLoadClass">荷量クラスの最低値</param>
         /// <param name="maxLoadClass">荷量クラスの最大値</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, List<LoadRecordModel> arrayTrips, int minLoadClass, int maxLoadClass)
+        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, List<LoadRecordModel> arrayTrips, int minLoadClass, int maxLoadClass, List<string> checkedDepos)
         {
             string? errorMessage;
             string startDate = startOfPeriod.ToString("yyyyMMdd");
@@ -140,6 +145,9 @@ namespace ai_truck_load_measurement.Controllers
                 DataTable searchConditionDT = new DataTable();
                 searchConditionDT.Columns.Add("項目名");
                 searchConditionDT.Columns.Add("検索条件");
+                // デポの設定
+                var selectedDeposName = LoadRecordController.SelectedDepos(checkedDepos);
+                searchConditionDT.Rows.Add("対象デポ", selectedDeposName);
                 // 期間の設定
                 searchConditionDT.Rows.Add("稼働日", $"{startDate}～{endDate}");
                 // 選択された便の設定
@@ -246,7 +254,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="minLoadClass">荷量クラスの最低値</param>
         /// <param name="maxLoadClass">荷量クラスの最大値</param>
         /// <returns></returns>
-        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, List<LoadRecordModel> arrayTrips, int minLoadClass, int maxLoadClass)
+        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, List<LoadRecordModel> arrayTrips, int minLoadClass, int maxLoadClass, List<string> checkedDepos)
         {
             // ダウンロードボタンが押された際の処理
             if (download == "download")
@@ -308,6 +316,8 @@ namespace ai_truck_load_measurement.Controllers
                             System.Text.Encoding.GetEncoding("shift_jis")))
                         {
                             //書き込む
+                            var selectedDepos = LoadRecordController.SelectedDepos(checkedDepos);
+                            sw.WriteLine($"対象デポ：{selectedDepos}");
                             sw.WriteLine($"稼働日：{startDate}～{endDate}");
                             // 選択された便の羅列
                             var selectedTripNames = "";

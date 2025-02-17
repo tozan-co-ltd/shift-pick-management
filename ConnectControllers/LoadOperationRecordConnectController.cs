@@ -44,17 +44,34 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="workDays">稼働日のリスト</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectTripNameFromWorkDays(List<DateTime> workDays)
+        public static string CreateSQLToSelectTripNameFromWorkDays(List<DateTime> workDays, List<string> checkedDepos)
         {
             var selectedDays = SelectedDaysSQL(workDays);
             var sql = $@"
                 SELECT DISTINCT
 	                trip_name AS Value,
 	                trip_name AS Text
-                FROM t_trip_records
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+	                m_trip_histories AS TripHistories
+                ON 
+	                TripRecords.trip_id = TripHistories.trip_id
                 WHERE ({selectedDays})
                 AND trip_name IS NOT NULL
-";
+            ";
+            if (checkedDepos[0] != "0")
+            {
+                sql += "AND (";
+                for (int i = 0; i < checkedDepos.Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        sql += $" OR ";
+                    }
+                    sql += $"depo_id = {checkedDepos[i]}";
+                }
+                sql += ")";
+            }
             return sql;
         }
 

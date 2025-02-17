@@ -50,7 +50,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreatSQLToSelectTripRecordFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference, bool hasTripName, bool hasIdentifyNumber)
+        public static string CreatSQLToSelectTripRecordFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference, bool hasTripName, bool hasIdentifyNumber, List<string> checkedDepos)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
@@ -59,10 +59,11 @@ namespace ai_truck_load_measurement.ConnectControllers
                     t_trip_records.trip_record_id,
 	                trip_name,
 	                trip_branch_seq,
-	                driver_name,
+	                t_trip_records.driver_name,
 	                station_id,
 	                truck_number,
 	                identify_number,
+                    Depos.name AS depo_name,
 	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
 	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
 	                work_day,
@@ -87,17 +88,27 @@ namespace ai_truck_load_measurement.ConnectControllers
                 FROM t_trip_records";
             }
             sql += $@"
-                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
+                INNER JOIN
+	                m_trip_histories AS TripHistories
+                ON 
+	                t_trip_records.trip_id = TripHistories.trip_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                TripHistories.depo_id = Depos.depo_id
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
+            ";
             if (hasTripName)
             {
                 sql += $@"
-                AND NOT trip_name IS NULL";
+                AND NOT trip_name IS NULL ";
             }
             if (hasIdentifyNumber)
             {
                 sql += $@"
-                AND NOT identify_number IS NULL";
+                AND NOT identify_number IS NULL ";
             }
+            sql += SQLOfCheckedDepos(checkedDepos);
             return sql;
         }
 
@@ -108,7 +119,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreatSQLToSelectTripRecordForImage(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference, bool hasTripName, bool hasIdentifyNumber)
+        public static string CreatSQLToSelectTripRecordForImage(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference, bool hasTripName, bool hasIdentifyNumber, List<string> checkedDepos)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
@@ -117,7 +128,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     t_trip_records.trip_record_id,
 	                trip_name,
 	                trip_branch_seq,
-	                driver_name,
+	                t_trip_records.driver_name,
 	                station_id,
 	                truck_number,
 	                identify_number,
@@ -138,6 +149,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 FROM t_annotation_loads
                 INNER JOIN t_trip_records
                 ON t_annotation_loads.trip_record_id = t_trip_records.trip_record_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                TripHistories.depo_id = Depos.depo_id
                 ";
             }
             else
@@ -146,6 +161,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 FROM t_trip_records";
             }
             sql += $@"
+                INNER JOIN
+	                m_trip_histories AS TripHistories
+                ON 
+	                t_trip_records.trip_id = TripHistories.trip_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
             if (hasTripName)
             {
@@ -157,6 +176,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 sql += $@"
                 AND NOT identify_number IS NULL";
             }
+            sql += SQLOfCheckedDepos(checkedDepos);
             sql += $@"
             ORDER BY arrived_at";
             return sql;
@@ -169,7 +189,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="endOfPeriod">期間終了日</param>
         /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectTripRecordForDataTable(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference, bool hasTripName, bool hasIdentifyNumber)
+        public static string CreateSQLToSelectTripRecordForDataTable(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDeference, bool hasTripName, bool hasIdentifyNumber, List<string> checkedDepo)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
@@ -177,10 +197,11 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT
 	                trip_name,
 	                trip_branch_seq,
-	                driver_name,
+	                t_trip_records.driver_name,
 	                station_id,
 	                truck_number,
 	                identify_number,
+                    Depos.name AS depo_name,
 	                FORMAT(CONVERT(DATETIME, arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
 	                FORMAT(CONVERT(DATETIME, departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
 	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
@@ -206,6 +227,14 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
 
             sql += $@"
+                INNER JOIN
+	                m_trip_histories AS TripHistories
+                ON 
+	                t_trip_records.trip_id = TripHistories.trip_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                TripHistories.depo_id = Depos.depo_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
             if (hasTripName)
             {
@@ -217,12 +246,30 @@ namespace ai_truck_load_measurement.ConnectControllers
                 sql += $@"
                 AND NOT identify_number IS NULL";
             }
+            sql += SQLOfCheckedDepos(checkedDepo);
             sql += $@"
             ORDER BY trip_name, work_day, trip_branch_seq
             ";
             return sql;
         }
 
-       
+        private static string SQLOfCheckedDepos(List<string> checkedDepos)
+        {
+            var sql = "";
+            if (checkedDepos.Count > 0)
+            {
+                sql += "AND TripHistories.depo_id IN (";
+                for (int i = 0; i < checkedDepos.Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        sql += $", ";
+                    }
+                    sql += $"'{checkedDepos[i]}'";
+                }
+                sql += ")";
+            }
+            return sql;
+        }
     }
 }
