@@ -138,7 +138,7 @@
                                 <label>@Html.DisplayNameFor(model => model.DepoName)<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.M_DepoList" required id="DepoID"></select>
+                                <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.MDepoList" required id="DepoID"></select>
                                 <span class="text-danger w-100" asp-validation-for="DepoName"></span>
                             </div>
                         </div>
@@ -265,6 +265,7 @@
                 $("#DriverName").val(item.driverName);
                 $("#TruckID").val(item.truckID);
                 getIdentifyNumber(item.truckID);
+                $("#DepoID").val(item.depoID);
                 $("#RegistDayShiftStartTime").val(dayShiftStartTime);
                 $("#ApplicableStartDateTime").val(applicableStartDateTime);
                 $("#ApplicableEndDateTime").val(applicableEndDateTime);

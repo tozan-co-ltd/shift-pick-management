@@ -42,7 +42,6 @@ namespace ai_truck_load_measurement.Controllers
                 IEnumerable<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(sql);
 
                 model.M_TripList = tripList.ToPagedList();
-                model.M_DepoList = GetMDepoList();
 
                 return View(model);
             }
@@ -51,45 +50,6 @@ namespace ai_truck_load_measurement.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return View(model);
-            }
-        }
-
-        /// <summary>
-        /// デポのセレクトリスト作成
-        /// </summary>
-        /// <returns></returns>
-        private List<SelectListItem> GetMDepoList()
-        {
-            var selectListItem = new List<SelectListItem>();
-            // 初期選択肢追加
-            selectListItem.Add(new SelectListItem() { Text = "選択してください", Value = "0", Selected = true, Disabled = true });
-
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                using (var connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-                    string commandText = $@"
-                        SELECT
-                            depo_id as Value,
-                            name AS Text
-                        FROM m_depos
-                        ";
-
-                    var getSelectListItem = connection.Query<SelectListItem>(commandText).ToList();
-                    // セレクトリストにデポ情報追加
-                    foreach(var item in getSelectListItem)
-                    {
-                        selectListItem.Add(item);
-                    }
-                }
-                return selectListItem;
-            }
-            catch (Exception)
-            {
-                throw;
             }
         }
 
@@ -222,11 +182,6 @@ namespace ai_truck_load_measurement.Controllers
 
                     model.TruckSelectList.Add(menuItem);
                 }
-
-                // デポのセレクトリスト作成
-                model.M_DepoList = GetMDepoList();
-
-
 
                 // 適用終了日時を過ぎた便を表示するチェックボックスの入力
                 model.IsCheckedBeforeApplicablePeriod = isChecked;
