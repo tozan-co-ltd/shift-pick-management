@@ -109,7 +109,18 @@
         {
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
-        <p class="mb-3 top-title">SyncBace ステーション状況</p>
+        <p class="mb-3 top-title" id="stationTitle"></p>
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">デポ選択</span>
+                <div>
+                    <div id="selectDepos"></div>
+                    <div class="col-12">
+                        <select class="form-select" name="DepoID"  asp-items="@Model.MDepoList" id="selectDepo"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div>
             <button class="btn btn-update mr-2" onclick="onUpdateClick()" id="updateStation">更新</button>
             <label class="mb-2" id="updateAt">更新日時:@DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss")</label>
@@ -117,24 +128,6 @@
 
         <div id="cardlayout-wrap">
             <!-- カードレイアウトをラッピング -->
-            <section class="card-list">
-                <p class="station-number">ステーション1</p>
-                <h2 class="card-title" id="card-title1"></h2>
-                <p class="truck-status" id="truck-status1"></p>
-                <figure class="card-figure"><img src="" id="image1"></figure>
-            </section>
-            <section class="card-list">
-                <p class="station-number">ステーション2</p>
-                <h2 class="card-title" id="card-title2"></h2>
-                <p class="truck-status" id="truck-status2"></p>
-                <figure class="card-figure"><img src="" id="image2"></figure>
-            </section>
-            <section class="card-list">
-                <p class="station-number">ステーション3</p>
-                <h2 class="card-title" id="card-title3"></h2>
-                <p class="truck-status" id="truck-status3"></p>
-                <figure class="card-figure"><img src="" id="image3"></figure>
-            </section>
         </div>
             <!-- カードレイアウトをラッピング -->
     </div>
@@ -147,13 +140,32 @@
         window.setInterval(function () {
             onUpdateClick();
         }, 60000);
+        $("#selectDepo").find("option[value='" + top_model.mainDepoID + "']").attr("selected", "selected");
+        if(top_model.mainDepoName != ""){
+            console.log($("#stationTitle"));
+            $("#stationTitle")[0].innerText = getStationTitle(top_model.mainDepoName);
+        }
     });
 
     function viewCards(top_model) {
         var now = GetDateString(new Date());
+        // 更新日時の更新
         $('#updateAt').text("更新日時:" + now + ':' + ('0' + new Date().getSeconds()).slice(-2));
-        for (var i = 1; i <= 3; i++) {
-            var cardModel = top_model.topModelList.find(x => x.stationID == i);
+        // カード要素の初期化
+        $("#cardlayout-wrap")[0].innerHTML = "";
+        for (var i = 1; i <= top_model.viewCardModelList.length; i++) {
+            var cardModel = top_model.viewCardModelList.find(x => x.stationSeq == i);
+
+            // カード要素生成
+            $("#cardlayout-wrap")[0].innerHTML += 
+                    "<section class=\"card-list\">"
+                 +      "<p class=\"station-number\" > ステーション" + i + " </p>"
+                 +      "<h2 class=\"card-title\" id = \"card-title" + i + "\" > </h2>"
+                 +      "<p class=\"truck-status\" id = \"truck-status" + i + "\" > </p>"
+                 +      "<figure class=\"card-figure\" > <img src=\"\" id = \"image" + i +"\" > </figure>"
+                 +  "</section>";
+
+            // カード要素設定
             if (cardModel.truckExist) {
                 $('#card-title' + i).text("停車");
                 $('#card-title' + i).css("color", "#000000");
@@ -172,14 +184,18 @@
     function onUpdateClick(){
         DeleteErrorMessages();
 
+        var depoID = $('select[id="selectDepo"]')[0].value;
+
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetTopModel", "Top")';
         let method = 'Get';
+        let data = { depoID: depoID };
 
         // Ajax call
         $.ajax({
             url: url,
-            method: method
+            method: method,
+            data: data
         }).done(function (response) {
             viewCards(response);
         }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -191,6 +207,32 @@
                 $("#edit-modal-error-message").text(errorMessage);
             }
         });
+    }
+
+    // デポ選択時
+    $(function () {
+        $('select[id="selectDepo"]').change(function () {
+            var depo = $('select[id="selectDepo"]')[0];
+            var selectedDepoID = 0;
+            for(var i=0; i < depo.length; i++){
+                if(depo[i].selected){
+                    $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
+                    selectedDepoID = depo[i].value;
+                    console.log(selectedDepoID);
+                }
+            }
+            onUpdateClick();
+
+        });
+    })
+
+    function getStationTitle(depoName){
+        if(depoName == null){
+            return "ステーション状況";
+        }
+        else{
+            return depoName + "　ステーション状況";
+        }
     }
 
 </script>
