@@ -121,15 +121,39 @@
                 </div>
             </div>
         </div>
-        <div>
+        <div class="mb-3">
             <button class="btn btn-update mr-2" onclick="onUpdateClick()" id="updateStation">更新</button>
             <label class="mb-2" id="updateAt">更新日時:@DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss")</label>
         </div>
-
+        <div>
+            <button class="btn btn-secondary btn-icon-split" onclick="onUpdateClick()" id="figureButton" data-toggle="modal" data-target="#map-modal">
+                <span class="icon text-white-50">
+                    <i class="fa-solid fa-map"></i>
+                </span>
+                <span class="text">配置図</span>
+            </button>
+        </div>
         <div id="cardlayout-wrap">
             <!-- カードレイアウトをラッピング -->
         </div>
             <!-- カードレイアウトをラッピング -->
+    </div>
+</div>
+
+<!--  map Modal-->
+<div class="modal fade" id="map-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content trip-record-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-modal-label">カメラ配置図</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <figure class="mb-2 modal-img"><img src="" id="modalImage" /></figure>
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
@@ -144,6 +168,7 @@
         if(top_model.mainDepoName != ""){
             console.log($("#stationTitle"));
             $("#stationTitle")[0].innerText = getStationTitle(top_model.mainDepoName);
+            $('#modalImage').attr("src", "/images/" + top_model.mainDepoName + "map.png");
         }
     });
 
@@ -218,7 +243,7 @@
                 if(depo[i].selected){
                     $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
                     selectedDepoID = depo[i].value;
-                    console.log(selectedDepoID);
+                    $('#modalImage').attr("src", "/images/" + depo[i].innerText + "map.png");
                 }
             }
             onUpdateClick();
