@@ -130,7 +130,6 @@ namespace ai_truck_load_measurement.Models
         public IEnumerable<SelectListItem> GetMDepoList()
         {
             var selectListItem = new List<SelectListItem>();
-
             try
             {
                 // SQLServer接続文字列取得

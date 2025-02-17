@@ -8,6 +8,7 @@ using ai_truck_load_measurement.Properties;
 using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
+using NPOI.SS.Formula.Functions;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -30,7 +31,7 @@ namespace ai_truck_load_measurement.Controllers
                 var departureLoadClass = model.DepartureLoadClass;
 
                 // 到着荷量クラスと出発荷量クラスをそれぞれ変換
-                model.ArrivalLoadStatus =　ConversionLoadClassToLoadStatus(arrivalLoadClass);
+                model.ArrivalLoadStatus = ConversionLoadClassToLoadStatus(arrivalLoadClass);
                 model.DepartureLoadStatus = ConversionLoadClassToLoadStatus(departureLoadClass);
 
                 // テーブルの空欄を"-"に変換
@@ -52,13 +53,13 @@ namespace ai_truck_load_measurement.Controllers
         public static DataTable GetConvertedLoadClassDataTable(DataTable dt)
         {
             // テーブルに値を変換した後の文字列を格納する列を追加
-            dt.Columns.Add("converted_branch_seq", typeof(string)).SetOrdinal(1);
-            dt.Columns.Add("converted_truck_number", typeof(string)).SetOrdinal(5);
-            dt.Columns.Add("converted_identify_number", typeof(string)).SetOrdinal(6);
-            dt.Columns.Add("converted_arrival_scheduled_time", typeof(string)).SetOrdinal(7);
-            dt.Columns.Add("converted_departure_scheduled_time", typeof(string)).SetOrdinal(8);
-            dt.Columns.Add("arrival_load_status", typeof(string)).SetOrdinal(16);
-            dt.Columns.Add("departure_load_status", typeof(string)).SetOrdinal(17);
+            dt.Columns.Add("converted_branch_seq", typeof(string)).SetOrdinal(dt.Columns.IndexOf("trip_branch_seq"));
+            dt.Columns.Add("converted_truck_number", typeof(string)).SetOrdinal(dt.Columns.IndexOf("truck_number"));
+            dt.Columns.Add("converted_identify_number", typeof(string)).SetOrdinal(dt.Columns.IndexOf("identify_number"));
+            dt.Columns.Add("converted_arrival_scheduled_time", typeof(string)).SetOrdinal(dt.Columns.IndexOf("arrival_scheduled_time"));
+            dt.Columns.Add("converted_departure_scheduled_time", typeof(string)).SetOrdinal(dt.Columns.IndexOf("departure_scheduled_time"));
+            dt.Columns.Add("arrival_load_status", typeof(string)).SetOrdinal(dt.Columns.IndexOf("arrival_load_class"));
+            dt.Columns.Add("departure_load_status", typeof(string)).SetOrdinal(dt.Columns.IndexOf("departure_load_class"));
 
             // 各列の値を適切な値に変換
             foreach (DataRow row in dt.Rows)
@@ -281,6 +282,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <th class=""font-weight-bold"">ステーション<br>ID</th>
                                 <th class=""font-weight-bold"">車両<br>番号</th>
                                 <th class=""font-weight-bold"">識別<br>番号</th>
+                                <th class=""font-weight-bold"">デポ</th>
                                 <th class=""font-weight-bold"">到着<br>予定</th>
                                 <th class=""font-weight-bold"">出発<br>予定</th>
                                 <th class=""font-weight-bold"">稼働日</th>
@@ -306,7 +308,7 @@ namespace ai_truck_load_measurement.Controllers
                     var departureScheduledTime = item.DepartureScheduledTime.ToString("HH:mm");
                     if (departureScheduledTime == "00:00") departureScheduledTime = "-";
                     var hasTripName = 0;
-                    if(item.TripName == "-") hasTripName = 1;
+                    if (item.TripName == "-") hasTripName = 1;
                     searchData += $@"
                         <tr>
                             <td hidden>{item.TripRecordID}</td>
@@ -317,6 +319,7 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{item.StationID}</td>
                             <td>{truckNumber}</td>
                             <td>{item.IdentifyNumber}</td>
+                            <td>{item.DepoName}</td>
                             <td>{arrivalScheduledTime}</td>
                             <td>{departureScheduledTime}</td>
                             <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
@@ -421,13 +424,17 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="startOfPeriod">期間の開始日時</param>
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <returns></returns>
-        public List<LoadRecordModel> GetTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
+        public List<LoadRecordModel> GetTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             List<LoadRecordModel> tripRecordList = new();
             try
             {
+                // デポが何も選択されていない場合、空のリストを返す
+                if (checkedDepos.Count == 0)
+                    return tripRecordList;
+
                 // 便実績情報取得SQL作成
-                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod);
+                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod, checkedDepos);
                 // DB接続
                 tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
 
@@ -441,14 +448,25 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-
-        public string GetTripNameAndBranchSeqHTML(DateTime startOfPeriod, DateTime endOfPeriod)
+        /// <summary>
+        /// 便枝番セレクトリストのHTML取得
+        /// </summary>
+        /// <param name="startOfPeriod">便の期間開始日</param>
+        /// <param name="endOfPeriod">便の期間終了日</param>
+        /// <param name="checkedDepos">選択されたデポ</param>
+        /// <returns></returns>
+        public string GetTripNameAndBranchSeqHTML(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
-            var tripRecordList = GetTripNameFromPeriod(startOfPeriod,endOfPeriod);
+            var tripRecordList = GetTripNameFromPeriod(startOfPeriod, endOfPeriod, checkedDepos);
             var html = CreateSelectTripNameAndBranchSeqHTML(tripRecordList);
             return html;
         }
 
+        /// <summary>
+        /// 便枝番セレクトリストのHTML作成
+        /// </summary>
+        /// <param name="tripRecordList">便実績リスト</param>
+        /// <returns></returns>
         private string CreateSelectTripNameAndBranchSeqHTML(List<LoadRecordModel> tripRecordList)
         {
             var html = "";
@@ -501,7 +519,7 @@ namespace ai_truck_load_measurement.Controllers
                         <label class=""checkbox-item""><input type=""checkbox"" name=""tripNameAndBranchSeq"" id=""{selectValue}"" value=""{selectValue}"">{selectValue}</label>
                 ";
             }
-        
+
             html += $@"
                         </div>
                     </div>
@@ -541,7 +559,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="sql">sql文</param>
         /// <returns></returns>
-        public static List<LoadRecordModel> CommonSearchTrips (string sql)
+        public static List<LoadRecordModel> CommonSearchTrips(string sql)
         {
             // DB接続
             var loadClasses = LoadRecordConnectController.ConnectTTripRecords(sql);
@@ -554,5 +572,35 @@ namespace ai_truck_load_measurement.Controllers
 
             return loadClasses;
         }
+
+        /// <summary>
+        /// 選択されたデポ名リストを1行で
+        /// </summary>
+        /// <param name="checkedDepos">選択されたデポIDリスト</param>
+        /// <returns></returns>
+        public static string SelectedDepos(List<string> checkedDepos)
+        {
+            var selectedDepos = "";
+
+            // デポが選択されていない場合
+            if (checkedDepos.Count == 0)
+                return "なし";
+
+            // デポ名リスト作成
+            var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
+            var checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
+
+            for (int i = 0; i < checkedDeposName.Count; i++)
+            {
+                if (i != 0)
+                {
+                    selectedDepos += ", ";
+                }
+                selectedDepos += checkedDeposName[i].DepoName;
+            }
+
+            return selectedDepos;
+        }
     }
+
 }

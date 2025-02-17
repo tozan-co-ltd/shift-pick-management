@@ -744,6 +744,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("ステーションID");
                     headerList.Add("車両番号");
                     headerList.Add("識別番号");
+                    headerList.Add("デポ名");
                     headerList.Add("到着予定時間");
                     headerList.Add("出発予定時間");
                     headerList.Add("稼働日");
