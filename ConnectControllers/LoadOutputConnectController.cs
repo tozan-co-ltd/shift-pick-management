@@ -258,20 +258,16 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = "";
             if (checkedDepos.Count > 0)
             {
-                sql += "AND (";
+                sql += "AND TripHistories.depo_id IN (";
                 for (int i = 0; i < checkedDepos.Count; i++)
                 {
                     if (i != 0)
                     {
-                        sql += $" OR ";
+                        sql += $", ";
                     }
-                    sql += $"TripHistories.depo_id = {checkedDepos[i]}";
+                    sql += $"'{checkedDepos[i]}'";
                 }
                 sql += ")";
-            }
-            else
-            {
-                sql = "AND 1=0";
             }
             return sql;
         }
