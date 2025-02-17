@@ -429,6 +429,10 @@ namespace ai_truck_load_measurement.Controllers
             List<LoadRecordModel> tripRecordList = new();
             try
             {
+                // デポが何も選択されていない場合、空のリストを返す
+                if (checkedDepos.Count == 0)
+                    return tripRecordList;
+
                 // 便実績情報取得SQL作成
                 var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod, checkedDepos);
                 // DB接続
@@ -444,7 +448,13 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-
+        /// <summary>
+        /// 便枝番セレクトリストのHTML取得
+        /// </summary>
+        /// <param name="startOfPeriod">便の期間開始日</param>
+        /// <param name="endOfPeriod">便の期間終了日</param>
+        /// <param name="checkedDepos">選択されたデポ</param>
+        /// <returns></returns>
         public string GetTripNameAndBranchSeqHTML(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             var tripRecordList = GetTripNameFromPeriod(startOfPeriod, endOfPeriod, checkedDepos);
@@ -452,6 +462,11 @@ namespace ai_truck_load_measurement.Controllers
             return html;
         }
 
+        /// <summary>
+        /// 便枝番セレクトリストのHTML作成
+        /// </summary>
+        /// <param name="tripRecordList">便実績リスト</param>
+        /// <returns></returns>
         private string CreateSelectTripNameAndBranchSeqHTML(List<LoadRecordModel> tripRecordList)
         {
             var html = "";
@@ -565,23 +580,25 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public static string SelectedDepos(List<string> checkedDepos)
         {
+            var selectedDepos = "";
+
+            // デポが選択されていない場合
+            if (checkedDepos.Count == 0)
+                return "なし";
+
             // デポ名リスト作成
             var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
             var checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
 
-            var selectedDepos = "";
-
-            if (checkedDeposName.Count > 0)
+            for (int i = 0; i < checkedDeposName.Count; i++)
             {
-                for (int i = 0; i < checkedDeposName.Count; i++)
+                if (i != 0)
                 {
-                    if (i != 0)
-                    {
-                        selectedDepos += ", ";
-                    }
-                    selectedDepos += checkedDeposName[i].DepoName;
+                    selectedDepos += ", ";
                 }
+                selectedDepos += checkedDeposName[i].DepoName;
             }
+
             return selectedDepos;
         }
     }

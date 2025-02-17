@@ -60,12 +60,17 @@ namespace ai_truck_load_measurement.Controllers
         public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber, List<string> checkedDepos)
         {
             var searchData = string.Empty;
-            IEnumerable<LoadOutputModel> tripRecordList;
+            SearchedTripRecordListModel searchedTripRecordListModel = new();
             try
             {
+                if (checkedDepos.Count == 0)
+                {
+                    return Json(searchedTripRecordListModel);
+                }
+
                 // 指定した期間の便マスター情報取得SQL作成
                 var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordFromPeriod(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
-                var searchedTripRecordListModel = LoadRecordController.SearchData(sql, "LoadOutput");
+                searchedTripRecordListModel = LoadRecordController.SearchData(sql, "LoadOutput");
 
                 return Json(searchedTripRecordListModel);
             }
@@ -111,11 +116,15 @@ namespace ai_truck_load_measurement.Controllers
                 searchConditionDT.Rows.Add("絞り込み条件：",shiborikomiCondition);
 
                 // 便実績情報取得
-                var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
-                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
+                DataTable tTripRecordDT = new DataTable();
+                if (checkedDepos.Count > 0)
+                {
+                    var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
+                    tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
 
-                // 荷量のクラスを数値化
-                tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
+                    // 荷量のクラスを数値化
+                    tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
+                }
 
                 // ファイル名
                 var tmpFilename = $"荷量実績_{startDate}-{endDate}.xlsx";
@@ -229,15 +238,23 @@ namespace ai_truck_load_measurement.Controllers
             // ダウンロードボタンが押された際の処理
             if (download == "download")
             {
-                // 指定した期間の便実績情報取得SQL作成
-                var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
-                // DB接続
-                IEnumerable<LoadOutputModel> tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql);
+                IEnumerable<LoadOutputModel> tripRecordList = new List<LoadOutputModel>();
 
+                if(checkedDepos.Count > 0)
+                {
+                    // 指定した期間の便実績情報取得SQL作成
+                    var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
+                    // DB接続
+                    tripRecordList = LoadOutputConnectController.ConnectTTripRecords(sql);
+                }
 
+                var checkedDeposName =  new List<LoadRecordModel>();
                 // デポ名リスト作成
-                var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
-                var checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
+                if (checkedDepos.Count > 0)
+                {
+                    var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
+                    checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
+                }
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");
                 var endDate = endOfPeriod.ToString("yyyyMMdd");

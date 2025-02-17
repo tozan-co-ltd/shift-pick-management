@@ -96,16 +96,17 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_depos AS Depos
                 ON
                 TripHistories.depo_id = Depos.depo_id
-                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
+            ";
             if (hasTripName)
             {
                 sql += $@"
-                AND NOT trip_name IS NULL";
+                AND NOT trip_name IS NULL ";
             }
             if (hasIdentifyNumber)
             {
                 sql += $@"
-                AND NOT identify_number IS NULL";
+                AND NOT identify_number IS NULL ";
             }
             sql += SQLOfCheckedDepos(checkedDepos);
             return sql;
@@ -255,16 +256,16 @@ namespace ai_truck_load_measurement.ConnectControllers
         private static string SQLOfCheckedDepos(List<string> checkedDepos)
         {
             var sql = "";
-            if (checkedDepos[0] != "0")
+            if (checkedDepos.Count > 0)
             {
-                sql += "AND (";
+                sql += "AND TripHistories.depo_id IN (";
                 for (int i = 0; i < checkedDepos.Count; i++)
                 {
                     if (i != 0)
                     {
-                        sql += $" OR ";
+                        sql += $", ";
                     }
-                    sql += $"TripHistories.depo_id = {checkedDepos[i]}";
+                    sql += $"'{checkedDepos[i]}'";
                 }
                 sql += ")";
             }

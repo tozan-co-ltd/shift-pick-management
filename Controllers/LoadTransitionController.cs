@@ -28,11 +28,17 @@ namespace ai_truck_load_measurement.Controllers
             depoList.Add(mainDepo.DepoID.ToString());
             try
             {
-                // 便実績情報取得SQL作成
-                var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today, depoList);
-                // DB接続
-                List<SelectListItem> tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
+                List<SelectListItem> tripNameList = new();
 
+                // メインデポが設定されている場合
+                if (depoList.Count != 0)
+                {
+                    // 便実績情報取得SQL作成
+                    var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today, depoList);
+                    // DB接続
+                    tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
+                }
+                
                 model.TripNameList = tripNameList;
 
                 // 便実績情報取得SQL作成
