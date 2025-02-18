@@ -123,5 +123,7 @@ namespace ai_truck_load_measurement.Models
 
         // 適用終了日時を過ぎた便を表示するチェックボックスの入力
         public bool IsCheckedBeforeApplicablePeriod {  get; set; } = false;
+        public M_DepoModel? MainDepo { get; set; }
     }
+
 }
