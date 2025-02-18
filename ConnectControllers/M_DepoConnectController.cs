@@ -61,6 +61,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ON
 	                Users.depo_id = Depos.depo_id
                 WHERE Users.ad_name = '{ADName}'
+                AND is_deleted <> 1
             ";
             return sql;
         }

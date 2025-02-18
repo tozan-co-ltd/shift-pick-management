@@ -124,7 +124,7 @@ namespace ai_truck_load_measurement.Models
         }
 
         /// <summary>
-        /// ユーザーリスト取得
+        /// デポリスト取得
         /// </summary>
         /// <returns></returns>
         public IEnumerable<SelectListItem> GetMDepoList()

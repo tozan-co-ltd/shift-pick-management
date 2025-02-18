@@ -14,10 +14,10 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <returns></returns>
-        public static List<TopModel> ConnectTops(string sql)
+        public static List<ViewCardModel> ConnectTops(string sql)
         {
             // 戻り値
-            List<TopModel> strList = new();
+            List<ViewCardModel> strList = new();
 
             // DB接続
             try
@@ -30,7 +30,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     connection.ConnectionString = connectionString;
                     connection.Open();
                     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<TopModel>(sql).ToList();
+                    strList = connection.Query<ViewCardModel>(sql).ToList();
                 }
                 return strList;
             }
@@ -44,13 +44,14 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 最新のステーション状況取得SQL
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectLatestStationStatus()
+        public static string CreateSQLToSelectLatestStationStatus(int depoID)
         {
             var sql = $@"
                 SELECT 
                     detect_records.station_id,
                     load_class,
-                    ip_adress
+                    ip_adress,
+                    station_seq
                  FROM t_load_detect_records AS detect_records
                  JOIN (
                     SELECT station_id, MAX(created_at) AS latest_create
@@ -61,6 +62,9 @@ namespace ai_truck_load_measurement.ConnectControllers
                 AND detect_records.created_at = latest_detect_records.latest_create
                 JOIN m_devices
                 ON detect_records.station_id = m_devices.station_id
+                JOIN m_stations
+                 ON detect_records.station_id = m_stations.station_id
+                 WHERE depo_id = {depoID}
             ";
             return sql;
         }
