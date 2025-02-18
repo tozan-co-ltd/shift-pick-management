@@ -49,7 +49,7 @@
             <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                 <span class="warehouse-name-drs span-paragraph">オプション</span>
                 <div>
-                    <label><input type="checkbox" id="m_tripCheckBox" /> 適用終了日時を過ぎた便も表示</label>
+                    <label><input type="checkbox" id="isBeforeApplicablePeriod" /> 適用終了日時を過ぎた便も表示</label>
                 </div>
             </div>
         </div>
@@ -356,23 +356,21 @@
     }
 
     // チェックボックス押下時
-    $('input').change(function () {
+    $('input[id="isBeforeApplicablePeriod"]').change(function () {
         tableDisplay();
     });
 
     // 便テーブルの表示
     function tableDisplay() {
         // チェックボックスの入力情報取得
-        var checkBox = false;
-        $('input:checked').each(function () {
-            checkBox = $(this).prop('checked');
-        });
-
+        var isBeforeApplicablePeriod = $('input[id="isBeforeApplicablePeriod"]')[0].checked;
+        var checkedDepos = getCheckedDepos();
+        console.log(checkedDepos);
 
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "M_Trip")';
         let method = 'Post';
-        let data = { isBeforeApplicablePeriod: checkBox };
+        let data = { isBeforeApplicablePeriod: isBeforeApplicablePeriod, checkedDepos: checkedDepos };
 
         // Ajax call
         $.ajax({
@@ -450,6 +448,7 @@
                 depos[i].checked = false;
             }
         }
+        tableDisplay();
     });
 
     // 各デポチェックボックス押下時
@@ -462,18 +461,17 @@
                     break;
                 }
             }
+            tableDisplay();
         });
     })
 
     // 画面表示時にログインユーザーのメインデポにチェックを入れる
     function depoCheckDisplay(model) {
         console.log("start");
-        var mainDepoID = model.mainDepoID;
+        var mainDepoID = model.mainDepo.depoID;
         if (mainDepoID == 0)
             return;
         var depos = $('input[name=depos]');
-        console.log(mainDepoID);
-        console.log(depos);
         for (var i = 0; i < depos.length; i++) {
             if (depos[i].id == "depo" + mainDepoID) {
                 depos[i].checked = true;
@@ -490,7 +488,6 @@
                 checkedDepos.push(depos[i].value);
             }
         }
-        console.log(checkedDepos);
         return checkedDepos;
     }
 </script>

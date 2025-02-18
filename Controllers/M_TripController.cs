@@ -36,10 +36,21 @@ namespace ai_truck_load_measurement.Controllers
             
             try
             {
-                // 便マスター情報取得SQL作成
-                var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod);
-                // DB接続
-                IEnumerable<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(sql);
+                // ログインユーザーのメインデポ情報取得
+                var mainDepo = GetMainDepo();
+                model.MainDepo = mainDepo;
+                List<string> depoList = new();
+                depoList.Add(mainDepo.DepoID.ToString());
+
+                IEnumerable<M_TripModel> tripList = new List<M_TripModel>();
+
+                if (depoList.Count > 0)
+                {
+                    // 便マスター情報取得SQL作成
+                    var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod, depoList);
+                    // DB接続
+                    tripList = M_TripConnectController.ConnectMTrips(sql);
+                }
 
                 model.M_TripList = tripList.ToPagedList();
 
@@ -58,16 +69,19 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
         /// <returns></returns>
-        public IActionResult SearchData(bool isBeforeApplicablePeriod)
+        public IActionResult SearchData(bool isBeforeApplicablePeriod, List<string> checkedDepos)
         {
             var searchData = string.Empty;
             List<M_TripModel> tripList = new();
             try
             {
-                // 便マスター情報取得SQL作成
-                var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod);
-                // DB接続
-                tripList = M_TripConnectController.ConnectMTrips(sql);
+                if (checkedDepos.Count > 0)
+                {
+                    // 便マスター情報取得SQL作成
+                    var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod, checkedDepos);
+                    // DB接続
+                    tripList = M_TripConnectController.ConnectMTrips(sql);
+                }
 
                 searchData += $@"
                     <div class=""mt-3"">

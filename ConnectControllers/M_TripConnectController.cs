@@ -310,7 +310,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用終了日時を過ぎた便を表示するか</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMTrips(bool isBeforeApplicablePeriod)
+        public static string CreateSQLToSelectMTrips(bool isBeforeApplicablePeriod, List<string> checkedDepos)
         {
             var sql = $@"
                 SELECT 
@@ -342,6 +342,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                m_depos as Depos
                 ON
 	                TripHistories.depo_id = Depos.depo_id
+                {SQLOfCheckedDepos(checkedDepos)}
             ";
             // 適用終了日時を過ぎた便を表示しない場合
             if (!isBeforeApplicablePeriod)
@@ -349,7 +350,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 DateTime today = DateTime.Now;
                 string formatToday = today.ToString("yyyy/MM/dd HH:mm:ss");
                 sql += $@"
-                    WHERE
+                    AND
                         TripHistories.applicable_end_datetime > '{today}'
                 ";
             }
@@ -666,6 +667,30 @@ namespace ai_truck_load_measurement.ConnectControllers
                 WHERE 
                     TripHistories.trip_history_id = {tripHistoryId}
             ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 選択されたデポを検索条件とするSQLを作成する
+        /// </summary>
+        /// <param name="checkedDepos">選択されたデポ</param>
+        /// <returns></returns>
+        private static string SQLOfCheckedDepos(List<string> checkedDepos)
+        {
+            var sql = "";
+            if (checkedDepos.Count > 0)
+            {
+                sql += "WHERE TripHistories.depo_id IN (";
+                for (int i = 0; i < checkedDepos.Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        sql += $", ";
+                    }
+                    sql += $"'{checkedDepos[i]}'";
+                }
+                sql += ")";
+            }
             return sql;
         }
     }
