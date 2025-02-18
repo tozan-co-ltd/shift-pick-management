@@ -365,20 +365,28 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="gamenName">現在の画面名</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, bool isBeforeApplicablePeriod, DateTime referenceDate)
+        public JsonResult ExportFile(string gamenName, bool isBeforeApplicablePeriod, DateTime referenceDate, List<string> checkedDepos)
         {
             string? errorMessage;
             try
             {
-                // 便マスター情報取得
-                var mTripSql = M_TripConnectController.CreateSQLToSelectMTripsForDataTable(isBeforeApplicablePeriod, referenceDate);
-                DataTable mTripDT = M_TripConnectController.ConnectMTripsToDataTable(mTripSql);
+                DataTable mTripDT = new DataTable(); // 便マスター用データテーブル
+                DataTable mTripBranchDT = new DataTable(); // 便枝番マスター用データテーブル
+                DataTable mTripBranchConsecutiveDT = new DataTable();
 
-                // 便枝番マスター情報取得
-                var mTripBranchSql = M_TripConnectController.CreateSQLToSelectMTripBranchesForDataTable(referenceDate);
-                DataTable mTripBranchDT = M_TripConnectController.ConnectMTripsToDataTable(mTripBranchSql);
-                // 便枝番マスターに枝連番列を追加
-                var mTripBranchConsecutiveDT = SortDataTableFromBranchConsecutiveNumber(mTripBranchDT);
+                if (checkedDepos.Count > 0)
+                {
+                    // 便マスター情報取得
+                    var mTripSql = M_TripConnectController.CreateSQLToSelectMTripsForDataTable(isBeforeApplicablePeriod, referenceDate, checkedDepos);
+                    mTripDT = M_TripConnectController.ConnectMTripsToDataTable(mTripSql);
+
+                    // 便枝番マスター情報取得
+                    var mTripBranchSql = M_TripConnectController.CreateSQLToSelectMTripBranchesForDataTable(referenceDate, checkedDepos);
+                    mTripBranchDT = M_TripConnectController.ConnectMTripsToDataTable(mTripBranchSql);
+                    // 便枝番マスターに枝連番列を追加
+                    mTripBranchConsecutiveDT = SortDataTableFromBranchConsecutiveNumber(mTripBranchDT);
+                }
+
 
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(gamenName);

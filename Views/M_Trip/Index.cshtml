@@ -235,34 +235,23 @@
         $('#div-error-message').text("");
 
         // チェックボックスの入力情報取得
-        var checkBox = false;
-        $('input:checked').each(function () {
-            checkBox = $(this).prop('checked');
-        });
+        var isBeforeApplicablePeriod = $('input[id="isBeforeApplicablePeriod"]')[0].checked;
+        var checkedDepos = getCheckedDepos();
 
         // 基準日時取得
         var referenceDate = $('#referenceDate').val();
 
-        const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&isBeforeApplicablePeriod=' + checkBox + '&referenceDate=' + referenceDate, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-        var { data, errorMessage } = await response.json();
+        // フォーム情報取得
+        let data = {
+            "gamenName": gamenName,
+            "isBeforeApplicablePeriod": isBeforeApplicablePeriod,
+            "referenceDate": referenceDate,
+            checkedDepos: checkedDepos
+        };
 
-        if (errorMessage) {
-            $("#div-error-message").show();
-            $("#div-error-message").text(errorMessage);
-        } else {
-            var { contentType, fileContents, fileDownloadName } = data;
-            {
-                const link = document.createElement("a");
-                link.href = `data:${contentType};base64,${fileContents}`;
-                link.download = fileDownloadName;
-                link.click();
-            }
-        }
+        // Excel出力共通処理
+        onExportFileTripsCommon(page, data);
+
     }
 
     // 編集ボタン押下

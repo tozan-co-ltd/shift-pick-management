@@ -342,6 +342,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                m_depos as Depos
                 ON
 	                TripHistories.depo_id = Depos.depo_id
+                WHERE
                 {SQLOfCheckedDepos(checkedDepos)}
             ";
             // 適用終了日時を過ぎた便を表示しない場合
@@ -369,7 +370,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="isBeforeApplicablePeriod">適用終了日時を過ぎた便を含むか</param>
         /// <param name="refferenceDate">基準日時</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMTripsForDataTable(bool isBeforeApplicablePeriod, DateTime refferenceDate)
+        public static string CreateSQLToSelectMTripsForDataTable(bool isBeforeApplicablePeriod, DateTime refferenceDate, List<string> checkedDepos)
         {
             var sql = $@"
                 SELECT 
@@ -395,13 +396,15 @@ namespace ai_truck_load_measurement.ConnectControllers
                     m_trucks as Trucks
                 ON
                     TripHistories.truck_id = Trucks.truck_id
+                WHERE
+                    {SQLOfCheckedDepos(checkedDepos)}
             ";
             // 適用終了日時を過ぎた便を含まない場合
             if (!isBeforeApplicablePeriod)
             {
                 string formatRefferenceDate = refferenceDate.ToString("yyyy/MM/dd HH:mm:ss");
                 sql += $@"
-                    WHERE
+                    AND
                         TripHistories.applicable_end_datetime > '{formatRefferenceDate}'
                 ";
             }
@@ -418,7 +421,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="refferenceDate">基準日時</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMTripBranchesForDataTable(DateTime refferenceDate)
+        public static string CreateSQLToSelectMTripBranchesForDataTable(DateTime refferenceDate, List<string> checkedDepos)
         {
             string formatRefferenceDate = refferenceDate.ToString("yyyy/MM/dd HH:mm:ss");
             var sql = $@"
@@ -466,6 +469,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     BranchNumbers.applicable_start_datetime < '{formatRefferenceDate}'
                 AND
                     '{formatRefferenceDate}' < TripHistories.applicable_end_datetime
+                AND
+                    {SQLOfCheckedDepos(checkedDepos)}
                 ORDER BY
                     TripHistories.trip_id, BranchNumbers.arrival_scheduled_time
             ";
@@ -680,7 +685,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = "";
             if (checkedDepos.Count > 0)
             {
-                sql += "WHERE TripHistories.depo_id IN (";
+                sql += "TripHistories.depo_id IN (";
                 for (int i = 0; i < checkedDepos.Count; i++)
                 {
                     if (i != 0)
