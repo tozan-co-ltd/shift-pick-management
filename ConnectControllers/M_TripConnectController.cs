@@ -379,6 +379,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     TripHistories.driver_name,
                     Trucks.truck_number,
                     Trucks.identify_number,
+	                Depos.name AS depo_name,
                     FORMAT(CONVERT(DATETIME, TripHistories.day_shift_start_time), 'HH:mm'),
                     FORMAT(TripHistories.applicable_start_datetime, 'yyyy/MM/dd HH:mm:ss'),
                     FORMAT(TripHistories.applicable_end_datetime, 'yyyy/MM/dd HH:mm:ss'),
@@ -396,6 +397,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                     m_trucks as Trucks
                 ON
                     TripHistories.truck_id = Trucks.truck_id
+                INNER JOIN 
+	                m_depos as Depos
+                ON
+	                TripHistories.depo_id = Depos.depo_id
                 WHERE
                     {SQLOfCheckedDepos(checkedDepos)}
             ";
