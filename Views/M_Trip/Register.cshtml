@@ -84,6 +84,15 @@
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayNameFor(model => model.DepoName)<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.MDepoList" required></select>
+                            <span class="text-danger w-100" asp-validation-for="DepoID"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
                             <label>@Html.DisplayName("ApplicableStartDateTime")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
@@ -128,6 +137,7 @@
     $(document).ready(function(){
         // M_TripModel取得
         var tripModel = @Html.Raw(Json.Serialize(Model));
+        console.log(tripModel);
         getIdentifyNumber(tripModel.truckID);
         if (tripModel.truckID == 0) {
             $('#DayShiftStartTime').val("");

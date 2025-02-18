@@ -34,8 +34,24 @@
             }
         </div>
 
-        <div class="mb-3">
-            <label><input type="checkbox" id="m_tripCheckBox"/> 適用終了日時を過ぎた便も表示</label>
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">デポ</span>
+                <div>
+                    <label><input type="checkbox" class=" mr-2" id="allDepo" />すべて</label>
+                    <br />
+                    <div id="selectDepos"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">オプション</span>
+                <div>
+                    <label><input type="checkbox" id="isBeforeApplicablePeriod" /> 適用終了日時を過ぎた便も表示</label>
+                </div>
+            </div>
         </div>
 
         <div class="mg-bot-20">
@@ -134,6 +150,15 @@
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <label>@Html.DisplayNameFor(model => model.DepoName)<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.MDepoList" required id="DepoID"></select>
+                                <span class="text-danger w-100" asp-validation-for="DepoName"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel">
                                 <label><a>@Html.DisplayName("ApplicableStartDateTime")<span style="color:red">*</span></a></label>
                             </div>
@@ -186,6 +211,9 @@
         // 適用終了日時を過ぎた便を表示するチェックボックスの値を取得
         var trip_model = @Html.Raw(Json.Serialize(Model));
         $('input').prop('checked', trip_model.isCheckedBeforeApplicablePeriod);
+        // デポチェックボックス追加
+        addDepos(trip_model);
+        depoCheckDisplay(trip_model);
         // テーブル表示
         tableDisplay();
     });
@@ -207,34 +235,23 @@
         $('#div-error-message').text("");
 
         // チェックボックスの入力情報取得
-        var checkBox = false;
-        $('input:checked').each(function () {
-            checkBox = $(this).prop('checked');
-        });
+        var isBeforeApplicablePeriod = $('input[id="isBeforeApplicablePeriod"]')[0].checked;
+        var checkedDepos = getCheckedDepos();
 
         // 基準日時取得
         var referenceDate = $('#referenceDate').val();
 
-        const response = await fetch('' + page + '/ExportFile?gamenName=' + gamenName + '&isBeforeApplicablePeriod=' + checkBox + '&referenceDate=' + referenceDate, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-        var { data, errorMessage } = await response.json();
+        // フォーム情報取得
+        let data = {
+            "gamenName": gamenName,
+            "isBeforeApplicablePeriod": isBeforeApplicablePeriod,
+            "referenceDate": referenceDate,
+            checkedDepos: checkedDepos
+        };
 
-        if (errorMessage) {
-            $("#div-error-message").show();
-            $("#div-error-message").text(errorMessage);
-        } else {
-            var { contentType, fileContents, fileDownloadName } = data;
-            {
-                const link = document.createElement("a");
-                link.href = `data:${contentType};base64,${fileContents}`;
-                link.download = fileDownloadName;
-                link.click();
-            }
-        }
+        // Excel出力共通処理
+        onExportFileTripsCommon(page, data);
+
     }
 
     // 編集ボタン押下
@@ -243,6 +260,7 @@
 
         // M_TripModel取得
         var tripModel = @Html.Raw(Json.Serialize(Model));
+        console.log(tripModel);
         tripModel.m_TripList.forEach(function (item) {
             var dayShiftStartTime = GetTimeString(new Date(item.dayShiftStartTime));
             var applicableStartDateTime = GetDateString(new Date(item.applicableStartDateTime));
@@ -254,6 +272,7 @@
                 $("#DriverName").val(item.driverName);
                 $("#TruckID").val(item.truckID);
                 getIdentifyNumber(item.truckID);
+                $("#DepoID").val(item.depoID);
                 $("#RegistDayShiftStartTime").val(dayShiftStartTime);
                 $("#ApplicableStartDateTime").val(applicableStartDateTime);
                 $("#ApplicableEndDateTime").val(applicableEndDateTime);
@@ -326,23 +345,21 @@
     }
 
     // チェックボックス押下時
-    $('input').change(function () {
+    $('input[id="isBeforeApplicablePeriod"]').change(function () {
         tableDisplay();
     });
 
     // 便テーブルの表示
     function tableDisplay() {
         // チェックボックスの入力情報取得
-        var checkBox = false;
-        $('input:checked').each(function () {
-            checkBox = $(this).prop('checked');
-        });
-
+        var isBeforeApplicablePeriod = $('input[id="isBeforeApplicablePeriod"]')[0].checked;
+        var checkedDepos = getCheckedDepos();
+        console.log(checkedDepos);
 
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "M_Trip")';
         let method = 'Post';
-        let data = { isBeforeApplicablePeriod: checkBox };
+        let data = { isBeforeApplicablePeriod: isBeforeApplicablePeriod, checkedDepos: checkedDepos };
 
         // Ajax call
         $.ajax({
@@ -394,4 +411,72 @@
         getIdentifyNumber(truckID);
     });
 
+
+    // デポの選択用チェックボックスを生成
+    function addDepos(model) {
+        var selectDepos = $("#selectDepos")[0];
+        model.mDepoList.forEach(depo => {
+            if (depo.value == null)
+                return;
+            var depoLabel = document.createElement("label");
+            depoLabel.innerHTML += "<input type=\"checkbox\" class=\"mr-2\" name=\"depos\" id=\"depo" + depo.value + "\" value=\"" + depo.value + "\" />" + depo.text;
+            depoLabel.className += "mr-3 ";
+            selectDepos.appendChild(depoLabel);
+
+
+        })
+    }
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        var depos = $('input[name="depos"]');
+        for (var i = 0; i < depos.length; i++) {
+            if ($('input[id=allDepo]')[0].checked) {
+                depos[i].checked = true;
+            } else {
+                depos[i].checked = false;
+            }
+        }
+        tableDisplay();
+    });
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            var depos = $('input[name=depos]');
+            for (var i = 0; i < depos.length; i++) {
+                if (!depos[i].checked) {
+                    $('input[id=allDepo]')[0].checked = false;
+                    break;
+                }
+            }
+            tableDisplay();
+        });
+    })
+
+    // 画面表示時にログインユーザーのメインデポにチェックを入れる
+    function depoCheckDisplay(model) {
+        console.log("start");
+        var mainDepoID = model.mainDepo.depoID;
+        if (mainDepoID == 0)
+            return;
+        var depos = $('input[name=depos]');
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].id == "depo" + mainDepoID) {
+                depos[i].checked = true;
+            }
+        }
+    }
+
+    // 選択されたデポのIDリストを取得する
+    function getCheckedDepos() {
+        var depos = $('input[name=depos]');
+        var checkedDepos = [];
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].checked) {
+                checkedDepos.push(depos[i].value);
+            }
+        }
+        return checkedDepos;
+    }
 </script>

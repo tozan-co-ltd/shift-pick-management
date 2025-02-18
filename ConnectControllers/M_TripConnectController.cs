@@ -310,11 +310,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用終了日時を過ぎた便を表示するか</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMTrips(bool isBeforeApplicablePeriod)
+        public static string CreateSQLToSelectMTrips(bool isBeforeApplicablePeriod, List<string> checkedDepos)
         {
             var sql = $@"
                 SELECT 
-	                TripHistories.trip_id,
+                    TripHistories.trip_id,
                     TripHistories.trip_history_id,
                     Trips.trip_name,
                     TripHistories.driver_name,
@@ -322,12 +322,14 @@ namespace ai_truck_load_measurement.ConnectControllers
                     Trucks.truck_number,
                     Trucks.identify_number,
                     CONVERT(DATETIME, TripHistories.day_shift_start_time) AS day_shift_start_time,
+	                TripHistories.depo_id,
+	                Depos.name AS depo_name,
                     TripHistories.applicable_start_datetime,
                     TripHistories.applicable_end_datetime,
                     TripHistories.updated_at,
                     TripHistories.updated_by
                 FROM 
-	                m_trip_histories as TripHistories
+                    m_trip_histories as TripHistories
                 INNER JOIN
                     m_trips as Trips
                 ON 
@@ -336,6 +338,12 @@ namespace ai_truck_load_measurement.ConnectControllers
                     m_trucks as Trucks
                 ON
                     TripHistories.truck_id = Trucks.truck_id
+                INNER JOIN 
+	                m_depos as Depos
+                ON
+	                TripHistories.depo_id = Depos.depo_id
+                WHERE
+                {SQLOfCheckedDepos(checkedDepos)}
             ";
             // 適用終了日時を過ぎた便を表示しない場合
             if (!isBeforeApplicablePeriod)
@@ -343,7 +351,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 DateTime today = DateTime.Now;
                 string formatToday = today.ToString("yyyy/MM/dd HH:mm:ss");
                 sql += $@"
-                    WHERE
+                    AND
                         TripHistories.applicable_end_datetime > '{today}'
                 ";
             }
@@ -362,7 +370,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="isBeforeApplicablePeriod">適用終了日時を過ぎた便を含むか</param>
         /// <param name="refferenceDate">基準日時</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMTripsForDataTable(bool isBeforeApplicablePeriod, DateTime refferenceDate)
+        public static string CreateSQLToSelectMTripsForDataTable(bool isBeforeApplicablePeriod, DateTime refferenceDate, List<string> checkedDepos)
         {
             var sql = $@"
                 SELECT 
@@ -371,6 +379,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     TripHistories.driver_name,
                     Trucks.truck_number,
                     Trucks.identify_number,
+	                Depos.name AS depo_name,
                     FORMAT(CONVERT(DATETIME, TripHistories.day_shift_start_time), 'HH:mm'),
                     FORMAT(TripHistories.applicable_start_datetime, 'yyyy/MM/dd HH:mm:ss'),
                     FORMAT(TripHistories.applicable_end_datetime, 'yyyy/MM/dd HH:mm:ss'),
@@ -388,13 +397,19 @@ namespace ai_truck_load_measurement.ConnectControllers
                     m_trucks as Trucks
                 ON
                     TripHistories.truck_id = Trucks.truck_id
+                INNER JOIN 
+	                m_depos as Depos
+                ON
+	                TripHistories.depo_id = Depos.depo_id
+                WHERE
+                    {SQLOfCheckedDepos(checkedDepos)}
             ";
             // 適用終了日時を過ぎた便を含まない場合
             if (!isBeforeApplicablePeriod)
             {
                 string formatRefferenceDate = refferenceDate.ToString("yyyy/MM/dd HH:mm:ss");
                 sql += $@"
-                    WHERE
+                    AND
                         TripHistories.applicable_end_datetime > '{formatRefferenceDate}'
                 ";
             }
@@ -411,7 +426,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="refferenceDate">基準日時</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMTripBranchesForDataTable(DateTime refferenceDate)
+        public static string CreateSQLToSelectMTripBranchesForDataTable(DateTime refferenceDate, List<string> checkedDepos)
         {
             string formatRefferenceDate = refferenceDate.ToString("yyyy/MM/dd HH:mm:ss");
             var sql = $@"
@@ -459,6 +474,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     BranchNumbers.applicable_start_datetime < '{formatRefferenceDate}'
                 AND
                     '{formatRefferenceDate}' < TripHistories.applicable_end_datetime
+                AND
+                    {SQLOfCheckedDepos(checkedDepos)}
                 ORDER BY
                     TripHistories.trip_id, BranchNumbers.arrival_scheduled_time
             ";
@@ -558,6 +575,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     truck_id,
                     driver_name,
                     day_shift_start_time,
+                    depo_id,
                     applicable_start_datetime,
                     applicable_end_datetime,
                     created_at,
@@ -570,6 +588,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     '{model.TruckID}',
                     '{model.DriverName}',
                     '1900/01/01 {model.RegistDayShiftStartTime}:00',
+                    '{model.DepoID}',
                     '{model.ApplicableStartDateTime}',
                     '{model.ApplicableEndDateTime}',
                     '{formatCreatedAt}',
@@ -598,6 +617,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                driver_name = '{model.DriverName}',
 	                truck_id = {model.TruckID},
 	                day_shift_start_time = '1900/01/01 {model.RegistDayShiftStartTime}:00',
+                    depo_id = {model.DepoID},
 	                applicable_start_datetime = '{model.ApplicableStartDateTime}',
 	                applicable_end_datetime = '{model.ApplicableEndDateTime}',
                     updated_at = '{formatupdatedAt}',
@@ -657,6 +677,30 @@ namespace ai_truck_load_measurement.ConnectControllers
                 WHERE 
                     TripHistories.trip_history_id = {tripHistoryId}
             ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 選択されたデポを検索条件とするSQLを作成する
+        /// </summary>
+        /// <param name="checkedDepos">選択されたデポ</param>
+        /// <returns></returns>
+        private static string SQLOfCheckedDepos(List<string> checkedDepos)
+        {
+            var sql = "";
+            if (checkedDepos.Count > 0)
+            {
+                sql += "TripHistories.depo_id IN (";
+                for (int i = 0; i < checkedDepos.Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        sql += $", ";
+                    }
+                    sql += $"'{checkedDepos[i]}'";
+                }
+                sql += ")";
+            }
             return sql;
         }
     }
