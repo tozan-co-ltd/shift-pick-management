@@ -168,7 +168,7 @@
         if(top_model.mainDepoName != ""){
             console.log($("#stationTitle"));
             $("#stationTitle")[0].innerText = getStationTitle(top_model.mainDepoName);
-            $('#modalImage').attr("src", "/images/top/layout/" + top_model.mainDepoName + "layout.png");
+            $('#modalImage').attr("src", "/images/top/layout/depo" + top_model.mainDepoID + "layout.png");
         }
     });
 
@@ -243,7 +243,7 @@
                 if(depo[i].selected){
                     $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
                     selectedDepoID = depo[i].value;
-                    $('#modalImage').attr("src", "/images/top/layout/" + depo[i].innerText + "layout.png");
+                    $('#modalImage').attr("src", "/images/top/layout/depo" + depo[i].value + "layout.png");
                 }
             }
             onUpdateClick();
