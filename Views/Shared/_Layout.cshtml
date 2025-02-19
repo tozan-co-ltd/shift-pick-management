@@ -62,7 +62,13 @@
     <nav class="sb-topnav navbar navbar-expand navbar-dark @wrapperClass">
         <!-- Navbar Brand-->
         <a id="home-title" class="navbar-brand ps-3 navbar-logo" asp-controller="Top" asp-action="Index">
-            <img class="login-img card-img-top" src="~/images/webicon.png" /> AI荷量把握
+            <img class="login-img card-img-top" src="~/images/webicon.png" /> @{
+                var navBarText = "AI荷量把握";
+#if DEBUG
+                navBarText = "テスト環境";
+#endif
+                }
+                @navBarText
         </a>
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-angles-left"></i></button>

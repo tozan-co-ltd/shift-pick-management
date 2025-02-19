@@ -1107,3 +1107,7 @@ table.dataTable span.column_highlight {
     border-color: gray;
     padding-bottom: 0.25em;
 }
+
+.navbar-dark-test {
+    background-color: #D297FC; 
+}
