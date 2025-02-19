@@ -73,10 +73,10 @@
                                 <td>@item.DepoName</td>
                                 @if(item.AuthorizedKubun == 0)
                                 {
-                                    <td>管理者</td>
+                                    <td>なし</td>
                                 }else if(item.AuthorizedKubun == 1)
                                 {
-                                    <td>なし</td>
+                                    <td>管理者</td>
                                 }
                                 <td>@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
                                 <td>@item.UpdatedBy</td>
@@ -136,8 +136,8 @@
                                 <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input type="radio" class="mr-2" asp-for="AuthorizedKubun" value="0" name="AuthorizedKubun">権限あり
-                                <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" value="1" name="AuthorizedKubun" checked>権限なし
+                                <input type="radio" class="mr-2" asp-for="AuthorizedKubun" value="1" name="AuthorizedKubun">権限あり
+                                <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" value="0" name="AuthorizedKubun" checked>権限なし
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
@@ -241,9 +241,15 @@
                 $("#ADName").val(item.adName);
                 $("#DepoID").val(item.depoID);
                 var authorizedKubun = item.authorizedKubun;
-                document.getElementsByName("AuthorizedKubun")[authorizedKubun].checked = true;
-                console.log(document.getElementsByName("AuthorizedKubun")[authorizedKubun]);
+                AuthorizedKubunCheck(authorizedKubun);
             }
+        });
+    }
+
+    function AuthorizedKubunCheck(authorizedKubun) {
+        document.getElementsByName("AuthorizedKubun").forEach(function (item) {
+            if (item.value == authorizedKubun)
+                item.checked = true;
         });
     }
 
