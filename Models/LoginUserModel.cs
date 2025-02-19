@@ -13,5 +13,9 @@
         /// ユーザーのAD名
         /// </summary>
         public String ADName {  get; set; }
+        /// <summary>
+        /// ユーザーの権限区分
+        /// </summary>
+        public int AuthorizedKubun {  get; set; }
     }
 }

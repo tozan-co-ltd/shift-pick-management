@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using ai_truck_load_measurement.Commons;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 
 namespace ai_truck_load_measurement.Models
 {
@@ -174,6 +176,14 @@ namespace ai_truck_load_measurement.Models
             string currentMenuName = currentWebMenu.MenuName;
             return currentMenuName;
         }
+
+        public void GetBaseView(ClaimsPrincipal claimsPrincipal, ViewContext viewContext)
+        {
+            base.GetBaseView(claimsPrincipal, viewContext);
+            AuthorizedKubun = claimsPrincipal.Claims.ToList().Where(x => x.Type == "AuthorizedKubun").First().Value;
+        }
+
+        public string? AuthorizedKubun { get; set; }
     }
 
     /// <summary>
