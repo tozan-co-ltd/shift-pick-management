@@ -210,7 +210,7 @@
 
         // 適用終了日時を過ぎた便を表示するチェックボックスの値を取得
         var trip_model = @Html.Raw(Json.Serialize(Model));
-        $('input').prop('checked', trip_model.isCheckedBeforeApplicablePeriod);
+        $('input[id="isBeforeApplicablePeriod"]').prop('checked', trip_model.isCheckedBeforeApplicablePeriod);
         // デポチェックボックス追加
         addDepos(trip_model);
         depoCheckDisplay(trip_model);
@@ -222,10 +222,8 @@
     function onRegisterClick(page, tripHistoryID) {
         event.preventDefault();
         // チェックボックスの入力情報取得
-        var checkBox = false;
-        $('input:checked').each(function () {
-            checkBox = $(this).prop('checked');
-        });
+        var checkBox = $('input[id="isBeforeApplicablePeriod"]')[0].checked;
+
         location.href = "" + page + "/Register?isChecked=" + checkBox + "&id=" + tripHistoryID;
     }
 
