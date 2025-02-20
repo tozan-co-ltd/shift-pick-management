@@ -319,18 +319,14 @@ namespace ai_truck_load_measurement.ConnectControllers
                     arrival_load_img_path,
                     departure_load_img_path
                 FROM t_trip_records AS TripRecords
-                INNER JOIN
-                m_trip_histories AS TripHistories
-                ON
-                TripRecords.trip_id = TripHistories.trip_id
-                INNER JOIN
-                m_depos AS Depos
-                ON
-                TripHistories.depo_id = Depos.depo_id
-                INNER JOIN
+                JOIN
                 m_stations AS Stations
                 ON
-                TripRecords.station_id = Stations.station_id";
+                TripRecords.station_id = Stations.station_id
+                JOIN
+                m_depos AS Depos
+                ON
+                Stations.depo_id = Depos.depo_id";
             return sql;
         }
 
