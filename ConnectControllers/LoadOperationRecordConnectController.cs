@@ -137,10 +137,11 @@ namespace ai_truck_load_measurement.ConnectControllers
                     trip_record_id,
 	                trip_name,
 	                trip_branch_seq,
-	                driver_name,
+	                TripRecords.driver_name,
 	                station_id,
 	                truck_number,
 	                identify_number,
+                    Depos.name AS depo_name,
 	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
 	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
 	                work_day,
@@ -150,7 +151,15 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departure_load_class,
 	                arrival_load_img_path,
 	                departure_load_img_path
-                FROM t_trip_records
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+                m_trip_histories AS TripHistories
+                ON
+                TripRecords.trip_id = TripHistories.trip_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                TripHistories.depo_id = Depos.depo_id
                 WHERE ({selectedDays})
                 AND trip_name = '{tripName}'
             ";
@@ -170,10 +179,11 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT
 	                trip_name,
 	                trip_branch_seq,
-	                driver_name,
+	                TripRecords.driver_name,
 	                station_id,
 	                truck_number,
 	                identify_number,
+                    Depos.name AS depo_name,
 	                FORMAT(CONVERT(DATETIME, arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
 	                FORMAT(CONVERT(DATETIME, departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
 	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
@@ -183,7 +193,15 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departure_load_class,
 	                arrival_load_img_path,
 	                departure_load_img_path
-                FROM t_trip_records
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+                m_trip_histories AS TripHistories
+                ON
+                TripRecords.trip_id = TripHistories.trip_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                TripHistories.depo_id = Depos.depo_id
                 WHERE ({selectedDays})
                 AND trip_name = '{tripName}'
                 ORDER BY trip_name, work_day, trip_branch_seq
