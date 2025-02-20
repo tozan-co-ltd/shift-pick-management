@@ -824,7 +824,7 @@
 
             var checkBoxVal = "";
             // 入力があるチェックボックス取得
-            $('input:checked').each(function () {
+            $('input[name="chartCheckBoxes"]:checked').each(function () {
                 var r = $(this).val();
                 checkBoxVal += r;
             })
