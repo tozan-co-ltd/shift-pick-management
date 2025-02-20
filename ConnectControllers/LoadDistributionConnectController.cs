@@ -146,11 +146,11 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                arrival_load_img_path,
 	                departure_load_img_path
                 FROM t_trip_records AS TripRecords
-                JOIN
+                INNER JOIN
                 m_stations AS Stations
                 ON
                 TripRecords.station_id = Stations.station_id
-                JOIN
+                INNER JOIN
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id
@@ -195,11 +195,11 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                arrival_load_img_path,
 	                departure_load_img_path
                 FROM t_trip_records AS TripRecords
-                JOIN
+                INNER JOIN
                 m_stations AS Stations
                 ON
                 TripRecords.station_id = Stations.station_id
-                JOIN
+                INNER JOIN
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id

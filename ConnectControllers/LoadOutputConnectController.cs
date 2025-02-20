@@ -88,11 +88,11 @@ namespace ai_truck_load_measurement.ConnectControllers
                 FROM t_trip_records AS TripRecords";
             }
             sql += $@"
-                JOIN
+                INNER JOIN
                 m_stations AS Stations
                 ON
                 TripRecords.station_id = Stations.station_id
-                JOIN
+                INNER JOIN
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id
@@ -157,11 +157,11 @@ namespace ai_truck_load_measurement.ConnectControllers
                 FROM t_trip_records AS TripRecords";
             }
             sql += $@"
-                JOIN
+                INNER JOIN
                 m_stations AS Stations
                 ON
                 TripRecords.station_id = Stations.station_id
-                JOIN
+                INNER JOIN
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id
@@ -227,11 +227,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             }
 
             sql += $@"
-                JOIN
+                INNER JOIN
                 m_stations AS Stations
                 ON
                 TripRecords.station_id = Stations.station_id
-                JOIN
+                INNER JOIN
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id
