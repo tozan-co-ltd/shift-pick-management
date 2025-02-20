@@ -279,7 +279,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <th class=""font-weight-bold"">便名称<br></th>
                                 <th class=""font-weight-bold"">便枝番</th>
                                 <th class=""font-weight-bold"">乗務員</th>
-                                <th class=""font-weight-bold"">ステーション<br>ID</th>
+                                <th class=""font-weight-bold"">ステーション<br>名</th>
                                 <th class=""font-weight-bold"">車両<br>番号</th>
                                 <th class=""font-weight-bold"">識別<br>番号</th>
                                 <th class=""font-weight-bold"">デポ</th>
@@ -316,7 +316,7 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{item.TripName}</td>
                             <td>{item.TripBranchSeq}</td>
                             <td>{item.DriverName}</td>
-                            <td>{item.StationID}</td>
+                            <td>{item.StationName}</td>
                             <td>{truckNumber}</td>
                             <td>{item.IdentifyNumber}</td>
                             <td>{item.DepoName}</td>

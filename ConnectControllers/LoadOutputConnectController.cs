@@ -56,11 +56,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
             var sql = $@"
                 SELECT DISTINCT
-                    t_trip_records.trip_record_id,
+                    TripRecords.trip_record_id,
 	                trip_name,
 	                trip_branch_seq,
-	                t_trip_records.driver_name,
-	                station_id,
+	                driver_name,
+	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
                     Depos.name AS depo_name,
@@ -78,24 +78,24 @@ namespace ai_truck_load_measurement.ConnectControllers
             {
                 sql += $@"
                 FROM t_annotation_loads
-                INNER JOIN t_trip_records
-                ON t_annotation_loads.trip_record_id = t_trip_records.trip_record_id
+                INNER JOIN t_trip_records AS TripRecords
+                ON t_annotation_loads.trip_record_id = TripRecords.trip_record_id
                 ";
             }
             else
             {
                 sql += $@"
-                FROM t_trip_records";
+                FROM t_trip_records AS TripRecords";
             }
             sql += $@"
                 INNER JOIN
-	                m_trip_histories AS TripHistories
-                ON 
-	                t_trip_records.trip_id = TripHistories.trip_id
+                m_stations AS Stations
+                ON
+                TripRecords.station_id = Stations.station_id
                 INNER JOIN
                 m_depos AS Depos
                 ON
-                TripHistories.depo_id = Depos.depo_id
+                Stations.depo_id = Depos.depo_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
             ";
             if (hasTripName)
@@ -125,11 +125,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
             var sql = $@"
                 SELECT
-                    t_trip_records.trip_record_id,
+                    TripRecords.trip_record_id,
 	                trip_name,
 	                trip_branch_seq,
-	                t_trip_records.driver_name,
-	                station_id,
+	                TripRecords.driver_name,
+	                TripRecords.station_id,
 	                truck_number,
 	                identify_number,
 	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
@@ -146,25 +146,25 @@ namespace ai_truck_load_measurement.ConnectControllers
             {
                 sql += $@"
                     ,arrival_departure_class
-                FROM t_annotation_loads
-                INNER JOIN t_trip_records
-                ON t_annotation_loads.trip_record_id = t_trip_records.trip_record_id
-                INNER JOIN
-                m_depos AS Depos
-                ON
-                TripHistories.depo_id = Depos.depo_id
+                FROM t_annotation_loads 
+                INNER JOIN t_trip_records AS TripRecords
+                ON t_annotation_loads.trip_record_id = TripRecords.trip_record_id
                 ";
             }
             else
             {
                 sql += $@"
-                FROM t_trip_records";
+                FROM t_trip_records AS TripRecords";
             }
             sql += $@"
                 INNER JOIN
-	                m_trip_histories AS TripHistories
-                ON 
-	                t_trip_records.trip_id = TripHistories.trip_id
+                m_stations AS Stations
+                ON
+                TripRecords.station_id = Stations.station_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                Stations.depo_id = Depos.depo_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
             if (hasTripName)
             {
@@ -197,8 +197,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT
 	                trip_name,
 	                trip_branch_seq,
-	                t_trip_records.driver_name,
-	                station_id,
+	                driver_name,
+	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
                     Depos.name AS depo_name,
@@ -216,25 +216,25 @@ namespace ai_truck_load_measurement.ConnectControllers
             {
                 sql += $@"
                 FROM t_annotation_loads
-                INNER JOIN t_trip_records
-                ON t_annotation_loads.trip_record_id = t_trip_records.trip_record_id
+                INNER JOIN t_trip_records AS TripRecords
+                ON t_annotation_loads.trip_record_id = TripRecords.trip_record_id
                 ";
             }
             else
             {
                 sql += $@"
-                FROM t_trip_records";
+                FROM t_trip_records AS TripRecords";
             }
 
             sql += $@"
                 INNER JOIN
-	                m_trip_histories AS TripHistories
-                ON 
-	                t_trip_records.trip_id = TripHistories.trip_id
+                m_stations AS Stations
+                ON
+                TripRecords.station_id = Stations.station_id
                 INNER JOIN
                 m_depos AS Depos
                 ON
-                TripHistories.depo_id = Depos.depo_id
+                Stations.depo_id = Depos.depo_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
             if (hasTripName)
             {
@@ -258,7 +258,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = "";
             if (checkedDepos.Count > 0)
             {
-                sql += "AND TripHistories.depo_id IN (";
+                sql += "AND Depos.depo_id IN (";
                 for (int i = 0; i < checkedDepos.Count; i++)
                 {
                     if (i != 0)

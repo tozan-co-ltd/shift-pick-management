@@ -16,6 +16,8 @@ namespace ai_truck_load_measurement.Models
         public string? DriverName { get; set; }
         // ステーションID
         public int StationID { get; set; }
+        // ステーション名
+        public string? StationName { get; set; }
         // 車両番号
         public string? TruckNumber { get; set; }
         // 識別番号

@@ -132,7 +132,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                trip_name,
 	                trip_branch_seq,
 	                TripRecords.driver_name,
-	                station_id,
+	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
                     Depos.name AS depo_name,
@@ -147,13 +147,13 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departure_load_img_path
                 FROM t_trip_records AS TripRecords
                 INNER JOIN
-                m_trip_histories AS TripHistories
+                m_stations AS Stations
                 ON
-                TripRecords.trip_id = TripHistories.trip_id
+                TripRecords.station_id = Stations.station_id
                 INNER JOIN
                 m_depos AS Depos
                 ON
-                TripHistories.depo_id = Depos.depo_id
+                Stations.depo_id = Depos.depo_id
                 WHERE ({selectedTrips})
                 AND work_day BETWEEN '{startOfPeriod}' AND '{endOfPeriod}'
                 AND ((departure_load_class BETWEEN {minLoadClass} AND {maxLoadClass})
@@ -181,7 +181,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                trip_name,
 	                trip_branch_seq,
 	                TripRecords.driver_name,
-	                station_id,
+	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
                     Depos.name AS depo_name,
@@ -196,13 +196,13 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departure_load_img_path
                 FROM t_trip_records AS TripRecords
                 INNER JOIN
-                m_trip_histories AS TripHistories
+                m_stations AS Stations
                 ON
-                TripRecords.trip_id = TripHistories.trip_id
+                TripRecords.station_id = Stations.station_id
                 INNER JOIN
                 m_depos AS Depos
                 ON
-                TripHistories.depo_id = Depos.depo_id
+                Stations.depo_id = Depos.depo_id
                 WHERE ({selectedTrips})
                 AND work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 AND ((departure_load_class BETWEEN {minLoadClass} AND {maxLoadClass})
