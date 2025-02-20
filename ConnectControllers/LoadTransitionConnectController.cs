@@ -82,7 +82,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                trip_name,
 	                trip_branch_seq,
 	                TripRecords.driver_name,
-	                station_id,
+	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
                     Depos.name AS depo_name,
@@ -104,6 +104,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_depos AS Depos
                 ON
                 TripHistories.depo_id = Depos.depo_id
+                INNER JOIN
+                m_stations AS Stations
+                ON
+                TripRecords.station_id = Stations.station_id
                 WHERE ({selectedTrips})
                 AND work_day BETWEEN '{startOfPeriod}' AND '{endOfPeriod}'
             ";
@@ -127,7 +131,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                trip_name,
 	                trip_branch_seq,
 	                TripRecords.driver_name,
-	                station_id,
+	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
                     Depos.name AS depo_name,
@@ -149,6 +153,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_depos AS Depos
                 ON
                 TripHistories.depo_id = Depos.depo_id
+                INNER JOIN
+                m_stations AS Stations
+                ON
+                TripRecords.station_id = Stations.station_id
                 WHERE ({selectedTrips})
                 AND work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 ORDER BY trip_name, work_day, trip_branch_seq
