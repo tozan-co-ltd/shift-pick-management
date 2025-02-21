@@ -516,6 +516,19 @@ namespace ai_truck_load_measurement.Commons
         /// <returns>作成結果</returns>
         public static bool CreateTwoSheetExcel(DataTable dt, DataTable dtTwo, string exportfileFullPath, List<string> headerList, List<string> headerListTwo, string sheetName, string sheetName2)
         {
+
+            // 出力ファイルパスが未指定の場合は中断する
+            if (String.IsNullOrWhiteSpace(exportfileFullPath))
+            {
+                return false;
+            }
+
+            // 既にファイルが存在している場合は削除する
+            if (File.Exists(exportfileFullPath))
+            {
+                File.Delete(exportfileFullPath);
+            }
+
             // データがない場合はヘッダーのみ作成
             if (dt == null || dt.Rows.Count == 0)
             {
@@ -567,17 +580,7 @@ namespace ai_truck_load_measurement.Commons
                 return true;
             }
 
-            // 出力ファイルパスが未指定の場合は中断する
-            if (String.IsNullOrWhiteSpace(exportfileFullPath))
-            {
-                return false;
-            }
-
-            // 既にファイルが存在している場合は削除する
-            if (File.Exists(exportfileFullPath))
-            {
-                File.Delete(exportfileFullPath);
-            }
+            
 
             try
             {
@@ -676,9 +679,21 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("乗務員");
                     headerList.Add("車両番号");
                     headerList.Add("識別番号");
+                    headerList.Add("デポ");
                     headerList.Add("昼勤開始時間");
                     headerList.Add("適用開始日時");
                     headerList.Add("適用終了日時");
+                    headerList.Add("作成日時");
+                    headerList.Add("作成者");
+                    headerList.Add("更新日時");
+                    headerList.Add("更新者");
+                    break;
+                case "ユーザーマスター":
+                    headerList.Add("ユーザーID");
+                    headerList.Add("AD名");
+                    headerList.Add("デポ名");
+                    headerList.Add("管理権限");
+                    headerList.Add("削除フラグ");
                     headerList.Add("作成日時");
                     headerList.Add("作成者");
                     headerList.Add("更新日時");
@@ -730,9 +745,10 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("便名称");
                     headerList.Add("便枝番");
                     headerList.Add("乗務員");
-                    headerList.Add("ステーションID");
+                    headerList.Add("ステーション名");
                     headerList.Add("車両番号");
                     headerList.Add("識別番号");
+                    headerList.Add("デポ名");
                     headerList.Add("到着予定時間");
                     headerList.Add("出発予定時間");
                     headerList.Add("稼働日");

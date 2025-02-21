@@ -44,17 +44,34 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="workDays">稼働日のリスト</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectTripNameFromWorkDays(List<DateTime> workDays)
+        public static string CreateSQLToSelectTripNameFromWorkDays(List<DateTime> workDays, List<string> checkedDepos)
         {
             var selectedDays = SelectedDaysSQL(workDays);
             var sql = $@"
                 SELECT DISTINCT
 	                trip_name AS Value,
 	                trip_name AS Text
-                FROM t_trip_records
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+	                m_trip_histories AS TripHistories
+                ON 
+	                TripRecords.trip_id = TripHistories.trip_id
                 WHERE ({selectedDays})
                 AND trip_name IS NOT NULL
-";
+            ";
+            if (checkedDepos[0] != "0")
+            {
+                sql += "AND (";
+                for (int i = 0; i < checkedDepos.Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        sql += $" OR ";
+                    }
+                    sql += $"depo_id = {checkedDepos[i]}";
+                }
+                sql += ")";
+            }
             return sql;
         }
 
@@ -120,10 +137,11 @@ namespace ai_truck_load_measurement.ConnectControllers
                     trip_record_id,
 	                trip_name,
 	                trip_branch_seq,
-	                driver_name,
-	                station_id,
+	                TripRecords.driver_name,
+	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
+                    Depos.name AS depo_name,
 	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
 	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
 	                work_day,
@@ -133,7 +151,15 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departure_load_class,
 	                arrival_load_img_path,
 	                departure_load_img_path
-                FROM t_trip_records
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+                m_stations AS Stations
+                ON
+                TripRecords.station_id = Stations.station_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                Stations.depo_id = Depos.depo_id
                 WHERE ({selectedDays})
                 AND trip_name = '{tripName}'
             ";
@@ -153,10 +179,11 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT
 	                trip_name,
 	                trip_branch_seq,
-	                driver_name,
-	                station_id,
+	                TripRecords.driver_name,
+	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
+                    Depos.name AS depo_name,
 	                FORMAT(CONVERT(DATETIME, arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
 	                FORMAT(CONVERT(DATETIME, departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
 	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
@@ -166,7 +193,15 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departure_load_class,
 	                arrival_load_img_path,
 	                departure_load_img_path
-                FROM t_trip_records
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+                m_stations AS Stations
+                ON
+                TripRecords.station_id = Stations.station_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                Stations.depo_id = Depos.depo_id
                 WHERE ({selectedDays})
                 AND trip_name = '{tripName}'
                 ORDER BY trip_name, work_day, trip_branch_seq

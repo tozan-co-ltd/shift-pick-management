@@ -302,22 +302,31 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 SELECT
                     trip_record_id,
-	                trip_name,
-	                trip_branch_seq,
-	                driver_name,
-	                station_id,
-	                truck_number,
-	                identify_number,
-	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
-	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
-	                work_day,
-	                arrived_at,
-	                departed_at,
-	                arrival_load_class,
-	                departure_load_class,
-	                arrival_load_img_path,
-	                departure_load_img_path
-                FROM t_trip_records";
+                    trip_name,
+                    trip_branch_seq,
+                    TripRecords.driver_name,
+	                Stations.name AS station_name,
+                    truck_number,
+                    identify_number,
+	                Depos.name AS depo_name,
+                    CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
+                    CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+                    work_day,
+                    arrived_at,
+                    departed_at,
+                    arrival_load_class,
+                    departure_load_class,
+                    arrival_load_img_path,
+                    departure_load_img_path
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+                m_stations AS Stations
+                ON
+                TripRecords.station_id = Stations.station_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                Stations.depo_id = Depos.depo_id";
             return sql;
         }
 
@@ -327,7 +336,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="startOfPeriod">期間開始日</param>
         /// <param name="endOfPeriod">期間終了日</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod)
+        public static string CreateSQLToSelectTripNameFromPeriod(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
@@ -335,10 +344,30 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT DISTINCT
 	                trip_name ,
 	                trip_branch_seq
-                FROM t_trip_records
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+	                m_trip_histories AS TripHistories
+                ON 
+	                TripRecords.trip_id = TripHistories.trip_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 AND trip_name IS NOT NULL
             ";
+            if(checkedDepos.Count != 0 )
+            {
+                if (checkedDepos[0] != "0")
+                {
+                    sql += "AND (";
+                    for (int i = 0; i < checkedDepos.Count; i++)
+                    {
+                        if (i != 0)
+                        {
+                            sql += $" OR ";
+                        }
+                        sql += $"depo_id = {checkedDepos[i]}";
+                    }
+                    sql += ")";
+                }
+            }
             return sql;
         }
 
@@ -445,6 +474,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+       
         /// <summary>
         /// 荷量の相違ありテーブルの到着出発クラスに保存する値
         /// </summary>
@@ -462,6 +492,35 @@ namespace ai_truck_load_measurement.ConnectControllers
                 arrivalOrDeparture = "departure";
             }
             return arrivalOrDeparture;
+        }
+
+        /// <summary>
+        /// デポIDリストからデポ名リストを取得するSQLを生成する
+        /// </summary>
+        /// <param name="depoIDs">デポIDリスト</param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectDepoNameFromDepoID(List<string> depoIDs)
+        {
+            var sql = $@"
+                SELECT
+                    name AS depo_name
+                FROM
+                    m_depos
+            ";
+            if (depoIDs.Count != 0)
+            {
+                sql +="WHERE ";
+                for (int i = 0; i < depoIDs.Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        sql += " OR ";
+                    }
+                    sql += $@"depo_id = {depoIDs[i]}";
+                }
+            }
+            
+            return sql;
         }
     }
 }

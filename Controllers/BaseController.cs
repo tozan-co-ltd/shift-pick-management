@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.ConnectControllers;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -16,7 +17,8 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     var loginUserModel = new LoginUserModel
                     {
-                        UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value
+                        UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
+                        ADName = claimsLoginUserList.Where(x => x.Type == "ADName").First().Value
                     };
                     return loginUserModel;
                 }
@@ -26,6 +28,20 @@ namespace ai_truck_load_measurement.Controllers
             {
                 throw;
             }
+        }
+
+        public M_DepoModel GetMainDepo()
+        {
+            M_DepoModel model = new M_DepoModel();
+            var user = ClaimsLoginUserData();
+            var sql = M_DepoConnectController.CreateSQLToSelectDepoFromADName(user.ADName);
+            var depoList = M_DepoConnectController.ConnectMDepos(sql);
+            if (depoList.Count > 0)
+            {
+                model = depoList[0];
+            }
+            return model;
+            
         }
 
     }

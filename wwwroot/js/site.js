@@ -469,8 +469,8 @@ function EditModal(tripRecordID, isArrived, page) {
                     + "<td>乗務員</td>"
                     + "<td>" + item.driverName + "</td>"
                     + "</tr><tr>"
-                    + "<td>ステーションID</td>"
-                    + "<td>" + item.stationID + "</td>"
+                    + "<td>ステーション名</td>"
+                    + "<td>" + item.stationName + "</td>"
                     + "</tr><tr>"
                     + "<td>車両番号</td>"
                     + "<td>" + truckNumber + "</td>"
@@ -494,13 +494,8 @@ function EditModal(tripRecordID, isArrived, page) {
                 }
 
             }).fail(function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 404) {
-                    var errorMessage = jqXHR.responseJSON.errorMessage;
-                    $("#edit-modal-error-message").text(errorMessage);
-                } else {
-                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#edit-modal-error-message").text(errorMessage);
-                }
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
             });
 
         }
@@ -540,13 +535,8 @@ function onVerificationRequiredClick(tripRecordID, isArrived, page) {
             // 完了モーダル表示
             alert('登録が完了しました。');
         }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 404) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#edit-modal-error-message").text(errorMessage);
-            } else {
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#edit-modal-error-message").text(errorMessage);
-            }
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#edit-modal-error-message").text(errorMessage);
         });
     }
 }
@@ -615,13 +605,8 @@ function tableDisplayCommon(page, data) {
             body.highlight(table.search());
         });
     }).fail(function (jqXHR, textStatus, errorThrown) {
-        if (jqXHR.status === 404) {
-            var errorMessage = jqXHR.responseJSON.errorMessage;
-            $("#edit-modal-error-message").text(errorMessage);
-        } else {
-            var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-            $("#edit-modal-error-message").text(errorMessage);
-        }
+        var errorMessage = jqXHR.responseJSON.errorMessage;
+        $("#edit-modal-error-message").text(errorMessage);
     });
 }
 
@@ -651,13 +636,8 @@ function onExportAllImagesCommon(page, data) {
             link.click();
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
-        if (jqXHR.status === 404) {
-            var errorMessage = jqXHR.responseJSON.errorMessage;
-            $("#div-error-message").text(errorMessage);
-        } else {
-            var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-            $("#div-error-message").text(errorMessage);
-        }
+        var errorMessage = jqXHR.responseJSON.errorMessage;
+        $("#div-error-message").text(errorMessage);
     });
 }
 //-------------------------------------------------------------------//
@@ -831,27 +811,33 @@ function clearTrips() {
     arrayWorkDays = [];
 }
 
+function condtionChange(page) {
+
+}
+
 // 期間変更時
 function periodChange(page) {
     // 期間の開始、終了日付の取得
     var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
     var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
+    var checkedDepos = getCheckedDepos();
+
     // 選択中の便名称取得
     var currentTripName = $('[name=TripName]').val();
 
     // 便選択の選択肢の生成
-    createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page);
+    createToggleSelectCheckBox(startOfPeriod, endOfPeriod, checkedDepos, page);
 }
 
 // 便選択の選択肢の生成
-function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page) {
+function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, checkedDepos, page) {
 
     // フォーム情報取得
     let url = window.location.href + '/GetTripNameAndBranchSeqHTML';
     url = url.replace(page, 'LoadRecord');
     let method = 'Post';
-    let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod };
+    let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, checkedDepos: checkedDepos };
 
     // Ajax call
     $.ajax({
@@ -878,7 +864,7 @@ function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page) {
 
         // チェックボックス切り替え時のイベント設定
         $(function () {
-            $('input').change(function () {
+            $('input[name="tripNameAndBranchSeq"]').change(function () {
                 // デフォルトの操作を無効化
                 event.preventDefault();
 
@@ -909,5 +895,5 @@ function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, page) {
         }
     });
 
-
+    
 }

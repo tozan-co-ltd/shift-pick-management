@@ -34,6 +34,15 @@
 
         <form id="loadOperationRecordForm">
             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                    <span class="warehouse-name-drs span-paragraph">デポ</span>
+                    <div>
+                        <label class="mr-2"><input type="checkbox" class=" mr-2" id="allDepo" />すべて  [</label>
+                        <label id="selectDepos"></label>]
+                    </div>
+                </div>
+            </div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3">
                     <span class="warehouse-name-drs span-paragraph">稼働日選択</span>
                     <input type="text" id="workDay" class="form-control pickerDateForLoadOperationRecord" style="width:170px;">
@@ -458,6 +467,8 @@
         $('#workDay').val(GetDayString(today));
         var y = today.getFullYear();
         $('#graphAndTable').css('display', 'none');
+        addDepos(model);
+        depoCheckDisplay(model);
     })
 
     // 稼働日の日付変更時
@@ -484,10 +495,13 @@
             select.removeChild(select.firstChild);
         }
 
+        // デポ情報取得
+        var checkedDepos = getCheckedDepos();
+
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetTripNameFromWorkDay", "LoadOperationRecord")';
         let method = 'Post';
-        let data = { workDays: arrayWorkDays};
+        let data = { workDays: arrayWorkDays, checkedDepos: checkedDepos};
 
         // Ajax call
         $.ajax({
@@ -809,7 +823,7 @@
 
             var checkBoxVal = "";
             // 入力があるチェックボックス取得
-            $('input:checked').each(function () {
+            $('input[name="chartCheckBoxes"]:checked').each(function () {
                 var r = $(this).val();
                 checkBoxVal += r;
             })
@@ -861,11 +875,16 @@
         // 便名称取得
         var tripName = $('[name=TripName]').val();
 
+
+        // デポ情報取得
+        var checkedDepos = getCheckedDepos();
+
         // フォーム情報取得
         let data = {
             download: "download",
             workDays: arrayWorkDays,
-            selectedTripName: tripName
+            selectedTripName: tripName,
+            checkedDepos: checkedDepos
         };
 
         onExportAllImagesCommon(page, data);
@@ -878,14 +897,89 @@
         // 便名称取得
         var tripName = $('[name=TripName]').val();
 
+        // デポ情報取得
+        var checkedDepos = getCheckedDepos();
+
         // フォーム情報取得
         let data = {
             "gamenName": gamenName,
             workDays: arrayWorkDays,
-            tripName: tripName
+            tripName: tripName,
+            checkedDepos: checkedDepos
         };
 
         // Excel出力共通処理
         onExportFileTripsCommon(page, data);
+    }
+
+    // デポの選択用チェックボックスを生成
+    function addDepos(model) {
+        var selectDepos = $("#selectDepos")[0];
+        model.mDepoList.forEach(depo => {
+            if (depo.value == null)
+                return;
+            var depoLabel = document.createElement("label");
+            depoLabel.innerHTML += "<input type=\"checkbox\" class=\"mr-2\" name=\"depos\" id=\"depo" + depo.value + "\" value=\"" + depo.value + "\" />" + depo.text;
+            depoLabel.className += "mr-3 ";
+            selectDepos.appendChild(depoLabel);
+
+
+        })
+    }
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        var depos = $('input[name="depos"]');
+        for (var i = 0; i < depos.length; i++) {
+            if ($('input[id=allDepo]')[0].checked) {
+                depos[i].checked = true;
+            } else {
+                depos[i].checked = false;
+            }
+        }
+        periodChangeOperationLecord()
+    });
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            var depos = $('input[name=depos]');
+            for (var i = 0; i < depos.length; i++) {
+                if (!depos[i].checked) {
+                    $('input[id=allDepo]')[0].checked = false;
+                    break;
+                }
+            }
+            periodChangeOperationLecord()
+        });
+    })
+
+    // 画面表示時にログインユーザーのメインデポにチェックを入れる
+    function depoCheckDisplay(model) {
+        console.log("start");
+        var mainDepoID = model.mainDepoID;
+        if (mainDepoID == 0)
+            return;
+        var depos = $('input[name=depos]');
+        console.log(mainDepoID);
+        console.log(depos);
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].id == "depo" + mainDepoID) {
+                depos[i].checked = true;
+            }
+        }
+    }
+
+    // 選択されたデポのIDリストを取得する
+    function getCheckedDepos() {
+        var depos = $('input[name=depos]');
+        var checkedDepos = [];
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].checked) {
+                checkedDepos.push(depos[i].value);
+            }
+        }
+        console.log(checkedDepos);
+        return checkedDepos;
     }
 </script>

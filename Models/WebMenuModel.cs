@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using ai_truck_load_measurement.Commons;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 
 namespace ai_truck_load_measurement.Models
 {
@@ -18,6 +20,7 @@ namespace ai_truck_load_measurement.Models
             new M_WebMenu{CategoryID = 2, MenuID = 1, MenuName = "車両マスター", Controller = "M_Truck", Action = "Index"},
             new M_WebMenu{CategoryID = 2, MenuID = 2, MenuName = "便マスター", Controller = "M_Trip", Action = "Index"},
             new M_WebMenu{CategoryID = 2, MenuID = 3, MenuName = "便枝番マスター", Controller = "M_TripBranchNumber", Action = "Index"},
+            new M_WebMenu{CategoryID = 2, MenuID = 4, MenuName = "ユーザーマスター", Controller = "M_User", Action = "Index"},
         };
 
         /// <summary>
@@ -173,6 +176,14 @@ namespace ai_truck_load_measurement.Models
             string currentMenuName = currentWebMenu.MenuName;
             return currentMenuName;
         }
+
+        public void GetBaseView(ClaimsPrincipal claimsPrincipal, ViewContext viewContext)
+        {
+            base.GetBaseView(claimsPrincipal, viewContext);
+            AuthorizedKubun = claimsPrincipal.Claims.ToList().Where(x => x.Type == "AuthorizedKubun").First().Value;
+        }
+
+        public string? AuthorizedKubun { get; set; }
     }
 
     /// <summary>

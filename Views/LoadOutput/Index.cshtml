@@ -17,7 +17,7 @@
                     <div class="card-body">
                         <ul class="mb-0">
                             <li>最長90日の期間が検索できます。</li>
-                            <li>便枝番とは、便がSyncBaceへ訪問した回数を示すために昼勤開始時間から順に割り当てた番号です。</li>
+                            <li>便枝番とは、便が各拠点へ訪問した回数を示すために昼勤開始時間から順に割り当てた番号です。</li>
                         </ul>
                     </div>
                 </div>
@@ -31,6 +31,15 @@
             {
                 <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
             }
+        </div>
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">デポ</span>
+                <div>
+                    <label class="mr-2"><input type="checkbox" class=" mr-2" id="allDepo" />すべて  [</label>
+                    <label id="selectDepos"></label>]
+                </div>
+            </div>
         </div>
 
         <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
@@ -74,9 +83,9 @@
         </div>
 
         <div class="mb-3">
-            <label><input type="checkbox" class=" mr-2" id="isOnlyHasAmountDefference" />荷量の相違あり</label>
-            <label><input type="checkbox" class="ml-3 mr-2" id="hasTripName" />便名称あり</label>
-            <label><input type="checkbox" class="ml-3 mr-2" id="hasIdentifyNumber" />識別番号あり</label>
+            <label><input type="checkbox" class=" mr-2" id="isOnlyHasAmountDefference" name="searchCondition"/>荷量の相違あり</label>
+            <label><input type="checkbox" class="ml-3 mr-2" id="hasTripName" name="searchCondition"/>便名称あり</label>
+            <label><input type="checkbox" class="ml-3 mr-2" id="hasIdentifyNumber" name="searchCondition" />識別番号あり</label>
         </div>
 
         <div class="mt-3" id="tripRecordTable">
@@ -121,12 +130,14 @@
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
+        addDepos(model);
+        depoCheckDisplay(model);
         tableDisplay('LoadOutput');
     });
 
 
     // チェックボックス押下時
-    $('input[type="checkbox"]').change(function () {
+    $('input[name="searchCondition"]').change(function () {
         DeleteErrorMessages();
         if (isWithin90Days()) {
             tableDisplay('LoadOutput');
@@ -157,16 +168,21 @@
         var hasTripName = $('#hasTripName')[0].checked;
         var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
 
+
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
         var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // デポ情報取得
+        var checkedDepos = getCheckedDepos();
 
         // テーブル表示用データ作成
         let data = { startOfPeriod: startOfPeriod,
             endOfPeriod: endOfPeriod, 
             isOnlyHasAmountDefference: isOnlyHasAmountDefference, 
             hasTripName: hasTripName,
-            hasIdentifyNumber: hasIdentifyNumber
+            hasIdentifyNumber: hasIdentifyNumber,
+            checkedDepos: checkedDepos
         };
 
         tableDisplayCommon(page, data);
@@ -186,6 +202,9 @@
             var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
+
             // フォーム情報取得
             let data = {
                 "gamenName": gamenName,
@@ -193,7 +212,8 @@
                 "endOfPeriod": endOfPeriod,
                 "isOnlyHasAmountDefference": isOnlyHasAmountDefference,
                 hasTripName: hasTripName,
-                hasIdentifyNumber: hasIdentifyNumber
+                hasIdentifyNumber: hasIdentifyNumber,
+                checkedDepos: checkedDepos
             };
 
             // Excel出力共通処理
@@ -219,13 +239,17 @@
             var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
             var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
+
             let data = { 
                 download: "download", 
                 startOfPeriod: startOfPeriod, 
                 endOfPeriod: endOfPeriod, 
                 isOnlyHasAmountDefference: isOnlyHasAmountDefference,
                 hasTripName: hasTripName,
-                hasIdentifyNumber: hasIdentifyNumber
+                hasIdentifyNumber: hasIdentifyNumber,
+                checkedDepos: checkedDepos
             };
 
             onExportAllImagesCommon(page, data);
@@ -236,4 +260,79 @@
         }
     }
 
+    // デポの選択用チェックボックスを生成
+    function addDepos(model) {
+        var selectDepos = $("#selectDepos")[0];
+        model.mDepoList.forEach(depo => {
+            if (depo.value == null)
+                return;
+            var depoLabel = document.createElement("label");
+            depoLabel.innerHTML += "<input type=\"checkbox\" class=\"mr-2\" name=\"depos\" id=\"depo" + depo.value + "\" value=\"" + depo.value + "\" >" + depo.text + "</input>";
+            depoLabel.className += "mr-3 ";
+            selectDepos.appendChild(depoLabel);
+
+
+        })
+    }
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        var depos = $('input[name="depos"]');
+        for (var i = 0; i < depos.length; i++) {
+            if ($('input[id=allDepo]')[0].checked) {
+                depos[i].checked = true;
+            } else {
+                depos[i].checked = false;
+            }
+        }
+    });
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            var depos = $('input[name=depos]');
+            for (var i = 0; i < depos.length; i++) {
+                if (!depos[i].checked) {
+                    $('input[id=allDepo]')[0].checked = false;
+                    break;
+                }
+            }
+        });
+    })
+
+    // 画面表示時にログインユーザーのメインデポにチェックを入れる
+    function depoCheckDisplay(model) {
+        var mainDepoID = model.mainDepoID;
+        if (mainDepoID == 0)
+            return;
+        var depos = $('input[name=depos]');
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].id == "depo" + mainDepoID) {
+                depos[i].checked = true;
+            }
+        }
+    }
+
+    // 選択されたデポのIDリストを取得する
+    function getCheckedDepos() {
+        var depos = $('input[name=depos]');
+        var checkedDepos = [];
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].checked) {
+                checkedDepos.push(depos[i].value);
+            }
+        }
+        return checkedDepos;
+    }
+
+    // function getCheckedDeposName(){
+    //     var depos = $('input[name=depos]');
+    //     var checkedDeposName = [];
+    //     for (var i = 0; i < depos.length; i++) {
+    //         if (depos[i].checked) {
+    //             checkedDeposName.push(depos[i].innerText);
+    //         }
+    //     }
+    //     return checkedDeposName;
+    // }
 </script>

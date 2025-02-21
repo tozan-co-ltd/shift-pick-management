@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
 using ai_truck_load_measurement.Commons;
 using System.Data;
+using Dapper;
+using DocumentFormat.OpenXml.Office.CustomUI;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -34,10 +36,21 @@ namespace ai_truck_load_measurement.Controllers
             
             try
             {
-                // 便マスター情報取得SQL作成
-                var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod);
-                // DB接続
-                IEnumerable<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(sql);
+                // ログインユーザーのメインデポ情報取得
+                var mainDepo = GetMainDepo();
+                model.MainDepo = mainDepo;
+                List<string> depoList = new();
+                depoList.Add(mainDepo.DepoID.ToString());
+
+                IEnumerable<M_TripModel> tripList = new List<M_TripModel>();
+
+                if (depoList.Count > 0)
+                {
+                    // 便マスター情報取得SQL作成
+                    var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod, depoList);
+                    // DB接続
+                    tripList = M_TripConnectController.ConnectMTrips(sql);
+                }
 
                 model.M_TripList = tripList.ToPagedList();
 
@@ -56,16 +69,19 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
         /// <returns></returns>
-        public IActionResult SearchData(bool isBeforeApplicablePeriod)
+        public IActionResult SearchData(bool isBeforeApplicablePeriod, List<string> checkedDepos)
         {
             var searchData = string.Empty;
             List<M_TripModel> tripList = new();
             try
             {
-                // 便マスター情報取得SQL作成
-                var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod);
-                // DB接続
-                tripList = M_TripConnectController.ConnectMTrips(sql);
+                if (checkedDepos.Count > 0)
+                {
+                    // 便マスター情報取得SQL作成
+                    var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod, checkedDepos);
+                    // DB接続
+                    tripList = M_TripConnectController.ConnectMTrips(sql);
+                }
 
                 searchData += $@"
                     <div class=""mt-3"">
@@ -78,6 +94,7 @@ namespace ai_truck_load_measurement.Controllers
                                     <th class=""font-weight-bold"">乗務員</th>
                                     <th class=""font-weight-bold"">車両番号</th>
                                     <th class=""font-weight-bold"">識別番号</th>
+                                    <th class=""font-weight-bold"">デポ</th>
                                     <th class=""font-weight-bold"">昼勤開始時間</th>
                                     <th class=""font-weight-bold"">適用開始日時</th>
                                     <th class=""font-weight-bold"">適用終了日時</th>
@@ -108,6 +125,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{@item.DriverName}</td>
                                 <td>{@item.TruckNumber}</td>
                                 <td>{@item.IdentifyNumber}</td>
+                                <td>{@item.DepoName}</td>
                                 <td>{@item.DayShiftStartTime.ToString("HH:mm")}</td>
                                 <td>{@item.ApplicableStartDateTime.ToString("yyyy/MM/dd HH:mm")}</td>
                                 <td>{@item.ApplicableEndDateTime.ToString("yyyy/MM/dd HH:mm")}</td>
@@ -165,6 +183,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 車両マスター情報取得
                 var truckSql = M_TruckConnectController.CreateSQLToSelectMTrucks();
                 IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(truckSql);
+
                 // 車両番号のセレクトリスト作成
                 foreach (var truck in truckList)
                 {
@@ -346,20 +365,28 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="gamenName">現在の画面名</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, bool isBeforeApplicablePeriod, DateTime referenceDate)
+        public JsonResult ExportFile(string gamenName, bool isBeforeApplicablePeriod, DateTime referenceDate, List<string> checkedDepos)
         {
             string? errorMessage;
             try
             {
-                // 便マスター情報取得
-                var mTripSql = M_TripConnectController.CreateSQLToSelectMTripsForDataTable(isBeforeApplicablePeriod, referenceDate);
-                DataTable mTripDT = M_TripConnectController.ConnectMTripsToDataTable(mTripSql);
+                DataTable mTripDT = new DataTable(); // 便マスター用データテーブル
+                DataTable mTripBranchDT = new DataTable(); // 便枝番マスター用データテーブル
+                DataTable mTripBranchConsecutiveDT = new DataTable();
 
-                // 便枝番マスター情報取得
-                var mTripBranchSql = M_TripConnectController.CreateSQLToSelectMTripBranchesForDataTable(referenceDate);
-                DataTable mTripBranchDT = M_TripConnectController.ConnectMTripsToDataTable(mTripBranchSql);
-                // 便枝番マスターに枝連番列を追加
-                var mTripBranchConsecutiveDT = SortDataTableFromBranchConsecutiveNumber(mTripBranchDT);
+                if (checkedDepos.Count > 0)
+                {
+                    // 便マスター情報取得
+                    var mTripSql = M_TripConnectController.CreateSQLToSelectMTripsForDataTable(isBeforeApplicablePeriod, referenceDate, checkedDepos);
+                    mTripDT = M_TripConnectController.ConnectMTripsToDataTable(mTripSql);
+
+                    // 便枝番マスター情報取得
+                    var mTripBranchSql = M_TripConnectController.CreateSQLToSelectMTripBranchesForDataTable(referenceDate, checkedDepos);
+                    mTripBranchDT = M_TripConnectController.ConnectMTripsToDataTable(mTripBranchSql);
+                    // 便枝番マスターに枝連番列を追加
+                    mTripBranchConsecutiveDT = SortDataTableFromBranchConsecutiveNumber(mTripBranchDT);
+                }
+
 
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(gamenName);

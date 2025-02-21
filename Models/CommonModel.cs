@@ -34,6 +34,11 @@ namespace ai_truck_load_measurement.Models
         public IEnumerable<SelectListItem>? MTruckList { get; set; }
 
         /// <summary>
+        /// デポリスト
+        /// </summary>
+        public IEnumerable<SelectListItem>? MDepoList { get; set; }
+
+        /// <summary>
         /// ベースビュー作成
         /// </summary>
         /// <remarks>コントロール名、ビュータイトルを設定</remarks>
@@ -45,6 +50,7 @@ namespace ai_truck_load_measurement.Models
             CategoryTitle = GetCategoryTitle();
             ViewTitle = GetViewTitle();
             MTruckList = GetMTruckList();
+            MDepoList = GetMDepoList();
         }
 
         /// <summary>
@@ -109,6 +115,39 @@ namespace ai_truck_load_measurement.Models
 
                     selectListItem = connection.Query<SelectListItem>(commandText).ToList();
                 }
+                return selectListItem;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// デポリスト取得
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<SelectListItem> GetMDepoList()
+        {
+            var selectListItem = new List<SelectListItem>();
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string commandText = $@"
+                        SELECT
+                            depo_id as Value,
+                            name AS Text
+                        FROM m_depos
+                        ";
+
+                    selectListItem = connection.Query<SelectListItem>(commandText).ToList();
+                }
+                var firstItem = new SelectListItem() { Text = "選択してください", Disabled = true, Selected = true };
+                selectListItem.Insert(0, firstItem);
                 return selectListItem;
             }
             catch (Exception)

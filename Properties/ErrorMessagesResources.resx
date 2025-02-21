@@ -154,7 +154,7 @@
     <value>登録済みの便の適用開始/終了日時がかぶるため登録できません。</value>
   </data>
   <data name="E1013" xml:space="preserve">
-    <value>CSV形式でないファイルが含まれているため登録できません。</value>
+    <value>この{0}はAD内に存在しないため登録できません。</value>
   </data>
   <data name="E1014" xml:space="preserve">
     <value>ファイル内にデータがありません。</value>
