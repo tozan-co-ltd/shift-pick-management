@@ -168,7 +168,7 @@
         if(top_model.mainDepoName != ""){
             console.log($("#stationTitle"));
             $("#stationTitle")[0].innerText = getStationTitle(top_model.mainDepoName);
-            $('#modalImage').attr("src", "/images/top/layout/depo" + top_model.mainDepoID + "layout.png");
+            $('#modalImage').attr("src", window.location.href + "/images/top/layout/depo" + top_model.mainDepoID + "layout.png");
         }
     });
 
