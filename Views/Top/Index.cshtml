@@ -256,7 +256,7 @@
                 if(depo[i].selected){
                     $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
                     selectedDepoID = depo[i].value;
-                    $('#modalImage').attr("src", "/images/top/layout/depo" + depo[i].value + "layout.png");
+                    $('#modalImage').attr("src", window.location.href + "/images/top/layout/depo" + depo[i].value + "layout.png");
                 }
             }
             onUpdateClick();
