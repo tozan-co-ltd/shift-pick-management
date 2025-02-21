@@ -14,8 +14,8 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <returns></returns>
         public static int GetAuthorizedKubunFromUserName(string sql)
         {
-            // 戻り値 デフォルト値は権限無しの1
-            var authorizedKubun = 1;
+            // 戻り値 デフォルト値は権限無しの0
+            var authorizedKubun = 0;
 
             List<M_UserModel> strList = new();
 
