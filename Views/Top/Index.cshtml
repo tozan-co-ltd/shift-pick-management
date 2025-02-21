@@ -103,14 +103,15 @@
     <div class="card-header">
         @ViewData["Title"]
     </div>
-
     <div class="card-body">
         @if (ViewData["ErrorMessage"] != null)
         {
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
-        <span class="mt-1 text-danger">船見デポはステーション5以外、「空車・停車」の情報と画像が一致していません。</span>
         <p class="mb-3 top-title" id="stationTitle"></p>
+        <div class ="mb-3">
+        <span  style="color:red;">船見デポはステーション5以外、「空車・停車」の情報と画像が一致していません。</span>
+        </div>
         <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
             <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                 <span class="warehouse-name-drs span-paragraph">デポ選択</span>
@@ -195,13 +196,14 @@
             if (cardModel.truckExist) {
                 $('#card-title' + i).text("停車");
                 $('#card-title' + i).css("color", "#000000");
+                $('#truck-status' + i).text(cardModel.truckStatus);
             }
             else {
                 $('#card-title' + i).text("空車");
                 $('#card-title' + i).css("color", "#1CC88A");
+                $('#truck-status' + i).text("");
             }
 
-            $('#truck-status' + i).text(cardModel.truckStatus);
             
             $('#image' + i).attr("src", cardModel.imageBase64);
         }
