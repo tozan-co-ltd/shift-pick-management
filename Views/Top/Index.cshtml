@@ -162,7 +162,7 @@
     $(document).ready(function () {
         // モデル取得
         var top_model = @Html.Raw(Json.Serialize(Model));
-        viewCards(top_model);
+        viewCards(top_model, top_model.mainDepoName);
         window.setInterval(function () {
             onUpdateClick();
         }, 60000);
@@ -174,7 +174,7 @@
         }
     });
 
-    function viewCards(top_model) {
+    function viewCards(top_model, depoName) {
         var now = GetDateString(new Date());
         // 更新日時の更新
         $('#updateAt').text("更新日時:" + now + ':' + ('0' + new Date().getSeconds()).slice(-2));
@@ -186,7 +186,7 @@
             // カード要素生成
             $("#cardlayout-wrap")[0].innerHTML += 
                     "<section class=\"card-list\">"
-                 +      "<p class=\"station-number\" > ステーション" + i + " </p>"
+                 +      "<p class=\"station-number\" > " + depoName + i + "番 </p>"
                  +      "<h2 class=\"card-title\" id = \"card-title" + i + "\" > </h2>"
                  +      "<p class=\"truck-status\" id = \"truck-status" + i + "\" > </p>"
                  +      "<figure class=\"card-figure\" > <img src=\"\" id = \"image" + i +"\" > </figure>"
@@ -201,7 +201,7 @@
             else {
                 $('#card-title' + i).text("空車");
                 $('#card-title' + i).css("color", "#1CC88A");
-                $('#truck-status' + i).text("");
+                $('#truck-status' + i).text("　");
             }
 
             
@@ -212,7 +212,16 @@
     function onUpdateClick(){
         DeleteErrorMessages();
 
-        var depoID = $('select[id="selectDepo"]')[0].value;
+        var depo = $('select[id="selectDepo"]')[0];
+        var depoID = depo.value;
+
+        var depoName = "";
+        for (var i = 0; i < depo.length; i++) {
+            if (depo[i].selected) {
+                depoName = depo[i].innerText;
+            }
+        }
+
 
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetTopModel", "Top")';
@@ -225,7 +234,7 @@
             method: method,
             data: data
         }).done(function (response) {
-            viewCards(response);
+            viewCards(response, depoName);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -242,6 +251,7 @@
         $('select[id="selectDepo"]').change(function () {
             var depo = $('select[id="selectDepo"]')[0];
             var selectedDepoID = 0;
+            var depoName = "";
             for(var i=0; i < depo.length; i++){
                 if(depo[i].selected){
                     $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
