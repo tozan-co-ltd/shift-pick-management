@@ -270,7 +270,7 @@
     function switchFunamiCaution(depoID){
         // 船見デポの場合、注意分表示
         if (depoID == 3) {
-            $("#funamiCaution")[0].innerText = "船見デポはステーション5以外、「空車・停車」の情報と画像が一致していません。";
+            $("#funamiCaution")[0].innerText = "船見デポ5番以外は常に「空車」表示になっています。";
         }
         else {
             $("#funamiCaution")[0].innerText = "";
