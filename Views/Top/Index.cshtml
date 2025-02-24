@@ -109,8 +109,8 @@
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
         <p class="mb-3 top-title" id="stationTitle"></p>
-        <div class ="mb-3">
-        <span  style="color:red;">船見デポはステーション5以外、「空車・停車」の情報と画像が一致していません。</span>
+        <div class="mb-3" >
+            <p style="color:red;" id="funamiCaution"></p>
         </div>
         <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
             <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
@@ -163,6 +163,7 @@
         // モデル取得
         var top_model = @Html.Raw(Json.Serialize(Model));
         viewCards(top_model, top_model.mainDepoName);
+        switchFunamiCaution(top_model.mainDepoID);
         window.setInterval(function () {
             onUpdateClick();
         }, 60000);
@@ -235,6 +236,7 @@
             data: data
         }).done(function (response) {
             viewCards(response, depoName);
+            switchFunamiCaution(depoID);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -259,10 +261,21 @@
                     $('#modalImage').attr("src", window.location.href + "/images/top/layout/depo" + depo[i].value + "layout.png");
                 }
             }
+
             onUpdateClick();
 
         });
     })
+
+    function switchFunamiCaution(depoID){
+        // 船見デポの場合、注意分表示
+        if (depoID == 3) {
+            $("#funamiCaution")[0].innerText = "船見デポはステーション5以外、「空車・停車」の情報と画像が一致していません。";
+        }
+        else {
+            $("#funamiCaution")[0].innerText = "";
+        }
+    }
 
     function getStationTitle(depoName){
         if(depoName == null){
