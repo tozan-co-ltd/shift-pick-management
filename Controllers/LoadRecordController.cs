@@ -286,8 +286,8 @@ namespace ai_truck_load_measurement.Controllers
                                 <th class=""font-weight-bold"">到着<br>予定</th>
                                 <th class=""font-weight-bold"">出発<br>予定</th>
                                 <th class=""font-weight-bold"">稼働日</th>
-                                <th class=""font-weight-bold"">到着日時</th>
-                                <th class=""font-weight-bold"">出発日時</th>
+                                <th class=""font-weight-bold"">到着実績</th>
+                                <th class=""font-weight-bold"">出発実績</th>
                                 <th class=""font-weight-bold"">到着荷量<br>(%)</th>
                                 <th class=""font-weight-bold"">出発荷量<br>(%)</th>
                                 <th class=""font-weight-bold"">到着荷量<br>画像</th>
