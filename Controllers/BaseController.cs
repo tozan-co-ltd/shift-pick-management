@@ -18,7 +18,8 @@ namespace ai_truck_load_measurement.Controllers
                     var loginUserModel = new LoginUserModel
                     {
                         UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
-                        ADName = claimsLoginUserList.Where(x => x.Type == "ADName").First().Value
+                        ADName = claimsLoginUserList.Where(x => x.Type == "ADName").First().Value,
+                        AuthorizedKubun  = claimsLoginUserList.Where(x => x.Type == "AuthorizedKubun").First().Value,
                     };
                     return loginUserModel;
                 }

@@ -12,10 +12,10 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <returns></returns>
-        public static int GetAuthorizedKubunFromUserName(string sql)
+        public static string GetAuthorizedKubunFromUserName(string sql)
         {
             // 戻り値 デフォルト値は権限無しの0
-            var authorizedKubun = 0;
+            var authorizedKubun = "";
 
             List<M_UserModel> strList = new();
 

@@ -186,6 +186,8 @@ namespace ai_truck_load_measurement.Controllers
             // ステーションの画像取得
             model.ArrivalLoadImgPath = CheckAndConvertImagePath(model.ArrivalLoadImgPath);
             model.DepartureLoadImgPath = CheckAndConvertImagePath(model.DepartureLoadImgPath);
+            // 管理権限区分取得
+            model.AuthorizedKubun = ClaimsLoginUserData().AuthorizedKubun;
             return model;
         }
 

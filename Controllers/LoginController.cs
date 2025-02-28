@@ -89,7 +89,7 @@ namespace ai_truck_load_measurement.Controllers
                 var claims = new[] {
                     new Claim("UserName", loginUserModel.UserName),
                     new Claim("ADName", model.LoginId),
-                    new Claim("AuthorizedKubun", loginUserModel.AuthorizedKubun.ToString()),
+                    new Claim("AuthorizedKubun", loginUserModel.AuthorizedKubun),
                 };
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
@@ -232,7 +232,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="loginId">ログインID</param>
         /// <returns></returns>
-        private int GetAuthorizedKubunOfUser(string loginId)
+        private string GetAuthorizedKubunOfUser(string loginId)
         {
             // ログインIDから権限区分を取得
             var sql = LoginConnectController.CreateSQLToSelectAuthorizedKubunFromUserName(loginId);
