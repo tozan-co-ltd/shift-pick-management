@@ -78,6 +78,6 @@ namespace ai_truck_load_measurement.Models
         // 便実績リスト
         public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
         // 管理権限区分
-        public string AuthorizedKubun {  get; set; }
+        public int AuthorizedKubun {  get; set; }
     }
 }

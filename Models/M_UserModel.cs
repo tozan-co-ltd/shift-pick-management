@@ -48,7 +48,7 @@ namespace ai_truck_load_measurement.Models
         /// 管理権限区分
         /// </summary>
         [Display(Name = "管理権限")]
-        public string AuthorizedKubun {  get; set; }
+        public int AuthorizedKubun {  get; set; }
 
         /// <summary>
         /// 作成日時

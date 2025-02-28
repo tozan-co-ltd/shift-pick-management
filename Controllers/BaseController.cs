@@ -15,11 +15,13 @@ namespace ai_truck_load_measurement.Controllers
             {
                 if (claimsLoginUserList.Count > 0)
                 {
+                    var authorizedKubun = claimsLoginUserList.Where(x => x.Type == "AuthorizedKubun").First().Value;
+                    var kubunint = authorizedKubun;
                     var loginUserModel = new LoginUserModel
                     {
                         UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
                         ADName = claimsLoginUserList.Where(x => x.Type == "ADName").First().Value,
-                        AuthorizedKubun  = claimsLoginUserList.Where(x => x.Type == "AuthorizedKubun").First().Value,
+                        AuthorizedKubun  = Int32.Parse(claimsLoginUserList.Where(x => x.Type == "AuthorizedKubun").First().Value),
                     };
                     return loginUserModel;
                 }

@@ -16,6 +16,6 @@
         /// <summary>
         /// ユーザーの権限区分
         /// </summary>
-        public string AuthorizedKubun {  get; set; }
+        public int AuthorizedKubun {  get; set; }
     }
 }

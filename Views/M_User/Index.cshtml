@@ -71,10 +71,10 @@
                                 <td>@item.UserID</td>
                                 <td>@item.ADName</td>
                                 <td>@item.DepoName</td>
-                                @if(item.AuthorizedKubun == "0")
+                                @if(item.AuthorizedKubun == 0)
                                 {
                                     <td>なし</td>
-                                }else if(item.AuthorizedKubun == "1")
+                                }else if(item.AuthorizedKubun == 1)
                                 {
                                     <td>管理者</td>
                                 }
