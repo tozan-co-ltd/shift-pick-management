@@ -9,6 +9,7 @@ using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using NPOI.SS.Formula.Functions;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -476,10 +477,21 @@ namespace ai_truck_load_measurement.Controllers
                 return html;
             }
 
+            var depoIDInPreviousTrip = 0;
+
             var tripName = tripRecordList[0].TripName;
             for (var i = 0; i < tripRecordList.Count; i++)
             {
                 var selectValue = tripRecordList[i].TripName + "_" + tripRecordList[i].TripBranchSeq;
+                var depoName = "";
+                if (depoIDInPreviousTrip != tripRecordList[i].DepoID)
+                {
+                    depoName = $@"
+                        <div class=""mt-2 mb-1"">
+                            <strong> {tripRecordList[i].DepoName} </strong>
+                        </div>";
+                    depoIDInPreviousTrip = tripRecordList[i].DepoID;
+                }
                 if (i == 0)
                 {
                     html += $@" 
@@ -493,6 +505,7 @@ namespace ai_truck_load_measurement.Controllers
                     </div>
                     <hr />
                     <div class=""medium-item"">
+                        {depoName}
                         <div class=""medium-header"">
                             <div class=""toggle-icon collapsed""></div>
                             <strong>　{tripRecordList[i].TripName}</strong>
@@ -502,11 +515,13 @@ namespace ai_truck_load_measurement.Controllers
                 }
                 if (tripName != tripRecordList[i].TripName && i != 0)
                 {
+                    
                     tripName = tripRecordList[i].TripName;
                     html += $@"
                         </div>
                     </div>
                     <div class=""medium-item"">
+                        {depoName}
                         <div class=""medium-header"">
                             <div class=""toggle-icon collapsed""></div>
                             <strong>　{tripRecordList[i].TripName}</strong>
@@ -526,7 +541,7 @@ namespace ai_truck_load_measurement.Controllers
             ";
             return html;
         }
-
+                
         /// <summary>
         /// 便名称から指定した期間内の便枝番のリストを取得する
         /// </summary>

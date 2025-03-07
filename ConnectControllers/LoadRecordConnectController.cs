@@ -342,13 +342,19 @@ namespace ai_truck_load_measurement.ConnectControllers
             string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
             var sql = $@"
                 SELECT DISTINCT
-	                trip_name ,
-	                trip_branch_seq
+	                trip_name,
+	                trip_branch_seq,
+                    TripHistories.depo_id,
+	                name As depo_name
                 FROM t_trip_records AS TripRecords
                 INNER JOIN
 	                m_trip_histories AS TripHistories
                 ON 
 	                TripRecords.trip_id = TripHistories.trip_id
+                INNER JOIN
+	                m_depos AS Depos
+                ON
+	                TripHistories.depo_id = Depos.depo_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 AND trip_name IS NOT NULL
             ";
@@ -363,9 +369,12 @@ namespace ai_truck_load_measurement.ConnectControllers
                         {
                             sql += $" OR ";
                         }
-                        sql += $"depo_id = {checkedDepos[i]}";
+                        sql += $"TripHistories.depo_id = {checkedDepos[i]}";
                     }
-                    sql += ")";
+                    sql += $@")
+                        ORDER BY
+                            TripHistories.depo_id
+                    ";
                 }
             }
             return sql;
