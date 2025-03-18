@@ -373,7 +373,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     }
                     sql += $@")
                         ORDER BY
-                            TripHistories.depo_id
+                            TripHistories.depo_id, trip_name, trip_branch_seq
                     ";
                 }
             }
