@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using NPOI.SS.Formula.Functions;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -471,30 +472,16 @@ namespace ai_truck_load_measurement.Controllers
         private string CreateSelectTripNameAndBranchSeqHTML(List<LoadRecordModel> tripRecordList)
         {
             var html = "";
+
+            // 選択した稼働日内にデータがない
             if (tripRecordList.Count == 0)
             {
                 html = "<small>選択された稼働日にデータがありません</small>";
                 return html;
             }
 
-            var depoIDInPreviousTrip = 0;
-
-            var tripName = tripRecordList[0].TripName;
-            for (var i = 0; i < tripRecordList.Count; i++)
-            {
-                var selectValue = tripRecordList[i].TripName + "_" + tripRecordList[i].TripBranchSeq;
-                var depoName = "";
-                if (depoIDInPreviousTrip != tripRecordList[i].DepoID)
-                {
-                    depoName = $@"
-                        <div class=""mt-2 mb-1"">
-                            <strong> {tripRecordList[i].DepoName} </strong>
-                        </div>";
-                    depoIDInPreviousTrip = tripRecordList[i].DepoID;
-                }
-                if (i == 0)
-                {
-                    html += $@" 
+            // ドロップダウンリストの最上部
+            html += $@" 
                     <div class=""d-flex justify-content-between mb-1"">
                         <a href=""#"" class=""btn btn-secondary "" onclick=""allToggleOpen()"" >
                             <span class=""text"">全て展開</span>
@@ -504,41 +491,57 @@ namespace ai_truck_load_measurement.Controllers
                         </a>
                     </div>
                     <hr />
-                    <div class=""medium-item"">
-                        {depoName}
-                        <div class=""medium-header"">
-                            <div class=""toggle-icon collapsed""></div>
-                            <strong>　{tripRecordList[i].TripName}</strong>
-                        </div>
-                        <div class=""small-items"">
-                    ";
-                }
-                if (tripName != tripRecordList[i].TripName && i != 0)
-                {
-                    
-                    tripName = tripRecordList[i].TripName;
-                    html += $@"
-                        </div>
-                    </div>
-                    <div class=""medium-item"">
-                        {depoName}
-                        <div class=""medium-header"">
-                            <div class=""toggle-icon collapsed""></div>
-                            <strong>　{tripRecordList[i].TripName}</strong>
-                        </div>
-                        <div class=""small-items"">
-                    ";
-                }
-
-                html += $@"
-                        <label class=""checkbox-item""><input type=""checkbox"" name=""tripNameAndBranchSeq"" id=""{selectValue}"" value=""{selectValue}"">{selectValue}</label>
-                ";
-            }
-
-            html += $@"
-                        </div>
-                    </div>
             ";
+
+            // 便実績リストをデポIDごとにソート、グループ化
+            var sortedList = tripRecordList.OrderBy(x => x.DepoID).
+                GroupBy(x=>x.DepoID);
+
+            foreach (var tripRecordListInDepo in sortedList)
+            {
+                // デポ名表示HTML
+                var depoNameHTML = $@"
+                            <div class=""mt-2 mb-1"">
+                                <strong> {tripRecordListInDepo.First().DepoName} </strong>
+                            </div>
+                ";
+                // 便名称、便枝番でソート、便名称ごとにグループ化
+                var tripRecordListGroupByTripName = tripRecordListInDepo.OrderBy(x => x.TripName)
+                    .ThenBy(x=> x.TripBranchSeq)
+                    .GroupBy(x => x.TripName);
+                                
+                foreach (var tripRecordListSameTripName in tripRecordListGroupByTripName)
+                {
+                    var firstTripRecordInSameTripName = tripRecordListSameTripName.First();
+                    // 便名トグル表示HTML
+                    html += $@"
+                            <div class=""medium-item"">
+                                {depoNameHTML}
+                                <div class=""medium-header"">
+                                    <div class=""toggle-icon collapsed""></div>
+                                    <strong>　{firstTripRecordInSameTripName.TripName}</strong>
+                                </div>
+                                    <div class=""small-items"">
+                            ";
+
+                    foreach (var tripRecordSameTripName in tripRecordListSameTripName)
+                    {
+                        var selectValue = tripRecordSameTripName.TripName + "_" + tripRecordSameTripName.TripBranchSeq;
+                        // 便選択チェックボックスの追加
+                        html += $@"
+                            <label class=""checkbox-item"">
+                                <input type=""checkbox"" name=""tripNameAndBranchSeq"" id=""{selectValue}"" value=""{selectValue}"">{selectValue}
+                            </label>
+                        ";
+                    }
+                    html += $@"
+                            </div>
+                        </div>
+                    ";
+                    // デポ内で2つ目以降の便にデポ名は不要
+                    depoNameHTML = "";
+                }
+            }
             return html;
         }
                 
