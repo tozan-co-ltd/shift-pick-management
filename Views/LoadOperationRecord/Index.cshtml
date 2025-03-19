@@ -145,9 +145,9 @@
                         var arrivalChart = new Chart(ctx, chartSetting('到着'));
 
                         // chart.jsの設定
-                        function chartSetting(yLabel) {
-                            if (yLabel == null)
-                                yLabel = "";
+                        function chartSetting(axisLabel) {
+                            if (axisLabel == null)
+                               axisLabel = "";
                             var setting = {
                                 type: 'scatter',
                                 data: {
@@ -173,7 +173,7 @@
                                             //軸ラベル表示
                                             scaleLabel: {
                                                 display: true,
-                                                labelString: '到着時間',
+                                                labelString: axisLabel + '時間',
                                                 fontSize: 24
                                             },
                                             ticks: {
@@ -197,7 +197,7 @@
                                             //軸ラベル表示
                                             scaleLabel: {
                                                 display: true,
-                                                labelString: yLabel + '荷量(%)',
+                                                labelString: axisLabel + '荷量(%)',
                                                 fontSize: 24
                                             },
                                             //Y軸の範囲を指定
@@ -736,7 +736,6 @@
                     $("#div-error-message").text(errorMessage);
                 }
             });
-            console.log(arrivalChart.options.legend)
         } 
 
         // 昼勤開始時間の線描画用データ作成
@@ -956,13 +955,10 @@
 
     // 画面表示時にログインユーザーのメインデポにチェックを入れる
     function depoCheckDisplay(model) {
-        console.log("start");
         var mainDepoID = model.mainDepoID;
         if (mainDepoID == 0)
             return;
         var depos = $('input[name=depos]');
-        console.log(mainDepoID);
-        console.log(depos);
         for (var i = 0; i < depos.length; i++) {
             if (depos[i].id == "depo" + mainDepoID) {
                 depos[i].checked = true;
@@ -979,7 +975,6 @@
                 checkedDepos.push(depos[i].value);
             }
         }
-        console.log(checkedDepos);
         return checkedDepos;
     }
 </script>
