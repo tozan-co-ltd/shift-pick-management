@@ -54,6 +54,8 @@ namespace ai_truck_load_measurement.Models
         public string? DepartureLoadImgPath { get; set; }
         // 便実績リスト
         public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
+        // メインデポ
+        public M_DepoModel? MainDepo {  get; set; }
         // メインデポID
         public int MainDepoID { get; set; }
         // メインデポ名

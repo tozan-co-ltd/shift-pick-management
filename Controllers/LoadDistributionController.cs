@@ -39,6 +39,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 // ログインユーザーのメインデポ情報取得
                 var mainDepo = GetMainDepo();
+                model.MainDepo = mainDepo;
                 model.MainDepoID = mainDepo.DepoID;
                 model.MainDepoName = mainDepo.Name;
                 return View(model);
