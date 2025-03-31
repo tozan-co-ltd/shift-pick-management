@@ -374,7 +374,6 @@ function EditModal(tripRecordID, isArrived, page) {
                 var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
                 var truckNumber = item.truckNumber;
                 var authorizedKubun = response.authorizedKubun;
-                console.log("a");
                 if (truckNumber == "0") truckNumber = "-";
                 if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
 
