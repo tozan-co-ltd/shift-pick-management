@@ -169,12 +169,14 @@ namespace ai_truck_load_measurement.ConnectControllers
             if (hasTripName)
             {
                 sql += $@"
-                AND NOT trip_name IS NULL";
+                AND NOT trip_name IS NULL
+                ";
             }
             if (hasIdentifyNumber)
             {
                 sql += $@"
-                AND NOT identify_number IS NULL";
+                AND NOT identify_number IS NULL
+                ";
             }
             sql += SQLOfCheckedDepos(checkedDepos);
             sql += $@"
@@ -235,16 +237,19 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id
-                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
+                ";
             if (hasTripName)
             {
                 sql += $@"
-                AND NOT trip_name IS NULL";
+                AND NOT trip_name IS NULL
+                ";
             }
             if (hasIdentifyNumber)
             {
                 sql += $@"
-                AND NOT identify_number IS NULL";
+                AND NOT identify_number IS NULL
+                ";
             }
             sql += SQLOfCheckedDepos(checkedDepo);
             sql += $@"
