@@ -212,7 +212,7 @@
         $('input[id="isBeforeApplicablePeriod"]').prop('checked', trip_model.isCheckedBeforeApplicablePeriod);
         // デポチェックボックス追加
         addDepos(trip_model);
-        depoCheckDisplayTrip(trip_model);
+        depoCheckDisplay(trip_model);
         // テーブル表示
         tableDisplay();
     });
@@ -423,18 +423,5 @@
         });
     })
 
-    // 画面表示時にログインユーザーのメインデポにチェックを入れる
-    function depoCheckDisplayTrip(model) {
-        console.log("start");
-        var mainDepoID = model.mainDepo.depoID;
-        if (mainDepoID == 0)
-            return;
-        var depos = $('input[name=depos]');
-        for (var i = 0; i < depos.length; i++) {
-            if (depos[i].id == "depo" + mainDepoID) {
-                depos[i].checked = true;
-            }
-        }
-    }
 
 </script>

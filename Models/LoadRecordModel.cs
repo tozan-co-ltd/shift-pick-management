@@ -56,10 +56,6 @@ namespace ai_truck_load_measurement.Models
         public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
         // メインデポ
         public M_DepoModel? MainDepo {  get; set; }
-        // メインデポID
-        public int MainDepoID { get; set; }
-        // メインデポ名
-        public string? MainDepoName { get; set; }
         // 訂正後荷量クラス
         public int AnnotationLoadClass { get; set; }
         // 訂正後荷量の%表示

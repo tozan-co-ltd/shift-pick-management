@@ -37,9 +37,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 model.TripRecordList = tripRecordList.ToPagedList();
                 // ログインユーザーのメインデポ情報取得
-                var mainDepo = GetMainDepo();
-                model.MainDepoID = mainDepo.DepoID;
-                model.MainDepoName = mainDepo.Name;
+                model.MainDepo = GetMainDepo();
                 return View(model);
             }
             catch (Exception ex)
