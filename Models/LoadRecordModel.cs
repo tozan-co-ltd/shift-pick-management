@@ -77,4 +77,18 @@ namespace ai_truck_load_measurement.Models
         // デポ名
         public string? DepoName { get; set; }
     }
+
+    public class LoadRecordViewModel
+    {
+        // 便実績リスト
+        public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
+        // メインデポID
+        public int MainDepoID { get; set; }
+        // メインデポ名
+        public string? MainDepoName { get; set; }
+        // 便名称のリスト
+        public List<SelectListItem>? TripNameList { get; set; }
+        // 選択された便名称
+        public string? SelectedTripName { get; set; }
+    }
 }
