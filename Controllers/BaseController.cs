@@ -15,10 +15,13 @@ namespace ai_truck_load_measurement.Controllers
             {
                 if (claimsLoginUserList.Count > 0)
                 {
+                    Int32.TryParse(claimsLoginUserList.Where(x => x.Type == "MainDepoID").First().Value, out var mainDepoID);
                     var loginUserModel = new LoginUserModel
                     {
                         UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
-                        ADName = claimsLoginUserList.Where(x => x.Type == "ADName").First().Value
+                        ADName = claimsLoginUserList.Where(x => x.Type == "ADName").First().Value,
+                        MainDepoName = claimsLoginUserList.Where(x => x.Type == "MainDepoName").First().Value,
+                        MainDepoID = mainDepoID,
                     };
                     return loginUserModel;
                 }
@@ -29,21 +32,6 @@ namespace ai_truck_load_measurement.Controllers
                 throw;
             }
         }
-
-        public M_DepoModel GetMainDepo()
-        {
-            M_DepoModel model = new M_DepoModel();
-            var user = ClaimsLoginUserData();
-            var sql = M_DepoConnectController.CreateSQLToSelectDepoFromADName(user.ADName);
-            var depoList = M_DepoConnectController.ConnectMDepos(sql);
-            if (depoList.Count > 0)
-            {
-                model = depoList[0];
-            }
-            return model;
-            
-        }
-
     }
 
 }

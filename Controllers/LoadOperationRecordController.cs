@@ -17,13 +17,18 @@ namespace ai_truck_load_measurement.Controllers
         public IActionResult Index()
         {
             var model = new LoadOperationRecordViewModel();
+
             var today = DateTime.Now;
             List<DateTime> dates = new();
             dates.Add(today);
-            // ログインユーザーのメインデポ情報取得
-            var mainDepo = GetMainDepo();
+
+            // ログイン中ユーザー情報取得
+            var user = ClaimsLoginUserData();
+            // メインデポ情報取得
+            model = (LoadOperationRecordViewModel)LoadRecordController.SetMainDepoInfo(model, user);
             List<string> depoList = new();
-            depoList.Add(mainDepo.DepoID.ToString());
+            depoList.Add(user.MainDepoID.ToString());
+
             try
             {
                 // 便実績情報取得SQL作成
@@ -42,8 +47,6 @@ namespace ai_truck_load_measurement.Controllers
 
                 model.TripRecordList = tripRecordList.ToPagedList();
                 
-                model.MainDepoID = mainDepo.DepoID;
-                model.MainDepoName = mainDepo.Name;
                 return View(model);
             }
             catch (Exception ex)

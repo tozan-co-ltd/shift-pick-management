@@ -37,10 +37,11 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // ログインユーザーのメインデポ情報取得
-                var mainDepo = GetMainDepo();
-                model.MainDepo = mainDepo;
+                var user = ClaimsLoginUserData();
+                model.MainDepoID = user.MainDepoID;
+                model.MainDepoName = user.MainDepoName;
                 List<string> depoList = new();
-                depoList.Add(mainDepo.DepoID.ToString());
+                depoList.Add(user.MainDepoID.ToString());
 
                 IEnumerable<M_TripModel> tripList = new List<M_TripModel>();
 
