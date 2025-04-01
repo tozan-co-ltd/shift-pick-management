@@ -21,7 +21,7 @@ namespace ai_truck_load_measurement.Controllers
         public IActionResult Index()
         {
             // 戻り値
-            LoadOutputModel model = new();
+            LoadRecordViewModel model = new();
 
             // ログイン中ユーザー情報取得
             var user = ClaimsLoginUserData();

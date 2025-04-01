@@ -70,15 +70,13 @@ namespace ai_truck_load_measurement.Models
         public string? SelectedTripName { get; set; }
         // 昼勤開始時間
         public DateTime? DayShiftStartTime { get; set; }
-        // ユーザー名
-        public string? UserName {  get; set; }
         // デポID
         public int DepoID {  get; set; }
         // デポ名
         public string? DepoName { get; set; }
     }
 
-    public class LoadRecordViewModel
+    public class LoadRecordViewModel: CommonModel
     {
         // 便実績リスト
         public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
@@ -86,6 +84,8 @@ namespace ai_truck_load_measurement.Models
         public int MainDepoID { get; set; }
         // メインデポ名
         public string? MainDepoName { get; set; }
+        // ユーザー名
+        public string? UserName { get; set; }
         // 便名称のリスト
         public List<SelectListItem>? TripNameList { get; set; }
         // 選択された便名称

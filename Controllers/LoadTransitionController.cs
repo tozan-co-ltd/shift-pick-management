@@ -20,7 +20,7 @@ namespace ai_truck_load_measurement.Controllers
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         public IActionResult Index()
         {
-            var model = new LoadTransitionModel();
+            var model = new LoadRecordViewModel();
             var today = DateTime.Now;
             var oneWeekAgo = today.AddDays(-7);
             var mainDepo = GetMainDepo();

@@ -16,7 +16,7 @@ namespace ai_truck_load_measurement.Controllers
     {
         public IActionResult Index()
         {
-            var model = new LoadOperationRecordModel();
+            var model = new LoadOperationRecordViewModel();
             var today = DateTime.Now;
             List<DateTime> dates = new();
             dates.Add(today);
