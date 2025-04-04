@@ -46,7 +46,7 @@ namespace ai_truck_load_measurement.Models
         [Display(Name = "到着予定時間")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [RegularExpression(@"^([0-1][0-9]|[2][0-3]):[0-5][0-9]$", ErrorMessage = "hh:mmで入力してください。")]
-        public string? RegistArrivalScheduledTime { get; set; }
+        public string RegistArrivalScheduledTime { get; set; }
 
         /// <summary>
         /// 出発予定時間  
@@ -59,7 +59,7 @@ namespace ai_truck_load_measurement.Models
         [Display(Name = "出発予定時間")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         [RegularExpression(@"^([0-1][0-9]|[2][0-3]):[0-5][0-9]$", ErrorMessage = "hh:mmで入力してください。")]
-        public string? RegistDepartureScheduledTime { get; set; }
+        public string RegistDepartureScheduledTime { get; set; }
 
         /// <summary>
         ///  適用開始日時
@@ -85,7 +85,7 @@ namespace ai_truck_load_measurement.Models
         /// 作成者
         /// </summary>
         [Display(Name = "作成者")]
-        public string? CreatedBy { get; set; }
+        public string CreatedBy { get; set; }
 
         /// <summary>
         /// 更新日時
@@ -97,21 +97,18 @@ namespace ai_truck_load_measurement.Models
         /// 更新者
         /// </summary>
         [Display(Name = "更新者")]
-        public string? UpdatedBy { get; set; }
+        public string UpdatedBy { get; set; }
 
         /// <summary>
         /// 昼勤開始時間
         /// </summary>
         public DateTime DayShiftStartTime { get; set; }
 
-
-        /// <summary>
-        /// 適用終了日時を過ぎた便を表示するチェックボックスの入力
-        /// </summary>
-        public bool IsCheckedBeforeApplicablePeriod { get; set; } = false;
-
     }
 
+    /// <summary>
+    /// 便枝番画面表示用ビューモデル
+    /// </summary>
     public class M_TripBranchNumberListViewModel : CommonModel
     {
         /// <summary>
