@@ -23,7 +23,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public IActionResult Index(int tripId, bool isChecked)
         {
-            M_TripBranchNumberModel model = new();
+            M_TripBranchNumberListViewModel model = new();
 
             model.TripID = tripId;
             model.IsCheckedBeforeApplicablePeriod = isChecked;
@@ -270,7 +270,7 @@ namespace ai_truck_load_measurement.Controllers
         [HttpGet]
         public IActionResult Register(bool isChecked, int id, string tripName)
         {
-            M_TripBranchNumberModel model = new();
+            M_TripBranchNumberListViewModel model = new();
             try
             {
                 model.TripID = id;
