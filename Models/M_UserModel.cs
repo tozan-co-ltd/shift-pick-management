@@ -10,34 +10,24 @@ namespace ai_truck_load_measurement.Models
     public class M_UserModel : CommonModel
     {
         /// <summary>
-        /// ユーザーリスト
-        /// </summary>
-        public IPagedList<M_UserModel>? M_UserList { get; set; }
-
-        /// <summary>
         /// ユーザーID
         /// </summary>
         [Display(Name = "ユーザーID")]
-        public int? UserID { get; set; }
-
-        /// <summary>
-        /// ユーザー名
-        /// </summary>
-        public string? UserName { get; set; }
+        public int UserID { get; set; }
 
         /// <summary>
         /// ユーザーのActiveDirectory名
         /// </summary>
         [Display(Name = "AD名")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string? ADName {  get; set; }
+        public string ADName {  get; set; }
 
         /// <summary>
         /// メインデポID
         /// </summary>
         [Display(Name = "メインデポ")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
-        public string? DepoID {  get; set; }
+        public string DepoID {  get; set; }
 
         /// <summary>
         /// メインデポ名
@@ -58,7 +48,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 作成者
         /// </summary>
-        public string? CreatedBy {  get; set; }
+        public string CreatedBy {  get; set; }
 
         /// <summary>
         /// 更新日時
@@ -68,6 +58,40 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 更新者
         /// </summary>
-        public string? UpdatedBy {  get; set; }
+        public string UpdatedBy {  get; set; }
+    }
+
+    public class M_UserListViewModel : CommonModel
+    {
+        /// <summary>
+        /// ユーザーリスト
+        /// </summary>
+        public IPagedList<M_UserModel>? M_UserList { get; set; }
+
+        /// <summary>
+        /// ユーザーID
+        /// </summary>
+        [Display(Name = "ユーザーID")]
+        public int UserID { get; set; }
+
+        /// <summary>
+        /// ユーザーのActiveDirectory名
+        /// </summary>
+        [Display(Name = "AD名")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string ADName { get; set; }
+
+        /// <summary>
+        /// メインデポID
+        /// </summary>
+        [Display(Name = "メインデポ")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string DepoID { get; set; }
+
+        /// <summary>
+        /// 管理権限区分
+        /// </summary>
+        [Display(Name = "管理権限")]
+        public int AuthorizedKubun { get; set; }
     }
 }
