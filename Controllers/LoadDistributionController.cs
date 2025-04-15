@@ -190,7 +190,7 @@ namespace ai_truck_load_measurement.Controllers
                     if (createRs.Item1)
                     {
                         var file = System.IO.File.ReadAllBytes(createRs.Item2);
-
+                        CreateFile.DeleteFile(tmpFilename);
 
                         return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
                     }
