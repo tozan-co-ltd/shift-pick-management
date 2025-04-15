@@ -409,71 +409,19 @@
     });
 
 
-    // デポの選択用チェックボックスを生成
-    function addDepos(model) {
-        var selectDepos = $("#selectDepos")[0];
-        model.mDepoList.forEach(depo => {
-            if (depo.value == null)
-                return;
-            var depoLabel = document.createElement("label");
-            depoLabel.innerHTML += "<input type=\"checkbox\" class=\"mr-2\" name=\"depos\" id=\"depo" + depo.value + "\" value=\"" + depo.value + "\" />" + depo.text;
-            depoLabel.className += "mr-3 ";
-            selectDepos.appendChild(depoLabel);
-
-
-        })
-    }
-
     // 「すべて」チェックボックス押下時
     $('input[id=allDepo]').change(function () {
-        var depos = $('input[name="depos"]');
-        for (var i = 0; i < depos.length; i++) {
-            if ($('input[id=allDepo]')[0].checked) {
-                depos[i].checked = true;
-            } else {
-                depos[i].checked = false;
-            }
-        }
+        pushAllCheckBox();
         tableDisplay();
     });
 
     // 各デポチェックボックス押下時
     $(function () {
         $('input[name="depos"]').change(function () {
-            var depos = $('input[name=depos]');
-            for (var i = 0; i < depos.length; i++) {
-                if (!depos[i].checked) {
-                    $('input[id=allDepo]')[0].checked = false;
-                    break;
-                }
-            }
+            pushDepoCheckBox();
             tableDisplay();
         });
     })
 
-    // 画面表示時にログインユーザーのメインデポにチェックを入れる
-    function depoCheckDisplay(model) {
-        console.log("start");
-        var mainDepoID = model.mainDepo.depoID;
-        if (mainDepoID == 0)
-            return;
-        var depos = $('input[name=depos]');
-        for (var i = 0; i < depos.length; i++) {
-            if (depos[i].id == "depo" + mainDepoID) {
-                depos[i].checked = true;
-            }
-        }
-    }
 
-    // 選択されたデポのIDリストを取得する
-    function getCheckedDepos() {
-        var depos = $('input[name=depos]');
-        var checkedDepos = [];
-        for (var i = 0; i < depos.length; i++) {
-            if (depos[i].checked) {
-                checkedDepos.push(depos[i].value);
-            }
-        }
-        return checkedDepos;
-    }
 </script>

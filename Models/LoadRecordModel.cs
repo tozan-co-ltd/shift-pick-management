@@ -52,10 +52,8 @@ namespace ai_truck_load_measurement.Models
         public string? ArrivalLoadImgPath { get; set; }
         // 出発荷量画像パス
         public string? DepartureLoadImgPath { get; set; }
-        // メインデポID
-        public int MainDepoID { get; set; }
-        // メインデポ名
-        public string? MainDepoName { get; set; }
+        // メインデポ
+        public M_DepoModel? MainDepo {  get; set; }
         // 訂正後荷量クラス
         public int AnnotationLoadClass { get; set; }
         // 訂正後荷量の%表示

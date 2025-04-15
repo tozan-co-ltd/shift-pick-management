@@ -50,8 +50,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 model.TripRecordList = tripRecordList.ToPagedList();
 
-                model.MainDepoID = mainDepo.DepoID;
-                model.MainDepoName = mainDepo.Name;
+                model.MainDepo = mainDepo;
                 return View(model);
             }
             catch (Exception ex)
