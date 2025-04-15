@@ -752,8 +752,8 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("到着予定時間");
                     headerList.Add("出発予定時間");
                     headerList.Add("稼働日");
-                    headerList.Add("到着日時");
-                    headerList.Add("出発日時");
+                    headerList.Add("到着実績");
+                    headerList.Add("出発実績");
                     headerList.Add("到着荷量(%)");
                     headerList.Add("出発荷量(%)");
                     headerList.Add("到着荷量画像パス");
