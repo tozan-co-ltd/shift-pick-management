@@ -51,6 +51,18 @@ namespace ai_truck_load_measurement.Models
         public int AuthorizedKubun {  get; set; }
 
         /// <summary>
+        /// メール受け取り要否
+        /// </summary>
+        [Display(Name = "メール受け取り要否")]
+        public bool IsRequiredMail { get; set; }
+
+        /// <summary>
+        /// メール受け取り要否
+        /// </summary>
+        [Display(Name = "メールアドレス")]
+        public string MailAddress {  get; set; }
+
+        /// <summary>
         /// 作成日時
         /// </summary>
         public DateTime CreatedAt { get; set; }

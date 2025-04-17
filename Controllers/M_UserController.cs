@@ -97,6 +97,9 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // ユーザー名がADに存在するか
+                // デバッグ時は無効化
+#if DEBUG
+#else
                 if (!HasNameInAD(model.ADName))
                 {
                     string displayName = Utils.GetDisplayName<M_UserModel>("ADName");
@@ -106,6 +109,7 @@ namespace ai_truck_load_measurement.Controllers
 
                     return BadRequest(new { errorMessage });
                 }
+#endif
 
                 // ユーザーマスター登録
                 M_UserConnectController.InsertMUser(model, user);

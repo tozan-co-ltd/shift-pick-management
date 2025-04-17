@@ -61,6 +61,8 @@
                         <th class="font-weight-bold">AD名</th>
                         <th class="font-weight-bold">メインデポ</th>
                         <th class="font-weight-bold">管理権限</th>
+                        <th class="font-weight-bold">メール受け取り要否</th>
+                        <th class="font-weight-bold">メールアドレス</th>
                         <th class="font-weight-bold">更新日時</th>
                         <th class="font-weight-bold">更新者</th>
                     </tr>
@@ -91,6 +93,15 @@
                                 {
                                     <td>管理者</td>
                                 }
+                                @if (item.IsRequiredMail)
+                                {
+                                    <td>受け取る</td>
+                                }
+                                else
+                                {
+                                    <td>受け取らない</td>
+                                }
+                                <td>@item.MailAddress</td>
                                 <td>@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
                                 <td>@item.UpdatedBy</td>
                             </tr>
