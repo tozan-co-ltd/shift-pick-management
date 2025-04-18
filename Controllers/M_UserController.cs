@@ -252,7 +252,9 @@ namespace ai_truck_load_measurement.Controllers
                 DataTable dt = M_UserConnectController.ConnectMUsersToDataTable(sql);
 
                 // 管理権限列を数字から文字に変換
-                var conversionedDt = ConvertAuthorizedKubunFromNumberToString(dt);
+                var conversionedDt = GetConvertAuthorizedKubunFromNumberToString(dt);
+                // メール受け取り要否列をboolから文字に変換
+                conversionedDt = GetConvertedIsRequiredMailFromBoolToString(conversionedDt);
 
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(gamenName);
@@ -326,7 +328,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="dt">変換元データテーブル</param>
         /// <returns></returns>
-        private DataTable ConvertAuthorizedKubunFromNumberToString(DataTable dt)
+        private DataTable GetConvertAuthorizedKubunFromNumberToString(DataTable dt)
         {
             var index = dt.Columns.IndexOf("authorized_kubun");
             dt.Columns.Add("authorized_kubun_name").SetOrdinal(index);
@@ -471,6 +473,28 @@ namespace ai_truck_load_measurement.Controllers
             }
 
             return true;
+        }
+
+        private DataTable GetConvertedIsRequiredMailFromBoolToString(DataTable dt)
+        {
+            // テーブルに値を変換した後の文字列を格納する列を追加
+            dt.Columns.Add("converted_is_required_mail", typeof(string)).SetOrdinal(dt.Columns.IndexOf("is_required_mail"));
+            // 各列の値を適切な値に変換
+            foreach (DataRow row in dt.Rows)
+            {
+                if (row["is_required_mail"] == "TRUE")
+                {
+                    row["converted_is_required_mail"] = "受け取る";
+                }
+                else
+                {
+                    row["converted_is_required_mail"] = "受け取らない";
+                }
+            }
+
+            // 変換前の列を削除
+            dt.Columns.Remove("is_required_mail");
+            return dt;
         }
     }
 }
