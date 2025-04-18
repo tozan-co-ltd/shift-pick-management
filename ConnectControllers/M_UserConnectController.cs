@@ -287,6 +287,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     ad_name = '{model.ADName}',
                     depo_id = '{model.DepoID}',
                     authorized_kubun = '{model.AuthorizedKubun}',
+                    is_required_mail = '{model.IsRequiredMail}',
+                    mail_address = '{model.MailAddress}',
                     updated_at = '{updatedAt}',
                     updated_by = '{updatedBy}'
                 WHERE

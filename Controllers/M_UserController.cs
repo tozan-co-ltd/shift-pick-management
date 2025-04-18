@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using ai_truck_load_measurement.Commons;
 using System.Data;
 using System.DirectoryServices;
+using NPOI.SS.Formula.Functions;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -73,24 +74,12 @@ namespace ai_truck_load_measurement.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 入力規則チェック
-                if (!ModelState.IsValid)
+                // 入力チェック
+                var validCheck = ValidCheck(model);
+                if (!validCheck.IsValid)
                 {
                     // log取得
-                    errorMessage = "E1011: " + ErrorMessagesResources.E1011;
-                    _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
-
-                    return BadRequest(new { errorMessage });
-                }
-
-                // AD名重複チェック
-                var duplicateCheck = IsADNameDuplicate(model);
-                if (duplicateCheck)
-                {
-                    string displayName = Utils.GetDisplayName<M_UserModel>("ADName");
-
-                    // log取得
-                    errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, displayName);
+                    errorMessage = validCheck.ErrorMessage;
                     _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
 
                     return BadRequest(new { errorMessage });
@@ -153,30 +142,21 @@ namespace ai_truck_load_measurement.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
-                // 入力規則チェック
-                if (!ModelState.IsValid)
+                // 入力チェック
+                var validCheck = ValidCheck(model);
+                if (!validCheck.IsValid)
                 {
                     // log取得
-                    errorMessage = "E1011: " + ErrorMessagesResources.E1011;
-                    _logger.Error($"ユーザーマスター更新失敗 {errorMessage}");
-
-                    return BadRequest(new { errorMessage });
-                }
-
-
-                // ユーザー名重複チェック
-                if (IsADNameDuplicate(model))
-                {
-                    string displayName = Utils.GetDisplayName<M_UserModel>("ADName");
-
-                    // log取得
-                    errorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, displayName);
+                    errorMessage = validCheck.ErrorMessage;
                     _logger.Error($"ユーザーマスター登録失敗 {errorMessage}");
 
                     return BadRequest(new { errorMessage });
                 }
 
                 // ユーザー名がADに存在するか
+                // デバッグ時は無効化
+#if DEBUG
+#else
                 if (!HasNameInAD(model.ADName))
                 {
                     string displayName = Utils.GetDisplayName<M_UserModel>("ADName");
@@ -186,6 +166,7 @@ namespace ai_truck_load_measurement.Controllers
 
                     return BadRequest(new { errorMessage });
                 }
+#endif
 
                 // ユーザーマスター更新
                 M_UserConnectController.UpdateMUser(model, user);
@@ -397,6 +378,99 @@ namespace ai_truck_load_measurement.Controllers
             {
                 return false;
             }
+        }
+
+        // 各種入力チェック
+        private ValidCheckModel ValidCheck(M_UserModel model)
+        {
+            // 入力規則チェック
+            if (!ModelState.IsValid)
+                return new ValidCheckModel{
+                    IsValid = false,
+                    ErrorMessage = "E1011: " + ErrorMessagesResources.E1011
+                };
+
+            // ユーザー名重複チェック
+            if (IsADNameDuplicate(model))
+            {
+                string displayName = Utils.GetDisplayName<M_UserModel>("ADName");
+                return new ValidCheckModel
+                {
+                    IsValid = false,
+                    ErrorMessage = "E1010: " + string.Format(ErrorMessagesResources.E1010, displayName),
+                };
+            }
+
+            // メールの入力チェック
+            var mailValid = MailCheck(model);
+            if (!mailValid.IsValid)
+                return new ValidCheckModel
+                {
+                    IsValid = false,
+                    ErrorMessage = mailValid.ErrorMessage,
+                };
+
+
+            return new ValidCheckModel
+            {
+                IsValid = true,
+                ErrorMessage = "",
+            };
+        }
+
+        // メールの入力チェック
+        private ValidCheckModel MailCheck(M_UserModel model)
+        {
+
+            // メールアドレスに入力があり、
+            // かつメールアドレスの形式ではない
+            if (!string.IsNullOrEmpty(model.MailAddress) && !IsValidMailAddress(model.MailAddress))
+                return new ValidCheckModel()
+                {
+                    IsValid = false,
+                    ErrorMessage = "E1011: " + ErrorMessagesResources.E1011
+                };
+
+            // メールを受け取る
+            // かつメールアドレスの入力がない
+            if (model.IsRequiredMail && string.IsNullOrEmpty(model.MailAddress))
+                return new ValidCheckModel()
+                {
+                    IsValid = false,
+                    ErrorMessage = "E1014: " + ErrorMessagesResources.E1014
+                };
+
+            return new ValidCheckModel()
+            {
+                IsValid = true,
+                ErrorMessage = ""
+            };
+        }
+
+        /// <summary>
+        /// 指定された文字列がメールアドレスとして正しい形式か検証する
+        /// </summary>
+        /// <param name="address">検証する文字列</param>
+        /// <returns>正しい時はTrue。正しくない時はFalse。</returns>
+        private bool IsValidMailAddress(string address)
+        {
+            if (string.IsNullOrEmpty(address))
+            {
+                return false;
+            }
+
+            try
+            {
+                System.Net.Mail.MailAddress a =
+                    new System.Net.Mail.MailAddress(address);
+            }
+            catch (FormatException)
+            {
+                //FormatExceptionがスローされた時は、正しくない
+                return false;
+            }
+
+            return true;
         }
     }
 }

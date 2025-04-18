@@ -57,10 +57,10 @@ namespace ai_truck_load_measurement.Models
         public bool IsRequiredMail { get; set; }
 
         /// <summary>
-        /// メール受け取り要否
+        /// メールアドレス
         /// </summary>
         [Display(Name = "メールアドレス")]
-        public string MailAddress {  get; set; }
+        public string? MailAddress {  get; set; }
 
         /// <summary>
         /// 作成日時
@@ -81,5 +81,13 @@ namespace ai_truck_load_measurement.Models
         /// 更新者
         /// </summary>
         public string? UpdatedBy {  get; set; }
+    }
+
+    // バリデーションチェック時のモデル
+    public class ValidCheckModel
+    {
+        public bool IsValid {  get; set; }
+
+        public string ErrorMessage {  get; set; }
     }
 }
