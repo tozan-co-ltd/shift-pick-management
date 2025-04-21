@@ -1,5 +1,5 @@
 ﻿@using ai_truck_load_measurement.Commons;
-@model ai_truck_load_measurement.Models.M_NotificationModel;
+@model ai_truck_load_measurement.Models.M_NotificationRegisterViewModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - " + "登録";
@@ -26,27 +26,132 @@
                 <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="mTruckForm">
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayName("TripName")<span style="color:red">*</span></label>
+                            <label>@Html.DisplayName("TripNameSelectList")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <input class="form-control" type="text" asp-for="TripName" autocomplete="off" value="" required>
-                            <small class="form-text text-muted w-100 p-1">最大4桁の半角数字で入力してください</small>
-                            <span class="text-danger w-100" asp-validation-for="TruckNumber"></span>
+                            <select class="form-select" name="TripID" asp-for="TripID" asp-items="@Model.TripNameSelectList" required></select>
+                            <span class="text-danger w-100" asp-validation-for="TripID"></span>
                         </div>
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayName("IdentifyNumber")<span style="color:red">*</span></label>
+                            <label>@Html.DisplayName("TripBranchSeqSelectList")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <input class="form-control" type="text" asp-for="IdentifyNumber" autocomplete="off" value="" required>
-                            <small class="form-text text-muted w-100 p-1">4桁の半角数字で入力してください</small>
-                            <span class="text-danger w-100" asp-validation-for="IdentifyNumber"></span>
+                            <select class="form-select" name="TripBranchSeq" asp-for="TripBranchSeq" asp-items="@Model.TripBranchSeqSelectList" required></select>
+                            <span class="text-danger w-100" asp-validation-for="TripBranchSeq"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                        </div>
+                        <div class="col-lg-5 column-2nd">
+                            <div class="card">
+                                <div class="card-header">
+                                    <label>便枝番詳細情報</label>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="mb-0">
+                                        <li>到着予定時間：</li>
+                                        <li>出発予定時間：</li>
+                                        <li>適用開始日時：</li>
+                                        <li>適用終了日時：</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("ArrivalLowerLoadClass")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" name="ArrivalLowerLoadClass" asp-for="ArrivalLowerLoadClass" required>
+                                <option value="0" selected>選択してください</option>
+                                <option value="2">通知しない</option>
+                                <option value="3">1～10%</option>
+                                <option value="4">11～20%</option>
+                                <option value="5">21～30%</option>
+                                <option value="6">31～40%</option>
+                                <option value="7">41～50%</option>
+                                <option value="8">51～60%</option>
+                                <option value="9">61～70%</option>
+                                <option value="10">71～80%</option>
+                                <option value="11">81～90%</option>
+                                <option value="12">91～100%</option>
+                            </select>
+                            <span class="text-danger w-100" asp-validation-for="ArrivalLowerLoadClass"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("DepartureLowerLoadClass")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" name="DepartureLowerLoadClass" asp-for="DepartureLowerLoadClass" required>
+                                <option value="0" selected>選択してください</option>
+                                <option value="2">通知しない</option>
+                                <option value="3">1～10%</option>
+                                <option value="4">11～20%</option>
+                                <option value="5">21～30%</option>
+                                <option value="6">31～40%</option>
+                                <option value="7">41～50%</option>
+                                <option value="8">51～60%</option>
+                                <option value="9">61～70%</option>
+                                <option value="10">71～80%</option>
+                                <option value="11">81～90%</option>
+                                <option value="12">91～100%</option>
+                            </select>
+                            <span class="text-danger w-100" asp-validation-for="DepartureLowerLoadClass"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("NotificationStartDateTime")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="datetime-local" asp-for="NotificationStartDateTime" autocomplete="off" id="NotificationStartDateTime" required>
+                            <small class="form-text text-muted w-100 p-1">YYYY/MM/DD hh:mmで入力してください</small>
+                            <span class="text-danger w-100" asp-validation-for="NotificationStartDateTime"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("NotificationEndDateTime")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="datetime-local" asp-for="NotificationEndDateTime" autocomplete="off" id="NotificationEndDateTime" required>
+                            <small class="form-text text-muted w-100 p-1">YYYY/MM/DD hh:mmで入力してください</small>
+                            <span class="text-danger w-100" asp-validation-for="NotificationEndDateTime"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("NotificationUserList")</label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <div class="dropdown-container  mr-3" id="dropdownContainer">
+                                <button class="dropdown-button btn btn-primary btn-icon-split btn-register" id="dropdownButton">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
+                                    <span class="text">追加　　　</span>
+                                </button>
+                                <div class="dropdown-content" id="dropdownContent">
+                                    <div id="createToggleCheckBox">選択された稼働日にデータがありません</div>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-danger btn-icon-split btn-register mr-3" onclick="clearTrips()">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                                <span class="text">一括クリア</span>
+                            </a>
                         </div>
                     </div>
                     <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                         <div class="input-group-append mr-4">
-                            <a class="btn btn-secondary btn-icon-split" asp-controller="M_Truck" asp-action="Index">
+                            <a class="btn btn-secondary btn-icon-split" asp-controller="M_Notification" asp-action="Index">
                                 <span class="icon text-white-50">
                                     <i class="fas fa-arrow-left-long"></i>
                                 </span>

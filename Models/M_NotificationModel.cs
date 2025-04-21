@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace ai_truck_load_measurement.Models
 {
@@ -60,12 +61,12 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 通知開始日時
         /// </summary>
-        public DateTime NotificationStartDatetime { get; set; }
+        public DateTime NotificationStartDateTime { get; set; }
 
         /// <summary>
         /// 通知終了日時
         /// </summary>
-        public DateTime NotificationEndDatetime { get; set; }
+        public DateTime NotificationEndDateTime { get; set; }
 
         /// <summary>
         /// 通知先ユーザーリスト
@@ -122,12 +123,18 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         ///  便名称選択肢リスト
         /// </summary>
+        [Display(Name = "便名称")]
         public List<SelectListItem> TripNameSelectList { get; set; }
+
+        public int TripID {  get; set; }
 
         /// <summary>
         /// 便枝番選択肢リスト
         /// </summary>
+        [Display(Name = "便枝番")]
         public List<SelectListItem> TripBranchSeqSelectList { get; set; }
+
+        public int TripBranchSeq {  get; set; }
 
         /// <summary>
         /// 到着予定時間
@@ -150,13 +157,33 @@ namespace ai_truck_load_measurement.Models
         public DateTime ApplicableEndDateTime {  get; set; }
 
         /// <summary>
+        /// 到着荷量下限
+        /// </summary>
+        [Display(Name = "到着荷量下限")]
+        public int ArrivalLowerLoadClass {  get; set; }
+
+        /// <summary>
+        /// 出発荷量下限
+        /// </summary>
+        [Display(Name = "出発荷量下限")]
+        public int DepartureLowerLoadClass { get; set; }
+
+        /// <summary>
         /// 通知開始日時
         /// </summary>
-        public DateTime NotificationStartDatetime { get; set; }
+        [Display(Name = "通知開始日時")]
+        public DateTime NotificationStartDateTime { get; set; }
 
         /// <summary>
         /// 通知終了日時
         /// </summary>
-        public DateTime NotificationEndDatetime { get; set; }
+        [Display(Name = "通知終了日時")]
+        public DateTime NotificationEndDateTime { get; set; }
+
+        /// <summary>
+        /// メール受信者リスト
+        /// </summary>
+        [Display(Name = "メール受信者")]
+        public List<R_NotificationUserModel> NotificationUserList {  get; set; }
     }
 }

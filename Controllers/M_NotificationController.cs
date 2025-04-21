@@ -10,5 +10,12 @@ namespace ai_truck_load_measurement.Controllers
             var model = new M_NotificationViewModel();
             return View(model);
         }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            var model = new M_NotificationRegisterViewModel();
+            return View(model);
+        }
     }
 }
