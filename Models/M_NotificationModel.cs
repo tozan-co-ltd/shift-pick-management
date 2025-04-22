@@ -21,7 +21,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 便名称
         /// </summary>
-        public string TripName { get; set; }
+        public string? TripName { get; set; }
 
         /// <summary>
         /// 便枝番
@@ -36,7 +36,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// デポ名
         /// </summary>
-        public string DepoName { get; set; }
+        public string? DepoName { get; set; }
 
         /// <summary>
         /// 到着荷量下限クラス
@@ -46,7 +46,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 到着荷量下限の%表示
         /// </summary>
-        public string ArrivalLowerLoadStatus {  get; set; }
+        public string? ArrivalLowerLoadStatus {  get; set; }
 
         /// <summary>
         /// 出発荷量下限クラス
@@ -56,7 +56,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 出発荷量下限の%表示
         /// </summary>
-        public string DepartureLowerLoadStatus { get;set; }
+        public string? DepartureLowerLoadStatus { get;set; }
 
         /// <summary>
         /// 通知開始日時
@@ -71,7 +71,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 通知先ユーザーリスト
         /// </summary>
-        public List<R_NotificationUserModel> NotificationUsers { get; set; }
+        public List<R_NotificationUserModel>? NotificationUsers { get; set; }
 
         /// <summary>
         /// 削除フラグ
@@ -87,7 +87,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 作成者
         /// </summary>
-        public string CreatedBy {  get; set; }
+        public string? CreatedBy {  get; set; }
 
         /// <summary>
         /// 更新日時
@@ -97,7 +97,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 更新者
         /// </summary>
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
     }
 
 
@@ -106,6 +106,7 @@ namespace ai_truck_load_measurement.Models
     {
         public int NotificationUserID { get; set; }
         public int NotificationID { get; set; }
+        public string ADName {  get; set; }
         public int UserID { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime CreatedAt { get; set; }

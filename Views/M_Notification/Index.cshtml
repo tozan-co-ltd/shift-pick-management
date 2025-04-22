@@ -45,7 +45,7 @@
             <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                 <span class="warehouse-name-drs span-paragraph">オプション</span>
                 <div>
-                    <label><input type="checkbox" id="isBeforeApplicablePeriod" /> 通知終了日時を過ぎた便も表示</label>
+                    <label><input type="checkbox" id="isBeforeNotificationPeriod" /> 通知終了日時を過ぎた便も表示</label>
                 </div>
             </div>
         </div>
@@ -70,70 +70,152 @@
                 </div>
             </div>
         </div>
-        <div class="mt-3">
-            <table class="table table-sm stripe hover nowrap datatable-normal table-center">
-                <thead>
-                    <tr align="center">
-                        <th width="40"></th>
-                        <th class="font-weight-bold">通知ID</th>
-                        <th class="font-weight-bold">便名称</th>
-                        <th class="font-weight-bold">便枝番</th>
-                        <th class="font-weight-bold">デポ名</th>
-                        <th class="font-weight-bold">到着荷量下限</th>
-                        <th class="font-weight-bold">出発荷量下限</th>
-                        <th class="font-weight-bold">通知開始日時</th>
-                        <th class="font-weight-bold">通知終了日時</th>
-                        <th class="font-weight-bold">メール<br />受信者</th>
-                        <th class="font-weight-bold">更新者</th>
-                        <th class="font-weight-bold">更新日時</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (@Model.M_NotificationList != null)
-                    {
-                        @foreach (var item in @Model.M_NotificationList)
+        <div id="m_notificationTable">
+            <div class="mt-3">
+                <table class="table table-sm stripe hover nowrap datatable-normal table-center">
+                    <thead>
+                        <tr align="center">
+                            <th width="40"></th>
+                            <th class="font-weight-bold">通知ID</th>
+                            <th class="font-weight-bold">便名称</th>
+                            <th class="font-weight-bold">便枝番</th>
+                            <th class="font-weight-bold">デポ名</th>
+                            <th class="font-weight-bold">到着荷量下限</th>
+                            <th class="font-weight-bold">出発荷量下限</th>
+                            <th class="font-weight-bold">通知開始日時</th>
+                            <th class="font-weight-bold">通知終了日時</th>
+                            <th class="font-weight-bold">メール<br />受信者</th>
+                            <th class="font-weight-bold">更新日時</th>
+                            <th class="font-weight-bold">更新者</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (@Model.M_NotificationList != null)
                         {
-                            <tr>
-                                <td>
-                                    <a class="btn btn-success btn-icon-split ml-1 mr-1"
-                                       onclick="OnEditClick('@item.NotificationID')" data-id="@item.NotificationID" data-toggle="modal" data-target="#edit-modal">
-                                        <i class="fa-solid fa-pen"></i>
-                                    </a>
-                                    <button class="btn btn-danger btn-icon-split"
-                                            onclick="OnDeleteClick('@item.NotificationID')" data-id="@item.NotificationID" data-toggle="modal" data-target="#delete-modal">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </td>
-                                <td>@item.NotificationID</td>
-                                <td>@item.TripName</td>
-                                <td>@item.TripBranchSeq</td>
-                                <td>@item.DepoName</td>
-                                <td>@item.TripName</td>
-                                <td>@item.ArrivalLowerLoadStatus</td>
-                                <td>@item.DepartureLowerLoadClass</td>
-                                <td>
-                                    @for(int i=0; i<item.NotificationUsers.Count; i++)
-                                    {
-                                        @if(i != 0)
+                            @foreach (var item in @Model.M_NotificationList)
+                            {
+                                <tr>
+                                    <td>
+                                        <a class="btn btn-success btn-icon-split ml-1 mr-1"
+                                           onclick="OnEditClick('@item.NotificationID')" data-id="@item.NotificationID" data-toggle="modal" data-target="#edit-modal">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+                                        <button class="btn btn-danger btn-icon-split"
+                                                onclick="OnDeleteClick('@item.NotificationID')" data-id="@item.NotificationID" data-toggle="modal" data-target="#delete-modal">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                                    <td>@item.NotificationID</td>
+                                    <td>@item.TripName</td>
+                                    <td>@item.TripBranchSeq</td>
+                                    <td>@item.DepoName</td>
+                                    <td>@item.ArrivalLowerLoadStatus</td>
+                                    <td>@item.DepartureLowerLoadStatus</td>
+                                    <td>@item.NotificationStartDateTime</td>
+                                    <td>@item.NotificationEndDateTime</td>
+                                    <td>
+                                        @if (item.NotificationUsers != null)
                                         {
-                                           <br /> 
+                                            @for (int i = 0; i < item.NotificationUsers.Count; i++)
+                                            {
+                                                @if (i != 0)
+                                                {
+                                                    <br />
+                                                }
+                                                @item.NotificationUsers[i]
+                                            }
                                         }
-                                        @item.NotificationUsers[i]
-                                    }
-                                </td>
-                                <td>@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
-                                <td>@item.UpdatedBy</td>
-                            </tr>
+                                    </td>
+                                    <td>@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                                    <td>@item.UpdatedBy</td>
+                                </tr>
+                            }
                         }
-                    }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
+        
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
             model = @Html.Raw(Json.Serialize(Model));
+            console.log(model);
             addDepos(model);
             depoCheckDisplay(model);
         })
+
+        // オプションチェックボックス押下時
+        $('input[id="isBeforeNotificationPeriod"]').change(function () {
+            tableDisplay();
+        });
+
+        // 「すべて」チェックボックス押下時
+        $('input[id=allDepo]').change(function () {
+            pushAllCheckBox();
+            tableDisplay();
+        });
+
+        // 各デポチェックボックス押下時
+        $(function () {
+            $('input[name="depos"]').change(function () {
+                pushDepoCheckBox();
+                tableDisplay();
+            });
+        });
+
+        // 便テーブルの表示
+        function tableDisplay() {
+            // チェックボックスの入力情報取得
+            var isBeforeNotificationPeriod = $('input[id="isBeforeNotificationPeriod"]')[0].checked;
+            var checkedDepos = getCheckedDepos();
+            console.log(checkedDepos);
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("SearchData", "M_Notification")';
+            let method = 'Post';
+            let data = { isBeforeNotificationPeriod: isBeforeNotificationPeriod, checkedDepos: checkedDepos };
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+
+                $('#m_notificationTable').empty().html(response);
+                // 日本語表示
+                const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+                const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
+
+                // ID(2列目)昇順
+                $("#notificationTable").DataTable({
+                    "language": {
+                        "url": language_url
+                    },
+                    lengthChange: true,     // 件数切替
+                    info: true,            // 総件数
+                    scrollX: true,          // 横スクロール可
+                    scrollCollapse: true,   // 縦スクロール表示
+                    order: [[1, "asc"]],    // ID昇順
+                    searchHighlight: true,  // 検索ハイライト
+                    columnDefs: [
+                        { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
+                    ],
+                    "oLanguage": {
+                        "sSearch": "フリーワード(全件)"
+                    },
+                    dom: dom_structure
+                });
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#edit-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#edit-error-message").text(errorMessage);
+                }
+            });
+
+        }
     </script>
