@@ -130,3 +130,10 @@
             </table>
         </div>
     </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            model = @Html.Raw(Json.Serialize(Model));
+            addDepos(model);
+            depoCheckDisplay(model);
+        })
+    </script>

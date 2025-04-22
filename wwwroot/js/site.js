@@ -717,9 +717,7 @@ function addTrips(selectedTripName) {
         $("#div-error-message").text(errorMessage);
         return;
     }
-
-    console.log("nunu");
-
+    
     var tripNameAndBranchSeq = selectedTripName.split("_");
 
     // 便名称と便枝番取得
@@ -812,10 +810,6 @@ function clearTrips() {
     arrayWorkDays = [];
 }
 
-function condtionChange(page) {
-
-}
-
 // 期間変更時
 function periodChange(page) {
     // 期間の開始、終了日付の取得
@@ -848,20 +842,7 @@ function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, checkedDepos, pa
     }).done(function (response) {
         $('#createToggleCheckBox').empty().html(response);
         // 中項目のヘッダーをクリックで小項目を表示/非表示
-        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
-        mediumHeaders.forEach(header => {
-            header.addEventListener('click', () => {
-                const smallItems = header.nextElementSibling;
-                const toggleIcon = header.querySelector('.toggle-icon');
-                if (smallItems.classList.contains('show')) {
-                    smallItems.classList.remove('show');
-                    toggleIcon.classList.add('collapsed');
-                } else {
-                    smallItems.classList.add('show');
-                    toggleIcon.classList.remove('collapsed');
-                }
-            });
-        });
+        mediumHeaderDisplaySwitch();
 
         // チェックボックス切り替え時のイベント設定
         $(function () {
@@ -897,6 +878,24 @@ function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, checkedDepos, pa
     });
 
     
+}
+
+// 中項目のヘッダーをクリックで小項目を表示/非表示
+function mediumHeaderDisplaySwitch() {
+    let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+    mediumHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (smallItems.classList.contains('show')) {
+                smallItems.classList.remove('show');
+                toggleIcon.classList.add('collapsed');
+            } else {
+                smallItems.classList.add('show');
+                toggleIcon.classList.remove('collapsed');
+            }
+        });
+    });
 }
 
 //----------------------------------実績画面デポ関連-----------------------------------//
@@ -962,4 +961,143 @@ function pushDepoCheckBox() {
             break;
         }
     }
+}
+
+//-----------------------------通知マスター関連----------------------//
+
+
+// ユーザーの選択肢の生成
+function createToggleUserSelectCheckBox(page) {
+
+    // フォーム情報取得
+    let url = window.location.href + '/GetADNameHTML';
+    url = url.replace(page, '');
+    let method = 'Post';
+    let data = {};
+
+    // Ajax call
+    $.ajax({
+        url: url,
+        method: method,
+        data: data
+    }).done(function (response) {
+        $('#createToggleCheckBox').empty().html(response);
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        mediumHeaderDisplaySwitch();
+
+        // チェックボックス切り替え時のイベント設定
+        $(function () {
+            $('input[name="adName"]').change(function () {
+                // デフォルトの操作を無効化
+                event.preventDefault();
+
+                var checkBox = $(this).prop('checked');
+                console.log(checkBox);
+                var ADNameAndUserID = $(this).val().split("/");
+                var selectedADName = ADNameAndUserID[0];
+                var selectedUserID = ADNameAndUserID[1];
+
+                // イベントの発火元取得
+                // チェックボックスの状態取得
+                if (checkBox) {
+                    // 便追加
+                    addUsers(selectedUserID, selectedADName);
+
+                } else {
+                    // 便削除
+                    onUserLabelDeleteClick(selectedADName);
+                }
+
+            })
+        });
+
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status === 404) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        } else {
+            var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+            $("#div-error-message").text(errorMessage);
+        }
+    });
+}
+
+// 選択されたユーザーの配列
+let arrayUsers = [];
+
+// 追加ボタン押下時
+function addUsers(userID, adName) {
+    event.preventDefault();
+    
+    // 1行目の場合、項目追加
+    if (arrayTrips.length == 0)
+        document.getElementById("selectedUsers").innerHTML = "<span class=\" mb-3\">選択されたユーザー</span>";
+
+    // 重複チェック
+    const userIDs = arrayUsers.map(d => d.userID);
+    if (userIDs.includes(userID)) {
+        return;
+    }
+    
+    var selectedUsers = $('#selectedUsersChild')[0];
+
+    // 選択された便に追加
+    arrayUsers.push({ userID, adName});
+    pushLabelToSelectedUsers(selectedUsers, adName);
+}
+
+// 選択された便ラベルを作成、指定した親要素の子として登録
+function pushLabelToSelectedUsers(selectedUsers, adName) {
+    var selectedUserLabel = document.createElement("label");
+    selectedUserLabel.innerText = adName;
+    selectedUserLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1 \" onclick=\"onUserLabelDeleteClick('" + adName + "')\" id=\"" + adName +  "\">×</a>";
+    selectedUserLabel.className += "mr-2 mb-3 selected-user-label";
+    selectedUserLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
+    selectedUserLabel.style.padding = "0.5em";
+    selectedUserLabel.style.borderRadius = "5px";
+    selectedUsers.appendChild(selectedUserLabel);
+}
+
+// 選択された便の×ボタン押下時
+function onUserLabelDeleteClick(adName) {
+    event.preventDefault();
+    // ラベル全削除
+    $('.selected-user-label').remove();
+
+    // 配列から削除
+    const adNames = arrayUsers.map(d => d.adName);
+    var deleteIndex = adNames.indexOf(adName);
+
+    if (deleteIndex < 0)
+        return;
+
+    arrayUsers.splice(deleteIndex, 1);
+
+    $('#' + adName).prop('checked', false);
+
+    // 選択された便が1つも無くなった場合
+    if (arrayUsers.length == 0) {
+        document.getElementById("selectedUsers").innerHTML = "";
+        return;
+    }
+
+    // 選択された便の再表示
+    for (var i = 0; i < arrayUsers.length; i++) {
+        var selectedUsers = $('#selectedUsersChild')[0];
+
+        var adName = arrayUsers[i].adName;
+        pushLabelToSelectedTrips(selectedUsers, adName);
+    }
+}
+
+// 追加した選択肢の一括クリアボタン押下時
+function clearUsers() {
+    event.preventDefault();
+    // ラベルと配列から全削除
+    $('.selected-user-label').remove();
+    $('[name="adName"]').prop('checked', false);
+    var selectedUsers = document.getElementById("selectedUsers");
+    if (selectedUsers != null)
+        selectedUsers.innerHTML = "";
+    arrayUsers = [];
 }

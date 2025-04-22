@@ -38,7 +38,9 @@
                             <label>@Html.DisplayName("TripBranchSeqSelectList")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <select class="form-select" name="TripBranchSeq" asp-for="TripBranchSeq" asp-items="@Model.TripBranchSeqSelectList" required></select>
+                            <select class="form-select" name="TripBranchSeq" asp-for="TripBranchSeq" asp-items="@Model.TripBranchSeqSelectList" id="TripBranchSeq" required>
+                                <option value="0" selected disabled>選択してください</option>
+                            </select>
                             <span class="text-danger w-100" asp-validation-for="TripBranchSeq"></span>
                         </div>
                     </div>
@@ -52,10 +54,10 @@
                                 </div>
                                 <div class="card-body">
                                     <ul class="mb-0">
-                                        <li>到着予定時間：</li>
-                                        <li>出発予定時間：</li>
-                                        <li>適用開始日時：</li>
-                                        <li>適用終了日時：</li>
+                                        <li id="ArrivalScheduledTime">到着予定時間：</li>
+                                        <li id="DepartureScheduledTime">出発予定時間：</li>
+                                        <li id="ApplicableStartDateTime">適用開始日時：</li>
+                                        <li id="ApplicableEndDateTime">適用終了日時：</li>
                                     </ul>
                                 </div>
                             </div>
@@ -67,7 +69,7 @@
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <select class="form-select" name="ArrivalLowerLoadClass" asp-for="ArrivalLowerLoadClass" required>
-                                <option value="0" selected>選択してください</option>
+                                <option value="0" selected disabled>選択してください</option>
                                 <option value="2">通知しない</option>
                                 <option value="3">1～10%</option>
                                 <option value="4">11～20%</option>
@@ -89,7 +91,7 @@
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <select class="form-select" name="DepartureLowerLoadClass" asp-for="DepartureLowerLoadClass" required>
-                                <option value="0" selected>選択してください</option>
+                                <option value="0" selected disabled>選択してください</option>
                                 <option value="2">通知しない</option>
                                 <option value="3">1～10%</option>
                                 <option value="4">11～20%</option>
@@ -131,17 +133,17 @@
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <div class="dropdown-container  mr-3" id="dropdownContainer">
-                                <button class="dropdown-button btn btn-primary btn-icon-split btn-register" id="dropdownButton">
+                                <button class="dropdown-button btn btn-primary btn-icon-split btn-register" type="button" id="dropdownButton">
                                     <span class="icon text-white-50">
                                         <i class="fas fa-plus"></i>
                                     </span>
                                     <span class="text">追加　　　</span>
                                 </button>
                                 <div class="dropdown-content" id="dropdownContent">
-                                    <div id="createToggleCheckBox">選択された稼働日にデータがありません</div>
+                                    <div id="createToggleCheckBox">ユーザーマスターにユーザーが存在しません</div>
                                 </div>
                             </div>
-                            <a href="#" class="btn btn-danger btn-icon-split btn-register mr-3" onclick="clearTrips()">
+                            <a href="#" class="btn btn-danger btn-icon-split btn-register mr-3" onclick="clearUsers()">
                                 <span class="icon text-white-50">
                                     <i class="fas fa-trash"></i>
                                 </span>
@@ -149,6 +151,12 @@
                             </a>
                         </div>
                     </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st" id="selectedUsers">
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd" id="selectedUsersChild"></div>
+                    </div>
+                    
                     <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                         <div class="input-group-append mr-4">
                             <a class="btn btn-secondary btn-icon-split" asp-controller="M_Notification" asp-action="Index">
@@ -169,3 +177,151 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    // ロード時の処理
+    $(document).ready(function () {
+        // 今日の日付を取得
+        var today = new Date();
+        today.setDate(today.getDate());
+        var yyyy = today.getFullYear();
+        var MM = ("0" + (today.getMonth() + 1)).slice(-2);
+        var dd = ("0" + today.getDate()).slice(-2);
+        var hh = ("0" + today.getHours()).slice(-2);
+        var mm = ("0" + today.getMinutes()).slice(-2);;
+
+        $('#NotificationStartDateTime').val(yyyy + '-' + MM + '-' + dd + "T" + hh + ":" + mm);
+
+        // ユーザーのセレクトリスト作成
+        createToggleUserSelectCheckBox("/Register");
+    })
+
+    // 便名称選択時の処理
+    $('[name=TripID]').change(function () {
+        var tripID = $('[name=TripID]').val();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripBranchSeqs", "M_Notification")';
+        let method = 'POST';
+        let data = { tripID: tripID };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            // 便枝番セレクトリストの更新
+            AddOptionToSelectList(response)
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    });
+
+    // 便枝番セレクトリスト更新
+    function AddOptionToSelectList(selectListItems) {
+        var selectList = document.getElementById("TripBranchSeq");
+
+        // 子要素の初期化
+        while (selectList.firstChild) {
+            selectList.removeChild(selectList.firstChild);
+        }
+
+        selectListItems.forEach(function (item) {
+            console.log(item);
+            // optionタグを作成する
+            var option = document.createElement("option");
+            option.text = item.text;
+            option.value = item.value;
+            selectList.appendChild(option);
+        });
+    }
+
+    // 便枝番選択時の処理
+    $('[name=TripBranchSeq]').change(function () {
+        var tripID = $('[name=TripID]').val();
+        var tripBranchNumberID = $('[name=TripBranchSeq]').val();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripBranchSeqData", "M_Notification")';
+        let method = 'POST';
+        let data = { tripID: tripID, tripBranchNumberID: tripBranchNumberID };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            console.log(response);
+            SetTripBranchSeqData(response);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    });
+
+    function SetTripBranchSeqData(tripBranchNumberModel){
+        console.log($("#ArrivalScheduledTime"));
+        $("#ArrivalScheduledTime")[0].innerText = "到着予定時間：" + GetTimeString(new Date(tripBranchNumberModel.arrivalScheduledTime));
+        $("#DepartureScheduledTime")[0].innerText = "出発予定時間：" + GetTimeString(new Date(tripBranchNumberModel.departureScheduledTime));
+        $("#ApplicableStartDateTime")[0].innerText = "適用開始日時：" + GetDateString(new Date(tripBranchNumberModel.applicableStartDateTime));
+        $("#ApplicableEndDateTime")[0].innerText = "適用終了日時：" + GetDateString(new Date(tripBranchNumberModel.applicableEndDateTime));
+        $("#NotificationEndDateTime").val(tripBranchNumberModel.applicableEndDateTime);
+        console.log($("#ArrivalScheduledTime"));
+    }
+
+    // ドロップダウンの表示・非表示
+    dropdownButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropdownContainer.classList.toggle('show');
+    });
+
+    // コンテンツ外をクリックした場合、プルダウンを閉じる
+    document.addEventListener('click', (e) => {
+        if (!dropdownContainer.contains(e.target)) {
+            dropdownContainer.classList.remove('show');
+        }
+    });
+
+
+    function allToggleOpen() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (!smallItems.classList.contains('show')) {
+                smallItems.classList.add('show');
+                toggleIcon.classList.remove('collapsed');
+            }
+        });
+    }
+
+    function allToggleClose() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (smallItems.classList.contains('show')) {
+                smallItems.classList.remove('show');
+                toggleIcon.classList.add('collapsed');
+            }
+        });
+    }
+</script>
