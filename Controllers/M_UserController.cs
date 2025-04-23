@@ -337,11 +337,11 @@ namespace ai_truck_load_measurement.Controllers
                 var authorizedKubun = (int)row["authorized_kubun"];
                 if (authorizedKubun == 0)
                 {
-                    row["authorized_kubun_name"] = "管理者";
+                    row["authorized_kubun_name"] = "なし";
                 }
                 else if (authorizedKubun == 1)
                 {
-                    row["authorized_kubun_name"] = "なし";
+                    row["authorized_kubun_name"] = "管理者";
                 }
             }
             dt.Columns.Remove("authorized_kubun");
@@ -482,7 +482,7 @@ namespace ai_truck_load_measurement.Controllers
             // 各列の値を適切な値に変換
             foreach (DataRow row in dt.Rows)
             {
-                if (row["is_required_mail"] == "TRUE")
+                if (row["is_required_mail"].ToString() == "True")
                 {
                     row["converted_is_required_mail"] = "受け取る";
                 }
