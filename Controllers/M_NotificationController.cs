@@ -68,6 +68,12 @@ namespace ai_truck_load_measurement.Controllers
                     var sql = M_NotificationConnectController.CreateSQLToSelectMNotifications(isBeforeNotificationPeriod, checkedDepos);
                     // DB接続
                     notificationList = M_NotificationConnectController.ConnectMNotifications(sql);
+                    // 荷量クラスを％表示に変換
+                    foreach (M_NotificationModel notification in notificationList)
+                    {
+                        notification.ArrivalLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.ArrivalLowerLoadClass) + " 未満";
+                        notification.DepartureLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.DepartureLowerLoadClass) + " 未満";
+                    }
                 }
 
                 searchData += $@"
@@ -289,7 +295,7 @@ namespace ai_truck_load_measurement.Controllers
                 SelectListItem menuItem = new()
                 {
                     Text = Convert.ToString(tripBranch.TripBranchSeq),
-                    Value = Convert.ToString(tripBranch.TripBranchNumberID),
+                    Value = Convert.ToString(tripBranch.TripBranchNumberID) + "_" + Convert.ToString(tripBranch.TripBranchSeq),
                     Selected = false
                 };
                 selectList.Add(menuItem);
@@ -305,38 +311,12 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         private List<M_TripBranchNumberModel> AddTripBranchSeq(List<M_TripBranchNumberModel> tripBranchNumberList)
         {
-            var countBeforeShiftStartTimeRow = 0; // 到着予定時間が昼勤開始時間より早い行の数
             var tripBranchSeq = 1; // 枝連番
 
-            for (int i = 0; i < tripBranchNumberList.Count; i++)
+            foreach (var tripBranchNumber in tripBranchNumberList) 
             {
-
-                var tripBranchNumber = tripBranchNumberList[i];
-                var dayShiftStartTime = tripBranchNumber.DayShiftStartTime;
-                var arrivalScheduledTime = tripBranchNumber.ArrivalScheduledTime;
-
-                // 到着予定時間が昼勤開始時間以降のデータの場合、枝連番付与
-                // それ以外の場合、昼勤開始時間以前の行数のカウントを1増やす
-                if (arrivalScheduledTime > dayShiftStartTime)
-                {
-                    tripBranchNumber.TripBranchSeq = tripBranchSeq;
-                    tripBranchSeq++;
-                }
-                else
-                {
-                    countBeforeShiftStartTimeRow++;
-                }
-            }
-
-            // 到着予定時間が昼勤開始時間以前のデータに枝連番付与
-            if (countBeforeShiftStartTimeRow > 0)
-            {
-                for (int i = 0; i < countBeforeShiftStartTimeRow; i++)
-                {
-                    var tripBranchNumber = tripBranchNumberList[i];
-                    tripBranchNumber.TripBranchSeq = tripBranchSeq;
-                    tripBranchSeq++;
-                }
+                tripBranchNumber.TripBranchSeq = tripBranchSeq;
+                tripBranchSeq++;
             }
 
             return tripBranchNumberList;
