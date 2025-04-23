@@ -60,6 +60,7 @@ namespace ai_truck_load_measurement.Models
         /// メールアドレス
         /// </summary>
         [Display(Name = "メールアドレス")]
+        [RegularExpression(@"^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$", ErrorMessage = "メールアドレスを入力してください")]
         public string? MailAddress {  get; set; }
 
         /// <summary>
