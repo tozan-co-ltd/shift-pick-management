@@ -42,6 +42,37 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// 通知ユーザー情報取得
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <returns></returns>
+        public static List<R_NotificationUserModel> ConnectRNotificationUsers(string sql)
+        {
+            // 戻り値
+            List<R_NotificationUserModel> strList = new();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                    strList = connection.Query<R_NotificationUserModel>(sql).ToList();
+                }
+                return strList;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
         /// 便情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
@@ -260,6 +291,36 @@ namespace ai_truck_load_measurement.ConnectControllers
             sql += $@"
                 ORDER BY 
                     Notifications.notification_id, Notifications.notification_start_datetime
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 通知ユーザー情報取得SQL作成
+        /// </summary>
+        /// <param name="notificationId">通知ID</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectRNotificationUsers(int notificationId)
+        {
+            var sql = $@"
+                SELECT 
+                    NotificationUsers.notification_user_id
+                    ,NotificationUsers.notification_id
+                    ,NotificationUsers.user_id
+                    ,Users.ad_name
+                    ,NotificationUsers.is_deleted
+                    ,NotificationUsers.created_at
+                    ,NotificationUsers.created_by
+                FROM 
+                    r_notification_users AS NotificationUsers
+                INNER JOIN
+                    m_users AS Users
+                ON
+                    NotificationUsers.user_id = Users.user_id
+                WHERE
+                    notification_id = {notificationId}
+                AND
+                    NotificationUsers.is_deleted <> 1
             ";
             return sql;
         }

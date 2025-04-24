@@ -27,13 +27,18 @@ namespace ai_truck_load_measurement.Controllers
 
                 if (depoList.Count > 0)
                 {
-                    // 便マスター情報取得SQL作成
-                    var sql = M_NotificationConnectController.CreateSQLToSelectMNotifications(true, depoList);
+                    // 通知マスター情報取得SQL作成
+                    var notificationSql = M_NotificationConnectController.CreateSQLToSelectMNotifications(true, depoList);
                     // DB接続
-                    notificationList = M_NotificationConnectController.ConnectMNotifications(sql);
-                    // 荷量クラスを％表示に変換
+                    notificationList = M_NotificationConnectController.ConnectMNotifications(notificationSql);
+
                     foreach(M_NotificationModel notification in notificationList)
                     {
+                        // 通知ユーザー情報取得SQL作成
+                        var notificationUserSql = M_NotificationConnectController.CreateSQLToSelectRNotificationUsers(notification.NotificationID);
+                        notification.NotificationUsers = M_NotificationConnectController.ConnectRNotificationUsers(notificationUserSql);
+
+                        // 荷量クラスを％表示に変換
                         notification.ArrivalLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.ArrivalLowerLoadClass) + " 未満";
                         notification.DepartureLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.DepartureLowerLoadClass) + " 未満";
                     }
@@ -50,6 +55,7 @@ namespace ai_truck_load_measurement.Controllers
                 return View(model);
             }
         }
+
 
         /// <summary>
         /// 便情報テーブル非同期更新用
@@ -71,6 +77,9 @@ namespace ai_truck_load_measurement.Controllers
                     // 荷量クラスを％表示に変換
                     foreach (M_NotificationModel notification in notificationList)
                     {
+                        // 通知ユーザー情報取得SQL作成
+                        var notificationUserSql = M_NotificationConnectController.CreateSQLToSelectRNotificationUsers(notification.NotificationID);
+                        notification.NotificationUsers = M_NotificationConnectController.ConnectRNotificationUsers(notificationUserSql);
                         notification.ArrivalLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.ArrivalLowerLoadClass) + " 未満";
                         notification.DepartureLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.DepartureLowerLoadClass) + " 未満";
                     }
