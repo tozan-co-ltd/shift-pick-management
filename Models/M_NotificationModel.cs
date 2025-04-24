@@ -23,6 +23,8 @@ namespace ai_truck_load_measurement.Models
         /// </summary>
         public string? TripName { get; set; }
 
+        public string? TripBranchIDAndSeq {  get; set; }
+
         /// <summary>
         /// 便枝番
         /// </summary>
@@ -67,6 +69,8 @@ namespace ai_truck_load_measurement.Models
         /// 通知終了日時
         /// </summary>
         public DateTime NotificationEndDateTime { get; set; }
+
+        public List<string>? NotificationUsersView { get; set; }
 
         /// <summary>
         /// 通知先ユーザーリスト
@@ -135,6 +139,9 @@ namespace ai_truck_load_measurement.Models
         /// </summary>
         [Display(Name = "便枝番")]
         public List<SelectListItem> TripBranchSeqSelectList { get; set; }
+
+
+        public string? TripBranchIDAndSeq { get; set; }
 
         public int TripBranchSeq {  get; set; }
 

@@ -38,10 +38,10 @@
                             <label>@Html.DisplayName("TripBranchSeqSelectList")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <select class="form-select" name="TripBranchSeq" asp-for="TripBranchSeq" asp-items="@Model.TripBranchSeqSelectList" id="TripBranchSeq" required>
+                            <select class="form-select" name="TripBranchIDAndSeq" asp-for="TripBranchIDAndSeq" asp-items="@Model.TripBranchSeqSelectList" id="TripBranchIDAndSeq" required>
                                 <option value="0" selected disabled>選択してください</option>
                             </select>
-                            <span class="text-danger w-100" asp-validation-for="TripBranchSeq"></span>
+                            <span class="text-danger w-100" asp-validation-for="TripBranchIDAndSeq"></span>
                         </div>
                     </div>
                     <div class="col-12 input-group div-input-group">
@@ -226,7 +226,7 @@
 
     // 便枝番セレクトリスト更新
     function AddOptionToSelectList(selectListItems) {
-        var selectList = document.getElementById("TripBranchSeq");
+        var selectList = document.getElementById("TripBranchIDAndSeq");
 
         // 子要素の初期化
         while (selectList.firstChild) {
@@ -244,9 +244,9 @@
     }
 
     // 便枝番選択時の処理
-    $('[name=TripBranchSeq]').change(function () {
+    $('[name=TripBranchIDAndSeq]').change(function () {
         var tripID = $('[name=TripID]').val();
-        var tripBranchNumberID = $('[name=TripBranchSeq]').val();
+        var tripBranchNumberID = $('[name=TripBranchIDAndSeq]').val().split("_")[0];
 
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetTripBranchSeqData", "M_Notification")';
@@ -346,6 +346,7 @@
             let method = 'POST';
             let formId = 'mNotificationForm';
             let data = form.serializeArray();
+            data.push({ NotificationUsers: arrayUsers });
             console.log(data);
 
             // Ajax call

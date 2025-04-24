@@ -987,7 +987,7 @@ function createToggleUserSelectCheckBox(page) {
 
         // チェックボックス切り替え時のイベント設定
         $(function () {
-            $('input[name="adName"]').change(function () {
+            $('input[name="NotificationUsersView"]').change(function () {
                 // デフォルトの操作を無効化
                 event.preventDefault();
 
@@ -1095,7 +1095,7 @@ function clearUsers() {
     event.preventDefault();
     // ラベルと配列から全削除
     $('.selected-user-label').remove();
-    $('[name="adName"]').prop('checked', false);
+    $('[name="NotificationUsersView"]').prop('checked', false);
     var selectedUsers = document.getElementById("selectedUsers");
     if (selectedUsers != null)
         selectedUsers.innerHTML = "";

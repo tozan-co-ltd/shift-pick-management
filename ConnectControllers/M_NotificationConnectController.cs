@@ -105,12 +105,12 @@ namespace ai_truck_load_measurement.ConnectControllers
 
 
         /// <summary>
-        /// 便情報と便履歴情報登録
+        /// 通知マスターと通知ユーザー登録
         /// </summary>
         /// <param name="model">登録情報</param>
         /// <param name="loginUser">ログインユーザー情報</param>
         /// <returns>インサート数</returns>
-        public static int InsertMNotification(M_NotificationModel model, LoginUserModel loginUser)
+        public static int InsertMNotificationAndRNotificationUser(M_NotificationModel model, LoginUserModel loginUser)
         {
             // SQLServer接続文字列取得
             var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
@@ -129,8 +129,12 @@ namespace ai_truck_load_measurement.ConnectControllers
                     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
                     try
                     {
-                        string sql =CreateSQLToInsetMNotification(model, loginUser.UserName);
-                        insertedCount = connection.Execute(sql, new { }, command.Transaction);
+                        // 通知マスター登録
+                        var notificationId = InsertMNotification(model, loginUser.UserName, connection, command);
+
+                        // 通知ユーザー登録
+                        insertedCount = InsertRNotificationUser(model, notificationId, loginUser.UserName, connection, command);
+
                     }
                     catch (Exception)
                     {
@@ -141,6 +145,71 @@ namespace ai_truck_load_measurement.ConnectControllers
                     return insertedCount;
                 }
             }
+        }
+
+        /// <summary>
+        /// 通知マスター登録
+        /// </summary>
+        /// <param name="model">通知モデル</param>
+        /// <param name="userName">ユーザー名</param>
+        /// <param name="connection">SqlConnection</param>
+        /// <param name="command">SqlCommand</param>
+        /// <returns>通知ID</returns>
+        private static int InsertMNotification(M_NotificationModel model, string userName, SqlConnection connection, SqlCommand command)
+        {
+            string notificationSql = CreateSQLToInsetMNotification(model, userName);
+            var notificationId = Int32.Parse(connection.ExecuteScalar(notificationSql, new { }, command.Transaction).ToString());
+            return notificationId;
+        }
+
+        /// <summary>
+        /// 通知ユーザー登録
+        /// </summary>
+        /// <param name="model">通知モデル</param>
+        /// <param name="notificationId">通知ID</param>
+        /// <param name="userName">ユーザー名</param>
+        /// <param name="connection">SqlConnection</param>
+        /// <param name="command">SqlCommand</param>
+        /// <returns></returns>
+        private static int InsertRNotificationUser(M_NotificationModel model, int notificationId, string userName, SqlConnection connection, SqlCommand command)
+        {
+            // 通知ユーザーのAD名とユーザーIDを取得してモデルリスト化する
+            var notificationUserList = GetNotificationUserList(model);
+            int insertedCount = 0;
+            // 各通知ユーザーを登録
+            foreach (var notificationUser in notificationUserList)
+            {
+                var sql = CreateSQLToInsertRNotificationUsers(notificationUser, notificationId, userName);
+                insertedCount += connection.Execute(sql, new { }, command.Transaction);
+            }
+            return insertedCount;
+        }
+
+        /// <summary>
+        /// 通知ユーザーのAD名とユーザーIDを取得してモデルリスト化する
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private static List<R_NotificationUserModel> GetNotificationUserList(M_NotificationModel model)
+        {
+            List<R_NotificationUserModel> notificationUserList = new();
+            var notificationUserStringList = model.NotificationUsersView;
+
+            if (notificationUserStringList == null)
+                return notificationUserList;
+
+            foreach(var notificationUserString in notificationUserStringList)
+            {
+                var adNameAndUserId = notificationUserString.Split('/');
+                R_NotificationUserModel notificationUser = new R_NotificationUserModel()
+                {
+                    ADName = adNameAndUserId[0],
+                    UserID = Int32.Parse(adNameAndUserId[1]),
+                };
+                notificationUserList.Add(notificationUser);
+            }
+
+            return notificationUserList;
         }
 
         /// <summary>
@@ -257,7 +326,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="tripId">便ID</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectMTripBranchNumberFromTripBranchNumberID(int tripId, int tripBranchNumberID)
+        public static string CreateSQLToSelectMTripBranchNumberFromTripBranchNumberID(int tripId, int tripBranchNumberId)
         {
             DateTime today = DateTime.Now;
             var sql = $@"
@@ -269,7 +338,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                applicable_end_datetime
                 FROM m_trip_branch_numbers
                 WHERE trip_id = '{tripId}'
-                AND trip_branch_number_id = '{tripBranchNumberID}'
+                AND trip_branch_number_id = '{tripBranchNumberId}'
                 AND applicable_end_datetime > '{today}'
             ";
             return sql;
@@ -280,7 +349,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="model">通知モデル</param>
         /// <param name="createdBy">作成者</param>
-        /// <returns></returns>
+        /// <returns>SQL文</returns>
         public static string CreateSQLToInsetMNotification(M_NotificationModel model, string createdBy)
         {
             DateTime today = DateTime.Now;
@@ -310,6 +379,33 @@ namespace ai_truck_load_measurement.ConnectControllers
                            ,'{createdBy}'
                            ,'false')
                     SELECT SCOPE_IDENTITY();
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 通知ユーザー情報登録SQL作成
+        /// </summary>
+        /// <param name="model">通知ユーザーモデル</param>
+        /// <param name="notificationId">通知ID</param>
+        /// <param name="createdBy">作成者</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToInsertRNotificationUsers(R_NotificationUserModel model, int notificationId, string createdBy)
+        {
+            DateTime today = DateTime.Now;
+            var sql = $@"
+                INSERT INTO r_notification_users
+                           ([notification_id]
+                           ,[user_id]
+                           ,[is_deleted]
+                           ,[created_at]
+                           ,[created_by])
+                     VALUES
+                           ({notificationId}
+                           ,{model.UserID}
+                           ,'false'
+                           ,'{today.ToString("yyyy-MM-dd HH:mm:ss")}'
+                           ,'{createdBy}')
             ";
             return sql;
         }

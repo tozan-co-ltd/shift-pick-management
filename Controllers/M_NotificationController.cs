@@ -198,6 +198,8 @@ namespace ai_truck_load_measurement.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
+                model = ConvertTripBranchSeqFromTripBranchIDAndSeq(model);
+
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
@@ -210,7 +212,7 @@ namespace ai_truck_load_measurement.Controllers
 
 
                 // 便マスター登録
-                M_NotificationConnectController.InsertMNotification(model, user);
+                M_NotificationConnectController.InsertMNotificationAndRNotificationUser(model, user);
 
                 // log取得
                 _logger.Info($"便マスター登録成功 便名称:{model.TripName}");
@@ -234,6 +236,18 @@ namespace ai_truck_load_measurement.Controllers
 
                 return NotFound(new { errorMessage });
             }
+        }
+
+        /// <summary>
+        /// 「便枝番ID_枝連番」から枝連番を取得、保存する
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private M_NotificationModel ConvertTripBranchSeqFromTripBranchIDAndSeq(M_NotificationModel model)
+        {
+            var tripBranchIDAndSeq = model.TripBranchIDAndSeq.Split('_');
+            model.TripBranchSeq = Int32.Parse(tripBranchIDAndSeq[1]);
+            return model;
         }
 
         /// <summary>
@@ -410,7 +424,7 @@ namespace ai_truck_load_measurement.Controllers
                         // ユーザーチェックボックスの追加
                         html += $@"
                                 <label class=""checkbox-item"">
-                                    <input type=""checkbox"" name=""adName"" id=""{user.ADName}"" value=""{user.ADName}/{user.UserID}"">{user.ADName}
+                                    <input type=""checkbox"" name=""NotificationUsersView"" id=""{user.ADName}"" value=""{user.ADName}/{user.UserID}"">{user.ADName}
                                 </label>
                         ";
                 }
