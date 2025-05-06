@@ -490,9 +490,9 @@
     {
         var selectedUsers = $('#selectedUsersChild')[0];
 
+        clearUsers();
         // ユーザーが登録されていない場合
         if (notificationModel.notificationUsers.length == 0) {
-            clearUsers();
             return;
         }
 
