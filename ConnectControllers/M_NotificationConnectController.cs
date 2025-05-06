@@ -104,6 +104,39 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// 通知情報をデータテーブルとして取得
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <returns></returns>
+        public static DataTable ConnectMNotificationsToDataTable(string sql)
+        {
+            // 戻り値
+            DataTable dataTable = new DataTable();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandText = sql;
+                    var adapter = new SqlDataAdapter(command);
+                    adapter.Fill(dataTable);
+                }
+                return dataTable;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
         /// 便枝番情報取得
         /// </summary>
         /// <param name="sql">SQL文</param>
@@ -785,6 +818,113 @@ namespace ai_truck_load_measurement.ConnectControllers
                 WHERE
                     notification_id = {notificationID}
             ";
+            return sql;
+        }
+
+        /// <summary>
+        /// データテーブル用の通知マスター情報取得SQL作成
+        /// </summary>
+        /// <param name="isBeforeNotificationPeriod">通知終了日時を過ぎた便を含むか</param>
+        /// <param name="checkedDepos">チェックされたデポリスト</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectMNotificationsForDataTable(bool isBeforeNotificationPeriod, List<string> checkedDepos)
+        {
+            var sql = $@"
+                SELECT 
+	                Notifications.notification_id,
+                    Trips.trip_name,
+                    Notifications.trip_branch_seq,
+	                Depos.name AS depo_name,
+                    Notifications.arrival_lower_load_class,
+                    Notifications.departure_lower_load_class,
+                    Notifications.is_deleted,
+                    FORMAT(Notifications.notification_start_datetime, 'yyyy/MM/dd HH:mm:ss'),
+                    FORMAT(Notifications.notification_end_datetime, 'yyyy/MM/dd HH:mm:ss'),
+                    FORMAT(Notifications.created_at, 'yyyy/MM/dd HH:mm:ss'),
+                    Notifications.created_by,
+                    FORMAT(Notifications.updated_at, 'yyyy/MM/dd HH:mm:ss'),
+                    Notifications.updated_by
+                FROM 
+	                m_notifications AS Notifications
+                INNER JOIN
+                    m_trips AS Trips
+                ON
+                    Notifications.trip_id = Trips.trip_id
+                INNER JOIN
+                    m_trip_histories AS TripHistories
+                ON 
+                    Notifications.trip_id = TripHistories.trip_id
+                INNER JOIN 
+	                m_depos as Depos
+                ON
+	                TripHistories.depo_id = Depos.depo_id
+                WHERE
+                    {CommonConnectController.SQLOfCheckedDepos(checkedDepos)}
+            ";
+            // 適用終了日時を過ぎた便を含まない場合
+            if (!isBeforeNotificationPeriod)
+            {
+                string formatRefferenceDate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+                sql += $@"
+                    AND
+                        Notifications.notification_end_datetime > '{formatRefferenceDate}'
+                ";
+            }
+
+            sql += $@"
+                    ORDER BY 
+                        Notifications.notification_id
+                ";
+            return sql;
+        }
+
+        /// <summary>
+        /// データテーブル用の通知ユーザー情報取得SQL作成
+        /// </summary>
+        /// <param name="isBeforeNotificationPeriod">通知終了日時を過ぎた便を含むか</param>
+        /// <param name="checkedDepos">チェックされたデポリスト</param>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectRNotificationUsersForDataTable(bool isBeforeNotificationPeriod, List<string> checkedDepos)
+        {
+            var sql = $@"
+                SELECT 
+                    NotificationUsers.notification_user_id,
+	                NotificationUsers.notification_id,
+                    Users.ad_name,
+                    NotificationUsers.is_deleted,
+                    FORMAT(NotificationUsers.created_at, 'yyyy/MM/dd HH:mm:ss'),
+                    NotificationUsers.created_by
+                FROM
+                    r_notification_users AS NotificationUsers
+                INNER JOIN
+	                m_notifications AS Notifications
+                ON
+                    NotificationUsers.notification_id = notifications.notification_id
+                INNER JOIN
+                    m_trip_histories AS TripHistories
+                ON 
+                    Notifications.trip_id = TripHistories.trip_id
+                INNER JOIN
+                    m_users AS Users
+                ON
+                    NotificationUsers.user_id = Users.user_id
+                WHERE
+                    {CommonConnectController.SQLOfCheckedDepos(checkedDepos)}
+            ";
+            // 通知終了日時を過ぎた便を含まない場合
+            if (!isBeforeNotificationPeriod)
+            {
+                string formatRefferenceDate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+                sql += $@"
+                    AND
+                        Notifications.notification_end_datetime > '{formatRefferenceDate}'
+                ";
+            }
+
+            sql += $@"
+                    ORDER BY 
+                        NotificationUsers.notification_user_id
+                ";
             return sql;
         }
     }

@@ -1,10 +1,12 @@
-﻿using ai_truck_load_measurement.ConnectControllers;
+﻿using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
+using System.Data;
 using X.PagedList;
 
 namespace ai_truck_load_measurement.Controllers
@@ -345,6 +347,123 @@ namespace ai_truck_load_measurement.Controllers
 
                 return NotFound(new { errorMessage });
             }
+        }
+
+
+        /// <summary>
+        /// ファイル出力
+        /// </summary>
+        /// <param name="gamenName">現在の画面名</param>
+        /// <returns></returns>
+        public JsonResult ExportFile(string gamenName, bool isBeforeNotificationPeriod, List<string> checkedDepos)
+        {
+            string? errorMessage;
+            try
+            {
+                DataTable mNotificationDT = new DataTable(); // 通知マスター用データテーブル
+                DataTable rNotificationUserDT = new DataTable(); // 通知ユーザー用データテーブル
+                DataTable mNotificationConvertedDT = new DataTable();
+
+                // デポが選択されていない場合
+                if (checkedDepos.Count == 0)
+                {
+                    // エラーメッセージ取得
+                    // 「ファイルが存在しません。」
+                    errorMessage = ErrorMessagesResources.E9999;
+                    return Json(new { res = "NG", error = errorMessage });
+                }
+
+                // 通知マスター情報取得
+                var mNotificationSql = M_NotificationConnectController.CreateSQLToSelectMNotificationsForDataTable(isBeforeNotificationPeriod, checkedDepos);
+                mNotificationDT = M_NotificationConnectController.ConnectMNotificationsToDataTable(mNotificationSql);
+                // 荷量クラスを数値に変換
+                mNotificationConvertedDT = GetConvertedLoadClassDataTable(mNotificationDT);
+
+                // 通知ユーザー情報取得
+                var rNotificationUserSql = M_NotificationConnectController.CreateSQLToSelectRNotificationUsersForDataTable(isBeforeNotificationPeriod, checkedDepos);
+                rNotificationUserDT = M_NotificationConnectController.ConnectMNotificationsToDataTable(rNotificationUserSql);
+
+                // ファイル名
+                var tmpFilename = CreateFile.CreateFileName(gamenName);
+                // 2シートあり
+                bool sheetTwo = true;
+
+                // シート名
+                string sheetNameOne = "通知マスター";
+                string sheetNameTwo = "通知ユーザー";
+
+
+                try
+                {
+                    // Excelファイル作成チェック
+                    var createRs = CreateFile.CheckCreateExcel(mNotificationConvertedDT, rNotificationUserDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
+
+                    if (createRs.Item1)
+                    {
+                        var file = System.IO.File.ReadAllBytes(createRs.Item2);
+
+                        CreateFile.DeleteFile(tmpFilename);
+
+                        return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+                    }
+                    else
+                    {
+                        // エラーメッセージ取得
+                        // 「ファイルが存在しません。」
+                        errorMessage = ErrorMessagesResources.E9999;
+
+                        return Json(new { res = "NG", error = errorMessage });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // エラーメッセージ取得
+                    // 「NASに接続できませんでした。」
+                    errorMessage = ErrorMessagesResources.E9999;
+
+                    // log取得
+                    var exceptionMessage = ex.Message;
+                    return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+                }
+            }
+            catch (Exception ex)
+            {
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+
+                // log取得
+                var exceptionMessage = ex.Message;
+                return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+            }
+
+        }
+
+        /// <summary>
+        /// データテーブルの荷量クラスを数値に変換
+        /// </summary>
+        /// <param name="dt">変換元データテーブル</param>
+        /// <returns></returns>
+        public  DataTable GetConvertedLoadClassDataTable(DataTable dt)
+        {
+            // テーブルに値を変換した後の文字列を格納する列を追加
+            dt.Columns.Add("arrival_lower_load_status", typeof(string)).SetOrdinal(dt.Columns.IndexOf("arrival_lower_load_class"));
+            dt.Columns.Add("departure_lower_load_status", typeof(string)).SetOrdinal(dt.Columns.IndexOf("departure_lower_load_class"));
+
+            // 各列の値を適切な値に変換
+            foreach (DataRow row in dt.Rows)
+            {
+                // 荷量クラスを%表示に変換
+                var arrivalLoadClass = (int)row["arrival_lower_load_class"];
+                var departureLoadClass = (int)row["departure_lower_load_class"];
+                row["arrival_lower_load_status"] = LoadRecordController.ConversionLoadClassToLoadStatus(arrivalLoadClass) + " 未満";
+                row["departure_lower_load_status"] = LoadRecordController.ConversionLoadClassToLoadStatus(departureLoadClass) + " 未満";
+            }
+
+            // 変換前の列を削除
+            dt.Columns.Remove("arrival_lower_load_class");
+            dt.Columns.Remove("departure_lower_load_class");
+            return dt;
         }
 
         /// <summary>

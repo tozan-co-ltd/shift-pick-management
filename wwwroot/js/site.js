@@ -149,6 +149,7 @@ function onExportFileTripsCommon(page, data) {
     let url = window.location.href + '/ExportFile';
     let method = 'Post';
     tableDisplay(page);
+    console.log(data);
     event.preventDefault();
     // Ajax call
     $.ajax({

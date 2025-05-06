@@ -61,7 +61,7 @@
                     </a>
                 </div>
                 <div class="input-group-append">
-                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFile('M_Notification', '@Model.ViewTitle')">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileNotification('M_Notification', '@Model.ViewTitle')">
                         <span class="icon text-white-50">
                             <i class="fas fa-file-export"></i>
                         </span>
@@ -317,7 +317,6 @@
 <script type="text/javascript">
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
-        console.log(model);
         addDepos(model);
         depoCheckDisplay(model);
         tableDisplay();
@@ -349,7 +348,6 @@
         // チェックボックスの入力情報取得
         var isBeforeNotificationPeriod = $('input[id="isBeforeNotificationPeriod"]')[0].checked;
         var checkedDepos = getCheckedDepos();
-        console.log(checkedDepos);
 
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "M_Notification")';
@@ -441,6 +439,27 @@
         });
     }
 
+    // エクセル出力
+    function onExportFileNotification(page, gamenName) {
+        event.preventDefault();
+        $('#div-error-message').text("");
+
+        // チェックボックスの入力情報取得
+        var isBeforeNotificationPeriod = $('input[id="isBeforeNotificationPeriod"]')[0].checked;
+        var checkedDepos = getCheckedDepos();
+
+        // フォーム情報取得
+        let data = {
+            "gamenName": gamenName,
+            "isBeforeNotificationPeriod": isBeforeNotificationPeriod,
+            checkedDepos: checkedDepos
+        };
+
+        // Excel出力共通処理
+        onExportFileTripsCommon(page, data);
+
+    }
+
 
     // 編集ボタン押下
     function OnEditClick(notificationID) {
@@ -461,12 +480,13 @@
                 $("#DepartureLowerLoadClass").val(item.departureLowerLoadClass);
                 $("#NotificationStartDateTime").val(notificationStartDateTime);
                 $("#NotificationEndDateTime").val(notificationEndDateTime);
+                // 通知ユーザー取得
                 getNotificationUsers(item);
             }
         });
     }
 
-
+    // 通知ユーザー取得
     function getNotificationUsers(notificationModel)
     {
         var selectedUsers = $('#selectedUsersChild')[0];
@@ -532,6 +552,7 @@
         GetTripBranchSeqs();
     });
 
+    // 便枝番取得
     function GetTripBranchSeqs() {
         var tripID = $('[name=TripID]').val();
 
@@ -608,6 +629,7 @@
         });
     });
 
+    // 削除ボタン押下
     function OnDeleteClick(notificationID) {
         // M_NotificationViewModel取得
         var model = @Html.Raw(Json.Serialize(Model));
