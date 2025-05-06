@@ -188,7 +188,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <returns>通知ID</returns>
         private static int InsertMNotification(M_NotificationModel model, string userName, SqlConnection connection, SqlCommand command)
         {
-            string notificationSql = CreateSQLToInsetMNotification(model, userName);
+            string notificationSql = CreateSQLToInsertMNotification(model, userName);
             var notificationId = Int32.Parse(connection.ExecuteScalar(notificationSql, new { }, command.Transaction).ToString());
             return notificationId;
         }
@@ -214,6 +214,139 @@ namespace ai_truck_load_measurement.ConnectControllers
                 insertedCount += connection.Execute(sql, new { }, command.Transaction);
             }
             return insertedCount;
+        }
+
+        /// <summary>
+        /// 通知マスターと通知ユーザー更新
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="loginUser"></param>
+        /// <returns></returns>
+        public static int UpdateMNotificationAndRNotificationUser(M_NotificationModel model, LoginUserModel loginUser)
+        {
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    // トランザクションの開始
+                    command.Transaction = connection.BeginTransaction();
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                    int insertedCount = 0;
+
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                    try
+                    {
+                        // 通知マスター登録
+                        var notificationId = UpdateMNotification(model, loginUser.UserName, connection, command);
+
+                        // 通知ユーザー登録
+                        //insertedCount = InsertRNotificationUser(model, notificationId, loginUser.UserName, connection, command);
+
+                    }
+                    catch (Exception)
+                    {
+                        command.Transaction.Rollback();
+                        throw;
+                    }
+                    command.Transaction.Commit();
+                    return insertedCount;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 通知マスター更新
+        /// </summary>
+        /// <param name="model">通知モデル</param>
+        /// <param name="userName">ユーザー名</param>
+        /// <param name="connection">SqlConnection</param>
+        /// <param name="command">SqlCommand</param>
+        /// <returns></returns>
+        public static int UpdateMNotification(M_NotificationModel model, string userName, SqlConnection connection, SqlCommand command)
+        {
+            string notificationSql = CreateSQLToUpdateMNotification(model, userName);
+            var notificationId = connection.Execute(notificationSql, new { }, command.Transaction);
+            return notificationId;
+        }
+
+        /// <summary>
+        /// 通知情報削除
+        /// </summary>
+        /// <param name="truckId">車両ID</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <returns>更新件数</returns>
+        public static int DeleteMNotificationAndRNotificationUser(int notificationID, LoginUserModel loginUser)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                using (var command = connection.CreateCommand())
+                {
+                    // トランザクションの開始
+                    command.Transaction = connection.BeginTransaction();
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                    var notificationDeletedCount = 0;
+                    try
+                    {
+                        // 通知マスター削除
+                        notificationDeletedCount += DeleteMNotification(notificationID, loginUser, connection, command);
+
+                        // 通知ユーザー削除
+                        notificationDeletedCount += DeleteRNotificationUser(notificationID, connection, command);
+
+                    }
+                    catch (Exception)
+                    {
+                        command.Transaction.Rollback();
+                        throw;
+                    }
+                    command.Transaction.Commit();
+                    return notificationDeletedCount;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 通知情報削除
+        /// </summary>
+        /// <param name="notificationID">通知ID</param>
+        /// <param name="loginUser">ログインユーザー情報</param>
+        /// <param name="connection">SQLConnection</param>
+        /// <param name="command">SqlCommand</param>
+        /// <returns>更新件数</returns>
+        public static int DeleteMNotification(int notificationID, LoginUserModel loginUser, SqlConnection connection, SqlCommand command)
+        {
+            string sql = CreateSQLToDeleteMNotification(notificationID, loginUser.UserName);
+            var count = connection.Execute(sql, new { }, command.Transaction);
+
+            return count;
+        }
+
+        /// <summary>
+        /// 通知ユーザー情報削除
+        /// </summary>
+        /// <param name="notificationID">通知ID</param>
+        /// <param name="connection">SqlConnection</param>
+        /// <param name="command">SqlCommand</param>
+        /// <returns></returns>
+        public static int DeleteRNotificationUser(int notificationID, SqlConnection connection, SqlCommand command)
+        {
+            string sql = CreateSQLToDeleteRNotificationUser(notificationID);
+            var count = connection.Execute(sql, new { }, command.Transaction);
+
+            return count;
         }
 
         /// <summary>
@@ -254,6 +387,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 SELECT 
                     Notifications.notification_id,
+                    Notifications.trip_id,
                     Trips.trip_name,
                     Notifications.trip_branch_seq,
 	                Depos.name AS depo_name,
@@ -279,6 +413,8 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                TripHistories.depo_id = Depos.depo_id
                 WHERE
                     {CommonConnectController.SQLOfCheckedDepos(checkedDepos)}
+                AND
+                    Notifications.is_deleted <> 1
             ";
             if (!isBeforeNotificationPeriod)
             {
@@ -411,7 +547,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="model">通知モデル</param>
         /// <param name="createdBy">作成者</param>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToInsetMNotification(M_NotificationModel model, string createdBy)
+        public static string CreateSQLToInsertMNotification(M_NotificationModel model, string createdBy)
         {
             DateTime today = DateTime.Now;
             var sql = $@"
@@ -467,6 +603,69 @@ namespace ai_truck_load_measurement.ConnectControllers
                            ,'false'
                            ,'{today.ToString("yyyy-MM-dd HH:mm:ss")}'
                            ,'{createdBy}')
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 通知情報更新SQL作成
+        /// </summary>
+        /// <param name="model">通知モデル</param>
+        /// <param name="updatedBy">更新者</param>
+        /// <returns></returns>
+        public static string CreateSQLToUpdateMNotification(M_NotificationModel model, string updatedBy)
+        {
+            DateTime today = DateTime.Now;
+            var sql = $@"
+                UPDATE m_notifications
+                   SET [trip_id] = '{model.TripID}'
+                      ,[trip_branch_seq] = '{model.TripBranchSeq}'
+                      ,[arrival_lower_load_class] = '{model.ArrivalLowerLoadClass}'
+                      ,[departure_lower_load_class] = '{model.DepartureLowerLoadClass}'
+                      ,[notification_start_datetime] = '{model.NotificationStartDateTime.ToString("yyyy-MM-dd HH:mm")}'
+                      ,[notification_end_datetime] = '{model.NotificationEndDateTime.ToString("yyyy-MM-dd HH:mm")}'
+                      ,[updated_at] = '{today.ToString("yyyy-MM-dd HH:mm:ss")}'
+                      ,[updated_by] = '{updatedBy}'
+                 WHERE 
+                    notification_id = {model.NotificationID}
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 通知情報削除SQL作成
+        /// </summary>
+        /// <param name="notificationID"></param>
+        /// <param name="updatedBy"></param>
+        /// <returns></returns>
+        public static string CreateSQLToDeleteMNotification(int notificationID, string updatedBy)
+        {
+            DateTime today = DateTime.Now;
+            var sql = $@"
+                UPDATE m_notifications
+                SET is_deleted = 1
+                    ,updated_at = '{today.ToString("yyyy-MM-dd HH:mm:ss")}'
+                    ,updated_by = '{updatedBy}'
+    
+                WHERE
+                    notification_id = {notificationID}
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 通知ユーザー情報削除SQL作成
+        /// </summary>
+        /// <param name="notificationID">通知ID</param>
+        /// <returns></returns>
+        public static string CreateSQLToDeleteRNotificationUser(int notificationID)
+        {
+            DateTime today = DateTime.Now;
+            var sql = $@"
+                UPDATE r_notification_users
+                SET is_deleted = 1
+                WHERE
+                    notification_id = {notificationID}
             ";
             return sql;
         }

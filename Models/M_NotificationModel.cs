@@ -122,6 +122,95 @@ namespace ai_truck_load_measurement.Models
         public List<M_NotificationModel> M_NotificationList { get; set; }
 
         public M_DepoModel MainDepo {  get; set; }
+
+        /// <summary>
+        /// 通知ID
+        /// </summary>
+        [Display(Name = "通知ID")]
+        public int NotificationID { get; set; }
+
+        /// <summary>
+        /// 便ID
+        /// </summary>
+        public int TripID { get; set; }
+
+
+        /// <summary>
+        ///  便名称選択肢リスト
+        /// </summary>
+        [Display(Name = "便名称")]
+        public List<SelectListItem> TripNameSelectList { get; set; }
+
+
+        /// <summary>
+        /// 便枝番選択肢リスト
+        /// </summary>
+        [Display(Name = "便枝番")]
+        public List<SelectListItem> TripBranchSeqSelectList { get; set; }
+
+        /// <summary>
+        /// 便名称
+        /// </summary>
+        [Display(Name = "便名称")]
+        public string? TripName { get; set; }
+
+        public string? TripBranchIDAndSeq { get; set; }
+
+        /// <summary>
+        /// 便枝番
+        /// </summary>
+        public int TripBranchSeq { get; set; }
+
+        /// <summary>
+        /// デポID
+        /// </summary>
+        public int DepoID { get; set; }
+
+        /// <summary>
+        /// デポ名
+        /// </summary>
+        public string? DepoName { get; set; }
+
+        /// <summary>
+        /// 到着荷量下限クラス
+        /// </summary>
+        [Display(Name = "到着荷量下限")]
+        public int ArrivalLowerLoadClass { get; set; }
+
+        /// <summary>
+        /// 到着荷量下限の%表示
+        /// </summary>
+        public string? ArrivalLowerLoadStatus { get; set; }
+
+        /// <summary>
+        /// 出発荷量下限クラス
+        /// </summary>
+        [Display(Name = "出発荷量下限")]
+        public int DepartureLowerLoadClass { get; set; }
+
+        /// <summary>
+        /// 出発荷量下限の%表示
+        /// </summary>
+        public string? DepartureLowerLoadStatus { get; set; }
+
+        /// <summary>
+        /// 通知開始日時
+        /// </summary>
+        [Display(Name = "通知開始日時")]
+        public DateTime NotificationStartDateTime { get; set; }
+
+        /// <summary>
+        /// 通知終了日時
+        /// </summary>
+        [Display(Name = "通知終了日時")]
+        public DateTime NotificationEndDateTime { get; set; }
+
+        public List<string>? NotificationUsersView { get; set; }
+
+        /// <summary>
+        /// 通知先ユーザーリスト
+        /// </summary>
+        public List<R_NotificationUserModel>? NotificationUsers { get; set; }
     }
 
     public class M_NotificationRegisterViewModel : CommonModel

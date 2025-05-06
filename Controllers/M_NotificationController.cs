@@ -45,6 +45,7 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 model.M_NotificationList = notificationList.ToList();
+                model.TripNameSelectList = GetTrips();
 
                 return View(model);
             }
@@ -248,6 +249,60 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
+        /// 便マスター更新
+        /// </summary>
+        /// <param name="model">更新情報</param>
+        [HttpPost]
+        public IActionResult Edit(M_NotificationModel model)
+        {
+            string? errorMessage;
+            try
+            {
+
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                //model = ConvertTripBranchSeqFromTripBranchIDAndSeq(model);
+
+                // 入力規則チェック
+                if (!ModelState.IsValid)
+                {
+                    // log取得
+                    errorMessage = "E1011: " + ErrorMessagesResources.E1011;
+                    _logger.Error($"便マスター登録失敗 {errorMessage}");
+                    var errormsgs = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.ErrorMessage));
+                    return NotFound(new { errorMessage });
+                }
+
+
+                // 便マスター登録
+                M_NotificationConnectController.UpdateMNotificationAndRNotificationUser(model, user);
+
+                // log取得
+                _logger.Info($"便マスター登録成功 便名称:{model.TripName}");
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+            catch (Exception ex)
+            {
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+        }
+
+        /// <summary>
         /// 「便枝番ID_枝連番」から枝連番を取得、保存する
         /// </summary>
         /// <param name="model"></param>
@@ -257,6 +312,47 @@ namespace ai_truck_load_measurement.Controllers
             var tripBranchIDAndSeq = model.TripBranchIDAndSeq.Split('_');
             model.TripBranchSeq = Int32.Parse(tripBranchIDAndSeq[1]);
             return model;
+        }
+
+        /// <summary>
+        /// 車両マスター削除
+        /// </summary>
+        /// <param name="truckId">車両ID</param>
+        /// <returns></returns>
+        public IActionResult Delete(int notificationID)
+        {
+            string? errorMessage;
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 車両マスター削除
+                int deleteAffectedRows = M_NotificationConnectController.DeleteMNotificationAndRNotificationUser(notificationID, user);
+
+                // log取得
+                _logger.Info($"通知マスター削除成功 通知ID:{notificationID}");
+
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+            catch (Exception ex)
+            {
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
         }
 
         /// <summary>
