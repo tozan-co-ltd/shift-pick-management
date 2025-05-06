@@ -1073,6 +1073,7 @@ function onUserLabelDeleteClick(adName) {
 
     arrayUsers.splice(deleteIndex, 1);
 
+    // チェックボックスからチェックを外す
     $('#' + adName).prop('checked', false);
 
     // 選択された便が1つも無くなった場合
@@ -1086,7 +1087,7 @@ function onUserLabelDeleteClick(adName) {
         var selectedUsers = $('#selectedUsersChild')[0];
 
         var adName = arrayUsers[i].adName;
-        pushLabelToSelectedTrips(selectedUsers, adName);
+        pushLabelToSelectedUsers(selectedUsers, adName);
     }
 }
 

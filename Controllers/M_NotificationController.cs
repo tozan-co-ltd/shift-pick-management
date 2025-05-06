@@ -20,28 +20,19 @@ namespace ai_truck_load_measurement.Controllers
                 // ログインユーザーのメインデポ情報取得
                 var mainDepo = GetMainDepo();
                 model.MainDepo = mainDepo;
-                List<string> depoList = new();
-                depoList.Add(mainDepo.DepoID.ToString());
 
                 IEnumerable<M_NotificationModel> notificationList = new List<M_NotificationModel>();
 
-                if (depoList.Count > 0)
+                // 通知マスター情報取得SQL作成
+                var notificationSql = M_NotificationConnectController.CreateSQLToSelectMNotificationsAll();
+                // DB接続
+                notificationList = M_NotificationConnectController.ConnectMNotifications(notificationSql);
+                foreach (M_NotificationModel notification in notificationList)
                 {
-                    // 通知マスター情報取得SQL作成
-                    var notificationSql = M_NotificationConnectController.CreateSQLToSelectMNotifications(true, depoList);
-                    // DB接続
-                    notificationList = M_NotificationConnectController.ConnectMNotifications(notificationSql);
+                    // 通知ユーザー情報取得SQL作成
+                    var notificationUserSql = M_NotificationConnectController.CreateSQLToSelectRNotificationUsers(notification.NotificationID);
+                    notification.NotificationUsers = M_NotificationConnectController.ConnectRNotificationUsers(notificationUserSql);
 
-                    foreach(M_NotificationModel notification in notificationList)
-                    {
-                        // 通知ユーザー情報取得SQL作成
-                        var notificationUserSql = M_NotificationConnectController.CreateSQLToSelectRNotificationUsers(notification.NotificationID);
-                        notification.NotificationUsers = M_NotificationConnectController.ConnectRNotificationUsers(notificationUserSql);
-
-                        // 荷量クラスを％表示に変換
-                        notification.ArrivalLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.ArrivalLowerLoadClass) + " 未満";
-                        notification.DepartureLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.DepartureLowerLoadClass) + " 未満";
-                    }
                 }
 
                 model.M_NotificationList = notificationList.ToList();
@@ -75,12 +66,13 @@ namespace ai_truck_load_measurement.Controllers
                     var sql = M_NotificationConnectController.CreateSQLToSelectMNotifications(isBeforeNotificationPeriod, checkedDepos);
                     // DB接続
                     notificationList = M_NotificationConnectController.ConnectMNotifications(sql);
-                    // 荷量クラスを％表示に変換
                     foreach (M_NotificationModel notification in notificationList)
                     {
                         // 通知ユーザー情報取得SQL作成
                         var notificationUserSql = M_NotificationConnectController.CreateSQLToSelectRNotificationUsers(notification.NotificationID);
                         notification.NotificationUsers = M_NotificationConnectController.ConnectRNotificationUsers(notificationUserSql);
+
+                        // 荷量クラスを％表示に変換
                         notification.ArrivalLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.ArrivalLowerLoadClass) + " 未満";
                         notification.DepartureLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.DepartureLowerLoadClass) + " 未満";
                     }

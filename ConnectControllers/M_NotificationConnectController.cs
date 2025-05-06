@@ -244,7 +244,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                         var notificationId = UpdateMNotification(model, loginUser.UserName, connection, command);
 
                         // 通知ユーザー登録
-                        //insertedCount = InsertRNotificationUser(model, notificationId, loginUser.UserName, connection, command);
+                        insertedCount = UpdateRNotificationUser(model, loginUser.UserName, connection, command);
 
                     }
                     catch (Exception)
@@ -271,6 +271,35 @@ namespace ai_truck_load_measurement.ConnectControllers
             string notificationSql = CreateSQLToUpdateMNotification(model, userName);
             var notificationId = connection.Execute(notificationSql, new { }, command.Transaction);
             return notificationId;
+        }
+
+
+        /// <summary>
+        /// 通知ユーザー更新
+        /// </summary>
+        /// <param name="model">通知モデル</param>
+        /// <param name="notificationId">通知ID</param>
+        /// <param name="userName">ユーザー名</param>
+        /// <param name="connection">SqlConnection</param>
+        /// <param name="command">SqlCommand</param>
+        /// <returns></returns>
+        private static int UpdateRNotificationUser(M_NotificationModel model, string userName, SqlConnection connection, SqlCommand command)
+        {
+            // 通知ユーザーの削除フラグを一旦全て1に
+            var deleteSql = CreateSQLToDeleteRNotificationUser(model.NotificationID);
+            var deleteCount = connection.Execute(deleteSql, new { }, command.Transaction);
+
+            // 通知ユーザーのAD名とユーザーIDを取得してモデルリスト化する
+            var notificationUserList = GetNotificationUserList(model);
+            int insertedCount = 0;
+
+            // 各通知ユーザーを登録
+            foreach (var notificationUser in notificationUserList)
+            {
+                var sql = CreateSQLToUpdateRNotificationUsers(model.NotificationID, notificationUser.UserID, userName);
+                insertedCount += connection.Execute(sql, new { }, command.Transaction);
+            }
+            return insertedCount;
         }
 
         /// <summary>
@@ -377,11 +406,54 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// 全通知情報取得SQL作成
+        /// </summary>
+        /// <param name="depoList">デポリスト</param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectMNotificationsAll()
+        {
+            DateTime today = DateTime.Now;
+            var sql = $@"
+                SELECT 
+                    Notifications.notification_id,
+                    Notifications.trip_id,
+                    Trips.trip_name,
+                    Notifications.trip_branch_seq,
+	                Depos.name AS depo_name,
+                    Notifications.arrival_lower_load_class,
+                    Notifications.departure_lower_load_class,
+                    Notifications.notification_start_datetime,
+                    Notifications.notification_end_datetime,
+                    Notifications.updated_by,
+                    Notifications.updated_at
+                FROM 
+                    m_notifications as Notifications
+                INNER JOIN
+	                m_trips AS Trips
+                ON
+	                Notifications.trip_id = Trips.trip_id
+                INNER JOIN
+                    m_trip_histories as TripHistories
+                ON 
+                    Notifications.trip_id = TripHistories.trip_id
+                INNER JOIN 
+	                m_depos as Depos
+                ON
+	                TripHistories.depo_id = Depos.depo_id
+                WHERE
+                    Notifications.is_deleted <> 1
+                ORDER BY 
+                    Notifications.notification_id, Notifications.notification_start_datetime
+            ";
+            return sql;
+        }
+
+        /// <summary>
         /// 通知情報取得SQL作成
         /// </summary>
         /// <param name="depoList">デポリスト</param>
         /// <returns></returns>
-       public static string CreateSQLToSelectMNotifications(bool isBeforeNotificationPeriod, List<string> checkedDepos)
+        public static string CreateSQLToSelectMNotifications(bool isBeforeNotificationPeriod, List<string> checkedDepos)
         {
             DateTime today = DateTime.Now;
             var sql = $@"
@@ -628,6 +700,52 @@ namespace ai_truck_load_measurement.ConnectControllers
                       ,[updated_by] = '{updatedBy}'
                  WHERE 
                     notification_id = {model.NotificationID}
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 通知ユーザー情報更新SQL作成
+        /// </summary>
+        /// <param name="notificationID">通知ID</param>
+        /// <param name="userID">ユーザーID</param>
+        /// <param name="updatedBy">更新者</param>
+        /// <returns></returns>
+        public static string CreateSQLToUpdateRNotificationUsers(int notificationID, int userID,  string updatedBy)
+        {
+            DateTime today = DateTime.Now;
+            var sql = $@"
+                MERGE INTO r_notification_users AS NotificationUsers
+                 USING
+	                (SELECT
+		                {notificationID} AS notification_id,
+		                {userID} AS user_id,
+		                0 AS is_deleted,
+		                '{updatedBy}' AS created_by,
+		                '{today.ToString("yyyy-MM-dd HH:mm:ss")}' AS created_at
+	                ) AS US
+                ON NotificationUsers.notification_id = US.notification_id
+	                AND NotificationUsers.user_id = US.user_id
+                WHEN MATCHED THEN
+                UPDATE SET
+	                NotificationUsers.is_deleted = US.is_deleted
+                WHEN NOT MATCHED THEN
+                INSERT
+                (
+	                notification_id
+	                ,user_id
+	                ,is_deleted
+	                ,created_at
+	                ,created_by
+                )
+                VALUES
+                (
+	                US.notification_id
+	                ,US.user_id
+	                ,US.is_deleted
+	                ,US.created_at
+	                ,US.created_by
+                );
             ";
             return sql;
         }
