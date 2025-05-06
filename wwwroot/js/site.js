@@ -149,7 +149,6 @@ function onExportFileTripsCommon(page, data) {
     let url = window.location.href + '/ExportFile';
     let method = 'Post';
     tableDisplay(page);
-    console.log(data);
     event.preventDefault();
     // Ajax call
     $.ajax({
@@ -993,7 +992,6 @@ function createToggleUserSelectCheckBox(page) {
                 event.preventDefault();
 
                 var checkBox = $(this).prop('checked');
-                console.log(checkBox);
                 var ADNameAndUserID = $(this).val().split("/");
                 var selectedADName = ADNameAndUserID[0];
                 var selectedUserID = ADNameAndUserID[1];

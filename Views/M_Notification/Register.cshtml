@@ -234,7 +234,6 @@
         }
 
         selectListItems.forEach(function (item) {
-            console.log(item);
             // optionタグを作成する
             var option = document.createElement("option");
             option.text = item.text;
@@ -259,7 +258,6 @@
             method: method,
             data: data
         }).done(function (response) {
-            console.log(response);
             SetTripBranchSeqData(response);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
@@ -273,13 +271,11 @@
     });
 
     function SetTripBranchSeqData(tripBranchNumberModel){
-        console.log($("#ArrivalScheduledTime"));
         $("#ArrivalScheduledTime")[0].innerText = "到着予定時間：" + GetTimeString(new Date(tripBranchNumberModel.arrivalScheduledTime));
         $("#DepartureScheduledTime")[0].innerText = "出発予定時間：" + GetTimeString(new Date(tripBranchNumberModel.departureScheduledTime));
         $("#ApplicableStartDateTime")[0].innerText = "適用開始日時：" + GetDateString(new Date(tripBranchNumberModel.applicableStartDateTime));
         $("#ApplicableEndDateTime")[0].innerText = "適用終了日時：" + GetDateString(new Date(tripBranchNumberModel.applicableEndDateTime));
         $("#NotificationEndDateTime").val(tripBranchNumberModel.applicableEndDateTime);
-        console.log($("#ArrivalScheduledTime"));
     }
 
     // ドロップダウンの表示・非表示
@@ -347,7 +343,6 @@
             let formId = 'mNotificationForm';
             let data = form.serializeArray();
             data.push({ NotificationUsers: arrayUsers });
-            console.log(data);
 
             // Ajax call
             $.ajax({

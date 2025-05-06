@@ -469,7 +469,6 @@
         var model = @Html.Raw(Json.Serialize(Model));
         model.m_NotificationList.forEach(function (item) {
             if (item.notificationID == notificationID) {
-                console.log(item);
                 var notificationStartDateTime = GetDateString(new Date(item.notificationStartDateTime));
                 var notificationEndDateTime = GetDateString(new Date(item.notificationEndDateTime));
                 $("#NotificationID").val(item.notificationID);
@@ -616,7 +615,6 @@
             method: method,
             data: data
         }).done(function (response) {
-            console.log(response);
             SetTripBranchSeqData(response);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
