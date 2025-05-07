@@ -693,6 +693,8 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("AD名");
                     headerList.Add("デポ名");
                     headerList.Add("管理権限");
+                    headerList.Add("メール受け取り要否");
+                    headerList.Add("メールアドレス");
                     headerList.Add("削除フラグ");
                     headerList.Add("作成日時");
                     headerList.Add("作成者");

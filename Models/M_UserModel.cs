@@ -51,6 +51,19 @@ namespace ai_truck_load_measurement.Models
         public int AuthorizedKubun {  get; set; }
 
         /// <summary>
+        /// メール受け取り要否
+        /// </summary>
+        [Display(Name = "メール受け取り要否")]
+        public bool IsRequiredMail { get; set; }
+
+        /// <summary>
+        /// メールアドレス
+        /// </summary>
+        [Display(Name = "メールアドレス")]
+        [RegularExpression(@"^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$", ErrorMessage = "メールアドレスを入力してください")]
+        public string? MailAddress {  get; set; }
+
+        /// <summary>
         /// 作成日時
         /// </summary>
         public DateTime CreatedAt { get; set; }
@@ -70,4 +83,6 @@ namespace ai_truck_load_measurement.Models
         /// </summary>
         public string? UpdatedBy {  get; set; }
     }
+
+    
 }
