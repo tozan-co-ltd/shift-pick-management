@@ -373,6 +373,7 @@ function EditModal(tripRecordID, isArrived, page) {
                 var workDayForFile = GetDayStringForFile(new Date(item.workDay));
                 var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
                 var truckNumber = item.truckNumber;
+                var authorizedKubun = response.authorizedKubun;
                 if (truckNumber == "0") truckNumber = "-";
                 if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
 
@@ -438,9 +439,7 @@ function EditModal(tripRecordID, isArrived, page) {
                     + "<td>荷量の相違あり</td>"
                     + "<td>"
                     + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">";
-                if (!(userName == "服部 正次" || userName == "林 恭佑")) {
-                    tr += "<label id=\"loadStatusSelect\" ></label>";
-                } else {
+                if (authorizedKubun == "1") {
                     tr += "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" id=\"loadStatusSelect\" >"
                         + "<option value=\"\" hidden></option>"
                         + "<option value=\"1\">0%</option>"
@@ -458,6 +457,8 @@ function EditModal(tripRecordID, isArrived, page) {
                         + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "', '" + page + "')\" id=\"verificationRequired\">"
                         + "<span class=\"text\">要検証</span>"
                         + "</a>";
+                } else {
+                    tr += "<label id=\"loadStatusSelect\" ></label>";
                 }
 
                 tr += "</div>"
@@ -485,7 +486,7 @@ function EditModal(tripRecordID, isArrived, page) {
                     + "<td>" + arriveOrDepartureDate + "</td>"
                     + "</tr>";
                 container.append(tr);
-                if (userName == "服部 正次" || userName == "林 恭佑") {
+                if (authorizedKubun == "1") {
                     $('#loadStatusSelect').val(response.annotationLoadClass);
                 } else if (response.annotationLoadStatus != null) {
                     $('#loadStatusSelect').text(response.annotationLoadStatus + "%");
@@ -896,4 +897,69 @@ function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, checkedDepos, pa
     });
 
     
+}
+
+//----------------------------------実績画面デポ関連-----------------------------------//
+// デポの選択用チェックボックスを生成
+function addDepos(model) {
+    var selectDepos = $("#selectDepos")[0];
+    model.mDepoList.forEach(depo => {
+        if (depo.value == null)
+            return;
+        var depoLabel = document.createElement("label");
+        depoLabel.innerHTML += "<input type=\"checkbox\" class=\"mr-2\" name=\"depos\" id=\"depo" + depo.value + "\" value=\"" + depo.value + "\" />" + depo.text;
+        depoLabel.className += "mr-3 ";
+        selectDepos.appendChild(depoLabel);
+
+
+    })
+}
+
+
+// 画面表示時にログインユーザーのメインデポにチェックを入れる
+function depoCheckDisplay(model) {
+    var mainDepoID = model.mainDepo.depoID;
+    if (mainDepoID == 0)
+        return;
+    var depos = $('input[name=depos]');
+    for (var i = 0; i < depos.length; i++) {
+        if (depos[i].id == "depo" + mainDepoID) {
+            depos[i].checked = true;
+        }
+    }
+}
+
+// 選択されたデポのIDリストを取得する
+function getCheckedDepos() {
+    var depos = $('input[name=depos]');
+    var checkedDepos = [];
+    for (var i = 0; i < depos.length; i++) {
+        if (depos[i].checked) {
+            checkedDepos.push(depos[i].value);
+        }
+    }
+    return checkedDepos;
+}
+
+// 「すべて」チェックボックス押下時共通処理
+function pushAllCheckBox() {
+    var depos = $('input[name="depos"]');
+    for (var i = 0; i < depos.length; i++) {
+        if ($('input[id=allDepo]')[0].checked) {
+            depos[i].checked = true;
+        } else {
+            depos[i].checked = false;
+        }
+    }
+}
+
+// 各デポチェックボックス押下時共通処理
+function pushDepoCheckBox() {
+    var depos = $('input[name=depos]');
+    for (var i = 0; i < depos.length; i++) {
+        if (!depos[i].checked) {
+            $('input[id=allDepo]')[0].checked = false;
+            break;
+        }
+    }
 }

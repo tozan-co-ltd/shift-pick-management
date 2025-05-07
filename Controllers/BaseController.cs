@@ -11,23 +11,18 @@ namespace ai_truck_load_measurement.Controllers
         public LoginUserModel? ClaimsLoginUserData()
         {
             var claimsLoginUserList = User.Claims.ToList();
-            try
+            if (claimsLoginUserList.Count > 0)
             {
-                if (claimsLoginUserList.Count > 0)
+                Int32.TryParse(claimsLoginUserList.Where(x => x.Type == "AuthorizedKubun").First().Value, out var authorizedKubun);
+                var loginUserModel = new LoginUserModel
                 {
-                    var loginUserModel = new LoginUserModel
-                    {
-                        UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
-                        ADName = claimsLoginUserList.Where(x => x.Type == "ADName").First().Value
-                    };
-                    return loginUserModel;
-                }
-                return null;
+                    UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
+                    ADName = claimsLoginUserList.Where(x => x.Type == "ADName").First().Value,
+                    AuthorizedKubun  = authorizedKubun,
+                };
+                return loginUserModel;
             }
-            catch(Exception)
-            {
-                throw;
-            }
+            return null;
         }
 
         public M_DepoModel GetMainDepo()

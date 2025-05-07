@@ -19,6 +19,19 @@
             }
         </div>
 
+        <div class="row mb-3">
+            <div class="col-lg-10">
+                <div class="card border-left-custom">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>メインデポに設定されたデポが各画面のデフォルト値として登録されます。</li>
+                            <li>管理者権限が「管理者」のユーザーはマスターと荷量実績の荷量の相違を登録・編集できます。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="mg-bot-20">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-2">
@@ -136,8 +149,10 @@
                                 <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input type="radio" class="mr-2" asp-for="AuthorizedKubun" value="1" name="AuthorizedKubun">権限あり
-                                <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" value="0" name="AuthorizedKubun" checked>権限なし
+                                <input type="radio" class="mr-2" asp-for="AuthorizedKubun" value="1" name="AuthorizedKubun" id="hasAuthorizedKubun">
+                                <label for="hasAuthorizedKubun">権限あり</label>
+                                <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" value="0" name="AuthorizedKubun" id="notHasAuthorizedKubun" checked>
+                                <label for="notHasAuthorizedKubun">権限なし</label>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">

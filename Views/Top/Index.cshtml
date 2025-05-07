@@ -121,6 +121,8 @@
                         <select class="form-select" name="DepoID"  asp-items="@Model.MDepoList" id="selectDepo"></select>
                     </div>
                 </div>
+                <span class="spinner-border" style="display: none; vertical-align: middle; margin-left: 10px" role="status" id="loading"></span>
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
         <div class="mb-3">
@@ -169,7 +171,6 @@
         }, 60000);
         $("#selectDepo").find("option[value='" + top_model.mainDepoID + "']").attr("selected", "selected");
         if(top_model.mainDepoName != ""){
-            console.log($("#stationTitle"));
             $("#stationTitle")[0].innerText = getStationTitle(top_model.mainDepoName);
             $('#modalImage').attr("src", window.location.href + "/images/top/layout/depo" + top_model.mainDepoID + "layout.png");
         }
@@ -236,7 +237,8 @@
             data: data
         }).done(function (response) {
             viewCards(response, depoName);
-            switchFunamiCaution(depoID);
+            switchFunamiCaution(depoID); 
+            document.querySelector("#loading").style.display = "none";
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -251,6 +253,9 @@
     // デポ選択時
     $(function () {
         $('select[id="selectDepo"]').change(function () {
+            // ロード中表示
+            document.querySelector("#loading").style.display = "inline-block";
+
             var depo = $('select[id="selectDepo"]')[0];
             var selectedDepoID = 0;
             var depoName = "";
@@ -270,7 +275,7 @@
     function switchFunamiCaution(depoID){
         // 船見デポの場合、注意分表示
         if (depoID == 3) {
-            $("#funamiCaution")[0].innerText = "船見デポ1番、5番、7番以外は常に「空車」表示になっています。";
+            $("#funamiCaution")[0].innerText = "船見デポ1番、3番、5番、7番以外は常に「空車」表示になっています。";
         }
         else {
             $("#funamiCaution")[0].innerText = "";
