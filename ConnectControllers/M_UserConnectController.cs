@@ -203,6 +203,37 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// メール受け取りユーザー情報取得用SQL
+        /// </summary>
+        /// <returns></returns>
+        public static string CreateSQLToSelectMUsersIsRequiredMail()
+        {
+            var sql = $@"
+                SELECT 
+                   Users.user_id,
+                   Users.ad_name,
+                   Users.depo_id,
+                   Depos.name AS depo_name,
+                   Users.authorized_kubun,
+                   Users.created_at,
+                   Users.created_by,
+                   Users.updated_at,
+                   Users.updated_by
+                FROM 
+                    m_users AS Users
+                INNER JOIN
+	                m_depos AS Depos
+                ON
+	                Users.depo_id = Depos.depo_id
+                WHERE 
+                    Users.is_deleted = 0
+                AND
+                    Users.is_required_mail = 1
+            ";
+            return sql;
+        }
+
+        /// <summary>
         /// DataTable用のユーザーマスター情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>

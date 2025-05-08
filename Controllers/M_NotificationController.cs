@@ -585,7 +585,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public List<M_UserModel> GetUserList()
         {
-            var sql = M_UserConnectController.CreateSQLToSelectMUsers();
+            var sql = M_UserConnectController.CreateSQLToSelectMUsersIsRequiredMail();
             var userList = M_UserConnectController.ConnectMUsers(sql);
             return userList;
         }
