@@ -613,8 +613,9 @@ function tableDisplayCommon(page, data) {
             body.highlight(table.search());
         });
 
-        //if (document.querySelector("#loading") != null)
-            //document.querySelector("#loading").style.display = "none";
+
+        if (document.querySelector("#loading") != null)
+            document.querySelector("#loading").style.display = "none";
     }).fail(function (jqXHR, textStatus, errorThrown) {
         var errorMessage = jqXHR.responseJSON.errorMessage;
         $("#edit-modal-error-message").text(errorMessage);
