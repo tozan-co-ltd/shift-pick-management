@@ -65,12 +65,11 @@
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayName("ArrivalLowerLoadClass")<span style="color:red">*</span></label>
+                            <label>@Html.DisplayName("ArrivalLowerLoadClass")</label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <select class="form-select" name="ArrivalLowerLoadClass" asp-for="ArrivalLowerLoadClass" required>
-                                <option value="0" selected disabled>選択してください</option>
-                                <option value="2">通知しない</option>
+                                <option value="2" selected>設定無し</option>
                                 <option value="3">1～10%</option>
                                 <option value="4">11～20%</option>
                                 <option value="5">21～30%</option>
@@ -87,12 +86,11 @@
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayName("DepartureLowerLoadClass")<span style="color:red">*</span></label>
+                            <label>@Html.DisplayName("DepartureLowerLoadClass")</label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <select class="form-select" name="DepartureLowerLoadClass" asp-for="DepartureLowerLoadClass" required>
-                                <option value="0" selected disabled>選択してください</option>
-                                <option value="2">通知しない</option>
+                                <option value="2" selected>設定無し</option>
                                 <option value="3">1～10%</option>
                                 <option value="4">11～20%</option>
                                 <option value="5">21～30%</option>
