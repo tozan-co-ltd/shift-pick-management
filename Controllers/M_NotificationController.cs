@@ -75,8 +75,8 @@ namespace ai_truck_load_measurement.Controllers
                         notification.NotificationUsers = M_NotificationConnectController.ConnectRNotificationUsers(notificationUserSql);
 
                         // 荷量クラスを％表示に変換
-                        notification.ArrivalLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.ArrivalLowerLoadClass) + " 未満";
-                        notification.DepartureLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(notification.DepartureLowerLoadClass) + " 未満";
+                        notification.ArrivalLowerLoadStatus = ConversionLoadClassToLoadStatus(notification.ArrivalLowerLoadClass);
+                        notification.DepartureLowerLoadStatus = ConversionLoadClassToLoadStatus(notification.DepartureLowerLoadClass);
                     }
                 }
 
@@ -456,8 +456,8 @@ namespace ai_truck_load_measurement.Controllers
                 // 荷量クラスを%表示に変換
                 var arrivalLoadClass = (int)row["arrival_lower_load_class"];
                 var departureLoadClass = (int)row["departure_lower_load_class"];
-                row["arrival_lower_load_status"] = LoadRecordController.ConversionLoadClassToLoadStatus(arrivalLoadClass) + " 未満";
-                row["departure_lower_load_status"] = LoadRecordController.ConversionLoadClassToLoadStatus(departureLoadClass) + " 未満";
+                row["arrival_lower_load_status"] = ConversionLoadClassToLoadStatus(arrivalLoadClass);
+                row["departure_lower_load_status"] = ConversionLoadClassToLoadStatus(departureLoadClass);
             }
 
             // 変換前の列を削除
@@ -650,6 +650,27 @@ namespace ai_truck_load_measurement.Controllers
                 ";
             }
             return html;
+        }
+
+        /// <summary>
+        /// 荷量クラスからパーセント表示に変換
+        /// </summary>
+        /// <param name="loadClass">荷量クラス</param>
+        /// <returns></returns>
+        public static string ConversionLoadClassToLoadStatus(int loadClass)
+        {
+            var loadStatus = "-";
+            if (loadClass >= 3)
+            {
+                int lowerLimit = (loadClass - 3) * 10 + 1;
+                int upperLimit = (loadClass - 2) * 10;
+                loadStatus = ($"{lowerLimit}-{upperLimit} 未満");
+            }
+            else if (loadClass == 2)
+            {
+                loadStatus = "設定無し";
+            }
+            return loadStatus;
         }
     }
 }
