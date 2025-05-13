@@ -11,11 +11,11 @@ namespace ai_truck_load_measurement.Models
         public int DepartureLowerLoadClass { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public string TripName { get; set; }
-        public int TripBranchSeq { get; set; }
-        public string StationName { get; set; }
-        public string DriverName { get; set; }
-        public DateTime WorkDay { get; set; }
+        //public string TripName { get; set; }
+        //public int TripBranchSeq { get; set; }
+        //public string StationName { get; set; }
+        //public string DriverName { get; set; }
+        //public DateTime WorkDay { get; set; }
 
     }
 

@@ -56,11 +56,6 @@ namespace ai_truck_load_measurement.ConnectControllers
                     ,AlertRecords.departure_lower_load_class
                     ,AlertRecords.created_at
                     ,AlertRecords.updated_at
-                    ,TripRecords.trip_name
-                    ,TripRecords.trip_branch_seq
-                    ,TripRecords.driver_name
-	                ,FORMAT(TripRecords.work_day, 'yyyy/MM/dd') AS work_day
-                    ,Stations.name AS station_name
                 FROM t_alert_records AS AlertRecords
                 INNER JOIN
                     t_trip_records AS TripRecords
@@ -85,10 +80,11 @@ namespace ai_truck_load_measurement.ConnectControllers
         {
             var sql = $@"
                 SELECT
-                    TripRecords.trip_name
+                    TripRecords.trip_record_id
+                    ,TripRecords.trip_name
                     ,TripRecords.trip_branch_seq
                     ,TripRecords.driver_name
-                    ,Stations.name AS depo_name
+                    ,Stations.name AS station_name
                     ,TripRecords.truck_number
                     ,TripRecords.identify_number
 	                ,FORMAT(CONVERT(DATETIME, TripRecords.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time
