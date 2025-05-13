@@ -1,8 +1,10 @@
-﻿using ai_truck_load_measurement.ConnectControllers;
+﻿using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
+using System.Data;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -70,7 +72,8 @@ namespace ai_truck_load_measurement.Controllers
                         // アラート履歴に対応した便実績
                         var loadRecord = loadRecordList.Find(x => x.TripRecordID == alertRecord.TripRecordID)!;
                         // アラート項目部分のhtml取得
-                        var alertItems = GetAlertItemsHTML(alertRecord, loadRecord);
+                        var alertItems = GetAlertItems(alertRecord, loadRecord);
+                        var alertItemsHTML = ConvertAlertItemsToHTML(alertItems);
 
                         searchData += $@"
                             <tr>
@@ -78,7 +81,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{loadRecord.TripBranchSeq}</td>
                                 <td>{loadRecord.StationName}</td>
                                 <td>{loadRecord.DriverName}</td>
-                                <td>{alertItems}</td>
+                                <td>{alertItemsHTML}</td>
                                 <td>{loadRecord.WorkDay.ToString("yyyy/MM/dd")}</td>
                                 <td>
                                     <a class=""btn btn-success btn-icon-split ml-1 mr-1""
@@ -121,7 +124,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="alertRecord"></param>
         /// <param name="loadRecord"></param>
         /// <returns></returns>
-        public string GetAlertItemsHTML(AlertRecordModel alertRecord, LoadRecordModel loadRecord)
+        public List<string> GetAlertItems(AlertRecordModel alertRecord, LoadRecordModel loadRecord)
         {
             var alertItems = new List<string>();
 
@@ -143,10 +146,7 @@ namespace ai_truck_load_measurement.Controllers
             if (loadRecord.DepartureLoadClass != -1 && loadRecord.DepartureLoadClass < alertRecord.DepartureLowerLoadClass)
                 alertItems.Add("出発荷量(下限)");
 
-            // html作成
-            var html = CreateAlertHTML(alertItems);
-
-            return html;
+            return alertItems;
         }
 
         /// <summary>
@@ -173,16 +173,176 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="alertItems">アラート項目リスト</param>
         /// <returns></returns>
-        public string CreateAlertHTML(List<string> alertItems)
+        public string ConvertAlertItemsToHTML(List<string> alertItems)
         {
             var html = "";
-            for(int i = 0; i<alertItems.Count; i++)
+            for (int i = 0; i < alertItems.Count; i++)
             {
                 if (i > 0)
                     html += "<br>";
                 html += alertItems[i];
             }
             return html;
+        }
+
+        /// <summary>
+        /// ファイル出力
+        /// </summary>
+        /// <param name="gamenName">現在の画面名</param>
+        /// <param name="startOfPeriod">期間の開始日時</param>
+        /// <param name="endOfPeriod">期間の終了日時</param>
+        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみ表示か</param>
+        /// <returns></returns>
+        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        {
+            string? errorMessage;
+            string startDate = startOfPeriod.ToString("yyyyMMdd");
+            string endDate = endOfPeriod.ToString("yyyyMMdd");
+            try
+            {
+                // 検索条件シート用データテーブル作成
+                DataTable searchConditionDT = new DataTable();
+                searchConditionDT.Columns.Add("項目名");
+                searchConditionDT.Columns.Add("検索条件");
+                // デポの設定
+                var selectedDeposName = LoadRecordController.SelectedDepos(checkedDepos);
+                searchConditionDT.Rows.Add("対象デポ", selectedDeposName);
+                // 稼働日の設定
+                searchConditionDT.Rows.Add("稼働日", $"{startDate}～{endDate}");
+
+
+                // アラート履歴情報取得
+                DataTable tAlertRecordDT = new DataTable();
+                if (checkedDepos.Count > 0)
+                {
+                    var tAlertRecordSql = AlertRecordConnectController.CreateSQLToSelectAlertRecordForDataTable(startOfPeriod, endOfPeriod, checkedDepos);
+                    tAlertRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tAlertRecordSql);
+
+                    // 荷量のクラスの数値化とアラート項目生成
+                    tAlertRecordDT = GetConvertedLoadClassDataTable(tAlertRecordDT);
+                }
+
+                // ファイル名
+                var tmpFilename = $"アラート履歴_{startDate}-{endDate}.xlsx";
+                // 2シートあり
+                bool sheetTwo = true;
+
+                // シート名
+                string sheetNameOne = "検索条件シート";
+                string sheetNameTwo = "荷量実績シート";
+
+
+                try
+                {
+                    // Excelファイル作成チェック
+                    var createRs = CreateFile.CheckCreateExcel(searchConditionDT, tAlertRecordDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
+
+                    if (createRs.Item1)
+                    {
+                        var file = System.IO.File.ReadAllBytes(createRs.Item2);
+
+                        CreateFile.DeleteFile(tmpFilename);
+
+                        return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
+                    }
+                    else
+                    {
+                        // エラーメッセージ取得
+                        // 「ファイルが存在しません。」
+                        errorMessage = ErrorMessagesResources.E9999;
+
+                        return Json(new { res = "NG", error = errorMessage });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // エラーメッセージ取得
+                    // 「NASに接続できませんでした。」
+                    errorMessage = ErrorMessagesResources.E9999;
+
+                    // log取得
+                    var exceptionMessage = ex.Message;
+                    return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+                }
+            }
+            catch (Exception ex)
+            {
+                // エラーメッセージ取得
+                // 「予期せぬエラーが発⽣しました。」
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+
+                // log取得
+                var exceptionMessage = ex.Message;
+                return Json(new { res = "NG", error = errorMessage + exceptionMessage });
+            }
+
+        }
+
+        /// <summary>
+        /// データテーブルの荷量クラスを数値に変換
+        /// </summary>
+        /// <param name="dt">変換元データテーブル</param>
+        /// <returns></returns>
+        public DataTable GetConvertedLoadClassDataTable(DataTable dt)
+        {
+            // テーブルに値を変換した後の文字列を格納する列を追加
+            dt.Columns.Add("alert_items", typeof(string)).SetOrdinal(dt.Columns.IndexOf("driver_name"));
+            dt.Columns.Add("arrival_load_status", typeof(string)).SetOrdinal(dt.Columns.IndexOf("arrival_load_class"));
+            dt.Columns.Add("arrival_lower_load_status", typeof(string)).SetOrdinal(dt.Columns.IndexOf("arrival_lower_load_class"));
+            dt.Columns.Add("departure_load_status", typeof(string)).SetOrdinal(dt.Columns.IndexOf("departure_load_class"));
+            dt.Columns.Add("departure_lower_load_status", typeof(string)).SetOrdinal(dt.Columns.IndexOf("departure_lower_load_class"));
+
+            // 各列の値を適切な値に変換
+            foreach (DataRow row in dt.Rows)
+            {
+                // 荷量クラスを%表示に変換
+                var arrivalLoadClass = (int)row["arrival_load_class"];
+                var arrivalLowerLoadClass = (int)row["arrival_lower_load_class"];
+                var departureLoadClass = (int)row["departure_load_class"];
+                var departureLowerLoadClass = (int)row["departure_lower_load_class"];
+                row["arrival_load_status"] = LoadRecordController.ConversionLoadClassToLoadStatus(arrivalLoadClass);
+                row["arrival_lower_load_status"] = LoadRecordController.ConversionLoadClassToLoadStatus(arrivalLowerLoadClass);
+                row["departure_load_status"] = LoadRecordController.ConversionLoadClassToLoadStatus(departureLoadClass);
+                row["departure_lower_load_status"] = LoadRecordController.ConversionLoadClassToLoadStatus(departureLowerLoadClass);
+
+                // アラート項目を生成
+                AlertRecordModel alertRecord = new AlertRecordModel
+                {
+                    ArrivalLowerLoadClass = arrivalLowerLoadClass,
+                    DepartureLowerLoadClass = departureLowerLoadClass,
+                };
+                LoadRecordModel loadRecord = new LoadRecordModel
+                {
+                    ArrivalScheduledTime = DateTime.Parse(row["arrival_scheduled_time"].ToString()!),
+                    DepartureScheduledTime = DateTime.Parse(row["departure_scheduled_time"].ToString()!),
+                    ArrivedAt = DateTime.Parse(row["arrived_at"].ToString()!),
+                    DepartedAt = DateTime.Parse(row["departed_at"].ToString()!),
+                    ArrivalLoadClass = arrivalLoadClass,
+                    DepartureLoadClass = departureLoadClass
+                };
+                var alertItems = GetAlertItems(alertRecord, loadRecord);
+                row["alert_items"] = ConvertAlertItemsToString(alertItems);
+            }
+
+            // 変換前の列を削除
+            dt.Columns.Remove("arrival_load_class");
+            dt.Columns.Remove("arrival_lower_load_class");
+            dt.Columns.Remove("departure_load_class");
+            dt.Columns.Remove("departure_lower_load_class");
+            return dt;
+        }
+
+        private string ConvertAlertItemsToString(List<string> alertItems)
+        {
+            var alertItemString = "";
+            for (int i = 0; i < alertItems.Count; i++)
+            {
+                if (i > 0)
+                    alertItemString += ", ";
+
+                alertItemString += alertItems[i];
+            }
+            return alertItemString;
         }
     }
 }

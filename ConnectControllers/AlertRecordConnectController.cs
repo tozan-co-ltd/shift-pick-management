@@ -136,6 +136,48 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
-
+        /// <summary>
+        /// アラート履歴DataTable取得SQL
+        /// </summary>
+        /// <param name="startOfPeriod"></param>
+        /// <param name="endOfPeriod"></param>
+        /// <param name="checkedDepos"></param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectAlertRecordForDataTable(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        {
+            var sql = $@"
+                SELECT
+                    AlertRecords.alert_record_id
+                    ,TripRecords.trip_name
+                    ,TripRecords.trip_branch_seq
+                    ,TripRecords.driver_name
+                    ,Stations.name AS station_name
+                    ,TripRecords.truck_number
+                    ,TripRecords.identify_number
+                    ,FORMAT(CONVERT(DATETIME, arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time
+	                ,FORMAT(CONVERT(DATETIME, departure_scheduled_time), 'HH:mm') AS departure_scheduled_time
+	                ,FORMAT(work_day, 'yyyy/MM/dd') AS work_day
+	                ,FORMAT(arrived_at, 'yyyy/MM/dd HH:mm') AS arrived_at
+	                ,FORMAT(departed_at, 'yyyy/MM/dd HH:mm') AS departed_at
+                    ,TripRecords.arrival_load_class
+                    ,AlertRecords.arrival_lower_load_class
+                    ,TripRecords.departure_load_class
+                    ,AlertRecords.departure_lower_load_class
+                    ,TripRecords.arrival_load_img_path
+                    ,TripRecords.departure_load_img_path
+                FROM t_alert_records AS AlertRecords
+                INNER JOIN
+                    t_trip_records AS TripRecords
+                ON 
+                    AlertRecords.trip_record_id = TripRecords.trip_record_id
+                INNER JOIN
+                    m_stations AS Stations
+                ON
+                    TripRecords.station_id = Stations.station_id
+                WHERE
+                    TripRecords.work_day BETWEEN '{startOfPeriod.ToString("yyyy/MM/dd")}' AND '{endOfPeriod.ToString("yyyy/MM/dd")}'
+            ";
+            return sql;
+        }
     }
 }

@@ -65,7 +65,7 @@
         <div class="mg-bot-20 mb-3">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-1">
-                    <a class="btn btn-info btn-icon-split" onclick="onExportFile('AlertRecord', '@Model.ViewTitle')" id="exportFile">
+                    <a class="btn btn-info btn-icon-split" onclick="onExportFileAlert('AlertRecord', '@Model.ViewTitle')" id="exportFile">
                         <span class="icon text-white-50">
                             <i class="fas fa-file-export"></i>
                         </span>
@@ -169,5 +169,31 @@
             var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
             $("#div-error-message").text(errorMessage);
         }
+    }
+
+    // Excel出力
+    async function onExportFileAlert(page, gamenName) {
+        event.preventDefault();
+        $('#div-error-message').text("");
+
+        // チェックボックスの入力情報取得
+        var checkedDepos = getCheckedDepos();
+
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // フォーム情報取得
+        let data = {
+            "gamenName": gamenName,
+            "startOfPeriod": startOfPeriod,
+            "endOfPeriod": endOfPeriod,
+            checkedDepos: checkedDepos
+        };
+        console.log(data);
+
+        // Excel出力共通処理
+        onExportFileTripsCommon(page, data);
+
     }
 </script>
