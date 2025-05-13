@@ -5,6 +5,7 @@ using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Data;
+using System.IO.Compression;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -343,6 +344,106 @@ namespace ai_truck_load_measurement.Controllers
                 alertItemString += alertItems[i];
             }
             return alertItemString;
+        }
+
+        /// <summary>
+        /// 画像一括ダウンロード
+        /// </summary>
+        /// <param name="download"></param>
+        /// <param name="startOfPeriod">期間開始日</param>
+        /// <param name="endOfPeriod">期間終了日</param>
+        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみのデータか</param>
+        /// <returns></returns>
+        public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        {
+            // ダウンロードボタンが押された際の処理
+            if (download == "download")
+            {
+                IEnumerable<LoadRecordModel> tripRecordList = new List<LoadRecordModel>();
+
+                if (checkedDepos.Count > 0)
+                {
+                    // 指定した期間の便実績情報取得SQL作成
+                    var sql = AlertRecordConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, checkedDepos);
+                    // DB接続
+                    tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
+                }
+
+                var checkedDeposName = new List<LoadRecordModel>();
+                // デポ名リスト作成
+                if (checkedDepos.Count > 0)
+                {
+                    var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
+                    checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
+                }
+
+                var startDate = startOfPeriod.ToString("yyyyMMdd");
+                var endDate = endOfPeriod.ToString("yyyyMMdd");
+
+                // 空のメモリストリームを生成
+                using (var ms = new MemoryStream())
+                {// メモリストリームを指定してZipArchiveを作成
+                    using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
+                    {
+                        var date = string.Empty;
+                        foreach (var tripRecord in tripRecordList)
+                        {
+                            // ステーションの画像取得
+                            var arrivalLoadImgPath = LoadRecordController.CheckAndConvertImagePath(tripRecord.ArrivalLoadImgPath);
+                            var departureLoadImgPath = LoadRecordController.CheckAndConvertImagePath(tripRecord.DepartureLoadImgPath);
+                            byte[] arrivalLoadImgBytes = Convert.FromBase64String(arrivalLoadImgPath);
+                            byte[] departureLoadImgBytes = Convert.FromBase64String(departureLoadImgPath);
+                            // 荷量取得
+                            var arrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(tripRecord.ArrivalLoadClass);
+                            var departureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(tripRecord.DepartureLoadClass);
+                            date = tripRecord.WorkDay.ToString("yyyyMMdd");
+                            // 便名称と便枝番が空欄の時の処理
+                            var tripName = tripRecord.TripName;
+                            if (string.IsNullOrEmpty(tripName)) tripName = "-";
+                            var tripBranchSeq = tripRecord.TripBranchSeq;
+                            if (string.IsNullOrEmpty(tripBranchSeq)) tripBranchSeq = "-";
+
+
+                            // ファイルネームの指定
+                            var FileNameArrive = string.Format($"{tripName}_{tripBranchSeq}_{date}_A_{arrivalLoadStatus}.jpg");
+                            var FileNameDeparture = string.Format($"{tripName}_{tripBranchSeq}_{date}_D_{departureLoadStatus}.jpg");
+
+                            // 到着の画像をzipストリームに書き込む
+                            var zipEntry = archive.CreateEntry(FileNameArrive, CompressionLevel.Fastest);
+                            using (var zipStream = zipEntry.Open())
+                            {
+                                zipStream.Write(arrivalLoadImgBytes, 0, arrivalLoadImgBytes.Length);
+                            }
+
+                            // 出発の画像をzipストリームに書き込む
+                            var zipEntry2 = archive.CreateEntry(FileNameDeparture, CompressionLevel.Fastest);
+                            using (var zipStream = zipEntry2.Open())
+                            {
+                                zipStream.Write(departureLoadImgBytes, 0, departureLoadImgBytes.Length);
+                            }
+                        }
+                        // 検索条件のテキストファイルを追加
+                        var zipEntryText = archive.CreateEntry("検索条件.txt");
+                        using (StreamWriter sw = new StreamWriter(zipEntryText.Open(),
+                            System.Text.Encoding.GetEncoding("shift_jis")))
+                        {
+                            //書き込む
+                            sw.WriteLine($"稼働日：{startDate}～{endDate}");
+                            var selectedDepos = LoadRecordController.SelectedDepos(checkedDepos);
+                            sw.WriteLine($"対象デポ：{selectedDepos}");
+                        }
+                    }
+
+
+                    // メモリストリームを配列に変換してViewに渡す
+                    return Json(new { data = File(ms.ToArray(), "application/zip", $"荷量画像_{startDate}-{endDate}") });
+                }
+            }
+            // エラーメッセージ取得
+            // 「ファイルが存在しません。」
+            var errorMessage = ErrorMessagesResources.E9999;
+
+            return Json(new { res = "NG", error = errorMessage });
         }
     }
 }

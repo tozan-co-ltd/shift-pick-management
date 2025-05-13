@@ -179,5 +179,56 @@ namespace ai_truck_load_measurement.ConnectControllers
             ";
             return sql;
         }
+
+        /// <summary>
+        /// 画像出力用の便実績情報取得SQL
+        /// </summary>
+        /// <param name="startOfPeriod">期間開始日</param>
+        /// <param name="endOfPeriod">期間終了日</param>
+        /// <param name="isOnlyHasAmountDeference">荷量の相違ありのみ表示か</param>
+        /// <returns></returns>
+        public static string CreatSQLToSelectTripRecordForImage(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        {
+            string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
+            string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
+            var sql = $@"
+                SELECT
+                    TripRecords.trip_record_id,
+	                trip_name,
+	                trip_branch_seq,
+	                TripRecords.driver_name,
+	                TripRecords.station_id,
+	                truck_number,
+	                identify_number,
+	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
+	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+	                work_day,
+	                arrived_at,
+	                departed_at,
+	                arrival_load_class,
+	                departure_load_class,
+	                arrival_load_img_path,
+	                departure_load_img_path
+                FROM
+                    t_alert_records AS AlertRecords
+                INNER JOIN
+                    t_trip_records AS TripRecords
+                ON
+                    AlertRecords.trip_record_id = TripRecords.trip_record_id
+                INNER JOIN
+                m_stations AS Stations
+                ON
+                TripRecords.station_id = Stations.station_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                Stations.depo_id = Depos.depo_id
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
+            
+            sql += LoadRecordConnectController.SQLOfCheckedDepos(checkedDepos);
+            sql += $@"
+            ORDER BY arrived_at";
+            return sql;
+        }
     }
 }

@@ -196,4 +196,31 @@
         onExportFileTripsCommon(page, data);
 
     }
+
+    // 画像一括出力ボタン押下
+    function onExportAllImages(page) {
+        event.preventDefault();
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
+
+            let data = {
+                download: "download",
+                startOfPeriod: startOfPeriod,
+                endOfPeriod: endOfPeriod,
+                checkedDepos: checkedDepos
+            };
+
+            onExportAllImagesCommon(page, data);
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
 </script>

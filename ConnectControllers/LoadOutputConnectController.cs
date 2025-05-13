@@ -108,7 +108,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 sql += $@"
                 AND NOT identify_number IS NULL ";
             }
-            sql += SQLOfCheckedDepos(checkedDepos);
+            sql += LoadRecordConnectController.SQLOfCheckedDepos(checkedDepos);
             return sql;
         }
 
@@ -178,7 +178,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 AND NOT identify_number IS NULL
                 ";
             }
-            sql += SQLOfCheckedDepos(checkedDepos);
+            sql += LoadRecordConnectController.SQLOfCheckedDepos(checkedDepos);
             sql += $@"
             ORDER BY arrived_at";
             return sql;
@@ -251,30 +251,12 @@ namespace ai_truck_load_measurement.ConnectControllers
                 AND NOT identify_number IS NULL
                 ";
             }
-            sql += SQLOfCheckedDepos(checkedDepo);
+            sql += LoadRecordConnectController.SQLOfCheckedDepos(checkedDepo);
             sql += $@"
             ORDER BY trip_name, work_day, trip_branch_seq
             ";
             return sql;
         }
 
-        private static string SQLOfCheckedDepos(List<string> checkedDepos)
-        {
-            var sql = "";
-            if (checkedDepos.Count > 0)
-            {
-                sql += "AND Depos.depo_id IN (";
-                for (int i = 0; i < checkedDepos.Count; i++)
-                {
-                    if (i != 0)
-                    {
-                        sql += $", ";
-                    }
-                    sql += $"'{checkedDepos[i]}'";
-                }
-                sql += ")";
-            }
-            return sql;
-        }
     }
 }

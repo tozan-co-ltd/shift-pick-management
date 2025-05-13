@@ -531,5 +531,25 @@ namespace ai_truck_load_measurement.ConnectControllers
             
             return sql;
         }
+
+
+        public static string SQLOfCheckedDepos(List<string> checkedDepos)
+        {
+            var sql = "";
+            if (checkedDepos.Count > 0)
+            {
+                sql += "AND Depos.depo_id IN (";
+                for (int i = 0; i < checkedDepos.Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        sql += $", ";
+                    }
+                    sql += $"'{checkedDepos[i]}'";
+                }
+                sql += ")";
+            }
+            return sql;
+        }
     }
 }
