@@ -31,13 +31,17 @@ namespace ai_truck_load_measurement.Controllers
                 if (checkedDepos.Count > 0)
                 {
                     // アラート履歴情報取得SQL作成
-                    var alertRecordSql = AlertRecordConnectController.CreateSQLToSelectAlertRecord(startOfPeriod, endOfPeriod);
+                    var alertRecordSql = AlertRecordConnectController.CreateSQLToSelectAlertRecord(startOfPeriod, endOfPeriod, checkedDepos);
                     // DB接続
                     alertRecordList = AlertRecordConnectController.ConnectTAlertRecords(alertRecordSql);
-                    // アラート履歴に対応する便実績情報取得SQL作成
-                    var loadRecordSql = AlertRecordConnectController.CreateSQLToSelectTripRecordFromAlertRecord(alertRecordList);
-                    // DB接続
-                    loadRecordList = LoadRecordConnectController.ConnectTTripRecords(loadRecordSql);
+
+                    if (alertRecordList.Count > 0)
+                    {
+                        // アラート履歴に対応する便実績情報取得SQL作成
+                        var loadRecordSql = AlertRecordConnectController.CreateSQLToSelectTripRecordFromAlertRecord(alertRecordList);
+                        // DB接続
+                        loadRecordList = LoadRecordConnectController.ConnectTTripRecords(loadRecordSql);
+                    }
                 }
 
                 // テーブルのヘッダ部分

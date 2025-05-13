@@ -45,7 +45,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="startOfPeriod">期間開始日</param>
         /// <param name="endOfPeriod">期間終了日</param>
         /// <returns></returns>
-        public static string CreateSQLToSelectAlertRecord(DateTime startOfPeriod, DateTime endOfPeriod)
+        public static string CreateSQLToSelectAlertRecord(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             var sql = $@"
                 SELECT
@@ -68,6 +68,22 @@ namespace ai_truck_load_measurement.ConnectControllers
                 WHERE
                     TripRecords.work_day BETWEEN '{startOfPeriod.ToString("yyyy/MM/dd")}' AND '{endOfPeriod.ToString("yyyy/MM/dd")}'
             ";
+            if (checkedDepos.Count != 0)
+            {
+                if (checkedDepos[0] != "0")
+                {
+                    sql += "AND (";
+                    for (int i = 0; i < checkedDepos.Count; i++)
+                    {
+                        if (i != 0)
+                        {
+                            sql += $" OR ";
+                        }
+                        sql += $"Stations.depo_id = {checkedDepos[i]}";
+                    }
+                    sql += $@")";
+                }
+            }
             return sql;
         }
 
@@ -90,8 +106,8 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                ,FORMAT(CONVERT(DATETIME, TripRecords.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time
 	                ,FORMAT(CONVERT(DATETIME, TripRecords.departure_scheduled_time), 'HH:mm') AS departure_scheduled_time
 	                ,FORMAT(TripRecords.work_day, 'yyyy/MM/dd') AS work_day
-	                ,FORMAT(TripRecords.arrived_at, 'yyyy/MM/dd HH:mm')
-	                ,FORMAT(TripRecords.departed_at, 'yyyy/MM/dd HH:mm')
+	                ,FORMAT(TripRecords.arrived_at, 'yyyy/MM/dd HH:mm') AS arrived_at
+	                ,FORMAT(TripRecords.departed_at, 'yyyy/MM/dd HH:mm') AS departed_at
 	                ,TripRecords.arrival_load_class
 	                ,TripRecords.departure_load_class
                 FROM t_trip_records AS TripRecords

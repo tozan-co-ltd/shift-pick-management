@@ -50,7 +50,7 @@
                 <label class="m-1">～</label>
                 <input type="text" id="endOfPeriod" class="form-control pickerDate endDate mr-3">
                 <div class="input-group-append mr-3">
-                    <a class="btn btn-secondary btn-icon-split" onclick="onSearchClick('AlertRecord')">
+                    <a class="btn btn-secondary btn-icon-split" onclick="onSearchClick()">
                         <span class="icon text-white-50">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
@@ -104,7 +104,6 @@
     });
 
 
-    // 便実績テーブル表示
     // アラート履歴テーブルの表示
     function tableDisplay() {
         // チェックボックスの入力情報取得
@@ -158,6 +157,17 @@
                 $("#edit-modal-error-message").text(errorMessage);
             }
         });
+    }
 
+    // 検索ボタン押下時
+    function onSearchClick() {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
     }
 </script>
