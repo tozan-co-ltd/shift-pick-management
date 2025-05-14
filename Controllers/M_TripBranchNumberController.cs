@@ -213,6 +213,10 @@ namespace ai_truck_load_measurement.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
+                // タグが未入力の場合、空文字を登録する
+                if (string.IsNullOrEmpty(model.Tag))
+                    model.Tag = "";
+
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {

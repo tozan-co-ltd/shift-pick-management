@@ -35,6 +35,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// タグ
         /// </summary>
+        [Display(Name = "タグ")]
         public string? Tag { get; set; }
 
         /// <summary>
