@@ -747,6 +747,7 @@ namespace ai_truck_load_measurement.Commons
                 default:
                     headerList.Add("便名称");
                     headerList.Add("便枝番");
+                    headerList.Add("タグ");
                     headerList.Add("乗務員");
                     headerList.Add("ステーション名");
                     headerList.Add("車両番号");
