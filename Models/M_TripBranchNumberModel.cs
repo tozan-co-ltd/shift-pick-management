@@ -33,6 +33,11 @@ namespace ai_truck_load_measurement.Models
         public int TripBranchSeq {  get; set; }
 
         /// <summary>
+        /// タグ
+        /// </summary>
+        public string? Tag { get; set; }
+
+        /// <summary>
         /// 便名称
         /// </summary>
         [Display(Name = "便名称")]

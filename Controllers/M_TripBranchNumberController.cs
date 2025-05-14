@@ -95,7 +95,8 @@ namespace ai_truck_load_measurement.Controllers
                     searchData += $@"<th class=""font-weight-bold"">枝連番</th>";
 
                 }
-                 searchData +=   $@"<th class=""font-weight-bold"">到着予定時間</th>
+                 searchData +=   $@"<th class=""font-weight-bold"">タグ</th>
+                                    <th class=""font-weight-bold"">到着予定時間</th>
                                     <th class=""font-weight-bold"">出発予定時間</th>
                                     <th class=""font-weight-bold"">適用開始日時</th>
                                     <th class=""font-weight-bold"">適用終了日時</th>
@@ -125,6 +126,7 @@ namespace ai_truck_load_measurement.Controllers
 
                         }
                         searchData += $@"
+                                    <td>{item.Tag}</td>
                                     <td>{@item.ArrivalScheduledTime.ToString("HH:mm")}</td>
                                     <td>{@item.DepartureScheduledTime.ToString("HH:mm")}</td>
                                     <td>{@item.ApplicableStartDateTime.ToString("yyyy/MM/dd HH:mm")}</td>

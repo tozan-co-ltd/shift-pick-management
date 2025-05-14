@@ -150,6 +150,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 SELECT
 	                trip_branch_number_id,
+                    tag,
 	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
 	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
 	                applicable_start_datetime,
@@ -181,6 +182,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 SELECT
                     trip_branch_number_id,
+                    tag,
                     CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
                     CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
                     BranchNumbers.applicable_start_datetime,
