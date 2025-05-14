@@ -269,6 +269,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 UPDATE m_trip_branch_numbers
                 SET 
                     trip_id = '{model.TripID}',
+                    tag = '{model.Tag}',
 	                arrival_scheduled_time = '1900/01/01 {model.RegistArrivalScheduledTime}:00',
 	                departure_scheduled_time = '1900/01/01 {model.RegistDepartureScheduledTime}:00',
 	                applicable_start_datetime = '{model.ApplicableStartDateTime}',
