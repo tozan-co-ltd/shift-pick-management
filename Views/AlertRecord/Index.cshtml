@@ -118,7 +118,6 @@
     // 画面ロード時
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
-        console.log(model);
         var today = new Date();
         var oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -217,7 +216,6 @@
             "endOfPeriod": endOfPeriod,
             checkedDepos: checkedDepos
         };
-        console.log(data);
 
         // Excel出力共通処理
         onExportFileTripsCommon(page, data);
@@ -262,7 +260,6 @@
         for (i = 0; i < trs.length - tableLength; i++) {
             arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
         }
-        console.log(arrayTrs);
         EditAlertModal(alertRecordID, isArrived, page);
     }
 
@@ -420,7 +417,6 @@
     // モーダル内の「上へ」「下へ」ボタン押下時
     function onOtherAlertModalClick(otherTripRecordID, isArrived, page) {
         event.preventDefault();
-        console.log(otherTripRecordID);
         if (isArrived == "true") {
             isArrived = true;
         } else {
