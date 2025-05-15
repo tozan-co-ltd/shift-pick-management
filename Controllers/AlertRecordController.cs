@@ -61,6 +61,10 @@ namespace ai_truck_load_measurement.Controllers
                 alertRecord.ArrivalLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(alertRecord.ArrivalLowerLoadClass);
                 alertRecord.DepartureLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(alertRecord.DepartureLowerLoadClass);
 
+                // 出発・到着予定時刻の日付を変換
+                loadRecord.ArrivalScheduledTime = ConversionScheduledTime(loadRecord.ArrivalScheduledTime, loadRecord.ArrivedAt);
+                loadRecord.DepartureScheduledTime = ConversionScheduledTime(loadRecord.DepartureScheduledTime, loadRecord.DepartedAt);
+
                 // 画像パス変換
                 loadRecord.ArrivalLoadImgPath = LoadRecordController.CheckAndConvertImagePath(loadRecord.ArrivalLoadImgPath);
                 loadRecord.DepartureLoadImgPath = LoadRecordController.CheckAndConvertImagePath(loadRecord.DepartureLoadImgPath);
@@ -74,6 +78,18 @@ namespace ai_truck_load_measurement.Controllers
             model.LoadRecordList = loadRecordList;
             return model;
         }
+
+        /// <summary>
+        /// 出発・到着予定時刻の日付を変換
+        /// </summary>
+        /// <param name="scheduledTime"></param>
+        /// <param name="recordTime"></param>
+        /// <returns></returns>
+        private DateTime ConversionScheduledTime(DateTime scheduledTime, DateTime recordTime)
+        {
+            return new DateTime(recordTime.Year, recordTime.Month, recordTime.Day, scheduledTime.Hour, scheduledTime.Minute, scheduledTime.Second);
+        }
+
 
         /// <summary>
         /// アラート履歴情報テーブル非同期更新用
@@ -180,6 +196,7 @@ namespace ai_truck_load_measurement.Controllers
                 return Json(errorMessage);
             }
         }
+
 
         /// <summary>
         /// アラート項目取得
