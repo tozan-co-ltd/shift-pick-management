@@ -13,10 +13,10 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// </summary>
         /// <param name="sql">SQL文</param>
         /// <returns></returns>
-        public static List<AlertRecordModel> ConnectTAlertRecords(string sql)
+        public static List<T> ConnectTAlertRecords<T>(string sql)
         {
             // 戻り値
-            List<AlertRecordModel> strList = new();
+            List<T> strList = new();
 
             // DB接続
             try
@@ -29,7 +29,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     connection.ConnectionString = connectionString;
                     connection.Open();
                     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<AlertRecordModel>(sql).ToList();
+                    strList = connection.Query<T>(sql).ToList();
                 }
                 return strList;
             }
@@ -110,6 +110,8 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                ,FORMAT(TripRecords.departed_at, 'yyyy/MM/dd HH:mm') AS departed_at
 	                ,TripRecords.arrival_load_class
 	                ,TripRecords.departure_load_class
+                    ,TripRecords.arrival_load_img_path
+                    ,TripRecords.departure_load_img_path
                 FROM t_trip_records AS TripRecords
                 INNER JOIN
                     m_stations AS Stations
@@ -228,6 +230,24 @@ namespace ai_truck_load_measurement.ConnectControllers
             sql += LoadRecordConnectController.SQLOfCheckedDepos(checkedDepos);
             sql += $@"
             ORDER BY arrived_at";
+            return sql;
+        }
+
+        /// <summary>
+        /// アラート履歴情報取得SQL
+        /// </summary>
+        /// <returns></returns>
+        public static string CreateSQLToSelectAlertRecord()
+        {
+            var sql = $@"
+                SELECT
+                    alert_record_id
+                    ,trip_record_id
+                    ,arrival_lower_load_class
+                    ,departure_lower_load_class
+                FROM
+                    t_alert_records 
+            ";
             return sql;
         }
     }

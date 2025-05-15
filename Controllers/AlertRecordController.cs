@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Data;
 using System.IO.Compression;
+using X.PagedList;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -15,16 +16,71 @@ namespace ai_truck_load_measurement.Controllers
         {
             var model = new AlertRecordViewModel();
             // ログインユーザーのメインデポ情報取得
-            model.MainDepo = GetMainDepo();
-            return View(model);
+            try
+            {
+                // アラート履歴情報取得SQL作成
+                var alertRecordSql = AlertRecordConnectController.CreateSQLToSelectAlertRecord();
+                // DB接続
+                List<AlertRecordModel> alertRecordList = AlertRecordConnectController.ConnectTAlertRecords<AlertRecordModel>(alertRecordSql);
+
+                // 便実績情報取得SQL作成
+                var loadRecordSql = AlertRecordConnectController.CreateSQLToSelectTripRecordFromAlertRecord(alertRecordList);
+                List<LoadRecordModel> loadRecordList = AlertRecordConnectController.ConnectTAlertRecords<LoadRecordModel>(loadRecordSql);
+
+                // テーブル情報を変換
+                model = ConversionForViewModel(alertRecordList, loadRecordList);
+
+                // ログインユーザーのメインデポ情報取得
+                model.MainDepo = GetMainDepo();
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return View(model);
+            }
         }
 
         /// <summary>
-        /// 便情報テーブル非同期更新用
+        /// 各種情報を表示用に変換
+        /// </summary>
+        /// <param name="alertRecordList"></param>
+        /// <param name="loadRecordList"></param>
+        /// <returns></returns>
+        private AlertRecordViewModel ConversionForViewModel(List<AlertRecordModel> alertRecordList, List<LoadRecordModel> loadRecordList)
+        {
+            AlertRecordViewModel model = new();
+            foreach (var alertRecord in alertRecordList)
+            {
+                // アラート履歴に対応した便実績
+                var loadRecord = loadRecordList.Find(x => x.TripRecordID == alertRecord.TripRecordID)!;
+                // 荷量のクラスから％表示に
+                loadRecord.ArrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(loadRecord.ArrivalLoadClass);
+                loadRecord.DepartureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(loadRecord.DepartureLoadClass);
+                alertRecord.ArrivalLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(alertRecord.ArrivalLowerLoadClass);
+                alertRecord.DepartureLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(alertRecord.DepartureLowerLoadClass);
+
+                // 画像パス変換
+                loadRecord.ArrivalLoadImgPath = LoadRecordController.CheckAndConvertImagePath(loadRecord.ArrivalLoadImgPath);
+                loadRecord.DepartureLoadImgPath = LoadRecordController.CheckAndConvertImagePath(loadRecord.DepartureLoadImgPath);
+
+                // アラート項目取得
+                var alertItems = GetAlertItems(alertRecord, loadRecord);
+                alertRecord.ArrivalAlertItems = alertItems.FindAll(x => x.Contains("到着"));
+                alertRecord.DepartureAlertItems = alertItems.FindAll(x => x.Contains("出発"));
+            }
+            model.AlertRecordList = alertRecordList;
+            model.LoadRecordList = loadRecordList;
+            return model;
+        }
+
+        /// <summary>
+        /// アラート履歴情報テーブル非同期更新用
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
         /// <returns></returns>
-        public IActionResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             var searchData = string.Empty;
             List<AlertRecordModel> alertRecordList = new();
@@ -36,7 +92,7 @@ namespace ai_truck_load_measurement.Controllers
                     // アラート履歴情報取得SQL作成
                     var alertRecordSql = AlertRecordConnectController.CreateSQLToSelectAlertRecord(startOfPeriod, endOfPeriod, checkedDepos);
                     // DB接続
-                    alertRecordList = AlertRecordConnectController.ConnectTAlertRecords(alertRecordSql);
+                    alertRecordList = AlertRecordConnectController.ConnectTAlertRecords<AlertRecordModel>(alertRecordSql);
 
                     if (alertRecordList.Count > 0)
                     {
@@ -53,6 +109,7 @@ namespace ai_truck_load_measurement.Controllers
                         <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripTable"">
                             <thead>
                                 <tr align=""center"">
+                                    <th hidden>アラート履歴ID</th>
                                     <th class=""font-weight-bold"">便名称</th>
                                     <th class=""font-weight-bold"">便枝番</th>
                                     <th class=""font-weight-bold"">ステーション</ br>名</th>
@@ -74,10 +131,11 @@ namespace ai_truck_load_measurement.Controllers
                         var loadRecord = loadRecordList.Find(x => x.TripRecordID == alertRecord.TripRecordID)!;
                         // アラート項目部分のhtml取得
                         var alertItems = GetAlertItems(alertRecord, loadRecord);
-                        var alertItemsHTML = ConvertAlertItemsToHTML(alertItems);
+                        var alertItemsHTML = ConversionAlertItemsToHTML(alertItems);
 
                         searchData += $@"
                             <tr>
+                                <td hidden>{alertRecord.AlertRecordID}</td>
                                 <td>{loadRecord.TripName}</td>
                                 <td>{loadRecord.TripBranchSeq}</td>
                                 <td>{loadRecord.StationName}</td>
@@ -92,7 +150,7 @@ namespace ai_truck_load_measurement.Controllers
                                 </td>
                                 <td>
                                     <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                        onclick=""OnDepartureLoadImageClick('{alertRecord.AlertRecordID}', this)"" data-id=""{alertRecord.AlertRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                        onclick=""OnDepartureAlertImageClick('{alertRecord.AlertRecordID}', this)"" data-id=""{alertRecord.AlertRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
                                     <i class=""fa-solid fa-truck""></i>
                                     </a>
                                 </td>
@@ -106,21 +164,25 @@ namespace ai_truck_load_measurement.Controllers
                     </div>
                 ";
 
-                return Content(searchData);
+                return Json(new SearchedTripRecordListModel
+                {
+                    searchedTripRecordHTML = searchData,
+                    searchedTripRecordLength = alertRecordList.Count()
+                });
             }
             catch (SqlException)
             {
-                return NotFound(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+                return Json(new { errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
             }
             catch (Exception)
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
-                return Content(errorMessage);
+                return Json(errorMessage);
             }
         }
 
         /// <summary>
-        /// アラート項目のHTML取得
+        /// アラート項目取得
         /// </summary>
         /// <param name="alertRecord"></param>
         /// <param name="loadRecord"></param>
@@ -170,11 +232,11 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
-        /// アラート項目リストからhtmlを作成する
+        /// アラート項目のhtml取得
         /// </summary>
         /// <param name="alertItems">アラート項目リスト</param>
         /// <returns></returns>
-        public string ConvertAlertItemsToHTML(List<string> alertItems)
+        public string ConversionAlertItemsToHTML(List<string> alertItems)
         {
             var html = "";
             for (int i = 0; i < alertItems.Count; i++)
@@ -444,6 +506,22 @@ namespace ai_truck_load_measurement.Controllers
             var errorMessage = ErrorMessagesResources.E9999;
 
             return Json(new { res = "NG", error = errorMessage });
+        }
+
+        /// <summary>
+        /// アラート詳細モーダルに表示する値の取得
+        /// </summary>
+        /// <param name="model">モーダルに表示するモデル</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        public AlertRecordModalModel GetModalItems(int alertRecordID, bool isArrived)
+        {
+            var model = new AlertRecordModalModel();
+            // ステーションの画像取得
+            model.ArrivalLoadImgPath = LoadRecordController.CheckAndConvertImagePath(model.ArrivalLoadImgPath);
+            model.DepartureLoadImgPath = LoadRecordController.CheckAndConvertImagePath(model.DepartureLoadImgPath);
+            // アラート項目html取得
+            return model;
         }
     }
 }

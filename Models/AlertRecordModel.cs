@@ -8,7 +8,12 @@ namespace ai_truck_load_measurement.Models
         public int TripRecordID {  get; set; }
         public int NotificationID {  get; set; }
         public int ArrivalLowerLoadClass {  get; set; }
+        public string? ArrivalLowerLoadStatus {  get; set; }
         public int DepartureLowerLoadClass { get; set; }
+        public string? DepartureLowerLoadStatus { get; set; }
+        public List<string>? AlertItems {  get; set; }
+        public List<string>? ArrivalAlertItems { get; set; }
+        public List<string>? DepartureAlertItems { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         //public string TripName { get; set; }
@@ -21,6 +26,7 @@ namespace ai_truck_load_measurement.Models
 
     public class AlertRecordModalModel : CommonModel
     {
+        public int AlertRecordID { get; set; }
         public string TripName {  get; set; }
         public int TripBranchSeq {  get; set; }
         public string DriverName {  get; set; }
@@ -39,6 +45,8 @@ namespace ai_truck_load_measurement.Models
         public DateTime DepartedAt { get; set; }
         public DateTime ArrivalScheduledTime {  get; set; }
         public DateTime DepartureScheduledTime {  get; set; }
+        public string ArrivalLoadImgPath {  get; set; }
+        public string DepartureLoadImgPath { get; set;}
     }
 
     public class AlertRecordViewModel : CommonModel
