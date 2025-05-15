@@ -475,6 +475,8 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                TripHistories.depo_id = Depos.depo_id
                 WHERE
                     Notifications.is_deleted <> 1
+                AND
+                    TripHistories.applicable_end_datetime > '{today.ToString("yyyy/MM/dd HH:mm")}'
                 ORDER BY 
                     Notifications.notification_id, Notifications.notification_start_datetime
             ";
@@ -520,6 +522,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     {CommonConnectController.SQLOfCheckedDepos(checkedDepos)}
                 AND
                     Notifications.is_deleted <> 1
+                AND
+                    TripHistories.applicable_end_datetime > '{today.ToString("yyyy/MM/dd HH:mm")}'
             ";
             if (!isBeforeNotificationPeriod)
             {
