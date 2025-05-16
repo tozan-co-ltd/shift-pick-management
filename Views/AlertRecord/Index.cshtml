@@ -310,9 +310,9 @@
                     loadStatus = loadRecord.arrivalLoadStatus;
                     imagePath = loadRecord.arrivalLoadImgPath;
                     arriveOrDepartureSchedule = "到着予定";
-                    arriveOrDepartureScheduleDate = GetDateString(new Date(loadRecord.arrivedAt));
+                    arriveOrDepartureScheduleDate = GetDateString(new Date(loadRecord.arrivalScheduledTime));
                     arriveOrDepartureRecord = "到着実績";
-                    arriveOrDepartureRecordDate = GetDateString(new Date(loadRecord.arrivalScheduledTime));
+                    arriveOrDepartureRecordDate = GetDateString(new Date(loadRecord.arrivedAt));
                     downloadFileName = loadRecord.tripName + "_" + loadRecord.tripBranchSeq + "_" + workDayForFile + "_A_" + loadStatus + ".jpg";
                 }
                 else {
@@ -322,9 +322,9 @@
                     loadStatus = loadRecord.departureLoadStatus;
                     imagePath = loadRecord.departureLoadImgPath;
                     arriveOrDepartureSchedule = "出発予定";
-                    arriveOrDepartureScheduleDate = GetDateString(new Date(loadRecord.departedAt));
+                    arriveOrDepartureScheduleDate = GetDateString(new Date(loadRecord.departureScheduledTime));
                     arriveOrDepartureRecord = "出発実績";
-                    arriveOrDepartureRecordDate = GetDateString(new Date(loadRecord.departureScheduledTime));
+                    arriveOrDepartureRecordDate = GetDateString(new Date(loadRecord.departedAt));
                     downloadFileName = loadRecord.tripName + "_" + loadRecord.tripBranchSeq + "_" + workDayForFile + "_D_" + loadStatus + ".jpg";
                 }
 
