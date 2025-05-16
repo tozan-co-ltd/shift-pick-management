@@ -287,129 +287,144 @@
         alertRecordModel.forEach(function (item) {
             if (item.alertRecordID == alertRecordID) {
                 var loadRecord = model.loadRecordList.find(x => x.tripRecordID == item.tripRecordID);
-                var imagePath = "";
-                var arriveOrDepartureSchedule = "";
-                var arriveOrDepartureScheduleDate = "";
-                var arriveOrDepartureRecord = "";
-                var arriveOrDepartureRecordDate = "";
-                var lowerLoadStatus = "";
-                var loadStatus = "";
-                var downloadFileName = "";
-                var alertItems = "";
-                var workDayForFile = GetDayStringForFile(new Date(loadRecord.workDay));
-                var tripNameAndBranchSeq = loadRecord.tripName + "_" + loadRecord.tripBranchSeq;
-                var truckNumber = loadRecord.truckNumber;
-                if (truckNumber == "0") truckNumber = "-";
-                if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
+                // フォーム情報取得
+                let url = window.location.origin + '@Url.Action("GetModalItems", "AlertRecord")';
+                let method = 'POST';
+                let data = { loadRecord: loadRecord};
 
-                // 到着か出発かで変わる要素の登録
-                if (isArrived) {
-                    $('#detail-modal-label').text("到着荷量画像");
-                    alertItems = conversionAlertItemsToHTML(item.arrivalAlertItems);
-                    lowerLoadStatus = item.arrivalLowerLoadStatus;
-                    loadStatus = loadRecord.arrivalLoadStatus;
-                    imagePath = loadRecord.arrivalLoadImgPath;
-                    arriveOrDepartureSchedule = "到着予定";
-                    arriveOrDepartureScheduleDate = GetDateString(new Date(loadRecord.arrivalScheduledTime));
-                    arriveOrDepartureRecord = "到着実績";
-                    arriveOrDepartureRecordDate = GetDateString(new Date(loadRecord.arrivedAt));
-                    downloadFileName = loadRecord.tripName + "_" + loadRecord.tripBranchSeq + "_" + workDayForFile + "_A_" + loadStatus + ".jpg";
-                }
-                else {
-                    $('#detail-modal-label').text("出発荷量画像");
-                    alertItems = conversionAlertItemsToHTML(item.departureAlertItems);
-                    lowerLoadStatus = item.departureLowerLoadStatus;
-                    loadStatus = loadRecord.departureLoadStatus;
-                    imagePath = loadRecord.departureLoadImgPath;
-                    arriveOrDepartureSchedule = "出発予定";
-                    arriveOrDepartureScheduleDate = GetDateString(new Date(loadRecord.departureScheduledTime));
-                    arriveOrDepartureRecord = "出発実績";
-                    arriveOrDepartureRecordDate = GetDateString(new Date(loadRecord.departedAt));
-                    downloadFileName = loadRecord.tripName + "_" + loadRecord.tripBranchSeq + "_" + workDayForFile + "_D_" + loadStatus + ".jpg";
-                }
+                // Ajax call
+                $.ajax({
+                    url: url,
+                    method: method,
+                    data: data
+                }).done(function (response) {
+                    var imagePath = "";
+                    var arriveOrDepartureSchedule = "";
+                    var arriveOrDepartureScheduleDate = "";
+                    var arriveOrDepartureRecord = "";
+                    var arriveOrDepartureRecordDate = "";
+                    var lowerLoadStatus = "";
+                    var loadStatus = "";
+                    var downloadFileName = "";
+                    var alertItems = "";
+                    var workDayForFile = GetDayStringForFile(new Date(response.workDay));
+                    var tripNameAndBranchSeq = response.tripName + "_" + response.tripBranchSeq;
+                    var truckNumber = response.truckNumber;
+                    if (truckNumber == "0") truckNumber = "-";
+                    if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
 
-                // アラート該当項目の文字色変更
-                var loadAlert = "";
-                var timeAlert = "";
-                if(alertItems.includes("荷量"))
-                    loadAlert = "class=\"text-danger\"";
-                if(alertItems.includes("時間"))
-                    timeAlert = "class=\"text-danger\"";
+                    // 到着か出発かで変わる要素の登録
+                    if (isArrived) {
+                        $('#detail-modal-label').text("到着荷量画像");
+                        alertItems = conversionAlertItemsToHTML(item.arrivalAlertItems);
+                        lowerLoadStatus = item.arrivalLowerLoadStatus;
+                        loadStatus = response.arrivalLoadStatus;
+                        imagePath = response.arrivalLoadImgPath;
+                        arriveOrDepartureSchedule = "到着予定";
+                        arriveOrDepartureScheduleDate = GetDateString(new Date(response.arrivalScheduledTime));
+                        arriveOrDepartureRecord = "到着実績";
+                        arriveOrDepartureRecordDate = GetDateString(new Date(response.arrivedAt));
+                        downloadFileName = response.tripName + "_" + response.tripBranchSeq + "_" + workDayForFile + "_A_" + loadStatus + ".jpg";
+                    }
+                    else {
+                        $('#detail-modal-label').text("出発荷量画像");
+                        alertItems = conversionAlertItemsToHTML(item.departureAlertItems);
+                        lowerLoadStatus = item.departureLowerLoadStatus;
+                        loadStatus = response.departureLoadStatus;
+                        imagePath = response.departureLoadImgPath;
+                        arriveOrDepartureSchedule = "出発予定";
+                        arriveOrDepartureScheduleDate = GetDateString(new Date(response.departureScheduledTime));
+                        arriveOrDepartureRecord = "出発実績";
+                        arriveOrDepartureRecordDate = GetDateString(new Date(response.departedAt));
+                        downloadFileName = response.tripName + "_" + response.tripBranchSeq + "_" + workDayForFile + "_D_" + loadStatus + ".jpg";
+                    }
 
-                $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
+                    // アラート該当項目の文字色変更
+                    var loadAlert = "";
+                    var timeAlert = "";
+                    if(alertItems.includes("荷量"))
+                        loadAlert = "class=\"text-danger\"";
+                    if(alertItems.includes("時間"))
+                        timeAlert = "class=\"text-danger\"";
 
-                var workDay = GetDayString(new Date(loadRecord.workDay));
+                    $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
 
-                // 表示している行の上下の行の便実績ID取得
-                var alertRecordIDIndex = arrayTrs.indexOf(alertRecordID);
-                var previousAlertRecordID = arrayTrs[alertRecordIDIndex - 1];
-                var nextAlertRecordID = arrayTrs[alertRecordIDIndex + 1];
+                    var workDay = GetDayString(new Date(response.workDay));
+
+                    // 表示している行の上下の行の便実績ID取得
+                    var alertRecordIDIndex = arrayTrs.indexOf(alertRecordID);
+                    var previousAlertRecordID = arrayTrs[alertRecordIDIndex - 1];
+                    var nextAlertRecordID = arrayTrs[alertRecordIDIndex + 1];
 
 
-                // ボタンの追加
-                var buttons = $("#tripRecord-buttons");
-                buttons.empty();
-                let div = "<div class=\"d-flex xs-block justify-content-start align-items-center p-0 mb-2 trip-record-buttons\">"
-                    + "<div class=\"input-group-append mr-3\" >"
-                    + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherAlertModalClick('" + previousAlertRecordID + "','" + isArrived + "','" + page + "')\" >"
-                    + "<span class=\"text\" >▲上へ</span>"
-                    + "</a>"
-                    + "</div>"
-                    + "<div class=\"input-group-append mr-3\" >"
-                    + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherAlertModalClick('" + nextAlertRecordID + "','" + isArrived + "','" + page + "')\" >"
-                    + "<span class=\"text\" >▼下へ</span>"
-                    + "</a>"
-                    + "</div>"
-                    + "<div class=\"input-group-append mr-3 right-button\" >"
-                    + " <a href=\"data:image/jpeg;base64," + imagePath + "\", download=\"" + downloadFileName + "\" class=\"btn btn-info btn-icon-split\"  >"
-                    + "<span class=\"icon text-white-50\" >"
-                    + "<i class=\"fa-solid fa-circle-down\" > </i>"
-                    + "</span>"
-                    + "<span class=\"text\" >画像出力</span>"
-                    + "</a>"
-                    + "</div>";
-                buttons.append(div);
+                    // ボタンの追加
+                    var buttons = $("#tripRecord-buttons");
+                    buttons.empty();
+                    let div = "<div class=\"d-flex xs-block justify-content-start align-items-center p-0 mb-2 trip-record-buttons\">"
+                        + "<div class=\"input-group-append mr-3\" >"
+                        + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherAlertModalClick('" + previousAlertRecordID + "','" + isArrived + "','" + page + "')\" >"
+                        + "<span class=\"text\" >▲上へ</span>"
+                        + "</a>"
+                        + "</div>"
+                        + "<div class=\"input-group-append mr-3\" >"
+                        + " <a href=\"#\" class=\"btn btn-secondary btn-icon-split\" onclick = \"onOtherAlertModalClick('" + nextAlertRecordID + "','" + isArrived + "','" + page + "')\" >"
+                        + "<span class=\"text\" >▼下へ</span>"
+                        + "</a>"
+                        + "</div>"
+                        + "<div class=\"input-group-append mr-3 right-button\" >"
+                        + " <a href=\"data:image/jpeg;base64," + imagePath + "\", download=\"" + downloadFileName + "\" class=\"btn btn-info btn-icon-split\"  >"
+                        + "<span class=\"icon text-white-50\" >"
+                        + "<i class=\"fa-solid fa-circle-down\" > </i>"
+                        + "</span>"
+                        + "<span class=\"text\" >画像出力</span>"
+                        + "</a>"
+                        + "</div>";
+                    buttons.append(div);
 
-                // テーブルの追加
-                var container = $("#tripRecord-contatiner");
-                container.empty();
-                let tr = "<tr style=\"background-color: yellow\" class=\"text-danger\">"
-                    + "<td>アラート項目</td>"
-                    + "<td>" + alertItems + "</td>"
-                    + "</tr><tr>"
-                    + "<td>荷量下限</td>"
-                    + "<td>" + lowerLoadStatus + "%</td>"
-                    + "</tr><tr " + loadAlert + ">"
-                    + "<td>荷量実績</td>"
-                    + "<td>" + loadStatus + "%</td>"
-                    + "</tr><tr>"
-                    + "<td>便名称_便枝番</td>"
-                    + "<td>" + tripNameAndBranchSeq + "</td>"
-                    + "</tr><tr>"
-                    + "<td>乗務員</td>"
-                    + "<td>" + loadRecord.driverName + "</td>"
-                    + "</tr><tr>"
-                    + "<td>ステーション名</td>"
-                    + "<td>" + loadRecord.stationName + "</td>"
-                    + "</tr><tr>"
-                    + "<td>車両番号</td>"
-                    + "<td>" + truckNumber + "</td>"
-                    + "</tr><tr>"
-                    + "<td>識別番号</td>"
-                    + "<td>" + loadRecord.identifyNumber + "</td>"
-                    + "</tr><tr>"
-                    + "<td>稼働日</td>"
-                    + "<td>" + workDay + "</td>"
-                    + "</tr><tr>"
-                    + "<td>" + arriveOrDepartureSchedule + "</td>"
-                    + "<td>" + arriveOrDepartureScheduleDate + "</td>"
-                    + "</tr><tr " + timeAlert + ">"
-                    + "<td>" + arriveOrDepartureRecord + "</td>"
-                    + "<td>" + arriveOrDepartureRecordDate + "</td>"
-                    + "</tr>";
-                container.append(tr);
-                
+                    // テーブルの追加
+                    var container = $("#tripRecord-contatiner");
+                    container.empty();
+                    let tr = "<tr style=\"background-color: yellow\" class=\"text-danger\">"
+                        + "<td>アラート項目</td>"
+                        + "<td>" + alertItems + "</td>"
+                        + "</tr><tr>"
+                        + "<td>荷量下限</td>"
+                        + "<td>" + lowerLoadStatus + "%</td>"
+                        + "</tr><tr " + loadAlert + ">"
+                        + "<td>荷量実績</td>"
+                        + "<td>" + loadStatus + "%</td>"
+                        + "</tr><tr>"
+                        + "<td>便名称_便枝番</td>"
+                        + "<td>" + tripNameAndBranchSeq + "</td>"
+                        + "</tr><tr>"
+                        + "<td>乗務員</td>"
+                        + "<td>" + response.driverName + "</td>"
+                        + "</tr><tr>"
+                        + "<td>ステーション名</td>"
+                        + "<td>" + response.stationName + "</td>"
+                        + "</tr><tr>"
+                        + "<td>車両番号</td>"
+                        + "<td>" + truckNumber + "</td>"
+                        + "</tr><tr>"
+                        + "<td>識別番号</td>"
+                        + "<td>" + response.identifyNumber + "</td>"
+                        + "</tr><tr>"
+                        + "<td>稼働日</td>"
+                        + "<td>" + workDay + "</td>"
+                        + "</tr><tr>"
+                        + "<td>" + arriveOrDepartureSchedule + "</td>"
+                        + "<td>" + arriveOrDepartureScheduleDate + "</td>"
+                        + "</tr><tr " + timeAlert + ">"
+                        + "<td>" + arriveOrDepartureRecord + "</td>"
+                        + "<td>" + arriveOrDepartureRecordDate + "</td>"
+                        + "</tr>";
+                    container.append(tr);
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+                });
             }
+            
         });
     }
 

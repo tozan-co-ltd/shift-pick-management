@@ -55,19 +55,9 @@ namespace ai_truck_load_measurement.Controllers
             {
                 // アラート履歴に対応した便実績
                 var loadRecord = loadRecordList.Find(x => x.TripRecordID == alertRecord.TripRecordID)!;
-                // 荷量のクラスから％表示に
-                loadRecord.ArrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(loadRecord.ArrivalLoadClass);
-                loadRecord.DepartureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(loadRecord.DepartureLoadClass);
+                
                 alertRecord.ArrivalLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(alertRecord.ArrivalLowerLoadClass);
                 alertRecord.DepartureLowerLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(alertRecord.DepartureLowerLoadClass);
-
-                // 出発・到着予定時刻の日付を変換
-                loadRecord.ArrivalScheduledTime = ConversionScheduledTime(loadRecord.ArrivalScheduledTime, loadRecord.ArrivedAt);
-                loadRecord.DepartureScheduledTime = ConversionScheduledTime(loadRecord.DepartureScheduledTime, loadRecord.DepartedAt);
-
-                // 画像パス変換
-                loadRecord.ArrivalLoadImgPath = LoadRecordController.CheckAndConvertImagePath(loadRecord.ArrivalLoadImgPath);
-                loadRecord.DepartureLoadImgPath = LoadRecordController.CheckAndConvertImagePath(loadRecord.DepartureLoadImgPath);
 
                 // アラート項目取得
                 var alertItems = GetAlertItems(alertRecord, loadRecord);
@@ -79,16 +69,6 @@ namespace ai_truck_load_measurement.Controllers
             return model;
         }
 
-        /// <summary>
-        /// 出発・到着予定時刻の日付を変換
-        /// </summary>
-        /// <param name="scheduledTime"></param>
-        /// <param name="recordTime"></param>
-        /// <returns></returns>
-        private DateTime ConversionScheduledTime(DateTime scheduledTime, DateTime recordTime)
-        {
-            return new DateTime(recordTime.Year, recordTime.Month, recordTime.Day, scheduledTime.Hour, scheduledTime.Minute, scheduledTime.Second);
-        }
 
 
         /// <summary>
@@ -263,6 +243,40 @@ namespace ai_truck_load_measurement.Controllers
                 html += alertItems[i];
             }
             return html;
+        }
+
+        /// <summary>
+        /// モーダルに表示する情報取得
+        /// </summary>
+        /// <param name="loadRecord"></param>
+        /// <returns></returns>
+        public LoadRecordModel GetModalItems(LoadRecordModel loadRecord)
+        {
+            // 荷量のクラスから％表示に
+            loadRecord.ArrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(loadRecord.ArrivalLoadClass);
+            loadRecord.DepartureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(loadRecord.DepartureLoadClass);
+
+
+            // 出発・到着予定時刻の日付を変換
+            loadRecord.ArrivalScheduledTime = ConversionScheduledTime(loadRecord.ArrivalScheduledTime, loadRecord.ArrivedAt);
+            loadRecord.DepartureScheduledTime = ConversionScheduledTime(loadRecord.DepartureScheduledTime, loadRecord.DepartedAt);
+
+            // 画像パス変換
+            loadRecord.ArrivalLoadImgPath = LoadRecordController.CheckAndConvertImagePath(loadRecord.ArrivalLoadImgPath);
+            loadRecord.DepartureLoadImgPath = LoadRecordController.CheckAndConvertImagePath(loadRecord.DepartureLoadImgPath);
+
+            return loadRecord;
+        }
+
+        /// <summary>
+        /// 出発・到着予定時刻の日付を変換
+        /// </summary>
+        /// <param name="scheduledTime"></param>
+        /// <param name="recordTime"></param>
+        /// <returns></returns>
+        private DateTime ConversionScheduledTime(DateTime scheduledTime, DateTime recordTime)
+        {
+            return new DateTime(recordTime.Year, recordTime.Month, recordTime.Day, scheduledTime.Hour, scheduledTime.Minute, scheduledTime.Second);
         }
 
         /// <summary>
@@ -525,20 +539,5 @@ namespace ai_truck_load_measurement.Controllers
             return Json(new { res = "NG", error = errorMessage });
         }
 
-        /// <summary>
-        /// アラート詳細モーダルに表示する値の取得
-        /// </summary>
-        /// <param name="model">モーダルに表示するモデル</param>
-        /// <param name="isArrived">到着か否か</param>
-        /// <returns></returns>
-        public AlertRecordModalModel GetModalItems(int alertRecordID, bool isArrived)
-        {
-            var model = new AlertRecordModalModel();
-            // ステーションの画像取得
-            model.ArrivalLoadImgPath = LoadRecordController.CheckAndConvertImagePath(model.ArrivalLoadImgPath);
-            model.DepartureLoadImgPath = LoadRecordController.CheckAndConvertImagePath(model.DepartureLoadImgPath);
-            // アラート項目html取得
-            return model;
-        }
     }
 }
