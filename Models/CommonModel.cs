@@ -156,4 +156,12 @@ namespace ai_truck_load_measurement.Models
             }
         }
     }
+
+    // バリデーションチェック時のモデル
+    public class ValidCheckModel
+    {
+        public bool IsValid { get; set; }
+
+        public string ErrorMessage { get; set; }
+    }
 }

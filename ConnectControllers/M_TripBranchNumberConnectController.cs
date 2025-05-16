@@ -150,6 +150,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 SELECT
 	                trip_branch_number_id,
+                    tag,
 	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
 	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
 	                applicable_start_datetime,
@@ -181,6 +182,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 SELECT
                     trip_branch_number_id,
+                    tag,
                     CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
                     CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
                     BranchNumbers.applicable_start_datetime,
@@ -227,6 +229,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 INSERT INTO m_trip_branch_numbers(
                     trip_id,
+                    tag,
                     arrival_scheduled_time,
                     departure_scheduled_time,
                     applicable_start_datetime,
@@ -238,6 +241,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 )
                 VALUES (
                     '{model.TripID}',
+                    '{model.Tag}',
                     '1900/01/01 {model.RegistArrivalScheduledTime}:00',
                     '1900/01/01 {model.RegistDepartureScheduledTime}:00',
                     '{model.ApplicableStartDateTime}',
@@ -265,6 +269,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 UPDATE m_trip_branch_numbers
                 SET 
                     trip_id = '{model.TripID}',
+                    tag = '{model.Tag}',
 	                arrival_scheduled_time = '1900/01/01 {model.RegistArrivalScheduledTime}:00',
 	                departure_scheduled_time = '1900/01/01 {model.RegistDepartureScheduledTime}:00',
 	                applicable_start_datetime = '{model.ApplicableStartDateTime}',

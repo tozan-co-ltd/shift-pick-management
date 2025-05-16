@@ -61,6 +61,8 @@
                         <th class="font-weight-bold">AD名</th>
                         <th class="font-weight-bold">メインデポ</th>
                         <th class="font-weight-bold">管理権限</th>
+                        <th class="font-weight-bold">メール受け取り要否</th>
+                        <th class="font-weight-bold">メールアドレス</th>
                         <th class="font-weight-bold">更新日時</th>
                         <th class="font-weight-bold">更新者</th>
                     </tr>
@@ -91,6 +93,15 @@
                                 {
                                     <td>管理者</td>
                                 }
+                                @if (item.IsRequiredMail)
+                                {
+                                    <td>受け取る</td>
+                                }
+                                else
+                                {
+                                    <td>受け取らない</td>
+                                }
+                                <td>@item.MailAddress</td>
                                 <td>@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
                                 <td>@item.UpdatedBy</td>
                             </tr>
@@ -120,14 +131,14 @@
                     <form class="col-md-12" id="mUserForm">
                         <div class="col-14 input-group div-input-group">
                             <div class="col-14 input-group div-input-group">
-                                <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <div class="col-12 col-sm-4 col-md-3 column-1st">
                                     <label>@Html.DisplayName("UserID")</label>
                                 </div>
                                 <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                     <input class="form-control" type="text" asp-for="UserID" autocomplete="off" readonly id="UserID">
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
                                 <label>@Html.DisplayName("ADName")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
@@ -136,7 +147,7 @@
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
                                 <label>@Html.DisplayName("DepoID")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
@@ -145,7 +156,7 @@
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
                                 <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
@@ -153,6 +164,26 @@
                                 <label for="hasAuthorizedKubun">権限あり</label>
                                 <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" value="0" name="AuthorizedKubun" id="notHasAuthorizedKubun" checked>
                                 <label for="notHasAuthorizedKubun">権限なし</label>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayName("IsRequiredMail")<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input type="radio" class="mr-2" asp-for="IsRequiredMail" autocomplete="off" value="true" name="IsRequiredMail" id="isRequiredMail">
+                                <label for="isRequiredMail">受け取る</label>
+                                <input type="radio" class="mr-2 ml-3" asp-for="IsRequiredMail" autocomplete="off" value="false" name="IsRequiredMail" id="isNotRequiredMail" checked>
+                                <label for="isNotRequiredMail">受け取らない</label>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st">
+                                <label>@Html.DisplayName("MailAddress")</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input class="form-control" type="text" asp-for="MailAddress" autocomplete="off" value="" id="MailAddress">
+                                <span class="text-danger w-100" asp-validation-for="MailAddress"></span>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
@@ -219,6 +250,22 @@
                                 <input class="form-control" id="deleteAuthorizedKubun" type="text" disabled>
                             </div>
                         </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>メール受け取り要否</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteIsRequiredMail" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>メールアドレス</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="deleteMailAddress" type="text" disabled>
+                            </div>
+                        </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
                             <button class="btn btn-secondary btn-icon-split mb-2 mr-0 mr-sm-5" data-dismiss="modal" aria-label="Close">
                                 <span class="text">キャンセル</span>
@@ -257,6 +304,8 @@
                 $("#DepoID").val(item.depoID);
                 var authorizedKubun = item.authorizedKubun;
                 AuthorizedKubunCheck(authorizedKubun);
+                IsRequiredMailCheck(item.isRequiredMail);
+                $("#MailAddress").val(item.mailAddress);
             }
         });
     }
@@ -267,6 +316,17 @@
             if (item.value == authorizedKubun)
                 item.checked = true;
         });
+    }
+
+    // 現在のメール受け取り要否をチェックボックスに反映する
+    function IsRequiredMailCheck(isRequired) {
+        if (isRequired) {
+            document.getElementById("isRequiredMail").checked = true;
+        }
+        else {
+            document.getElementById("isNotRequiredMail").checked = true;
+        }
+    
     }
 
     // 更新
@@ -319,6 +379,13 @@
                     authorizedKubun = "なし";
                 }
                 $("#deleteAuthorizedKubun").val(authorizedKubun);
+                if (item.isRequiredMail) {
+                    $("#deleteIsRequiredMail").val("受け取る");
+                }
+                else{
+                    $("#deleteIsRequiredMail").val("受け取らない");
+                }
+                $("#deleteMailAddress").val(item.mailAddress);
             }
         });
     }

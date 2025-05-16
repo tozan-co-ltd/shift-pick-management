@@ -693,6 +693,8 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("AD名");
                     headerList.Add("デポ名");
                     headerList.Add("管理権限");
+                    headerList.Add("メール受け取り要否");
+                    headerList.Add("メールアドレス");
                     headerList.Add("削除フラグ");
                     headerList.Add("作成日時");
                     headerList.Add("作成者");
@@ -720,6 +722,7 @@ namespace ai_truck_load_measurement.Commons
                 case "便マスター":
                     headerList.Add("便ID");
                     headerList.Add("便名称");
+                    headerList.Add("タグ");
                     headerList.Add("乗務員");
                     headerList.Add("車両番号");
                     headerList.Add("識別番号");
@@ -744,6 +747,7 @@ namespace ai_truck_load_measurement.Commons
                 default:
                     headerList.Add("便名称");
                     headerList.Add("便枝番");
+                    headerList.Add("タグ");
                     headerList.Add("乗務員");
                     headerList.Add("ステーション名");
                     headerList.Add("車両番号");

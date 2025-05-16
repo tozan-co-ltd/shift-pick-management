@@ -178,7 +178,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   ファイル内にデータがありません。 に類似しているローカライズされた文字列を検索します。
+        ///   メール受け取りが必要な場合、メールアドレスを入力してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1014 {
             get {

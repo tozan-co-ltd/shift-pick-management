@@ -433,6 +433,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT 
 	                TripHistories.trip_id,
                     Trips.trip_name,
+                    BranchNumbers.tag,
                     TripHistories.driver_name,
                     Trucks.truck_number,
                     Trucks.identify_number,

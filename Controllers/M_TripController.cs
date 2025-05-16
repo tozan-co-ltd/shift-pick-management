@@ -463,7 +463,7 @@ namespace ai_truck_load_measurement.Controllers
         public DataTable SortDataTableFromBranchConsecutiveNumber(DataTable dt)
         {
             // テーブルに枝連番列を追加
-            dt.Columns.Add("branch_consecutive_number", typeof(int)).SetOrdinal(13);
+            dt.Columns.Add("branch_consecutive_number", typeof(int)).SetOrdinal(dt.Columns.IndexOf("trip_branch_number_id") + 1);
 
             // 各便IDごとに
             int maxTripID = (int)dt.Select("trip_id = MAX(trip_id)", "")[0][0];
