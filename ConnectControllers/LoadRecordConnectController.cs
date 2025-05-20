@@ -304,13 +304,14 @@ namespace ai_truck_load_measurement.ConnectControllers
                     trip_record_id,
                     trip_name,
                     trip_branch_seq,
+                    TripBranchNumbers.tag,
                     TripRecords.driver_name,
 	                Stations.name AS station_name,
                     truck_number,
                     identify_number,
 	                Depos.name AS depo_name,
-                    CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
-                    CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+                    CONVERT(DATETIME, TripRecords.arrival_scheduled_time) AS arrival_scheduled_time,
+                    CONVERT(DATETIME, TripRecords.departure_scheduled_time) AS departure_scheduled_time,
                     work_day,
                     arrived_at,
                     departed_at,
@@ -326,7 +327,11 @@ namespace ai_truck_load_measurement.ConnectControllers
                 INNER JOIN
                 m_depos AS Depos
                 ON
-                Stations.depo_id = Depos.depo_id";
+                Stations.depo_id = Depos.depo_id
+                LEFT OUTER JOIN
+                m_trip_branch_numbers AS TripBranchNumbers
+                ON
+                TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id";
             return sql;
         }
 

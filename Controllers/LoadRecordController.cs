@@ -54,6 +54,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public static DataTable GetConvertedLoadClassDataTable(DataTable dt)
         {
+
             // テーブルに値を変換した後の文字列を格納する列を追加
             dt.Columns.Add("converted_branch_seq", typeof(string)).SetOrdinal(dt.Columns.IndexOf("trip_branch_seq"));
             dt.Columns.Add("converted_truck_number", typeof(string)).SetOrdinal(dt.Columns.IndexOf("truck_number"));
@@ -281,8 +282,9 @@ namespace ai_truck_load_measurement.Controllers
                             <tr align=""center"">
                                 <th hidden>便実績ID</th>
                                 <th hidden>便名称有無</th>
-                                <th class=""font-weight-bold"">便名称<br></th>
+                                <th class=""font-weight-bold"">便名称</th>
                                 <th class=""font-weight-bold"">便枝番</th>
+                                <th class=""font-weight-bold"">タグ</th>
                                 <th class=""font-weight-bold"">乗務員</th>
                                 <th class=""font-weight-bold"">ステーション<br>名</th>
                                 <th class=""font-weight-bold"">車両<br>番号</th>
@@ -319,7 +321,8 @@ namespace ai_truck_load_measurement.Controllers
                             <td hidden>{item.TripRecordID}</td>
                             <td hidden>{hasTripName}</td>
                             <td>{item.TripName}</td>
-                            <td>{item.TripBranchSeq}</td>
+                            <td>{item.TripBranchSeq}</td>   
+                            <td>{item.Tag}</td>   
                             <td>{item.DriverName}</td>
                             <td>{item.StationName}</td>
                             <td>{truckNumber}</td>

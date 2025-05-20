@@ -348,6 +348,10 @@ function EditModal(tripRecordID, isArrived, page) {
     // デフォルトの操作を無効化
     event.preventDefault();
 
+    // ローディング画像表示
+    $("#modal-content").css('display', 'none');
+    $("#loading-modal").css('display', 'inline-block');
+
     // LoadOutputModel取得
     var tripRecordModel = model.tripRecordList;
     tripRecordModel.forEach(function (item) {
@@ -467,6 +471,9 @@ function EditModal(tripRecordID, isArrived, page) {
                     + "<td>便名称_便枝番</td>"
                     + "<td>" + tripNameAndBranchSeq + "</td>"
                     + "</tr><tr>"
+                    + "<td>タグ</td>"
+                    + "<td>" + item.tag + "</td>"
+                    + "</tr><tr>"
                     + "<td>乗務員</td>"
                     + "<td>" + item.driverName + "</td>"
                     + "</tr><tr>"
@@ -494,6 +501,9 @@ function EditModal(tripRecordID, isArrived, page) {
                     $('#loadStatusSelect').text("-");
                 }
 
+                // ローディング画像非表示
+                $("#modal-content").css('display', 'inline-block');
+                $("#loading-modal").css('display', 'none');
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
                 $("#edit-modal-error-message").text(errorMessage);
@@ -511,7 +521,8 @@ function onOtherModalClick(otherTripRecordID, isArrived, page) {
     } else {
         isArrived = false;
     }
-    EditModal(otherTripRecordID, isArrived, page);
+    if(otherTripRecordID != 'undefined')
+        EditModal(otherTripRecordID, isArrived, page);
 }
 
 // 要検証ボタン押下時
@@ -605,6 +616,10 @@ function tableDisplayCommon(page, data) {
             body.unhighlight();
             body.highlight(table.search());
         });
+
+
+        if (document.querySelector("#loading") != null)
+            document.querySelector("#loading").style.display = "none";
     }).fail(function (jqXHR, textStatus, errorThrown) {
         var errorMessage = jqXHR.responseJSON.errorMessage;
         $("#edit-modal-error-message").text(errorMessage);
