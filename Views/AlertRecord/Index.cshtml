@@ -92,7 +92,10 @@
 <!--  Detail Modal-->
 <div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content trip-record-modal">
+        <div class="loader-modal" id="loading-modal">
+            <div class="three-quarter-spinner"></div>
+        </div>
+        <div class="modal-content trip-record-modal" id="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="detail-modal-label"></h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
@@ -282,6 +285,11 @@
         // デフォルトの操作を無効化
         event.preventDefault();
 
+
+        // ローディング画像表示
+        $("#modal-content").css('display', 'none');
+        $("#loading-modal").css('display', 'inline-block');
+
         // alertRecordModel取得
         var alertRecordModel = model.alertRecordList;
         alertRecordModel.forEach(function (item) {
@@ -419,6 +427,10 @@
                         + "<td>" + arriveOrDepartureRecordDate + "</td>"
                         + "</tr>";
                     container.append(tr);
+
+                    // ローディング画像非表示
+                    $("#modal-content").css('display', 'inline-block');
+                    $("#loading-modal").css('display', 'none');
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
                 $("#edit-modal-error-message").text(errorMessage);
@@ -437,7 +449,8 @@
         } else {
             isArrived = false;
         }
-        EditAlertModal(otherTripRecordID, isArrived, page);
+        if(otherTripRecordID != 'undefined')
+            EditAlertModal(otherTripRecordID, isArrived, page);
     }
 
 
