@@ -54,6 +54,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public static DataTable GetConvertedLoadClassDataTable(DataTable dt)
         {
+
             // テーブルに値を変換した後の文字列を格納する列を追加
             dt.Columns.Add("converted_branch_seq", typeof(string)).SetOrdinal(dt.Columns.IndexOf("trip_branch_seq"));
             dt.Columns.Add("converted_truck_number", typeof(string)).SetOrdinal(dt.Columns.IndexOf("truck_number"));
