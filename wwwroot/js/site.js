@@ -521,7 +521,8 @@ function onOtherModalClick(otherTripRecordID, isArrived, page) {
     } else {
         isArrived = false;
     }
-    EditModal(otherTripRecordID, isArrived, page);
+    if(otherTripRecordID != 'undefined')
+        EditModal(otherTripRecordID, isArrived, page);
 }
 
 // 要検証ボタン押下時
