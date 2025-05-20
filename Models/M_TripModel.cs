@@ -10,10 +10,6 @@ namespace ai_truck_load_measurement.Models
     /// </summary>
     public class M_TripModel: CommonModel
     {
-        /// <summary>
-        /// 車両リスト
-        /// </summary>
-        public IPagedList<M_TripModel>? M_TripList { get; set; }
 
         /// <summary>
         /// 便ID
@@ -118,15 +114,111 @@ namespace ai_truck_load_measurement.Models
         /// </summary>
         [Display(Name = "更新者")]
         public string? UpdatedBy { get; set; }
+    }
+
+    /// <summary>
+    /// 便マスター画面表示用モデル
+    /// </summary>
+    public class M_TripViewModel : CommonModel
+    {
+        /// <summary>
+        /// 便リスト
+        /// </summary>
+        public IPagedList<M_TripModel>? M_TripList { get; set; }
+
+        /// <summary>
+        /// 便ID
+        /// </summary>
+        [Display(Name = "便ID")]
+        public int TripID { get; set; }
+
+        /// <summary>
+        /// 便履歴ID
+        /// </summary>
+        public int TripHistoryID { get; set; }
+
+        /// <summary>
+        /// 便名称
+        /// </summary>
+        [Display(Name = "便名称")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? TripName { get; set; }
+
+        /// <summary>
+        /// 乗務員
+        /// </summary>
+        [Display(Name = "乗務員")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public string? DriverName { get; set; }
+
+        /// <summary>
+        /// 車両ID
+        /// </summary>
+        public string? TruckID { get; set; }
+
+        /// <summary>
+        /// 車両番号
+        /// </summary>
+        [Display(Name = "車両番号")]
+        public int TruckNumber { get; set; }
+
+        /// <summary>
+        /// 識別番号
+        /// </summary>
+        [Display(Name = "識別番号")]
+        public string? IdentifyNumber { get; set; }
+
+        /// <summary>
+        /// 昼勤開始時間  
+        /// </summary>
+        public DateTime DayShiftStartTime { get; set; }
+
+        /// <summary>
+        /// 昼勤開始時間登録用
+        /// </summary>
+        [Display(Name = "昼勤開始時間")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [RegularExpression(@"^([0-1][0-9]|[2][0-3]):[0-5][0-9]$", ErrorMessage = "hh:mmで入力してください。")]
+        public string? RegistDayShiftStartTime { get; set; }
+
+        /// <summary>
+        /// デポID
+        /// </summary>
+        public string? DepoID { get; set; }
+
+        /// <summary>
+        /// デポ名
+        /// </summary>
+        [Display(Name = "デポ")]
+        public string? DepoName { get; set; }
+
+        /// <summary>
+        ///  適用開始日時
+        /// </summary>
+        [Display(Name = "適用開始日時")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public DateTime ApplicableStartDateTime { get; set; }
+
+        /// <summary>
+        /// 適用終了日時
+        /// </summary>
+        [Display(Name = "適用終了日時")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        public DateTime ApplicableEndDateTime { get; set; }
 
         public List<SelectListItem> TruckSelectList { get; set; } = new List<SelectListItem>();
 
-        // 適用終了日時を過ぎた便を表示するチェックボックスの入力
-        public bool IsCheckedBeforeApplicablePeriod {  get; set; } = false;
-        // メインデポID
-        public int MainDepoID {  get; set; }
-        // メインデポ名
-        public string MainDepoName {  get; set; }
+        /// <summary>
+        /// 適用終了日時を過ぎた便を表示するチェックボックスの入力
+        /// </summary>
+        public bool IsCheckedBeforeApplicablePeriod { get; set; } = false;
+        /// <summary>
+        /// メインデポID
+        /// </summary>
+        public int MainDepoID { get; set; }
+        /// <summary>
+        /// メインデポ名
+        /// </summary>
+        public string MainDepoName { get; set; }
     }
-
 }
