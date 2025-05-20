@@ -328,7 +328,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id
-                INNER JOIN
+                LEFT OUTER JOIN
                 m_trip_branch_numbers AS TripBranchNumbers
                 ON
                 TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id";
