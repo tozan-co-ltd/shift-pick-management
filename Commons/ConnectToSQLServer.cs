@@ -64,5 +64,25 @@ namespace ai_truck_load_measurement.Commons
                 throw;
             }
         }
+
+        public static List<T> ExecuteQuery<T>(string sql)
+        {
+            List<T> resultList = new();
+            try
+            {
+                var connectionString = GetSQLServerConnectionString();
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                    resultList = connection.Query<T>(sql).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return resultList;
+        }
     }
 }
