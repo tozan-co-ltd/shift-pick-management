@@ -249,7 +249,7 @@ namespace ai_truck_load_measurement.Controllers
             {
                 // ユーザーマスター情報取得
                 var sql = M_UserConnectController.CreateSQLToSelectMUsersForDataTable();
-                DataTable dt = M_UserConnectController.ConnectMUsersToDataTable(sql);
+                DataTable dt = ConnectToSQLServer.ConnectToDataTable(sql);
 
                 // 管理権限列を数字から文字に変換
                 var conversionedDt = GetConvertAuthorizedKubunFromNumberToString(dt);

@@ -13,39 +13,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class M_TruckConnectController
     {
         /// <summary>
-        /// 車両情報をデータテーブルとして取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static DataTable ConnectMTrucksToDataTable(string sql)
-        {
-            // 戻り値
-           DataTable dataTable = new DataTable();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandText = sql;
-                    var adapter = new SqlDataAdapter(command);
-                    adapter.Fill(dataTable);
-                }
-                return dataTable;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// 車両情報登録
         /// </summary>
         /// <param name="model">登録情報</param>

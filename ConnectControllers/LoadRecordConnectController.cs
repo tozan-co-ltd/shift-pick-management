@@ -11,39 +11,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class LoadRecordConnectController
     {
         /// <summary>
-        /// 便実績情報をデータテーブルとして取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static DataTable ConnectTTripRecordToDataTable(string sql)
-        {
-            // 戻り値
-            DataTable dataTable = new DataTable();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandText = sql;
-                    var adapter = new SqlDataAdapter(command);
-                    adapter.Fill(dataTable);
-                }
-                return dataTable;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// 選択された便名称と便枝番からSQLの検索条件箇所を作成する
         /// </summary>
         /// <param name="models">選択された便名称と便枝番のリスト</param>

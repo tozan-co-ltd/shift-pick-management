@@ -378,11 +378,11 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     // 便マスター情報取得
                     var mTripSql = M_TripConnectController.CreateSQLToSelectMTripsForDataTable(isBeforeApplicablePeriod, referenceDate, checkedDepos);
-                    mTripDT = M_TripConnectController.ConnectMTripsToDataTable(mTripSql);
+                    mTripDT = ConnectToSQLServer.ConnectToDataTable(mTripSql);
 
                     // 便枝番マスター情報取得
                     var mTripBranchSql = M_TripConnectController.CreateSQLToSelectMTripBranchesForDataTable(referenceDate, checkedDepos);
-                    mTripBranchDT = M_TripConnectController.ConnectMTripsToDataTable(mTripBranchSql);
+                    mTripBranchDT = ConnectToSQLServer.ConnectToDataTable(mTripBranchSql);
                     // 便枝番マスターに枝連番列を追加
                     mTripBranchConsecutiveDT = SortDataTableFromBranchConsecutiveNumber(mTripBranchDT);
                 }

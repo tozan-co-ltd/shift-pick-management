@@ -160,10 +160,9 @@ namespace ai_truck_load_measurement.Controllers
                 searchConditionDT.Rows.Add("選択された稼働日", selectedWorkDays);
                 searchConditionDT.Rows.Add("便名称", tripName);
 
-
                 // 便実績情報取得
                 var tTripRecordSql = LoadOperationRecordConnectController.CreateSQLToSelectTripRecordForDataTable(workDays, tripName);
-                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
+                DataTable tTripRecordDT = ConnectToSQLServer.ConnectToDataTable(tTripRecordSql);
 
                 // 荷量のクラスを数値化
                 tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);

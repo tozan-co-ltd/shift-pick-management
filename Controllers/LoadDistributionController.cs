@@ -165,7 +165,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 便実績情報取得
                 var tTripRecordSql = LoadDistributionConnectController.CreateSQLToSelectTripRecordForDataTable(arrayTrips, startOfPeriod, endOfPeriod, minLoadClass, maxLoadClass);
-                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
+                DataTable tTripRecordDT = ConnectToSQLServer.ConnectToDataTable(tTripRecordSql);
 
                 // 荷量のクラスを数値化
                 tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);

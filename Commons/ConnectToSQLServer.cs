@@ -1,6 +1,6 @@
 ﻿using Dapper;
-using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 using System.Data.SqlClient;
+using System.Data;
 
 namespace ai_truck_load_measurement.Commons
 {
@@ -65,6 +65,12 @@ namespace ai_truck_load_measurement.Commons
             }
         }
 
+        /// <summary>
+        /// sqlから対象のクラスのListを取得する
+        /// </summary>
+        /// <typeparam name="T">対象のクラス</typeparam>
+        /// <param name="sql"></param>
+        /// <returns></returns>
         public static List<T> ExecuteQuery<T>(string sql)
         {
             List<T> resultList = new();
@@ -83,6 +89,39 @@ namespace ai_truck_load_measurement.Commons
                 throw;
             }
             return resultList;
+        }
+
+        /// <summary>
+        /// 情報をデータテーブルとして取得
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <returns></returns>
+        public static DataTable ConnectToDataTable(string sql)
+        {
+            // 戻り値
+            DataTable dataTable = new DataTable();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = GetSQLServerConnectionString();
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandText = sql;
+                    var adapter = new SqlDataAdapter(command);
+                    adapter.Fill(dataTable);
+                }
+                return dataTable;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

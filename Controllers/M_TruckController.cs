@@ -237,7 +237,7 @@ namespace ai_truck_load_measurement.Controllers
             { 
                 // 車両マスター情報取得
                 var sql = M_TruckConnectController.CreateSQLToSelectMTrucksForDataTable();
-                DataTable dt = M_TruckConnectController.ConnectMTrucksToDataTable(sql);
+                DataTable dt = ConnectToSQLServer.ConnectToDataTable(sql);
 
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(gamenName);

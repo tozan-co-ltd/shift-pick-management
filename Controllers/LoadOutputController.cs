@@ -118,7 +118,7 @@ namespace ai_truck_load_measurement.Controllers
                 if (checkedDepos.Count > 0)
                 {
                     var tTripRecordSql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
-                    tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
+                    tTripRecordDT = ConnectToSQLServer.ConnectToDataTable(tTripRecordSql);
 
                     // 荷量のクラスを数値化
                     tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
