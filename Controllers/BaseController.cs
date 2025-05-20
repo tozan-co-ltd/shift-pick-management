@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.ConnectControllers;
+using ai_truck_load_measurement.Commons;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -30,7 +31,7 @@ namespace ai_truck_load_measurement.Controllers
             M_DepoModel model = new M_DepoModel();
             var user = ClaimsLoginUserData();
             var sql = M_DepoConnectController.CreateSQLToSelectDepoFromADName(user.ADName);
-            var depoList = M_DepoConnectController.ConnectMDepos(sql);
+            var depoList = ConnectToSQLServer.ExecuteQuery<M_DepoModel>(sql);
             if (depoList.Count > 0)
             {
                 model = depoList[0];

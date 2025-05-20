@@ -9,37 +9,6 @@ namespace ai_truck_load_measurement.ConnectControllers
 {
     public class M_UserConnectController 
     {
-        /// <summary>
-        /// ユーザー情報取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static List<M_UserModel> ConnectMUsers(string sql)
-        {
-            // 戻り値
-            List<M_UserModel> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<M_UserModel>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
 
         /// <summary>
         /// ユーザー情報登録

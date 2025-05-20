@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using NPOI.SS.Formula.Functions;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Bibliography;
+using ai_truck_load_measurement.Commons;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -271,7 +272,7 @@ namespace ai_truck_load_measurement.Controllers
             var searchData = string.Empty;
             IEnumerable<LoadRecordModel> tripRecordList;
             // DB接続
-            tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
+            tripRecordList = ConnectToSQLServer.ExecuteQuery<LoadRecordModel>(sql);
             // 荷量のクラスを数値に、画像パスをBase64に変換
             tripRecordList = ConversionForTable(tripRecordList);
             searchData += $@"
@@ -443,7 +444,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod, checkedDepos);
                 // DB接続
-                tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
+                tripRecordList = ConnectToSQLServer.ExecuteQuery<LoadRecordModel>(sql);
 
                 return tripRecordList;
             }
@@ -565,7 +566,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadRecordConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName, startOfPeriod, endOfPeriod);
                 // DB接続
-                tripBranchSeqList = LoadRecordConnectController.ConnectTTripRecordsForTripBranchSeq(sql);
+                tripBranchSeqList = ConnectToSQLServer.ExecuteQuery<int>(sql);
 
                 return tripBranchSeqList;
             }
@@ -585,7 +586,7 @@ namespace ai_truck_load_measurement.Controllers
         public static List<LoadRecordModel> CommonSearchTrips(string sql)
         {
             // DB接続
-            var loadClasses = LoadRecordConnectController.ConnectTTripRecords(sql);
+            var loadClasses = ConnectToSQLServer.ExecuteQuery<LoadRecordModel>(sql);
             // 荷量クラスをパーセント表示に変換
             foreach (var loadClass in loadClasses)
             {
@@ -611,7 +612,7 @@ namespace ai_truck_load_measurement.Controllers
 
             // デポ名リスト作成
             var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
-            var checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
+            var checkedDeposName = ConnectToSQLServer.ExecuteQuery<LoadRecordModel>(deposNameSQL);
 
             for (int i = 0; i < checkedDeposName.Count; i++)
             {

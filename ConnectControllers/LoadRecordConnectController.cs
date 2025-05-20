@@ -11,37 +11,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class LoadRecordConnectController
     {
         /// <summary>
-        /// 便実績情報取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static List<LoadRecordModel> ConnectTTripRecords(string sql)
-        {
-            // 戻り値
-            List<LoadRecordModel> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<LoadRecordModel>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// 便実績情報をデータテーブルとして取得
         /// </summary>
         /// <param name="sql">SQL文</param>
@@ -91,70 +60,6 @@ namespace ai_truck_load_measurement.ConnectControllers
                 selectedTrips += @$"(trip_name = '{models[i].TripName}' AND trip_branch_seq = '{models[i].TripBranchSeq}')";
             }
             return selectedTrips;
-        }
-
-        /// <summary>
-        /// 便名称取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <param name="">データベース名</param>
-        /// <returns></returns>
-        public static List<SelectListItem> ConnectTTripRecordsForTripName(string sql)
-        {
-            // 戻り値
-            List<SelectListItem> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<SelectListItem>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// 便枝番リスト取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <param name="">データベース名</param>
-        /// <returns></returns>
-        public static List<int> ConnectTTripRecordsForTripBranchSeq(string sql)
-        {
-            // 戻り値
-            List<int> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<int>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
         }
 
 

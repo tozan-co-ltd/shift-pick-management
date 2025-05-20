@@ -29,7 +29,7 @@ namespace ai_truck_load_measurement.Controllers
                 // ユーザーマスター情報取得SQL作成
                 var sql = M_UserConnectController.CreateSQLToSelectMUsers();
                 // DB接続
-                IEnumerable<M_UserModel> userList = M_UserConnectController.ConnectMUsers(sql);
+                IEnumerable<M_UserModel> userList = ConnectToSQLServer.ExecuteQuery<M_UserModel>(sql);
 
                 model.M_UserList = userList.ToPagedList();
                 return View(model);

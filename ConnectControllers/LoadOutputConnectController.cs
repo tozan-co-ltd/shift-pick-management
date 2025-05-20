@@ -11,39 +11,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class LoadOutputConnectController
     {
         /// <summary>
-        /// 便実績情報取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static List<LoadOutputModel> ConnectTTripRecords(string sql)
-        {
-            // 戻り値
-            List<LoadOutputModel> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<LoadOutputModel>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
-
-        /// <summary>
         /// 指定した期間の便実績情報取得SQL
         /// </summary>
         /// <param name="startOfPeriod">期間開始日</param>

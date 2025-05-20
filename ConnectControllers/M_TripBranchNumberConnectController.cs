@@ -12,68 +12,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class M_TripBranchNumberConnectController 
     {
         /// <summary>
-        /// 便情報取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static List<M_TripBranchNumberModel> ConnectMTripBranchNumbers(string sql)
-        {
-            // 戻り値
-            List<M_TripBranchNumberModel> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<M_TripBranchNumberModel>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// 便IDから便名称を取得
-        /// </summary>
-        /// <param name="tripID">便ID</param>
-        /// <returns></returns>
-        public static string ConnectMTripForTripNameFromTripID(int tripID)
-        {
-            var tripName = "";
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    var sql = CreateSQLToSelectTripNameFromTripID(tripID);
-                    var strList = connection.Query<M_TripBranchNumberModel>(sql).ToList();
-                    tripName = strList[0].TripName;
-                }
-                return tripName;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// 便枝番情報登録
         /// </summary>
         /// <param name="model">登録情報</param>
