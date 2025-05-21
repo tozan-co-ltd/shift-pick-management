@@ -31,7 +31,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 車両マスター情報取得SQL作成
                 var sql = M_TruckConnectController.CreateSQLToSelectMTrucks();
                 // DB接続
-                IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(sql);
+                IEnumerable<M_TruckModel> truckList = ConnectToSQLServer.ExecuteQueryToList<M_TruckModel>(sql);
 
                 model.M_TruckList = truckList.ToPagedList();
 
@@ -97,7 +97,8 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // 車両マスター登録
-                M_TruckConnectController.InsertMTruck(model, user);
+                var sql = M_TruckConnectController.CreateSQLToInsertMTruck(model, DateTime.Now, user.UserName);
+                ConnectToSQLServer.ExecuteQuery(sql);
 
                 // log取得
                 _logger.Info($"車両マスター登録成功 車両コード:{model.TruckNumber}");
@@ -157,7 +158,8 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // 車両マスター更新
-                M_TruckConnectController.UpdateMTruck(model, user);
+                var updateSql = M_TruckConnectController.CreateSQLToUpdateMTruck(model, DateTime.Now, user.UserName);
+                ConnectToSQLServer.ExecuteQuery(updateSql);
 
                 // log取得
                 _logger.Info($"車両マスター更新成功 車両ID:{model.TruckID}");
@@ -197,8 +199,9 @@ namespace ai_truck_load_measurement.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
+                var sql = M_TruckConnectController.CreateSQLToDeleteMTruck(truckId, DateTime.Now, user.UserName);
                 // 車両マスター削除
-                int deleteAffectedRows = M_TruckConnectController.DeleteMTruck(truckId, user);
+                int deleteAffectedRows = ConnectToSQLServer.ExecuteQuery(sql);
 
                 // log取得
                 _logger.Info($"車両マスター削除成功 車両ID:{truckId}");
@@ -237,7 +240,7 @@ namespace ai_truck_load_measurement.Controllers
             { 
                 // 車両マスター情報取得
                 var sql = M_TruckConnectController.CreateSQLToSelectMTrucksForDataTable();
-                DataTable dt = M_TruckConnectController.ConnectMTrucksToDataTable(sql);
+                DataTable dt = ConnectToSQLServer.ConnectToDataTable(sql);
 
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(gamenName);

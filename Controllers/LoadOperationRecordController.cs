@@ -29,14 +29,14 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(dates, depoList);
                 // DB接続
-                List<SelectListItem> tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
+                List<SelectListItem> tripNameList = ConnectToSQLServer.ExecuteQueryToList<SelectListItem>(sql);
 
                 model.TripNameList = tripNameList;
 
                 // 便実績情報取得SQL作成
                 var sql2 = LoadRecordConnectController.CreatSQLToSelectTripRecord();
                 // DB接続
-                IEnumerable<LoadRecordModel> tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql2);
+                IEnumerable<LoadRecordModel> tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql2);
                 // テーブル情報を変換
                 tripRecordList = LoadRecordController.ConversionForTable(tripRecordList);
 
@@ -66,7 +66,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreateSQLToSelectTripNameFromWorkDays(workDays, checkedDepos);
                 // DB接続
-                tripRecordList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
+                tripRecordList = ConnectToSQLServer.ExecuteQueryToList<SelectListItem>(sql);
 
                 return tripRecordList;
             }
@@ -160,10 +160,9 @@ namespace ai_truck_load_measurement.Controllers
                 searchConditionDT.Rows.Add("選択された稼働日", selectedWorkDays);
                 searchConditionDT.Rows.Add("便名称", tripName);
 
-
                 // 便実績情報取得
                 var tTripRecordSql = LoadOperationRecordConnectController.CreateSQLToSelectTripRecordForDataTable(workDays, tripName);
-                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
+                DataTable tTripRecordDT = ConnectToSQLServer.ConnectToDataTable(tTripRecordSql);
 
                 // 荷量のクラスを数値化
                 tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
@@ -258,7 +257,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 指定した期間の便実績情報取得SQL作成
                 var sql = LoadOperationRecordConnectController.CreatSQLToSelectTripRecordForImage(workDays, selectedTripName);
                 // DB接続
-                IEnumerable<LoadRecordModel> tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
+                IEnumerable<LoadRecordModel> tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql);
 
                 // 空のメモリストリームを生成
                 using (var ms = new MemoryStream())
