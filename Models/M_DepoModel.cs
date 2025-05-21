@@ -27,7 +27,7 @@ namespace ai_truck_load_measurement.Models
         {
             M_DepoModel model = new M_DepoModel();
             var sql = M_DepoConnectController.CreateSQLToSelectDepoFromADName(user.ADName);
-            var depoList = ConnectToSQLServer.ExecuteQuery<M_DepoModel>(sql);
+            var depoList = ConnectToSQLServer.ExecuteQueryToList<M_DepoModel>(sql);
             if (depoList.Count > 0)
             {
                 model = depoList[0];

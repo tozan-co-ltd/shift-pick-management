@@ -12,72 +12,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class M_TripBranchNumberConnectController 
     {
         /// <summary>
-        /// 便枝番情報登録
-        /// </summary>
-        /// <param name="model">登録情報</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>インサート数</returns>
-        public static int InsertMTripBranchNumber(M_TripBranchNumberModel model, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToInsertMTripBranchNumber(model, sysDate, loginUser.UserName);
-                    var insertedCount = connection.Execute(sql);
-                    return insertedCount;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 便枝番情報更新
-        /// </summary>
-        /// <param name="model">登録情報</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>更新件数</returns>
-        public static int UpdateMTripBranchNumber(M_TripBranchNumberModel model, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-
-                    // 便枝番テーブル更新
-                    string sql = CreateSQLToUpdateMTripBranchNumber(model, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
-                    return count;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
         /// 便枝番情報取得SQL作成
         /// </summary>
         /// <param name="tripId">便ID</param>
@@ -200,7 +134,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="updatedAt">更新日時</param>
         /// <param name="updatedBy">更新者</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToUpdateMTripBranchNumber(M_TripBranchNumberModel model, DateTime updatedAt, string updatedBy)
+        public static string CreateSQLToUpdateMTripBranchNumber(M_TripBranchNumberModel model, DateTime updatedAt, string updatedBy)
         {
             string formatupdatedAt = updatedAt.ToString("yyyy/MM/dd HH:mm:ss");
             var sql = $@"

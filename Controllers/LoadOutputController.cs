@@ -31,7 +31,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadRecordConnectController.CreatSQLToSelectTripRecord();
                 // DB接続
-                IEnumerable<LoadOutputModel> tripRecordList =ConnectToSQLServer.ExecuteQuery<LoadOutputModel>(sql);
+                IEnumerable<LoadOutputModel> tripRecordList =ConnectToSQLServer.ExecuteQueryToList<LoadOutputModel>(sql);
                 // テーブル情報を変換
                 tripRecordList = (IEnumerable<LoadOutputModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
@@ -244,7 +244,7 @@ namespace ai_truck_load_measurement.Controllers
                     // 指定した期間の便実績情報取得SQL作成
                     var sql = LoadOutputConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
                     // DB接続
-                    tripRecordList =ConnectToSQLServer.ExecuteQuery<LoadOutputModel>(sql);
+                    tripRecordList =ConnectToSQLServer.ExecuteQueryToList<LoadOutputModel>(sql);
                 }
 
                 var checkedDeposName =  new List<LoadRecordModel>();
@@ -252,7 +252,7 @@ namespace ai_truck_load_measurement.Controllers
                 if (checkedDepos.Count > 0)
                 {
                     var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
-                    checkedDeposName = ConnectToSQLServer.ExecuteQuery<LoadRecordModel>(deposNameSQL);
+                    checkedDeposName = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(deposNameSQL);
                 }
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");

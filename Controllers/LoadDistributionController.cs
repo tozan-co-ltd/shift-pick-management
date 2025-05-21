@@ -24,14 +24,14 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadDistributionConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today);
                 // DB接続
-                List<SelectListItem> tripNameList = ConnectToSQLServer.ExecuteQuery<SelectListItem>(sql);
+                List<SelectListItem> tripNameList = ConnectToSQLServer.ExecuteQueryToList<SelectListItem>(sql);
 
                 model.TripNameList = tripNameList;
 
                 // 便実績情報取得SQL作成
                 var sql2 = LoadRecordConnectController.CreatSQLToSelectTripRecord();
                 // DB接続
-                IEnumerable<LoadDistributionModel> tripRecordList = ConnectToSQLServer.ExecuteQuery<LoadDistributionModel>(sql2);
+                IEnumerable<LoadDistributionModel> tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadDistributionModel>(sql2);
                 // テーブル情報を変換
                 tripRecordList = (IEnumerable<LoadDistributionModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
@@ -65,9 +65,9 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 var arrivalSql = LoadDistributionConnectController.CreateSQLToSelectArrivalLoadClassFromSearchConditions(tripName, tripBranchSeq, startOfPeriod, endOfPeriod, minLoadClass, maxLoadClass);
-                var arrivalStatuses = ConnectToSQLServer.ExecuteQuery<LoadDistributionModel>(arrivalSql);
+                var arrivalStatuses = ConnectToSQLServer.ExecuteQueryToList<LoadDistributionModel>(arrivalSql);
                 var departureSql = LoadDistributionConnectController.CreateSQLToSelectDepartureLoadClassFromSearchConditions(tripName, tripBranchSeq, startOfPeriod, endOfPeriod, minLoadClass, maxLoadClass);
-                var departureStatuses = ConnectToSQLServer.ExecuteQuery<LoadDistributionModel>(departureSql);
+                var departureStatuses = ConnectToSQLServer.ExecuteQueryToList<LoadDistributionModel>(departureSql);
                 foreach (var arrivalStatus in arrivalStatuses)
                 {
                     var arrivalLoadClass = arrivalStatus.ArrivalLoadClass;
@@ -260,7 +260,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 指定した期間の便実績情報取得SQL作成
                 var sql = LoadDistributionConnectController.CreatSQLToSelectTripRecordForImage(arrayTrips, startOfPeriod, endOfPeriod, minLoadClass, maxLoadClass);
                 // DB接続
-                IEnumerable<LoadDistributionModel> tripRecordList = ConnectToSQLServer.ExecuteQuery<LoadDistributionModel>(sql);
+                IEnumerable<LoadDistributionModel> tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadDistributionModel>(sql);
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");
                 var endDate = endOfPeriod.ToString("yyyyMMdd");

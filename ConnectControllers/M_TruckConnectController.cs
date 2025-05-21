@@ -13,104 +13,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class M_TruckConnectController
     {
         /// <summary>
-        /// 車両情報登録
-        /// </summary>
-        /// <param name="model">登録情報</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>インサート数</returns>
-        public static int InsertMTruck(M_TruckModel model, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToInsertMTruck(model, sysDate, loginUser.UserName);
-                    var insertedCount = connection.Execute(sql);
-                    return insertedCount;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 車両情報更新
-        /// </summary>
-        /// <param name="model">登録情報</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>更新件数</returns>
-        public static int UpdateMTruck(M_TruckModel model, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToUpdateMTruck(model, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
-
-                    return count;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 車両情報削除
-        /// </summary>
-        /// <param name="truckId">車両ID</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>更新件数</returns>
-        public static int DeleteMTruck(int truckId, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToDeleteMTruck(truckId, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
-
-                    return count;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
         /// 車両マスター情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
@@ -228,7 +130,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="createdAt">システムタイム</param>
         /// <param name="createdBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToInsertMTruck(M_TruckModel model, DateTime createdAt, string createdBy)
+        public static string CreateSQLToInsertMTruck(M_TruckModel model, DateTime createdAt, string createdBy)
         {
             string formatCreatedAt = createdAt.ToString("yyyy/MM/dd HH:mm:ss");
 
@@ -260,7 +162,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToUpdateMTruck(M_TruckModel model, DateTime updatedAt, string updatedBy)
+        public static string CreateSQLToUpdateMTruck(M_TruckModel model, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                 UPDATE m_trucks
@@ -283,7 +185,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="updatedAt"></param>
         /// <param name="updatedBy"></param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToDeleteMTruck(int truckId, DateTime updatedAt, string updatedBy)
+        public static string CreateSQLToDeleteMTruck(int truckId, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                 UPDATE m_trucks

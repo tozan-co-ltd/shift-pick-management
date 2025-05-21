@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
 using System.Data;
+using ai_truck_load_measurement.Models;
 
 namespace ai_truck_load_measurement.Commons
 {
@@ -71,7 +72,7 @@ namespace ai_truck_load_measurement.Commons
         /// <typeparam name="T">対象のクラス</typeparam>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public static List<T> ExecuteQuery<T>(string sql)
+        public static List<T> ExecuteQueryToList<T>(string sql)
         {
             List<T> resultList = new();
             try
@@ -121,6 +122,61 @@ namespace ai_truck_load_measurement.Commons
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// クエリ実行、カウントを返す
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <returns>更新件数</returns>
+        public static int ExecuteQuery(string sql)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = GetSQLServerConnectionString();
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                // DB接続
+                try
+                {
+                    var count = connection.Execute(sql);
+
+                    return count;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// sqlで取得した結果セットの最初の行の最初の列の値を返す
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        public static Object? ExecuteQueryScalar(string sql)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = GetSQLServerConnectionString();
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                try
+                {
+                    return connection.ExecuteScalar(sql);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
         }
     }

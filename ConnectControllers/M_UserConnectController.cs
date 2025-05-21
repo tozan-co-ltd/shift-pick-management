@@ -9,105 +9,6 @@ namespace ai_truck_load_measurement.ConnectControllers
 {
     public class M_UserConnectController 
     {
-
-        /// <summary>
-        /// ユーザー情報登録
-        /// </summary>
-        /// <param name="model">登録情報</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>インサート数</returns>
-        public static int InsertMUser(M_UserModel model, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToInsertMUser(model, sysDate, loginUser.UserName);
-                    var insertedCount = connection.Execute(sql);
-                    return insertedCount;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
-        /// ユーザー情報更新
-        /// </summary>
-        /// <param name="model">登録情報</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>更新件数</returns>
-        public static int UpdateMUser(M_UserModel model, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToUpdateMUser(model, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
-
-                    return count;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
-        /// ユーザー情報削除
-        /// </summary>
-        /// <param name="userId">ユーザーID</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>更新件数</returns>
-        public static int DeleteMUser(int userId, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToDeleteMUser(userId, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
-
-                    return count;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
         /// <summary>
         /// ユーザー情報取得用SQL
         /// </summary>
@@ -177,7 +78,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="createdAt">システムタイム</param>
         /// <param name="createdBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToInsertMUser(M_UserModel model, DateTime createdAt, string createdBy)
+        public static string CreateSQLToInsertMUser(M_UserModel model, DateTime createdAt, string createdBy)
         {
             string formatCreatedAt = createdAt.ToString("yyyy/MM/dd HH:mm:ss");
 
@@ -216,7 +117,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToUpdateMUser(M_UserModel model, DateTime updatedAt, string updatedBy)
+        public static string CreateSQLToUpdateMUser(M_UserModel model, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                 UPDATE m_users
@@ -242,7 +143,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToDeleteMUser(int userId, DateTime updatedAt, string updatedBy)
+        public static string CreateSQLToDeleteMUser(int userId, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                 UPDATE m_users

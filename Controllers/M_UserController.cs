@@ -29,7 +29,7 @@ namespace ai_truck_load_measurement.Controllers
                 // ユーザーマスター情報取得SQL作成
                 var sql = M_UserConnectController.CreateSQLToSelectMUsers();
                 // DB接続
-                IEnumerable<M_UserModel> userList = ConnectToSQLServer.ExecuteQuery<M_UserModel>(sql);
+                IEnumerable<M_UserModel> userList = ConnectToSQLServer.ExecuteQueryToList<M_UserModel>(sql);
 
                 model.M_UserList = userList.ToPagedList();
                 return View(model);
@@ -101,7 +101,8 @@ namespace ai_truck_load_measurement.Controllers
 #endif
 
                 // ユーザーマスター登録
-                M_UserConnectController.InsertMUser(model, user);
+                var sql = M_UserConnectController.CreateSQLToInsertMUser(model, DateTime.Now, user.UserName);
+                ConnectToSQLServer.ExecuteQuery(sql);
 
                 // log取得
                 _logger.Info($"ユーザーマスター登録成功 ユーザー名:{model.ADName}");
@@ -169,7 +170,8 @@ namespace ai_truck_load_measurement.Controllers
 #endif
 
                 // ユーザーマスター更新
-                M_UserConnectController.UpdateMUser(model, user);
+                var sql = M_UserConnectController.CreateSQLToUpdateMUser(model, DateTime.Now, user.UserName);
+                ConnectToSQLServer.ExecuteQuery(sql);
 
                 // log取得
                 _logger.Info($"ユーザーマスター更新成功 ユーザーID:{model.UserID}");
@@ -210,7 +212,8 @@ namespace ai_truck_load_measurement.Controllers
                 var user = ClaimsLoginUserData();
 
                 // ユーザーマスター削除
-                int deleteAffectedRows = M_UserConnectController.DeleteMUser(userId, user);
+                var sql = M_UserConnectController.CreateSQLToDeleteMUser(userId, DateTime.Now, user.UserName);
+                ConnectToSQLServer.ExecuteQuery(sql);
 
                 // log取得
                 _logger.Info($"ユーザーマスター削除成功 ユーザーID:{userId}");

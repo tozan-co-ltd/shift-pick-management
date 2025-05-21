@@ -49,7 +49,7 @@ namespace ai_truck_load_measurement.Controllers
                     // 便マスター情報取得SQL作成
                     var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod, depoList);
                     // DB接続
-                    tripList = ConnectToSQLServer.ExecuteQuery<M_TripModel>(sql);
+                    tripList = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(sql);
                 }
 
                 model.M_TripList = tripList.ToPagedList();
@@ -80,7 +80,7 @@ namespace ai_truck_load_measurement.Controllers
                     // 便マスター情報取得SQL作成
                     var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod, checkedDepos);
                     // DB接続
-                    tripList = ConnectToSQLServer.ExecuteQuery<M_TripModel>(sql);
+                    tripList = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(sql);
                 }
 
                 searchData += $@"
@@ -170,7 +170,7 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     // 便履歴IDから便履歴情報取得
                     var tripSql = M_TripConnectController.CreateSQLToSelectMTripHistoryByTripHistoryId(id);
-                    List<M_TripModel> tripList = ConnectToSQLServer.ExecuteQuery<M_TripModel>(tripSql);
+                    List<M_TripModel> tripList = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(tripSql);
 
                     // 同一便IDのデータが1つだけのとき以外はエラー
                     if (tripList.Count != 1)
@@ -182,7 +182,7 @@ namespace ai_truck_load_measurement.Controllers
                 }
                 // 車両マスター情報取得
                 var truckSql = M_TruckConnectController.CreateSQLToSelectMTrucks();
-                IEnumerable<M_TruckModel> truckList = ConnectToSQLServer.ExecuteQuery<M_TruckModel>(truckSql);
+                IEnumerable<M_TruckModel> truckList = ConnectToSQLServer.ExecuteQueryToList<M_TruckModel>(truckSql);
 
                 // 車両番号のセレクトリスト作成
                 foreach (var truck in truckList)
@@ -341,7 +341,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             // 便名称が重複している便履歴の取得
             var duplicateMTripNameSql = M_TripConnectController.CreateSQLToSelectApplicablePeriodFromDuplicateMTripName(model);
-            var duplicateMTripNameList = ConnectToSQLServer.ExecuteQuery<M_TripModel>(duplicateMTripNameSql);
+            var duplicateMTripNameList = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(duplicateMTripNameSql);
 
             // 適用期間重複チェック
             bool isDupulicated = false;
