@@ -867,7 +867,7 @@ select[readonly] {
 }
 
 .table-center td{
-    text-align:center !important;
+    text-align:center;
 }
 
 .table-center th{
