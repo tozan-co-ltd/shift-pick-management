@@ -48,8 +48,30 @@
                             <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <input type="radio" class="mr-2" asp-for="AuthorizedKubun" autocomplete="off" value="1" name="AuthorizedKubun" >権限あり
-                            <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" autocomplete="off" value="0" name="AuthorizedKubun" checked>権限なし
+                            <input type="radio" class="mr-2" asp-for="AuthorizedKubun" autocomplete="off" value="1" name="AuthorizedKubun" id="hasAuthorizedKubun">
+                            <label for="hasAuthorizedKubun">権限あり</label>
+                            <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" autocomplete="off" value="0" name="AuthorizedKubun" id="notHasAuthorizedKubun" checked>
+                            <label for="notHasAuthorizedKubun">権限なし</label>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("IsRequiredMail")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input type="radio" class="mr-2" asp-for="IsRequiredMail" autocomplete="off" value="true" name="IsRequiredMail" id="isRequiredMail">
+                            <label for="isRequiredMail">受け取る</label>
+                            <input type="radio" class="mr-2 ml-3" asp-for="IsRequiredMail" autocomplete="off" value="false" name="IsRequiredMail" id="isNotRequiredMail" checked>
+                            <label for="isNotRequiredMail">受け取らない</label>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("MailAddress")</label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="text" asp-for="MailAddress" autocomplete="off" value=""  placeholder="例: t_yamada@@tozan.co.jp">
+                            <span class="text-danger w-100" asp-validation-for="MailAddress"></span>
                         </div>
                     </div>
                     <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">

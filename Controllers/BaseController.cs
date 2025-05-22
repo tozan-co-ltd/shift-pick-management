@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.ConnectControllers;
+using ai_truck_load_measurement.Commons;
 
 namespace ai_truck_load_measurement.Controllers
 {

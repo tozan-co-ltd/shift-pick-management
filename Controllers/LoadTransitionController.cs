@@ -40,7 +40,7 @@ namespace ai_truck_load_measurement.Controllers
                     // 便実績情報取得SQL作成
                     var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today, depoList);
                     // DB接続
-                    tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
+                    tripNameList = ConnectToSQLServer.ExecuteQueryToList<SelectListItem>(sql);
                 }
                 
                 model.TripNameList = tripNameList;
@@ -48,7 +48,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql2 = LoadRecordConnectController.CreatSQLToSelectTripRecord();
                 // DB接続
-                IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql2);
+                IEnumerable<LoadTransitionModel> tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadTransitionModel>(sql2);
                 // テーブル情報を変換
                 tripRecordList = (IEnumerable<LoadTransitionModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
@@ -155,7 +155,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 便実績情報取得
                 var tTripRecordSql = LoadTransitionConnectController.CreateSQLToSelectTripRecordForDataTable(arrayTrips, startOfPeriod, endOfPeriod);
-                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
+                DataTable tTripRecordDT = ConnectToSQLServer.ConnectToDataTable(tTripRecordSql);
 
                 // 荷量のクラスを数値化
                 tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
@@ -179,6 +179,7 @@ namespace ai_truck_load_measurement.Controllers
                     {
                         var file = System.IO.File.ReadAllBytes(createRs.Item2);
 
+                        CreateFile.DeleteFile(tmpFilename);
 
                         return Json(new { data = File(file, System.Net.Mime.MediaTypeNames.Application.Octet, tmpFilename) });
                     }
@@ -231,7 +232,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 指定した期間の便実績情報取得SQL作成
                 var sql = LoadTransitionConnectController.CreatSQLToSelectTripRecordForImage(arrayTrips, startOfPeriod, endOfPeriod);
                 // DB接続
-                IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql);
+                IEnumerable<LoadTransitionModel> tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadTransitionModel>(sql);
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");
                 var endDate = endOfPeriod.ToString("yyyyMMdd");

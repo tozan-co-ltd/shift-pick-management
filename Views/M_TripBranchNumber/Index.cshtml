@@ -111,6 +111,15 @@
                         <br />
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel">
+                                <label><a>@Html.DisplayName("Tag")</a></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input class="form-control" type="text" asp-for="Tag" autocomplete="off" value="" required>
+                                <span class="text-danger w-100" asp-validation-for="Tag"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel">
                                 <label><a>@Html.DisplayName("RegistArrivalScheduledTime")<span style="color:red">*</span></a></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
@@ -270,6 +279,7 @@
                 $("#TripBranchNumberID").val(item.tripBranchNumberID);
                 $("#TripID").val(model.tripID);
                 $("#TripName").val(model.tripName);
+                $("#Tag").val(item.tag);
                 $("#RegistArrivalScheduledTime").val(arrivalScheduledTime);
                 $("#RegistDepartureScheduledTime").val(departureScheduledTime);
                 $("#ApplicableStartDateTime").val(applicableStartDateTime);

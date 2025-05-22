@@ -47,6 +47,15 @@
                     <br />
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("Tag")</label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="text" asp-for="Tag" autocomplete="off" id="Tag" required>
+                            <span class="text-danger w-100" asp-validation-for="Tag"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
                             <label>@Html.DisplayName("RegistArrivalScheduledTime")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">

@@ -11,39 +11,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class LoadOutputConnectController
     {
         /// <summary>
-        /// 便実績情報取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static List<LoadOutputModel> ConnectTTripRecords(string sql)
-        {
-            // 戻り値
-            List<LoadOutputModel> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<LoadOutputModel>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
-
-        /// <summary>
         /// 指定した期間の便実績情報取得SQL
         /// </summary>
         /// <param name="startOfPeriod">期間開始日</param>
@@ -58,14 +25,15 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT DISTINCT
                     TripRecords.trip_record_id,
 	                trip_name,
-	                trip_branch_seq,
+	                TripRecords.trip_branch_seq,
+                    TripBranchNumbers.tag,
 	                driver_name,
 	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
                     Depos.name AS depo_name,
-	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
-	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+	                CONVERT(DATETIME, TripRecords.arrival_scheduled_time) AS arrival_scheduled_time,
+	                CONVERT(DATETIME, TripRecords.departure_scheduled_time) AS departure_scheduled_time,
 	                work_day,
 	                arrived_at,
 	                departed_at,
@@ -96,6 +64,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id
+                LEFT OUTER JOIN
+                m_trip_branch_numbers AS TripBranchNumbers
+                ON
+                TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
             ";
             if (hasTripName)
@@ -169,12 +141,14 @@ namespace ai_truck_load_measurement.ConnectControllers
             if (hasTripName)
             {
                 sql += $@"
-                AND NOT trip_name IS NULL";
+                AND NOT trip_name IS NULL
+                ";
             }
             if (hasIdentifyNumber)
             {
                 sql += $@"
-                AND NOT identify_number IS NULL";
+                AND NOT identify_number IS NULL
+                ";
             }
             sql += SQLOfCheckedDepos(checkedDepos);
             sql += $@"
@@ -197,13 +171,14 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT
 	                trip_name,
 	                trip_branch_seq,
+                    TripBranchNumbers.tag,
 	                driver_name,
 	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
                     Depos.name AS depo_name,
-	                FORMAT(CONVERT(DATETIME, arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
-	                FORMAT(CONVERT(DATETIME, departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
+	                FORMAT(CONVERT(DATETIME, TripRecords.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
+	                FORMAT(CONVERT(DATETIME, TripRecords.departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
 	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
 	                FORMAT(arrived_at, 'yyyy/MM/dd HH:mm'),
 	                FORMAT(departed_at, 'yyyy/MM/dd HH:mm'),
@@ -235,16 +210,23 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id
-                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'";
+                LEFT OUTER JOIN
+                m_trip_branch_numbers AS TripBranchNumbers
+                ON
+                TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
+                ";
             if (hasTripName)
             {
                 sql += $@"
-                AND NOT trip_name IS NULL";
+                AND NOT trip_name IS NULL
+                ";
             }
             if (hasIdentifyNumber)
             {
                 sql += $@"
-                AND NOT identify_number IS NULL";
+                AND NOT identify_number IS NULL
+                ";
             }
             sql += SQLOfCheckedDepos(checkedDepo);
             sql += $@"

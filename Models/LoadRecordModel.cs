@@ -52,12 +52,8 @@ namespace ai_truck_load_measurement.Models
         public string? ArrivalLoadImgPath { get; set; }
         // 出発荷量画像パス
         public string? DepartureLoadImgPath { get; set; }
-        // 便実績リスト
-        public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
-        // メインデポID
-        public int MainDepoID { get; set; }
-        // メインデポ名
-        public string? MainDepoName { get; set; }
+        // メインデポ
+        public M_DepoModel? MainDepo {  get; set; }
         // 訂正後荷量クラス
         public int AnnotationLoadClass { get; set; }
         // 訂正後荷量の%表示
@@ -74,6 +70,13 @@ namespace ai_truck_load_measurement.Models
         public int DepoID {  get; set; }
         // デポ名
         public string? DepoName { get; set; }
+        // タグ
+        public string? Tag {  get; set; }
+
+        // 便実績リスト
+        public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
+        // 管理権限区分
+        public int AuthorizedKubun {  get; set; }
     }
 
     public class LoadRecordViewModel: CommonModel
