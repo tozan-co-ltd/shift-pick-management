@@ -242,7 +242,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             // ログインIDから権限区分を取得
             var sql = LoginConnectController.CreateSQLToSelectAuthorizedKubunFromUserName(loginID);
-            var authorizedKubun = ConnectToSQLServer.ExecuteQueryScalar(sql);
+            var authorizedKubun = GetAuthorizedKubunFromUserName(sql);
 
             return authorizedKubun;
 
@@ -265,5 +265,34 @@ namespace ai_truck_load_measurement.Controllers
             return model;
 
         }
+        /// <summary>
+        /// ユーザーの権限区分情報取得
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <returns></returns>
+        private int GetAuthorizedKubunFromUserName(string sql)
+        {
+            // 戻り値 デフォルト値は権限無しの0
+            var authorizedKubun = 0;
+
+            List<M_UserModel> strList = new();
+
+            // DB接続
+            try
+            {
+                strList = ConnectToSQLServer.ExecuteQueryToList<M_UserModel>(sql);
+                if (strList.Count > 0)
+                {
+                    authorizedKubun = strList[0].AuthorizedKubun;
+                }
+
+                return authorizedKubun;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
     }
 }
