@@ -95,6 +95,21 @@ namespace ai_truck_load_measurement.Models
         public string ADName { get; set; }
 
         /// <summary>
+        /// メールアドレス
+        /// </summary>
+        [Display(Name = "メールアドレス")]
+        [RegularExpression(@"^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$", ErrorMessage = "メールアドレスを入力してください")]
+        public string? MailAddress { get; set; }
+
+
+
+        /// <summary>
+        /// メール受け取り要否
+        /// </summary>
+        [Display(Name = "メール受け取り要否")]
+        public bool IsRequiredMail { get; set; }
+
+        /// <summary>
         /// メインデポID
         /// </summary>
         [Display(Name = "メインデポ")]

@@ -242,7 +242,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             // ログインIDから権限区分を取得
             var sql = LoginConnectController.CreateSQLToSelectAuthorizedKubunFromUserName(loginID);
-            var authorizedKubun = LoginConnectController.GetAuthorizedKubunFromUserName(sql);
+            var authorizedKubun = ConnectToSQLServer.ExecuteQueryScalar(sql);
 
             return authorizedKubun;
 

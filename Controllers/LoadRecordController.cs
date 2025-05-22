@@ -643,6 +643,55 @@ namespace ai_truck_load_measurement.Controllers
             model.MainDepoName = user.MainDepoName;
             return model;
         }
+
+
+        /// <summary>
+        ///「荷量の相違あり」で保存した値があるか
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="isArrived">到着か否か</param>
+        public static bool IsSameAnnotationLoadsExist(int tripRecordID, bool isArrived)
+        {
+            // 戻り値
+            var isAnnotationLoadsExist = false;
+
+            try
+            {
+                string sql = LoadRecordConnectController.CreateSQLToSelectAnnotationLoadClassByTripRecordIDAndIsArrived(tripRecordID, isArrived);
+                // 同じ便実績IDかつ到着か否かが一致するデータが存在する場合、値が代入される
+                var reader = ConnectToSQLServer.ExecuteQueryScalar(sql);
+                if (reader != null)
+                {
+                    isAnnotationLoadsExist = true;
+                }
+                return isAnnotationLoadsExist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// 便実績IDと到着か否かから訂正後荷量クラスを取得する
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        public static int GetAnnotationLoadClassByTripRecordIDAndIsArrived(int tripRecordID, bool isArrived)
+        {
+            try
+            {
+                string sql = LoadRecordConnectController.CreateSQLToSelectAnnotationLoadClassByTripRecordIDAndIsArrived(tripRecordID, isArrived);
+                var annotationLoadClass = Convert.ToInt32(ConnectToSQLServer.ExecuteQueryScalar(sql));
+                return annotationLoadClass;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 
 

@@ -27,9 +27,13 @@ namespace ai_truck_load_measurement.Controllers
         {
             M_TripBranchNumberListViewModel model = new();
 
+            // 便情報取得
+            var tripSql = M_TripBranchNumberConnectController.CreateSQLToSelectTripNameFromTripID(tripId);
+            var trip = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberListViewModel>(tripSql)[0];
+
             model.TripID = tripId;
             model.IsCheckedBeforeApplicablePeriod = isChecked;
-            model.TripName = M_TripBranchNumberConnectController.ConnectMTripForTripNameFromTripID(tripId);
+            model.TripName = trip.TripName;
 
             try
             {
