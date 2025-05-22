@@ -16,9 +16,14 @@ namespace ai_truck_load_measurement.Controllers
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         public IActionResult Index()
         {
-            var model = new LoadDistributionModel();
+            var model = new LoadRecordViewModel();
             var today = DateTime.Now;
             var oneWeekAgo = today.AddDays(-7);
+
+            // ログイン中ユーザー情報取得
+            var user = ClaimsLoginUserData();
+            // メインデポ情報取得
+            model = LoadRecordController.SetMainDepoInfo(model, user);
             try
             {
                 // 便実績情報取得SQL作成
@@ -37,8 +42,6 @@ namespace ai_truck_load_measurement.Controllers
 
                 model.TripRecordList = tripRecordList.ToPagedList();
 
-                // ログインユーザーのメインデポ情報取得
-                model.MainDepo = GetMainDepo();
                 return View(model);
             }
             catch (Exception ex)

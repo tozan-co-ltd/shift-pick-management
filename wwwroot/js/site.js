@@ -937,7 +937,7 @@ function addDepos(model) {
 
 // 画面表示時にログインユーザーのメインデポにチェックを入れる
 function depoCheckDisplay(model) {
-    var mainDepoID = model.mainDepo.depoID;
+    var mainDepoID = model.mainDepoID;
     if (mainDepoID == 0)
         return;
     var depos = $('input[name=depos]');

@@ -23,7 +23,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public IActionResult Index(bool? isChecked)
         {
-            M_TripModel model = new();
+            M_TripViewModel model = new();
 
             // 適用期間より前のデータが必要か
             bool isBeforeApplicablePeriod = true;
@@ -37,10 +37,11 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // ログインユーザーのメインデポ情報取得
-                var mainDepo = GetMainDepo();
-                model.MainDepo = mainDepo;
+                var user = ClaimsLoginUserData();
+                model.MainDepoID = user.MainDepoID;
+                model.MainDepoName = user.MainDepoName;
                 List<string> depoList = new();
-                depoList.Add(mainDepo.DepoID.ToString());
+                depoList.Add(user.MainDepoID.ToString());
 
                 IEnumerable<M_TripModel> tripList = new List<M_TripModel>();
 
@@ -162,7 +163,7 @@ namespace ai_truck_load_measurement.Controllers
         [HttpGet]
         public IActionResult Register(bool isChecked, int id)
         {
-            M_TripModel model = new();
+            M_TripViewModel model = new();
             try
             {   
                 // 新しい適用期間の作成の場合
@@ -178,7 +179,7 @@ namespace ai_truck_load_measurement.Controllers
                         ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
                         return View(model);
                     }
-                    model = tripList[0];
+                    model = SetTripStatusToTripViewModel( tripList[0], model);
                 }
                 // 車両マスター情報取得
                 var truckSql = M_TruckConnectController.CreateSQLToSelectMTrucks();
@@ -207,6 +208,18 @@ namespace ai_truck_load_measurement.Controllers
                 ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
                 return View(model);
             }
+        }
+
+        private M_TripViewModel SetTripStatusToTripViewModel(M_TripModel tripModel, M_TripViewModel viewModel)
+        {
+            viewModel.TripName = tripModel.TripName;
+            viewModel.DriverName = tripModel.DriverName;
+            viewModel.TruckID = tripModel.TruckID;
+            viewModel.DayShiftStartTime = tripModel.DayShiftStartTime;
+            viewModel.DepoName = tripModel.DepoName;
+            viewModel.ApplicableStartDateTime = tripModel.ApplicableStartDateTime;
+            viewModel.ApplicableEndDateTime = tripModel.ApplicableEndDateTime;
+            return viewModel;
         }
 
         /// <summary>

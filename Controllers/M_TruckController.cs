@@ -22,7 +22,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public IActionResult Index()
         {
-            M_TruckModel model = new();
+            M_TruckListViewModel model = new();
             try
             {
                 // ログイン中ユーザー情報取得

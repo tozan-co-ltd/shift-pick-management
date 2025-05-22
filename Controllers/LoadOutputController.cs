@@ -21,11 +21,12 @@ namespace ai_truck_load_measurement.Controllers
         public IActionResult Index()
         {
             // 戻り値
-            LoadOutputModel model = new();
+            LoadRecordViewModel model = new();
 
             // ログイン中ユーザー情報取得
             var user = ClaimsLoginUserData();
-            model.UserName = user.UserName;
+            // メインデポ情報取得
+            model = LoadRecordController.SetMainDepoInfo(model, user);
             try
             {
                 // 便実績情報取得SQL作成
@@ -36,8 +37,6 @@ namespace ai_truck_load_measurement.Controllers
                 tripRecordList = (IEnumerable<LoadOutputModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
-                // ログインユーザーのメインデポ情報取得
-                model.MainDepo = GetMainDepo();
                 return View(model);
             }
             catch (Exception ex)

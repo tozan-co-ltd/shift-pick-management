@@ -20,12 +20,16 @@ namespace ai_truck_load_measurement.Controllers
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         public IActionResult Index()
         {
-            var model = new LoadTransitionModel();
+            var model = new LoadRecordViewModel();
             var today = DateTime.Now;
             var oneWeekAgo = today.AddDays(-7);
-            var mainDepo = GetMainDepo();
+
+            // ログイン中ユーザー情報取得
+            var user = ClaimsLoginUserData();
+            // メインデポ情報取得
+            model = LoadRecordController.SetMainDepoInfo(model, user);
             List<string> depoList = new();
-            depoList.Add(mainDepo.DepoID.ToString());
+            depoList.Add(user.MainDepoID.ToString());
             try
             {
                 List<SelectListItem> tripNameList = new();
@@ -49,8 +53,6 @@ namespace ai_truck_load_measurement.Controllers
                 tripRecordList = (IEnumerable<LoadTransitionModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
-
-                model.MainDepo = mainDepo;
                 return View(model);
             }
             catch (Exception ex)

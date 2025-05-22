@@ -630,6 +630,22 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
+        /// ログインユーザーからメインデポ情報を取得、保存する
+        /// </summary>
+        /// <param name="model">保存先モデル</param>
+        /// <param name="user">ログインユーザー</param>
+        /// <returns></returns>
+        public static LoadRecordViewModel SetMainDepoInfo(LoadRecordViewModel model, LoginUserModel user)
+        {
+            // ログイン中ユーザー情報取得
+            model.UserName = user.UserName;
+            model.MainDepoID = user.MainDepoID;
+            model.MainDepoName = user.MainDepoName;
+            return model;
+        }
+
+
+        /// <summary>
         ///「荷量の相違あり」で保存した値があるか
         /// </summary>
         /// <param name="tripRecordID">便実績ID</param>
@@ -676,7 +692,6 @@ namespace ai_truck_load_measurement.Controllers
                 throw;
             }
         }
-
     }
 
 

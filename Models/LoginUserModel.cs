@@ -17,5 +17,10 @@
         /// ユーザーの権限区分
         /// </summary>
         public int AuthorizedKubun {  get; set; }
+        /// <summary>
+        /// ユーザーのメインデポ
+        /// </summary>
+        public int MainDepoID {  get; set; }
+        public string MainDepoName { get; set; }
     }
 }

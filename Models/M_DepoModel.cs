@@ -21,19 +21,5 @@ namespace ai_truck_load_measurement.Models
         public DateTime UpdatedAt { get; set; }
         // 更新者
         public string UpdatedBy { get; set; }
-
-        
-        public static M_DepoModel GetMainDepo(LoginUserModel user)
-        {
-            M_DepoModel model = new M_DepoModel();
-            var sql = M_DepoConnectController.CreateSQLToSelectDepoFromADName(user.ADName);
-            var depoList = ConnectToSQLServer.ExecuteQueryToList<M_DepoModel>(sql);
-            if (depoList.Count > 0)
-            {
-                model = depoList[0];
-            }
-            return model;
-            
-        }
     }
 }

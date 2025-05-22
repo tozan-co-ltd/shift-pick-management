@@ -25,13 +25,15 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public IActionResult Index(int tripId, bool isChecked)
         {
-            M_TripBranchNumberModel model = new();
-            var tripNameSql = M_TripBranchNumberConnectController.CreateSQLToSelectTripNameFromTripID(tripId);
-            var tripNameList = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberModel>(tripNameSql);
+            M_TripBranchNumberListViewModel model = new();
+
+            // 便情報取得
+            var tripSql = M_TripBranchNumberConnectController.CreateSQLToSelectTripNameFromTripID(tripId);
+            var trip = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberListViewModel>(tripSql)[0];
 
             model.TripID = tripId;
             model.IsCheckedBeforeApplicablePeriod = isChecked;
-            model.TripName = tripNameList[0].TripName;
+            model.TripName = trip.TripName;
 
             try
             {
@@ -281,7 +283,7 @@ namespace ai_truck_load_measurement.Controllers
         [HttpGet]
         public IActionResult Register(bool isChecked, int id, string tripName)
         {
-            M_TripBranchNumberModel model = new();
+            M_TripBranchNumberListViewModel model = new();
             try
             {
                 model.TripID = id;

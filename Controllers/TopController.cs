@@ -33,9 +33,9 @@ namespace ai_truck_load_measurement.Controllers
         public async Task<IActionResult> Index()
         {
             // ログインユーザーのメインデポ情報取得
-            var mainDepo = GetMainDepo();
+            var user = ClaimsLoginUserData();
             // トップ画面モデル取得
-            TopModel topModel = await GetTopModel(mainDepo.DepoID);
+            TopModel topModel = await GetTopModel(user.MainDepoID);
             return View(topModel);
         }
 
@@ -72,9 +72,8 @@ namespace ai_truck_load_measurement.Controllers
                 viewCardModelList = GetStationImage(viewCardModelList);
                 topModel.ViewCardModelList = viewCardModelList;
                 // ログインユーザーのメインデポ情報取得
-                var mainDepo = GetMainDepo();
-                topModel.MainDepoID = mainDepo.DepoID;
-                topModel.MainDepoName = mainDepo.Name;
+                topModel.MainDepoID = user.MainDepoID;
+                topModel.MainDepoName = user.MainDepoName;
                 return topModel;
             }
             catch (Exception ex)
