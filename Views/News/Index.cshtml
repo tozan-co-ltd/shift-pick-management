@@ -1,0 +1,6 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.NewsListViewModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+}

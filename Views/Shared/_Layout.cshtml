@@ -113,7 +113,7 @@
                                 var menuList = categoryMenuList.WebMenuList;
                                 var currentController = ViewContext.RouteData.Values["controller"].ToString();
                                 var currentCategoryID = Model.GetCategoryIDFromControlerName(currentController);
-                                if (menuList.Count != 0 && !(categoryID == 2 && Model.AuthorizedKubun != "1"))
+                                if (menuList.Count != 0 && !(categoryID == 4 && Model.AuthorizedKubun != "1"))
                                 {
                                     <li class="nav-item">
                                         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse@(categoryID)"
