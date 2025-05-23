@@ -1,0 +1,16 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.NewsListViewModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.ViewTitle;
+}
+<ul class="news-list">
+    <li class="item">
+        <a href="#">
+            <p class="date">2025/05/23</p>
+            <p class="category"><span>アップデート</span></p>
+        </a>
+    </li>
+</ul>
+<br />
+<p class="title h3">タイトル</p>

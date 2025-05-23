@@ -91,5 +91,11 @@ namespace ai_truck_load_measurement.Controllers
                 return NotFound(new { errorMessage });
             }
         }
+
+        public IActionResult Detail(int newsID)
+        {
+            NewsListViewModel model = new();
+            return View(model);
+        }
     }
 }

@@ -7,7 +7,7 @@
 <div class="card shadow de-inspection m-4">
     <div class="card-header d-flex">
         <label style="text-align: center">@ViewData["Title"]</label>
-        <button class="btn btn-primary print-btn mr-4" id="search-btn" style="margin-left: auto;" data-toggle="modal" data-target="#insert-modal">
+        <button class="btn btn-primary print-btn mr-4" id="search-btn" style="margin-left: auto;" data-toggle="modal" data-target="#insert-modal" onclick="OnInsertClick()">
             <span class="text">追加</span>
         </button>
     </div>
@@ -63,11 +63,11 @@
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <select class="form-select" name="CategoryClass" asp-for="CategoryClass" required id="CategoryClass">
-                                    <option value="0" selected>選択してください</option>
+                                    <option value="" selected disabled id="firstSelect">選択してください</option>
+                                    <option value="0">アップデート</option>
                                     <option value="1">メンテナンス</option>
                                     <option value="2">障害・不具合</option>
                                     <option value="3">操作案内</option>
-                                    <option value="0">test</option>
                                 </select>
                                 <span class="text-danger w-100" asp-validation-for="CategoryClass"></span>
                             </div>
@@ -98,9 +98,14 @@
 </div>
 <script type="text/javascript">
 
-    // 更新
-    function OnExecuteEdit() {
-        $('#mTruckForm').submit(function (event) {
+    // 登録ボタン押下時
+    function OnInsertClick(){
+        document.getElementById('firstSelect').selected = true;
+    }
+
+    // 登録
+    function OnExecuteInsert() {
+        $('#newsForm').submit(function (event) {
             DeleteErrorMessages();
 
             // ページの更新を禁止する
@@ -110,9 +115,9 @@
             event.stopImmediatePropagation();
 
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("Edit", "M_Truck")';
+            let url = window.location.origin + '@Url.Action("Register", "News")';
             let method = 'POST';
-            let formId = 'mTruckForm';
+            let formId = 'newsForm';
             let data = $('#' + formId).serializeArray();
 
             // Ajax call
@@ -121,16 +126,16 @@
                 method: method,
                 data: data
             }).done(function (response) {
-                $('#edit-modal').hide();
+                $('#insert-modal').hide();
                 // 完了モーダル表示
                 AlertMessage('', '完了', '登録が完了しました。', null, null);
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
                     var errorMessage = jqXHR.responseJSON.errorMessage;
-                    $("#edit-modal-error-message").text(errorMessage);
+                    $("#insert-modal-error-message").text(errorMessage);
                 } else {
                     var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                    $("#edit-modal-error-message").text(errorMessage);
+                    $("#insert-modal-error-message").text(errorMessage);
                 }
             });
         });
