@@ -1,6 +1,7 @@
 ﻿using Dapper;
-using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 using System.Data.SqlClient;
+using System.Data;
+using ai_truck_load_measurement.Models;
 
 namespace ai_truck_load_measurement.Commons
 {
@@ -62,6 +63,120 @@ namespace ai_truck_load_measurement.Commons
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// sqlから対象のクラスのListを取得する
+        /// </summary>
+        /// <typeparam name="T">対象のクラス</typeparam>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public static List<T> ExecuteQueryToList<T>(string sql)
+        {
+            List<T> resultList = new();
+            try
+            {
+                var connectionString = GetSQLServerConnectionString();
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                    resultList = connection.Query<T>(sql).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return resultList;
+        }
+
+        /// <summary>
+        /// 情報をデータテーブルとして取得
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <returns></returns>
+        public static DataTable ConnectToDataTable(string sql)
+        {
+            // 戻り値
+            DataTable dataTable = new DataTable();
+
+            // DB接続
+            try
+            {
+                // SQLServer接続文字列取得
+                var connectionString = GetSQLServerConnectionString();
+                // SQLServer接続
+                using (var connection = new SqlConnection())
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandText = sql;
+                    var adapter = new SqlDataAdapter(command);
+                    adapter.Fill(dataTable);
+                }
+                return dataTable;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// クエリ実行、カウントを返す
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <returns>更新件数</returns>
+        public static int ExecuteQuery(string sql)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = GetSQLServerConnectionString();
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                // DB接続
+                try
+                {
+                    var count = connection.Execute(sql);
+
+                    return count;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// sqlで取得した結果セットの最初の行の最初の列の値を返す
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        public static Object? ExecuteQueryScalar(string sql)
+        {
+            // SQLServer接続文字列取得
+            var connectionString = GetSQLServerConnectionString();
+            // SQLServer接続
+            using (var connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                try
+                {
+                    return connection.ExecuteScalar(sql);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
         }
     }

@@ -11,37 +11,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class M_TripConnectController 
     {
         /// <summary>
-        /// 便情報取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static List<M_TripModel> ConnectMTrips(string sql)
-        {
-            // 戻り値
-            List<M_TripModel> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<M_TripModel>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// 便情報と便履歴情報登録
         /// </summary>
         /// <param name="model">登録情報</param>
@@ -270,40 +239,6 @@ namespace ai_truck_load_measurement.ConnectControllers
                 }
             }
         }
-
-        /// <summary>
-        /// 便情報をデータテーブルとして取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static DataTable ConnectMTripsToDataTable(string sql)
-        {
-            // 戻り値
-            DataTable dataTable = new DataTable();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandText = sql;
-                    var adapter = new SqlDataAdapter(command);
-                    adapter.Fill(dataTable);
-                }
-                return dataTable;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
 
         /// <summary>
         /// 便マスター情報取得SQL作成

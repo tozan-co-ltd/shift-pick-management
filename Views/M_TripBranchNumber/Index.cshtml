@@ -1,5 +1,5 @@
 ﻿@using ai_truck_load_measurement.Commons;
-@model ai_truck_load_measurement.Models.M_TripBranchNumberModel;
+@model ai_truck_load_measurement.Models.M_TripBranchNumberListViewModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = "マスター - 便マスター - 便枝番マスター";
@@ -238,6 +238,7 @@
                 searchHighlight: true,  // 検索ハイライト
                 columnDefs: [
                     { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
+                    { targets: 3, className: "dt-body-left"}, // タグ列左寄せ
                 ],
                 "oLanguage": {
                     "sSearch": ""

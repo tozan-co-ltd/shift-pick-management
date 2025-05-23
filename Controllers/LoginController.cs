@@ -90,6 +90,8 @@ namespace ai_truck_load_measurement.Controllers
                     new Claim("UserName", loginUserModel.UserName),
                     new Claim("ADName", model.LoginId),
                     new Claim("AuthorizedKubun", loginUserModel.AuthorizedKubun.ToString()),
+                    new Claim("MainDepoID", loginUserModel.MainDepoID.ToString()),
+                    new Claim("MainDepoName", loginUserModel.MainDepoName),
                 };
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
@@ -175,10 +177,14 @@ namespace ai_truck_load_measurement.Controllers
                     return null;
                 }
 
+                var mainDepo = GetMainDepo(loginId);
+
                 LoginUserModel loginUserModel = new()
                 {
                     UserName = authenticateUserName,
                     AuthorizedKubun = GetAuthorizedKubunOfUser(loginId),
+                    MainDepoID = mainDepo.DepoID,
+                    MainDepoName = mainDepo.Name
                 };
 
                 return loginUserModel;
@@ -232,14 +238,61 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="loginId">ログインID</param>
         /// <returns></returns>
-        private int GetAuthorizedKubunOfUser(string loginId)
+        private int GetAuthorizedKubunOfUser(string loginID)
         {
             // ログインIDから権限区分を取得
-            var sql = LoginConnectController.CreateSQLToSelectAuthorizedKubunFromUserName(loginId);
-            var authorizedKubun = LoginConnectController.GetAuthorizedKubunFromUserName(sql);
+            var sql = LoginConnectController.CreateSQLToSelectAuthorizedKubunFromUserName(loginID);
+            var authorizedKubun = GetAuthorizedKubunFromUserName(sql);
 
             return authorizedKubun;
 
         }
+
+        /// <summary>
+        /// ログインIDを元にログイン時のメインデポを取得する
+        /// </summary>
+        /// <param name="loginID"></param>
+        /// <returns></returns>
+        private M_DepoModel GetMainDepo(string loginID)
+        {
+            M_DepoModel model = new M_DepoModel();
+            var sql = LoginConnectController.CreateSQLToSelectDepoFromADName(loginID);
+            var depoList = LoginConnectController.ConnectMDepos(sql);
+            if (depoList.Count > 0)
+            {
+                model = depoList[0];
+            }
+            return model;
+
+        }
+        /// <summary>
+        /// ユーザーの権限区分情報取得
+        /// </summary>
+        /// <param name="sql">SQL文</param>
+        /// <returns></returns>
+        private int GetAuthorizedKubunFromUserName(string sql)
+        {
+            // 戻り値 デフォルト値は権限無しの0
+            var authorizedKubun = 0;
+
+            List<M_UserModel> strList = new();
+
+            // DB接続
+            try
+            {
+                strList = ConnectToSQLServer.ExecuteQueryToList<M_UserModel>(sql);
+                if (strList.Count > 0)
+                {
+                    authorizedKubun = strList[0].AuthorizedKubun;
+                }
+
+                return authorizedKubun;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
     }
 }

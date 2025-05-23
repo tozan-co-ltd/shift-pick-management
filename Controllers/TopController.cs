@@ -33,9 +33,9 @@ namespace ai_truck_load_measurement.Controllers
         public async Task<IActionResult> Index()
         {
             // ログインユーザーのメインデポ情報取得
-            var mainDepo = GetMainDepo();
+            var user = ClaimsLoginUserData();
             // トップ画面モデル取得
-            TopModel topModel = await GetTopModel(mainDepo.DepoID);
+            TopModel topModel = await GetTopModel(user.MainDepoID);
             return View(topModel);
         }
 
@@ -53,11 +53,11 @@ namespace ai_truck_load_measurement.Controllers
                 // 最新のステーション状況取得SQL作成
                 var latestStationStatusSQL = TopConnectController.CreateSQLToSelectLatestStationStatus(depoID);
                 // 最新のステーション状況取得
-                List<ViewCardModel> viewCardModelList = TopConnectController.ConnectTops(latestStationStatusSQL);
+                List<ViewCardModel> viewCardModelList = ConnectToSQLServer.ExecuteQueryToList<ViewCardModel>(latestStationStatusSQL);
                 // トラック有無取得SQL作成
                 var isExistTrucksSQL = TopConnectController.CreateSQLToSelectIsExistTrucksPerStationID();
                 // トラック有無取得
-                IEnumerable<ViewCardModel> isExistTrucksList = TopConnectController.ConnectTops(isExistTrucksSQL);
+                IEnumerable<ViewCardModel> isExistTrucksList = ConnectToSQLServer.ExecuteQueryToList<ViewCardModel>(isExistTrucksSQL);
                 foreach (var item in viewCardModelList)
                 {
                     var isExistTruck = isExistTrucksList.Where(x => x.StationID == item.StationID).ToList();
@@ -72,9 +72,8 @@ namespace ai_truck_load_measurement.Controllers
                 viewCardModelList = GetStationImage(viewCardModelList);
                 topModel.ViewCardModelList = viewCardModelList;
                 // ログインユーザーのメインデポ情報取得
-                var mainDepo = GetMainDepo();
-                topModel.MainDepoID = mainDepo.DepoID;
-                topModel.MainDepoName = mainDepo.Name;
+                topModel.MainDepoID = user.MainDepoID;
+                topModel.MainDepoName = user.MainDepoName;
                 return topModel;
             }
             catch (Exception ex)
