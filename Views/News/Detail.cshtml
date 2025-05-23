@@ -4,13 +4,31 @@
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.ViewTitle;
 }
-<ul class="news-list">
-    <li class="item">
-        <a href="#">
-            <p class="date">2025/05/23</p>
-            <p class="category"><span>アップデート</span></p>
-        </a>
-    </li>
-</ul>
-<br />
-<p class="title h3">タイトル</p>
+            
+<div class="card shadow de-inspection m-4">
+    <div class="card-header d-flex">
+        <label style="text-align: center">@ViewData["Title"]</label>
+    </div>
+    <div class="card-body">
+        <div class="news-category"><label style="color:#999">2025/05/23</label>　 <span>アップデート</span></div>
+        <br />
+        <p class="title h3">タイトル</p>
+        <br />
+        <div>
+            本文つらつらつつらつら
+            <br />
+            伝えたいこと伝えたいこと伝えたいこと
+            <br />
+            これこれこういうことをなんちゃらかんちゃら
+        </div>
+        <br /><br />
+        <div class="input-group-append mr-4">
+            <a class="btn btn-secondary btn-icon-split" asp-controller="News" asp-action="Index">
+                <span class="icon text-white-50">
+                    <i class="fas fa-arrow-left-long"></i>
+                </span>
+                <span class="text">戻る</span>
+            </a>
+        </div>
+    </div>
+</div>

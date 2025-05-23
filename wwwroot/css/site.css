@@ -1254,6 +1254,16 @@ table.dataTable span.column_highlight {
     }
 }
 
+.news-category span {
+    background: #999;
+    color: #FFF;
+    text-align: center;
+    display: inline-block;
+    padding: 5px 20px;
+    font-size: 12px;
+    line-height: 1;
+}
+
 /* ‘•ü */
 
 * {
