@@ -180,5 +180,40 @@ namespace ai_truck_load_measurement.ConnectControllers
 
             return sql;
         }
+
+        /// <summary>
+        /// 異なるユーザーIDで削除済みの重複AD名情報取得SQL作成
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public static string CreateSQLToDUplicateDeletedADName(M_UserModel model)
+        {
+            var sql = $@"
+                SELECT
+                    COUNT(*)                      
+                FROM 
+                    m_users
+                WHERE
+                    ad_name = '{model.ADName}'
+                    AND user_id <> {model.UserID}
+                    and is_deleted = 1
+            ";
+
+            return sql;
+        }
+
+        /// <summary>
+        /// ユーザーIDに対応するユーザー情報を削除するSQL作成
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        public static string CreateSQLToDeleteUser(int userID)
+        {
+            var sql = $@"
+                DELETE FROM m_users
+                WHERE user_id = {userID}
+            ";
+            return sql;
+        }
     }
 }
