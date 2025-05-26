@@ -75,11 +75,11 @@
                             <tr>
                                 <td>
                                     <a class="btn btn-success btn-icon-split ml-1 mr-1"
-                                       onclick="OnEditClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#edit-modal">
+                                    onclick="OnEditClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#edit-modal">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
                                     <button class="btn btn-danger btn-icon-split"
-                                            onclick="OnDeleteClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#delete-modal">
+                                    onclick="OnDeleteClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#delete-modal">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </td>
@@ -89,9 +89,14 @@
                                 @if(item.AuthorizedKubun == 0)
                                 {
                                     <td>なし</td>
-                                }else if(item.AuthorizedKubun == 1)
+                                }
+                                else if(item.AuthorizedKubun == 1)
                                 {
                                     <td>管理者</td>
+                                }
+                                else if(item.AuthorizedKubun == 2)
+                                {
+                                    <td>システム管理者</td>
                                 }
                                 @if (item.IsRequiredMail)
                                 {

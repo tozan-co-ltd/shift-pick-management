@@ -10,16 +10,12 @@
         <label style="text-align: center">@ViewData["Title"]</label>
     </div>
     <div class="card-body">
-        <div class="news-category"><label style="color:#999">2025/05/23</label>　 <span>アップデート</span></div>
+        <div class="news-category"><label style="color:#999">@Model.NewsList[0].CreatedAt.ToString("yyyy/MM/dd")</label>　 <span>@Model.NewsList[0].CategoryStatus</span></div>
         <br />
-        <p class="title h3">タイトル</p>
+        <p class="title h3" style="font-weight:bold">@Model.NewsList[0].NewsSubject</p>
         <br />
-        <div>
-            本文つらつらつつらつら
-            <br />
-            伝えたいこと伝えたいこと伝えたいこと
-            <br />
-            これこれこういうことをなんちゃらかんちゃら
+        <div id="content">
+            
         </div>
         <br /><br />
         <div class="input-group-append mr-4">
@@ -32,3 +28,13 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    // ロード時の処理
+    $(document).ready(function () {
+        // NewsModel取得
+        var newsModel = @Html.Raw(Json.Serialize(Model));
+        console.log(newsModel);
+        document.getElementById('content').innerHTML = newsModel.newsList[0].newsContent;
+    });
+</script>

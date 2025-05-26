@@ -4,6 +4,7 @@ using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
+using X.PagedList;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -22,6 +23,11 @@ namespace ai_truck_load_measurement.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// カテゴリークラスからカテゴリー名への変換
+        /// </summary>
+        /// <param name="news"></param>
+        /// <returns></returns>
         private string ConversionCategoryClassToCategoryStatus(NewsModel news)
         {
             var categoryClass = news.CategoryClass;
@@ -61,7 +67,7 @@ namespace ai_truck_load_measurement.Controllers
                     return NotFound(new { errorMessage });
                 }
 
-
+                model.NewsContent = model.NewsContent.Replace("\r\n", "<br />");
 
                 // お知らせ登録
                 var sql = NewsConnectController.CreateSQLToInsertNews(model, DateTime.Now, user.UserName);
@@ -92,10 +98,31 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
+        /// <summary>
+        /// お知らせ詳細画面表示
+        /// </summary>
+        /// <param name="newsID"></param>
+        /// <returns></returns>
         public IActionResult Detail(int newsID)
         {
             NewsListViewModel model = new();
-            return View(model);
+          
+            try
+            {
+                var sql = NewsConnectController.CreateSQLToSelectNewsFromNewsID(newsID);
+                model.NewsList =  ConnectToSQLServer.ExecuteQueryToList<NewsModel>(sql);
+                foreach (var news in model.NewsList)
+                {
+                    news.CategoryStatus = ConversionCategoryClassToCategoryStatus(news);
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return View(model);
+            }
         }
     }
 }
