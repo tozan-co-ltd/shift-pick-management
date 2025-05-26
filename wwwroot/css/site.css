@@ -64,6 +64,14 @@ label{
 }
 
 .icon-categoryid-2::before {
+    content: '\f26c';
+}
+
+.icon-categoryid-3::before {
+    content: '\f05a';
+}
+
+.icon-categoryid-4::before {
     content: '\f0ad';
 }
 
