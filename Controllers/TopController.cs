@@ -196,7 +196,7 @@ namespace ai_truck_load_measurement.Controllers
                 var imageBytes = await result.Content.ReadAsByteArrayAsync();
                 return Convert.ToBase64String(imageBytes);
             }
-            catch
+            catch(Exception ex)
             {
                 return "";
             }
