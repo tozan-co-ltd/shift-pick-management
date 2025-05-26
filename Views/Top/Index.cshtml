@@ -178,12 +178,14 @@
 
     function viewCards(top_model, depoName) {
         var now = GetDateString(new Date());
+        console.log(top_model.viewCardModelList);
         // 更新日時の更新
         $('#updateAt').text("更新日時:" + now + ':' + ('0' + new Date().getSeconds()).slice(-2));
         // カード要素の初期化
         $("#cardlayout-wrap")[0].innerHTML = "";
         for (var i = 1; i <= top_model.viewCardModelList.length; i++) {
-            var cardModel = top_model.viewCardModelList.find(x => x.stationSeq == i);
+            if(i != 14){
+                var cardModel = top_model.viewCardModelList.find(x => x.stationSeq == i);
 
             // カード要素生成
             $("#cardlayout-wrap")[0].innerHTML += 
@@ -206,8 +208,10 @@
                 $('#truck-status' + i).text("　");
             }
 
-            
+
             $('#image' + i).attr("src", cardModel.imageBase64);
+            }
+            
         }
     }
 
