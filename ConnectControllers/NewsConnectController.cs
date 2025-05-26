@@ -19,6 +19,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ,created_at
                 ,created_by
             FROM t_news
+            ORDER BY news_id DESC
             ";
             return sql;
         }
