@@ -60,11 +60,11 @@ label{
 }
 
 .icon-categoryid-1::before {
-    content: '\f0d1';
+    content: '\f26c';
 }
 
 .icon-categoryid-2::before {
-    content: '\f26c';
+    content: '\f0d1';
 }
 
 .icon-categoryid-3::before {
