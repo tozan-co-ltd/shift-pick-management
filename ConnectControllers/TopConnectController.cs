@@ -65,7 +65,6 @@ namespace ai_truck_load_measurement.ConnectControllers
                 JOIN m_stations
                  ON detect_records.station_id = m_stations.station_id
                  WHERE depo_id = {depoID}
-                AND detect_records.station_id <> 18
             ";
             return sql;
         }
