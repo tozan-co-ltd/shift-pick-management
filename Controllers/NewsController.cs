@@ -13,9 +13,11 @@ namespace ai_truck_load_measurement.Controllers
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         public IActionResult Index()
         {
+            var user = ClaimsLoginUserData();
             NewsListViewModel model = new();
             var sql = NewsConnectController.CreateSQLToSelectNews();
             model.NewsList = ConnectToSQLServer.ExecuteQueryToList<NewsModel>(sql);
+            model.AuthorizedKubun = user.AuthorizedKubun;
             foreach(var news in model.NewsList)
             {
                 news.CategoryStatus = ConversionCategoryClassToCategoryStatus(news);

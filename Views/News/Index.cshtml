@@ -7,9 +7,12 @@
 <div class="card shadow de-inspection m-4">
     <div class="card-header d-flex">
         <label style="text-align: center">@ViewData["Title"]</label>
-        <button class="btn btn-primary print-btn mr-4" id="search-btn" style="margin-left: auto;" data-toggle="modal" data-target="#insert-modal" onclick="OnInsertClick()">
-            <span class="text">追加</span>
-        </button>
+        @if(Model.AuthorizedKubun == 2)
+        {
+            <button class="btn btn-primary print-btn mr-4" id="search-btn" style="margin-left: auto;" data-toggle="modal" data-target="#insert-modal" onclick="OnInsertClick()">
+                <span class="text">追加</span>
+            </button>
+        }
     </div>
     <div class="card-body">
 

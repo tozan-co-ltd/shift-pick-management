@@ -31,5 +31,6 @@ namespace ai_truck_load_measurement.Models
         public DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }
 
+        public int AuthorizedKubun { get; set; }
     }
 }
