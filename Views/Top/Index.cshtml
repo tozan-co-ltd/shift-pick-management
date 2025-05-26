@@ -184,8 +184,7 @@
         // カード要素の初期化
         $("#cardlayout-wrap")[0].innerHTML = "";
         for (var i = 1; i <= top_model.viewCardModelList.length; i++) {
-            if(true){
-                var cardModel = top_model.viewCardModelList.find(x => x.stationSeq == i);
+            var cardModel = top_model.viewCardModelList.find(x => x.stationSeq == i);
 
             // カード要素生成
             $("#cardlayout-wrap")[0].innerHTML += 
@@ -210,7 +209,6 @@
 
 
             $('#image' + i).attr("src", cardModel.imageBase64);
-            }
             
         }
     }
