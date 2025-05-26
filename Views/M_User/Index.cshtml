@@ -165,10 +165,13 @@
                                 <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input type="radio" class="mr-2" asp-for="AuthorizedKubun" value="1" name="AuthorizedKubun" id="hasAuthorizedKubun">
-                                <label for="hasAuthorizedKubun">権限あり</label>
-                                <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" value="0" name="AuthorizedKubun" id="notHasAuthorizedKubun" checked>
-                                <label for="notHasAuthorizedKubun">権限なし</label>
+                                <select class="form-select" name="AuthorizedKubun" asp-for="AuthorizedKubun" required id="AuthorizedKubun">
+                                    <option value="" selected disabled id="firstSelect">選択してください</option>
+                                    <option value="0">一般</option>
+                                    <option value="1">管理者</option>
+                                    <option value="2">システム管理者</option>
+                                </select>
+                                <span class="text-danger w-100" asp-validation-for="AuthorizedKubun"></span>
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
@@ -307,21 +310,20 @@
                 $("#UserID").val(item.userID);
                 $("#ADName").val(item.adName);
                 $("#DepoID").val(item.depoID);
-                var authorizedKubun = item.authorizedKubun;
-                AuthorizedKubunCheck(authorizedKubun);
+                $("#AuthorizedKubun").val(item.authorizedKubun);
                 IsRequiredMailCheck(item.isRequiredMail);
                 $("#MailAddress").val(item.mailAddress);
             }
         });
     }
 
-    // 現在の管理区分にチェックを入れる
-    function AuthorizedKubunCheck(authorizedKubun) {
-        document.getElementsByName("AuthorizedKubun").forEach(function (item) {
-            if (item.value == authorizedKubun)
-                item.checked = true;
-        });
-    }
+    // // 現在の管理区分にチェックを入れる
+    // function AuthorizedKubunCheck(authorizedKubun) {
+    //     document.getElementsByName("AuthorizedKubun").forEach(function (item) {
+    //         if (item.value == authorizedKubun)
+    //             item.checked = true;
+    //     });
+    // }
 
     // 現在のメール受け取り要否をチェックボックスに反映する
     function IsRequiredMailCheck(isRequired) {
