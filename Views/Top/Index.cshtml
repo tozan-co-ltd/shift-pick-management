@@ -2,7 +2,7 @@
 @model ai_truck_load_measurement.Models.TopModel;
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = "トップ";
+    ViewData["Title"] = Model.ViewTitle; ;
 }
 <style>
     /* カードレイアウト部分をラッピングし、
@@ -285,10 +285,10 @@
 
     function getStationTitle(depoName){
         if(depoName == null){
-            return "ステーション状況";
+            return "デポを選択してください";
         }
         else{
-            return depoName + "　ステーション状況";
+            return depoName;
         }
     }
 

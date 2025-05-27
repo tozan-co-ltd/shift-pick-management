@@ -47,12 +47,17 @@
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
                             <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                         </div>
+                        
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <input type="radio" class="mr-2" asp-for="AuthorizedKubun" autocomplete="off" value="1" name="AuthorizedKubun" id="hasAuthorizedKubun">
-                            <label for="hasAuthorizedKubun">権限あり</label>
-                            <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" autocomplete="off" value="0" name="AuthorizedKubun" id="notHasAuthorizedKubun" checked>
-                            <label for="notHasAuthorizedKubun">権限なし</label>
+                            <select class="form-select" name="AuthorizedKubun" asp-for="AuthorizedKubun" required>
+                                <option value="" selected disabled id="firstSelect">選択してください</option>
+                                <option value="0">一般</option>
+                                <option value="1">管理者</option>
+                                <option value="2">システム管理者</option>
+                            </select>
+                            <span class="text-danger w-100" asp-validation-for="AuthorizedKubun"></span>
                         </div>
+                        
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
@@ -96,6 +101,11 @@
 </div>
 
 <script type="text/javascript">
+    $(document).ready(function(){
+        document.getElementById('firstSelect').selected = true;
+    });
+
+
     // 登録ボタン押下
     function OnRegister() {
 
