@@ -18,22 +18,25 @@
 
         @if(Model.NewsList.Count > 0)
         {
-            <ul class="news-list">
+            <div class="news-container news-list">
 
                 @foreach(var item in Model.NewsList)
                 {
-                    <li class="item">
-                        <a href="News/Detail?newsID=@item.NewsID" >
-                            <p class="date">@item.CreatedAt.ToString("yyyy/MM/dd")</p>
-                            <p class="category"><span>@item.CategoryStatus</span></p>
-                            <p class="title">@item.NewsSubject</p>
-                        </a>
-                    </li>
+                    <dl class="item">
+                        <dd>
+                            <a href="News/Detail?newsID=@item.NewsID">
+                                <p class="date">@item.CreatedAt.ToString("yyyy/MM/dd")</p>
+                                <p class="category"><span>@item.CategoryStatus</span></p>
+                                <p class="title">@item.NewsSubject</p>
+                            </a>
+                        </dd>
+                    </dl>
                 }
-            </ul>
+            </div>
         }
     </div>
 </div>
+
 
 <!--  Edit Modal-->
 <div class="modal fade" id="insert-modal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -143,5 +146,15 @@
             });
         });
     }
+
+    $(function() {
+        $('.news-container').paginathing({//親要素のclassを記述
+            perPage: 10,//1ページあたりの表示件数
+            prevText:'前へ',//1つ前のページへ移動するボタンのテキスト
+            nextText:'次へ',//1つ次のページへ移動するボタンのテキスト
+            activeClass: 'navi-active',//現在のページ番号に任意のclassを付与できます
+            firstLast: false,
+        })
+    });
 
 </script>

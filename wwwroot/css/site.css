@@ -1285,4 +1285,19 @@ a {
 body {
     margin: 20px;
 }
+
+.pagination-container a {
+    padding: 10px 20px;
+    display: block;
+    color: #0076BF;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    background: #fff;
+}
+
+.pagination-container .navi-active a {
+    font-weight: bold;
+    background: #fafafa;
+}
+
 /*---------------------------------------------------------------------------*/
