@@ -443,7 +443,7 @@ function EditModal(tripRecordID, isArrived, page) {
                     + "<td>荷量の相違あり</td>"
                     + "<td>"
                     + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">";
-                if (authorizedKubun == "1") {
+                if (authorizedKubun == "1" || authorizedKubun == "2") {
                     tr += "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" id=\"loadStatusSelect\" >"
                         + "<option value=\"\" hidden></option>"
                         + "<option value=\"1\">0%</option>"
