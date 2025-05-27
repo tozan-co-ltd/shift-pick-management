@@ -188,10 +188,10 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public async Task<string> GetImageBase64FromAPI(string url)
         {
-            var client = GetDigestClient(url);
             // 取得できない場合、空文字を返す
             try
             {
+                var client = GetDigestClient(url);
                 var result = await client.GetAsync(url);
                 var imageBytes = await result.Content.ReadAsByteArrayAsync();
                 return Convert.ToBase64String(imageBytes);
