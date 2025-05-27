@@ -178,13 +178,16 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 var mainDepo = GetMainDepo(loginId);
+                var mainDepoName = "";
+                if (mainDepo.Name != null)
+                    mainDepoName = mainDepo.Name;
 
                 LoginUserModel loginUserModel = new()
                 {
                     UserName = authenticateUserName,
                     AuthorizedKubun = GetAuthorizedKubunOfUser(loginId),
                     MainDepoID = mainDepo.DepoID,
-                    MainDepoName = mainDepo.Name
+                    MainDepoName = mainDepoName
                 };
 
                 return loginUserModel;

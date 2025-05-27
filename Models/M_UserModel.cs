@@ -61,7 +61,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 作成者
         /// </summary>
-        public string CreatedBy {  get; set; }
+        public string? CreatedBy {  get; set; }
 
         /// <summary>
         /// 更新日時
@@ -71,7 +71,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 更新者
         /// </summary>
-        public string UpdatedBy {  get; set; }
+        public string? UpdatedBy {  get; set; }
     }
 
     public class M_UserListViewModel : CommonModel
