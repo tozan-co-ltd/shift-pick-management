@@ -1201,7 +1201,7 @@ table.dataTable span.column_highlight {
     padding: 0;
 }
 
-    .news-list .item a {
+    .news-list .item div {
         display: flex;
         flex-wrap: wrap;
         flex-wrap: nowrap;
@@ -1211,7 +1211,7 @@ table.dataTable span.column_highlight {
         padding: 20px 20px;
     }
 
-    .news-list .item:first-child a {
+    .news-list .item:first-child div {
         border-top: 1px solid #CCC;
     }
 
@@ -1241,15 +1241,15 @@ table.dataTable span.column_highlight {
 
     .news-list .item .title {
         margin: 0;
-        width: 100%;
+        width: 30%;
     }
 
-    .news-list .item a:hover .title {
+    .news-list .item div:hover .title {
         color: #00F;
     }
 
 @media screen and (max-width: 767px) {
-    .news-list .item a {
+    .news-list .item div {
         flex-wrap: wrap;
     }
 

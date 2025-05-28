@@ -24,12 +24,18 @@
                 {
                     <dl class="item">
                         <dd>
-                            <a href="#">
+                            <div >
                                 <p class="date">@item.CreatedAt.ToString("yyyy/MM/dd")</p>
                                 <p class="category"><span>@item.CategoryStatus</span></p>
                                 <p class="title">@item.NewsSubject</p>
                                 <p class="title">@item.NewsContent</p>
-                            </a>
+                                @if(Model.AuthorizedKubun == 2)
+                                {
+                                    <span class="ml-2">
+                                        <button class="btn btn-primary" onclick="OnEditClick(@item.NewsID)" data-toggle="modal" data-target="#edit-modal">編集</button>
+                                    </span>
+                                }
+                            </div>
                         </dd>
                     </dl>
                 }
@@ -39,7 +45,7 @@
 </div>
 
 
-<!--  Edit Modal-->
+<!--  Insert Modal-->
 <div class="modal fade" id="insert-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -103,6 +109,71 @@
         </div>
     </div>
 </div>
+
+<!--  Edit Modal-->
+<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="edit-modal-label">更新</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-12">
+                    <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <form class="col-md-12" id="newsForm">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <label>@Html.DisplayName("NewsSubject")<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input class="form-control" type="text" asp-for="NewsSubject" autocomplete="off" id="NewsSubjectEdit" value="">
+                                <span class="text-danger w-100" asp-validation-for="NewsSubject"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <label>@Html.DisplayNameFor(model => model.CategoryClass)<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <select class="form-select" name="CategoryClass" asp-for="CategoryClass" required id="CategoryClassEdit">
+                                    <option value="" selected disabled id="firstSelect">選択してください</option>
+                                    <option value="0">アップデート</option>
+                                    <option value="1">メンテナンス</option>
+                                    <option value="2">障害・不具合</option>
+                                    <option value="3">操作案内</option>
+                                </select>
+                                <span class="text-danger w-100" asp-validation-for="CategoryClass"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <label>@Html.DisplayName("NewsContent")<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <textarea class="form-control" asp-for="NewsContent" autocomplete="off" value="" required id="NewsContentEdit"></textarea>
+                                <span class="text-danger w-100" asp-validation-for="NewsContent"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
+                            <button class="btn btn-secondary btn-icon-split mb-2 mr-0 mr-sm-5" data-dismiss="modal" aria-label="Close">
+                                <span class="text">キャンセル</span>
+                            </button>
+                            <button class="btn btn-success btn-icon-split mb-2" onclick="OnExecuteInsert()">
+                                <span class="text" style="min-width:84px">更新</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript">
 
     // 登録ボタン押下時
@@ -157,5 +228,15 @@
             firstLast: false,
         })
     });
+
+    // 編集ボタン押下時
+    function OnEditClick(targetID){
+        // ボタンを押した行のデータ取得
+        var model =  @Html.Raw(Json.Serialize(Model));
+        var news = model.newsList.find(({newsID}) => newsID == targetID);
+        $("#NewsSubjectEdit").val(news.newsSubject);
+        $('#CategoryClassEdit').val(news.categoryClass);
+        $('#NewsContentEdit').val(news.newsContent);
+    }
 
 </script>
