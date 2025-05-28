@@ -13,13 +13,13 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
             SELECT
                 news_id
-                ,news_subject
                 ,news_content
                 ,category_class
+                ,news_date
                 ,created_at
                 ,created_by
             FROM t_news
-            ORDER BY news_id DESC
+            ORDER BY news_date DESC , news_id DESC
             ";
             return sql;
         }
@@ -35,16 +35,20 @@ namespace ai_truck_load_measurement.ConnectControllers
         {
             var sql = $@"
                 INSERT INTO t_news(
-                    news_subject 
-                    ,news_content
+                    news_content
                     ,category_class
+                    ,news_date
                     ,created_at
                     ,created_by
+                    ,updated_at
+                    ,updated_by
                 )
                 VALUES (
-                    '{model.NewsSubject}',
                     '{model.NewsContent}',
                     '{model.CategoryClass}',
+                    '{model.NewsDate}',
+                    '{createdAt.ToString("yyyy/MM/dd HH:mm:ss")}',
+                    '{createdBy}',
                     '{createdAt.ToString("yyyy/MM/dd HH:mm:ss")}',
                     '{createdBy}'
                 );
@@ -52,22 +56,15 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
-        /// <summary>
-        /// 指定されたお知らせIDの情報取得SQL
-        /// </summary>
-        /// <param name="newsID"></param>
-        /// <returns></returns>
-        public static string CreateSQLToSelectNewsFromNewsID(int newsID)
+
+        public static string CreateSQLToUpdateNews(NewsModel model)
         {
             var sql = $@"
-                SELECT
-                    news_subject
-                    ,news_content
-                    ,category_class
-                    ,created_at
-                FROM t_news
-                WHERE news_id = {newsID}
-            ";
+UPDATE t_news
+SET
+    category_class = '{model.CategoryClass}'
+    ,news_content = '{model.NewsContent}'
+";
             return sql;
         }
     }

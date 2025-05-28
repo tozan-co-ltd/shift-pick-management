@@ -25,14 +25,13 @@
                     <dl class="item">
                         <dd>
                             <div >
-                                <p class="date">@item.CreatedAt.ToString("yyyy/MM/dd")</p>
+                                <p class="date">@item.NewsDate.ToString("yyyy/MM/dd")</p>
                                 <p class="category"><span>@item.CategoryStatus</span></p>
-                                <p class="title">@item.NewsSubject</p>
                                 <p class="title">@item.NewsContent</p>
                                 @if(Model.AuthorizedKubun == 2)
                                 {
                                     <span class="ml-2">
-                                        <button class="btn btn-primary" onclick="OnEditClick(@item.NewsID)" data-toggle="modal" data-target="#edit-modal">編集</button>
+                                        <button class="btn btn-primary" onclick="OnEditClick(@item.NewsID)" data-toggle="modal" data-target="#edit-modal" style="white-space: nowrap">編集</button>
                                     </span>
                                 }
                             </div>
@@ -63,15 +62,6 @@
                     <form class="col-md-12" id="newsForm">
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
-                                <label>@Html.DisplayName("NewsSubject")<span style="color:red">*</span></label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input class="form-control" type="text" asp-for="NewsSubject" autocomplete="off">
-                                <span class="text-danger w-100" asp-validation-for="NewsSubject"></span>
-                            </div>
-                        </div>
-                        <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayNameFor(model => model.CategoryClass)<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
@@ -92,6 +82,16 @@
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <textarea class="form-control"  asp-for="NewsContent" autocomplete="off" value="" required></textarea>
                                 <span class="text-danger w-100" asp-validation-for="NewsContent"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel">
+                                <label><a>@Html.DisplayName("NewsDate")<span style="color:red">*</span></a></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input class="form-control pickerDate" style="max-width: 1000px;" type="text" asp-for="NewsDate" autocomplete="off" value="2025-05-28" required>
+                                <small class="form-text text-muted w-100 p-1">YYYY/MM/DDで入力してください。</small>
+                                <span class="text-danger w-100" asp-validation-for="NewsDate"></span>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
@@ -128,15 +128,6 @@
                     <form class="col-md-12" id="newsForm">
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
-                                <label>@Html.DisplayName("NewsSubject")<span style="color:red">*</span></label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input class="form-control" type="text" asp-for="NewsSubject" autocomplete="off" id="NewsSubjectEdit" value="">
-                                <span class="text-danger w-100" asp-validation-for="NewsSubject"></span>
-                            </div>
-                        </div>
-                        <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayNameFor(model => model.CategoryClass)<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
@@ -159,6 +150,16 @@
                                 <span class="text-danger w-100" asp-validation-for="NewsContent"></span>
                             </div>
                         </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel">
+                                <label><a>@Html.DisplayName("NewsDate")<span style="color:red">*</span></a></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input class="form-control pickerDate" style="max-width: 1000px;" type="text" asp-for="NewsDate" autocomplete="off" value="" required id="NewsDateEdit">
+                                <small class="form-text text-muted w-100 p-1">YYYY/MM/DDで入力してください。</small>
+                                <span class="text-danger w-100" asp-validation-for="NewsDate"></span>
+                            </div>
+                        </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
                             <button class="btn btn-secondary btn-icon-split mb-2 mr-0 mr-sm-5" data-dismiss="modal" aria-label="Close">
                                 <span class="text">キャンセル</span>
@@ -179,6 +180,9 @@
     // 登録ボタン押下時
     function OnInsertClick(){
         document.getElementById('firstSelect').selected = true;
+
+        var today = new Date();
+        $('#NewsDate').val(GetDayString(today));
     }
 
     // 登録

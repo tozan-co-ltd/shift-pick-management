@@ -98,31 +98,5 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-        /// <summary>
-        /// お知らせ詳細画面表示
-        /// </summary>
-        /// <param name="newsID"></param>
-        /// <returns></returns>
-        public IActionResult Detail(int newsID)
-        {
-            NewsListViewModel model = new();
-          
-            try
-            {
-                var sql = NewsConnectController.CreateSQLToSelectNewsFromNewsID(newsID);
-                model.NewsList =  ConnectToSQLServer.ExecuteQueryToList<NewsModel>(sql);
-                foreach (var news in model.NewsList)
-                {
-                    news.CategoryStatus = ConversionCategoryClassToCategoryStatus(news);
-                }
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
-                ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return View(model);
-            }
-        }
     }
 }
