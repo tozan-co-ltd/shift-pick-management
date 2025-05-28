@@ -99,10 +99,19 @@ namespace ai_truck_load_measurement.Controllers
                     return BadRequest(new { errorMessage });
                 }
 #endif
+                // 削除済みユーザー内に同AD名ユーザーが存在するか
+                var duplicateDeletedUserSql = M_UserConnectController.CreateSQLToDuplicateDeletedADName(model.ADName);
+                var duplicateDeletedUserList = ConnectToSQLServer.ExecuteQueryToList<M_UserModel>(duplicateDeletedUserSql);
+
 
                 // ユーザーマスター登録
-                var sql = M_UserConnectController.CreateSQLToInsertMUser(model, DateTime.Now, user.UserName);
-                ConnectToSQLServer.ExecuteQuery(sql);
+
+                var insertSql = "";
+                if (duplicateDeletedUserList.Count > 0)
+                    insertSql = M_UserConnectController.CreateSQLToReInsertMUser(model, DateTime.Now, user.UserName);
+                else
+                    insertSql = M_UserConnectController.CreateSQLToInsertMUser(model, DateTime.Now, user.UserName);
+                ConnectToSQLServer.ExecuteQuery(insertSql);
 
                 // log取得
                 _logger.Info($"ユーザーマスター登録成功 ユーザー名:{model.ADName}");
