@@ -110,7 +110,9 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 表示する画像をAPIから取得してbase64に変換
                 var imageUrl = ($"http://{model.IPAdress}/jpg/image.jpg");
-                var imagePath64 = await GetImageBase64FromAPI(imageUrl);
+                var imagePath64 = "";
+                if(model.StationSeq != 14)
+                    imagePath64 = await GetImageBase64FromAPI(imageUrl);
                 model.ImageBase64 = "data:image/jpeg;base64," + imagePath64;
             }
             return models;
