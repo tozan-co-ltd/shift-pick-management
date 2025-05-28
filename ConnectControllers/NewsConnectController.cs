@@ -57,14 +57,19 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
 
-        public static string CreateSQLToUpdateNews(NewsModel model)
+        public static string CreateSQLToUpdateNews(NewsModel model, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
-UPDATE t_news
-SET
-    category_class = '{model.CategoryClass}'
-    ,news_content = '{model.NewsContent}'
-";
+                UPDATE t_news
+                SET
+                    category_class = '{model.CategoryClass}'
+                    ,news_content = '{model.NewsContent}'
+                    ,news_date = '{model.NewsDate}'
+                    ,updated_at = '{updatedAt.ToString("yyyy/MM/dd HH:mm:ss")}'
+                    ,updated_by = '{updatedBy}'
+                WHERE
+                    news_id = '{model.NewsID}'
+            ";
             return sql;
         }
     }

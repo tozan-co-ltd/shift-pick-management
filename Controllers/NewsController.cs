@@ -97,6 +97,56 @@ namespace ai_truck_load_measurement.Controllers
                 return NotFound(new { errorMessage });
             }
         }
+        /// <summary>
+        /// お知らせ更新
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        [HttpPost]
+        public IActionResult Edit(NewsModel model)
+        {
+            string? errorMessage;
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
 
+                // 入力規則チェック
+                if (!ModelState.IsValid)
+                {
+                    // log取得
+                    errorMessage = "E1011: " + ErrorMessagesResources.E1011;
+                    _logger.Error($"お知らせ更新失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
+                }
+
+                // お知らせ更新
+                var sql = NewsConnectController.CreateSQLToUpdateNews(model, DateTime.Now, user.UserName);
+                ConnectToSQLServer.ExecuteQuery(sql);
+
+                // log取得
+                _logger.Info($"お知らせ更新成功");
+
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+            catch (Exception ex)
+            {
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+        }
     }
 }

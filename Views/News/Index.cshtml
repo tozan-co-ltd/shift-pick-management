@@ -125,7 +125,8 @@
                     <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
-                    <form class="col-md-12" id="newsForm">
+                    <form class="col-md-12" id="newsFormEdit">
+                        <input type="hidden" asp-for="NewsID" id="NewsIDEdit" />
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayNameFor(model => model.CategoryClass)<span style="color:red">*</span></label>
@@ -164,7 +165,7 @@
                             <button class="btn btn-secondary btn-icon-split mb-2 mr-0 mr-sm-5" data-dismiss="modal" aria-label="Close">
                                 <span class="text">キャンセル</span>
                             </button>
-                            <button class="btn btn-success btn-icon-split mb-2" onclick="OnExecuteInsert()">
+                            <button class="btn btn-success btn-icon-split mb-2" onclick="OnExecuteEdit()">
                                 <span class="text" style="min-width:84px">更新</span>
                             </button>
                         </div>
@@ -225,7 +226,7 @@
 
     $(function() {
         $('.news-container').paginathing({//親要素のclassを記述
-            perPage: 10,//1ページあたりの表示件数
+            perPage: 30,//1ページあたりの表示件数
             prevText:'前へ',//1つ前のページへ移動するボタンのテキスト
             nextText:'次へ',//1つ次のページへ移動するボタンのテキスト
             activeClass: 'navi-active',//現在のページ番号に任意のclassを付与できます
@@ -238,9 +239,50 @@
         // ボタンを押した行のデータ取得
         var model =  @Html.Raw(Json.Serialize(Model));
         var news = model.newsList.find(({newsID}) => newsID == targetID);
-        $("#NewsSubjectEdit").val(news.newsSubject);
+        var newsDate = GetDayString(new Date(news.newsDate));
+        $('#NewsIDEdit').val(news.newsID);
         $('#CategoryClassEdit').val(news.categoryClass);
         $('#NewsContentEdit').val(news.newsContent);
+        $('#NewsDateEdit').val(newsDate);
     }
+
+    // 更新
+    function OnExecuteEdit() {
+        $('#newsFormEdit').submit(function (event) {
+            DeleteErrorMessages();
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Edit", "News")';
+            let method = 'POST';
+            let formId = 'newsFormEdit';
+            let data = $('#' + formId).serializeArray();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#edit-modal').hide();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#edit-modal-error-message").text(errorMessage);
+                }
+            });
+        });
+    }
+
 
 </script>
