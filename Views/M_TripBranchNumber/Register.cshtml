@@ -1,5 +1,5 @@
 ﻿@using ai_truck_load_measurement.Commons;
-@model ai_truck_load_measurement.Models.M_TripBranchNumberModel;
+@model ai_truck_load_measurement.Models.M_TripBranchNumberListViewModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = "マスター - 便マスター - 便枝番マスター - 登録";
@@ -45,6 +45,15 @@
                         </div>
                     </div>
                     <br />
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("Tag")</label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <input class="form-control" type="text" asp-for="Tag" autocomplete="off" id="Tag" required>
+                            <span class="text-danger w-100" asp-validation-for="Tag"></span>
+                        </div>
+                    </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
                             <label>@Html.DisplayName("RegistArrivalScheduledTime")<span style="color:red">*</span></label>

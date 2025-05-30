@@ -23,7 +23,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public IActionResult Index(bool? isChecked)
         {
-            M_TripModel model = new();
+            M_TripViewModel model = new();
 
             // 適用期間より前のデータが必要か
             bool isBeforeApplicablePeriod = true;
@@ -37,10 +37,11 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // ログインユーザーのメインデポ情報取得
-                var mainDepo = GetMainDepo();
-                model.MainDepo = mainDepo;
+                var user = ClaimsLoginUserData();
+                model.MainDepoID = user.MainDepoID;
+                model.MainDepoName = user.MainDepoName;
                 List<string> depoList = new();
-                depoList.Add(mainDepo.DepoID.ToString());
+                depoList.Add(user.MainDepoID.ToString());
 
                 IEnumerable<M_TripModel> tripList = new List<M_TripModel>();
 
@@ -49,7 +50,7 @@ namespace ai_truck_load_measurement.Controllers
                     // 便マスター情報取得SQL作成
                     var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod, depoList);
                     // DB接続
-                    tripList = M_TripConnectController.ConnectMTrips(sql);
+                    tripList = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(sql);
                 }
 
                 model.M_TripList = tripList.ToPagedList();
@@ -80,7 +81,7 @@ namespace ai_truck_load_measurement.Controllers
                     // 便マスター情報取得SQL作成
                     var sql = M_TripConnectController.CreateSQLToSelectMTrips(isBeforeApplicablePeriod, checkedDepos);
                     // DB接続
-                    tripList = M_TripConnectController.ConnectMTrips(sql);
+                    tripList = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(sql);
                 }
 
                 searchData += $@"
@@ -162,7 +163,7 @@ namespace ai_truck_load_measurement.Controllers
         [HttpGet]
         public IActionResult Register(bool isChecked, int id)
         {
-            M_TripModel model = new();
+            M_TripViewModel model = new();
             try
             {   
                 // 新しい適用期間の作成の場合
@@ -170,7 +171,7 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     // 便履歴IDから便履歴情報取得
                     var tripSql = M_TripConnectController.CreateSQLToSelectMTripHistoryByTripHistoryId(id);
-                    List<M_TripModel> tripList = M_TripConnectController.ConnectMTrips(tripSql);
+                    List<M_TripModel> tripList = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(tripSql);
 
                     // 同一便IDのデータが1つだけのとき以外はエラー
                     if (tripList.Count != 1)
@@ -178,11 +179,11 @@ namespace ai_truck_load_measurement.Controllers
                         ViewData["ErrorMessage"] = "E3004: " + ErrorMessagesResources.E3004;
                         return View(model);
                     }
-                    model = tripList[0];
+                    model = SetTripStatusToTripViewModel( tripList[0], model);
                 }
                 // 車両マスター情報取得
                 var truckSql = M_TruckConnectController.CreateSQLToSelectMTrucks();
-                IEnumerable<M_TruckModel> truckList = M_TruckConnectController.ConnectMTrucks(truckSql);
+                IEnumerable<M_TruckModel> truckList = ConnectToSQLServer.ExecuteQueryToList<M_TruckModel>(truckSql);
 
                 // 車両番号のセレクトリスト作成
                 foreach (var truck in truckList)
@@ -207,6 +208,18 @@ namespace ai_truck_load_measurement.Controllers
                 ViewData["ErrorMessage"] = "E9999: " + ErrorMessagesResources.E9999;
                 return View(model);
             }
+        }
+
+        private M_TripViewModel SetTripStatusToTripViewModel(M_TripModel tripModel, M_TripViewModel viewModel)
+        {
+            viewModel.TripName = tripModel.TripName;
+            viewModel.DriverName = tripModel.DriverName;
+            viewModel.TruckID = tripModel.TruckID;
+            viewModel.DayShiftStartTime = tripModel.DayShiftStartTime;
+            viewModel.DepoName = tripModel.DepoName;
+            viewModel.ApplicableStartDateTime = tripModel.ApplicableStartDateTime;
+            viewModel.ApplicableEndDateTime = tripModel.ApplicableEndDateTime;
+            return viewModel;
         }
 
         /// <summary>
@@ -341,7 +354,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             // 便名称が重複している便履歴の取得
             var duplicateMTripNameSql = M_TripConnectController.CreateSQLToSelectApplicablePeriodFromDuplicateMTripName(model);
-            var duplicateMTripNameList = M_TripConnectController.ConnectMTrips(duplicateMTripNameSql);
+            var duplicateMTripNameList = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(duplicateMTripNameSql);
 
             // 適用期間重複チェック
             bool isDupulicated = false;
@@ -378,11 +391,11 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     // 便マスター情報取得
                     var mTripSql = M_TripConnectController.CreateSQLToSelectMTripsForDataTable(isBeforeApplicablePeriod, referenceDate, checkedDepos);
-                    mTripDT = M_TripConnectController.ConnectMTripsToDataTable(mTripSql);
+                    mTripDT = ConnectToSQLServer.ConnectToDataTable(mTripSql);
 
                     // 便枝番マスター情報取得
                     var mTripBranchSql = M_TripConnectController.CreateSQLToSelectMTripBranchesForDataTable(referenceDate, checkedDepos);
-                    mTripBranchDT = M_TripConnectController.ConnectMTripsToDataTable(mTripBranchSql);
+                    mTripBranchDT = ConnectToSQLServer.ConnectToDataTable(mTripBranchSql);
                     // 便枝番マスターに枝連番列を追加
                     mTripBranchConsecutiveDT = SortDataTableFromBranchConsecutiveNumber(mTripBranchDT);
                 }
@@ -463,7 +476,7 @@ namespace ai_truck_load_measurement.Controllers
         public DataTable SortDataTableFromBranchConsecutiveNumber(DataTable dt)
         {
             // テーブルに枝連番列を追加
-            dt.Columns.Add("branch_consecutive_number", typeof(int)).SetOrdinal(13);
+            dt.Columns.Add("branch_consecutive_number", typeof(int)).SetOrdinal(dt.Columns.IndexOf("trip_branch_number_id") + 1);
 
             // 各便IDごとに
             int maxTripID = (int)dt.Select("trip_id = MAX(trip_id)", "")[0][0];

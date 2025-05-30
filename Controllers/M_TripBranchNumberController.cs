@@ -1,6 +1,8 @@
-﻿using ai_truck_load_measurement.ConnectControllers;
+﻿using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
+using DocumentFormat.OpenXml.Validation;
 using MathNet.Numerics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -23,18 +25,22 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public IActionResult Index(int tripId, bool isChecked)
         {
-            M_TripBranchNumberModel model = new();
+            M_TripBranchNumberListViewModel model = new();
+
+            // 便情報取得
+            var tripSql = M_TripBranchNumberConnectController.CreateSQLToSelectTripNameFromTripID(tripId);
+            var trip = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberListViewModel>(tripSql)[0];
 
             model.TripID = tripId;
             model.IsCheckedBeforeApplicablePeriod = isChecked;
-            model.TripName = M_TripBranchNumberConnectController.ConnectMTripForTripNameFromTripID(tripId);
+            model.TripName = trip.TripName;
 
             try
             {
                 // 便枝番マスター情報取得SQL作成
                 var sql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(tripId, true);
                 // DB接続
-                IEnumerable<M_TripBranchNumberModel> tripList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(sql);
+                IEnumerable<M_TripBranchNumberModel> tripList = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberModel>(sql);
 
                 model.M_TripBranchNumberList = tripList.ToPagedList();
 
@@ -74,7 +80,7 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // DB接続
-                List<M_TripBranchNumberModel> tripBranchNumberList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(sql);
+                List<M_TripBranchNumberModel> tripBranchNumberList = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberModel>(sql);
                 // 枝連番列を追加
                 if (!isBeforeApplicablePeriod)
                 {
@@ -95,7 +101,8 @@ namespace ai_truck_load_measurement.Controllers
                     searchData += $@"<th class=""font-weight-bold"">枝連番</th>";
 
                 }
-                 searchData +=   $@"<th class=""font-weight-bold"">到着予定時間</th>
+                 searchData +=   $@"<th class=""font-weight-bold"">タグ</th>
+                                    <th class=""font-weight-bold"">到着予定時間</th>
                                     <th class=""font-weight-bold"">出発予定時間</th>
                                     <th class=""font-weight-bold"">適用開始日時</th>
                                     <th class=""font-weight-bold"">適用終了日時</th>
@@ -125,6 +132,7 @@ namespace ai_truck_load_measurement.Controllers
 
                         }
                         searchData += $@"
+                                    <td>{item.Tag}</td>
                                     <td>{@item.ArrivalScheduledTime.ToString("HH:mm")}</td>
                                     <td>{@item.DepartureScheduledTime.ToString("HH:mm")}</td>
                                     <td>{@item.ApplicableStartDateTime.ToString("yyyy/MM/dd HH:mm")}</td>
@@ -211,6 +219,10 @@ namespace ai_truck_load_measurement.Controllers
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
 
+                // タグが未入力の場合、空文字を登録する
+                if (string.IsNullOrEmpty(model.Tag))
+                    model.Tag = "";
+
                 // 入力規則チェック
                 if (!ModelState.IsValid)
                 {
@@ -233,7 +245,8 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // 便枝番マスター更新
-                M_TripBranchNumberConnectController.UpdateMTripBranchNumber(model, user);
+                var sql = M_TripBranchNumberConnectController.CreateSQLToUpdateMTripBranchNumber(model, DateTime.Now, user.UserName);
+                ConnectToSQLServer.ExecuteQuery(sql);
 
                 // log取得
                 _logger.Info($"便枝番マスター更新成功 便名称:{model.TripName}");
@@ -270,7 +283,7 @@ namespace ai_truck_load_measurement.Controllers
         [HttpGet]
         public IActionResult Register(bool isChecked, int id, string tripName)
         {
-            M_TripBranchNumberModel model = new();
+            M_TripBranchNumberListViewModel model = new();
             try
             {
                 model.TripID = id;
@@ -323,7 +336,8 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // 便枝番マスター登録
-                M_TripBranchNumberConnectController.InsertMTripBranchNumber(model, user);
+                var sql = M_TripBranchNumberConnectController.CreateSQLToInsertMTripBranchNumber(model, DateTime.Now, user.UserName);
+                ConnectToSQLServer.ExecuteQuery(sql);
 
                 // log取得
                 _logger.Info($"便枝番マスター登録成功 便名称:{model.TripName}");
@@ -358,7 +372,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             // 便IDが重複している便履歴の取得
             var duplicateTripIDSql = M_TripBranchNumberConnectController.CreateSQLToSelectTimesFromDuplicateTripID(model);
-            var duplicateMTripNameList = M_TripBranchNumberConnectController.ConnectMTripBranchNumbers(duplicateTripIDSql);
+            var duplicateMTripNameList = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberModel>(duplicateTripIDSql);
 
             // 適用期間重複チェック
             bool isDupulicated = false;

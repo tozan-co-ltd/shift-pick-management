@@ -60,10 +60,18 @@ label{
 }
 
 .icon-categoryid-1::before {
-    content: '\f0d1';
+    content: '\f26c';
 }
 
 .icon-categoryid-2::before {
+    content: '\f0d1';
+}
+
+.icon-categoryid-3::before {
+    content: '\f05a';
+}
+
+.icon-categoryid-4::before {
     content: '\f0ad';
 }
 
@@ -867,7 +875,7 @@ select[readonly] {
 }
 
 .table-center td{
-    text-align:center !important;
+    text-align:center;
 }
 
 .table-center th{
@@ -1111,3 +1119,185 @@ table.dataTable span.column_highlight {
 .navbar-dark-test {
     background-color: #D297FC; 
 }
+
+/*---------------------------------------------------------------------------*/
+/* KEYFRAMES */
+
+
+
+.loader,
+.loader:after {
+    border-radius: 50%;
+    width: 4em;
+    height: 4em;
+}
+
+.loader {
+    font-size: 10px;
+    position: relative;
+    text-indent: -9999em;
+    border-top: 0.44em solid rgba(51,204,255, 0.2);
+    border-right: 0.44em solid rgba(51,204,255, 0.2);
+    border-bottom: 0.44em solid rgba(51,204,255, 0.2);
+    border-left: 0.44em solid #33ccff;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-animation: load8 1.1s infinite linear;
+    animation: load8 1.1s infinite linear;
+}
+
+.loader-modal,
+.loader-modal:after {
+    border-radius: 50%;
+    width: 40em;
+    height: 40em;
+}
+
+.loader-modal {
+    font-size: 10px;
+    position: relative;
+    text-indent: -9999em;
+    border-top: 4.4em solid rgba(51,204,255, 0.2);
+    border-right: 4.4em solid rgba(51,204,255, 0.2);
+    border-bottom: 4.4em solid rgba(51,204,255, 0.2);
+    border-left: 4.4em solid #33ccff;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-animation: load8 1.1s infinite linear;
+    animation: load8 1.1s infinite linear;
+}
+
+@-webkit-keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/*-------------------------------news list ---------------------------------*/
+.news-list {
+    list-style: none outside;
+    margin: 0;
+    padding: 0;
+}
+
+    .news-list .item div {
+        display: flex;
+        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        text-decoration: none;
+        color: #333;
+        border-bottom: 1px solid #CCC;
+        padding: 20px 20px;
+    }
+
+    .news-list .item:first-child div {
+        border-top: 1px solid #CCC;
+    }
+
+    .news-list .item .date {
+        margin: 0;
+        min-width: 140px;
+        font-size: 16px;
+        color: #999;
+        padding: 0 20px 0 0;
+    }
+
+    .news-list .item .category {
+        margin: 0;
+        min-width: 140px;
+        padding: 0 20px 0 0;
+    }
+
+        .news-list .item .category span {
+            background: #999;
+            color: #FFF;
+            text-align: center;
+            display: inline-block;
+            padding: 5px 20px;
+            font-size: 12px;
+            line-height: 1;
+        }
+
+    .news-list .item .title {
+        margin: 0;
+        width: 100%;
+    }
+
+    .news-list .item div:hover .title {
+        color: #00F;
+    }
+
+@media screen and (max-width: 767px) {
+    .news-list .item div {
+        flex-wrap: wrap;
+    }
+
+    .news-list .item .date {
+        min-width: 100px;
+    }
+
+    .news-list .item .title {
+        margin-top: 10px;
+    }
+}
+
+.news-category span {
+    background: #999;
+    color: #FFF;
+    text-align: center;
+    display: inline-block;
+    padding: 5px 20px;
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* ëïè¸ */
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+}
+
+body {
+    margin: 20px;
+}
+
+.pagination-container a {
+    padding: 10px 20px;
+    display: block;
+    color: #0076BF;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    background: #fff;
+}
+
+.pagination-container .navi-active a {
+    font-weight: bold;
+    background: #fafafa;
+}
+
+/*---------------------------------------------------------------------------*/

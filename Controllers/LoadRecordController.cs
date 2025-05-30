@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using NPOI.SS.Formula.Functions;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Bibliography;
+using ai_truck_load_measurement.Commons;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -54,6 +55,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public static DataTable GetConvertedLoadClassDataTable(DataTable dt)
         {
+
             // テーブルに値を変換した後の文字列を格納する列を追加
             dt.Columns.Add("converted_branch_seq", typeof(string)).SetOrdinal(dt.Columns.IndexOf("trip_branch_seq"));
             dt.Columns.Add("converted_truck_number", typeof(string)).SetOrdinal(dt.Columns.IndexOf("truck_number"));
@@ -176,10 +178,10 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
         {
-            var isSameAnnotationLoadsExist = LoadRecordConnectController.IsSameAnnotationLoadsExist(model.TripRecordID, isArrived);
+            var isSameAnnotationLoadsExist = IsSameAnnotationLoadsExist(model.TripRecordID, isArrived);
             if (isSameAnnotationLoadsExist)
             {
-                var annotationLoadClass = LoadRecordConnectController.GetAnnotationLoadClassByTripRecordIDAndIsArrived(model.TripRecordID, isArrived);
+                var annotationLoadClass = GetAnnotationLoadClassByTripRecordIDAndIsArrived(model.TripRecordID, isArrived);
                 model.AnnotationLoadClass = annotationLoadClass;
                 var annotationLoadStatus = ConversionLoadClassToLoadStatus(annotationLoadClass);
                 model.AnnotationLoadStatus = annotationLoadStatus;
@@ -270,7 +272,7 @@ namespace ai_truck_load_measurement.Controllers
             var searchData = string.Empty;
             IEnumerable<LoadRecordModel> tripRecordList;
             // DB接続
-            tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
+            tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql);
             // 荷量のクラスを数値に、画像パスをBase64に変換
             tripRecordList = ConversionForTable(tripRecordList);
             searchData += $@"
@@ -280,8 +282,9 @@ namespace ai_truck_load_measurement.Controllers
                             <tr align=""center"">
                                 <th hidden>便実績ID</th>
                                 <th hidden>便名称有無</th>
-                                <th class=""font-weight-bold"">便名称<br></th>
+                                <th class=""font-weight-bold"">便名称</th>
                                 <th class=""font-weight-bold"">便枝番</th>
+                                <th class=""font-weight-bold"">タグ</th>
                                 <th class=""font-weight-bold"">乗務員</th>
                                 <th class=""font-weight-bold"">ステーション<br>名</th>
                                 <th class=""font-weight-bold"">車両<br>番号</th>
@@ -318,7 +321,8 @@ namespace ai_truck_load_measurement.Controllers
                             <td hidden>{item.TripRecordID}</td>
                             <td hidden>{hasTripName}</td>
                             <td>{item.TripName}</td>
-                            <td>{item.TripBranchSeq}</td>
+                            <td>{item.TripBranchSeq}</td>   
+                            <td>{item.Tag}</td>   
                             <td>{item.DriverName}</td>
                             <td>{item.StationName}</td>
                             <td>{truckNumber}</td>
@@ -385,19 +389,22 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // 「荷量の相違あり」で保存した値が既に存在するか
-                var isSameAnnotationLoadsExist = LoadRecordConnectController.IsSameAnnotationLoadsExist(tripRecordID, isArrived);
+                var isSameAnnotationLoadsExist = IsSameAnnotationLoadsExist(tripRecordID, isArrived);
+                var sql = "";
 
                 // 「荷量の相違あり」の設定値を更新、保存
                 if (isSameAnnotationLoadsExist)
                 {
                     // 更新
-                    LoadRecordConnectController.UpdateAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
+                    sql = LoadRecordConnectController.CreateSQLToUpdateAnnotationLoads(tripRecordID, loadStatus, user.UserName, DateTime.Now, isArrived);
                 }
                 else
                 {
                     // 新規保存
-                    LoadRecordConnectController.InsertAnnotationLoads(tripRecordID, loadStatus, isArrived, user);
+                    sql = LoadRecordConnectController.CreateSQLToInsertAnnotaionLoads(tripRecordID, loadStatus, user.UserName, DateTime.Now, isArrived);
                 }
+
+                ConnectToSQLServer.ExecuteQuery(sql);
 
                 return Ok();
             }
@@ -440,7 +447,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(startOfPeriod, endOfPeriod, checkedDepos);
                 // DB接続
-                tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
+                tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql);
 
                 return tripRecordList;
             }
@@ -562,7 +569,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql = LoadRecordConnectController.CreateSQLToSelectTripBranchSeqFromTripName(tripName, startOfPeriod, endOfPeriod);
                 // DB接続
-                tripBranchSeqList = LoadRecordConnectController.ConnectTTripRecordsForTripBranchSeq(sql);
+                tripBranchSeqList = ConnectToSQLServer.ExecuteQueryToList<int>(sql);
 
                 return tripBranchSeqList;
             }
@@ -582,7 +589,7 @@ namespace ai_truck_load_measurement.Controllers
         public static List<LoadRecordModel> CommonSearchTrips(string sql)
         {
             // DB接続
-            var loadClasses = LoadRecordConnectController.ConnectTTripRecords(sql);
+            var loadClasses = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql);
             // 荷量クラスをパーセント表示に変換
             foreach (var loadClass in loadClasses)
             {
@@ -608,7 +615,7 @@ namespace ai_truck_load_measurement.Controllers
 
             // デポ名リスト作成
             var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
-            var checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
+            var checkedDeposName = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(deposNameSQL);
 
             for (int i = 0; i < checkedDeposName.Count; i++)
             {
@@ -621,6 +628,71 @@ namespace ai_truck_load_measurement.Controllers
 
             return selectedDepos;
         }
+
+        /// <summary>
+        /// ログインユーザーからメインデポ情報を取得、保存する
+        /// </summary>
+        /// <param name="model">保存先モデル</param>
+        /// <param name="user">ログインユーザー</param>
+        /// <returns></returns>
+        public static LoadRecordViewModel SetMainDepoInfo(LoadRecordViewModel model, LoginUserModel user)
+        {
+            // ログイン中ユーザー情報取得
+            model.UserName = user.UserName;
+            model.MainDepoID = user.MainDepoID;
+            model.MainDepoName = user.MainDepoName;
+            return model;
+        }
+
+
+        /// <summary>
+        ///「荷量の相違あり」で保存した値があるか
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="isArrived">到着か否か</param>
+        public static bool IsSameAnnotationLoadsExist(int tripRecordID, bool isArrived)
+        {
+            // 戻り値
+            var isAnnotationLoadsExist = false;
+
+            try
+            {
+                string sql = LoadRecordConnectController.CreateSQLToSelectAnnotationLoadClassByTripRecordIDAndIsArrived(tripRecordID, isArrived);
+                // 同じ便実績IDかつ到着か否かが一致するデータが存在する場合、値が代入される
+                var reader = ConnectToSQLServer.ExecuteQueryScalar(sql);
+                if (reader != null)
+                {
+                    isAnnotationLoadsExist = true;
+                }
+                return isAnnotationLoadsExist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// 便実績IDと到着か否かから訂正後荷量クラスを取得する
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        public static int GetAnnotationLoadClassByTripRecordIDAndIsArrived(int tripRecordID, bool isArrived)
+        {
+            try
+            {
+                string sql = LoadRecordConnectController.CreateSQLToSelectAnnotationLoadClassByTripRecordIDAndIsArrived(tripRecordID, isArrived);
+                var annotationLoadClass = Convert.ToInt32(ConnectToSQLServer.ExecuteQueryScalar(sql));
+                return annotationLoadClass;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
+
 
 }

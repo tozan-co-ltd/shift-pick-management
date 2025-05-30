@@ -2,7 +2,7 @@
 @model ai_truck_load_measurement.Models.TopModel;
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = "トップ";
+    ViewData["Title"] = Model.ViewTitle; ;
 }
 <style>
     /* カードレイアウト部分をラッピングし、
@@ -121,7 +121,7 @@
                         <select class="form-select" name="DepoID"  asp-items="@Model.MDepoList" id="selectDepo"></select>
                     </div>
                 </div>
-                <span class="spinner-border" style="display: none; vertical-align: middle; margin-left: 10px" role="status" id="loading"></span>
+                <span class="loader" style="display: none; vertical-align: middle; " role="status" id="loading"></span>
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
@@ -183,6 +183,10 @@
         // カード要素の初期化
         $("#cardlayout-wrap")[0].innerHTML = "";
         for (var i = 1; i <= top_model.viewCardModelList.length; i++) {
+
+            if(i!=14){
+
+            }
             var cardModel = top_model.viewCardModelList.find(x => x.stationSeq == i);
 
             // カード要素生成
@@ -206,8 +210,9 @@
                 $('#truck-status' + i).text("　");
             }
 
-            
+
             $('#image' + i).attr("src", cardModel.imageBase64);
+            
         }
     }
 
@@ -275,7 +280,7 @@
     function switchFunamiCaution(depoID){
         // 船見デポの場合、注意分表示
         if (depoID == 3) {
-            $("#funamiCaution")[0].innerText = "船見デポ1番、5番、7番以外は常に「空車」表示になっています。";
+            $("#funamiCaution")[0].innerText = "船見デポ1番、3番、5番、7番以外は常に「空車」表示になっています。";
         }
         else {
             $("#funamiCaution")[0].innerText = "";
@@ -284,10 +289,10 @@
 
     function getStationTitle(depoName){
         if(depoName == null){
-            return "ステーション状況";
+            return "デポを選択してください";
         }
         else{
-            return depoName + "　ステーション状況";
+            return "";
         }
     }
 

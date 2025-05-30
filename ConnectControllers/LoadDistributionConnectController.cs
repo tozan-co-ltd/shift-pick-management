@@ -9,36 +9,6 @@ namespace ai_truck_load_measurement.ConnectControllers
 {
     public class LoadDistributionConnectController
     {
-        /// <summary>
-        /// 便実績情報取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static List<LoadDistributionModel> ConnectTTripRecords(string sql)
-        {
-            // 戻り値
-            List<LoadDistributionModel> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<LoadDistributionModel>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
 
         /// <summary>
         /// 便名称取得SQL
@@ -131,13 +101,14 @@ namespace ai_truck_load_measurement.ConnectControllers
                     trip_record_id,
 	                trip_name,
 	                trip_branch_seq,
+                    TripBranchNumbers.tag,
 	                TripRecords.driver_name,
 	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
                     Depos.name AS depo_name,
-	                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
-	                CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+	                CONVERT(DATETIME, TripRecords.arrival_scheduled_time) AS arrival_scheduled_time,
+	                CONVERT(DATETIME, TripRecords.departure_scheduled_time) AS departure_scheduled_time,
 	                work_day,
 	                arrived_at,
 	                departed_at,
@@ -154,6 +125,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id
+                LEFT OUTER JOIN
+                m_trip_branch_numbers AS TripBranchNumbers
+                ON
+                TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id
                 WHERE ({selectedTrips})
                 AND work_day BETWEEN '{startOfPeriod}' AND '{endOfPeriod}'
                 AND ((departure_load_class BETWEEN {minLoadClass} AND {maxLoadClass})
@@ -163,7 +138,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// データベース用便実績情報取得SQL
+        /// データテーブル用便実績情報取得SQL
         /// </summary>
         /// <param name="models">選択された便情報保持クラス</param>
         /// <param name="startOfPeriod">期間の開始日時</param>
@@ -180,13 +155,14 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT
 	                trip_name,
 	                trip_branch_seq,
+                    TripBranchNumbers.tag,
 	                TripRecords.driver_name,
 	                Stations.name AS station_name,
 	                truck_number,
 	                identify_number,
                     Depos.name AS depo_name,
-	                FORMAT(CONVERT(DATETIME, arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
-	                FORMAT(CONVERT(DATETIME, departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
+	                FORMAT(CONVERT(DATETIME, TripRecords.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
+	                FORMAT(CONVERT(DATETIME, TripRecords.departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
 	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
 	                FORMAT(arrived_at, 'yyyy/MM/dd HH:mm'),
 	                FORMAT(departed_at, 'yyyy/MM/dd HH:mm'),
@@ -203,6 +179,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id
+                LEFT OUTER JOIN
+                m_trip_branch_numbers AS TripBranchNumbers
+                ON
+                TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id
                 WHERE ({selectedTrips})
                 AND work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 AND ((departure_load_class BETWEEN {minLoadClass} AND {maxLoadClass})

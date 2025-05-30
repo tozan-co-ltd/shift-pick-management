@@ -10,170 +10,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class M_UserConnectController 
     {
         /// <summary>
-        /// ユーザー情報取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static List<M_UserModel> ConnectMUsers(string sql)
-        {
-            // 戻り値
-            List<M_UserModel> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<M_UserModel>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// ユーザー情報登録
-        /// </summary>
-        /// <param name="model">登録情報</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>インサート数</returns>
-        public static int InsertMUser(M_UserModel model, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToInsertMUser(model, sysDate, loginUser.UserName);
-                    var insertedCount = connection.Execute(sql);
-                    return insertedCount;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
-        /// ユーザー情報更新
-        /// </summary>
-        /// <param name="model">登録情報</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>更新件数</returns>
-        public static int UpdateMUser(M_UserModel model, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToUpdateMUser(model, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
-
-                    return count;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
-        /// ユーザー情報削除
-        /// </summary>
-        /// <param name="userId">ユーザーID</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>更新件数</returns>
-        public static int DeleteMUser(int userId, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-                // DB接続
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToDeleteMUser(userId, sysDate, loginUser.UserName);
-                    var count = connection.Execute(sql);
-
-                    return count;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// ユーザー情報をデータテーブルとして取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static DataTable ConnectMUsersToDataTable(string sql)
-        {
-            // 戻り値
-            DataTable dataTable = new DataTable();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandText = sql;
-                    var adapter = new SqlDataAdapter(command);
-                    adapter.Fill(dataTable);
-                }
-                return dataTable;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// ユーザー情報取得用SQL
         /// </summary>
         /// <returns></returns>
@@ -186,6 +22,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                    Users.depo_id,
                    Depos.name AS depo_name,
                    Users.authorized_kubun,
+                   Users.is_required_mail,
+                   Users.mail_address,
                    Users.created_at,
                    Users.created_by,
                    Users.updated_at,
@@ -245,6 +83,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     Users.ad_name,
                     Depos.name AS depo_name,
                     Users.authorized_kubun,
+                    Users.is_required_mail,
+                    Users.mail_address,
                     Users.is_deleted,
                     FORMAT (Users.created_at, 'yyyy/MM/dd HH:mm:ss'),
                     Users.created_by,
@@ -269,7 +109,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="createdAt">システムタイム</param>
         /// <param name="createdBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToInsertMUser(M_UserModel model, DateTime createdAt, string createdBy)
+        public static string CreateSQLToInsertMUser(M_UserModel model, DateTime createdAt, string createdBy)
         {
             string formatCreatedAt = createdAt.ToString("yyyy/MM/dd HH:mm:ss");
 
@@ -278,6 +118,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     ad_name, 
                     depo_id,
                     authorized_kubun,
+                    is_required_mail,
+                    mail_address,
                     created_at,
                     created_by,
                     updated_at,
@@ -287,6 +129,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     '{model.ADName}',
                     '{model.DepoID}',
                     '{model.AuthorizedKubun}',
+                    '{model.IsRequiredMail}',
+                    '{model.MailAddress}',
                     '{formatCreatedAt}',
                     '{createdBy}',
                     '{formatCreatedAt}',
@@ -296,6 +140,30 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// ユーザーマスター再登録SQL作成
+        /// </summary>
+        /// <param name="userId">ユーザーID</param>
+        /// <param name="updatedAt">システムタイム</param>
+        /// <param name="updatedBy">登録者名</param>
+        /// <returns></returns>
+        public static string CreateSQLToReInsertMUser(M_UserModel model, DateTime updatedAt, string updatedBy)
+        {
+            var sql = $@"
+                UPDATE m_users
+                SET 
+                    depo_id = {model.DepoID},
+                    authorized_kubun = '{model.AuthorizedKubun}',
+                    is_required_mail = '{model.IsRequiredMail}',
+                    mail_address = '{model.MailAddress}',
+                    is_deleted = 0,
+                    updated_at = '{updatedAt}',
+                    updated_by = '{updatedBy}'
+                WHERE 
+                    ad_name = '{model.ADName}'
+            ;";
+            return sql;
+        }
 
         /// <summary>
         /// ユーザーマスター更新SQL作成
@@ -304,7 +172,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToUpdateMUser(M_UserModel model, DateTime updatedAt, string updatedBy)
+        public static string CreateSQLToUpdateMUser(M_UserModel model, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                 UPDATE m_users
@@ -312,6 +180,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     ad_name = '{model.ADName}',
                     depo_id = '{model.DepoID}',
                     authorized_kubun = '{model.AuthorizedKubun}',
+                    is_required_mail = '{model.IsRequiredMail}',
+                    mail_address = '{model.MailAddress}',
                     updated_at = '{updatedAt}',
                     updated_by = '{updatedBy}'
                 WHERE
@@ -328,7 +198,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// <param name="updatedAt">システムタイム</param>
         /// <param name="updatedBy">ユーザー名</param>
         /// <returns>SQL文</returns>
-        private static string CreateSQLToDeleteMUser(int userId, DateTime updatedAt, string updatedBy)
+        public static string CreateSQLToDeleteMUser(int userId, DateTime updatedAt, string updatedBy)
         {
             var sql = $@"
                 UPDATE m_users
@@ -361,6 +231,26 @@ namespace ai_truck_load_measurement.ConnectControllers
                     ad_name = '{model.ADName}'
                     AND user_id <> {model.UserID}
                     and is_deleted = 0
+            ";
+
+            return sql;
+        }
+
+        /// <summary>
+        /// 削除済みの重複AD名情報取得SQL作成
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public static string CreateSQLToDuplicateDeletedADName(string adName)
+        {
+            var sql = $@"
+                SELECT
+                    COUNT(*)                      
+                FROM 
+                    m_users
+                WHERE
+                    ad_name = '{adName}'
+                    and is_deleted = 1
             ";
 
             return sql;

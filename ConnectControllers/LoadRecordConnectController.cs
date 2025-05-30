@@ -11,70 +11,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class LoadRecordConnectController
     {
         /// <summary>
-        /// 便実績情報取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static List<LoadRecordModel> ConnectTTripRecords(string sql)
-        {
-            // 戻り値
-            List<LoadRecordModel> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<LoadRecordModel>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// 便実績情報をデータテーブルとして取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static DataTable ConnectTTripRecordToDataTable(string sql)
-        {
-            // 戻り値
-            DataTable dataTable = new DataTable();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandText = sql;
-                    var adapter = new SqlDataAdapter(command);
-                    adapter.Fill(dataTable);
-                }
-                return dataTable;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// 選択された便名称と便枝番からSQLの検索条件箇所を作成する
         /// </summary>
         /// <param name="models">選択された便名称と便枝番のリスト</param>
@@ -94,206 +30,6 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// 便名称取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <param name="">データベース名</param>
-        /// <returns></returns>
-        public static List<SelectListItem> ConnectTTripRecordsForTripName(string sql)
-        {
-            // 戻り値
-            List<SelectListItem> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<SelectListItem>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// 便枝番リスト取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <param name="">データベース名</param>
-        /// <returns></returns>
-        public static List<int> ConnectTTripRecordsForTripBranchSeq(string sql)
-        {
-            // 戻り値
-            List<int> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<int>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
-        /// <summary>
-        /// 便実績IDと到着か否かから訂正後荷量クラスを取得する
-        /// </summary>
-        /// <param name="tripRecordID">便実績ID</param>
-        /// <param name="isArrived">到着か否か</param>
-        /// <returns></returns>
-        public static int GetAnnotationLoadClassByTripRecordIDAndIsArrived(int tripRecordID, bool isArrived)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                try
-                {
-                    string sql = CreateSQLToSelectAnnotationLoadClassByTripRecordIDAndIsArrived(tripRecordID, isArrived);
-                    var annotationLoadClass = Convert.ToInt32(connection.ExecuteScalar(sql));
-                    return annotationLoadClass;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-
-            }
-        }
-
-
-        /// <summary>
-        ///「荷量の相違あり」で保存した値があるか
-        /// </summary>
-        /// <param name="tripRecordID">便実績ID</param>
-        /// <param name="isArrived">到着か否か</param>
-        public static bool IsSameAnnotationLoadsExist(int tripRecordID, bool isArrived)
-        {
-            // 戻り値
-            var isAnnotationLoadsExist = false;
-
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                try
-                {
-                    string sql = CreateSQLToSelectAnnotationLoadClassByTripRecordIDAndIsArrived(tripRecordID, isArrived);
-                    // 同じ便実績IDかつ到着か否かが一致するデータが存在する場合、値が代入される
-                    var reader = connection.ExecuteScalar(sql);
-                    if (reader != null)
-                    {
-                        isAnnotationLoadsExist = true;
-                    }
-                    return isAnnotationLoadsExist;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 荷量の相違あり情報更新
-        /// </summary>
-        /// <param name="tripRecordID">便実績ID</param>
-        /// <param name="loadStatus">荷量クラス</param>
-        /// <param name="isArrived">到着か否か</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>インサート数</returns>
-        public static int UpdateAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToUpdateAnnotationLoads(tripRecordID, loadStatus, loginUser.UserName, sysDate, isArrived);
-                    var insertedCount = connection.Execute(sql);
-                    return insertedCount;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-
-            }
-        }
-
-
-        /// <summary>
-        /// 荷量の相違あり情報登録
-        /// </summary>
-        /// <param name="tripRecordID">便実績ID</param>
-        /// <param name="loadStatus">荷量クラス</param>
-        /// <param name="isArrived">到着か否か</param>
-        /// <param name="loginUser">ログインユーザー情報</param>
-        /// <returns>インサート数</returns>
-        public static int InsertAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived, LoginUserModel loginUser)
-        {
-            // SQLServer接続文字列取得
-            var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-            // SQLServer接続
-            using (var connection = new SqlConnection())
-            {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                try
-                {
-                    DateTime sysDate = DateTime.Now;
-                    string sql = CreateSQLToInsertAnnotaionLoads(tripRecordID, loadStatus, loginUser.UserName, sysDate, isArrived);
-                    var insertedCount = connection.Execute(sql);
-                    return insertedCount;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-
-            }
-        }
-
-
-        /// <summary>
         /// 便実績情報取得SQL
         /// </summary>
         /// <returns></returns>
@@ -304,13 +40,14 @@ namespace ai_truck_load_measurement.ConnectControllers
                     trip_record_id,
                     trip_name,
                     trip_branch_seq,
+                    TripBranchNumbers.tag,
                     TripRecords.driver_name,
 	                Stations.name AS station_name,
                     truck_number,
                     identify_number,
 	                Depos.name AS depo_name,
-                    CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
-                    CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+                    CONVERT(DATETIME, TripRecords.arrival_scheduled_time) AS arrival_scheduled_time,
+                    CONVERT(DATETIME, TripRecords.departure_scheduled_time) AS departure_scheduled_time,
                     work_day,
                     arrived_at,
                     departed_at,
@@ -326,7 +63,11 @@ namespace ai_truck_load_measurement.ConnectControllers
                 INNER JOIN
                 m_depos AS Depos
                 ON
-                Stations.depo_id = Depos.depo_id";
+                Stations.depo_id = Depos.depo_id
+                LEFT OUTER JOIN
+                m_trip_branch_numbers AS TripBranchNumbers
+                ON
+                TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id";
             return sql;
         }
 

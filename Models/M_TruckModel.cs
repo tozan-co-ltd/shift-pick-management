@@ -1,4 +1,5 @@
-﻿using ai_truck_load_measurement.Properties;
+﻿using ai_truck_load_measurement.Models;
+using ai_truck_load_measurement.Properties;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
@@ -68,4 +69,41 @@ namespace ai_truck_load_measurement.Models
         [Display(Name = "更新者")]
         public string? UpdatedBy { get; set; }
     }
+
+
+    /// <summary>
+    /// 車両マスターのビューモデル
+    /// </summary>
+    public class M_TruckListViewModel : CommonModel
+    {
+        /// <summary>
+        /// 車両リスト
+        /// </summary>
+        public IPagedList<M_TruckModel>? M_TruckList { get; set; }
+
+        /// <summary>
+        /// 車両ID
+        /// </summary>
+        [Display(Name = "車両ID")]
+        public int TruckID { get; set; }
+
+        /// <summary>
+        /// 車両番号
+        /// </summary>
+        [Display(Name = "車両番号")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [RegularExpression(@"^[0-9]{1,4}$", ErrorMessage = "最大4桁の半角数字で入力してください。")]
+        public string? TruckNumber { get; set; }
+
+        /// <summary>
+        /// 識別番号
+        /// </summary>
+        [Display(Name = "識別番号")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [RegularExpression(@"^[0-9]{4,4}$", ErrorMessage = "4桁の半角数字で入力してください。")]
+        public string? IdentifyNumber { get; set; }
+
+    }
 }
+
+

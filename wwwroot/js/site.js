@@ -348,6 +348,10 @@ function EditModal(tripRecordID, isArrived, page) {
     // デフォルトの操作を無効化
     event.preventDefault();
 
+    // ローディング画像表示
+    $("#modal-content").css('display', 'none');
+    $("#loading-modal").css('display', 'inline-block');
+
     // LoadOutputModel取得
     var tripRecordModel = model.tripRecordList;
     tripRecordModel.forEach(function (item) {
@@ -439,7 +443,7 @@ function EditModal(tripRecordID, isArrived, page) {
                     + "<td>荷量の相違あり</td>"
                     + "<td>"
                     + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">";
-                if (authorizedKubun == "1") {
+                if (authorizedKubun == "1" || authorizedKubun == "2") {
                     tr += "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" id=\"loadStatusSelect\" >"
                         + "<option value=\"\" hidden></option>"
                         + "<option value=\"1\">0%</option>"
@@ -466,6 +470,9 @@ function EditModal(tripRecordID, isArrived, page) {
                     + "</tr><tr>"
                     + "<td>便名称_便枝番</td>"
                     + "<td>" + tripNameAndBranchSeq + "</td>"
+                    + "</tr><tr>"
+                    + "<td>タグ</td>"
+                    + "<td>" + item.tag + "</td>"
                     + "</tr><tr>"
                     + "<td>乗務員</td>"
                     + "<td>" + item.driverName + "</td>"
@@ -494,6 +501,9 @@ function EditModal(tripRecordID, isArrived, page) {
                     $('#loadStatusSelect').text("-");
                 }
 
+                // ローディング画像非表示
+                $("#modal-content").css('display', 'inline-block');
+                $("#loading-modal").css('display', 'none');
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
                 $("#edit-modal-error-message").text(errorMessage);
@@ -511,7 +521,8 @@ function onOtherModalClick(otherTripRecordID, isArrived, page) {
     } else {
         isArrived = false;
     }
-    EditModal(otherTripRecordID, isArrived, page);
+    if(otherTripRecordID != 'undefined')
+        EditModal(otherTripRecordID, isArrived, page);
 }
 
 // 要検証ボタン押下時
@@ -597,6 +608,10 @@ function tableDisplayCommon(page, data) {
                 "sSearch": ""
             },
             dom: dom_structure,
+            "columnDefs": [
+                { className:"dt-body-left", "targets": [4] },
+                { className:"dt-body-left", "targets": [2] },
+            ],
         });
         var table = $("#tripRecordDataTable").DataTable();
         table.on('draw', function () {
@@ -605,6 +620,10 @@ function tableDisplayCommon(page, data) {
             body.unhighlight();
             body.highlight(table.search());
         });
+
+
+        if (document.querySelector("#loading") != null)
+            document.querySelector("#loading").style.display = "none";
     }).fail(function (jqXHR, textStatus, errorThrown) {
         var errorMessage = jqXHR.responseJSON.errorMessage;
         $("#edit-modal-error-message").text(errorMessage);
@@ -917,7 +936,7 @@ function addDepos(model) {
 
 // 画面表示時にログインユーザーのメインデポにチェックを入れる
 function depoCheckDisplay(model) {
-    var mainDepoID = model.mainDepo.depoID;
+    var mainDepoID = model.mainDepoID;
     if (mainDepoID == 0)
         return;
     var depos = $('input[name=depos]');
