@@ -701,6 +701,21 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("更新日時");
                     headerList.Add("更新者");
                     break;
+                case "通知マスター":
+                    headerList.Add("通知ID");
+                    headerList.Add("便名称");
+                    headerList.Add("便枝番");
+                    headerList.Add("デポ");
+                    headerList.Add("到着荷量下限");
+                    headerList.Add("出発荷量下限");
+                    headerList.Add("通知開始日時");
+                    headerList.Add("通知終了日時");
+                    headerList.Add("削除フラグ");
+                    headerList.Add("作成日時");
+                    headerList.Add("作成者");
+                    headerList.Add("更新日時");
+                    headerList.Add("更新者");
+                    break;
                 default:
                     headerList.Add("項目名");
                     headerList.Add("検索条件");
@@ -743,6 +758,14 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("便枝番マスター作成者");
                     headerList.Add("便枝番マスター更新日時");
                     headerList.Add("便枝番マスター更新者");
+                    break;
+                case "通知マスター":
+                    headerList.Add("通知ユーザーID");
+                    headerList.Add("通知ID");
+                    headerList.Add("AD名");
+                    headerList.Add("削除フラグ");
+                    headerList.Add("作成日時");
+                    headerList.Add("作成者");
                     break;
                 default:
                     headerList.Add("便名称");
