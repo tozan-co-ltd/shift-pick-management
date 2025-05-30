@@ -178,6 +178,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public LoadRecordModel GetModalItems(LoadRecordModel model, bool isArrived)
         {
+            // 「荷量の相違あり」で保存した値がある場合
             var isSameAnnotationLoadsExist = IsSameAnnotationLoadsExist(model.TripRecordID, isArrived);
             if (isSameAnnotationLoadsExist)
             {

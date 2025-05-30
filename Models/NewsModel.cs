@@ -24,11 +24,13 @@ namespace ai_truck_load_measurement.Models
         public int NewsID { get; set; }
         [Display(Name="本文")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
+        [StringLength(300, ErrorMessageResourceName ="E1015", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string NewsContent { get; set; }
         [Display(Name = "登録日付")]
         [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public DateTime NewsDate { get; set; }
         [Display(Name ="カテゴリ")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int CategoryClass { get; set; }
         public DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; }

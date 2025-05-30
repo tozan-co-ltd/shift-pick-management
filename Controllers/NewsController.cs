@@ -41,7 +41,7 @@ namespace ai_truck_load_measurement.Controllers
             else if (categoryClass == 2)
                 categoryStatus = "障害・不具合";
             else if (categoryClass == 3)
-                categoryStatus = "操作案内";
+                categoryStatus = "操作案内　　";
 
             return categoryStatus;
         }

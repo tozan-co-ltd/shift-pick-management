@@ -701,6 +701,21 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("更新日時");
                     headerList.Add("更新者");
                     break;
+                case "通知マスター":
+                    headerList.Add("通知ID");
+                    headerList.Add("便名称");
+                    headerList.Add("便枝番");
+                    headerList.Add("デポ");
+                    headerList.Add("到着荷量下限");
+                    headerList.Add("出発荷量下限");
+                    headerList.Add("通知開始日時");
+                    headerList.Add("通知終了日時");
+                    headerList.Add("削除フラグ");
+                    headerList.Add("作成日時");
+                    headerList.Add("作成者");
+                    headerList.Add("更新日時");
+                    headerList.Add("更新者");
+                    break;
                 default:
                     headerList.Add("項目名");
                     headerList.Add("検索条件");
@@ -743,6 +758,35 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("便枝番マスター作成者");
                     headerList.Add("便枝番マスター更新日時");
                     headerList.Add("便枝番マスター更新者");
+                    break;
+                case "アラート履歴":
+                    headerList.Add("アラート履歴ID");
+                    headerList.Add("便名称");
+                    headerList.Add("便枝番");
+                    headerList.Add("アラート項目");
+                    headerList.Add("乗務員");
+                    headerList.Add("ステーション名");
+                    headerList.Add("車両番号");
+                    headerList.Add("識別番号");
+                    headerList.Add("到着予定時間");
+                    headerList.Add("出発予定時間");
+                    headerList.Add("稼働日");
+                    headerList.Add("到着日時");
+                    headerList.Add("出発日時");
+                    headerList.Add("到着荷量(%)");
+                    headerList.Add("到着荷量下限(%)");
+                    headerList.Add("出発荷量(%)");
+                    headerList.Add("出発荷量下限(%)");
+                    headerList.Add("到着荷量画像パス");
+                    headerList.Add("出発荷量画像パス");
+                    break;
+                case "通知マスター":
+                    headerList.Add("通知ユーザーID");
+                    headerList.Add("通知ID");
+                    headerList.Add("AD名");
+                    headerList.Add("削除フラグ");
+                    headerList.Add("作成日時");
+                    headerList.Add("作成者");
                     break;
                 default:
                     headerList.Add("便名称");

@@ -278,9 +278,9 @@
     })
 
     function switchFunamiCaution(depoID){
-        // 船見デポの場合、注意分表示
+        // 船見デポの場合、注意文表示
         if (depoID == 3) {
-            $("#funamiCaution")[0].innerText = "船見デポ1番、3番、5番、7番以外は常に「空車」表示になっています。";
+            $("#funamiCaution")[0].innerText = "※注：荷量把握稼働中(1番,3番,5番,7番,8番)以外は常に「空車」表示となります";
         }
         else {
             $("#funamiCaution")[0].innerText = "";
