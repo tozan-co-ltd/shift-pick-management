@@ -187,7 +187,7 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
-        ///   アクセス権限がありません。 に類似しているローカライズされた文字列を検索します。
+        ///   100文字以内で入力してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E1015 {
             get {

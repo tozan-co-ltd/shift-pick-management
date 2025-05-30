@@ -160,7 +160,7 @@
     <value>メール受け取りが必要な場合、メールアドレスを入力してください。</value>
   </data>
   <data name="E1015" xml:space="preserve">
-    <value>アクセス権限がありません。</value>
+    <value>100文字以内で入力してください。</value>
   </data>
   <data name="E1016" xml:space="preserve">
     <value>異なるログインを検出したため自動ログアウトされました。</value>
