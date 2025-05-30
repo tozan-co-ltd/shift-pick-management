@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Data;
 using System.IO.Compression;
 using X.PagedList;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -15,9 +16,11 @@ namespace ai_truck_load_measurement.Controllers
         public IActionResult Index()
         {
             var model = new AlertRecordViewModel();
-            // ログインユーザーのメインデポ情報取得
             try
             {
+
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
                 // アラート履歴情報取得SQL作成
                 var alertRecordSql = AlertRecordConnectController.CreateSQLToSelectAlertRecord();
                 // DB接続
@@ -31,7 +34,8 @@ namespace ai_truck_load_measurement.Controllers
                 model = ConversionForViewModel(alertRecordList, loadRecordList);
 
                 // ログインユーザーのメインデポ情報取得
-                model.MainDepo = GetMainDepo();
+                model.MainDepoID = user.MainDepoID;
+                model.MainDepoName = user.MainDepoName;
                 return View(model);
             }
             catch (Exception ex)
@@ -95,7 +99,7 @@ namespace ai_truck_load_measurement.Controllers
                         // アラート履歴に対応する便実績情報取得SQL作成
                         var loadRecordSql = AlertRecordConnectController.CreateSQLToSelectTripRecordFromAlertRecord(alertRecordList);
                         // DB接続
-                        loadRecordList = LoadRecordConnectController.ConnectTTripRecords(loadRecordSql);
+                        loadRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(loadRecordSql);
                     }
                 }
 
@@ -310,7 +314,7 @@ namespace ai_truck_load_measurement.Controllers
                 if (checkedDepos.Count > 0)
                 {
                     var tAlertRecordSql = AlertRecordConnectController.CreateSQLToSelectAlertRecordForDataTable(startOfPeriod, endOfPeriod, checkedDepos);
-                    tAlertRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tAlertRecordSql);
+                    tAlertRecordDT = ConnectToSQLServer.ConnectToDataTable(tAlertRecordSql);
 
                     // 荷量のクラスの数値化とアラート項目生成
                     tAlertRecordDT = GetConvertedLoadClassDataTable(tAlertRecordDT);
@@ -459,7 +463,7 @@ namespace ai_truck_load_measurement.Controllers
                     // 指定した期間の便実績情報取得SQL作成
                     var sql = AlertRecordConnectController.CreatSQLToSelectTripRecordForImage(startOfPeriod, endOfPeriod, checkedDepos);
                     // DB接続
-                    tripRecordList = LoadRecordConnectController.ConnectTTripRecords(sql);
+                    tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql);
                 }
 
                 var checkedDeposName = new List<LoadRecordModel>();
@@ -467,7 +471,7 @@ namespace ai_truck_load_measurement.Controllers
                 if (checkedDepos.Count > 0)
                 {
                     var deposNameSQL = LoadRecordConnectController.CreateSQLToSelectDepoNameFromDepoID(checkedDepos);
-                    checkedDeposName = LoadRecordConnectController.ConnectTTripRecords(deposNameSQL);
+                    checkedDeposName = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(deposNameSQL);
                 }
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");

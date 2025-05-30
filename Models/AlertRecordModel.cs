@@ -1,58 +1,83 @@
-﻿using Org.BouncyCastle.Asn1.Mozilla;
+﻿using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Asn1.Mozilla;
 
 namespace ai_truck_load_measurement.Models
 {
+    /// <summary>
+    /// アラート履歴モデル
+    /// </summary>
     public class AlertRecordModel : CommonModel
     {
+        /// <summary>
+        /// アラート履歴ID
+        /// </summary>
         public int AlertRecordID { get; set; }
+
+        /// <summary>
+        /// 便実績ID
+        /// </summary>
         public int TripRecordID {  get; set; }
+
+        /// <summary>
+        /// 通知ID
+        /// </summary>
         public int NotificationID {  get; set; }
+
+        /// <summary>
+        /// 到着荷量下限クラス
+        /// </summary>
         public int ArrivalLowerLoadClass {  get; set; }
+
+        /// <summary>
+        /// 到着荷量下限％表示
+        /// </summary>
         public string? ArrivalLowerLoadStatus {  get; set; }
+
+        /// <summary>
+        /// 出発荷量下限クラス
+        /// </summary>
         public int DepartureLowerLoadClass { get; set; }
+
+        /// <summary>
+        /// 出発荷量下限％表示
+        /// </summary>
         public string? DepartureLowerLoadStatus { get; set; }
+
+        /// <summary>
+        /// アラート項目
+        /// </summary>
         public List<string>? AlertItems {  get; set; }
+
+        /// <summary>
+        /// 到着アラート項目
+        /// </summary>
         public List<string>? ArrivalAlertItems { get; set; }
+
+        /// <summary>
+        /// 出発アラート項目
+        /// </summary>
         public List<string>? DepartureAlertItems { get; set; }
+
+        /// <summary>
+        /// 作成日時
+        /// </summary>
         public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// 更新日時
+        /// </summary>
         public DateTime UpdatedAt { get; set; }
-        //public string TripName { get; set; }
-        //public int TripBranchSeq { get; set; }
-        //public string StationName { get; set; }
-        //public string DriverName { get; set; }
-        //public DateTime WorkDay { get; set; }
 
     }
 
-    public class AlertRecordModalModel : CommonModel
-    {
-        public int AlertRecordID { get; set; }
-        public string TripName {  get; set; }
-        public int TripBranchSeq {  get; set; }
-        public string DriverName {  get; set; }
-        public string StationName {  get; set; }
-        public string TruckNumber {  get; set; }
-        public string IdentifyNumber {  get; set; }
-        public int ArrivalLoadClass {  get; set; }
-        public string ArrivalLoadStatus {  get; set; }
-        public int DepartureLoadClass {  get; set; }
-        public string DepartureLoadStatus {  get; set; }
-        public int ArrivalLowerLoadClass { get; set; }
-        public string ArrivalLowerLoadStatus {  get; set; }
-        public int DepartureLowerLoadClass { get; set; }
-        public string DepartureLowerLoadStatus { get; set; }
-        public DateTime ArrivedAt {  get; set; }
-        public DateTime DepartedAt { get; set; }
-        public DateTime ArrivalScheduledTime {  get; set; }
-        public DateTime DepartureScheduledTime {  get; set; }
-        public string ArrivalLoadImgPath {  get; set; }
-        public string DepartureLoadImgPath { get; set;}
-    }
-
+    /// <summary>
+    /// アラート履歴ビュー用モデル
+    /// </summary>
     public class AlertRecordViewModel : CommonModel
     {
         public List<AlertRecordModel> AlertRecordList { get; set; }
         public List<LoadRecordModel> LoadRecordList { get; set; }
-        public M_DepoModel MainDepo {  get; set; }
+        public int MainDepoID {  get; set; }
+        public string MainDepoName { get; set; }
     }
 }

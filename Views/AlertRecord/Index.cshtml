@@ -131,6 +131,10 @@
         tableDisplay();
     });
 
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        pushAllCheckBox();
+    });
 
     // アラート履歴テーブルの表示
     function tableDisplay() {
