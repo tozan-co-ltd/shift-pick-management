@@ -759,6 +759,27 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("便枝番マスター更新日時");
                     headerList.Add("便枝番マスター更新者");
                     break;
+                case "アラート履歴":
+                    headerList.Add("アラート履歴ID");
+                    headerList.Add("便名称");
+                    headerList.Add("便枝番");
+                    headerList.Add("アラート項目");
+                    headerList.Add("乗務員");
+                    headerList.Add("ステーション名");
+                    headerList.Add("車両番号");
+                    headerList.Add("識別番号");
+                    headerList.Add("到着予定時間");
+                    headerList.Add("出発予定時間");
+                    headerList.Add("稼働日");
+                    headerList.Add("到着日時");
+                    headerList.Add("出発日時");
+                    headerList.Add("到着荷量(%)");
+                    headerList.Add("到着荷量下限(%)");
+                    headerList.Add("出発荷量(%)");
+                    headerList.Add("出発荷量下限(%)");
+                    headerList.Add("到着荷量画像パス");
+                    headerList.Add("出発荷量画像パス");
+                    break;
                 case "通知マスター":
                     headerList.Add("通知ユーザーID");
                     headerList.Add("通知ID");
