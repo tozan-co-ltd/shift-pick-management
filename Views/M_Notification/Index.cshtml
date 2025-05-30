@@ -1,0 +1,677 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.M_NotificationViewModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+}
+<div class="card shadow de-inspection masterInfo m-4">
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+    <div class="card-body">
+
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-lg-10">
+                <div class="card border-left-custom">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>通知期間内の便が初期表示されます。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">デポ</span>
+                <div>
+                    <label class="mr-2"><input type="checkbox" class=" mr-2" id="allDepo" />すべて  [</label>
+                    <label id="selectDepos"></label>]
+                </div>
+            </div>
+        </div>
+
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">オプション</span>
+                <div>
+                    <label><input type="checkbox" id="isBeforeNotificationPeriod" /> 通知終了日時を過ぎた便も表示</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                <div class="input-group-append mr-2">
+                    <a class="btn btn-primary btn-icon-split btn-register" asp-controller="M_Notification" asp-action="Register">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">新規作成</span>
+                    </a>
+                </div>
+                <div class="input-group-append">
+                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFileNotification('M_Notification', '@Model.ViewTitle')">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-file-export"></i>
+                        </span>
+                        <span class="text">Excel出力</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div id="m_notificationTable">
+        </div>
+        
+    </div>
+</div>
+
+<!--  Edit Modal-->
+<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="edit-modal-label">編集</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-12">
+                    <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <form class="col-md-12" id="mNotificationForm">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <label>@Html.DisplayName("NotificationID")</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input class="form-control" type="text" asp-for="NotificationID" autocomplete="off" name="NotificationID" id="NotificationID" required readonly>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <label>@Html.DisplayNameFor(model => model.TripName)<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <select class="form-select" name="TripID" asp-for="TripID" asp-items="@Model.TripNameSelectList" required id="TripID"></select>
+                                <span class="text-danger w-100" asp-validation-for="TripID"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <label>@Html.DisplayNameFor(model => model.TripBranchSeqSelectList)<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <select class="form-select" name="TripBranchSeq" asp-for="TripBranchSeq" asp-items="@Model.TripBranchSeqSelectList" required id="TripBranchSeq"></select>
+                                <span class="text-danger w-100" asp-validation-for="TripBranchSeq"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel">
+                                <label><a>@Html.DisplayNameFor(model => model.ArrivalLowerLoadClass)</a></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <select class="form-select" name="ArrivalLowerLoadClass" asp-for="ArrivalLowerLoadClass" required id="ArriavlLowerLoadClass">
+                                    <option value="2" selected>設定無し</option>
+                                    <option value="3">1～10%</option>
+                                    <option value="4">11～20%</option>
+                                    <option value="5">21～30%</option>
+                                    <option value="6">31～40%</option>
+                                    <option value="7">41～50%</option>
+                                    <option value="8">51～60%</option>
+                                    <option value="9">61～70%</option>
+                                    <option value="10">71～80%</option>
+                                    <option value="11">81～90%</option>
+                                    <option value="12">91～100%</option>
+                                </select>
+                                <span class="text-danger w-100" asp-validation-for="ArrivalLowerLoadClass"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel">
+                                <label><a>@Html.DisplayNameFor(model => model.DepartureLowerLoadClass)<span style="color:red">*</span></a></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <select class="form-select" name="DepartureLowerLoadClass" asp-for="DepartureLowerLoadClass" required id="DepartureLowerLoadClass">
+                                    <option value="2" selected>設定無し</option>
+                                    <option value="3">1～10%</option>
+                                    <option value="4">11～20%</option>
+                                    <option value="5">21～30%</option>
+                                    <option value="6">31～40%</option>
+                                    <option value="7">41～50%</option>
+                                    <option value="8">51～60%</option>
+                                    <option value="9">61～70%</option>
+                                    <option value="10">71～80%</option>
+                                    <option value="11">81～90%</option>
+                                    <option value="12">91～100%</option>
+                                </select>
+                                <span class="text-danger w-100" asp-validation-for="DepartureLowerLoadClass"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel">
+                                <label><a>@Html.DisplayName("NotificationStartDateTime")<span style="color:red">*</span></a></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input class="form-control" type="text" asp-for="NotificationStartDateTime" autocomplete="off" value="" required>
+                                <small class="form-text text-muted w-100 p-1">YYYY/MM/DD hh:mmで入力してください。</small>
+                                <span class="text-danger w-100" asp-validation-for="NotificationStartDateTime"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel">
+                                <label><a>@Html.DisplayName("NotificationEndDateTime")<span style="color:red">*</span></a></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <input class="form-control" type="text" asp-for="NotificationEndDateTime" autocomplete="off" value="" required>
+                                <small class="form-text text-muted w-100 p-1">YYYY/MM/DD hh:mmで入力してください。</small>
+                                <span class="text-danger w-100" asp-validation-for="NotificationEndDateTime"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel">
+                                <label><a>メール受信者</a></label>
+                            </div>
+                            <div class="col-14 col-sm-7 col-md-9 column-2nd">
+                                <div class="dropdown-container  mr-2" id="dropdownContainer">
+                                    <button class="dropdown-button btn btn-primary btn-icon-split btn-register" type="button" id="dropdownButton">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+                                        <span class="text">追加　　　</span>
+                                    </button>
+                                    <div class="dropdown-content" id="dropdownContent">
+                                        <div id="createToggleCheckBox">ユーザーマスターにユーザーが存在しません</div>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn btn-danger btn-icon-split btn-register" onclick="clearUsers()">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                    <span class="text">一括クリア</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl modalLabel" id="selectedUsers"></div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd" id="selectedUsersChild"></div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
+                            <button class="btn btn-secondary btn-icon-split mb-2 mr-0 mr-sm-5" data-dismiss="modal" aria-label="Close">
+                                <span class="text">キャンセル</span>
+                            </button>
+                            <button class="btn btn-success btn-icon-split mb-2" onclick="OnExecuteEdit()">
+                                <span class="text" style="min-width:84px">更新</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  Delete Modal-->
+<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete-modal-label">削除</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body unset-pd">
+                <div class="col-12 col-md-12">
+                    <p id="delete-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="col-12 col-md-12">
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>通知ID</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="DeleteNotificationID" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>便名称</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="DeleteTripName" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>便枝番</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="DeleteTripBranchSeq" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>到着荷量下限</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="DeleteArrivalLowerLoadClass" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>出発荷量下限</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="DeleteDepartureLowerLoadClass" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>通知開始日時</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="DeleteNotificationStartDateTime" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap">
+                            <div class="col-12 col-sm-4 col-md-4">
+                                <label>通知終了日時</label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-8 mb-2">
+                                <input class="form-control" id="DeleteNotificationEndDateTime" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
+                            <button class="btn btn-secondary btn-icon-split mb-2 mr-0 mr-sm-5" data-dismiss="modal" aria-label="Close">
+                                <span class="text">キャンセル</span>
+                            </button>
+                            <button class="btn btn-danger btn-icon-split mb-2" onclick="OnExecuteDelete()">
+                                <span class="text" style="min-width:84px">削除</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        model = @Html.Raw(Json.Serialize(Model));
+        addDepos(model);
+        depoCheckDisplay(model);
+        tableDisplay();
+        // ユーザーのセレクトリスト作成
+        createToggleUserSelectCheckBox();
+    })
+
+    // オプションチェックボックス押下時
+    $('input[id="isBeforeNotificationPeriod"]').change(function () {
+        tableDisplay();
+    });
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        pushAllCheckBox();
+        tableDisplay();
+    });
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            pushDepoCheckBox();
+            tableDisplay();
+        });
+    });
+
+    // 便テーブルの表示
+    function tableDisplay() {
+        // チェックボックスの入力情報取得
+        var isBeforeNotificationPeriod = $('input[id="isBeforeNotificationPeriod"]')[0].checked;
+        var checkedDepos = getCheckedDepos();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("SearchData", "M_Notification")';
+        let method = 'Post';
+        let data = { isBeforeNotificationPeriod: isBeforeNotificationPeriod, checkedDepos: checkedDepos };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+
+            $('#m_notificationTable').empty().html(response);
+            // 日本語表示
+            const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+            const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
+
+            // ID(2列目)昇順
+            $("#notificationTable").DataTable({
+                "language": {
+                    "url": language_url
+                },
+                lengthChange: true,     // 件数切替
+                info: true,            // 総件数
+                scrollX: true,          // 横スクロール可
+                scrollCollapse: true,   // 縦スクロール表示
+                order: [[1, "asc"]],    // ID昇順
+                searchHighlight: true,  // 検索ハイライト
+                columnDefs: [
+                    { targets: 0, sortable: false },    // インデックス0列(アイコン列)のソート禁止
+                ],
+                "oLanguage": {
+                    "sSearch": "フリーワード(全件)"
+                },
+                dom: dom_structure
+            });
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-error-message").text(errorMessage);
+            }
+        });
+
+    }
+
+    // ドロップダウンの表示・非表示
+    dropdownButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropdownContainer.classList.toggle('show');
+    });
+
+    // コンテンツ外をクリックした場合、プルダウンを閉じる
+    document.addEventListener('click', (e) => {
+        if (!dropdownContainer.contains(e.target)) {
+            dropdownContainer.classList.remove('show');
+        }
+    });
+
+    function allToggleOpen() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (!smallItems.classList.contains('show')) {
+                smallItems.classList.add('show');
+                toggleIcon.classList.remove('collapsed');
+            }
+        });
+    }
+
+    function allToggleClose() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (smallItems.classList.contains('show')) {
+                smallItems.classList.remove('show');
+                toggleIcon.classList.add('collapsed');
+            }
+        });
+    }
+
+    // エクセル出力
+    function onExportFileNotification(page, gamenName) {
+        event.preventDefault();
+        $('#div-error-message').text("");
+
+        // チェックボックスの入力情報取得
+        var isBeforeNotificationPeriod = $('input[id="isBeforeNotificationPeriod"]')[0].checked;
+        var checkedDepos = getCheckedDepos();
+
+        // フォーム情報取得
+        let data = {
+            "gamenName": gamenName,
+            "isBeforeNotificationPeriod": isBeforeNotificationPeriod,
+            checkedDepos: checkedDepos
+        };
+
+        // Excel出力共通処理
+        onExportFileTripsCommon(page, data);
+
+    }
+
+
+    // 編集ボタン押下
+    function OnEditClick(notificationID) {
+        DeleteErrorMessages();
+
+        // M_NotificationViewModel取得
+        var model = @Html.Raw(Json.Serialize(Model));
+        model.m_NotificationList.forEach(function (item) {
+            if (item.notificationID == notificationID) {
+                var notificationStartDateTime = GetDateString(new Date(item.notificationStartDateTime));
+                var notificationEndDateTime = GetDateString(new Date(item.notificationEndDateTime));
+                $("#NotificationID").val(item.notificationID);
+                $("#TripID").val(item.tripID);
+                GetTripBranchSeqs();
+                $("#TripBranchSeq").val(item.tripBranchSeq);
+                $("#ArriavlLowerLoadClass").val(item.arrivalLowerLoadClass);
+                $("#DepartureLowerLoadClass").val(item.departureLowerLoadClass);
+                $("#NotificationStartDateTime").val(notificationStartDateTime);
+                $("#NotificationEndDateTime").val(notificationEndDateTime);
+                // 通知ユーザー取得
+                getNotificationUsers(item);
+            }
+        });
+    }
+
+    // 通知ユーザー取得
+    function getNotificationUsers(notificationModel)
+    {
+        var selectedUsers = $('#selectedUsersChild')[0];
+
+        clearUsers();
+        // ユーザーが登録されていない場合
+        if (notificationModel.notificationUsers.length == 0) {
+            return;
+        }
+
+        notificationModel.notificationUsers.forEach(function (user) {
+            // 1行目の場合、項目追加
+            if (arrayTrips.length == 0)
+                document.getElementById("selectedUsers").innerHTML = "<span class=\" mb-3\">選択されたユーザー</span>";
+            var userID = user.userID;
+            var adName = user.adName;
+            arrayUsers.push({ userID, adName });
+            $('#' + adName).prop('checked', true);
+            pushLabelToSelectedUsers(selectedUsers, adName);
+        })
+    }
+
+    // 更新
+    function OnExecuteEdit() {
+        $('#mNotificationForm').submit(function (event) {
+            DeleteErrorMessages();
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Edit", "M_Notification")';
+            let method = 'POST';
+            let formId = 'mNotificationForm';
+            let data = $('#' + formId).serializeArray();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#edit-modal').hide();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                } else {
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#edit-modal-error-message").text(errorMessage);
+                }
+            });
+        });
+    }
+
+    // 便名称選択時の処理
+    $('[name=TripID]').change(function () {
+        GetTripBranchSeqs();
+    });
+
+    // 便枝番取得
+    function GetTripBranchSeqs() {
+        var tripID = $('[name=TripID]').val();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripBranchSeqs", "M_Notification")';
+        let method = 'POST';
+        let data = { tripID: tripID };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false
+        }).done(function (response) {
+            // 便枝番セレクトリストの更新
+            AddOptionToSelectList(response)
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    }
+
+    // 便枝番セレクトリスト更新
+    function AddOptionToSelectList(selectListItems) {
+        var selectList = document.getElementById("TripBranchSeq");
+
+        // 子要素の初期化
+        while (selectList.firstChild) {
+            selectList.removeChild(selectList.firstChild);
+        }
+
+        selectListItems.forEach(function (item) {
+            var tripBranchIDAndSeq = item.value.split("_");
+            // optionタグを作成する
+            var option = document.createElement("option");
+            option.text = item.text;
+            option.value = tripBranchIDAndSeq[1];
+            selectList.appendChild(option);
+        });
+    }
+
+    // 便枝番選択時の処理
+    $('[name=TripBranchSeq]').change(function () {
+        var tripID = $('[name=TripID]').val();
+        var tripBranchNumberID = $('[name=TripBranchSeq]').val().split("_")[0];
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripBranchSeqData", "M_Notification")';
+        let method = 'POST';
+        let data = { tripID: tripID, tripBranchNumberID: tripBranchNumberID };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            SetTripBranchSeqData(response);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    });
+
+    // 削除ボタン押下
+    function OnDeleteClick(notificationID) {
+        // M_NotificationViewModel取得
+        var model = @Html.Raw(Json.Serialize(Model));
+        model.m_NotificationList.forEach(function (item) {
+            if (item.notificationID == notificationID) {
+                var notificationStartDateTime = GetDateString(new Date(item.notificationStartDateTime));
+                var notificationEndDateTime = GetDateString(new Date(item.notificationEndDateTime));
+                $("#DeleteNotificationID").val(item.notificationID);
+                $("#DeleteTripName").val(item.tripName);
+                $("#DeleteTripBranchSeq").val(item.tripBranchSeq);
+                $("#DeleteArrivalLowerLoadClass").val(item.arrivalLowerLoadStatus);
+                $("#DeleteDepartureLowerLoadClass").val(item.departureLowerLoadStatus);
+                $("#DeleteNotificationStartDateTime").val(notificationStartDateTime);
+                $("#DeleteNotificationEndDateTime").val(notificationEndDateTime);
+            }
+        });
+    }
+
+
+    // 削除
+    function OnExecuteDelete() {
+        DeleteErrorMessages();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("Delete", "M_Notification")';
+        let method = 'POST';
+        let data = { "notificationId": $('#DeleteNotificationID').val()};
+
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            $('#delete-modal').hide();
+            // 完了モーダル表示
+            AlertMessage('', '完了', '登録が完了しました。', null, null);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#delete-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#delete-modal-error-message").text(errorMessage);
+            }
+        });
+    }
+</script>
