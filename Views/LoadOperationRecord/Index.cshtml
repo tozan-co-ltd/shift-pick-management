@@ -547,6 +547,7 @@
 
     // 稼働日選択時
     function addWorkDays(workDay) {
+        DeleteErrorMessages();
         // 20件の稼働日が選択されているとき
         if (20 <= arrayWorkDays.length) {
             var errorMessage = 'E1008: 選択できる稼働日は最大20件です。20件を超えないように選択してください。';
@@ -554,6 +555,11 @@
             return;
         }
 
+        if(workDay == 'Invalid Date'){
+            var errorMessage = 'E5555: 稼働日には正しい日付を入力してください。'
+            $("#div-error-message").text(errorMessage);
+            return;
+        }
 
         // 1行目の場合、項目追加
         if (arrayWorkDays.length == 0)
