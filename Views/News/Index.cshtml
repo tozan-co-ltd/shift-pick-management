@@ -80,7 +80,8 @@
                                 <label>@Html.DisplayName("NewsContent")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <textarea class="form-control"  asp-for="NewsContent" autocomplete="off" value="" required></textarea>
+                                <textarea class="form-control" asp-for="NewsContent" autocomplete="off" value="" required></textarea>
+                                <small class="form-text text-muted w-100 p-1">最大300文字</small>
                                 <span class="text-danger w-100" asp-validation-for="NewsContent"></span>
                             </div>
                         </div>
@@ -148,6 +149,7 @@
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <textarea class="form-control" asp-for="NewsContent" autocomplete="off" value="" required id="NewsContentEdit"></textarea>
+                                <small class="form-text text-muted w-100 p-1">最大300文字</small>
                                 <span class="text-danger w-100" asp-validation-for="NewsContent"></span>
                             </div>
                         </div>
