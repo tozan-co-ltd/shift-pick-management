@@ -119,8 +119,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     TripRecords.station_id = Stations.station_id
                 WHERE
                     TripRecords.is_deleted <> 1
-                AND
-                    {GetAlertRecordListSQL(alertRecords)}
+                {GetAlertRecordListSQL(alertRecords)}
             ";
             return sql;
         }
@@ -131,9 +130,10 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = "";
             for(int i=0; i<alertRecords.Count; i++)
             {
-                if(i != 0) sql += " OR ";
+                if (i != 0) sql += " OR ";
+                else sql += " AND ";
 
-                sql += $@"TripRecords.trip_record_id = {alertRecords[i].TripRecordID}";
+                    sql += $@"TripRecords.trip_record_id = {alertRecords[i].TripRecordID}";
             }
             return sql;
         }
