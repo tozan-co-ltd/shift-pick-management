@@ -33,9 +33,9 @@ namespace ai_truck_load_measurement.Controllers
         public async Task<IActionResult> Index()
         {
             // ログインユーザーのメインデポ情報取得
-            var mainDepo = GetMainDepo();
+            var user = ClaimsLoginUserData();
             // トップ画面モデル取得
-            TopModel topModel = await GetTopModel(mainDepo.DepoID);
+            TopModel topModel = await GetTopModel(user.MainDepoID);
             return View(topModel);
         }
 
@@ -53,11 +53,11 @@ namespace ai_truck_load_measurement.Controllers
                 // 最新のステーション状況取得SQL作成
                 var latestStationStatusSQL = TopConnectController.CreateSQLToSelectLatestStationStatus(depoID);
                 // 最新のステーション状況取得
-                List<ViewCardModel> viewCardModelList = TopConnectController.ConnectTops(latestStationStatusSQL);
+                List<ViewCardModel> viewCardModelList = ConnectToSQLServer.ExecuteQueryToList<ViewCardModel>(latestStationStatusSQL);
                 // トラック有無取得SQL作成
                 var isExistTrucksSQL = TopConnectController.CreateSQLToSelectIsExistTrucksPerStationID();
                 // トラック有無取得
-                IEnumerable<ViewCardModel> isExistTrucksList = TopConnectController.ConnectTops(isExistTrucksSQL);
+                IEnumerable<ViewCardModel> isExistTrucksList = ConnectToSQLServer.ExecuteQueryToList<ViewCardModel>(isExistTrucksSQL);
                 foreach (var item in viewCardModelList)
                 {
                     var isExistTruck = isExistTrucksList.Where(x => x.StationID == item.StationID).ToList();
@@ -72,9 +72,8 @@ namespace ai_truck_load_measurement.Controllers
                 viewCardModelList = GetStationImage(viewCardModelList);
                 topModel.ViewCardModelList = viewCardModelList;
                 // ログインユーザーのメインデポ情報取得
-                var mainDepo = GetMainDepo();
-                topModel.MainDepoID = mainDepo.DepoID;
-                topModel.MainDepoName = mainDepo.Name;
+                topModel.MainDepoID = user.MainDepoID;
+                topModel.MainDepoName = user.MainDepoName;
                 return topModel;
             }
             catch (Exception ex)
@@ -111,7 +110,9 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 表示する画像をAPIから取得してbase64に変換
                 var imageUrl = ($"http://{model.IPAdress}/jpg/image.jpg");
-                var imagePath64 = await GetImageBase64FromAPI(imageUrl);
+                var imagePath64 = "";
+                if (model.StationSeq != 14)
+                    imagePath64 = await GetImageBase64FromAPI(imageUrl);
                 model.ImageBase64 = "data:image/jpeg;base64," + imagePath64;
             }
             return models;
@@ -189,10 +190,18 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public async Task<string> GetImageBase64FromAPI(string url)
         {
-            var client = GetDigestClient(url);
-            var result = await client.GetAsync(url);
-            var imageBytes = await result.Content.ReadAsByteArrayAsync();
-            return Convert.ToBase64String(imageBytes);
+            // 取得できない場合、空文字を返す
+            try
+            {
+                var client = GetDigestClient(url);
+                var result = await client.GetAsync(url);
+                var imageBytes = await result.Content.ReadAsByteArrayAsync();
+                return Convert.ToBase64String(imageBytes);
+            }
+            catch(Exception ex)
+            {
+                return "";
+            }
         }
 
         /// <summary>
@@ -211,7 +220,7 @@ namespace ai_truck_load_measurement.Controllers
             myClientHandler.Credentials = cache;
 
             var client = new HttpClient(myClientHandler);
-            client.Timeout = new TimeSpan(0, 0, 0, 0, 5000);
+            client.Timeout = new TimeSpan(0, 0, 0, 0, 1500);
             return client;
         }
     }

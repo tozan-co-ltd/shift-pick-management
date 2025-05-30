@@ -443,7 +443,7 @@ function EditModal(tripRecordID, isArrived, page) {
                     + "<td>荷量の相違あり</td>"
                     + "<td>"
                     + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">";
-                if (authorizedKubun == "1") {
+                if (authorizedKubun == "1" || authorizedKubun == "2") {
                     tr += "<select name=\"loadStatusSelect\"  class=\"form-select mr-2\" id=\"loadStatusSelect\" >"
                         + "<option value=\"\" hidden></option>"
                         + "<option value=\"1\">0%</option>"
@@ -608,6 +608,10 @@ function tableDisplayCommon(page, data) {
                 "sSearch": ""
             },
             dom: dom_structure,
+            "columnDefs": [
+                { className:"dt-body-left", "targets": [4] },
+                { className:"dt-body-left", "targets": [2] },
+            ],
         });
         var table = $("#tripRecordDataTable").DataTable();
         table.on('draw', function () {
@@ -933,7 +937,7 @@ function addDepos(model) {
 
 // 画面表示時にログインユーザーのメインデポにチェックを入れる
 function depoCheckDisplay(model) {
-    var mainDepoID = model.mainDepo.depoID;
+    var mainDepoID = model.mainDepoID;
     if (mainDepoID == 0)
         return;
     var depos = $('input[name=depos]');

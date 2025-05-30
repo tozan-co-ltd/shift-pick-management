@@ -10,41 +10,6 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class LoadTransitionConnectController 
     {
         /// <summary>
-        /// 便実績情報取得
-        /// </summary>
-        /// <param name="sql">SQL文</param>
-        /// <returns></returns>
-        public static List<LoadTransitionModel> ConnectTTripRecords(string sql)
-        {
-            // 戻り値
-            List<LoadTransitionModel> strList = new();
-
-            // DB接続
-            try
-            {
-                // SQLServer接続文字列取得
-                var connectionString = ConnectToSQLServer.GetSQLServerConnectionString();
-                // SQLServer接続
-                using (var connection = new SqlConnection())
-                {
-                    connection.ConnectionString = connectionString;
-                    connection.Open();
-                    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                    strList = connection.Query<LoadTransitionModel>(sql).ToList();
-                }
-                return strList;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
-
-        
-
-        /// <summary>
         /// 検索条件から荷量クラスを取得するSQL
         /// </summary>
         /// <param name="tripName">便名称</param>

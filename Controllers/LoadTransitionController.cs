@@ -20,12 +20,16 @@ namespace ai_truck_load_measurement.Controllers
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         public IActionResult Index()
         {
-            var model = new LoadTransitionModel();
+            var model = new LoadRecordViewModel();
             var today = DateTime.Now;
             var oneWeekAgo = today.AddDays(-7);
-            var mainDepo = GetMainDepo();
+
+            // ログイン中ユーザー情報取得
+            var user = ClaimsLoginUserData();
+            // メインデポ情報取得
+            model = LoadRecordController.SetMainDepoInfo(model, user);
             List<string> depoList = new();
-            depoList.Add(mainDepo.DepoID.ToString());
+            depoList.Add(user.MainDepoID.ToString());
             try
             {
                 List<SelectListItem> tripNameList = new();
@@ -36,7 +40,7 @@ namespace ai_truck_load_measurement.Controllers
                     // 便実績情報取得SQL作成
                     var sql = LoadRecordConnectController.CreateSQLToSelectTripNameFromPeriod(oneWeekAgo, today, depoList);
                     // DB接続
-                    tripNameList = LoadRecordConnectController.ConnectTTripRecordsForTripName(sql);
+                    tripNameList = ConnectToSQLServer.ExecuteQueryToList<SelectListItem>(sql);
                 }
                 
                 model.TripNameList = tripNameList;
@@ -44,13 +48,11 @@ namespace ai_truck_load_measurement.Controllers
                 // 便実績情報取得SQL作成
                 var sql2 = LoadRecordConnectController.CreatSQLToSelectTripRecord();
                 // DB接続
-                IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql2);
+                IEnumerable<LoadTransitionModel> tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadTransitionModel>(sql2);
                 // テーブル情報を変換
                 tripRecordList = (IEnumerable<LoadTransitionModel>)LoadRecordController.ConversionForTable(tripRecordList);
 
                 model.TripRecordList = tripRecordList.ToPagedList();
-
-                model.MainDepo = mainDepo;
                 return View(model);
             }
             catch (Exception ex)
@@ -153,7 +155,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 便実績情報取得
                 var tTripRecordSql = LoadTransitionConnectController.CreateSQLToSelectTripRecordForDataTable(arrayTrips, startOfPeriod, endOfPeriod);
-                DataTable tTripRecordDT = LoadRecordConnectController.ConnectTTripRecordToDataTable(tTripRecordSql);
+                DataTable tTripRecordDT = ConnectToSQLServer.ConnectToDataTable(tTripRecordSql);
 
                 // 荷量のクラスを数値化
                 tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
@@ -230,7 +232,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 指定した期間の便実績情報取得SQL作成
                 var sql = LoadTransitionConnectController.CreatSQLToSelectTripRecordForImage(arrayTrips, startOfPeriod, endOfPeriod);
                 // DB接続
-                IEnumerable<LoadTransitionModel> tripRecordList = LoadTransitionConnectController.ConnectTTripRecords(sql);
+                IEnumerable<LoadTransitionModel> tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadTransitionModel>(sql);
 
                 var startDate = startOfPeriod.ToString("yyyyMMdd");
                 var endDate = endOfPeriod.ToString("yyyyMMdd");

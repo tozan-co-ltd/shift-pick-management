@@ -1,5 +1,5 @@
 ﻿@using ai_truck_load_measurement.Commons;
-@model ai_truck_load_measurement.Models.M_UserModel;
+@model ai_truck_load_measurement.Models.M_UserListViewModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
@@ -75,11 +75,11 @@
                             <tr>
                                 <td>
                                     <a class="btn btn-success btn-icon-split ml-1 mr-1"
-                                       onclick="OnEditClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#edit-modal">
+                                    onclick="OnEditClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#edit-modal">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
                                     <button class="btn btn-danger btn-icon-split"
-                                            onclick="OnDeleteClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#delete-modal">
+                                    onclick="OnDeleteClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#delete-modal">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </td>
@@ -89,9 +89,14 @@
                                 @if(item.AuthorizedKubun == 0)
                                 {
                                     <td>なし</td>
-                                }else if(item.AuthorizedKubun == 1)
+                                }
+                                else if(item.AuthorizedKubun == 1)
                                 {
                                     <td>管理者</td>
+                                }
+                                else if(item.AuthorizedKubun == 2)
+                                {
+                                    <td>システム管理者</td>
                                 }
                                 @if (item.IsRequiredMail)
                                 {
@@ -160,10 +165,13 @@
                                 <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input type="radio" class="mr-2" asp-for="AuthorizedKubun" value="1" name="AuthorizedKubun" id="hasAuthorizedKubun">
-                                <label for="hasAuthorizedKubun">権限あり</label>
-                                <input type="radio" class="mr-2 ml-3" asp-for="AuthorizedKubun" value="0" name="AuthorizedKubun" id="notHasAuthorizedKubun" checked>
-                                <label for="notHasAuthorizedKubun">権限なし</label>
+                                <select class="form-select" name="AuthorizedKubun" asp-for="AuthorizedKubun" required id="AuthorizedKubun">
+                                    <option value="" selected disabled id="firstSelect">選択してください</option>
+                                    <option value="0">一般</option>
+                                    <option value="1">管理者</option>
+                                    <option value="2">システム管理者</option>
+                                </select>
+                                <span class="text-danger w-100" asp-validation-for="AuthorizedKubun"></span>
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
@@ -302,21 +310,20 @@
                 $("#UserID").val(item.userID);
                 $("#ADName").val(item.adName);
                 $("#DepoID").val(item.depoID);
-                var authorizedKubun = item.authorizedKubun;
-                AuthorizedKubunCheck(authorizedKubun);
+                $("#AuthorizedKubun").val(item.authorizedKubun);
                 IsRequiredMailCheck(item.isRequiredMail);
                 $("#MailAddress").val(item.mailAddress);
             }
         });
     }
 
-    // 現在の管理区分にチェックを入れる
-    function AuthorizedKubunCheck(authorizedKubun) {
-        document.getElementsByName("AuthorizedKubun").forEach(function (item) {
-            if (item.value == authorizedKubun)
-                item.checked = true;
-        });
-    }
+    // // 現在の管理区分にチェックを入れる
+    // function AuthorizedKubunCheck(authorizedKubun) {
+    //     document.getElementsByName("AuthorizedKubun").forEach(function (item) {
+    //         if (item.value == authorizedKubun)
+    //             item.checked = true;
+    //     });
+    // }
 
     // 現在のメール受け取り要否をチェックボックスに反映する
     function IsRequiredMailCheck(isRequired) {

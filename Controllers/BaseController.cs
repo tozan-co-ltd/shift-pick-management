@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.ConnectControllers;
+using ai_truck_load_measurement.Commons;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -11,34 +12,29 @@ namespace ai_truck_load_measurement.Controllers
         public LoginUserModel? ClaimsLoginUserData()
         {
             var claimsLoginUserList = User.Claims.ToList();
-            if (claimsLoginUserList.Count > 0)
+            try
             {
-                Int32.TryParse(claimsLoginUserList.Where(x => x.Type == "AuthorizedKubun").First().Value, out var authorizedKubun);
-                var loginUserModel = new LoginUserModel
+                if (claimsLoginUserList.Count > 0)
                 {
-                    UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
-                    ADName = claimsLoginUserList.Where(x => x.Type == "ADName").First().Value,
-                    AuthorizedKubun  = authorizedKubun,
-                };
-                return loginUserModel;
+                    Int32.TryParse(claimsLoginUserList.Where(x => x.Type == "MainDepoID").First().Value, out var mainDepoID);
+                    Int32.TryParse(claimsLoginUserList.Where(x => x.Type == "AuthorizedKubun").First().Value, out var authorizedKubun);
+                    var loginUserModel = new LoginUserModel
+                    {
+                        AuthorizedKubun = authorizedKubun,
+                        UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
+                        ADName = claimsLoginUserList.Where(x => x.Type == "ADName").First().Value,
+                        MainDepoName = claimsLoginUserList.Where(x => x.Type == "MainDepoName").First().Value,
+                        MainDepoID = mainDepoID,
+                    };
+                    return loginUserModel;
+                }
+                return null;
             }
-            return null;
-        }
-
-        public M_DepoModel GetMainDepo()
-        {
-            M_DepoModel model = new M_DepoModel();
-            var user = ClaimsLoginUserData();
-            var sql = M_DepoConnectController.CreateSQLToSelectDepoFromADName(user.ADName);
-            var depoList = M_DepoConnectController.ConnectMDepos(sql);
-            if (depoList.Count > 0)
+            catch(Exception)
             {
-                model = depoList[0];
+                throw;
             }
-            return model;
-            
         }
-
     }
 
 }

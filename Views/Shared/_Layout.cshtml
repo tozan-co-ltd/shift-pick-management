@@ -68,8 +68,8 @@
 #if DEBUG
                 navBarText = "テスト環境";
 #endif
-                }
-                @navBarText
+            }
+            @navBarText
         </a>
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-angles-left"></i></button>
@@ -85,7 +85,7 @@
                 </div>
                 <!-- Dropdown -->
                 <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" id="navbarDropdown"
-                     aria-labelledby="navbarDropdown">
+                aria-labelledby="navbarDropdown">
                     <div id="user-detail-dropdown-item" class="dropdown-item text-gray-600">
                         <a class="dropdown-item mt-2 logout" href="#" data-toggle="modal" data-target="#logoutModal">
                             <i class="fas fa-sign-out-alt fa-fw mr-2"></i>
@@ -113,43 +113,56 @@
                                 var menuList = categoryMenuList.WebMenuList;
                                 var currentController = ViewContext.RouteData.Values["controller"].ToString();
                                 var currentCategoryID = Model.GetCategoryIDFromControlerName(currentController);
-                                if (menuList.Count != 0 && !(categoryID == 2 && Model.AuthorizedKubun != "1"))
+                                if (menuList.Count != 0 && !(categoryID == 4 && (Model.AuthorizedKubun != "1" && Model.AuthorizedKubun != "2")))
                                 {
-                                    <li class="nav-item">
-                                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse@(categoryID)"
-                                           aria-expanded="true" aria-controls="collapse@(categoryID)">
-                                            <i class="icon-category @("icon-categoryid-" + categoryID)"></i>
-                                            <span>@(categoryName)</span>
-                                        </a>
-                                        @if(currentCategoryID == categoryID || (currentCategoryID == null && categoryID == 1))
-                                        {
-                                            <div id="collapse@(categoryID)" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                                                <div class="bg-white py-2 collapse-inner rounded">
-                                                    @foreach (var obj in menuList)
-                                                    {
-                                                        @if(obj.MenuName != "便枝番マスター")
+                                    @if (categoryID == 1 || categoryID == 3)
+                                    {
+                                        <li class="nav-item">
+                                            <a class="nav-link collapsed" asp-area="" asp-controller="@menuList[0].Controller" asp-action="@menuList[0].Action">
+                                                <i class="icon-category @("icon-categoryid-" + categoryID)"></i>
+                                                <span>@menuList[0].MenuName</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="nav-item">
+                                            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse@(categoryID)"
+                                               aria-expanded="true" aria-controls="collapse@(categoryID)">
+                                                <i class="icon-category @("icon-categoryid-" + categoryID)"></i>
+                                                <span>@(categoryName)</span>
+                                            </a>
+                                            @if (currentCategoryID == categoryID || (currentCategoryID == null && categoryID == 1))
+                                            {
+                                                <div id="collapse@(categoryID)" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                                    <div class="bg-white py-2 collapse-inner rounded">
+                                                        @foreach (var obj in menuList)
                                                         {
-                                                            <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                            @if (obj.MenuName != "便枝番マスター")
+                                                            {
+                                                                <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                            }
                                                         }
-                                                    }
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div id="collapse@(categoryID)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                                                <div class="bg-white py-2 collapse-inner rounded">
-                                                    @foreach (var obj in menuList)
-                                                    {
-                                                        @if (obj.MenuName != "便枝番マスター")
+                                            }
+                                            else
+                                            {
+                                                <div id="collapse@(categoryID)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                                                    <div class="bg-white py-2 collapse-inner rounded">
+                                                        @foreach (var obj in menuList)
                                                         {
-                                                            <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                            @if (obj.MenuName != "便枝番マスター")
+                                                            {
+                                                                <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
+                                                            }
                                                         }
-                                                    }
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        }
-                                    </li>
+                                            }
+                                        </li>
+                                    }
+                                    
                                 }
                             }
                         </ul>
@@ -213,6 +226,9 @@
 
     <!--jquery.cookie.js-->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <!--paginating-->
+    <script src="js/paginathing.min.js"></script>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
 

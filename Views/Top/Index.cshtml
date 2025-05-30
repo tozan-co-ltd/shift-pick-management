@@ -2,7 +2,7 @@
 @model ai_truck_load_measurement.Models.TopModel;
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = "トップ";
+    ViewData["Title"] = Model.ViewTitle; ;
 }
 <style>
     /* カードレイアウト部分をラッピングし、
@@ -183,6 +183,10 @@
         // カード要素の初期化
         $("#cardlayout-wrap")[0].innerHTML = "";
         for (var i = 1; i <= top_model.viewCardModelList.length; i++) {
+
+            if(i!=14){
+
+            }
             var cardModel = top_model.viewCardModelList.find(x => x.stationSeq == i);
 
             // カード要素生成
@@ -206,8 +210,9 @@
                 $('#truck-status' + i).text("　");
             }
 
-            
+
             $('#image' + i).attr("src", cardModel.imageBase64);
+            
         }
     }
 
@@ -284,10 +289,10 @@
 
     function getStationTitle(depoName){
         if(depoName == null){
-            return "ステーション状況";
+            return "デポを選択してください";
         }
         else{
-            return depoName + "　ステーション状況";
+            return "";
         }
     }
 
