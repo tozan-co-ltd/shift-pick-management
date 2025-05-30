@@ -28,12 +28,12 @@ namespace ai_truck_load_measurement.Controllers
                 // 通知マスター情報取得SQL作成
                 var notificationSql = M_NotificationConnectController.CreateSQLToSelectMNotificationsAll();
                 // DB接続
-                notificationList = M_NotificationConnectController.ConnectMNotifications(notificationSql);
+                notificationList = ConnectToSQLServer.ExecuteQueryToList<M_NotificationModel>(notificationSql);
                 foreach (M_NotificationModel notification in notificationList)
                 {
                     // 通知ユーザー情報取得SQL作成
                     var notificationUserSql = M_NotificationConnectController.CreateSQLToSelectRNotificationUsers(notification.NotificationID);
-                    notification.NotificationUsers = M_NotificationConnectController.ConnectRNotificationUsers(notificationUserSql);
+                    notification.NotificationUsers = ConnectToSQLServer.ExecuteQueryToList<R_NotificationUserModel>(notificationUserSql);
 
                 }
 
@@ -67,12 +67,12 @@ namespace ai_truck_load_measurement.Controllers
                     // 便マスター情報取得SQL作成
                     var sql = M_NotificationConnectController.CreateSQLToSelectMNotifications(isBeforeNotificationPeriod, checkedDepos);
                     // DB接続
-                    notificationList = M_NotificationConnectController.ConnectMNotifications(sql);
+                    notificationList = ConnectToSQLServer.ExecuteQueryToList<M_NotificationModel>(sql);
                     foreach (M_NotificationModel notification in notificationList)
                     {
                         // 通知ユーザー情報取得SQL作成
                         var notificationUserSql = M_NotificationConnectController.CreateSQLToSelectRNotificationUsers(notification.NotificationID);
-                        notification.NotificationUsers = M_NotificationConnectController.ConnectRNotificationUsers(notificationUserSql);
+                        notification.NotificationUsers = ConnectToSQLServer.ExecuteQueryToList<R_NotificationUserModel>(notificationUserSql);
 
                         // 荷量クラスを％表示に変換
                         notification.ArrivalLowerLoadStatus = ConversionLoadClassToLoadStatus(notification.ArrivalLowerLoadClass);
@@ -375,13 +375,13 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 通知マスター情報取得
                 var mNotificationSql = M_NotificationConnectController.CreateSQLToSelectMNotificationsForDataTable(isBeforeNotificationPeriod, checkedDepos);
-                mNotificationDT = M_NotificationConnectController.ConnectMNotificationsToDataTable(mNotificationSql);
+                mNotificationDT = ConnectToSQLServer.ConnectToDataTable(mNotificationSql);
                 // 荷量クラスを数値に変換
                 mNotificationConvertedDT = GetConvertedLoadClassDataTable(mNotificationDT);
 
                 // 通知ユーザー情報取得
                 var rNotificationUserSql = M_NotificationConnectController.CreateSQLToSelectRNotificationUsersForDataTable(isBeforeNotificationPeriod, checkedDepos);
-                rNotificationUserDT = M_NotificationConnectController.ConnectMNotificationsToDataTable(rNotificationUserSql);
+                rNotificationUserDT = ConnectToSQLServer.ConnectToDataTable(rNotificationUserSql);
 
                 // ファイル名
                 var tmpFilename = CreateFile.CreateFileName(gamenName);
@@ -485,7 +485,7 @@ namespace ai_truck_load_measurement.Controllers
 
             // 便の選択肢作成
             var tripSql = M_NotificationConnectController.CreateSQLToSelectMTrips();
-            var tripList = M_NotificationConnectController.ConnectMTrips(tripSql);
+            var tripList = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(tripSql);
             foreach (var trip in tripList)
             {
                 SelectListItem menuItem = new()
@@ -517,7 +517,7 @@ namespace ai_truck_load_measurement.Controllers
             });
 
             var tripBranchSeqSql = M_NotificationConnectController.CreateSQLToSelectMTripBranchNumbers(tripID);
-            var tripBranchSeqList = M_NotificationConnectController.ConnectMTripBranchNumbers(tripBranchSeqSql);
+            var tripBranchSeqList = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberModel>(tripBranchSeqSql);
             // 枝連番行を追加
             tripBranchSeqList = AddTripBranchSeq(tripBranchSeqList);
             foreach(var tripBranch in tripBranchSeqList)
@@ -561,7 +561,7 @@ namespace ai_truck_load_measurement.Controllers
         public M_TripBranchNumberModel GetTripBranchSeqData(int tripID, int tripBranchNumberID)
         {
             var tripBranchSeqSql = M_NotificationConnectController.CreateSQLToSelectMTripBranchNumberFromTripBranchNumberID(tripID, tripBranchNumberID);
-            var tripBranchSeqList = M_NotificationConnectController.ConnectMTripBranchNumbers(tripBranchSeqSql);
+            var tripBranchSeqList = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberModel>(tripBranchSeqSql);
             return tripBranchSeqList[0];
         }
 
@@ -586,7 +586,7 @@ namespace ai_truck_load_measurement.Controllers
         public List<M_UserModel> GetUserList()
         {
             var sql = M_UserConnectController.CreateSQLToSelectMUsersIsRequiredMail();
-            var userList = M_UserConnectController.ConnectMUsers(sql);
+            var userList = ConnectToSQLServer.ExecuteQueryToList<M_UserModel>(sql);
             return userList;
         }
 
