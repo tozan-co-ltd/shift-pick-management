@@ -119,9 +119,20 @@ namespace ai_truck_load_measurement.Models
 
     public class M_NotificationViewModel: CommonModel
     {
+        /// <summary>
+        /// 通知リスト
+        /// </summary>
         public List<M_NotificationModel> M_NotificationList { get; set; }
 
-        public M_DepoModel MainDepo {  get; set; }
+        /// <summary>
+        /// メインデポID
+        /// </summary>
+        public int MainDepoID {  get; set; }
+
+        /// <summary>
+        /// メインデポ名
+        /// </summary>
+        public string MainDepoName {  get; set; }
 
         /// <summary>
         /// 通知ID
