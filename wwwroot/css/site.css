@@ -1260,10 +1260,6 @@ table.dataTable span.column_highlight {
         width: 100%;
     }
 
-    .news-list .item div:hover .title {
-        color: #00F;
-    }
-
 @media screen and (max-width: 767px) {
     .news-list .item div {
         flex-wrap: wrap;
