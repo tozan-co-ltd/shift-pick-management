@@ -1203,12 +1203,11 @@ table.dataTable span.column_highlight {
 
     .news-list .item div {
         display: flex;
-        flex-wrap: wrap;
-        flex-wrap: nowrap;
+        justify-content: center;
         text-decoration: none;
         color: #333;
         border-bottom: 1px solid #CCC;
-        padding: 20px 20px;
+        padding: 1.5rem 10px;
     }
 
     .news-list .item:first-child div {
@@ -1220,14 +1219,13 @@ table.dataTable span.column_highlight {
         min-width: 140px;
         font-size: 16px;
         color: #999;
-        padding: 0 20px 0 0;
     }
 
     .news-list .item .category {
         margin: 0;
         min-width: 140px;
         padding: 0 20px 0 0;
-        text-align:center;
+        text-align: center;
     }
 
     .news-list .item .category span {

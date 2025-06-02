@@ -22,16 +22,16 @@
 
                 @foreach(var item in Model.NewsList)
                 {
-                    <dl class="item">
-                        <dd>
-                            <div >
-                                <p class="date">@item.NewsDate.ToString("yyyy/MM/dd")</p>
-                                <p class="category @("news-categoryid-" + item.CategoryClass)"><span>@item.CategoryStatus</span></p>
-                                <p class="title">@item.NewsContent</p>
-                                @if(Model.AuthorizedKubun == 2)
+                    <dl class="item" style="margin-bottom: 0rem;">
+                        <dd style="margin-bottom: 0rem;">
+                            <div>
+                                <p class="date" style="display: flex; align-items: center;">@item.NewsDate.ToString("yyyy/MM/dd")</p>
+                                <p class="category @("news-categoryid-" + item.CategoryClass)" style="display: flex; align-items: center;"><span>@item.CategoryStatus</span></p>
+                                <p class="title" id="@("news-" + item.NewsID)" style="display: flex; align-items: center;"></p>
+                                @if (Model.AuthorizedKubun == 2)
                                 {
-                                    <span class="ml-2">
-                                        <button class="btn btn-primary" onclick="OnEditClick(@item.NewsID)" data-toggle="modal" data-target="#edit-modal" style="white-space: nowrap">編集</button>
+                                    <span class="ml-2" style="display: flex; align-items: center;">
+                                        <button class="btn btn-primary" onclick="OnEditClick(@item.NewsID)" data-toggle="modal" data-target="#edit-modal" style="white-space: nowrap;">編集</button>
                                     </span>
                                 }
                             </div>
@@ -179,6 +179,13 @@
     </div>
 </div>
 <script type="text/javascript">
+    // 画面読み込み時
+    $(document).ready(function () {
+        model = @Html.Raw(Json.Serialize(Model));
+        model.newsList.forEach(function(news){
+            $("#news-" + news.newsID)[0].innerHTML = news.newsContent;
+        });
+    })
 
     // 登録ボタン押下時
     function OnInsertClick(){
@@ -242,9 +249,10 @@
         var model =  @Html.Raw(Json.Serialize(Model));
         var news = model.newsList.find(({newsID}) => newsID == targetID);
         var newsDate = GetDayString(new Date(news.newsDate));
+        var newsContent = news.newsContent.replace(/<br \/>/g, "\r\n");
         $('#NewsIDEdit').val(news.newsID);
         $('#CategoryClassEdit').val(news.categoryClass);
-        $('#NewsContentEdit').val(news.newsContent);
+        $('#NewsContentEdit').val(newsContent);
         $('#NewsDateEdit').val(newsDate);
     }
 
