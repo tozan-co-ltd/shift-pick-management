@@ -27,7 +27,7 @@
                             <div>
                                 <p class="date" style="display: flex; align-items: center;">@item.NewsDate.ToString("yyyy/MM/dd")</p>
                                 <p class="category @("news-categoryid-" + item.CategoryClass)" style="display: flex; align-items: center;"><span>@item.CategoryStatus</span></p>
-                                <p class="title" id="@("news-" + item.NewsID)" style="display: flex; align-items: center;"></p>
+                                <p class="title" id="@("news-" + item.NewsID)"></p>
                                 @if (Model.AuthorizedKubun == 2)
                                 {
                                     <span class="ml-2" style="display: flex; align-items: center;">
