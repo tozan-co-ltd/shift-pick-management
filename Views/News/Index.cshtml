@@ -18,7 +18,7 @@
 
         @if(Model.NewsList.Count > 0)
         {
-            <div class="news-container news-list">
+            <div class="news-container news-list mb-3">
 
                 @foreach(var item in Model.NewsList)
                 {
@@ -238,6 +238,7 @@
             perPage: 30,//1ページあたりの表示件数
             prevText:'前へ',//1つ前のページへ移動するボタンのテキスト
             nextText:'次へ',//1つ次のページへ移動するボタンのテキスト
+            prevNext: false,
             activeClass: 'navi-active',//現在のページ番号に任意のclassを付与できます
             firstLast: false,
         })
