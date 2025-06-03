@@ -98,6 +98,10 @@
             border: #1CC88A;
             color: #ffffff;
     }
+    .news-notification{
+        background-color: lightgray;
+        padding: 1rem 1rem;
+    }
 </style>
 <div class="card shadow de-inspection m-4">
     <div class="card-header">
@@ -108,7 +112,11 @@
         {
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
-        <p class="mb-3 top-title" id="stationTitle"></p>
+        @* <p class="top-title" id="stationTitle"></p> *@
+        <div class="news-notification mb-3 d-flex">
+            <a href="/News" style="color:red; font-weight: bold;">新規お知らせが届いています。</a>
+            <a href="#" style="margin-left: auto;">閉じる</a>
+        </div>
         <div class="mb-3" >
             <p style="color:red;" id="funamiCaution"></p>
         </div>
@@ -171,7 +179,7 @@
         }, 60000);
         $("#selectDepo").find("option[value='" + top_model.mainDepoID + "']").attr("selected", "selected");
         if(top_model.mainDepoName != ""){
-            $("#stationTitle")[0].innerText = getStationTitle(top_model.mainDepoName);
+            // $("#stationTitle")[0].innerText = getStationTitle(top_model.mainDepoName);
             $('#modalImage').attr("src", window.location.href + "/images/top/layout/depo" + top_model.mainDepoID + "layout.png");
         }
     });
@@ -266,7 +274,7 @@
             var depoName = "";
             for(var i=0; i < depo.length; i++){
                 if(depo[i].selected){
-                    $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
+                    // $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
                     selectedDepoID = depo[i].value;
                     $('#modalImage').attr("src", window.location.href + "/images/top/layout/depo" + depo[i].value + "layout.png");
                 }
