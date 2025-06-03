@@ -13,6 +13,7 @@ using System;
 using SixLabors.ImageSharp.Formats;
 using System.Collections;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System.Data.SqlClient;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -87,7 +88,6 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-        
 
         /// <summary>
         /// 取得値の変換

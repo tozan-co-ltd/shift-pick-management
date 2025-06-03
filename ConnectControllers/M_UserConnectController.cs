@@ -271,6 +271,12 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 新規通知情報更新SQL作成
+        /// </summary>
+        /// <param name="hasNewsNotification"></param>
+        /// <param name="adName"></param>
+        /// <returns></returns>
         public static string CreateSQLToUpdateHasNewsNotification(bool hasNewsNotification, string adName)
         {
             var hasNewsNotificationBit = 0;
@@ -282,9 +288,14 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SET 
                     has_news_notification = {hasNewsNotificationBit}
                 WHERE
-                    ad_name = '{adName}'
-                    and is_deleted = 0
-";
+                    is_deleted = 0
+            ";
+            if (!hasNewsNotification)
+            {
+                sql += $@"
+                    AND ad_name = '{adName}'
+                ";
+            }
             return sql;
         }
     }
