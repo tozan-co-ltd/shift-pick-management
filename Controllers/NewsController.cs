@@ -69,6 +69,9 @@ namespace ai_truck_load_measurement.Controllers
                     return NotFound(new { errorMessage });
                 }
 
+                // 改行用変換処理
+                model.NewsContent = model.NewsContent.Replace("\r\n", "<br />");
+
                 // お知らせ登録
                 var sql = NewsConnectController.CreateSQLToInsertNews(model, DateTime.Now, user.UserName);
                 ConnectToSQLServer.ExecuteQuery(sql);
@@ -119,6 +122,10 @@ namespace ai_truck_load_measurement.Controllers
 
                     return NotFound(new { errorMessage });
                 }
+
+
+                // 改行用変換処理
+                model.NewsContent = model.NewsContent.Replace("\r\n", "<br />");
 
                 // お知らせ更新
                 var sql = NewsConnectController.CreateSQLToUpdateNews(model, DateTime.Now, user.UserName);
