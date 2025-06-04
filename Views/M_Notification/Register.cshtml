@@ -189,6 +189,7 @@
         var mm = ("0" + today.getMinutes()).slice(-2);;
 
         $('#NotificationStartDateTime').val(yyyy + '-' + MM + '-' + dd + "T" + hh + ":" + mm);
+        $('#NotificationEndDateTime').val(yyyy + '-' + MM + '-' + dd + "T" + hh + ":" + mm);
 
         // ユーザーのセレクトリスト作成
         createToggleUserSelectCheckBox("/Register");

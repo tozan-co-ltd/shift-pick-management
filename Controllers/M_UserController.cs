@@ -508,5 +508,57 @@ namespace ai_truck_load_measurement.Controllers
             dt.Columns.Remove("is_required_mail");
             return dt;
         }
+
+        /// <summary>
+        /// 新規通知有無取得
+        /// </summary>
+        /// <param name="adName"></param>
+        /// <returns></returns>
+        public static bool GetHasNewsNotification(string adName)
+        {
+            // 新規通知有無取得SQL作成
+            var sql = M_UserConnectController.CreateSQLToSelectHasNewsNotificationFromADName(adName);
+            // 新規通知有無取得
+            List<M_UserModel> userList = ConnectToSQLServer.ExecuteQueryToList<M_UserModel>(sql);
+            if (userList.Count != 0)
+                return userList[0].HasNewsNotification;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// 新規通知有無更新
+        /// </summary>
+        /// <param name="hasNewsNotification">更新後の新規通知有無情報</param>
+        /// <returns></returns>
+        public IActionResult UpdateHasNewsNotification(bool hasNewsNotification)
+        {
+            var errorMessage = "";
+            try
+            {
+                var user = ClaimsLoginUserData();
+                var sql = M_UserConnectController.CreateSQLToUpdateHasNewsNotification(hasNewsNotification, user.ADName);
+                ConnectToSQLServer.ExecuteQueryScalar(sql);
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return BadRequest(new { errorMessage });
+            }
+            catch (Exception ex)
+            {
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return BadRequest(new { errorMessage });
+            }
+        }
     }
 }

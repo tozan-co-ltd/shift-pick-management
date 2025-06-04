@@ -255,5 +255,48 @@ namespace ai_truck_load_measurement.ConnectControllers
 
             return sql;
         }
+
+        /// <summary>
+        /// AD名から新規通知有無取得SQL作成
+        /// </summary>
+        /// <param name="adName"></param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectHasNewsNotificationFromADName(string adName)
+        {
+            var sql = $@"
+                SELECT has_news_notification
+                FROM m_users
+                WHERE ad_name = '{adName}'
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 新規通知情報更新SQL作成
+        /// </summary>
+        /// <param name="hasNewsNotification"></param>
+        /// <param name="adName"></param>
+        /// <returns></returns>
+        public static string CreateSQLToUpdateHasNewsNotification(bool hasNewsNotification, string adName)
+        {
+            var hasNewsNotificationBit = 0;
+            if (hasNewsNotification)
+                hasNewsNotificationBit = 1;
+
+            var sql = $@"
+                UPDATE m_users
+                SET 
+                    has_news_notification = {hasNewsNotificationBit}
+                WHERE
+                    is_deleted = 0
+            ";
+            if (!hasNewsNotification)
+            {
+                sql += $@"
+                    AND ad_name = '{adName}'
+                ";
+            }
+            return sql;
+        }
     }
 }

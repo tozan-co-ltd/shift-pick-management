@@ -54,6 +54,11 @@ namespace ai_truck_load_measurement.Models
         public string? MailAddress {  get; set; }
 
         /// <summary>
+        /// 新規通知有無
+        /// </summary>
+        public bool HasNewsNotification { get; set; }
+
+        /// <summary>
         /// 作成日時
         /// </summary>
         public DateTime CreatedAt { get; set; }

@@ -13,6 +13,8 @@ namespace ai_truck_load_measurement.Models
         public int MainDepoID {  get; set; }
         // 現在のデポ名
         public string? MainDepoName { get; set; }
+        // 新規通知有無
+        public bool HasNewsNotification { get; set; }
     }
 
     /// <summary>
