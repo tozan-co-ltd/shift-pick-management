@@ -12,6 +12,8 @@ using System.Drawing;
 using System;
 using SixLabors.ImageSharp.Formats;
 using System.Collections;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System.Data.SqlClient;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -74,6 +76,8 @@ namespace ai_truck_load_measurement.Controllers
                 // ログインユーザーのメインデポ情報取得
                 topModel.MainDepoID = user.MainDepoID;
                 topModel.MainDepoName = user.MainDepoName;
+                // 新規通知有無取得
+                topModel.HasNewsNotification = M_UserController.GetHasNewsNotification(user.ADName);
                 return topModel;
             }
             catch (Exception ex)
@@ -83,6 +87,7 @@ namespace ai_truck_load_measurement.Controllers
                 return topModel;
             }
         }
+
 
         /// <summary>
         /// 取得値の変換

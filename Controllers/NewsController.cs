@@ -22,6 +22,8 @@ namespace ai_truck_load_measurement.Controllers
             {
                 news.CategoryStatus = ConversionCategoryClassToCategoryStatus(news);
             }
+            // 新規通知有無更新
+            UpdateHasNewsNotification(false);
             return View(model);
         }
 
@@ -76,6 +78,9 @@ namespace ai_truck_load_measurement.Controllers
                 var sql = NewsConnectController.CreateSQLToInsertNews(model, DateTime.Now, user.UserName);
                 ConnectToSQLServer.ExecuteQuery(sql);
 
+                // 新規通知有無更新
+                UpdateHasNewsNotification(true);
+
                 // log取得
                 _logger.Info($"お知らせ登録成功");
 
@@ -100,6 +105,21 @@ namespace ai_truck_load_measurement.Controllers
                 return NotFound(new { errorMessage });
             }
         }
+
+        /// <summary>
+        /// 新規通知有無更新
+        /// </summary>
+        /// <param name="hasNewsNotification">更新後の新規通知有無情報</param>
+        /// <returns></returns>
+        public int UpdateHasNewsNotification(bool hasNewsNotification)
+        {
+            var user = ClaimsLoginUserData();
+            var sql = M_UserConnectController.CreateSQLToUpdateHasNewsNotification(hasNewsNotification, user.ADName);
+            var count = ConnectToSQLServer.ExecuteQuery(sql);
+            return count;
+        }
+
+
         /// <summary>
         /// お知らせ更新
         /// </summary>

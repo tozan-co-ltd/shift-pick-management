@@ -9,94 +9,98 @@
     Flexboxを指定"space-between"で各アイテムを均等に配置し、
     最初と最後のアイテムを端に寄せます。*/
     #cardlayout-wrap {
-        position: relative;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -ms-flex-pack: justify;
-        margin: 2em auto;
-        width: 100%;
-        -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
-        -webkit-box-pack: justify;
-        justify-content: space-between;
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: justify;
+    margin: 2em auto;
+    width: 100%;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
     }
 
-    
+
 
     /* カードレイアウト内の画像を幅いっぱいに表示 */
     #cardlayout-wrap img {
-        display: block;
-        max-width: 100%;
-        height: auto;
-        margin: auto;
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: auto;
     }
 
     .card-figure {
-        margin: 0 0 0;
-        padding: 0.5em;
+    margin: 0 0 0;
+    padding: 0.5em;
     }
 
     /* カードレイアウトのタイトル部分 */
     .card-title {
-        margin: 0 0 0;
-        color: #333;
-        text-align: center;
-        font-size: 3.0em;
-        font-weight: bold;
+    margin: 0 0 0;
+    color: #333;
+    text-align: center;
+    font-size: 3.0em;
+    font-weight: bold;
     }
 
     /* カードレイアウトの説明文部分 */
     .created-at {
-        margin: 0 0.5em 0;
-        color: #493511;
-        text-align: center;
+    margin: 0 0.5em 0;
+    color: #493511;
+    text-align: center;
     }
 
     .station-number{
-        margin: 0;
-        padding: 0.5em;
-        color: #493511;
-        font-size: 1.4em;
+    margin: 0;
+    padding: 0.5em;
+    color: #493511;
+    font-size: 1.4em;
     }
 
     .truck-status{
-        color: #493511;
-        text-align: center;
-        font-weight: bold;
-        font-size: 1.5em;
+    color: #493511;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.5em;
     }
 
     .card-list {
-        margin: 0.5em auto;
-        padding: 0;
-        width: calc(96% / 3); /* 96%幅を3で割るという指定 */
-        background: #ffffff;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-        border-radius: 10px;
+    margin: 0.5em auto;
+    padding: 0;
+    width: calc(96% / 3); /* 96%幅を3で割るという指定 */
+    background: #ffffff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
     }
 
     .top-title {
-        color: #493511;
-        font-size: 1.8em;
+    color: #493511;
+    font-size: 1.8em;
     }
 
     .btn-update:not(:disabled):not(.disabled):active, .btn-update:not(:disabled):not(.disabled).active,
     .show > .btn-update.dropdown-toggle {
-        background-color: #1CC88A !important; 
-        border: #1CC88A !important;
-        color: #ffffff !important;
+    background-color: #1CC88A !important; 
+    border: #1CC88A !important;
+    color: #ffffff !important;
     }
 
     .btn-update{
-        background-color: #1CC88A;
-        border: #1CC88A;
-        color:#ffffff;
+    background-color: #1CC88A;
+    border: #1CC88A;
+    color:#ffffff;
     }
     .btn-update:hover{
-            background-color: #1CC88A;
-            border: #1CC88A;
-            color: #ffffff;
+    background-color: #1CC88A;
+    border: #1CC88A;
+    color: #ffffff;
+    }
+    .news-notification{
+    background-color: lightgray;
+    padding: 1rem 1rem;
     }
 </style>
 <div class="card shadow de-inspection m-4">
@@ -108,7 +112,16 @@
         {
             <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
         }
-        <p class="mb-3 top-title" id="stationTitle"></p>
+        @* <p class="top-title" id="stationTitle"></p> *@
+        @if (Model.HasNewsNotification)
+        {
+            <div id="newsNotification">
+                <div class="news-notification mb-3 d-flex">
+                    <a href="/News" style="color:red; font-weight: bold;">新規お知らせが届いています。</a>
+                    <a href="#" style="margin-left: auto;" onclick="onCloseClick()">閉じる</a>
+                </div>
+            </div>
+        }
         <div class="mb-3" >
             <p style="color:red;" id="funamiCaution"></p>
         </div>
@@ -137,10 +150,7 @@
                 <span class="text">配置図</span>
             </button>
         </div>
-        <div id="cardlayout-wrap">
-            <!-- カードレイアウトをラッピング -->
-        </div>
-            <!-- カードレイアウトをラッピング -->
+        <div id="cardlayout-wrap"></div>
     </div>
 </div>
 
@@ -171,7 +181,7 @@
         }, 60000);
         $("#selectDepo").find("option[value='" + top_model.mainDepoID + "']").attr("selected", "selected");
         if(top_model.mainDepoName != ""){
-            $("#stationTitle")[0].innerText = getStationTitle(top_model.mainDepoName);
+            // $("#stationTitle")[0].innerText = getStationTitle(top_model.mainDepoName);
             $('#modalImage').attr("src", window.location.href + "/images/top/layout/depo" + top_model.mainDepoID + "layout.png");
         }
     });
@@ -266,7 +276,7 @@
             var depoName = "";
             for(var i=0; i < depo.length; i++){
                 if(depo[i].selected){
-                    $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
+                    // $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
                     selectedDepoID = depo[i].value;
                     $('#modalImage').attr("src", window.location.href + "/images/top/layout/depo" + depo[i].value + "layout.png");
                 }
@@ -294,6 +304,32 @@
         else{
             return "";
         }
+    }
+
+    // 閉じるボタン押下時
+    function onCloseClick(){
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("UpdateHasNewsNotification", "M_User")';
+        let method = 'Post';
+        let data = { hasNewsNotification: false };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            $("#newsNotification")[0].innerHTML = "";
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#ErrorMessage").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#ErrorMessage").text(errorMessage);
+            }
+        });
     }
 
 </script>
