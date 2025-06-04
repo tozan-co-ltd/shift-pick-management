@@ -32,6 +32,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                m_trucks
                 WHERE 
                     is_deleted = 0
+                ORDER BY truck_number
             ";
             return sql;
         }
