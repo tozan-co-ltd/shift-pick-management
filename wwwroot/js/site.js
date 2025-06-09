@@ -374,12 +374,14 @@ function EditModal(tripRecordID, isArrived, page) {
                 var arriveOrDepartureDate = "";
                 var loadStatus = "";
                 var downloadFileName = "";
+                var tag = "-";
                 var workDayForFile = GetDayStringForFile(new Date(item.workDay));
                 var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
                 var truckNumber = item.truckNumber;
                 var authorizedKubun = response.authorizedKubun;
                 if (truckNumber == "0") truckNumber = "-";
                 if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
+                if (item.tag != null) tag = item.tag;
 
                 // 到着か出発かで変わる要素の登録
                 if (isArrived) {
@@ -472,7 +474,7 @@ function EditModal(tripRecordID, isArrived, page) {
                     + "<td>" + tripNameAndBranchSeq + "</td>"
                     + "</tr><tr>"
                     + "<td>タグ</td>"
-                    + "<td>" + item.tag + "</td>"
+                    + "<td>" + tag + "</td>"
                     + "</tr><tr>"
                     + "<td>乗務員</td>"
                     + "<td>" + item.driverName + "</td>"
