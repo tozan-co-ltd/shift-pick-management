@@ -137,12 +137,19 @@
     $(document).ready(function(){
         // M_TripModel取得
         var tripModel = @Html.Raw(Json.Serialize(Model));
-        console.log(tripModel);
         getIdentifyNumber(tripModel.truckID);
-        if (tripModel.truckID == 0) {
-            $('#DayShiftStartTime').val("");
-            $('#ApplicableStartDateTime').val("");
-            $('#ApplicableEndDateTime').val("");
+        if (tripModel.truckID == null) {
+            // 今日の日付を取得
+            var today = new Date();
+            today.setDate(today.getDate());
+            var yyyy = today.getFullYear();
+            var MM = ("0" + (today.getMonth() + 1)).slice(-2);
+            var dd = ("0" + today.getDate()).slice(-2);
+            var hh = ("0" + today.getHours()).slice(-2);
+            var mm = ("0" + today.getMinutes()).slice(-2);
+            $('#ApplicableStartDateTime').val(yyyy + '-' + MM + '-' + dd + "T" + hh + ":" + mm);
+            $('#ApplicableEndDateTime').val(yyyy + '-' + MM + '-' + dd + "T" + hh + ":" + mm);
+            $('#DayShiftStartTime').val("00:00");
         }
         else {
             var startTime = new Date(tripModel.dayShiftStartTime);
