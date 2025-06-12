@@ -610,10 +610,10 @@ function tableDisplayCommon(page, data) {
             dom: dom_structure,
             "columnDefs": [
                 { className:"dt-body-left", "targets": [2] },
-                { className:"dt-body-left", "targets": [0] },
+                { className: "dt-body-left", "targets": [0], },
             ],
             fixedColumns: {
-                leftColumns: 2,
+                leftColumns: 3,
             },
         });
         var table = $("#tripRecordDataTable").DataTable();
