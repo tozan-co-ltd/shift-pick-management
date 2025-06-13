@@ -27,6 +27,7 @@
                     <div class="card-body">
                         <ul class="mb-0">
                             <li>通知開始日時を現在時刻以前に設定した場合でも、現在時刻以前に到着した便に対するアラートが改めて登録されることはありません。</li>
+                            <li>到着・出発荷量下限に「すべて」を選択した場合、荷量に関わらず到着・出発アラートが通知されます。</li>
                         </ul>
                     </div>
                 </div>
@@ -103,6 +104,7 @@
                                 <option value="10">71～80%</option>
                                 <option value="11">81～90%</option>
                                 <option value="12">91～100%</option>
+                                <option value="100">すべて</option>
                             </select>
                             <span class="text-danger w-100" asp-validation-for="ArrivalLowerLoadClass"></span>
                         </div>
@@ -124,6 +126,7 @@
                                 <option value="10">71～80%</option>
                                 <option value="11">81～90%</option>
                                 <option value="12">91～100%</option>
+                                <option value="100">すべて</option>
                             </select>
                             <span class="text-danger w-100" asp-validation-for="DepartureLowerLoadClass"></span>
                         </div>

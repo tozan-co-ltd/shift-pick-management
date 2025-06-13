@@ -695,7 +695,11 @@ namespace ai_truck_load_measurement.Controllers
         public static string ConversionLoadClassToLoadStatus(int loadClass)
         {
             var loadStatus = "-";
-            if (loadClass >= 3)
+            if (loadClass == 100)
+            {
+                loadStatus = "すべて";
+            }
+            else if (loadClass >= 3)
             {
                 int lowerLimit = (loadClass - 3) * 10 + 1;
                 int upperLimit = (loadClass - 2) * 10;
