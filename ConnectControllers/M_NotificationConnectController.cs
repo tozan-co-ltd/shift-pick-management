@@ -295,6 +295,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     Notifications.trip_id,
                     Trips.trip_name,
                     Notifications.trip_branch_seq,
+                    Depos.depo_id,
 	                Depos.name AS depo_name,
                     Notifications.arrival_lower_load_class,
                     Notifications.departure_lower_load_class,
@@ -433,7 +434,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// 便マスター情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
-        public static string CreateSQLToSelectMTrips()
+        public static string CreateSQLToSelectMTrips(int depoID)
         {
             DateTime today = DateTime.Now;
             var sql = $@"
@@ -455,9 +456,11 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ON
 	                TripHistories.depo_id = Depos.depo_id
                 WHERE
-                        TripHistories.applicable_end_datetime > '{today}'
-                    ORDER BY 
-                        TripHistories.trip_id, TripHistories.applicable_start_datetime
+                    TripHistories.applicable_end_datetime > '{today}'
+                AND
+                    TripHistories.depo_id = '{depoID}'
+                ORDER BY 
+                    TripHistories.trip_id, TripHistories.applicable_start_datetime
             ";
             return sql;
         }

@@ -38,7 +38,9 @@
                             <label>@Html.DisplayName("TripNameSelectList")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <select class="form-select" name="TripID" asp-for="TripID" asp-items="@Model.TripNameSelectList" id="TripID" required></select>
+                            <select class="form-select" name="TripID" asp-for="TripID" asp-items="@Model.TripNameSelectList" id="TripID" required>
+                                <option value="0" selected disabled>選択してください</option>
+                            </select>
                             <span class="text-danger w-100" asp-validation-for="TripID"></span>
                         </div>
                     </div>
@@ -202,10 +204,11 @@
 
         // ユーザーのセレクトリスト作成
         createToggleUserSelectCheckBox("/Register");
-    })
+    });
 
-    // 便名称選択時の処理
-    $('[name=TripID]').change(function () {
+
+    // 便枝番取得
+    function GetTripBranchSeqs() {
         var tripID = $('[name=TripID]').val();
 
         // フォーム情報取得
@@ -217,10 +220,12 @@
         $.ajax({
             url: url,
             method: method,
-            data: data
+            data: data,
+            async: false,
         }).done(function (response) {
             // 便枝番セレクトリストの更新
-            AddOptionToSelectList(response, "TripBranchIDAndSeq")
+            AddOptionToSelectList(response, "TripBranchIDAndSeq");
+            console.log("start");
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -229,25 +234,6 @@
                 var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
                 $("#edit-modal-error-message").text(errorMessage);
             }
-        });
-    });
-
-
-
-    // セレクトリスト更新
-    function AddOptionToSelectList(selectListItems, selectListID) {
-        var selectList = document.getElementById(selectListID);
-        // 子要素の初期化
-        while (selectList.firstChild) {
-            selectList.removeChild(selectList.firstChild);
-        }
-
-        selectListItems.forEach(function (item) {
-            // optionタグを作成する
-            var option = document.createElement("option");
-            option.text = item.text;
-            option.value = item.value;
-            selectList.appendChild(option);
         });
     }
 

@@ -102,6 +102,15 @@
                         </div>
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <label>@Html.DisplayNameFor(model => model.DepoSelectList)<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.DepoSelectList" required id="DepoID"></select>
+                                <span class="text-danger w-100" asp-validation-for="DepoID"></span>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayNameFor(model => model.TripName)<span style="color:red">*</span></label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
@@ -315,6 +324,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
+        console.log(model);
         addDepos(model);
         depoCheckDisplay(model);
         tableDisplay();
@@ -470,6 +480,8 @@
                 var notificationStartDateTime = GetDateString(new Date(item.notificationStartDateTime));
                 var notificationEndDateTime = GetDateString(new Date(item.notificationEndDateTime));
                 $("#NotificationID").val(item.notificationID);
+                $("#DepoID").val(item.depoID);
+                GetTrips();
                 $("#TripID").val(item.tripID);
                 GetTripBranchSeqs();
                 $("#TripBranchSeq").val(item.tripBranchSeq);
@@ -480,6 +492,54 @@
                 // 通知ユーザー取得
                 getNotificationUsers(item);
             }
+        });
+    }
+
+    // 便枝番取得
+    function GetTripBranchSeqs() {
+        var tripID = $('[name=TripID]').val();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripBranchSeqs", "M_Notification")';
+        let method = 'POST';
+        let data = { tripID: tripID };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false
+        }).done(function (response) {
+            // 便枝番セレクトリストの更新
+            AddOptionToTripBranchSelectList(response)
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    }
+
+    // 便枝番セレクトリスト更新
+    function AddOptionToTripBranchSelectList(selectListItems) {
+        var selectList = document.getElementById("TripBranchSeq");
+
+        // 子要素の初期化
+        while (selectList.firstChild) {
+            selectList.removeChild(selectList.firstChild);
+        }
+
+        selectListItems.forEach(function (item) {
+            var tripBranchIDAndSeq = item.value.split("_");
+            // optionタグを作成する
+            var option = document.createElement("option");
+            option.text = item.text;
+            option.value = tripBranchIDAndSeq[1];
+            selectList.appendChild(option);
         });
     }
 
@@ -543,87 +603,6 @@
             });
         });
     }
-
-    // 便名称選択時の処理
-    $('[name=TripID]').change(function () {
-        GetTripBranchSeqs();
-    });
-
-    // 便枝番取得
-    function GetTripBranchSeqs() {
-        var tripID = $('[name=TripID]').val();
-
-        // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetTripBranchSeqs", "M_Notification")';
-        let method = 'POST';
-        let data = { tripID: tripID };
-
-        // Ajax call
-        $.ajax({
-            url: url,
-            method: method,
-            data: data,
-            async: false
-        }).done(function (response) {
-            // 便枝番セレクトリストの更新
-            AddOptionToSelectList(response)
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 404) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#edit-modal-error-message").text(errorMessage);
-            } else {
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#edit-modal-error-message").text(errorMessage);
-            }
-        });
-    }
-
-    // 便枝番セレクトリスト更新
-    function AddOptionToSelectList(selectListItems) {
-        var selectList = document.getElementById("TripBranchSeq");
-
-        // 子要素の初期化
-        while (selectList.firstChild) {
-            selectList.removeChild(selectList.firstChild);
-        }
-
-        selectListItems.forEach(function (item) {
-            var tripBranchIDAndSeq = item.value.split("_");
-            // optionタグを作成する
-            var option = document.createElement("option");
-            option.text = item.text;
-            option.value = tripBranchIDAndSeq[1];
-            selectList.appendChild(option);
-        });
-    }
-
-    // 便枝番選択時の処理
-    $('[name=TripBranchSeq]').change(function () {
-        var tripID = $('[name=TripID]').val();
-        var tripBranchNumberID = $('[name=TripBranchSeq]').val().split("_")[0];
-
-        // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetTripBranchSeqData", "M_Notification")';
-        let method = 'POST';
-        let data = { tripID: tripID, tripBranchNumberID: tripBranchNumberID };
-
-        // Ajax call
-        $.ajax({
-            url: url,
-            method: method,
-            data: data
-        }).done(function (response) {
-            SetTripBranchSeqData(response);
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 404) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#edit-modal-error-message").text(errorMessage);
-            } else {
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#edit-modal-error-message").text(errorMessage);
-            }
-        });
-    });
 
     // 削除ボタン押下
     function OnDeleteClick(notificationID) {

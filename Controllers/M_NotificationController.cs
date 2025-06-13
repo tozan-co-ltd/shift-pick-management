@@ -40,7 +40,6 @@ namespace ai_truck_load_measurement.Controllers
 
                 model.M_NotificationList = notificationList.ToList();
                 model.DepoSelectList = GetDepos();
-                model.TripNameSelectList = GetTrips();
 
                 return View(model);
             }
@@ -187,7 +186,6 @@ namespace ai_truck_load_measurement.Controllers
         {
             var model = new M_NotificationRegisterViewModel();
             model.DepoSelectList = GetDepos();
-            model.TripNameSelectList = GetTrips();
             
             return View(model);
         }
@@ -507,7 +505,7 @@ namespace ai_truck_load_measurement.Controllers
         /// 便名称リスト取得
         /// </summary>
         /// <returns></returns>
-        public List<SelectListItem> GetTrips()
+        public List<SelectListItem> GetTrips(int depoID)
         {
 
             var selectList = new List<SelectListItem>();
@@ -521,7 +519,7 @@ namespace ai_truck_load_measurement.Controllers
             });
 
             // 便の選択肢作成
-            var tripSql = M_NotificationConnectController.CreateSQLToSelectMTrips();
+            var tripSql = M_NotificationConnectController.CreateSQLToSelectMTrips(depoID);
             var tripList = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(tripSql);
             foreach (var trip in tripList)
             {

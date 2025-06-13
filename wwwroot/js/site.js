@@ -1122,3 +1122,59 @@ function clearUsers() {
         selectedUsers.innerHTML = "";
     arrayUsers = [];
 }
+
+// デポ選択時の処理
+$('[name=DepoID]').change(function () {
+    GetTrips();
+});
+
+function GetTrips() {
+    var depoID = $('[name=DepoID]').val();
+
+    // フォーム情報取得
+    let url = window.location.href + '/GetTrips';
+    url = url.replace("Register/", "");
+    let method = 'POST';
+    let data = { depoID: depoID };
+
+    // Ajax call
+    $.ajax({
+        url: url,
+        method: method,
+        data: data,
+        async: false,
+    }).done(function (response) {
+        // 便枝番セレクトリストの更新
+        AddOptionToSelectList(response, "TripID");
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status === 404) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#edit-modal-error-message").text(errorMessage);
+        } else {
+            var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+            $("#edit-modal-error-message").text(errorMessage);
+        }
+    });
+}
+
+// 便名称選択時の処理
+$('[name=TripID]').change(function () {
+    GetTripBranchSeqs();
+});
+
+// セレクトリスト更新
+function AddOptionToSelectList(selectListItems, selectListID) {
+    var selectList = document.getElementById(selectListID);
+    // 子要素の初期化
+    while (selectList.firstChild) {
+        selectList.removeChild(selectList.firstChild);
+    }
+
+    selectListItems.forEach(function (item) {
+        // optionタグを作成する
+        var option = document.createElement("option");
+        option.text = item.text;
+        option.value = item.value;
+        selectList.appendChild(option);
+    });
+}
