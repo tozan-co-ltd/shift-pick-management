@@ -1175,6 +1175,8 @@ function AddOptionToSelectList(selectListItems, selectListID) {
         var option = document.createElement("option");
         option.text = item.text;
         option.value = item.value;
+        option.disabled = item.disabled;
+        option.selected = item.selected;
         selectList.appendChild(option);
     });
 }

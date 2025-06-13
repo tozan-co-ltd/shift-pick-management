@@ -21,6 +21,18 @@
             }
         </div>
 
+        <div class="row mb-3">
+            <div class="col-lg-10">
+                <div class="card border-left-custom">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>通知開始日時を現在時刻以前に設定した場合でも、現在時刻以前に到着した便に対するアラートが改めて登録されることはありません。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
                 <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="mNotificationForm">
@@ -39,7 +51,7 @@
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <select class="form-select" name="TripID" asp-for="TripID" asp-items="@Model.TripNameSelectList" id="TripID" required>
-                                <option value="0" selected disabled>選択してください</option>
+                                <option value="0" selected disabled>デポを選択してください</option>
                             </select>
                             <span class="text-danger w-100" asp-validation-for="TripID"></span>
                         </div>
@@ -50,7 +62,7 @@
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <select class="form-select" name="TripBranchIDAndSeq" asp-for="TripBranchIDAndSeq" asp-items="@Model.TripBranchSeqSelectList" id="TripBranchIDAndSeq" required>
-                                <option value="0" selected disabled>選択してください</option>
+                                <option value="0" selected disabled>便名称を選択してください</option>
                             </select>
                             <span class="text-danger w-100" asp-validation-for="TripBranchIDAndSeq"></span>
                         </div>
@@ -225,7 +237,6 @@
         }).done(function (response) {
             // 便枝番セレクトリストの更新
             AddOptionToSelectList(response, "TripBranchIDAndSeq");
-            console.log("start");
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;

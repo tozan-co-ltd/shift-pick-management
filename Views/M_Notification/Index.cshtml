@@ -25,6 +25,13 @@
                     <div class="card-body">
                         <ul class="mb-0">
                             <li>通知期間内の便が初期表示されます。</li>
+                            <li>到着・出発時それぞれのアラート通知メールで表示される項目は以下の通りです。
+                                <ul>
+                                    <li>到着時アラート対象項目：到着時間(早or遅)</li>
+                                    <li>出発時アラート対象項目：出発時間(早or遅)、到着荷量(下限)、出発荷量(下限)</li>
+                                </ul>
+                            </li>
+                            <li>通知開始日時を現在時刻以前に設定した場合でも、現在時刻以前に到着した便に対するアラートが改めて登録されることはありません。</li>
                         </ul>
                     </div>
                 </div>
@@ -539,6 +546,7 @@
             var option = document.createElement("option");
             option.text = item.text;
             option.value = tripBranchIDAndSeq[1];
+            option.disabled = item.disabled;
             selectList.appendChild(option);
         });
     }
