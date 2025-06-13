@@ -26,10 +26,19 @@
                 <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="mNotificationForm">
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("DepoSelectList")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.DepoSelectList" id="DepoID" required></select>
+                            <span class="text-danger w-100" asp-validation-for="DepoID"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
                             <label>@Html.DisplayName("TripNameSelectList")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <select class="form-select" name="TripID" asp-for="TripID" asp-items="@Model.TripNameSelectList" required></select>
+                            <select class="form-select" name="TripID" asp-for="TripID" asp-items="@Model.TripNameSelectList" id="TripID" required></select>
                             <span class="text-danger w-100" asp-validation-for="TripID"></span>
                         </div>
                     </div>
@@ -211,7 +220,7 @@
             data: data
         }).done(function (response) {
             // 便枝番セレクトリストの更新
-            AddOptionToSelectList(response)
+            AddOptionToSelectList(response, "TripBranchIDAndSeq")
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -223,10 +232,11 @@
         });
     });
 
-    // 便枝番セレクトリスト更新
-    function AddOptionToSelectList(selectListItems) {
-        var selectList = document.getElementById("TripBranchIDAndSeq");
 
+
+    // セレクトリスト更新
+    function AddOptionToSelectList(selectListItems, selectListID) {
+        var selectList = document.getElementById(selectListID);
         // 子要素の初期化
         while (selectList.firstChild) {
             selectList.removeChild(selectList.firstChild);

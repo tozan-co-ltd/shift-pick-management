@@ -39,6 +39,7 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 model.M_NotificationList = notificationList.ToList();
+                model.DepoSelectList = GetDepos();
                 model.TripNameSelectList = GetTrips();
 
                 return View(model);
@@ -185,6 +186,7 @@ namespace ai_truck_load_measurement.Controllers
         public IActionResult Register()
         {
             var model = new M_NotificationRegisterViewModel();
+            model.DepoSelectList = GetDepos();
             model.TripNameSelectList = GetTrips();
             
             return View(model);
@@ -466,6 +468,40 @@ namespace ai_truck_load_measurement.Controllers
             dt.Columns.Remove("departure_lower_load_class");
             return dt;
         }
+
+        /// <summary>
+        /// デポリスト取得
+        /// </summary>
+        /// <returns></returns>
+        public List<SelectListItem> GetDepos()
+        {
+
+            var selectList = new List<SelectListItem>();
+            // 1行目作成
+            selectList.Add(new SelectListItem
+            {
+                Text = "選択してください",
+                Value = "0",
+                Selected = true,
+                Disabled = true,
+            });
+
+            // 便の選択肢作成
+            var depoSql = M_NotificationConnectController.CreateSQLToSelectMDepos();
+            var depoList = ConnectToSQLServer.ExecuteQueryToList<M_DepoModel>(depoSql);
+            foreach (var depo in depoList)
+            {
+                SelectListItem menuItem = new()
+                {
+                    Text = Convert.ToString(depo.Name),
+                    Value = Convert.ToString(depo.DepoID),
+                    Selected = false
+                };
+                selectList.Add(menuItem);
+            }
+            return selectList;
+        }
+
 
         /// <summary>
         /// 便名称リスト取得

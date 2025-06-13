@@ -414,6 +414,22 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
+        /// デポマスター情報取得SQL作成
+        /// </summary>
+        /// <returns></returns>
+        public static string CreateSQLToSelectMDepos()
+        {
+            var sql = $@"
+                SELECT
+                    depo_id
+                    ,name
+                FROM
+                    m_depos
+            ";
+            return sql;
+        }
+
+        /// <summary>
         /// 便マスター情報取得SQL作成
         /// </summary>
         /// <returns>SQL文</returns>
