@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.DirectoryServices;
 using DirectoryEntry = System.DirectoryServices.DirectoryEntry;
 using ai_truck_load_measurement.ConnectControllers;
+using System.Text.RegularExpressions;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -115,8 +116,12 @@ namespace ai_truck_load_measurement.Controllers
                 // log取得
                 _logger.Info($"ログイン成功 ログインID:{model.LoginId}, ログインユーザー名:{loginUserModel.UserName}");
 
-                if (model.ReturnUrl.Contains("AlertRecord")) 
-                    return RedirectToAction("Index", "AlertRecord");
+                if (!string.IsNullOrEmpty(model.ReturnUrl) && model.ReturnUrl.Contains("AlertRecord"))
+                {
+                    var isArrived = GetIsArrived(model.ReturnUrl);
+                    string alertRecordID = Regex.Replace(model.ReturnUrl, @"[^0-9]", "");
+                    return RedirectToAction("Index", "AlertRecord", new {TransitionAlertRecordID = alertRecordID, TransitionIsArrived = isArrived});
+                }
 
                 return RedirectToAction("Index", "Top");
             }
@@ -131,6 +136,14 @@ namespace ai_truck_load_measurement.Controllers
 
                 return View(model);
             }
+        }
+
+        private bool GetIsArrived(string returnUrl)
+        {
+            var isArrived = false;
+            if (returnUrl.Contains("true"))
+                isArrived = true;
+            return isArrived;
         }
 
         /// <summary>
