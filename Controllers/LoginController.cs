@@ -141,7 +141,7 @@ namespace ai_truck_load_measurement.Controllers
         private bool GetIsArrived(string returnUrl)
         {
             var isArrived = false;
-            if (returnUrl.Contains("true"))
+            if (returnUrl.Contains("True"))
                 isArrived = true;
             return isArrived;
         }
