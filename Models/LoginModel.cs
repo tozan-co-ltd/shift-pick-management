@@ -26,6 +26,11 @@ namespace ai_truck_load_measurement.Models
         public string? Password { get; set; }
 
         /// <summary>
+        /// リダイレクト先url
+        /// </summary>
+        public string? ReturnUrl {  get; set; }
+
+        /// <summary>
         /// システムバージョン
         /// </summary>
         public string SystemVersion { get; set; } = GetSystemVersion();

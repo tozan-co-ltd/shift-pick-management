@@ -25,7 +25,7 @@ namespace ai_truck_load_measurement.Controllers
         /// ログイン画面表示
         /// </summary>
         [AllowAnonymous]
-        public IActionResult Index(string param)
+        public IActionResult Index(string ReturnUrl)
         {
             LoginModel model = new();
             try
@@ -36,7 +36,7 @@ namespace ai_truck_load_measurement.Controllers
 #if DEBUG
                 ViewData["IsDevelopment"] = "true";
 #endif
-
+                model.ReturnUrl = ReturnUrl;
                 return View(model);
             }
             catch (Exception ex)
@@ -114,6 +114,9 @@ namespace ai_truck_load_measurement.Controllers
               
                 // log取得
                 _logger.Info($"ログイン成功 ログインID:{model.LoginId}, ログインユーザー名:{loginUserModel.UserName}");
+
+                if (model.ReturnUrl.Contains("AlertRecord")) 
+                    return RedirectToAction("Index", "AlertRecord");
 
                 return RedirectToAction("Index", "Top");
             }
