@@ -24,14 +24,15 @@
                 <div class="card border-left-custom">
                     <div class="card-body">
                         <ul class="mb-0">
-                            <li>通知期間内の便が初期表示されます。</li>
+                            <li>通知終了日時が現在以降の便が初期表示されます。</li>
+                            <li>メール受信者には、ユーザーマスターにて設定したアドレス宛にアラート通知メールが送信されます。</li>
                             <li>到着・出発時それぞれのアラート通知メールで表示される項目は以下の通りです。
                                 <ul>
                                     <li>到着時アラート対象項目：到着時間(早or遅)</li>
                                     <li>出発時アラート対象項目：出発時間(早or遅)、到着荷量(下限)、出発荷量(下限)</li>
                                 </ul>
                             </li>
-                            <li>通知開始日時を現在時刻以前に設定した場合でも、現在時刻以前に到着した便に対するアラートが改めて登録されることはありません。</li>
+                            <li>通知開始日時を現在時刻以前に設定した場合でも、現在時刻以前に到着した便に対するアラートが改めて通知されることはありません。</li>
                             <li>到着・出発荷量下限に「すべて」を選択した場合、荷量に関わらず到着・出発アラートが通知されます。</li>
                         </ul>
                     </div>
@@ -53,7 +54,7 @@
             <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                 <span class="warehouse-name-drs span-paragraph">オプション</span>
                 <div>
-                    <label><input type="checkbox" id="isBeforeNotificationPeriod" /> 通知終了日時を過ぎた便も表示</label>
+                    <label><input type="checkbox" id="isBeforeNotificationPeriod" /> すべての通知設定を表示</label>
                 </div>
             </div>
         </div>
