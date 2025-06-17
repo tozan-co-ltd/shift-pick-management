@@ -75,6 +75,14 @@ namespace ai_truck_load_measurement.Models
     /// </summary>
     public class AlertRecordViewModel : CommonModel
     {
+
+        /// <summary>
+        /// 画面遷移時の通知ID
+        /// </summary>
+        public int TransitionAlertRecordID { get; set; }
+
+        public bool TransitionIsArrived { get; set; }
+
         public List<AlertRecordModel> AlertRecordList { get; set; }
         public List<LoadRecordModel> LoadRecordList { get; set; }
         public int MainDepoID {  get; set; }

@@ -13,7 +13,7 @@ namespace ai_truck_load_measurement.Controllers
 {
     public class AlertRecordController : BaseController
     {
-        public IActionResult Index()
+        public IActionResult Index(int TransitionAlertRecordID, bool? TransitionIsArrived)
         {
             var model = new AlertRecordViewModel();
             try
@@ -36,6 +36,11 @@ namespace ai_truck_load_measurement.Controllers
                 // ログインユーザーのメインデポ情報取得
                 model.MainDepoID = user.MainDepoID;
                 model.MainDepoName = user.MainDepoName;
+                model.TransitionAlertRecordID = TransitionAlertRecordID;
+                if (TransitionIsArrived != null)
+                    model.TransitionIsArrived = TransitionIsArrived.Value;
+                else
+                    model.TransitionIsArrived = false;
                 return View(model);
             }
             catch (Exception ex)

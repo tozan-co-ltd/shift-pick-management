@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.DirectoryServices;
 using DirectoryEntry = System.DirectoryServices.DirectoryEntry;
 using ai_truck_load_measurement.ConnectControllers;
+using System.Text.RegularExpressions;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -25,7 +26,7 @@ namespace ai_truck_load_measurement.Controllers
         /// ログイン画面表示
         /// </summary>
         [AllowAnonymous]
-        public IActionResult Index(string param)
+        public IActionResult Index(string ReturnUrl)
         {
             LoginModel model = new();
             try
@@ -36,7 +37,7 @@ namespace ai_truck_load_measurement.Controllers
 #if DEBUG
                 ViewData["IsDevelopment"] = "true";
 #endif
-
+                model.ReturnUrl = ReturnUrl;
                 return View(model);
             }
             catch (Exception ex)
@@ -115,6 +116,13 @@ namespace ai_truck_load_measurement.Controllers
                 // log取得
                 _logger.Info($"ログイン成功 ログインID:{model.LoginId}, ログインユーザー名:{loginUserModel.UserName}");
 
+                if (!string.IsNullOrEmpty(model.ReturnUrl) && model.ReturnUrl.Contains("AlertRecord"))
+                {
+                    var isArrived = GetIsArrived(model.ReturnUrl);
+                    string alertRecordID = Regex.Replace(model.ReturnUrl, @"[^0-9]", "");
+                    return RedirectToAction("Index", "AlertRecord", new {TransitionAlertRecordID = alertRecordID, TransitionIsArrived = isArrived});
+                }
+
                 return RedirectToAction("Index", "Top");
             }
             catch (Exception ex)
@@ -128,6 +136,14 @@ namespace ai_truck_load_measurement.Controllers
 
                 return View(model);
             }
+        }
+
+        private bool GetIsArrived(string returnUrl)
+        {
+            var isArrived = false;
+            if (returnUrl.Contains("True"))
+                isArrived = true;
+            return isArrived;
         }
 
         /// <summary>
