@@ -34,8 +34,6 @@
                                 </ul>
                             </li>
                             <li>到着時間(早or遅)・出発時間(早or遅)は予定時間の前後60分を超過した場合にアラート通知が送信・記録されます。</li>
-                            <li>通知開始日時に過去を指定しても、過去分のアラート通知メール送信されません。またアラート履歴画面での実績確認もできません。</li>
-                            <li>到着・出発荷量下限に「すべて」を選択した場合、荷量、時間に関わらず到着・出発アラートが通知されます。</li>
                         </ul>
                     </div>
                 </div>
@@ -101,8 +99,21 @@
                 <div class="col-12 col-md-12">
                     <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
+                
                 <div class="d-flex justify-content-center">
                     <form class="col-md-12" id="mNotificationForm">
+                        <div class="row mb-3">
+                            <div class="col-lg-12">
+                                <div class="card border-left-custom">
+                                    <div class="card-body">
+                                        <ul class="mb-0">
+                                            <li>到着・出発荷量下限に「すべて」を選択した場合、荷量、時間に関わらず到着・出発アラートが通知されます。</li>
+                                            <li>通知開始日時に過去を指定しても、過去分のアラート通知メールは送信されません。また、アラート履歴に実績が登録されません。</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("NotificationID")</label>
