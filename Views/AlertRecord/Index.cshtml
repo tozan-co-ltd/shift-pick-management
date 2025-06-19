@@ -129,7 +129,21 @@
         addDepos(model);
         depoCheckDisplay(model);
         tableDisplay();
+        if(model.transitionAlertRecordID != 0){
+            showTransitionAlertRecordModal(model);
+        }
     });
+
+    // ログイン画面からの遷移時処理
+    function showTransitionAlertRecordModal(model){
+        const modal = new bootstrap.Modal(document.getElementById('detail-modal'));
+            modal.show();
+            arrayTrs = [];
+            model.alertRecordList.forEach(function(item){
+                arrayTrs.push(String(item.alertRecordID));
+            });
+            EditAlertModal(model.transitionAlertRecordID, model.transitionIsArrived, "page");
+    }
 
     // 「すべて」チェックボックス押下時
     $('input[id=allDepo]').change(function () {
@@ -258,6 +272,9 @@
 
     // 到着荷量画像ボタン押下
     function OnArrivalAlertImageClick(alertRecordID, button, page) {
+        // デフォルトの操作を無効化
+        event.preventDefault();
+
         // 配列の初期化
         arrayTrs = [];
         // 到着
@@ -272,6 +289,9 @@
 
     // 出発荷量画像ボタン押下
     function OnDepartureAlertImageClick(alertRecordID, button, page) {
+        // デフォルトの操作を無効化
+        event.preventDefault();
+
         // 配列の初期化
         arrayTrs = [];
         // 出発
@@ -286,10 +306,6 @@
 
     // アラート詳細モーダル作成
     function EditAlertModal(alertRecordID, isArrived, page) {
-        // デフォルトの操作を無効化
-        event.preventDefault();
-
-
         // ローディング画像表示
         $("#modal-content").css('display', 'none');
         $("#loading-modal").css('display', 'inline-block');

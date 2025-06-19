@@ -324,7 +324,7 @@ function OnArrivalLoadImageClick(tripRecordID, button, page) {
     // テーブルに表示されている便実績のIDをリスト化
     trs = button.parentNode.parentNode.parentNode.childNodes;
     for (i = 0; i < trs.length - tableLength; i++) {
-        arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
+        arrayTrs.push(trs[i + tableLength].childNodes[35].textContent);
     }
     EditModal(tripRecordID, isArrived, page);
 }
@@ -338,7 +338,7 @@ function OnDepartureLoadImageClick(tripRecordID, button, page) {
     // テーブルに表示されている便実績のIDをリスト化
     trs = button.parentNode.parentNode.parentNode.childNodes;
     for (i = 0; i < trs.length - tableLength; i++) {
-        arrayTrs.push(trs[i + tableLength].childNodes[1].textContent);
+        arrayTrs.push(trs[i + tableLength].childNodes[35].textContent);
     }
     EditModal(tripRecordID, isArrived, page);
 }
