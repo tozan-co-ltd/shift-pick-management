@@ -21,15 +21,39 @@
             }
         </div>
 
+        <div class="row mb-3">
+            <div class="col-lg-10">
+                <div class="card border-left-custom">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>通知開始日時に過去を指定しても、過去分のアラート通知メールは送信されません。またアラート履歴画面での実績確認もできません。</li>
+                            <li>到着・出発荷量下限に「すべて」を選択した場合、荷量・時間に関わらず到着・出発アラートが通知されます。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="mg-bot-20">
             <div class="col-16 sp-tablet mb-3">
                 <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="mNotificationForm">
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
+                            <label>@Html.DisplayName("DepoSelectList")<span style="color:red">*</span></label>
+                        </div>
+                        <div class="col-12 col-sm-8 col-md-5 column-2nd">
+                            <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.DepoSelectList" id="DepoID" required></select>
+                            <span class="text-danger w-100" asp-validation-for="DepoID"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 input-group div-input-group">
+                        <div class="col-12 col-sm-4 col-md-2 column-1st">
                             <label>@Html.DisplayName("TripNameSelectList")<span style="color:red">*</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <select class="form-select" name="TripID" asp-for="TripID" asp-items="@Model.TripNameSelectList" required></select>
+                            <select class="form-select" name="TripID" asp-for="TripID" asp-items="@Model.TripNameSelectList" id="TripID" required>
+                                <option value="0" selected disabled>デポを選択してください</option>
+                            </select>
                             <span class="text-danger w-100" asp-validation-for="TripID"></span>
                         </div>
                     </div>
@@ -39,7 +63,7 @@
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <select class="form-select" name="TripBranchIDAndSeq" asp-for="TripBranchIDAndSeq" asp-items="@Model.TripBranchSeqSelectList" id="TripBranchIDAndSeq" required>
-                                <option value="0" selected disabled>選択してください</option>
+                                <option value="0" selected disabled>便名称を選択してください</option>
                             </select>
                             <span class="text-danger w-100" asp-validation-for="TripBranchIDAndSeq"></span>
                         </div>
@@ -80,6 +104,7 @@
                                 <option value="10">71～80%</option>
                                 <option value="11">81～90%</option>
                                 <option value="12">91～100%</option>
+                                <option value="100">すべて</option>
                             </select>
                             <span class="text-danger w-100" asp-validation-for="ArrivalLowerLoadClass"></span>
                         </div>
@@ -101,6 +126,7 @@
                                 <option value="10">71～80%</option>
                                 <option value="11">81～90%</option>
                                 <option value="12">91～100%</option>
+                                <option value="100">すべて</option>
                             </select>
                             <span class="text-danger w-100" asp-validation-for="DepartureLowerLoadClass"></span>
                         </div>
@@ -193,10 +219,11 @@
 
         // ユーザーのセレクトリスト作成
         createToggleUserSelectCheckBox("/Register");
-    })
+    });
 
-    // 便名称選択時の処理
-    $('[name=TripID]').change(function () {
+
+    // 便枝番取得
+    function GetTripBranchSeqs() {
         var tripID = $('[name=TripID]').val();
 
         // フォーム情報取得
@@ -208,10 +235,11 @@
         $.ajax({
             url: url,
             method: method,
-            data: data
+            data: data,
+            async: false,
         }).done(function (response) {
             // 便枝番セレクトリストの更新
-            AddOptionToSelectList(response)
+            AddOptionToSelectList(response, "TripBranchIDAndSeq");
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -220,24 +248,6 @@
                 var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
                 $("#edit-modal-error-message").text(errorMessage);
             }
-        });
-    });
-
-    // 便枝番セレクトリスト更新
-    function AddOptionToSelectList(selectListItems) {
-        var selectList = document.getElementById("TripBranchIDAndSeq");
-
-        // 子要素の初期化
-        while (selectList.firstChild) {
-            selectList.removeChild(selectList.firstChild);
-        }
-
-        selectListItems.forEach(function (item) {
-            // optionタグを作成する
-            var option = document.createElement("option");
-            option.text = item.text;
-            option.value = item.value;
-            selectList.appendChild(option);
         });
     }
 

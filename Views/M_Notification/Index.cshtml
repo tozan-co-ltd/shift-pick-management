@@ -24,7 +24,15 @@
                 <div class="card border-left-custom">
                     <div class="card-body">
                         <ul class="mb-0">
-                            <li>通知期間内の便が初期表示されます。</li>
+                            <li>通知終了日時が現在以降の便が初期表示されます。</li>
+                            <li>メール受信者には、ユーザーマスターでメールを「受け取る」に設定したユーザーにのみアラート通知メールが送信されます。</li>
+                            <li>アラート通知メールは到着時と出発時でのみ送信され、以下項目が含まれます。
+                                <ul>
+                                    <li>到着時アラート対象項目：到着時間(早or遅)</li>
+                                    <li>出発時アラート対象項目：出発時間(早or遅)、到着荷量(下限)、出発荷量(下限)</li>
+                                </ul>
+                            </li>
+                            <li>到着時間(早or遅)・出発時間(早or遅)は到着・出発実績が予定より「60分～90分早い」or「20分～30分遅い」場合にアラート通知が送信・記録されます。</li>
                         </ul>
                     </div>
                 </div>
@@ -45,7 +53,7 @@
             <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                 <span class="warehouse-name-drs span-paragraph">オプション</span>
                 <div>
-                    <label><input type="checkbox" id="isBeforeNotificationPeriod" /> 通知終了日時を過ぎた便も表示</label>
+                    <label><input type="checkbox" id="isBeforeNotificationPeriod" /> すべての通知設定を表示</label>
                 </div>
             </div>
         </div>
@@ -90,14 +98,36 @@
                 <div class="col-12 col-md-12">
                     <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
+                
                 <div class="d-flex justify-content-center">
                     <form class="col-md-12" id="mNotificationForm">
+                        <div class="row mb-3">
+                            <div class="col-lg-12">
+                                <div class="card border-left-custom">
+                                    <div class="card-body">
+                                        <ul class="mb-0">
+                                            <li>到着・出発荷量下限に「すべて」を選択した場合、荷量・時間に関わらず到着・出発アラートが通知されます。</li>
+                                            <li>通知開始日時に過去日時を指定しても、過去分のアラート通知メールは送信されません。また、アラート履歴にも実績が登録されません。</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-14 input-group div-input-group">
                             <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
                                 <label>@Html.DisplayName("NotificationID")</label>
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <input class="form-control" type="text" asp-for="NotificationID" autocomplete="off" name="NotificationID" id="NotificationID" required readonly>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-sm-4 col-md-3 column-1st label-input-model-pl">
+                                <label>@Html.DisplayNameFor(model => model.DepoSelectList)<span style="color:red">*</span></label>
+                            </div>
+                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
+                                <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.DepoSelectList" required id="DepoID"></select>
+                                <span class="text-danger w-100" asp-validation-for="DepoID"></span>
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
@@ -135,6 +165,7 @@
                                     <option value="10">71～80%</option>
                                     <option value="11">81～90%</option>
                                     <option value="12">91～100%</option>
+                                    <option value="100">すべて</option>
                                 </select>
                                 <span class="text-danger w-100" asp-validation-for="ArrivalLowerLoadClass"></span>
                             </div>
@@ -156,6 +187,7 @@
                                     <option value="10">71～80%</option>
                                     <option value="11">81～90%</option>
                                     <option value="12">91～100%</option>
+                                    <option value="100">すべて</option>
                                 </select>
                                 <span class="text-danger w-100" asp-validation-for="DepartureLowerLoadClass"></span>
                             </div>
@@ -315,6 +347,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
+        console.log(model);
         addDepos(model);
         depoCheckDisplay(model);
         tableDisplay();
@@ -470,6 +503,8 @@
                 var notificationStartDateTime = GetDateString(new Date(item.notificationStartDateTime));
                 var notificationEndDateTime = GetDateString(new Date(item.notificationEndDateTime));
                 $("#NotificationID").val(item.notificationID);
+                $("#DepoID").val(item.depoID);
+                GetTrips();
                 $("#TripID").val(item.tripID);
                 GetTripBranchSeqs();
                 $("#TripBranchSeq").val(item.tripBranchSeq);
@@ -480,6 +515,55 @@
                 // 通知ユーザー取得
                 getNotificationUsers(item);
             }
+        });
+    }
+
+    // 便枝番取得
+    function GetTripBranchSeqs() {
+        var tripID = $('[name=TripID]').val();
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripBranchSeqs", "M_Notification")';
+        let method = 'POST';
+        let data = { tripID: tripID };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false
+        }).done(function (response) {
+            // 便枝番セレクトリストの更新
+            AddOptionToTripBranchSelectList(response)
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    }
+
+    // 便枝番セレクトリスト更新
+    function AddOptionToTripBranchSelectList(selectListItems) {
+        var selectList = document.getElementById("TripBranchSeq");
+
+        // 子要素の初期化
+        while (selectList.firstChild) {
+            selectList.removeChild(selectList.firstChild);
+        }
+
+        selectListItems.forEach(function (item) {
+            var tripBranchIDAndSeq = item.value.split("_");
+            // optionタグを作成する
+            var option = document.createElement("option");
+            option.text = item.text;
+            option.value = tripBranchIDAndSeq[1];
+            option.disabled = item.disabled;
+            selectList.appendChild(option);
         });
     }
 
@@ -543,87 +627,6 @@
             });
         });
     }
-
-    // 便名称選択時の処理
-    $('[name=TripID]').change(function () {
-        GetTripBranchSeqs();
-    });
-
-    // 便枝番取得
-    function GetTripBranchSeqs() {
-        var tripID = $('[name=TripID]').val();
-
-        // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetTripBranchSeqs", "M_Notification")';
-        let method = 'POST';
-        let data = { tripID: tripID };
-
-        // Ajax call
-        $.ajax({
-            url: url,
-            method: method,
-            data: data,
-            async: false
-        }).done(function (response) {
-            // 便枝番セレクトリストの更新
-            AddOptionToSelectList(response)
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 404) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#edit-modal-error-message").text(errorMessage);
-            } else {
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#edit-modal-error-message").text(errorMessage);
-            }
-        });
-    }
-
-    // 便枝番セレクトリスト更新
-    function AddOptionToSelectList(selectListItems) {
-        var selectList = document.getElementById("TripBranchSeq");
-
-        // 子要素の初期化
-        while (selectList.firstChild) {
-            selectList.removeChild(selectList.firstChild);
-        }
-
-        selectListItems.forEach(function (item) {
-            var tripBranchIDAndSeq = item.value.split("_");
-            // optionタグを作成する
-            var option = document.createElement("option");
-            option.text = item.text;
-            option.value = tripBranchIDAndSeq[1];
-            selectList.appendChild(option);
-        });
-    }
-
-    // 便枝番選択時の処理
-    $('[name=TripBranchSeq]').change(function () {
-        var tripID = $('[name=TripID]').val();
-        var tripBranchNumberID = $('[name=TripBranchSeq]').val().split("_")[0];
-
-        // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetTripBranchSeqData", "M_Notification")';
-        let method = 'POST';
-        let data = { tripID: tripID, tripBranchNumberID: tripBranchNumberID };
-
-        // Ajax call
-        $.ajax({
-            url: url,
-            method: method,
-            data: data
-        }).done(function (response) {
-            SetTripBranchSeqData(response);
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 404) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#edit-modal-error-message").text(errorMessage);
-            } else {
-                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#edit-modal-error-message").text(errorMessage);
-            }
-        });
-    });
 
     // 削除ボタン押下
     function OnDeleteClick(notificationID) {
