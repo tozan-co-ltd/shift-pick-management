@@ -139,7 +139,7 @@ namespace ai_truck_load_measurement.Models
         /// </summary>
         [Display(Name = "通知ID")]
         public int NotificationID { get; set; }
-
+              
         /// <summary>
         /// 便ID
         /// </summary>
@@ -171,6 +171,13 @@ namespace ai_truck_load_measurement.Models
         /// 便枝番
         /// </summary>
         public int TripBranchSeq { get; set; }
+
+
+        /// <summary>
+        ///  デポ選択肢リスト
+        /// </summary>
+        [Display(Name = "デポ")]
+        public List<SelectListItem> DepoSelectList { get; set; }
 
         /// <summary>
         /// デポID
@@ -226,6 +233,17 @@ namespace ai_truck_load_measurement.Models
 
     public class M_NotificationRegisterViewModel : CommonModel
     {
+        /// <summary>
+        ///  デポ選択肢リスト
+        /// </summary>
+        [Display(Name = "デポ")]
+        public List<SelectListItem> DepoSelectList { get; set; }
+
+        /// <summary>
+        /// デポID
+        /// </summary>
+        public int DepoID { get; set; }
+
         /// <summary>
         ///  便名称選択肢リスト
         /// </summary>

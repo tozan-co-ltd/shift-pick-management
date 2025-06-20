@@ -39,7 +39,7 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 model.M_NotificationList = notificationList.ToList();
-                model.TripNameSelectList = GetTrips();
+                model.DepoSelectList = GetDepos();
 
                 return View(model);
             }
@@ -185,7 +185,7 @@ namespace ai_truck_load_measurement.Controllers
         public IActionResult Register()
         {
             var model = new M_NotificationRegisterViewModel();
-            model.TripNameSelectList = GetTrips();
+            model.DepoSelectList = GetDepos();
             
             return View(model);
         }
@@ -468,10 +468,10 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
-        /// 便名称リスト取得
+        /// デポリスト取得
         /// </summary>
         /// <returns></returns>
-        public List<SelectListItem> GetTrips()
+        public List<SelectListItem> GetDepos()
         {
 
             var selectList = new List<SelectListItem>();
@@ -485,7 +485,41 @@ namespace ai_truck_load_measurement.Controllers
             });
 
             // 便の選択肢作成
-            var tripSql = M_NotificationConnectController.CreateSQLToSelectMTrips();
+            var depoSql = M_NotificationConnectController.CreateSQLToSelectMDepos();
+            var depoList = ConnectToSQLServer.ExecuteQueryToList<M_DepoModel>(depoSql);
+            foreach (var depo in depoList)
+            {
+                SelectListItem menuItem = new()
+                {
+                    Text = Convert.ToString(depo.Name),
+                    Value = Convert.ToString(depo.DepoID),
+                    Selected = false
+                };
+                selectList.Add(menuItem);
+            }
+            return selectList;
+        }
+
+
+        /// <summary>
+        /// 便名称リスト取得
+        /// </summary>
+        /// <returns></returns>
+        public List<SelectListItem> GetTrips(int depoID)
+        {
+
+            var selectList = new List<SelectListItem>();
+            // 1行目作成
+            selectList.Add(new SelectListItem
+            {
+                Text = "選択してください",
+                Value = "0",
+                Selected = true,
+                Disabled = true,
+            });
+
+            // 便の選択肢作成
+            var tripSql = M_NotificationConnectController.CreateSQLToSelectMTrips(depoID);
             var tripList = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(tripSql);
             foreach (var trip in tripList)
             {
@@ -661,7 +695,11 @@ namespace ai_truck_load_measurement.Controllers
         public static string ConversionLoadClassToLoadStatus(int loadClass)
         {
             var loadStatus = "-";
-            if (loadClass >= 3)
+            if (loadClass == 100)
+            {
+                loadStatus = "すべて";
+            }
+            else if (loadClass >= 3)
             {
                 int lowerLimit = (loadClass - 3) * 10 + 1;
                 int upperLimit = (loadClass - 2) * 10;
