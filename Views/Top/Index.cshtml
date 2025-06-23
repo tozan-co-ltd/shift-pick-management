@@ -131,7 +131,7 @@
                 <div>
                     <div id="selectDepos"></div>
                     <div class="col-12">
-                        <select class="form-select" name="DepoID"  asp-items="@Model.MDepoList" id="selectDepo"></select>
+                        <select class="form-select" asp-items="@Model.MDepoList" id="selectDepo"></select>
                     </div>
                 </div>
                 <span class="loader" style="display: none; vertical-align: middle; " role="status" id="loading"></span>
@@ -290,7 +290,7 @@
     function switchFunamiCaution(depoID){
         // 船見デポの場合、注意文表示
         if (depoID == 3) {
-            $("#funamiCaution")[0].innerText = "※注：荷量把握稼働中(1番,3番,5番,7番,8番)以外は常に「空車」表示となります";
+            $("#funamiCaution")[0].innerText = "※注：荷量把握稼働中(1番,3番～8番)以外は常に「空車」表示となります";
         }
         else {
             $("#funamiCaution")[0].innerText = "";
