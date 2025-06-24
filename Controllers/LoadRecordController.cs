@@ -470,7 +470,7 @@ namespace ai_truck_load_measurement.Controllers
         public string GetTripNameAndBranchSeqHTML(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             var tripRecordList = GetTripNameFromPeriod(startOfPeriod, endOfPeriod, checkedDepos);
-            var html = CreateSelectTripNameAndBranchSeqHTML(tripRecordList);
+            var html = CreateSelectTripNameAndBranchSeqHTML(tripRecordList, checkedDepos);
             return html;
         }
 
@@ -479,9 +479,16 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="tripRecordList">便実績リスト</param>
         /// <returns></returns>
-        private string CreateSelectTripNameAndBranchSeqHTML(List<LoadRecordModel> tripRecordList)
+        private string CreateSelectTripNameAndBranchSeqHTML(List<LoadRecordModel> tripRecordList, List<string> checkedDepos)
         {
             var html = "";
+
+            // デポにチェックが入っていない
+            if(checkedDepos.Count == 0)
+            {
+                html = "<small>デポを選択してください</small>";
+                return html;
+            }
 
             // 選択した稼働日内にデータがない
             if (tripRecordList.Count == 0)
