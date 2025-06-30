@@ -642,7 +642,7 @@ function tableDisplayCommon(page, data) {
 function onExportAllImagesCommon(page, data) {
 
     // フォーム情報取得
-    let url = window.location.origin + '/' + page + '/ZipDownload';
+    let url = window.location.href + '/ZipDownload';
     let method = 'POST';
 
     tableDisplay(page);

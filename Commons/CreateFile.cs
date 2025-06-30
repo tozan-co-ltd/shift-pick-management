@@ -487,6 +487,7 @@ namespace ai_truck_load_measurement.Commons
 
                 // データセット
                 sheet.Cells[startIndex, 1].LoadFromDataTable(dt, printHeader);
+                sheet.Cells.AutoFitColumns();
 
                 // 保管
                 package.Save();
@@ -635,8 +636,10 @@ namespace ai_truck_load_measurement.Commons
 
                 // シート1 データセット
                 sheet.Cells[startIndex, 1].LoadFromDataTable(dt, printHeader);
+                sheet.Cells.AutoFitColumns();
                 // シート2 データセット
                 sheetTwo.Cells[startIndex, 1].LoadFromDataTable(dtTwo, printHeader);
+                sheetTwo.Cells.AutoFitColumns();
 
                 // ファイル保存
                 package.Save();
