@@ -14,7 +14,7 @@
     display: -ms-flexbox;
     display: flex;
     -ms-flex-pack: justify;
-    margin: 2em auto;
+    margin: 1em auto;
     width: 100%;
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
@@ -127,7 +127,7 @@
         </div>
         <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
             <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                <span class="warehouse-name-drs span-paragraph">デポ選択</span>
+                <span class="warehouse-name-drs span-paragraph">デポ</span>
                 <div>
                     <div id="selectDepos"></div>
                     <div class="col-12">
@@ -165,6 +165,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                <div id="notDepoSelected">デポを選択すると、ここにカメラ配置図が表示されます</div>
                 <figure class="mb-2 modal-img"><img src="" id="modalImage" /></figure>
             </div>
         </div>
@@ -183,6 +184,7 @@
         if(top_model.mainDepoName != ""){
             // $("#stationTitle")[0].innerText = getStationTitle(top_model.mainDepoName);
             $('#modalImage').attr("src", window.location.href + "/images/top/layout/depo" + top_model.mainDepoID + "layout.png");
+            $("#notDepoSelected")[0].innerHTML = "";
         }
     });
 
@@ -195,7 +197,7 @@
         for (var i = 1; i <= top_model.viewCardModelList.length; i++) {
 
             if(i!=14){
-
+                
             }
             var cardModel = top_model.viewCardModelList.find(x => x.stationSeq == i);
 
@@ -281,7 +283,7 @@
                     $('#modalImage').attr("src", window.location.href + "/images/top/layout/depo" + depo[i].value + "layout.png");
                 }
             }
-
+            $("#notDepoSelected")[0].innerHTML = "";
             onUpdateClick();
 
         });
