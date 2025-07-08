@@ -177,14 +177,14 @@ namespace ai_truck_load_measurement.Controllers
                 bool sheetTwo = true;
 
                 // シート名
-                string sheetNameOne = "検索条件シート";
-                string sheetNameTwo = "荷量実績シート";
+                string sheetNameOne = "荷量実績";
+                string sheetNameTwo = "検索条件";
 
 
                 try
                 {
                     // Excelファイル作成チェック
-                    var createRs = CreateFile.CheckCreateExcel(searchConditionDT, tTripRecordDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
+                    var createRs = CreateFile.CheckCreateExcel(tTripRecordDT, searchConditionDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
 
                     if (createRs.Item1)
                     {

@@ -544,7 +544,7 @@ namespace ai_truck_load_measurement.Commons
 
                     using ExcelWorksheet sheet = package.Workbook.Worksheets[sheetName];
                     // フィルター設定
-                    sheet.Cells["A1:AM1"].AutoFilter = true;
+                    sheet.Cells["A1:Q1"].AutoFilter = true;
                     // ウィンドウ枠の固定
                     sheet.View.FreezePanes(2, 1);
                     // セル自動選択
@@ -600,6 +600,8 @@ namespace ai_truck_load_measurement.Commons
                 sheet.View.FreezePanes(2, 1);
                 // セル自動選択
                 sheet.Select("A1");
+                // フィルター設定
+                sheet.Cells["A1:Q1"].AutoFilter = true;
 
                 // タイトル行が指定されているときは、タイトル行をセットする
                 if (headerList != null && headerList.Count > 0)
@@ -619,7 +621,7 @@ namespace ai_truck_load_measurement.Commons
                 // シート2取得
                 using ExcelWorksheet sheetTwo = package.Workbook.Worksheets[sheetName2];
                 // フィルター設定
-                sheetTwo.Cells["A1:AM1"].AutoFilter = true;
+                //sheetTwo.Cells["A1:AM1"].AutoFilter = true;
 
                 // タイトル行が指定されているときは、タイトル行をセットする
                 if (headerListTwo != null && headerListTwo.Count > 0)
