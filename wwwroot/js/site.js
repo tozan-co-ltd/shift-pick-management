@@ -767,8 +767,8 @@ function addTrips(selectedTripName) {
     pushLabelToSelectedTrips(selectedTrips, selectedTripName);
 }
 
+// チェックが入っていないチェックボックスの無効化
 function notCheckedTripsDisabled() {
-    // 「興味・関心のある分野」のチェックボックス
     let inputTrips = document.querySelectorAll("input[name=tripNameAndBranchSeq]");
 
     if (0 < inputTrips.length) {
@@ -781,8 +781,8 @@ function notCheckedTripsDisabled() {
     }
 }
 
+// すべてのチェックボックスの有効化
 function tripsDisabledDelete() {
-    // 「興味・関心のある分野」のチェックボックス
     let inputTrips = document.querySelectorAll("input[name=tripNameAndBranchSeq]");
     $("#div-error-message").text("");
 

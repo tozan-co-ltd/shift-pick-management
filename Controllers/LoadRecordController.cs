@@ -490,7 +490,7 @@ namespace ai_truck_load_measurement.Controllers
                 return html;
             }
 
-            // 選択した稼働日内にデータがない
+            // 選択した稼働日内にデータがない 
             if (tripRecordList.Count == 0)
             {
                 html = "<small>選択された稼働日にデータがありません</small>";
@@ -500,10 +500,10 @@ namespace ai_truck_load_measurement.Controllers
             // ドロップダウンリストの最上部
             html += $@" 
                     <div class=""d-flex justify-content-between mb-1"">
-                        <a href=""#"" class=""btn btn-secondary "" onclick=""allToggleOpen()"" >
+                        <a href=""#"" class=""btn btn-outline-secondary "" onclick=""allToggleOpen()"" >
                             <span class=""text"">全て展開</span>
                         </a>
-                        <a href=""#"" class=""btn btn-secondary "" onclick=""allToggleClose()"" >
+                        <a href=""#"" class=""btn btn-outline-secondary "" onclick=""allToggleClose()"" >
                             <span class=""text"">全て閉じる</span>
                         </a>
                     </div>
