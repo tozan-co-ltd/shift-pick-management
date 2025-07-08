@@ -134,21 +134,19 @@
                         <select class="form-select" asp-items="@Model.MDepoList" id="selectDepo"></select>
                     </div>
                 </div>
-                <span class="loader" style="display: none; vertical-align: middle; " role="status" id="loading"></span>
+                <span class="loader mr-2" style="display: none; vertical-align: middle; " role="status" id="loading"></span>
                 <span class="visually-hidden">Loading...</span>
+                <button class="btn btn-secondary btn-icon-split" onclick="onUpdateClick()" id="figureButton" data-toggle="modal" data-target="#map-modal">
+                    <span class="icon text-white-50">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                    </span>
+                    <span class="text">配置図</span>
+                </button>
             </div>
         </div>
         <div class="mb-3">
             <button class="btn btn-update mr-2" onclick="onUpdateClick()" id="updateStation">更新</button>
             <label class="mb-2" id="updateAt">更新日時:@DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss")</label>
-        </div>
-        <div>
-            <button class="btn btn-secondary btn-icon-split" onclick="onUpdateClick()" id="figureButton" data-toggle="modal" data-target="#map-modal">
-                <span class="icon text-white-50">
-                    <i class="fa-solid fa-map"></i>
-                </span>
-                <span class="text">配置図</span>
-            </button>
         </div>
         <div id="cardlayout-wrap"></div>
     </div>
