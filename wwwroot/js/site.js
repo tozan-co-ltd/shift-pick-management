@@ -736,10 +736,8 @@ let arrayTrips = [];
 function addTrips(selectedTripName) {
     event.preventDefault();
     // 20件の便が選択されているとき
-    if (20 <= arrayTrips.length) {
-        var errorMessage = 'E1008: 選択できる便数(便＋枝番)は最大20件です。20件を超えないように選択してください。';
-        $("#div-error-message").text(errorMessage);
-        return;
+    if (19 <= arrayTrips.length) {
+        notCheckedTripsDisabled();
     }
     
     var tripNameAndBranchSeq = selectedTripName.split("_");
@@ -772,6 +770,33 @@ function addTrips(selectedTripName) {
     pushLabelToSelectedTrips(selectedTrips, selectedTripName);
 }
 
+// チェックが入っていないチェックボックスの無効化
+function notCheckedTripsDisabled() {
+    let inputTrips = document.querySelectorAll("input[name=tripNameAndBranchSeq]");
+
+    if (0 < inputTrips.length) {
+
+        for (let data of inputTrips) {
+            if (!data.checked) {
+                data.disabled = true;
+            }
+        }
+    }
+}
+
+// すべてのチェックボックスの有効化
+function tripsDisabledDelete() {
+    let inputTrips = document.querySelectorAll("input[name=tripNameAndBranchSeq]");
+    $("#div-error-message").text("");
+
+    if (0 < inputTrips.length) {
+
+        for (let data of inputTrips) {
+            data.disabled = false;
+        }
+    }
+}
+
 // 選択された便ラベルを作成、指定した親要素の子として登録
 function pushLabelToSelectedTrips(selectedTrips, selectedTripName) {
     var selectedTripLabel = document.createElement("label");
@@ -787,6 +812,7 @@ function pushLabelToSelectedTrips(selectedTrips, selectedTripName) {
 // 選択された便の×ボタン押下時
 function onLabelDeleteClick(selectedTripName) {
     event.preventDefault();
+    tripsDisabledDelete();
     // ラベル全削除
     $('.selected-trip-label').remove();
 
@@ -821,6 +847,7 @@ function onLabelDeleteClick(selectedTripName) {
 // 追加した選択肢の一括クリアボタン押下時
 function clearTrips() {
     event.preventDefault();
+    tripsDisabledDelete();
     // ラベルと配列から全削除
     $('.selected-trip-label').remove();
     $('[name="tripNameAndBranchSeq"]').prop('checked', false);
@@ -886,6 +913,8 @@ function createToggleSelectCheckBox(startOfPeriod, endOfPeriod, checkedDepos, pa
                 } else {
                     // 便削除
                     onLabelDeleteClick(selectedTripName);
+                    // disable解除
+                    tripsDisabledDelete();
                 }
 
             })
