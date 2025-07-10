@@ -157,6 +157,13 @@ namespace ai_truck_load_measurement.Controllers
                 var tTripRecordSql = LoadTransitionConnectController.CreateSQLToSelectTripRecordForDataTable(arrayTrips, startOfPeriod, endOfPeriod);
                 DataTable tTripRecordDT = ConnectToSQLServer.ConnectToDataTable(tTripRecordSql);
 
+                // 便実績が0の場合
+                if (tTripRecordDT.Rows.Count == 0)
+                {
+                    errorMessage = "E1016:" + ErrorMessagesResources.E1016;
+                    return Json(new { res = "NG", error = errorMessage });
+                }
+
                 // 荷量のクラスを数値化
                 tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
 

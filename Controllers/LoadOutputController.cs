@@ -123,6 +123,13 @@ namespace ai_truck_load_measurement.Controllers
                     tTripRecordDT = LoadRecordController.GetConvertedLoadClassDataTable(tTripRecordDT);
                 }
 
+                // 便実績が0の場合
+                if (tTripRecordDT.Rows.Count == 0)
+                {
+                    errorMessage = "E1016:" + ErrorMessagesResources.E1016;
+                    return Json(new { res = "NG", error = errorMessage });
+                }
+
                 // ファイル名
                 var tmpFilename = $"荷量実績_{startDate}-{endDate}.xlsx";
                 // 2シートあり
