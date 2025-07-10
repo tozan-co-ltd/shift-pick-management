@@ -45,7 +45,7 @@
             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3">
                     <span class="warehouse-name-drs span-paragraph">稼働日選択</span>
-                    <input type="text" id="workDay" class="form-control pickerDateForLoadOperationRecord" style="width:170px;">
+                    <input type="text" id="workDay" class="form-control pickerDateForLoadOperationRecord" value="稼働日を選択してください" style="width:14em;">
                 </div>
                 <a href="#" class="btn btn-danger btn-icon-split mb-3 " onclick="clearTrips()">
                     <span class="icon text-white-50">
@@ -466,9 +466,6 @@
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
         userName = model.userName;
-        var today = new Date();
-        $('#workDay').val(GetDayString(today));
-        var y = today.getFullYear();
         $('#graphAndTable').css('display', 'none');
         addDepos(model);
         depoCheckDisplay(model);
@@ -491,6 +488,8 @@
 
         // 便名称取得
         var tripName = $('[name=TripName]').val();
+
+        $('#workDay').css('width', '8em');
 
         // 便名称の選択肢を全削除
         var select = $('#tripName')[0];

@@ -607,6 +607,7 @@ select[readonly] {
 }
 
 .startDate, .endDate, .pickerDate{
+    width: 8em;
     max-width: 163px;
 }
 
