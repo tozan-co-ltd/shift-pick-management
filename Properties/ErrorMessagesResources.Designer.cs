@@ -196,6 +196,15 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
+        ///   出力されるデータがありません。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1016 {
+            get {
+                return ResourceManager.GetString("E1016", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   データベースに接続できませんでした。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E3001 {

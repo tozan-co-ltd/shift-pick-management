@@ -156,12 +156,18 @@ function onExportFileTripsCommon(page, data) {
         method: method,
         data: data
     }).done(function (response) {
-        var { contentType, fileContents, fileDownloadName } = response.data;
-        {
-            const link = document.createElement("a");
-            link.href = `data:${contentType};base64,${fileContents}`;
-            link.download = fileDownloadName;
-            link.click();
+        if (response.res == "NG") {
+            $("#div-error-message").show();
+            $("#div-error-message").text(response.error);
+        }
+        else {
+            var { contentType, fileContents, fileDownloadName } = response.data;
+            {
+                const link = document.createElement("a");
+                link.href = `data:${contentType};base64,${fileContents}`;
+                link.download = fileDownloadName;
+                link.click();
+            }
         }
 
     }).fail(function (jqXHR, textStatus, errorThrown) {
