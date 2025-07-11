@@ -1011,11 +1011,16 @@ function pushAllCheckBox() {
 // 各デポチェックボックス押下時共通処理
 function pushDepoCheckBox() {
     var depos = $('input[name=depos]');
+    var isAllDeposChecked = true;
     for (var i = 0; i < depos.length; i++) {
         if (!depos[i].checked) {
             $('input[id=allDepo]')[0].checked = false;
+            isAllDeposChecked = false;
             break;
         }
+    }
+    if (isAllDeposChecked) {
+        $('input[id=allDepo]')[0].checked = true;
     }
 }
 
