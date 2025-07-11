@@ -980,6 +980,12 @@ select[readonly] {
 
 .label-delete {
     color: red;
+    text-decoration: none;
+}
+
+.label-delete:hover{
+    text-decoration:none;
+    color: red;
 }
 
 /*------------------Search Highlight CSS------------------------------*/
