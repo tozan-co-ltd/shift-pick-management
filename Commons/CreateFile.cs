@@ -544,7 +544,7 @@ namespace ai_truck_load_measurement.Commons
 
                     using ExcelWorksheet sheet = package.Workbook.Worksheets[sheetName];
                     // フィルター設定
-                    sheet.Cells["A1:AM1"].AutoFilter = true;
+                    sheet.Cells["A1:Q1"].AutoFilter = true;
                     // ウィンドウ枠の固定
                     sheet.View.FreezePanes(2, 1);
                     // セル自動選択
@@ -600,6 +600,8 @@ namespace ai_truck_load_measurement.Commons
                 sheet.View.FreezePanes(2, 1);
                 // セル自動選択
                 sheet.Select("A1");
+                // フィルター設定
+                sheet.Cells["A1:Q1"].AutoFilter = true;
 
                 // タイトル行が指定されているときは、タイトル行をセットする
                 if (headerList != null && headerList.Count > 0)
@@ -619,7 +621,7 @@ namespace ai_truck_load_measurement.Commons
                 // シート2取得
                 using ExcelWorksheet sheetTwo = package.Workbook.Worksheets[sheetName2];
                 // フィルター設定
-                sheetTwo.Cells["A1:AM1"].AutoFilter = true;
+                //sheetTwo.Cells["A1:AM1"].AutoFilter = true;
 
                 // タイトル行が指定されているときは、タイトル行をセットする
                 if (headerListTwo != null && headerListTwo.Count > 0)
@@ -720,8 +722,23 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("更新者");
                     break;
                 default:
-                    headerList.Add("項目名");
-                    headerList.Add("検索条件");
+                    headerList.Add("便名称");
+                    headerList.Add("便枝番");
+                    headerList.Add("タグ");
+                    headerList.Add("乗務員");
+                    headerList.Add("ステーション名");
+                    headerList.Add("車両番号");
+                    headerList.Add("識別番号");
+                    headerList.Add("デポ名");
+                    headerList.Add("到着予定時間");
+                    headerList.Add("出発予定時間");
+                    headerList.Add("稼働日");
+                    headerList.Add("到着実績");
+                    headerList.Add("出発実績");
+                    headerList.Add("到着荷量(%)");
+                    headerList.Add("出発荷量(%)");
+                    headerList.Add("到着荷量画像パス");
+                    headerList.Add("出発荷量画像パス");
                     break;
             }
             return headerList;
@@ -792,23 +809,8 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("作成者");
                     break;
                 default:
-                    headerList.Add("便名称");
-                    headerList.Add("便枝番");
-                    headerList.Add("タグ");
-                    headerList.Add("乗務員");
-                    headerList.Add("ステーション名");
-                    headerList.Add("車両番号");
-                    headerList.Add("識別番号");
-                    headerList.Add("デポ名");
-                    headerList.Add("到着予定時間");
-                    headerList.Add("出発予定時間");
-                    headerList.Add("稼働日");
-                    headerList.Add("到着実績");
-                    headerList.Add("出発実績");
-                    headerList.Add("到着荷量(%)");
-                    headerList.Add("出発荷量(%)");
-                    headerList.Add("到着荷量画像パス");
-                    headerList.Add("出発荷量画像パス");
+                    headerList.Add("項目名");
+                    headerList.Add("検索条件");
                     break;
             }
             return headerList;
