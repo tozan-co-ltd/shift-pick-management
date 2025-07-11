@@ -165,6 +165,9 @@
   <data name="E1016" xml:space="preserve">
     <value>出力されるデータがありません。</value>
   </data>
+  <data name="E1017" xml:space="preserve">
+    <value>{0}を選択してください。</value>
+  </data>
   <data name="E3001" xml:space="preserve">
     <value>データベースに接続できませんでした。</value>
   </data>

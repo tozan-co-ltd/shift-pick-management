@@ -390,6 +390,13 @@
             $("#div-error-message").text(errorMessage);
             return;
         }
+        
+        // 選択された便が0件の場合
+        if(arrayTrips.length == 0){
+            var errorMessage = 'E1017: 便を選択してください。';
+            $("#div-error-message").text(errorMessage);
+            return;
+        }
 
         // グラフとテーブルの表示
         $('#graphAndTable').css('display', 'block');

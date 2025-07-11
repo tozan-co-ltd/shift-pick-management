@@ -629,7 +629,17 @@
         // 便名称取得
         var tripName = $('[name=TripName]').val();
 
+        // 便が選択されていない場合
         if(tripName == null){
+            var errorMessage = 'E1017: 便を選択してください。';
+            $("#div-error-message").text(errorMessage);
+            return;
+        }
+
+        // 稼働日が選択されていない場合
+        if(arrayTrips.length == 0){
+            var errorMessage = 'E1017: 稼働日を選択してください。';
+            $("#div-error-message").text(errorMessage);
             return;
         }
 
