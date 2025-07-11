@@ -973,7 +973,7 @@ select[readonly] {
 }
 
 .radio-area input[type=radio]:checked + label {
-    background-color: #00A0DC;
+    background-color: rgb(236, 82, 172);
 }
 /*Å@-------------- radio button to toggle ---------------*/
 
