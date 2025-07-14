@@ -441,7 +441,7 @@ table .btn-primary.btn-icon-split {
 }
 
 .border-left-custom {
-    border-left: .25rem solid #f0844b !important;
+    border-left: .25rem solid rgb(236, 82, 172) !important;
     margin-bottom: 0.5rem;
     font-size: 0.8rem;
 }
@@ -973,12 +973,18 @@ select[readonly] {
 }
 
 .radio-area input[type=radio]:checked + label {
-    background-color: #00A0DC;
+    background-color: rgb(236, 82, 172);
 }
 /*Å@-------------- radio button to toggle ---------------*/
 
 
 .label-delete {
+    color: red;
+    text-decoration: none;
+}
+
+.label-delete:hover{
+    text-decoration:none;
     color: red;
 }
 
