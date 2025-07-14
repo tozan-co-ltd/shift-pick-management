@@ -47,7 +47,7 @@
                     <span class="warehouse-name-drs span-paragraph">稼働日選択</span>
                     <input type="text" id="workDay" class="form-control pickerDateForLoadOperationRecord" value="稼働日を選択してください" style="width:14em;">
                 </div>
-                <a href="#" class="btn btn-danger btn-icon-split mb-3 " onclick="clearTrips()">
+                <a href="#" class="btn btn-danger btn-icon-split mb-3 " onclick="clearTrips()" id="clearTrips" style="visibility: hidden">
                     <span class="icon text-white-50">
                         <i class="fas fa-trash"></i>
                     </span>
@@ -561,8 +561,10 @@
         }
 
         // 1行目の場合、項目追加
-        if (arrayWorkDays.length == 0)
+        if (arrayWorkDays.length == 0){
+            document.getElementById("clearTrips").style.visibility = 'visible';
             document.getElementById("selectedWorkDays0").innerHTML = "<span class=\"warehouse-name-drs span-paragraph mb-3\">選択された稼働日</span>";
+        }
        
         // 重複チェック
         if (arrayWorkDays.find(x => x == workDay)) {
@@ -600,8 +602,9 @@
         arrayWorkDays.splice(deleteIndex, 1);
 
         // 選択された便が1つも無くなった場合
-        if (arrayTrips.length == 0) {
+        if (arrayWorkDays.length == 0) {
             document.getElementById("selectedWorkDays0").innerHTML = "";
+            document.getElementById("clearTrips").style.visibility = 'hidden';
             return;
         }
 

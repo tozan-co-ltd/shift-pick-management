@@ -755,8 +755,10 @@ function addTrips(selectedTripName) {
     }
 
     // 1行目の場合、項目追加
-    if (arrayTrips.length == 0) 
+    if (arrayTrips.length == 0) {
+        document.getElementById("clearTrips").style.visibility = 'visible';
         document.getElementById("selectedTrips0").innerHTML = "<span class=\"warehouse-name-drs span-paragraph mb-3\">選択された便</span>";
+    }
 
     // 重複チェック
     const tripNames = arrayTrips.map(d => d.selectedTripName);
@@ -832,6 +834,7 @@ function onLabelDeleteClick(selectedTripName) {
 
     // 選択された便が1つも無くなった場合
     if (arrayTrips.length == 0) {
+        document.getElementById("clearTrips").style.visibility = 'hidden';
         document.getElementById("selectedTrips0").innerHTML = "";
         return;
     }
@@ -860,6 +863,7 @@ function clearTrips() {
     var selectedWorkDays = document.getElementById("selectedWorkDays0");
     if (selectedWorkDays != null)
         selectedWorkDays.innerHTML = "";
+    document.getElementById("clearTrips").style.visibility = 'hidden';
     arrayTrips = [];
     arrayWorkDays = [];
 }
