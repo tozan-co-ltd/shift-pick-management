@@ -205,6 +205,15 @@ namespace ai_truck_load_measurement.Properties {
         }
         
         /// <summary>
+        ///   {0}を選択してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string E1017 {
+            get {
+                return ResourceManager.GetString("E1017", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   データベースに接続できませんでした。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string E3001 {

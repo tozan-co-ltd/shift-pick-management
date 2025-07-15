@@ -755,8 +755,10 @@ function addTrips(selectedTripName) {
     }
 
     // 1行目の場合、項目追加
-    if (arrayTrips.length == 0) 
-        document.getElementById("selectedTrips0").innerHTML = "<span class=\"warehouse-name-drs span-paragraph mb-3\">選択された便</span>";
+    if (arrayTrips.length == 0) {
+        document.getElementById("clearTrips").style.visibility = 'visible';
+        document.getElementById("selectedTrips0").innerHTML = "<span class=\"mt-3\" style=\"width:140px\">選択された便</span>";
+    }
 
     // 重複チェック
     const tripNames = arrayTrips.map(d => d.selectedTripName);
@@ -805,10 +807,11 @@ function pushLabelToSelectedTrips(selectedTrips, selectedTripName) {
     var selectedTripLabel = document.createElement("label");
     selectedTripLabel.innerText = selectedTripName;
     selectedTripLabel.innerHTML += "<a href=\"#\" class=\"label-delete ml-1 \" onclick=\"onLabelDeleteClick('" + selectedTripName + "')\" id=\"\">×</a>";
-    selectedTripLabel.className += "mr-2 mb-3 selected-trip-label";
+    selectedTripLabel.className += "mr-2 mt-3 selected-trip-label";
     selectedTripLabel.style.backgroundColor = "rgba(200, 200, 200, 0.6)";
     selectedTripLabel.style.padding = "0.5em";
     selectedTripLabel.style.borderRadius = "5px";
+    selectedTripLabel.style.fontWeight = "normal";
     selectedTrips.appendChild(selectedTripLabel);
 }
 
@@ -832,6 +835,7 @@ function onLabelDeleteClick(selectedTripName) {
 
     // 選択された便が1つも無くなった場合
     if (arrayTrips.length == 0) {
+        document.getElementById("clearTrips").style.visibility = 'hidden';
         document.getElementById("selectedTrips0").innerHTML = "";
         return;
     }
@@ -860,6 +864,7 @@ function clearTrips() {
     var selectedWorkDays = document.getElementById("selectedWorkDays0");
     if (selectedWorkDays != null)
         selectedWorkDays.innerHTML = "";
+    document.getElementById("clearTrips").style.visibility = 'hidden';
     arrayTrips = [];
     arrayWorkDays = [];
 }
@@ -1011,11 +1016,16 @@ function pushAllCheckBox() {
 // 各デポチェックボックス押下時共通処理
 function pushDepoCheckBox() {
     var depos = $('input[name=depos]');
+    var isAllDeposChecked = true;
     for (var i = 0; i < depos.length; i++) {
         if (!depos[i].checked) {
             $('input[id=allDepo]')[0].checked = false;
+            isAllDeposChecked = false;
             break;
         }
+    }
+    if (isAllDeposChecked) {
+        $('input[id=allDepo]')[0].checked = true;
     }
 }
 
