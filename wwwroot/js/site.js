@@ -501,7 +501,7 @@ function EditModal(tripRecordID, isArrived, page) {
                     + "<td>" + arriveOrDepartureDate + "</td>"
                     + "</tr>";
                 container.append(tr);
-                if (authorizedKubun == "1") {
+                if (authorizedKubun == "1" || authorizedKubun == "2") {
                     $('#loadStatusSelect').val(response.annotationLoadClass);
                 } else if (response.annotationLoadStatus != null) {
                     $('#loadStatusSelect').text(response.annotationLoadStatus + "%");
