@@ -757,7 +757,7 @@ function addTrips(selectedTripName) {
     // 1行目の場合、項目追加
     if (arrayTrips.length == 0) {
         document.getElementById("clearTrips").style.visibility = 'visible';
-        document.getElementById("selectedTrips0").innerHTML = "<span class=\"mt-3\" style=\"width:140px\">選択された便</span>";
+        document.getElementById("selectedTrips0").innerHTML = "<span class=\"mt-3 warehouse-name-drs\" >選択された便</span>";
     }
 
     // 重複チェック
