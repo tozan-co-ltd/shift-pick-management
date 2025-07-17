@@ -186,6 +186,14 @@ namespace ai_truck_load_measurement.Controllers
                 IEnumerable<M_TruckModel> truckList = ConnectToSQLServer.ExecuteQueryToList<M_TruckModel>(truckSql);
 
                 // 車両番号のセレクトリスト作成
+                SelectListItem firstItem = new()
+                {
+                    Text = "選択してください",
+                    Value = "",
+                    Selected = true,
+                    Disabled = true
+                };
+                model.TruckSelectList.Add(firstItem);
                 foreach (var truck in truckList)
                 {
                     SelectListItem menuItem = new()
@@ -216,6 +224,7 @@ namespace ai_truck_load_measurement.Controllers
             viewModel.DriverName = tripModel.DriverName;
             viewModel.TruckID = tripModel.TruckID;
             viewModel.DayShiftStartTime = tripModel.DayShiftStartTime;
+            viewModel.DepoID = tripModel.DepoID;
             viewModel.DepoName = tripModel.DepoName;
             viewModel.ApplicableStartDateTime = tripModel.ApplicableStartDateTime;
             viewModel.ApplicableEndDateTime = tripModel.ApplicableEndDateTime;
