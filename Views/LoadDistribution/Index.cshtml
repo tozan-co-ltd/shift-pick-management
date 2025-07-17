@@ -41,27 +41,31 @@
         </div>
 
         <form id="LoadDistributionForm">
-            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
-                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                    <span class="warehouse-name-drs span-paragraph">デポ</span>
-                    <div>
-                        <label class="mr-2"><input type="checkbox" class=" mr-2" id="allDepo" />すべて  [</label>
-                        <label id="selectDepos"></label>]
+            <div class="span-paragraph mb-3">
+                <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                    <div class="d-flex justify-content-start align-items-center unset-pdl">
+                        <span class="warehouse-name-drs ">デポ</span>
+                        <div style="font-weight: normal">
+                            <label class="mr-2"><input type="checkbox" class=" mr-2" id="allDepo" />すべて  [</label>
+                            <label id="selectDepos"></label>]
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
-                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                    <span class="warehouse-name-drs span-paragraph">稼働日</span>
-                    <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
-                    <label class="m-1">～</label>
-                    <input type="text" id="endOfPeriod" class="form-control pickerDate endDate">
                 </div>
             </div>
             <div class="span-paragraph mb-3">
                 <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                     <div class="d-flex justify-content-start align-items-center unset-pdl">
-                        <span style="width:140px">便選択</span>
+                        <span class="warehouse-name-drs">稼働日</span>
+                        <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
+                        <label class="m-1">～</label>
+                        <input type="text" id="endOfPeriod" class="form-control pickerDate endDate">
+                    </div>
+                    </div>
+                </div>
+            <div class="span-paragraph mb-3">
+                <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                    <div class="d-flex justify-content-start align-items-center unset-pdl">
+                        <span class="warehouse-name-drs ">便選択</span>
                         <div class="dropdown-container  mr-3" id="dropdownContainer">
                             <button class="dropdown-button btn btn-primary btn-icon-split btn-register" id="dropdownButton">
                                 <span class="icon text-white-50">
@@ -104,37 +108,38 @@
                 </div>
             </div>
             
-
-            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
-                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
-                    <span class="warehouse-name-drs span-paragraph">荷量範囲</span>
-                    <select type="text" id="minLoadStatus" class="form-select" name="minLoadStatus" style="width: 100px">
-                        <option value="2" selected>0%</option>
-                        <option value="3">1%</option>
-                        <option value="4">11%</option>
-                        <option value="5">21%</option>
-                        <option value="6">31%</option>
-                        <option value="7">41%</option>
-                        <option value="8">51%</option>
-                        <option value="9">61%</option>
-                        <option value="10">71%</option>
-                        <option value="11">81%</option>
-                        <option value="12">91%</option>
-                    </select>
-                    <label class="m-1">～</label>
-                    <select type="text" id="maxLoadStatus" class="form-select" name="maxLoadStatus" style="width: 100px">
-                        <option value="2">0%</option>
-                        <option value="3">10%</option>
-                        <option value="4">20%</option>
-                        <option value="5">30%</option>
-                        <option value="6">40%</option>
-                        <option value="7">50%</option>
-                        <option value="8">60%</option>
-                        <option value="9">70%</option>
-                        <option value="10">80%</option>
-                        <option value="11">90%</option>
-                        <option value="12" selected>100%</option>
-                    </select>
+            <div class="span-paragraph mb-3">
+                <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                    <div class="d-flex justify-content-start align-items-center unset-pdl">
+                        <span class="warehouse-name-drs">荷量範囲</span>
+                        <select type="text" id="minLoadStatus" class="form-select" name="minLoadStatus" style="width: 100px">
+                            <option value="2" selected>0%</option>
+                            <option value="3">1%</option>
+                            <option value="4">11%</option>
+                            <option value="5">21%</option>
+                            <option value="6">31%</option>
+                            <option value="7">41%</option>
+                            <option value="8">51%</option>
+                            <option value="9">61%</option>
+                            <option value="10">71%</option>
+                            <option value="11">81%</option>
+                            <option value="12">91%</option>
+                        </select>
+                        <label class="m-1">～</label>
+                        <select type="text" id="maxLoadStatus" class="form-select" name="maxLoadStatus" style="width: 100px">
+                            <option value="2">0%</option>
+                            <option value="3">10%</option>
+                            <option value="4">20%</option>
+                            <option value="5">30%</option>
+                            <option value="6">40%</option>
+                            <option value="7">50%</option>
+                            <option value="8">60%</option>
+                            <option value="9">70%</option>
+                            <option value="10">80%</option>
+                            <option value="11">90%</option>
+                            <option value="12" selected>100%</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </form>
