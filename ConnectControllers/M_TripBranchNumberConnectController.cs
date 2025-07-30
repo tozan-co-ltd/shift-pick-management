@@ -63,7 +63,12 @@ namespace ai_truck_load_measurement.ConnectControllers
                     BranchNumbers.updated_by,
 	                CONVERT(DATETIME, day_shift_start_time) AS day_shift_start_time
                 FROM m_trip_branch_numbers AS BranchNumbers
-                INNER JOIN m_trip_histories AS TripHistories
+                INNER JOIN 
+	                (SELECT
+		                * 
+	                FROM m_trip_histories
+	                WHERE applicable_end_datetime> '{refferenceDate.ToString("yyyy/MM/dd HH:mm:ss")}'
+	                AND applicable_start_datetime < '{refferenceDate.ToString("yyyy/MM/dd HH:mm:ss")}') AS TripHistories
                 ON BranchNumbers.trip_id = TripHistories.trip_id
                 WHERE BranchNumbers.trip_id = {tripId}
                 AND BranchNumbers.applicable_end_datetime > '{refferenceDate.ToString("yyyy/MM/dd HH:mm:ss")}'

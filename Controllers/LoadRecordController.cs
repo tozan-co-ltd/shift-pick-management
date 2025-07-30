@@ -77,6 +77,7 @@ namespace ai_truck_load_measurement.Controllers
                 // 各列の値が空白の場合、"-"に変換する
                 if (string.IsNullOrEmpty(row["trip_name"].ToString())) row["trip_name"] = "-";
                 if (string.IsNullOrEmpty(row["driver_name"].ToString())) row["driver_name"] = "-";
+                if (string.IsNullOrEmpty(row["departed_at"].ToString())) row["departed_at"] = "-";
                 row["converted_identify_number"] = ConvertNumberToFourDigitOrHyphen(row["identify_number"].ToString());
                 ConvertString(row, "trip_branch_seq", "converted_branch_seq");
                 ConvertString(row, "truck_number", "converted_truck_number");
@@ -281,8 +282,6 @@ namespace ai_truck_load_measurement.Controllers
                     <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
                         <thead>
                             <tr align=""center"">
-                                <th hidden>便実績ID</th>
-                                <th hidden>便名称有無</th>
                                 <th class=""font-weight-bold"">便名称</th>
                                 <th class=""font-weight-bold"">便枝番</th>
                                 <th class=""font-weight-bold"">タグ</th>
@@ -300,6 +299,8 @@ namespace ai_truck_load_measurement.Controllers
                                 <th class=""font-weight-bold"">出発荷量<br>(%)</th>
                                 <th class=""font-weight-bold"">到着荷量<br>画像</th>
                                 <th class=""font-weight-bold"">出発荷量<br>画像</th>
+                                <th hidden>便実績ID</th>
+                                <th hidden>便名称有無</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -317,10 +318,10 @@ namespace ai_truck_load_measurement.Controllers
                     if (departureScheduledTime == "00:00") departureScheduledTime = "-";
                     var hasTripName = 0;
                     if (item.TripName == "-") hasTripName = 1;
+                    var departed = item.DepartedAt.ToString("yyyy/MM/dd HH:mm");
+                    if(departed == "0001/01/01 00:00") departed = "-";
                     searchData += $@"
                         <tr>
-                            <td hidden>{item.TripRecordID}</td>
-                            <td hidden>{hasTripName}</td>
                             <td>{item.TripName}</td>
                             <td>{item.TripBranchSeq}</td>   
                             <td>{item.Tag}</td>   
@@ -333,7 +334,7 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{departureScheduledTime}</td>
                             <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
                             <td>{item.ArrivedAt.ToString("yyyy/MM/dd HH:mm")}</td>
-                            <td>{item.DepartedAt.ToString("yyyy/MM/dd HH:mm")}</td>
+                            <td>{departed}</td>
                             <td>{item.ArrivalLoadStatus}</td>
                             <td>{item.DepartureLoadStatus}</td>
                             <td>
@@ -348,6 +349,8 @@ namespace ai_truck_load_measurement.Controllers
                                     <i class=""fa-solid fa-truck""></i>
                                 </a>
                             </td>
+                            <td hidden>{item.TripRecordID}</td>
+                            <td hidden>{hasTripName}</td>
                         </tr>
                 ";
                 }

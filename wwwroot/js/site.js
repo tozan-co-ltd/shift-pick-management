@@ -610,16 +610,19 @@ function tableDisplayCommon(page, data) {
             scrollX: true,          // 横スクロール可
             scrollCollapse: true,   // 縦スクロール表示
             searchHighlight: true,  // 検索ハイライト
-            orderFixed: [1, "asc"],
-            order: [[2, "asc"] , [9, "asc"], [3, "asc"]],    // ID昇順
+            orderFixed: [18, "asc"],
+            order: [[0, "asc"] , [7, "asc"], [1, "asc"]],    // ID昇順
             "oLanguage": {
                 "sSearch": ""
             },
             dom: dom_structure,
             "columnDefs": [
-                { className:"dt-body-left", "targets": [4] },
                 { className:"dt-body-left", "targets": [2] },
+                { className: "dt-body-left", "targets": [0], },
             ],
+            fixedColumns: {
+                leftColumns: 3,
+            },
         });
         var table = $("#tripRecordDataTable").DataTable();
         table.on('draw', function () {
@@ -710,6 +713,8 @@ function GetTimeString(date) {
 function GetDateString(date) {
     var day = GetDayString(date);
     var time = GetTimeString(date);
+    if (day == "1/01/01")
+        return "-";
     return day + " " + time;
 }
 
