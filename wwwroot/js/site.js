@@ -713,6 +713,8 @@ function GetTimeString(date) {
 function GetDateString(date) {
     var day = GetDayString(date);
     var time = GetTimeString(date);
+    if (day == "1/01/01")
+        return "-";
     return day + " " + time;
 }
 
