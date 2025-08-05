@@ -286,20 +286,20 @@ namespace ai_truck_load_measurement.Controllers
                                 <th class=""font-weight-bold"">便名称</th>
                                 <th class=""font-weight-bold"">便枝番</th>
                                 <th class=""font-weight-bold"">タグ</th>
-                                <th class=""font-weight-bold"">乗務員</th>
-                                <th class=""font-weight-bold"">ステーション<br>名</th>
-                                <th class=""font-weight-bold"">車両<br>番号</th>
                                 <th class=""font-weight-bold"">識別<br>番号</th>
-                                <th class=""font-weight-bold"">デポ</th>
-                                <th class=""font-weight-bold"">到着<br>予定</th>
-                                <th class=""font-weight-bold"">出発<br>予定</th>
-                                <th class=""font-weight-bold"">稼働日</th>
                                 <th class=""font-weight-bold"">到着実績</th>
                                 <th class=""font-weight-bold"">出発実績</th>
                                 <th class=""font-weight-bold"">到着荷量<br>(%)</th>
                                 <th class=""font-weight-bold"">出発荷量<br>(%)</th>
                                 <th class=""font-weight-bold"">到着荷量<br>画像</th>
                                 <th class=""font-weight-bold"">出発荷量<br>画像</th>
+                                <th class=""font-weight-bold"">乗務員</th>
+                                <th class=""font-weight-bold"">ステーション<br>名</th>
+                                <th class=""font-weight-bold"">車両<br>番号</th>
+                                <th class=""font-weight-bold"">デポ</th>
+                                <th class=""font-weight-bold"">到着<br>予定</th>
+                                <th class=""font-weight-bold"">出発<br>予定</th>
+                                <th class=""font-weight-bold"">稼働日</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -324,14 +324,7 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{item.TripName}</td>
                             <td>{item.TripBranchSeq}</td>   
                             <td>{item.Tag}</td>   
-                            <td>{item.DriverName}</td>
-                            <td>{item.StationName}</td>
-                            <td>{truckNumber}</td>
                             <td>{item.IdentifyNumber}</td>
-                            <td>{item.DepoName}</td>
-                            <td>{arrivalScheduledTime}</td>
-                            <td>{departureScheduledTime}</td>
-                            <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
                             <td>{item.ArrivedAt.ToString("yyyy/MM/dd HH:mm")}</td>
                             <td>{item.DepartedAt.ToString("yyyy/MM/dd HH:mm")}</td>
                             <td>{item.ArrivalLoadStatus}</td>
@@ -348,6 +341,13 @@ namespace ai_truck_load_measurement.Controllers
                                     <i class=""fa-solid fa-truck""></i>
                                 </a>
                             </td>
+                            <td>{item.DriverName}</td>
+                            <td>{item.StationName}</td>
+                            <td>{truckNumber}</td>
+                            <td>{item.DepoName}</td>
+                            <td>{arrivalScheduledTime}</td>
+                            <td>{departureScheduledTime}</td>
+                            <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
                         </tr>
                 ";
                 }
