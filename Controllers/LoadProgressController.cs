@@ -26,7 +26,7 @@ namespace ai_truck_load_measurement.Controllers
             var trips = GetTrips(depoId);
 
             // 便枝番情報取得
-            var tripBranchNumbers = GetTripBranchNumbers(depoId);
+            var tripBranchNumbers = GetTripBranchNumbers(depoId, workDay);
 
             // 便実績情報取得
             var loadRecords = GetLoadRecords(depoId, workDay);
@@ -48,7 +48,7 @@ namespace ai_truck_load_measurement.Controllers
             {
                 // 便一覧を取得
                 var trips = GetTrips(depoId);
-                var tripBranchNumbers = GetTripBranchNumbers(depoId);
+                var tripBranchNumbers = GetTripBranchNumbers(depoId, DateTime.Now);
                 // 便実績一覧を取得
                 var loadRecords = GetLoadRecords(depoId, DateTime.Now);
 
@@ -185,9 +185,9 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         // 便枝番情報取得
-        public static List<M_TripBranchNumberModel> GetTripBranchNumbers(int depoId)
+        public static List<M_TripBranchNumberModel> GetTripBranchNumbers(int depoId, DateTime workDay)
         {
-            var sql = LoadProgressConnectController.CreateSQLToSelectM_TripsFromDepo(depoId);
+            var sql = LoadProgressConnectController.CreateSQLToSelectTripBranchNumbersFromDepo(depoId, workDay);
             var tripBranchNumbers = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberModel>(sql);
             return tripBranchNumbers;
         }

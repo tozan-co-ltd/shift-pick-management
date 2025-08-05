@@ -46,6 +46,34 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        public static string CreateSQLToSelectTripBranchNumbersFromDepo(int depoId, DateTime workDay)
+        {
+            var sql = $@"
+                SELECT
+	                BranchNumbers.trip_id,
+	                trip_name,
+                    trip_branch_number_id,
+                    tag,
+                    CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time,
+                    CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time,
+                    BranchNumbers.applicable_start_datetime,
+                    BranchNumbers.applicable_end_datetime,
+                    BranchNumbers.updated_at,
+                    BranchNumbers.updated_by,
+                    CONVERT(DATETIME, day_shift_start_time) AS day_shift_start_time
+                FROM m_trip_branch_numbers AS BranchNumbers
+                INNER JOIN m_trip_histories AS TripHistories
+                ON BranchNumbers.trip_id = TripHistories.trip_id
+                INNER JOIN m_trips AS Trips
+                ON BranchNumbers.trip_id = Trips.trip_id
+                WHERE BranchNumbers.applicable_end_datetime > '{workDay.ToString("yyyy/MM/dd HH:mm")}'
+                AND BranchNumbers.applicable_start_datetime < '{workDay.ToString("yyyy/MM/dd HH:mm")}'
+                AND TripHistories.depo_id = {depoId}
+                ORDER BY trip_name
+            ";
+            return sql;
+        }
+
         public static string CreateSQLToSelectLoadRecordsFromDepoAndWorkDay(int depoId, DateTime workDay)
         {
             var sql = $@"

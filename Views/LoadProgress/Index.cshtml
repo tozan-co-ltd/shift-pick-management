@@ -18,22 +18,24 @@
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
         console.log(model);
-        // $.ajax({
-        //         type: 'GET',
-        //         dataType: 'JSON',
-        //         url: '@Url.Action("GetLoadProgressJson", "LoadProgress")'
-        // }).done(function (response) {
-        //     if(response.res == "OK")
-        //         loadProgressDataSets(response.data)
-        //     else{
-        //         $("#ErrorBlock").text(response.error)
-        //     }
-        // });
+        let data = {depoId: model.selectedDepo.depoID}
+        $.ajax({
+                type: 'GET',
+                data: data,
+                dataType: 'JSON',
+                url: '@Url.Action("GetLoadProgressJson", "LoadProgress")'
+        }).done(function (response) {
+            if(response.res == "OK")
+                loadProgressDataSets(response.data)
+            else{
+                $("#ErrorBlock").text(response.error)
+            }
+        });
     });
 
     function loadProgressDataSets(datasets){
 
-        var width = $(window).width() - 30, height = 75;
+        var width = $(window).width() - 60, height = 75;
         var padding = { top: 0, right: 10, bottom: 10, left: 65 }
         var barHeight = 120;
 
