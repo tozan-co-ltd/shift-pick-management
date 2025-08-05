@@ -85,6 +85,19 @@ namespace ai_truck_load_measurement.ConnectControllers
                     Depos.depo_id = {depoId}
                 AND
                     work_day = '{workDay.ToString("yyyy/MM/dd")}'
+                AND
+                    identify_number IS NOT NULL
+            ";
+            return sql;
+        }
+
+        public static string CreateSQLToSelectTripNames()
+        {
+            var sql = $@"
+                SELECT
+                    trip_name
+                FROM
+                    m_trips
             ";
             return sql;
         }

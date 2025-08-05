@@ -1,0 +1,187 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.LoadProgressModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+}
+<div class="card shadow de-inspection masterInfo m-4">
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+何か適当に書いて表示させるようのテスト
+    <div id="ErrorBlock" class="mb-3 text-danger text-center"></div>
+
+    <div id="timeline-chart" class="scroll-inner"></div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        model = @Html.Raw(Json.Serialize(Model));
+        console.log(model);
+        // $.ajax({
+        //         type: 'GET',
+        //         dataType: 'JSON',
+        //         url: '@Url.Action("GetLoadProgressJson", "LoadProgress")'
+        // }).done(function (response) {
+        //     if(response.res == "OK")
+        //         loadProgressDataSets(response.data)
+        //     else{
+        //         $("#ErrorBlock").text(response.error)
+        //     }
+        // });
+    });
+
+    function loadProgressDataSets(datasets){
+
+        var width = $(window).width() - 30, height = 75;
+        var padding = { top: 0, right: 10, bottom: 10, left: 65 }
+        var barHeight = 120;
+
+        // 日時を時刻に変換
+        $.each(datasets, function (index, data) {
+            $.each(data.value, function (index, data) {
+                data.from = moment(data.from);
+                data.to = moment(data.to);
+            })
+        })
+
+        // d3.jsで描画
+        $.each(datasets, function (index, data) {
+            var dataset = data.value;
+            var date = new Date();
+            var dateFormat = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
+            var timelineStartTime = moment(moment(dateFormat).startOf('day').add(5, 'h'));
+            var timelineEndTime = moment(moment(moment(dateFormat))).add(1, 'days').startOf('day').add(5, 'h');
+
+            var svg = d3.select('#timeline-chart')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+
+            // x軸(時間軸)
+            var xScale = d3.scaleTime()
+                .domain([timelineStartTime, timelineEndTime])
+                .range([padding.left, width - padding.right])
+            var chartHeight = height - padding.top - padding.bottom;
+
+            var xAxis = d3.axisBottom(xScale)
+                .ticks(14)
+                .tickSize(chartHeight)      // 軸のメモリの長さ
+                .tickFormat(d3.timeFormat('%H:%M'))
+            var gX = svg.append('g')
+                .call(xAxis)
+
+            // y軸(ラベル)
+            var dateDispFormat = data.key
+            var chartCenterY = padding.top + chartHeight / 2
+            svg.append('text')
+                .text(dateDispFormat)
+                .attr('x', 10)
+                .attr('y', chartCenterY)
+                .attr('dy', '0.5rem')
+
+            // データの描画
+            const scheduleG = svg.selectAll()
+                .data(dataset)
+                .enter()
+                .append('g')        // 要素のグループ化
+
+            let yRect = 1;
+            let yText = 0;
+
+            // 短形の描画
+            scheduleG.append('rect')
+                .attr('x', function (d) {
+                    return xScale(d['from'])
+                })
+                .attr('y', yRect)
+                .attr('width', function (d) {
+                    return xScale(d['to']) - xScale(d['from'])
+                })
+                .attr('height', function (d) {
+                    // 現在時刻
+                    if (d.shipping_lane_status_name == '現在時刻') {
+                        return barHeight
+                        // 休憩時間
+                    } else if (d.shipping_lane_status_name == '休憩時間') {
+                        return barHeight / 1.8
+                        // 運行便
+                    } else {
+                        return barHeight / 1.8
+                    }
+                })
+                .attr('fill', function (d) {
+                    var color = '';
+                    const emptyBoxTruckYardName = ["S3","S4","S5","W1","W2","W3"];
+                    if (emptyBoxTruckYardName.includes(data.key)) {
+                        // 現在時刻             赤 #ff0000
+                        if (d.shipping_lane_status_name == '現在時刻')
+                            color = '#ff0000';
+                        // 休憩時間             灰 #cccccc
+                        else if (d.shipping_lane_status_name == '休憩時間')
+                            color = '#cccccc';
+                        // 空箱(S3,S4,S5,W1,W2,W3) 紫 #cfa7cd
+                        else
+                            color = '#cfa7cd';
+                    } else {
+                        // 現在時刻             赤 #ff0000
+                        if (d.shipping_lane_status_name == '現在時刻')
+                            color = '#ff0000';
+                        // 休憩時間             灰 #cccccc
+                        else if (d.shipping_lane_status_name == '休憩時間')
+                            color = '#cccccc';
+                        // 作業者セット中       橙 #ffcc00
+                        else if (d.shipping_lane_status_name == '作業者セット中')
+                            color = '#ffcc00';
+                        // 作業者セット完了     黄 #ffff66
+                        else if (d.shipping_lane_status_name == '作業者セット完了')
+                            color = '#ffff66';
+                        // 積込み作業中         青 #0099ff
+                        else if (d.shipping_lane_status_name == '積込み作業中')
+                            color = '#0099ff';
+                        // 積込み完了           緑 #33cc00
+                        else if (d.shipping_lane_status_name == '積込み完了')
+                            color = '#33cc00';
+                        // 未着手               黒 #808080
+                        else if (d.shipping_lane_status_name == '未着手')
+                            color = '#808080';
+                    }
+                    return color
+                })
+                // 遅延表示(赤枠)
+                .attr('stroke', function (d) {
+                    var stroke = '';
+                    var curentDateTime = new Date();
+                    var shippingEndTime = new Date(d.shipping_end_scheduled_time);
+                    // 出荷レーン状況名が「作業者セット中」かつ出荷終了時間が現在時刻より前の場合は赤枠を表示
+                    if (d.shipping_lane_status_name == '作業者セット中' && curentDateTime > shippingEndTime) {
+                        stroke = "#ff0000";
+                    }
+                    return stroke
+                })
+                .attr("stroke-width", 3)
+                .attr('opacity', 0.7)
+
+            // 運行便名の描画
+            scheduleG.append('text')
+                .attr('transform', 'translate(5, 1)')   // SVGの表示領域
+                .attr('x', function (d) {
+                    return xScale(d['from'])            // x座標(親要素からの相対位置)
+                })
+                .attr('y', yText)                       // y座標(親要素からの相対位置)
+                .text(function (d) {
+                    // 現在時刻・休憩時間の場合は、便名表示なし
+                    if (d.shipping_lane_status_name == '現在時刻' || d.shipping_lane_status_name == '休憩時間') {
+                        return ''
+                        // 運行便の場合は、便名表示あり
+                    } else if (d.routeName != undefined && d.routeSeq != undefined) {
+                        return d.routeName + d.routeSeq
+                    }
+                })
+                .attr('font-size', '9px')               // 文字サイズ
+                .attr('writing-mode', 'tb')             // 縦書き
+                .attr('dominant-baseline', 'central')   // テキスト中央揃え
+                .attr('fill', '#000000')                // テキスト色
+        });
+    }
+</script>
