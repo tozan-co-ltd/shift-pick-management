@@ -65,7 +65,7 @@ namespace ai_truck_load_measurement.Controllers
 
                     tripBranchNumbers.ForEach(lst =>
                     {
-                        // トラックヤード名の存在をチェック
+                        // 便名の存在をチェック
                         if (lstTripName.Contains(lst.TripName))
                         {
                             if (!dictData.ContainsKey(lst.TripName))
@@ -74,6 +74,7 @@ namespace ai_truck_load_measurement.Controllers
 
                                 // 辞書に追加
                                 dictData.Add(lst.TripName, Schedule);
+                                dictData.Add(lst.TripName + "実績", new List<object>());
                             }
 
                             Schedule = dictData[lst.TripName];
@@ -116,13 +117,76 @@ namespace ai_truck_load_measurement.Controllers
                         }
                     });
 
+                    if(loadRecords.Count > 0)
+                    {
+                        loadRecords.ForEach(lst =>
+                        {
+
+                            // 便名の存在をチェック
+                            if (lstTripName.Contains(lst.TripName))
+                            {
+                                if (!dictData.ContainsKey(lst.TripName + "実績") )
+                                {
+                                    var Schedule = new List<object>();
+
+                                    // 辞書に追加
+                                    dictData.Add(lst.TripName + "実績", Schedule);
+                                }
+                                else if( dictData[lst.TripName + "実績"].Count == 0)
+                                {
+                                    var Schedule = new List<object>();
+                                    dictData[lst.TripName + "実績"] = Schedule;
+                                }
+
+                                    Schedule = dictData[lst.TripName + "実績"];
+
+                                // 昼勤開始時間と積込開始・終了予定時間を比較し、積込日を補正する
+                                // マイナスの場合は、積込日+1
+                                // ex. 積込日=2023/1/1,開始休憩時間=05:00,
+                                // 積込開始=23:39:00,積込終了=0:09:00の場合、積込開始=2023/1/1,積込終了=2023/1/2となる
+                                var startTime = TimeSpan.Parse(lst.ArrivedAt.ToString("HH:mm"));
+                                var endTime = TimeSpan.Parse(lst.DepartedAt.ToString("HH:mm"));
+                                var loadDate = DateTime.Now;
+                                var fromDateTime = "";
+                                var toDateTime = "";
+                                var dayShiftStartTime = TimeSpan.Parse("00:00");
+                                if(lst.DayShiftStartTime != null)
+                                {
+                                    dayShiftStartTime = TimeSpan.Parse(lst.DayShiftStartTime.Value.ToString("HH:MM"));
+                                }
+
+                                // 積込開始予定時間
+                                if (startTime < dayShiftStartTime)
+                                    // 積込日+1
+                                    loadDate = loadDate.AddDays(1);
+
+                                fromDateTime = loadDate.ToString("yyyy/MM/dd") + " " + startTime.ToString();
+
+                                // 積込終了予定時間
+                                if ((startTime < dayShiftStartTime && endTime > dayShiftStartTime) ||
+                                    (startTime > dayShiftStartTime && endTime < dayShiftStartTime))
+                                    // 積込日+1
+                                    loadDate = loadDate.AddDays(1);
+
+                                toDateTime = loadDate.ToString("yyyy/MM/dd") + " " + endTime.ToString();
+
+                                Schedule.Add(new
+                                {
+                                    routeName = lst.TripName,
+                                    routeSeq = lst.TripBranchSeq,
+                                    from = fromDateTime,
+                                    to = toDateTime,
+                                    shipping_start_scheduled_time = loadDate + " " + lst.ArrivalScheduledTime.ToString("HH:mm"),
+                                    shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm")
+                                });
+                            }
+                        });
+                    }
+
                     // 現在時刻を辞書に追加
                     var dictDataFormat = AddDateTimeNowToDictionary(dictData);
 
-                    // 辞書データをソート
-                    var sortedDictionary = dictDataFormat.OrderBy(x => x.Key, new SpecialKeyComparer()).ToDictionary(x => x.Key, x => x.Value);
-
-                    var result = new { res = "OK", data = sortedDictionary.ToArray() };
+                    var result = new { res = "OK", data = dictDataFormat.ToArray() };
 
                     return Json(result);
                 }
@@ -278,28 +342,6 @@ namespace ai_truck_load_measurement.Controllers
                 }
             }
             return results;
-        }
-
-        /// <summary>
-        /// 辞書データをソート
-        /// </summary>
-        /// <returns>x.CompareTo(y)</returns>
-        class SpecialKeyComparer : IComparer<string>
-        {
-            public int Compare(string x, string y)
-            {
-                var sql = LoadProgressConnectController.CreateSQLToSelectTripNames();
-                var tripNames = ConnectToSQLServer.ExecuteQueryToList<string>(sql);
-                for (var i = 0; i < tripNames.Count; i++)
-                {
-                    if (x == tripNames[i] && y != tripNames[i])
-                        return -(i + 1);
-                    if (x != tripNames[i] && y == tripNames[i])
-                        return i + 1;
-                }
-
-                return x.CompareTo(y);
-            }
         }
 
     }

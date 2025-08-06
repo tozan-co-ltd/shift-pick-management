@@ -42,6 +42,8 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                TripHistories.depo_id = Depos.depo_id
                 WHERE
                     TripHistories.depo_id = {depoId}
+                ORDER BY
+                    Trips.trip_name
             ";
             return sql;
         }
@@ -115,6 +117,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     work_day = '{workDay.ToString("yyyy/MM/dd")}'
                 AND
                     identify_number IS NOT NULL
+                ORDER BY trip_name
             ";
             return sql;
         }
