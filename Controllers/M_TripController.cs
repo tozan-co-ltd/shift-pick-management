@@ -117,11 +117,11 @@ namespace ai_truck_load_measurement.Controllers
                                        onclick=""OnEditClick('{@item.TripHistoryID}')"" data-id=""@item.TripHistoryID"" data-toggle=""modal"" data-target=""#edit-modal"">
                                         <i class=""fa-solid fa-pen""></i>
                                     </a>
-                                    <a class=""btn btn-icon-split ml-1 mr-1""onclick=""onRegisterClick('M_Trip', {item.TripHistoryID})"">
+                                    <a class=""btn btn-icon-split btn-secondary ml-1 mr-1""onclick=""onRegisterClick('M_Trip', {item.TripHistoryID})"">
                                         <i class=""fa-regular fa-copy""></i>
                                     </a>
                                 </td>
-                                <td><a class=""btn"" href=""M_TripBranchNumber?tripId={item.TripID}&isChecked={isBeforeApplicablePeriod}""><span style=""color:deepskyblue"">{@item.TripID}</a></td>
+                                <td><a class="""" href=""M_TripBranchNumber?tripId={item.TripID}&isChecked={isBeforeApplicablePeriod}""><span style=""color:deepskyblue"">{@item.TripID}</a></td>
                                 <td>{@item.TripName}</td>
                                 <td>{@item.DriverName}</td>
                                 <td>{@item.TruckNumber}</td>
@@ -186,6 +186,14 @@ namespace ai_truck_load_measurement.Controllers
                 IEnumerable<M_TruckModel> truckList = ConnectToSQLServer.ExecuteQueryToList<M_TruckModel>(truckSql);
 
                 // 車両番号のセレクトリスト作成
+                SelectListItem firstItem = new()
+                {
+                    Text = "選択してください",
+                    Value = "",
+                    Selected = true,
+                    Disabled = true
+                };
+                model.TruckSelectList.Add(firstItem);
                 foreach (var truck in truckList)
                 {
                     SelectListItem menuItem = new()
@@ -216,6 +224,7 @@ namespace ai_truck_load_measurement.Controllers
             viewModel.DriverName = tripModel.DriverName;
             viewModel.TruckID = tripModel.TruckID;
             viewModel.DayShiftStartTime = tripModel.DayShiftStartTime;
+            viewModel.DepoID = tripModel.DepoID;
             viewModel.DepoName = tripModel.DepoName;
             viewModel.ApplicableStartDateTime = tripModel.ApplicableStartDateTime;
             viewModel.ApplicableEndDateTime = tripModel.ApplicableEndDateTime;
