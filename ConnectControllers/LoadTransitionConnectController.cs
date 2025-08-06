@@ -97,20 +97,20 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                trip_name,
 	                trip_branch_seq,
                     TripBranchNumbers.tag,
-	                TripRecords.driver_name,
-	                Stations.name AS station_name,
-	                truck_number,
 	                identify_number,
-                    Depos.name AS depo_name,
-	                FORMAT(CONVERT(DATETIME, TripRecords.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
-	                FORMAT(CONVERT(DATETIME, TripRecords.departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
-	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
 	                FORMAT(arrived_at, 'yyyy/MM/dd HH:mm') AS arrived_at,
 	                FORMAT(departed_at, 'yyyy/MM/dd HH:mm') AS departed_at,
 	                arrival_load_class,
 	                departure_load_class,
 	                arrival_load_img_path,
-	                departure_load_img_path
+	                departure_load_img_path,
+	                TripRecords.driver_name,
+	                Stations.name AS station_name,
+	                truck_number,
+                    Depos.name AS depo_name,
+	                FORMAT(CONVERT(DATETIME, TripRecords.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
+	                FORMAT(CONVERT(DATETIME, TripRecords.departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
+	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day
                 FROM t_trip_records AS TripRecords
                 INNER JOIN
                 m_stations AS Stations

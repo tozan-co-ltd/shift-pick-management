@@ -597,6 +597,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     Trucks.truck_id,
                     Trucks.truck_number,
                     Trucks.identify_number,
+	                TripHistories.depo_id,
                     CONVERT(DATETIME, TripHistories.day_shift_start_time) AS day_shift_start_time,
                     TripHistories.applicable_start_datetime,
                     TripHistories.applicable_end_datetime

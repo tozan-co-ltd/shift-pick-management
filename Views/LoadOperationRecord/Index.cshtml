@@ -84,7 +84,9 @@
             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                 <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl mr-3">
                     <span class="warehouse-name-drs span-paragraph">便名称</span>
-                    <select type="text" class="form-select " name="TripName" asp-for="TripName" asp-items="@Model.TripNameList" required id="tripName"></select>
+                    <select type="text" class="form-select " name="TripName" asp-for="TripName" required id="tripName">
+                        <option>稼働日を選択してください</option>
+                    </select>
                 </div>
             </div>
             
@@ -521,9 +523,9 @@
             method: method,
             data: data
         }).done(function (response) {
+            var option = document.createElement("option");
             for (var i = 0; i < response.length; i++) {
                 // セレクトボックスの選択肢生成
-                var option = document.createElement("option");
                 if (response[i].text == null) {
                     option.text = "";
                 }
@@ -536,6 +538,12 @@
                 if (tripName == option.value) {
                     option.selected = true;
                 }
+                // セレクトボックスに追加
+                select.appendChild(option);
+            }
+            if(response.length == 0){
+                // 選択肢が存在しない場合
+                option.text = "選択した稼働日内に便実績が存在しません";
                 // セレクトボックスに追加
                 select.appendChild(option);
             }
