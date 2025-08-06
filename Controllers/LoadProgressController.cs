@@ -2,6 +2,7 @@
 using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -26,7 +27,7 @@ namespace ai_truck_load_measurement.Controllers
             var trips = GetTrips(depoId);
 
             // 便枝番情報取得
-            var tripBranchNumbers = GetTripBranchNumbers(depoId, workDay);
+            var tripBranchNumbers = GetTripBranchNumbers(depoId, trips, workDay);
 
             // 便実績情報取得
             var loadRecords = GetLoadRecords(depoId, workDay);
@@ -48,7 +49,8 @@ namespace ai_truck_load_measurement.Controllers
             {
                 // 便一覧を取得
                 var trips = GetTrips(depoId);
-                var tripBranchNumbers = GetTripBranchNumbers(depoId, DateTime.Now);
+                // 便枝番一覧を取得
+                var tripBranchNumbers = GetTripBranchNumbers(depoId, trips, DateTime.Now);
                 // 便実績一覧を取得
                 var loadRecords = GetLoadRecords(depoId, DateTime.Now);
 
@@ -185,10 +187,11 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         // 便枝番情報取得
-        public static List<M_TripBranchNumberModel> GetTripBranchNumbers(int depoId, DateTime workDay)
+        public List<M_TripBranchNumberModel> GetTripBranchNumbers(int depoId, List<M_TripModel> trips, DateTime workDay)
         {
             var sql = LoadProgressConnectController.CreateSQLToSelectTripBranchNumbersFromDepo(depoId, workDay);
             var tripBranchNumbers = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberModel>(sql);
+            tripBranchNumbers = SortTripBranchSeq(tripBranchNumbers, trips);
             return tripBranchNumbers;
         }
 
@@ -217,6 +220,67 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
+        /// 便枝番リストに枝連番を追加する
+        /// </summary>
+        /// <param name="tripBranchNumberList">枝連番を追加する対象便枝番リスト</param>
+        /// <returns></returns>
+        private List<M_TripBranchNumberModel> AddTripBranchSeq(List<M_TripBranchNumberModel> tripBranchNumberList)
+        {
+            var countBeforeShiftStartTimeRow = 0; // 到着予定時間が昼勤開始時間より早い行の数
+            var tripBranchSeq = 1; // 枝連番
+
+            for (int i = 0; i < tripBranchNumberList.Count; i++)
+            {
+
+                var tripBranchNumber = tripBranchNumberList[i];
+                var dayShiftStartTime = tripBranchNumber.DayShiftStartTime;
+                var arrivalScheduledTime = tripBranchNumber.ArrivalScheduledTime;
+
+                // 到着予定時間が昼勤開始時間以降のデータの場合、枝連番付与
+                // それ以外の場合、昼勤開始時間以前の行数のカウントを1増やす
+                if (arrivalScheduledTime > dayShiftStartTime)
+                {
+                    tripBranchNumber.TripBranchSeq = tripBranchSeq;
+                    tripBranchSeq++;
+                }
+                else
+                {
+                    countBeforeShiftStartTimeRow++;
+                }
+            }
+
+            // 到着予定時間が昼勤開始時間以前のデータに枝連番付与
+            if (countBeforeShiftStartTimeRow > 0)
+            {
+                for (int i = 0; i < countBeforeShiftStartTimeRow; i++)
+                {
+                    var tripBranchNumber = tripBranchNumberList[i];
+                    tripBranchNumber.TripBranchSeq = tripBranchSeq;
+                    tripBranchSeq++;
+                }
+            }
+
+            return tripBranchNumberList;
+        }
+
+        public List<M_TripBranchNumberModel> SortTripBranchSeq(List<M_TripBranchNumberModel> tripBranchNumberList, List<M_TripModel> trips)
+        {
+            List<M_TripBranchNumberModel> results = new();
+            // 便名称毎にグループ化
+            foreach (M_TripModel trip in trips)
+            {
+                List<M_TripBranchNumberModel> tripBranchNumbers = tripBranchNumberList.FindAll(x => x.TripID  == trip.TripID);
+                if (tripBranchNumbers.Count > 0)
+                {
+                    // グループごとにソート、追加
+                    var tripBranchNumberSorted = AddTripBranchSeq(tripBranchNumbers);
+                    results.AddRange(tripBranchNumberSorted);
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
         /// 辞書データをソート
         /// </summary>
         /// <returns>x.CompareTo(y)</returns>
@@ -237,5 +301,6 @@ namespace ai_truck_load_measurement.Controllers
                 return x.CompareTo(y);
             }
         }
+
     }
 }

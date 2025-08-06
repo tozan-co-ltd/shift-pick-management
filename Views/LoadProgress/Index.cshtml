@@ -8,7 +8,6 @@
     <div class="card-header">
         @ViewData["Title"]
     </div>
-何か適当に書いて表示させるようのテスト
     <div id="ErrorBlock" class="mb-3 text-danger text-center"></div>
 
     <div id="timeline-chart" class="scroll-inner"></div>
@@ -177,7 +176,7 @@
                         return ''
                         // 運行便の場合は、便名表示あり
                     } else if (d.routeName != undefined && d.routeSeq != undefined) {
-                        return d.routeName + d.routeSeq
+                        return d.routeName + "_" + d.routeSeq
                     }
                 })
                 .attr('font-size', '9px')               // 文字サイズ

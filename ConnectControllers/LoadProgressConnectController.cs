@@ -69,7 +69,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 WHERE BranchNumbers.applicable_end_datetime > '{workDay.ToString("yyyy/MM/dd HH:mm")}'
                 AND BranchNumbers.applicable_start_datetime < '{workDay.ToString("yyyy/MM/dd HH:mm")}'
                 AND TripHistories.depo_id = {depoId}
-                ORDER BY trip_name
+                ORDER BY trip_name, arrival_scheduled_time
             ";
             return sql;
         }
