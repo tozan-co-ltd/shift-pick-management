@@ -53,6 +53,7 @@ namespace ai_truck_load_measurement.Controllers
                 var tripBranchNumbers = GetTripBranchNumbers(depoId, trips, DateTime.Now);
                 // 便実績一覧を取得
                 var loadRecords = GetLoadRecords(depoId, DateTime.Now);
+                loadRecords = CheckLoadRecords(loadRecords, trips);
 
                 if (tripBranchNumbers.Count > 0)
                 {
@@ -71,10 +72,21 @@ namespace ai_truck_load_measurement.Controllers
                             if (!dictData.ContainsKey(lst.TripName))
                             {
                                 var Schedule = new List<object>();
+                                var LoadRecord = new List<object>();
+                                var dayShiftStartTimeObject = new
+                                {
+                                    from = DateTime.Now.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.ToString("HH:mm"),
+                                    to = DateTime.Now.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.AddMinutes(5).ToString("HH:mm"),
+                                    shipping_lane_status_name = "昼勤開始時間"
+                                };
 
                                 // 辞書に追加
                                 dictData.Add(lst.TripName, Schedule);
-                                dictData.Add(lst.TripName + "実績", new List<object>());
+                                dictData.Add(lst.TripName + "実績", LoadRecord);
+
+                                // 昼勤開始時間を追加
+                                Schedule.Add(dayShiftStartTimeObject);
+                                LoadRecord.Add(dayShiftStartTimeObject);
                             }
 
                             Schedule = dictData[lst.TripName];
@@ -125,6 +137,15 @@ namespace ai_truck_load_measurement.Controllers
                                 shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm"),
                                 shipping_lane_status_name = tripLaneStatusName
                             });
+
+
+                            Schedule.Add(new
+                            {
+                                from = DateTime.Now.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.ToString("HH:mm"),
+                                to = DateTime.Now.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.AddMinutes(5).ToString("HH:mm"),
+                                shipping_lane_status_name = "昼勤開始時間"
+                            });
+
                         }
                     });
 
@@ -146,7 +167,7 @@ namespace ai_truck_load_measurement.Controllers
                                 else if( dictData[lst.TripName + "実績"].Count == 0)
                                 {
                                     var Schedule = new List<object>();
-                                    dictData[lst.TripName + "実績"] = Schedule;
+                                    dictData[lst.TripName + "実績"].Add(Schedule);
                                 }
 
                                     Schedule = dictData[lst.TripName + "実績"];
@@ -183,6 +204,17 @@ namespace ai_truck_load_measurement.Controllers
 
                                 toDateTime = loadDate.ToString("yyyy/MM/dd") + " " + endTime.ToString();
 
+                                var tripLaneStatus = "";
+                                if (!string.IsNullOrEmpty(lst.TripBranchSeq))
+                                    tripLaneStatus += "紐付け有";
+                                else
+                                    tripLaneStatus += "紐付け無";
+
+                                if (lst.DepartedAt.ToString("yyyy/MM/dd") != "0001/01/01")
+                                    tripLaneStatus += "出発済";
+                                else
+                                    tripLaneStatus += "停車中";
+
                                 Schedule.Add(new
                                 {
                                     routeName = lst.TripName,
@@ -191,14 +223,16 @@ namespace ai_truck_load_measurement.Controllers
                                     to = toDateTime,
                                     shipping_start_scheduled_time = loadDate + " " + lst.ArrivalScheduledTime.ToString("HH:mm"),
                                     shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm"),
-                                    shipping_lane_status_name = "作業者セット中"
+                                    shipping_lane_status_name = tripLaneStatus
                                 });
+
+                               
                             }
                         });
                     }
 
                     // 現在時刻を辞書に追加
-                    var dictDataFormat = AddDateTimeNowToDictionary(dictData);
+                    var dictDataFormat = AddDateTimeToDictionary(dictData, DateTime.Now, "現在時刻");
 
                     var result = new { res = "OK", data = dictDataFormat.ToArray() };
 
@@ -221,7 +255,7 @@ namespace ai_truck_load_measurement.Controllers
         /// 現在時刻を辞書に追加
         /// </summary>
         /// <returns>dictDataFormat</returns>
-        public Dictionary<string, List<object>> AddDateTimeNowToDictionary(Dictionary<string, List<object>> dictData)
+        public Dictionary<string, List<object>> AddDateTimeToDictionary(Dictionary<string, List<object>> dictData, DateTime targetTime, string statusName)
         {
             Dictionary<string, List<object>> dictDataFormat = new();
 
@@ -231,9 +265,9 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     new
                     {
-                        from = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"),
-                        to = DateTime.Now.AddMinutes(5).ToString("yyyy/MM/dd HH:mm:ss"),
-                        shipping_lane_status_name = "現在時刻"
+                        from = targetTime.ToString("yyyy/MM/dd HH:mm:ss"),
+                        to = targetTime.AddMinutes(5).ToString("yyyy/MM/dd HH:mm:ss"),
+                        shipping_lane_status_name = statusName
                     }
                 };
                 var itemFormat = item.Value.Except(selected).ToList();

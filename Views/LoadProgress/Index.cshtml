@@ -34,9 +34,9 @@
 
     function loadProgressDataSets(datasets){
 
-        var width = $(window).width() - 60, height = 75;
+        var width = $(window).width() - 60, height = 90;
         var padding = { top: 0, right: 10, bottom: 10, left: 65 }
-        var barHeight = 120;
+        var barHeight = 135;
 
         // 日時を時刻に変換
         $.each(datasets, function (index, data) {
@@ -103,59 +103,59 @@
                     // 現在時刻
                     if (d.shipping_lane_status_name == '現在時刻') {
                         return barHeight
-                        // 休憩時間
-                    } else if (d.shipping_lane_status_name == '休憩時間') {
-                        return barHeight / 1.8
-                        // 運行便
+                    // 昼勤開始時間
+                    } else if(d.shipping_lane_status_name == '昼勤開始時間'){
+                        return barHeight * 2
+                    // 運行便
                     } else {
                         return barHeight / 1.8
                     }
                 })
                 .attr('fill', function (d) {
                     var color = '';
-                    const emptyBoxTruckYardName = ["S3","S4","S5","W1","W2","W3"];
-                    if (emptyBoxTruckYardName.includes(data.key)) {
-                        // 現在時刻             赤 #ff0000
-                        if (d.shipping_lane_status_name == '現在時刻')
-                            color = '#ff0000';
-                        // 休憩時間             灰 #cccccc
-                        else if (d.shipping_lane_status_name == '休憩時間')
-                            color = '#cccccc';
-                        // 空箱(S3,S4,S5,W1,W2,W3) 紫 #cfa7cd
-                        else
-                            color = '#cfa7cd';
-                    } else {
-                        // 現在時刻             赤 #ff0000
-                        if (d.shipping_lane_status_name == '現在時刻')
-                            color = '#ff0000';
-                        // 休憩時間             灰 #cccccc
-                        else if (d.shipping_lane_status_name == '休憩時間')
-                            color = '#cccccc';
-                        // 作業者セット中       橙 #ffcc00
-                        else if (d.shipping_lane_status_name == '作業者セット中')
-                            color = '#ffcc00';
-                        // 作業者セット完了     黄 #ffff66
-                        else if (d.shipping_lane_status_name == '作業者セット完了')
-                            color = '#ffff66';
-                        // 積込み作業中         青 #0099ff
-                        else if (d.shipping_lane_status_name == '積込み作業中')
-                            color = '#0099ff';
-                        // 積込み完了           緑 #33cc00
-                        else if (d.shipping_lane_status_name == '積込み完了')
-                            color = '#33cc00';
-                        // 未着手               黒 #808080
-                        else if (d.shipping_lane_status_name == '未着手')
-                            color = '#808080';
-                        // 出発後　　　　　　　 灰 #cccccc
-                        else if (d.shipping_lane_status_name == '出発後')
-                            color = '#cccccc';
-                        // 到着前　　　　　　　 薄いブルー #
-                        else if (d.shipping_lane_status_name == '到着前')
-                            color = '#aaffff';
-                        // 停車中
-                        else if (d.shipping_lane_status_name == '停車中')
-                            color = '#ec52ac';
-                    }
+                   
+                    // 現在時刻             赤 #ff0000
+                    if (d.shipping_lane_status_name == '現在時刻')
+                        color = '#ff0000';
+                    // 休憩時間             灰 #cccccc
+                    else if (d.shipping_lane_status_name == '休憩時間')
+                        color = '#cccccc';
+                    // 作業者セット中       橙 #ffcc00
+                    else if (d.shipping_lane_status_name == '作業者セット中')
+                        color = '#ffcc00';
+                    // 作業者セット完了     黄 #ffff66
+                    else if (d.shipping_lane_status_name == '作業者セット完了')
+                        color = '#ffff66';
+                    // 積込み作業中         青 #0099ff
+                    else if (d.shipping_lane_status_name == '昼勤開始時間')
+                        color = '#0099ff';
+                    // 積込み完了           緑 #33cc00
+                    else if (d.shipping_lane_status_name == '積込み完了')
+                        color = '#33cc00';
+                    // 未着手               黒 #808080
+                    else if (d.shipping_lane_status_name == '未着手')
+                        color = '#808080';
+                    // 出発後　　　　　　　 灰 #cccccc
+                    else if (d.shipping_lane_status_name == '出発後')
+                        color = '#cccccc';
+                    // 到着前　　　　　　　 薄いブルー #aaffff
+                    else if (d.shipping_lane_status_name == '到着前')
+                        color = '#aaffff';
+                    // 停車中               メインカラー #ec52ac
+                    else if (d.shipping_lane_status_name == '停車中')
+                        color = '#ec52ac';
+                    // 紐付け有かつ出発済   緑 #33cc00
+                    else if (d.shipping_lane_status_name == '紐付け有出発済')
+                        color = '#33cc00';
+                    // 紐づけ無かつ出発済   薄い緑 #cee6c1
+                    else if (d.shipping_lane_status_name == '紐付け無出発済')
+                        color = '#cee6c1';
+                    // 紐付け有かつ停車中   メインカラー #ec52ac
+                    else if (d.shipping_lane_status_name == '紐付け有停車中')
+                        color = '#ec52ac';
+                    // 紐づけ無かつ停車中   黄 #ffff66
+                    else if (d.shipping_lane_status_name == '紐付け無停車中')
+                        color = '#ffff66';
                     return color
                 })
                 // 遅延表示(赤枠)
@@ -186,6 +186,9 @@
                         // 運行便の場合は、便名表示あり
                     } else if (d.routeName != undefined && d.routeSeq != undefined) {
                         return d.routeName + "_" + d.routeSeq
+                    } else if(d.routeName != undefined){
+                        console.log(d.shipping_lane_status_name);
+                        return d.routeName
                     }
                 })
                 .attr('font-size', '9px')               // 文字サイズ
