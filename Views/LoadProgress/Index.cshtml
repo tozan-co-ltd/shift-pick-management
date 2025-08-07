@@ -51,8 +51,8 @@
             var dataset = data.value;
             var date = new Date();
             var dateFormat = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
-            var timelineStartTime = moment(moment(dateFormat).startOf('day').add(5, 'h'));
-            var timelineEndTime = moment(moment(moment(dateFormat))).add(1, 'days').startOf('day').add(5, 'h');
+            var timelineStartTime = moment(moment(dateFormat).startOf('day'));
+            var timelineEndTime = moment(moment(moment(dateFormat))).add(1, 'days').startOf('day');
 
             var svg = d3.select('#timeline-chart')
                 .append('svg')
@@ -146,6 +146,15 @@
                         // 未着手               黒 #808080
                         else if (d.shipping_lane_status_name == '未着手')
                             color = '#808080';
+                        // 出発後　　　　　　　 灰 #cccccc
+                        else if (d.shipping_lane_status_name == '出発後')
+                            color = '#cccccc';
+                        // 到着前　　　　　　　 薄いブルー #
+                        else if (d.shipping_lane_status_name == '到着前')
+                            color = '#aaffff';
+                        // 停車中
+                        else if (d.shipping_lane_status_name == '停車中')
+                            color = '#ec52ac';
                     }
                     return color
                 })

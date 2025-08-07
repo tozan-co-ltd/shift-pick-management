@@ -105,6 +105,16 @@ namespace ai_truck_load_measurement.Controllers
 
                             toDateTime = loadDate.ToString("yyyy/MM/dd") + " " + endTime.ToString();
 
+
+                            var loadTime = TimeSpan.Parse(loadDate.ToString("HH:mm"));
+                            var tripLaneStatusName = "";
+                            if (endTime < loadTime)
+                                tripLaneStatusName = "出発後";
+                            else if (loadTime < startTime)
+                                tripLaneStatusName = "到着前";
+                            else if (startTime < loadTime && loadTime < endTime)
+                                tripLaneStatusName = "停車中";
+
                             Schedule.Add(new
                             {
                                 routeName = lst.TripName,
@@ -112,7 +122,8 @@ namespace ai_truck_load_measurement.Controllers
                                 from = fromDateTime,
                                 to = toDateTime,
                                 shipping_start_scheduled_time = loadDate + " " + lst.ArrivalScheduledTime.ToString("HH:mm"),
-                                shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm")
+                                shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm"),
+                                shipping_lane_status_name = tripLaneStatusName
                             });
                         }
                     });
@@ -140,10 +151,10 @@ namespace ai_truck_load_measurement.Controllers
 
                                     Schedule = dictData[lst.TripName + "実績"];
 
-                                // 昼勤開始時間と積込開始・終了予定時間を比較し、積込日を補正する
+                                // 昼勤開始時間と到着・出発予定時間を比較し、稼働日を補正する
                                 // マイナスの場合は、積込日+1
-                                // ex. 積込日=2023/1/1,開始休憩時間=05:00,
-                                // 積込開始=23:39:00,積込終了=0:09:00の場合、積込開始=2023/1/1,積込終了=2023/1/2となる
+                                // ex. 稼働日=2023/1/1,昼勤開始時間=05:00,
+                                // 到着予定=23:39:00,出発予定=0:09:00の場合、到着日時=2023/1/1,出発日時=2023/1/2となる
                                 var startTime = TimeSpan.Parse(lst.ArrivedAt.ToString("HH:mm"));
                                 var endTime = TimeSpan.Parse(lst.DepartedAt.ToString("HH:mm"));
                                 var loadDate = DateTime.Now;
@@ -154,6 +165,8 @@ namespace ai_truck_load_measurement.Controllers
                                 {
                                     dayShiftStartTime = TimeSpan.Parse(lst.DayShiftStartTime.Value.ToString("HH:MM"));
                                 }
+
+
 
                                 // 積込開始予定時間
                                 if (startTime < dayShiftStartTime)
@@ -177,7 +190,8 @@ namespace ai_truck_load_measurement.Controllers
                                     from = fromDateTime,
                                     to = toDateTime,
                                     shipping_start_scheduled_time = loadDate + " " + lst.ArrivalScheduledTime.ToString("HH:mm"),
-                                    shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm")
+                                    shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm"),
+                                    shipping_lane_status_name = "作業者セット中"
                                 });
                             }
                         });
