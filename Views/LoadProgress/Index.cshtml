@@ -17,7 +17,8 @@
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
         console.log(model);
-        let data = {depoId: model.selectedDepo.depoID}
+        let today = GetDateString(new Date());
+        let data = {depoId: model.selectedDepo.depoID, loadDate: today}
         $.ajax({
                 type: 'GET',
                 data: data,

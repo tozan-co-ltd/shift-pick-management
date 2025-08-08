@@ -43,7 +43,7 @@ namespace ai_truck_load_measurement.Controllers
         /// トラックヤード指定時間のJsonリスト取得
         /// </summary>
         /// <returns>strList</returns>
-        public IActionResult GetLoadProgressJson(int depoId)
+        public IActionResult GetLoadProgressJson(int depoId, DateTime loadDate)
         {
             try
             {
@@ -75,8 +75,8 @@ namespace ai_truck_load_measurement.Controllers
                                 var LoadRecord = new List<object>();
                                 var dayShiftStartTimeObject = new
                                 {
-                                    from = DateTime.Now.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.ToString("HH:mm"),
-                                    to = DateTime.Now.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.AddMinutes(5).ToString("HH:mm"),
+                                    from = loadDate.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.ToString("HH:mm"),
+                                    to = loadDate.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.AddMinutes(5).ToString("HH:mm"),
                                     shipping_lane_status_name = "昼勤開始時間"
                                 };
 
@@ -97,23 +97,22 @@ namespace ai_truck_load_measurement.Controllers
                             // 積込開始=23:39:00,積込終了=0:09:00の場合、積込開始=2023/1/1,積込終了=2023/1/2となる
                             var startTime = TimeSpan.Parse(lst.ArrivalScheduledTime.ToString("HH:mm"));
                             var endTime = TimeSpan.Parse(lst.DepartureScheduledTime.ToString("HH:mm"));
-                            var loadDate = DateTime.Now;
                             var fromDateTime = "";
                             var toDateTime = "";
                             var dayShiftStartTime = TimeSpan.Parse(lst.DayShiftStartTime.ToString("HH:MM"));
 
                             // 積込開始予定時間
-                            if (startTime < dayShiftStartTime)
-                                // 積込日+1
-                                loadDate = loadDate.AddDays(1);
+                            //if (startTime < dayShiftStartTime)
+                            //    // 積込日+1
+                            //    loadDate = loadDate.AddDays(1);
 
                             fromDateTime = loadDate.ToString("yyyy/MM/dd") + " " + startTime.ToString();
 
                             // 積込終了予定時間
-                            if ((startTime < dayShiftStartTime && endTime > dayShiftStartTime) ||
-                                (startTime > dayShiftStartTime && endTime < dayShiftStartTime))
-                                // 積込日+1
-                                loadDate = loadDate.AddDays(1);
+                            //if ((startTime < dayShiftStartTime && endTime > dayShiftStartTime) ||
+                            //    (startTime > dayShiftStartTime && endTime < dayShiftStartTime))
+                            //    // 積込日+1
+                            //    loadDate = loadDate.AddDays(1);
 
                             toDateTime = loadDate.ToString("yyyy/MM/dd") + " " + endTime.ToString();
 
@@ -138,13 +137,6 @@ namespace ai_truck_load_measurement.Controllers
                                 shipping_lane_status_name = tripLaneStatusName
                             });
 
-
-                            Schedule.Add(new
-                            {
-                                from = DateTime.Now.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.ToString("HH:mm"),
-                                to = DateTime.Now.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.AddMinutes(5).ToString("HH:mm"),
-                                shipping_lane_status_name = "昼勤開始時間"
-                            });
 
                         }
                     });
@@ -178,7 +170,6 @@ namespace ai_truck_load_measurement.Controllers
                                 // 到着予定=23:39:00,出発予定=0:09:00の場合、到着日時=2023/1/1,出発日時=2023/1/2となる
                                 var startTime = TimeSpan.Parse(lst.ArrivedAt.ToString("HH:mm"));
                                 var endTime = TimeSpan.Parse(lst.DepartedAt.ToString("HH:mm"));
-                                var loadDate = DateTime.Now;
                                 var fromDateTime = "";
                                 var toDateTime = "";
                                 var dayShiftStartTime = TimeSpan.Parse("00:00");
@@ -232,7 +223,7 @@ namespace ai_truck_load_measurement.Controllers
                     }
 
                     // 現在時刻を辞書に追加
-                    var dictDataFormat = AddDateTimeToDictionary(dictData, DateTime.Now, "現在時刻");
+                    var dictDataFormat = AddDateTimeToDictionary(dictData, loadDate, "現在時刻");
 
                     var result = new { res = "OK", data = dictDataFormat.ToArray() };
 
