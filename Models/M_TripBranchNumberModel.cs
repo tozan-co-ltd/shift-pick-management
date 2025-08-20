@@ -91,7 +91,7 @@ namespace ai_truck_load_measurement.Models
         /// 作成者
         /// </summary>
         [Display(Name = "作成者")]
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
 
         /// <summary>
         /// 更新日時
@@ -103,7 +103,7 @@ namespace ai_truck_load_measurement.Models
         /// 更新者
         /// </summary>
         [Display(Name = "更新者")]
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
         /// <summary>
         /// 昼勤開始時間
