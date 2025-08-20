@@ -123,7 +123,7 @@ namespace ai_truck_load_measurement.Controllers
                                 tripLaneStatusName = "出発後";
                             else if (loadTime < startTime)
                                 tripLaneStatusName = "到着前";
-                            else if (startTime < loadTime && loadTime < endTime)
+                            else if (startTime <= loadTime && loadTime <= endTime)
                                 tripLaneStatusName = "停車中";
 
                             Schedule.Add(new
@@ -134,7 +134,9 @@ namespace ai_truck_load_measurement.Controllers
                                 to = toDateTime,
                                 shipping_start_scheduled_time = loadDate + " " + lst.ArrivalScheduledTime.ToString("HH:mm"),
                                 shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm"),
-                                shipping_lane_status_name = tripLaneStatusName
+                                shipping_lane_status_name = tripLaneStatusName,
+                                schedule_or_record = "schedule",
+                                trip_id = lst.TripID
                             });
 
 
@@ -214,7 +216,9 @@ namespace ai_truck_load_measurement.Controllers
                                     to = toDateTime,
                                     shipping_start_scheduled_time = loadDate + " " + lst.ArrivalScheduledTime.ToString("HH:mm"),
                                     shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm"),
-                                    shipping_lane_status_name = tripLaneStatus
+                                    shipping_lane_status_name = tripLaneStatus,
+                                    schedule_or_record = "record",
+                                    trip_record_id = lst.TripRecordID
                                 });
 
                                

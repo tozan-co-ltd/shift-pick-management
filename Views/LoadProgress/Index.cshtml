@@ -11,6 +11,7 @@
     <div id="ErrorBlock" class="mb-3 text-danger text-center"></div>
 
     <div id="timeline-chart" class="scroll-inner"></div>
+    <div id="container"></div>
 </div>
 
 <script>
@@ -172,7 +173,18 @@
                 })
                 .attr("stroke-width", 3)
                 .attr('opacity', 0.7)
-
+                .attr('class', function(d){
+                    if(d.schedule_or_record == 'record')
+                        return 'trip_record'
+                    else
+                        return ''
+                })
+                .attr('id', function(d){
+                     if(d.schedule_or_record == 'record')
+                        return d.trip_record_id
+                    else
+                        return ''
+                })
             // 運行便名の描画
             scheduleG.append('text')
                 .attr('transform', 'translate(5, 1)')   // SVGの表示領域
@@ -198,4 +210,75 @@
                 .attr('fill', '#000000')                // テキスト色
         });
     }
+
+    // 便実績クリック時
+    $(function () {
+      $(document).on('click', '.trip_record', function (event) {
+        console.log(event.target);
+        // trip_record_id をもとに便実績情報を取得
+        model = @Html.Raw(Json.Serialize(Model));
+        var id = event.target.id;
+        var trip = model.loadRecords.find(item => item.tripRecordID == id);
+
+       // 表示用の要素を初期化
+        while(container.firstChild){
+            container.removeChild(container.firstChild);
+        }
+
+        const item = createItem(event.pageX-50 , event.pageY-90, trip);
+        console.log(item);
+        container.appendChild(item);
+        // 便実績情報を基にボタンを作成
+      });
+    });
+
+    $(function (){
+        document.body.onclick = function ( event ) {
+            console.log(event.target.id);
+            if(event.target.id == ""){
+                while(container.firstChild){
+                    container.removeChild(container.firstChild);
+                }
+            }
+        }
+    })
+
+    // アイテムを作成する関数
+    function createItem(x, y, trip) {
+      console.log("引数" + y);
+      const item = document.createElement('div');
+      item.classList.add('item');
+      item.style.left = x + 'px';
+      item.style.top = y + 'px';
+      item.style.position = 'absolute'; // 絶対座標で配置
+      item.style.backgroundColor = 'black';
+      item.style.color = 'white';
+      item.innerHTML = trip.tripName + "<br />" 
+      + "到着予定時間: " + GetTimeString(new Date(trip.arrivalScheduledTime)) + "<br />"
+      + "出発予定時間: " + GetTimeString(new Date(trip.departureScheduledTime)) + "<br /><br />"
+      + "到着実績: " + GetTimeString(new Date(trip.arrivedAt)) + "<br />"
+      + "出発実績: " + GetTimeString(new Date(trip.departedAt)) + "<br />"
+      + "<a class=\"btn btn-success btn-icon-split ml-1 mr-1\""
+      + "onclick=\"OnArrivalLoadImageClick('" + trip.tripRecordID + "', this, '{page}')\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
+      + "<i class=\"fa-solid fa-truck\"></i></a>"
+      + "<a class=\"btn btn-success btn-icon-split ml-1 mr-1\""
+      + "onclick=\"OnDepartureLoadImageClick('" + trip.tripRecordID + "', this, '{page}')\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
+      + "<i class=\"fa-solid fa-truck\"></i></a>";
+      // アイテムの内容
+      // これでアイテム内の情報は大体だせるようにはなったけど、問題は出す位置よな
+      item.style.border = '2px solid #000000'
+      return item;
+    }
+
+    // 表示する要素
+    const container = document.getElementById('container'); // 例：idがcontainerの要素
+
+    // クリックイベントリスナーを追加
+    // container.addEventListener('click', (event) => {
+    //   const x = event.clientX; // マウスカーソルのX座標　取りたいのはマウスじゃなくて画面のx座標なんだよなぁ　みつを
+    //   const y = event.clientY; // マウスカーソルのY座標
+
+    //   const item = createItem(x, y);
+    //   container.appendChild(item);
+    // });
 </script>
