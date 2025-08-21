@@ -8,10 +8,18 @@
     <div class="card-header">
         @ViewData["Title"]
     </div>
-    <div id="ErrorBlock" class="mb-3 text-danger text-center"></div>
-
-    <div id="timeline-chart" class="scroll-inner"></div>
-    <div id="container"></div>
+    <div class="card-body">
+        <div id="ErrorBlock" class="mb-3 text-danger text-center"></div>
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
+            <div class="d-flex justify-content-start align-items-center unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">現在時刻</span>
+                <span id="current-time">2025/08/21 09:48</span>
+            </div>
+        </div>
+        <div id="timeline-chart" class="scroll-inner"></div>
+        <div id="container"></div>
+    </div>
+    
 </div>
 
 <script>
