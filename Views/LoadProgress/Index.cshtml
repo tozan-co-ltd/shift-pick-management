@@ -8,14 +8,29 @@
     <div class="card-header">
         @ViewData["Title"]
     </div>
-    <div class="card-body">
+    <div class="card-body" id="card-body">
         <div id="ErrorBlock" class="mb-3 text-danger text-center"></div>
         <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
             <div class="d-flex justify-content-start align-items-center unset-pdl">
                 <span class="warehouse-name-drs span-paragraph">現在時刻</span>
                 <span id="current-time">2025/08/21 09:48</span>
+                
             </div>
         </div>
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
+            
+            <div class="d-flex justify-content-start align-items-center unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">デポ</span>
+                <div>
+                    <div id="selectDepos"></div>
+                        <select class="form-select" asp-items="@Model.MDepoList" id="selectDepo"></select>
+                </div>
+                <span class="loader mr-2" style="display: none; vertical-align: middle; " role="status" id="loading"></span>
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+
         <div id="timeline-chart" class="scroll-inner"></div>
         <div id="container"></div>
     </div>
@@ -44,9 +59,10 @@
 
     function loadProgressDataSets(datasets){
 
-        var width = $(window).width() - 60, height = 90;
+        var width = $('#card-body').width() - 60, height = 90;
         var padding = { top: 0, right: 10, bottom: 10, left: 65 }
         var barHeight = 135;
+        var lineCount = 0;
 
         // 日時を時刻に変換
         $.each(datasets, function (index, data) {
@@ -63,6 +79,12 @@
             var dateFormat = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
             var timelineStartTime = moment(moment(dateFormat).startOf('day'));
             var timelineEndTime = moment(moment(moment(dateFormat))).add(1, 'days').startOf('day');
+            if(lineCount % 2 == 0){
+                height = 90
+            }
+            else{
+                height = 120
+            }
 
             var svg = d3.select('#timeline-chart')
                 .append('svg')
@@ -73,12 +95,19 @@
             var xScale = d3.scaleTime()
                 .domain([timelineStartTime, timelineEndTime])
                 .range([padding.left, width - padding.right])
-            var chartHeight = height - padding.top - padding.bottom;
-
+            var chartHeight = 90;
             var xAxis = d3.axisBottom(xScale)
-                .ticks(14)
-                .tickSize(chartHeight)      // 軸のメモリの長さ
+            .ticks(14)
+
+            if(lineCount % 2 == 0){
+                xAxis.tickSize(chartHeight)
+                .tickFormat('')
+            }
+            else{
+                xAxis.tickSize(chartHeight - padding.bottom)
                 .tickFormat(d3.timeFormat('%H:%M'))
+            }
+           
             var gX = svg.append('g')
                 .call(xAxis)
 
@@ -87,7 +116,7 @@
             var chartCenterY = padding.top + chartHeight / 2
             svg.append('text')
                 .text(dateDispFormat)
-                .attr('x', 10)
+                .attr('x',10)
                 .attr('y', chartCenterY)
                 .attr('dy', '0.5rem')
 
@@ -115,7 +144,7 @@
                         return barHeight
                     // 昼勤開始時間
                     } else if(d.shipping_lane_status_name == '昼勤開始時間'){
-                        return barHeight * 2
+                        return chartHeight
                     // 運行便
                     } else {
                         return barHeight / 1.8
@@ -127,24 +156,9 @@
                     // 現在時刻             赤 #ff0000
                     if (d.shipping_lane_status_name == '現在時刻')
                         color = '#ff0000';
-                    // 休憩時間             灰 #cccccc
-                    else if (d.shipping_lane_status_name == '休憩時間')
-                        color = '#cccccc';
-                    // 作業者セット中       橙 #ffcc00
-                    else if (d.shipping_lane_status_name == '作業者セット中')
-                        color = '#ffcc00';
-                    // 作業者セット完了     黄 #ffff66
-                    else if (d.shipping_lane_status_name == '作業者セット完了')
-                        color = '#ffff66';
-                    // 積込み作業中         青 #0099ff
+                    // 昼勤開始時間         青 #0099ff
                     else if (d.shipping_lane_status_name == '昼勤開始時間')
                         color = '#0099ff';
-                    // 積込み完了           緑 #33cc00
-                    else if (d.shipping_lane_status_name == '積込み完了')
-                        color = '#33cc00';
-                    // 未着手               黒 #808080
-                    else if (d.shipping_lane_status_name == '未着手')
-                        color = '#808080';
                     // 出発後　　　　　　　 灰 #cccccc
                     else if (d.shipping_lane_status_name == '出発後')
                         color = '#cccccc';
@@ -216,6 +230,8 @@
                 .attr('writing-mode', 'tb')             // 縦書き
                 .attr('dominant-baseline', 'central')   // テキスト中央揃え
                 .attr('fill', '#000000')                // テキスト色
+
+                lineCount ++ ;
         });
     }
 
