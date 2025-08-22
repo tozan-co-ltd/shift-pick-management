@@ -1,6 +1,7 @@
 ﻿using ai_truck_load_measurement.Commons;
 using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Models;
+using DocumentFormat.OpenXml.Drawing;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
@@ -45,14 +46,15 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns>strList</returns>
         public IActionResult GetLoadProgressJson(int depoId, DateTime loadDate)
         {
+
             try
             {
                 // 便一覧を取得
                 var trips = GetTrips(depoId);
                 // 便枝番一覧を取得
-                var tripBranchNumbers = GetTripBranchNumbers(depoId, trips, DateTime.Now);
+                var tripBranchNumbers = GetTripBranchNumbers(depoId, trips, loadDate);
                 // 便実績一覧を取得
-                var loadRecords = GetLoadRecords(depoId, DateTime.Now);
+                var loadRecords = GetLoadRecords(depoId, loadDate);
                 loadRecords = CheckLoadRecords(loadRecords, trips);
 
                 if (tripBranchNumbers.Count > 0)
@@ -117,7 +119,8 @@ namespace ai_truck_load_measurement.Controllers
                             toDateTime = loadDate.ToString("yyyy/MM/dd") + " " + endTime.ToString();
 
 
-                            var loadTime = TimeSpan.Parse(loadDate.ToString("HH:mm"));
+                            //var loadTime = TimeSpan.Parse(loadDate.ToString("HH:mm"));
+                            var loadTime = TimeSpan.Parse("13:27");
                             var tripLaneStatusName = "";
                             if (endTime < loadTime)
                                 tripLaneStatusName = "出発後";
@@ -172,6 +175,9 @@ namespace ai_truck_load_measurement.Controllers
                                 // 到着予定=23:39:00,出発予定=0:09:00の場合、到着日時=2023/1/1,出発日時=2023/1/2となる
                                 var startTime = TimeSpan.Parse(lst.ArrivedAt.ToString("HH:mm"));
                                 var endTime = TimeSpan.Parse(lst.DepartedAt.ToString("HH:mm"));
+                                if (lst.DepartedAt.ToString("yyyy/MM/dd") == "0001/01/01")
+                                    //endTime = TimeSpan.Parse(loadDate.AddMinutes(5).ToString("HH:MM"));
+                                    endTime = TimeSpan.Parse("13:27");
                                 var fromDateTime = "";
                                 var toDateTime = "";
                                 var dayShiftStartTime = TimeSpan.Parse("00:00");
@@ -260,8 +266,10 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     new
                     {
-                        from = targetTime.ToString("yyyy/MM/dd HH:mm:ss"),
-                        to = targetTime.AddMinutes(5).ToString("yyyy/MM/dd HH:mm:ss"),
+                        from = targetTime.ToString("yyyy/MM/dd") + " 13:27:00",
+                        to = targetTime.ToString("yyyy/MM/dd") + " 13:32:00",
+                        //from = targetTime.ToString("yyyy/MM/dd HH:mm:ss"),
+                        //to = targetTime.AddMinutes(5).ToString("yyyy/MM/dd HH:mm:ss"),
                         shipping_lane_status_name = statusName
                     }
                 };

@@ -37,10 +37,38 @@
     
 </div>
 
+<!--  Detail Modal-->
+<div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="loader-modal" id="loading-modal">
+            <div class="three-quarter-spinner"></div>
+        </div>
+        <div class="modal-content trip-record-modal" id="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-modal-label"></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-12">
+                    <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <figure class="mb-2 modal-img"><img src="" id="modalImage" /></figure>
+                <div id="tripRecord-buttons"></div>
+                <table class="table table-sm p-2 modal-table">
+                    <tbody id="tripRecord-contatiner">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
-        console.log(model);
         let today = GetDateString(new Date());
         let data = {depoId: model.selectedDepo.depoID, loadDate: today}
         $.ajax({
@@ -113,12 +141,34 @@
 
             // y軸(ラベル)
             var dateDispFormat = data.key
-            var chartCenterY = padding.top + chartHeight / 2
+            if(dateDispFormat.includes('実績')){
+                dateDispFormat = dateDispFormat.replace("実績", "")
+                console.log(dateDispFormat)
+            }
+            var chartCenterY = (padding.top + chartHeight) / 2
+            var chartTripCenterY = 10000
+            var scheduleOrRecord = ""
+            if(lineCount % 2 == 0){
+                // chartTripCenterY = padding.top + chartHeight
+                chartTripCenterY = 10
+                scheduleOrRecord = "予定"
+            }
+            else{
+                scheduleOrRecord = "実績"
+            }
             svg.append('text')
                 .text(dateDispFormat)
-                .attr('x',10)
+                .attr('x',0)
+                .attr('y', chartTripCenterY)
+                .attr('dy', '0.5rem')
+                .attr('font-weight', 'bold')
+
+            svg.append('text')
+                .text(scheduleOrRecord)
+                .attr('x',30)
                 .attr('y', chartCenterY)
                 .attr('dy', '0.5rem')
+                // .attr('font-weight', 'bold')
 
             // データの描画
             const scheduleG = svg.selectAll()
@@ -147,7 +197,11 @@
                         return chartHeight
                     // 運行便
                     } else {
-                        return barHeight / 1.8
+                        if(lineCount % 2 == 0){
+                            return chartHeight
+                        } else {
+                            return chartHeight - padding.bottom
+                        }
                     }
                 })
                 .attr('fill', function (d) {
@@ -211,7 +265,7 @@
             scheduleG.append('text')
                 .attr('transform', 'translate(5, 1)')   // SVGの表示領域
                 .attr('x', function (d) {
-                    return xScale(d['from'])            // x座標(親要素からの相対位置)
+                    return xScale((d['from'] + d['to'])/2) -5            // x座標(親要素からの相対位置)
                 })
                 .attr('y', yText)                       // y座標(親要素からの相対位置)
                 .text(function (d) {
@@ -220,16 +274,20 @@
                         return ''
                         // 運行便の場合は、便名表示あり
                     } else if (d.routeName != undefined && d.routeSeq != undefined) {
-                        return d.routeName + "_" + d.routeSeq
+                        return '枝番' + d.routeSeq
                     } else if(d.routeName != undefined){
-                        console.log(d.shipping_lane_status_name);
-                        return d.routeName
+                        console.log(d.shipping_lane_status_name)
+                        return '枝番なし'
                     }
                 })
-                .attr('font-size', '9px')               // 文字サイズ
+                .attr('font-size', '15px')               // 文字サイズ
                 .attr('writing-mode', 'tb')             // 縦書き
                 .attr('dominant-baseline', 'central')   // テキスト中央揃え
                 .attr('fill', '#000000')                // テキスト色
+                .attr('height', function (d) {
+                    return xScale(d['to']) - xScale(d['from'])
+                })
+
 
                 lineCount ++ ;
         });
@@ -283,10 +341,10 @@
       + "到着実績: " + GetTimeString(new Date(trip.arrivedAt)) + "<br />"
       + "出発実績: " + GetTimeString(new Date(trip.departedAt)) + "<br />"
       + "<a class=\"btn btn-success btn-icon-split ml-1 mr-1\""
-      + "onclick=\"OnArrivalLoadImageClick('" + trip.tripRecordID + "', this, '{page}')\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
+      + "onclick=\"EditTripRecordModal('" + trip.tripRecordID + "', \"true\")\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
       + "<i class=\"fa-solid fa-truck\"></i></a>"
       + "<a class=\"btn btn-success btn-icon-split ml-1 mr-1\""
-      + "onclick=\"OnDepartureLoadImageClick('" + trip.tripRecordID + "', this, '{page}')\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
+      + "onclick=\"EditTripRecordModal('" + trip.tripRecordID + "', \"false\")\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
       + "<i class=\"fa-solid fa-truck\"></i></a>";
       // アイテムの内容
       // これでアイテム内の情報は大体だせるようにはなったけど、問題は出す位置よな
@@ -305,4 +363,142 @@
     //   const item = createItem(x, y);
     //   container.appendChild(item);
     // });
+
+        // 荷量画像モーダル作成
+    function EditTripRecordModal(tripRecordID, isArrived) {
+        // デフォルトの操作を無効化
+        event.preventDefault();
+
+        // ローディング画像表示
+        $("#modal-content").css('display', 'none');
+        $("#loading-modal").css('display', 'inline-block');
+
+        // LoadOutputModel取得
+        var tripRecordModel = model.tripRecordList;
+        tripRecordModel.forEach(function (item) {
+            if (item.tripRecordID == tripRecordID) {
+
+                // フォーム情報取得
+                let url = window.location.href + '/GetModalItems';
+                url = url.replace(LoadProgress, 'LoadRecord');
+                let method = 'POST';
+                let data = { model: item, isArrived: isArrived };
+
+                // Ajax call
+                $.ajax({
+                    url: url,
+                    method: method,
+                    data: data
+                }).done(function (response) {
+                    var imagePath = "";
+                    var arriveOrDeparture = "";
+                    var arriveOrDepartureDate = "";
+                    var loadStatus = "";
+                    var downloadFileName = "";
+                    var tag = "-";
+                    var workDayForFile = GetDayStringForFile(new Date(item.workDay));
+                    var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
+                    var truckNumber = item.truckNumber;
+                    var authorizedKubun = response.authorizedKubun;
+                    if (truckNumber == "0") truckNumber = "-";
+                    if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
+                    if (item.tag != null) tag = item.tag;
+
+                    // 到着か出発かで変わる要素の登録
+                    if (isArrived) {
+                        $('#detail-modal-label').text("到着荷量画像");
+                        loadStatus = item.arrivalLoadStatus;
+                        imagePath = response.arrivalLoadImgPath;
+                        arriveOrDeparture = "到着時間";
+                        arriveOrDepartureDate = GetDateString(new Date(item.arrivedAt));
+                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_A_" + loadStatus + ".jpg";
+                    }
+                    else {
+                        $('#detail-modal-label').text("出発荷量画像");
+                        loadStatus = item.departureLoadStatus;
+                        imagePath = response.departureLoadImgPath;
+                        arriveOrDeparture = "出発時間";
+                        arriveOrDepartureDate = GetDateString(new Date(item.departedAt));
+                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_D_" + loadStatus + ".jpg";
+                    }
+
+                    $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
+
+                    var workDay = GetDayString(new Date(item.workDay));
+
+                    // 表示している行の上下の行の便実績ID取得
+                    var tripRecordIDIndex = arrayTrs.indexOf(tripRecordID);
+                    var previousTripRecordID = arrayTrs[tripRecordIDIndex - 1];
+                    var nextTripRecordID = arrayTrs[tripRecordIDIndex + 1];
+
+
+                    // ボタンの追加
+                    var buttons = $("#tripRecord-buttons");
+                    buttons.empty();
+                    let div = "<div class=\"d-flex xs-block justify-content-start align-items-center p-0 mb-2 trip-record-buttons\">"
+                        + "<span class=\"text\" >画像出力</span>"
+                        + "</a>"
+                        + "</div>";
+                    buttons.append(div);
+
+                    // テーブルの追加
+                    var container = $("#tripRecord-contatiner");
+                    container.empty();
+                    let tr = "<tr>"
+                        + "<td>荷量</td>"
+                        + "<td>" + loadStatus + "%</td>"
+                        + "</tr><tr>"
+                        + "<td>荷量の相違あり</td>"
+                        + "<td>"
+                        + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">";
+                   
+                    tr += "<label id=\"loadStatusSelect\" ></label>";
+
+                    tr += "</div>"
+                        + "</td>"
+                        + "</tr><tr>"
+                        + "<td>便名称_便枝番</td>"
+                        + "<td>" + tripNameAndBranchSeq + "</td>"
+                        + "</tr><tr>"
+                        + "<td>タグ</td>"
+                        + "<td>" + tag + "</td>"
+                        + "</tr><tr>"
+                        + "<td>乗務員</td>"
+                        + "<td>" + item.driverName + "</td>"
+                        + "</tr><tr>"
+                        + "<td>ステーション名</td>"
+                        + "<td>" + item.stationName + "</td>"
+                        + "</tr><tr>"
+                        + "<td>車両番号</td>"
+                        + "<td>" + truckNumber + "</td>"
+                        + "</tr><tr>"
+                        + "<td>識別番号</td>"
+                        + "<td>" + item.identifyNumber + "</td>"
+                        + "</tr><tr>"
+                        + "<td>稼働日</td>"
+                        + "<td>" + workDay + "</td>"
+                        + "</tr><tr>"
+                        + "<td>" + arriveOrDeparture + "</td>"
+                        + "<td>" + arriveOrDepartureDate + "</td>"
+                        + "</tr>";
+                    container.append(tr);
+                    if (authorizedKubun == "1") {
+                        $('#loadStatusSelect').val(response.annotationLoadClass);
+                    } else if (response.annotationLoadStatus != null) {
+                        $('#loadStatusSelect').text(response.annotationLoadStatus + "%");
+                    } else {
+                        $('#loadStatusSelect').text("-");
+                    }
+
+                    // ローディング画像非表示
+                    $("#modal-content").css('display', 'inline-block');
+                    $("#loading-modal").css('display', 'none');
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                });
+
+            }
+        });
+    }
 </script>

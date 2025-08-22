@@ -114,7 +114,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 WHERE
                     Depos.depo_id = {depoId}
                 AND
-                    work_day = '{workDay.ToString("yyyy/MM/dd")}'
+                    work_day = '2025/8/19'
                 AND
                     identify_number IS NOT NULL
                 ORDER BY trip_name
