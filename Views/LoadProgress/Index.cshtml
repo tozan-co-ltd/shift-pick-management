@@ -71,6 +71,8 @@
         model = @Html.Raw(Json.Serialize(Model));
         let today = GetDateString(new Date());
         let data = {depoId: model.selectedDepo.depoID, loadDate: today}
+        
+
         $.ajax({
                 type: 'GET',
                 data: data,
@@ -91,7 +93,7 @@
         var padding = { top: 0, right: 10, bottom: 10, left: 65 }
         var barHeight = 135;
         var lineCount = 0;
-
+        
         // 日時を時刻に変換
         $.each(datasets, function (index, data) {
             $.each(data.value, function (index, data) {
@@ -301,6 +303,7 @@
         model = @Html.Raw(Json.Serialize(Model));
         var id = event.target.id;
         var trip = model.loadRecords.find(item => item.tripRecordID == id);
+        //
 
        // 表示用の要素を初期化
         while(container.firstChild){
@@ -327,7 +330,16 @@
 
     // アイテムを作成する関数
     function createItem(x, y, trip) {
-      console.log("引数" + y);
+        const navElement = document.getElementById('sidenavAccordion'); 
+        var navWidth = navElement.offsetWidth;
+        console.log(navWidth);
+        var navbarContent = document.getElementById('body');
+        if (!navbarContent.classList.contains('sb-sidenav-toggled')) {
+          x -= navWidth;
+        }
+
+
+      console.log("引数" + x);
       const item = document.createElement('div');
       item.classList.add('item');
       item.style.left = x + 'px';
@@ -352,19 +364,7 @@
       return item;
     }
 
-    // 表示する要素
-    const container = document.getElementById('container'); // 例：idがcontainerの要素
-
-    // クリックイベントリスナーを追加
-    // container.addEventListener('click', (event) => {
-    //   const x = event.clientX; // マウスカーソルのX座標　取りたいのはマウスじゃなくて画面のx座標なんだよなぁ　みつを
-    //   const y = event.clientY; // マウスカーソルのY座標
-
-    //   const item = createItem(x, y);
-    //   container.appendChild(item);
-    // });
-
-        // 荷量画像モーダル作成
+    // 荷量画像モーダル作成
     function EditTripRecordModal(tripRecordID, isArrived) {
         // デフォルトの操作を無効化
         event.preventDefault();
