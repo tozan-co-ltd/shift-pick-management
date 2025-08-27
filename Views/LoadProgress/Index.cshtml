@@ -13,7 +13,7 @@
         <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
             <div class="d-flex justify-content-start align-items-center unset-pdl">
                 <span class="warehouse-name-drs span-paragraph">現在時刻</span>
-                <span id="current-time">2025/08/21 09:48</span>
+                <span id="current-time"></span>
                 
             </div>
         </div>
@@ -69,9 +69,18 @@
 <script>
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
+        $("#selectDepo").find("option[value='" + model.selectedDepo.depoID + "']").attr("selected", "selected");
+        window.setInterval(function () {
+            getLoadProgressJson();
+        }, 60000);
+        getLoadProgressJson()
+    });
+
+    function getLoadProgressJson(){
         let today = GetDateString(new Date());
-        let data = {depoId: model.selectedDepo.depoID, loadDate: today}
-        
+        $("#current-time")[0].innerHTML = today;
+        var depoID = $('select[id="selectDepo"]')[0].value;
+        let data = {depoId: depoID, loadDate: today};
 
         $.ajax({
                 type: 'GET',
@@ -79,15 +88,38 @@
                 dataType: 'JSON',
                 url: '@Url.Action("GetLoadProgressJson", "LoadProgress")'
         }).done(function (response) {
-            if(response.res == "OK")
-                loadProgressDataSets(response.data)
+            if(response.res == "OK"){
+                loadProgressDataSets(response.data);
+                document.querySelector("#loading").style.display = "none";
+            }
             else{
                 $("#ErrorBlock").text(response.error)
             }
         });
-    });
+    }
+
+     // デポ選択時
+    $(function () {
+        $('select[id="selectDepo"]').change(function () {
+            // ロード中表示
+            document.querySelector("#loading").style.display = "inline-block";
+
+            var depo = $('select[id="selectDepo"]')[0];
+            var selectedDepoID = 0;
+            var depoName = "";
+            for(var i=0; i < depo.length; i++){
+                if(depo[i].selected){
+                    // $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
+                    selectedDepoID = depo[i].value;
+                    getLoadProgressJson(selectedDepoID)
+                }
+            }
+
+        });
+    })
 
     function loadProgressDataSets(datasets){
+        document.getElementById("timeline-chart").innerHTML = "";
 
         var width = $('#card-body').width() - 60, height = 90;
         var padding = { top: 0, right: 10, bottom: 10, left: 65 }
@@ -145,7 +177,6 @@
             var dateDispFormat = data.key
             if(dateDispFormat.includes('実績')){
                 dateDispFormat = dateDispFormat.replace("実績", "")
-                console.log(dateDispFormat)
             }
             var chartCenterY = (padding.top + chartHeight) / 2
             var chartTripCenterY = 10000
@@ -278,7 +309,6 @@
                     } else if (d.routeName != undefined && d.routeSeq != undefined) {
                         return '枝番' + d.routeSeq
                     } else if(d.routeName != undefined){
-                        console.log(d.shipping_lane_status_name)
                         return '枝番なし'
                     }
                 })
@@ -298,7 +328,6 @@
     // 便実績クリック時
     $(function () {
       $(document).on('click', '.trip_record', function (event) {
-        console.log(event.target);
         // trip_record_id をもとに便実績情報を取得
         model = @Html.Raw(Json.Serialize(Model));
         var id = event.target.id;
@@ -311,7 +340,6 @@
         }
 
         const item = createItem(event.pageX-50 , event.pageY-90, trip);
-        console.log(item);
         container.appendChild(item);
         // 便実績情報を基にボタンを作成
       });
@@ -319,7 +347,6 @@
 
     $(function (){
         document.body.onclick = function ( event ) {
-            console.log(event.target.id);
             if(event.target.id == ""){
                 while(container.firstChild){
                     container.removeChild(container.firstChild);
@@ -332,14 +359,12 @@
     function createItem(x, y, trip) {
         const navElement = document.getElementById('sidenavAccordion'); 
         var navWidth = navElement.offsetWidth;
-        console.log(navWidth);
         var navbarContent = document.getElementById('body');
         if (!navbarContent.classList.contains('sb-sidenav-toggled')) {
           x -= navWidth;
         }
 
 
-      console.log("引数" + x);
       const item = document.createElement('div');
       item.classList.add('item');
       item.style.left = x + 'px';
