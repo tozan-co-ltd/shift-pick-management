@@ -25,16 +25,17 @@ namespace ai_truck_load_measurement.Controllers
         {
             var model = new LoadProgressModel();
 
-            var trips = GetTrips(depoId);
+            var trips = GetTrips();
 
             // 便枝番情報取得
             var tripBranchNumbers = GetTripBranchNumbers(depoId, trips, workDay);
 
             // 便実績情報取得
-            var loadRecords = GetLoadRecords(depoId, workDay);
+            var loadRecords = GetLoadRecords(workDay);
+            var loadRecordsConvertedStatus = LoadRecordController.ConversionForTable(loadRecords);
 
             // 便実績紐づけチェック
-            model.LoadRecords = CheckLoadRecords(loadRecords, trips);
+            model.LoadRecords = CheckLoadRecords(loadRecordsConvertedStatus.ToList(), trips);
             model.TripBranchNumbers = tripBranchNumbers;
 
             return model;
@@ -50,11 +51,11 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 // 便一覧を取得
-                var trips = GetTrips(depoId);
+                var trips = GetTripsFromDepo(depoId);
                 // 便枝番一覧を取得
                 var tripBranchNumbers = GetTripBranchNumbers(depoId, trips, loadDate);
                 // 便実績一覧を取得
-                var loadRecords = GetLoadRecords(depoId, loadDate);
+                var loadRecords = GetLoadRecordsFromDepo(depoId, loadDate);
                 loadRecords = CheckLoadRecords(loadRecords, trips);
 
                 if (tripBranchNumbers.Count > 0)
@@ -119,8 +120,7 @@ namespace ai_truck_load_measurement.Controllers
                             toDateTime = loadDate.ToString("yyyy/MM/dd") + " " + endTime.ToString();
 
 
-                            //var loadTime = TimeSpan.Parse(loadDate.ToString("HH:mm"));
-                            var loadTime = TimeSpan.Parse("13:27");
+                            var loadTime = TimeSpan.Parse(loadDate.ToString("HH:mm"));
                             var tripLaneStatusName = "";
                             if (endTime < loadTime)
                                 tripLaneStatusName = "出発後";
@@ -169,15 +169,16 @@ namespace ai_truck_load_measurement.Controllers
 
                                     Schedule = dictData[lst.TripName + "実績"];
 
-                                // 昼勤開始時間と到着・出発予定時間を比較し、稼働日を補正する
-                                // マイナスの場合は、積込日+1
+                                // 昼勤開始時間と到着・出発時間を比較し、稼働日を補正する
+                                // マイナスの場合は、稼働日+1
                                 // ex. 稼働日=2023/1/1,昼勤開始時間=05:00,
                                 // 到着予定=23:39:00,出発予定=0:09:00の場合、到着日時=2023/1/1,出発日時=2023/1/2となる
                                 var startTime = TimeSpan.Parse(lst.ArrivedAt.ToString("HH:mm"));
                                 var endTime = TimeSpan.Parse(lst.DepartedAt.ToString("HH:mm"));
                                 if (lst.DepartedAt.ToString("yyyy/MM/dd") == "0001/01/01")
-                                    //endTime = TimeSpan.Parse(loadDate.AddMinutes(5).ToString("HH:MM"));
-                                    endTime = TimeSpan.Parse("13:27");
+                                {
+                                    endTime = TimeSpan.Parse(loadDate.AddMinutes(5).ToString("HH:MM"));
+                                }
                                 var fromDateTime = "";
                                 var toDateTime = "";
                                 var dayShiftStartTime = TimeSpan.Parse("00:00");
@@ -266,10 +267,8 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     new
                     {
-                        from = targetTime.ToString("yyyy/MM/dd") + " 13:27:00",
-                        to = targetTime.ToString("yyyy/MM/dd") + " 13:32:00",
-                        //from = targetTime.ToString("yyyy/MM/dd HH:mm:ss"),
-                        //to = targetTime.AddMinutes(5).ToString("yyyy/MM/dd HH:mm:ss"),
+                        from = targetTime.ToString("yyyy/MM/dd HH:mm:ss"),
+                        to = targetTime.AddMinutes(5).ToString("yyyy/MM/dd HH:mm:ss"),
                         shipping_lane_status_name = statusName
                     }
                 };
@@ -294,7 +293,15 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         // 便情報取得
-        public static List<M_TripModel> GetTrips(int depoId)
+        public static List<M_TripModel> GetTrips()
+        {
+            var sql = LoadProgressConnectController.CreateSQLToSelectM_Trips();
+            var trips = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(sql);
+            return trips;
+        }
+
+        // 便情報取得
+        public static List<M_TripModel> GetTripsFromDepo(int depoId)
         {
             var sql = LoadProgressConnectController.CreateSQLToSelectM_TripsFromDepo(depoId);
             var trips = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(sql);
@@ -311,7 +318,15 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         // 便実績情報取得
-        public static List<LoadRecordModel> GetLoadRecords(int depoId, DateTime workDay)
+        public static List<LoadRecordModel> GetLoadRecords(DateTime workDay)
+        {
+            var sql = LoadProgressConnectController.CreateSQLToSelectLoadRecordsFromWorkDay(workDay);
+            var loadRecords = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql);
+            return loadRecords;
+        }
+
+        // 便実績情報取得
+        public static List<LoadRecordModel> GetLoadRecordsFromDepo(int depoId, DateTime workDay)
         {
             var sql = LoadProgressConnectController.CreateSQLToSelectLoadRecordsFromDepoAndWorkDay(depoId, workDay);
             var loadRecords = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql);

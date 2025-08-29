@@ -5,34 +5,42 @@
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 <div class="card shadow de-inspection masterInfo m-4">
-    <div class="card-header">
-        @ViewData["Title"]
-    </div>
-    <div class="card-body" id="card-body">
-        <div id="ErrorBlock" class="mb-3 text-danger text-center"></div>
-        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
-            <div class="d-flex justify-content-start align-items-center unset-pdl">
-                <span class="warehouse-name-drs span-paragraph">現在時刻</span>
-                <span id="current-time"></span>
+    <div class="print-area" id="print-area">
+        <div class="card-header">
+            @ViewData["Title"]
+        </div>
+        <div class="card-body" id="card-body">
+            <div id="ErrorBlock" class="mb-3 text-danger text-center"></div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
+                <div class="d-flex justify-content-start align-items-center unset-pdl">
+                    <span class="warehouse-name-drs span-paragraph">現在時刻</span>
+                    <span id="current-time"></span>
                 
-            </div>
-        </div>
-        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
-            
-            <div class="d-flex justify-content-start align-items-center unset-pdl">
-                <span class="warehouse-name-drs span-paragraph">デポ</span>
-                <div>
-                    <div id="selectDepos"></div>
-                        <select class="form-select" asp-items="@Model.MDepoList" id="selectDepo"></select>
                 </div>
-                <span class="loader mr-2" style="display: none; vertical-align: middle; " role="status" id="loading"></span>
-                <span class="visually-hidden">Loading...</span>
             </div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
+            
+                <div class="d-flex justify-content-start align-items-center unset-pdl">
+                    <span class="warehouse-name-drs span-paragraph">デポ</span>
+                    <div>
+                        <div id="selectDepos"></div>
+                            <select class="form-select" asp-items="@Model.MDepoList" id="selectDepo"></select>
+                    </div>
+                    <span class="loader mr-2" style="display: none; vertical-align: middle; " role="status" id="loading"></span>
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+
+                <div id="not-print-area" style="margin-left: auto;">
+                    <button class="btn btn-secondary print-btn mr-4" id="search-btn" onclick="window.print()" >
+                        <span class="text"><i class="fa-solid fa-print"></i></span>
+                    </button>
+                </div>
+            </div>
+
+
+            <div id="timeline-chart" class="scroll-inner"></div>
+            <div id="container"></div>
         </div>
-
-
-        <div id="timeline-chart" class="scroll-inner"></div>
-        <div id="container"></div>
     </div>
     
 </div>
@@ -378,10 +386,10 @@
       + "到着実績: " + GetTimeString(new Date(trip.arrivedAt)) + "<br />"
       + "出発実績: " + GetTimeString(new Date(trip.departedAt)) + "<br />"
       + "<a class=\"btn btn-success btn-icon-split ml-1 mr-1\""
-      + "onclick=\"EditTripRecordModal('" + trip.tripRecordID + "', \"true\")\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
+      + "onclick=\"EditTripRecordModal('" + trip.tripRecordID + "', 'true')\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
       + "<i class=\"fa-solid fa-truck\"></i></a>"
       + "<a class=\"btn btn-success btn-icon-split ml-1 mr-1\""
-      + "onclick=\"EditTripRecordModal('" + trip.tripRecordID + "', \"false\")\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
+      + "onclick=\"EditTripRecordModal('" + trip.tripRecordID + "', 'false')\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
       + "<i class=\"fa-solid fa-truck\"></i></a>";
       // アイテムの内容
       // これでアイテム内の情報は大体だせるようにはなったけど、問題は出す位置よな
@@ -399,13 +407,13 @@
         $("#loading-modal").css('display', 'inline-block');
 
         // LoadOutputModel取得
-        var tripRecordModel = model.tripRecordList;
+        var tripRecordModel = model.loadRecords;
         tripRecordModel.forEach(function (item) {
             if (item.tripRecordID == tripRecordID) {
 
                 // フォーム情報取得
                 let url = window.location.href + '/GetModalItems';
-                url = url.replace(LoadProgress, 'LoadRecord');
+                url = url.replace('LoadProgress', 'LoadRecord');
                 let method = 'POST';
                 let data = { model: item, isArrived: isArrived };
 

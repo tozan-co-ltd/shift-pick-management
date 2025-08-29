@@ -6,7 +6,43 @@ namespace ai_truck_load_measurement.ConnectControllers
     public class LoadProgressConnectController
     {
 
-       
+        public static string CreateSQLToSelectM_Trips()
+        {
+            var sql = $@"
+                SELECT 
+                    TripHistories.trip_id,
+                    TripHistories.trip_history_id,
+                    Trips.trip_name,
+                    TripHistories.driver_name,
+                    Trucks.truck_id,
+                    Trucks.truck_number,
+                    Trucks.identify_number,
+                    CONVERT(DATETIME, TripHistories.day_shift_start_time) AS day_shift_start_time,
+	                TripHistories.depo_id,
+	                Depos.name AS depo_name,
+                    TripHistories.applicable_start_datetime,
+                    TripHistories.applicable_end_datetime,
+                    TripHistories.updated_at,
+                    TripHistories.updated_by
+                FROM 
+                    m_trip_histories as TripHistories
+                INNER JOIN
+                    m_trips as Trips
+                ON 
+                    TripHistories.trip_id = Trips.trip_id
+                INNER JOIN
+                    m_trucks as Trucks
+                ON
+                    TripHistories.truck_id = Trucks.truck_id
+                INNER JOIN 
+	                m_depos as Depos
+                ON
+	                TripHistories.depo_id = Depos.depo_id
+                ORDER BY
+                    Trips.trip_name
+            ";
+            return sql;
+        }
 
         public static string CreateSQLToSelectM_TripsFromDepo(int depoId)
         {
@@ -76,6 +112,50 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        public static string CreateSQLToSelectLoadRecordsFromWorkDay(DateTime workDay)
+        {
+            var sql = $@"
+                SELECT
+                    trip_record_id,
+                    trip_name,
+                    trip_branch_seq,
+                    TripBranchNumbers.tag,
+                    TripRecords.driver_name,
+	                Stations.name AS station_name,
+                    truck_number,
+                    identify_number,
+	                Depos.name AS depo_name,
+                    CONVERT(DATETIME, TripRecords.arrival_scheduled_time) AS arrival_scheduled_time,
+                    CONVERT(DATETIME, TripRecords.departure_scheduled_time) AS departure_scheduled_time,
+                    work_day,
+                    arrived_at,
+                    departed_at,
+                    arrival_load_class,
+                    departure_load_class,
+                    arrival_load_img_path,
+                    departure_load_img_path
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+                m_stations AS Stations
+                ON
+                TripRecords.station_id = Stations.station_id
+                INNER JOIN
+                m_depos AS Depos
+                ON
+                Stations.depo_id = Depos.depo_id
+                LEFT OUTER JOIN
+                m_trip_branch_numbers AS TripBranchNumbers
+                ON
+                TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id
+                WHERE
+                    work_day = '{workDay.ToString("yyyy/MM/dd")}'
+                AND
+                    identify_number IS NOT NULL
+                ORDER BY trip_name
+            ";
+            return sql;
+        }
+
         public static string CreateSQLToSelectLoadRecordsFromDepoAndWorkDay(int depoId, DateTime workDay)
         {
             var sql = $@"
@@ -114,7 +194,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 WHERE
                     Depos.depo_id = {depoId}
                 AND
-                    work_day = '2025/8/19'
+                    work_day = '{workDay.ToString("yyyy/MM/dd")}'
                 AND
                     identify_number IS NOT NULL
                 ORDER BY trip_name
