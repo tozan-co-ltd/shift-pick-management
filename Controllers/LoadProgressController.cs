@@ -177,7 +177,14 @@ namespace ai_truck_load_measurement.Controllers
                                 var endTime = TimeSpan.Parse(lst.DepartedAt.ToString("HH:mm"));
                                 if (lst.DepartedAt.ToString("yyyy/MM/dd") == "0001/01/01")
                                 {
-                                    endTime = TimeSpan.Parse(loadDate.AddMinutes(5).ToString("HH:MM"));
+                                    if(IsLatestRecordInSameStations(lst) && IsTruckExistedInSameStations(lst))
+                                    {
+                                        endTime = TimeSpan.Parse(loadDate.AddMinutes(5).ToString("HH:MM"));
+                                    }
+                                    else
+                                    {
+                                        endTime = TimeSpan.Parse(lst.ArrivedAt.AddMinutes(15).ToString("HH:mm"));
+                                    }
                                 }
                                 var fromDateTime = "";
                                 var toDateTime = "";
@@ -410,5 +417,44 @@ namespace ai_truck_load_measurement.Controllers
             return results;
         }
 
+        /// <summary>
+        /// 便実績に該当するステーションに現在トラックが存在するか
+        /// </summary>
+        /// <param name="loadRecord"></param>
+        /// <returns></returns>
+        public bool IsTruckExistedInSameStations(LoadRecordModel loadRecord)
+        {
+            // トラック有無取得SQL作成
+            var isExistTrucksSQL = LoadProgressConnectController.CreateSQLToSelectIsExistTrucksFromStationID(loadRecord.StationID);
+            // トラック有無取得
+            IEnumerable<TruckExistModel> isExistTrucksList = ConnectToSQLServer.ExecuteQueryToList<TruckExistModel>(isExistTrucksSQL);
+            if (isExistTrucksList.First() != null && isExistTrucksList.First().TruckExist)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 該当便実績は同ステーション内にて最新かどうか
+        /// </summary>
+        /// <param name="loadRecord"></param>
+        /// <returns></returns>
+        public bool IsLatestRecordInSameStations(LoadRecordModel loadRecord)
+        {
+            var latestTripRecordsSQL = LoadProgressConnectController.CreateSQLToSelectLatestTripRecordsFromStationID(loadRecord.StationID);
+            IEnumerable<LoadRecordModel> latestTripRecords = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(latestTripRecordsSQL);
+            if (latestTripRecords.First() != null && latestTripRecords.First().TripRecordID == loadRecord.TripRecordID)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

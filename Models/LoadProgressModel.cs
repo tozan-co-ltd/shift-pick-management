@@ -13,4 +13,10 @@
         // 選択デポ
         public M_DepoModel SelectedDepo { get; set; }
     }
+
+    public class TruckExistModel : CommonModel
+    {
+        public int StationID { get; set; }
+        public bool TruckExist { get; set; }
+    }
 }

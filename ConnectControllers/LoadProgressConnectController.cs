@@ -165,6 +165,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     trip_branch_seq,
                     TripBranchNumbers.tag,
                     TripRecords.driver_name,
+                    TripRecords.station_id AS station_id,
 	                Stations.name AS station_name,
                     truck_number,
                     identify_number,
@@ -209,6 +210,47 @@ namespace ai_truck_load_measurement.ConnectControllers
                     trip_name
                 FROM
                     m_trips
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// ステーション毎のトラック有無取得SQL
+        /// </summary>
+        /// <returns>SQL文</returns>
+        public static string CreateSQLToSelectIsExistTrucksFromStationID(int stationID)
+        {
+            var sql = $@"
+                SELECT truck_sensor_records.station_id
+                       ,truck_exist
+                FROM t_truck_sensor_records truck_sensor_records
+                JOIN (
+	                SELECT station_id, MAX(created_at) AS latest_create
+	                FROM t_truck_sensor_records
+	                GROUP BY station_id
+                ) latest_detect_records
+                ON truck_sensor_records.station_id = latest_detect_records.station_id 
+                AND truck_sensor_records.created_at = latest_detect_records.latest_create
+                WHERE truck_sensor_records.station_id = {stationID}
+            ";
+            return sql;
+        }
+
+        public static string CreateSQLToSelectLatestTripRecordsFromStationID(int stationID)
+        {
+            var sql = $@"
+                SELECT TripRecords.trip_record_id
+	                ,TripRecords.station_id
+	                ,TripRecords.created_at
+                FROM t_trip_records AS TripRecords
+                JOIN(
+	                SELECT station_id, MAX(created_at) AS latest_create
+	                FROM t_trip_records
+	                GROUP BY station_id
+                ) LatestTripRecords
+                ON TripRecords.station_id = LatestTripRecords.station_id
+                AND TripRecords.created_at = LatestTripRecords.latest_create
+                WHERE TripRecords.station_id = {stationID}
             ";
             return sql;
         }

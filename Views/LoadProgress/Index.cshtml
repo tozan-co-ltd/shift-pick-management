@@ -77,6 +77,7 @@
 <script>
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
+        console.log(model);
         $("#selectDepo").find("option[value='" + model.selectedDepo.depoID + "']").attr("selected", "selected");
         window.setInterval(function () {
             getLoadProgressJson();
@@ -315,7 +316,7 @@
                         return ''
                         // 運行便の場合は、便名表示あり
                     } else if (d.routeName != undefined && d.routeSeq != undefined) {
-                        return '枝番' + d.routeSeq
+                        return '枝番' + toFullWidth(d.routeSeq)
                     } else if(d.routeName != undefined){
                         return '枝番なし'
                     }
@@ -331,6 +332,14 @@
 
                 lineCount ++ ;
         });
+    }
+
+    function toFullWidth(str) {
+        // 半角英数字を全角に変換
+        str = str.toString().replace(/[A-Za-z0-9]/g, function(s) {
+        return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
+        });
+        return str;
     }
 
     // 便実績クリック時
@@ -438,7 +447,7 @@
                     if (item.tag != null) tag = item.tag;
 
                     // 到着か出発かで変わる要素の登録
-                    if (isArrived) {
+                    if (isArrived == "true") {
                         $('#detail-modal-label').text("到着荷量画像");
                         loadStatus = item.arrivalLoadStatus;
                         imagePath = response.arrivalLoadImgPath;
@@ -533,5 +542,7 @@
 
             }
         });
+
+        
     }
 </script>
