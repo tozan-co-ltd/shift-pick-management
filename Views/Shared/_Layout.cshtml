@@ -115,7 +115,7 @@
                                 var currentCategoryID = Model.GetCategoryIDFromControlerName(currentController);
                                 if (menuList.Count != 0 && !(categoryID == 4 && (Model.AuthorizedKubun != "1" && Model.AuthorizedKubun != "2")))
                                 {
-                                    @if (categoryID == 1 || categoryID == 3)
+                                    @if (categoryID == 3)
                                     {
                                         <li class="nav-item">
                                             <a class="nav-link collapsed" asp-area="" asp-controller="@menuList[0].Controller" asp-action="@menuList[0].Action">
