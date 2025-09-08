@@ -1328,80 +1328,97 @@ body {
 
 /*---------------------------------------------------------------------------*/
 
-/*.page_top_btn {
+.page_top_btn {
     position: fixed;
-    bottom: 10px;
-    right: 10px;
+    bottom: 40px;
+    right: 40px;
     width: 60px;
     height: 60px;
     margin-right: 15px;
     margin-bottom: 15px;
     opacity: .6;
-    background: #F2F0E9;*/ /*背景色*/
-    /*color: #333;*/ /*マークの色*/
-    /*border: 2px solid #555;*/ /*外枠の線*/
-/*}*/
+    background: #F2F0E9; /*背景色*/
+    color: #333; /*マークの色*/
+    border: 2px solid #555; /*外枠の線*/
+    vertical-align: middle;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
 
     /* マウスオーバー時 */
-    /*.page_top_btn:hover {
+    .page_top_btn:hover {
         background: rgb(255, 0, 0, 0.8);
         color: rgb(255, 255, 255, 0.8);
-    }*/
+    }
 
 .color_legend {
     position: fixed;
     top: 70px;
     right: 30px;
     font-weight: bold;
-    padding: 0.7em;
+    padding: 0.7em 0.7em 0.7em 0;
     text-align: center;
     background: rgb(255, 255, 255);
     color: #000;
     transition: 0.3s0;
     border: solid .5px rgba(0,0,0,.2);
 }
-
-.page_top_btn {
+.round_btn {
+    display: block;
     position: fixed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    right: 20px;
-    bottom: 20px;
-    cursor: pointer;
-    opacity: 0;
-    visibility: hidden;
-    border: 0;
-    background: none;
-    transition: .2s;
-    letter-spacing: 3px;
+    top: 50px;
+    right: 30px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #333; /* 枠の調整 */
+    border-radius: 50%; /* 丸みの度合い */
+    background: #fff; /* ボタンの背景色 */
 }
 
-    .page_top_btn span:before {
-        position: absolute;
-        top: -29px;
-        left: 16px;
-        transform: rotate(-45deg);
-        display: block;
-        width: 12px;
-        height: 12px;
+    .round_btn::before, .round_btn::after {
         content: "";
-        border: 1px solid #000;
-        border-width: 1px 1px 0px 0px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 2px; /* 棒の幅（太さ） */
+        height: 15px; /* 棒の高さ */
+        background: #333; /* バツ印の色 */
     }
 
-    .page_top_btn span:after {
-        position: absolute;
-        width: 32px;
-        height: 32px;
-        border: 1px solid #000;
-        content: "";
-        border-radius: 100%;
-        top: -43px;
-        left: 5px;
+    .round_btn::before {
+        transform: translate(-50%,-50%) rotate(45deg);
     }
 
-.is-active {
-    opacity: 1;
-    visibility: visible;
+    .round_btn::after {
+        transform: translate(-50%,-50%) rotate(-45deg);
+    }
+
+.trip-box {
+    border: 2px solid #000; /* 枠の調整 */
+    padding: 5px;
+}
+
+.progress-color-box {
+    height: 30px;
+    width: 100px;
+    background-color: rgba(100,100,180,.2);
+    display: block;
+    padding: 3px;
+    border: solid .5px rgba(0,0,0,.2);
+}
+.progress-border-box {
+    height: 30px;
+    width: 100px;
+    background-color: #ffffff;
+    display: block;
+    border: solid .5px rgba(0,0,0, .3);
+    text-align: center;
+}
+
+.progress-border-box-line {
+    display: inline-block;
+    width: 3px;
+    height: 100%;
+    background-color: #000;
 }

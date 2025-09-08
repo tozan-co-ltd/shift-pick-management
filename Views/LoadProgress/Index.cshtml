@@ -41,75 +41,80 @@
 
             <div id="timeline-chart" class="scroll-inner"></div>
             <div id="container"></div>
-            @* <p id="page-top"><a href="#" class="page_top_btn"></a></p> *@
-            <button class="page_top_btn" id="page-top">
+            <p id="page-top"><a href="#" class="page_top_btn">PAGE<br />TOP</a></p>
+            @* <button class="page_top_btn" id="page-top">
                 <span></span>
                 TOP
-            </button>
+            </button> *@
         </div>
     </div>
+    <span class="round_btn"></span>
     <div class="color_legend">
         <div class="d-flex justify-content-start align-items-center mb-3">
-            <span class="warehouse-name-drs ">時刻</span>
-            <div class="mr-lg-5 d-flex justify-content-end">
+            <span style="width: 100px">時刻</span>
+            <div class="mr-3 d-flex justify-content-end">
                 <div class="border-box"><span class="border-box-line" style="background-color: #0099ff"></span></div>：昼勤開始時間
             </div>
-            <div class="mr-2 ml-lg-5 d-flex justify-content-end">
-                <div class="border-box"><span class="border-box-line" style="background-color: red"></span></div>：現在時刻
+            <div class="mr-2 d-flex justify-content-end">
+                <div class="border-box"><span class="border-box-line" style="background-color:#e6b422"></span></div>：現在時刻
             </div>
         </div>
         <div class="d-flex justify-content-start align-items-center mb-3">
-            <span class="warehouse-name-drs ">便予定</span>
+            <span style="width: 100px">便予定</span>
             <div class="d-flex justify-content-between">
                 <div class="mr-2 d-flex justify-content-end">
-                    <div class="border-box"><span class="color-box" style="background-color: #aaffff"></span></div>：到着前
+                    <div class="progress-border-box"><span class="progress-color-box" style="background-color: #aaffff">到着前</span></div>
                 </div>
                 <div class="mr-2 d-flex justify-content-end">
-                    <div class="border-box"><span class="color-box" style="background-color: #ec52ac"></span></div>：停車中
+                    <div class="progress-border-box"><span class="progress-color-box" style="background-color: #ec52ac">停車中</span></div>
                 </div>
                 <div class="mr-2 d-flex justify-content-end">
-                    <div class="border-box"><span class="color-box" style="background-color: #cccccc"></span></div>：出発後
+                    <div class="progress-border-box"><span class="progress-color-box" style="background-color: #cccccc">出発後</span></div>
                 </div>
             </div>
         </div>
-        <div class="d-flex justify-content-start ">
-            <span class="warehouse-name-drs ">便実績</span>
-            <div class="d-flex">
-                <div class="mr-2" style="width: 205px">
-                    紐付け有
+        <div class="d-flex justify-content-start mb-2">
+            <span style="width: 100px">便実績</span>
+            <div class="trip-box">
+                <div class="d-flex">
+                    <div class="mr-2" style="width: 205px; text-align:left">
+                        紐付け有
+                    </div>
+                    
                 </div>
-                <div class="mr-2 d-flex justify-content-end">
-                    <div class="border-box"><span class="color-box" style="background-color: #ec52ac"></span></div>：停車中
-                </div>
-            </div>
-        </div>
-        <div class="d-flex justify-content-start align-items-center mb-2">
-            <span class="warehouse-name-drs "></span>
-            <div class="mr-2 d-flex justify-content-end">
-                <div class="border-box"><span class="color-box" style="background-color: #33cc00"></span></div>：出発後, 出発実績有
-            </div>
-            <div class="mr-2 d-flex justify-content-end">
-                <div class="border-box"><span class="color-box" style="background-color: #00502e"></span></div>：出発後, 出発実績無
-            </div>
-        </div> 
-        <div class="d-flex justify-content-start align-items-center">
-            <span class="warehouse-name-drs "></span>
-            <div class="d-flex">
-                <div class="mr-2" style="width: 205px">
-                    紐付け無し
-                </div>
-                <div class="mr-2 d-flex justify-content-end">
-                    <div class="border-box"><span class="color-box" style="background-color: #ffff66"></span></div>：停車中
+                <div class="d-flex">
+                    <div class="mr-2 d-flex justify-content-end">
+                        <div class="progress-border-box"><span class="progress-color-box" style="background-color: #ccff66">停車中</span></div>
+                    </div>
+                    <div class="mr-2 d-flex justify-content-end">
+                        <div class="progress-border-box"><span class="progress-color-box" style="background-color: #33cc00">出発実績有</span></div>
+                    </div>
+                    <div class="mr-1 d-flex justify-content-end">
+                        <div class="progress-border-box"><span class="progress-color-box" style="background-color: #00502e; color:#ffffff">出発実績無</span></div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="d-flex justify-content-start align-items-center">
-            <span class="warehouse-name-drs "></span>
-            <div class="mr-2 d-flex justify-content-end">
-                <div class="border-box"><span class="color-box" style="background-color: #cee6c1"></span></div>：出発後, 出発実績有
-            </div>
-            <div class="mr-2 d-flex justify-content-end">
-                <div class="border-box"><span class="color-box" style="background-color: #BAB16B"></span></div>：出発後, 出発実績無
+            <span style="width: 100px"></span>
+            <div class="trip-box">
+                <div class="d-flex">
+                    <div class="mr-2" style="width: 205px; text-align:left">
+                        紐付け無し
+                    </div>
+                    
+                </div>
+                <div class="d-flex">
+                    <div class="mr-2 d-flex justify-content-end">
+                        <div class="progress-border-box"><span class="progress-color-box" style="background-color: #ffff66">停車中</span></div>
+                    </div>
+                    <div class="mr-2 d-flex justify-content-end">
+                        <div class="progress-border-box"><span class="progress-color-box" style="background-color: #cee6c1">出発実績有</span></div>
+                    </div>
+                    <div class="mr-1 d-flex justify-content-end">
+                        <div class="progress-border-box"><span class="progress-color-box" style="background-color: #BAB16B">出発実績無</span></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -322,7 +327,7 @@
                    
                     // 現在時刻             赤 #ff0000
                     if (d.shipping_lane_status_name == '現在時刻')
-                        color = '#ff0000';
+                        color = '#e6b422';
                     // 昼勤開始時間         青 #0099ff
                     else if (d.shipping_lane_status_name == '昼勤開始時間')
                         color = '#0099ff';
