@@ -5,7 +5,10 @@ namespace ai_truck_load_measurement.ConnectControllers
 {
     public class LoadProgressConnectController
     {
-
+        /// <summary>
+        /// 便予定情報取得SQL
+        /// </summary>
+        /// <returns></returns>
         public static string CreateSQLToSelectM_Trips()
         {
             var sql = $@"
@@ -44,6 +47,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 指定したデポの便予定情報取得SQL
+        /// </summary>
+        /// <param name="depoId">デポID</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectM_TripsFromDepo(int depoId)
         {
             var sql = $@"
@@ -84,6 +92,12 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 指定したデポ、稼働日の便枝番情報取得SQL
+        /// </summary>
+        /// <param name="depoId">デポID</param>
+        /// <param name="workDay">稼働日</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectTripBranchNumbersFromDepo(int depoId, DateTime workDay)
         {
             var sql = $@"
@@ -113,6 +127,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 指定した稼働日の便実績取得SQL
+        /// </summary>
+        /// <param name="workDay">稼働日</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectLoadRecordsFromWorkDay(DateTime workDay)
         {
             var sql = $@"
@@ -157,6 +176,12 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 指定したデポ、稼働日の便実績取得SQL
+        /// </summary>
+        /// <param name="depoId">デポID</param>
+        /// <param name="workDay">稼働日</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectLoadRecordsFromDepoAndWorkDay(int depoId, DateTime workDay)
         {
             var sql = $@"
@@ -204,6 +229,10 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 便名称取得SQL
+        /// </summary>
+        /// <returns></returns>
         public static string CreateSQLToSelectTripNames()
         {
             var sql = $@"
@@ -216,8 +245,9 @@ namespace ai_truck_load_measurement.ConnectControllers
         }
 
         /// <summary>
-        /// ステーション毎のトラック有無取得SQL
+        /// 指定したステーションのトラック有無取得SQL
         /// </summary>
+        /// <param name="stationID">ステーションID</param>
         /// <returns>SQL文</returns>
         public static string CreateSQLToSelectIsExistTrucksFromStationID(int stationID)
         {
@@ -237,6 +267,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 指定したステーションの最新の便実績取得SQL
+        /// </summary>
+        /// <param name="stationID">ステーションID</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectLatestTripRecordsFromStationID(int stationID)
         {
             var sql = $@"

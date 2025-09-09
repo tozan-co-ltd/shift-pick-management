@@ -108,6 +108,7 @@ namespace ai_truck_load_measurement.Controllers
                             var loadTime = TimeSpan.Parse(loadDate.ToString("HH:mm"));
                             var tripLaneStatusName = "";
 
+                            // 便予定のステータスを決定
                             if (endTime < loadTime)
                                 tripLaneStatusName = "出発後";
                             else if (loadTime < startTime)
@@ -226,8 +227,6 @@ namespace ai_truck_load_measurement.Controllers
                                     trip_record_id = lst.TripRecordID,
                                     has_depart_data = hasDepartData
                                 });
-
-                               
                             }
                         });
                     }
@@ -281,6 +280,11 @@ namespace ai_truck_load_measurement.Controllers
             return dictDataFormat;
         }
 
+        /// <summary>
+        /// 便リストから便名称のリストを取得
+        /// </summary>
+        /// <param name="trips">便リスト</param>
+        /// <returns></returns>
         public List<string> GetTripNames(List<M_TripModel> trips)
         {
             List<string> tripNames = new ();
@@ -291,7 +295,10 @@ namespace ai_truck_load_measurement.Controllers
             return tripNames;
         }
 
-        // 便情報取得
+        /// <summary>
+        /// 全便予定情報取得
+        /// </summary>
+        /// <returns></returns>
         public static List<M_TripModel> GetTrips()
         {
             var sql = LoadProgressConnectController.CreateSQLToSelectM_Trips();
@@ -299,7 +306,11 @@ namespace ai_truck_load_measurement.Controllers
             return trips;
         }
 
-        // 便情報取得
+        /// <summary>
+        /// 指定したデポの便予定情報取得
+        /// </summary>
+        /// <param name="depoId">デポのID</param>
+        /// <returns></returns>
         public static List<M_TripModel> GetTripsFromDepo(int depoId)
         {
             var sql = LoadProgressConnectController.CreateSQLToSelectM_TripsFromDepo(depoId);
@@ -307,7 +318,13 @@ namespace ai_truck_load_measurement.Controllers
             return trips;
         }
 
-        // 便枝番情報取得
+        /// <summary>
+        /// 便枝番情報取得
+        /// </summary>
+        /// <param name="depoId">デポID</param>
+        /// <param name="trips">便名</param>
+        /// <param name="workDay">稼働日</param>
+        /// <returns></returns>
         public List<M_TripBranchNumberModel> GetTripBranchNumbers(int depoId, List<M_TripModel> trips, DateTime workDay)
         {
             var sql = LoadProgressConnectController.CreateSQLToSelectTripBranchNumbersFromDepo(depoId, workDay);
@@ -316,7 +333,11 @@ namespace ai_truck_load_measurement.Controllers
             return tripBranchNumbers;
         }
 
-        // 便実績情報取得
+        /// <summary>
+        /// 指定した稼働日の全便実績情報取得
+        /// </summary>
+        /// <param name="workDay">稼働日</param>
+        /// <returns></returns>
         public static List<LoadRecordModel> GetLoadRecords(DateTime workDay)
         {
             var sql = LoadProgressConnectController.CreateSQLToSelectLoadRecordsFromWorkDay(workDay);
@@ -324,7 +345,12 @@ namespace ai_truck_load_measurement.Controllers
             return loadRecords;
         }
 
-        // 便実績情報取得
+        /// <summary>
+        /// 指定した稼働日、デポの便実績情報取得
+        /// </summary>
+        /// <param name="depoId">デポID</param>
+        /// <param name="workDay">稼働日</param>
+        /// <returns></returns>
         public static List<LoadRecordModel> GetLoadRecordsFromDepo(int depoId, DateTime workDay)
         {
             var sql = LoadProgressConnectController.CreateSQLToSelectLoadRecordsFromDepoAndWorkDay(depoId, workDay);
@@ -332,7 +358,12 @@ namespace ai_truck_load_measurement.Controllers
             return loadRecords;
         }
 
-        // 便実績紐づけチェック
+        /// <summary>
+        /// 便実績紐づけチェック
+        /// </summary>
+        /// <param name="loadRecords">便実績リスト</param>
+        /// <param name="trips">便リスト</param>
+        /// <returns></returns>
         public List<LoadRecordModel> CheckLoadRecords(List<LoadRecordModel> loadRecords, List<M_TripModel> trips)
         {
             foreach (var loadRecord in loadRecords)
@@ -392,6 +423,12 @@ namespace ai_truck_load_measurement.Controllers
             return tripBranchNumberList;
         }
 
+        /// <summary>
+        /// 便枝番リストのソート
+        /// </summary>
+        /// <param name="tripBranchNumberList">ソート対象の便枝番リスト</param>
+        /// <param name="trips">便リスト</param>
+        /// <returns></returns>
         public List<M_TripBranchNumberModel> SortTripBranchSeq(List<M_TripBranchNumberModel> tripBranchNumberList, List<M_TripModel> trips)
         {
             List<M_TripBranchNumberModel> results = new();
