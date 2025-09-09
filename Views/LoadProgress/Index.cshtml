@@ -87,7 +87,7 @@
                             <div class="progress-border-box"><span class="progress-color-box" style="background-color: #33cc00">出発実績有</span></div>
                         </div>
                         <div class="mr-1 d-flex justify-content-end">
-                            <div class="progress-border-box"><span class="progress-color-box" style="background-color: #33cc00; color: yellow; -webkit-text-stroke: .5px black;">出発実績無</span></div>
+                            <div class="progress-border-box"><span class="progress-color-box" style="background-color: #33cc00; color: #cccccc;">出発実績無</span></div>
                         </div>
                     </div>
                 </div>
@@ -109,7 +109,7 @@
                             <div class="progress-border-box"><span class="progress-color-box" style="background-color: #cee6c1">出発実績有</span></div>
                         </div>
                         <div class="mr-1 d-flex justify-content-end">
-                            <div class="progress-border-box"><span class="progress-color-box" style="background-color: #cee6c1; color: yellow; -webkit-text-stroke: .5px black;">出発実績無</span></div>
+                            <div class="progress-border-box"><span class="progress-color-box" style="background-color: #cee6c1; color:gray; ">出発実績無</span></div>
                         </div>
                     </div>
                 </div>
@@ -285,7 +285,6 @@
                 .attr('x',30)
                 .attr('y', chartCenterY)
                 .attr('dy', '0.5rem')
-                // .attr('font-weight', 'bold')
 
             // データの描画
             const scheduleG = svg.selectAll()
@@ -295,6 +294,7 @@
 
             let yRect = 1;
             let yText = 0;
+
 
             // 短形の描画
             scheduleG.append('rect')
@@ -353,17 +353,6 @@
                         color = '#ffff66';
                     return color
                 })
-                // 遅延表示(赤枠)
-                .attr('stroke', function (d) {
-                    var stroke = '';
-                    var curentDateTime = new Date();
-                    var shippingEndTime = new Date(d.shipping_end_scheduled_time);
-                    // 出荷レーン状況名が「作業者セット中」かつ出荷終了時間が現在時刻より前の場合は赤枠を表示
-                    if (d.shipping_lane_status_name == '作業者セット中' && curentDateTime > shippingEndTime) {
-                        stroke = "#ff0000";
-                    }
-                    return stroke
-                })
                 .attr("stroke-width", 3)
                 .attr('opacity', 0.7)
                 .attr('class', function(d){
@@ -378,6 +367,7 @@
                     else
                         return ''
                 })
+                
             // 運行便名の描画
             scheduleG.append('text')
                 .attr('transform', 'translate(5, 1)')   // SVGの表示領域
@@ -399,11 +389,17 @@
                 .attr('font-size', '15px')               // 文字サイズ
                 .attr('writing-mode', 'tb')             // 縦書き
                 .attr('dominant-baseline', 'central')   // テキスト中央揃え
-                .attr('fill', '#000000')                // テキスト色
                 .attr('height', function (d) {
                     return xScale(d['to']) - xScale(d['from'])
                 })
-
+                .attr('fill', function(d){
+                    // テキスト色
+                    var color = '#000000'
+                    // 出発時データが存在せず、かつ出発済みの実績データの場合
+                    if(!d.has_depart_data && d.shipping_lane_status_name.includes('出発済') && d.schedule_or_record == 'record')
+                        color = 'gray'
+                    return color
+                })
 
                 lineCount ++ ;
         });
@@ -424,7 +420,6 @@
         model = @Html.Raw(Json.Serialize(Model));
         var id = event.target.id;
         var trip = model.loadRecords.find(item => item.tripRecordID == id);
-        //
 
        // 表示用の要素を初期化
         while(container.firstChild){
@@ -437,6 +432,8 @@
       });
     });
 
+    // 便実績以外クリック時
+    // 便の詳細情報非表示
     $(function (){
         document.body.onclick = function ( event ) {
             if(event.target.id == ""){
@@ -642,6 +639,7 @@
         getLoadProgressJson();
     });
 
+    // 凡例の表示切替
     function hideColorLegend(){
         console.log('hide');
         $('#legend-area').hide();
