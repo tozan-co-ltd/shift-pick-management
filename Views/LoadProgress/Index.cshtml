@@ -187,7 +187,6 @@
                 data: data,
                 url: '@Url.Action("GetLoadRecords", "LoadProgress")'
         }).done(function (response) {
-            console.log(response);
             model.loadRecords = response;
         });
     }
@@ -638,7 +637,6 @@
 
     // 凡例の表示切替
     function hideColorLegend(){
-        console.log('hide');
         $('#legend-area').hide();
     }
 
