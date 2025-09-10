@@ -5,10 +5,11 @@
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
 <div class="card shadow de-inspection masterInfo m-4">
+    
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
     <div class="print-area" id="print-area">
-        <div class="card-header">
-            @ViewData["Title"]
-        </div>
         <div class="card-body" id="card-body">
             <div id="ErrorBlock" class="mb-3 text-danger text-center"></div>
             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
