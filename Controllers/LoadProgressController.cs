@@ -82,7 +82,7 @@ namespace ai_truck_load_measurement.Controllers
                                 {
                                     from = loadDate.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.ToString("HH:mm"),
                                     to = loadDate.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.AddMinutes(5).ToString("HH:mm"),
-                                    shipping_lane_status_name = "昼勤開始時間"
+                                    trip_lane_status_name = "昼勤開始時間"
                                 };
 
                                 // 辞書に追加
@@ -136,9 +136,9 @@ namespace ai_truck_load_measurement.Controllers
                                     routeSeq = lst.TripBranchSeq,
                                     from = afterFromDateTime,
                                     to = afterToDateTime,
-                                    shipping_start_scheduled_time = loadDate + " " + lst.ArrivalScheduledTime.ToString("HH:mm"),
-                                    shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm"),
-                                    shipping_lane_status_name = tripLaneStatusName,
+                                    arrival_scheduled_time = loadDate + " " + lst.ArrivalScheduledTime.ToString("HH:mm"),
+                                    departure_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm"),
+                                    trip_lane_status_name = tripLaneStatusName,
                                     schedule_or_record = "schedule",
                                     trip_id = lst.TripID
                                 });
@@ -151,9 +151,7 @@ namespace ai_truck_load_measurement.Controllers
                                 routeSeq = lst.TripBranchSeq,
                                 from = fromDateTime,
                                 to = toDateTime,
-                                shipping_start_scheduled_time = loadDate + " " + lst.ArrivalScheduledTime.ToString("HH:mm"),
-                                shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm"),
-                                shipping_lane_status_name = tripLaneStatusName,
+                                trip_lane_status_name = tripLaneStatusName,
                                 schedule_or_record = "schedule",
                                 trip_id = lst.TripID
                             });
@@ -185,6 +183,7 @@ namespace ai_truck_load_measurement.Controllers
 
                                 var startTime = TimeSpan.Parse(lst.ArrivedAt.ToString("HH:mm"));
                                 var endTime = TimeSpan.Parse(lst.DepartedAt.ToString("HH:mm"));
+                                // 出発データの有無判断
                                 var isDeparted = true;
                                 var hasDepartData = true;
                                 if (lst.DepartedAt.ToString("yyyy/MM/dd") == "0001/01/01")
@@ -192,11 +191,13 @@ namespace ai_truck_load_measurement.Controllers
                                     hasDepartData = false;
                                     if(IsLatestRecordInSameStations(lst) && IsTruckExistedInSameStations(lst))
                                     {
+                                        // 停車中の場合
                                         isDeparted = false;
                                         endTime = TimeSpan.Parse(loadDate.AddMinutes(5).ToString("HH:mm"));
                                     }
                                     else
                                     {
+                                        // 出発済みかつ出発データが存在しない場合
                                         endTime = TimeSpan.Parse(lst.ArrivedAt.AddMinutes(15).ToString("HH:mm"));
                                     }
                                 }
@@ -220,9 +221,7 @@ namespace ai_truck_load_measurement.Controllers
                                     routeSeq = lst.TripBranchSeq,
                                     from = fromDateTime,
                                     to = toDateTime,
-                                    shipping_start_scheduled_time = loadDate + " " + lst.ArrivalScheduledTime.ToString("HH:mm"),
-                                    shipping_end_scheduled_time = loadDate + " " + lst.DepartureScheduledTime.ToString("HH:mm"),
-                                    shipping_lane_status_name = tripLaneStatus,
+                                    trip_lane_status_name = tripLaneStatus,
                                     schedule_or_record = "record",
                                     trip_record_id = lst.TripRecordID,
                                     has_depart_data = hasDepartData
@@ -267,7 +266,7 @@ namespace ai_truck_load_measurement.Controllers
                     {
                         from = targetTime.ToString("yyyy/MM/dd HH:mm:ss"),
                         to = targetTime.AddMinutes(5).ToString("yyyy/MM/dd HH:mm:ss"),
-                        shipping_lane_status_name = statusName
+                        trip_lane_status_name = statusName
                     }
                 };
                 var itemFormat = item.Value.Except(selected).ToList();
@@ -338,7 +337,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="workDay">稼働日</param>
         /// <returns></returns>
-        public static List<LoadRecordModel> GetLoadRecords(DateTime workDay)
+        public List<LoadRecordModel> GetLoadRecords(DateTime workDay)
         {
             var sql = LoadProgressConnectController.CreateSQLToSelectLoadRecordsFromWorkDay(workDay);
             var loadRecords = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql);
@@ -449,7 +448,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 便実績に該当するステーションに現在トラックが存在するか
         /// </summary>
-        /// <param name="loadRecord"></param>
+        /// <param name="loadRecord">便実績</param>
         /// <returns></returns>
         public bool IsTruckExistedInSameStations(LoadRecordModel loadRecord)
         {
@@ -470,7 +469,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <summary>
         /// 該当便実績は同ステーション内にて最新かどうか
         /// </summary>
-        /// <param name="loadRecord"></param>
+        /// <param name="loadRecord">便実績</param>
         /// <returns></returns>
         public bool IsLatestRecordInSameStations(LoadRecordModel loadRecord)
         {
