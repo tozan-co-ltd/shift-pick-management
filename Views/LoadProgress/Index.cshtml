@@ -39,10 +39,9 @@
                 </div>
             </div>
 
-
             <div id="timeline-chart" class="scroll-inner"></div>
             <div id="container"></div>
-            <p id="page-top"><a href="#" class="page_top_btn">PAGE<br />TOP</a></p>
+            <a class="pagetop" href="#" id="pagetop"><div class="pagetop__arrow"></div></a>
         </div>
     </div>
     <div id="legend-area" style="display:none">
@@ -232,7 +231,7 @@
         $.each(datasets, function (index, data) {
             var dataset = data.value;
             var timelineStartTime = moment(moment(dateFormat).startOf('day'));
-            var timelineEndTime = moment(moment(moment(dateFormat))).add(1, 'days').startOf('day');
+            var timelineEndTime = moment(moment(dateFormat).startOf('day').add(24, 'hour'));
             if(lineCount % 2 == 0){
                 height = 90
             }
@@ -245,6 +244,7 @@
                 .attr('width', width)
                 .attr('height', height)
 
+            // svg.call(d3.zoom().on("zoom", zoomed))
             // x軸(時間軸)
             var xScale = d3.scaleTime()
                 .domain([timelineStartTime, timelineEndTime])
@@ -416,8 +416,17 @@
                 })
 
                 lineCount ++ ;
+
+            // function zoomed(event) {
+            //     // イベントが発生したらイベントオブジェクトの内容に従って transform するだけ
+            //     d3.select('#timeline-chart').attr("transform", d3.event.transform);
+            // }
         });
+
     }
+
+    
+
 
     function toFullWidth(str) {
         // 半角英数字を全角に変換
@@ -616,7 +625,7 @@
 
     // TOPへ戻る処理
     $(function(){
-      var pagetop = $('#page-top');
+      var pagetop = $('#pagetop');
       pagetop.hide();
       $(window).scroll(function () {
          if ($(this).scrollTop() > 100) {
@@ -624,10 +633,6 @@
          } else {
               pagetop.fadeOut();
          }
-      });
-      pagetop.click(function () {
-         $('body, html').animate({ scrollTop: 0 }, 500);
-         return false;
       });
     });
 
