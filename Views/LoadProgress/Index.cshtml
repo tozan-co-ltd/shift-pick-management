@@ -4,11 +4,24 @@
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
+
+<style>
+    .trip_name{
+        cursor: pointer;
+    }
+
+        .trip_name:hover {
+            text-decoration: underline;
+        color: blue;
+    }
+
+</style>
 <div class="card shadow de-inspection masterInfo m-4">
+    
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
     <div class="print-area" id="print-area">
-        <div class="card-header">
-            @ViewData["Title"]
-        </div>
         <div class="card-body" id="card-body">
             <div id="ErrorBlock" class="mb-3 text-danger text-center"></div>
             <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
@@ -22,7 +35,7 @@
                     <span class="loader mr-2 ml-2" style="display: none; vertical-align: middle; " role="status" id="loading"></span>
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <div class="d-flex justify-content-start align-items-center unset-pdl ml-5">
+                <div id="not-print-area" class="d-flex justify-content-start align-items-center unset-pdl ml-5">
                     <span >現在時刻: </span>
                     <span id="current-time"></span>
 
@@ -38,10 +51,9 @@
                 </div>
             </div>
 
-
             <div id="timeline-chart" class="scroll-inner"></div>
             <div id="container"></div>
-            <p id="page-top"><a href="#" class="page_top_btn">PAGE<br />TOP</a></p>
+            <a class="pagetop" href="#" id="pagetop"><div class="pagetop__arrow"></div></a>
         </div>
     </div>
     <div id="legend-area" style="display:none">
@@ -231,7 +243,7 @@
         $.each(datasets, function (index, data) {
             var dataset = data.value;
             var timelineStartTime = moment(moment(dateFormat).startOf('day'));
-            var timelineEndTime = moment(moment(moment(dateFormat))).add(1, 'days').startOf('day');
+            var timelineEndTime = moment(moment(dateFormat).startOf('day').add(24, 'hour'));
             if(lineCount % 2 == 0){
                 height = 90
             }
@@ -244,6 +256,7 @@
                 .attr('width', width)
                 .attr('height', height)
 
+            // svg.call(d3.zoom().on("zoom", zoomed))
             // x軸(時間軸)
             var xScale = d3.scaleTime()
                 .domain([timelineStartTime, timelineEndTime])
@@ -286,6 +299,8 @@
                 .attr('y', chartTripCenterY)
                 .attr('dy', '0.5rem')
                 .attr('font-weight', 'bold')
+                .attr('onclick', 'tripNameClick(' + data.value[0].trip_id + ')')
+                .attr('class', 'trip_name')
 
             svg.append('text')
                 .text(scheduleOrRecord)
@@ -413,10 +428,30 @@
                         color = 'gray'
                     return color
                 })
-
+                .attr('class', function(d){
+                    if(d.schedule_or_record == 'record')
+                        return 'trip_record'
+                    else
+                        return ''
+                })
+                .attr('id', function(d){
+                     if(d.schedule_or_record == 'record')
+                        return d.trip_record_id
+                    else
+                        return ''
+                })
                 lineCount ++ ;
+
+            // function zoomed(event) {
+            //     // イベントが発生したらイベントオブジェクトの内容に従って transform するだけ
+            //     d3.select('#timeline-chart').attr("transform", d3.event.transform);
+            // }
         });
+
     }
+
+    
+
 
     function toFullWidth(str) {
         // 半角英数字を全角に変換
@@ -426,11 +461,23 @@
         return str;
     }
 
+    // 便名称クリック時
+    function tripNameClick(tripID){
+        console.log('click' + tripID);
+        window.location.href = "M_TripBranchNumber?tripId=" + tripID + "&isChecked=False";
+    }
+    $(function () {
+      $(document).on('click', '.trip_name', function (event) {
+        // trip_id をもとに便枝番マスター画面に遷移
+        var id = event.target.id;
+        window.href = "M_TripBranchNumber?tripId=" + id + "&isChecked=False";
+      });
+    });
+
     // 便実績クリック時
     $(function () {
       $(document).on('click', '.trip_record', function (event) {
         // trip_record_id をもとに便実績情報を取得
-        model = @Html.Raw(Json.Serialize(Model));
         var id = event.target.id;
         var trip = model.loadRecords.find(item => item.tripRecordID == id);
 
@@ -615,7 +662,7 @@
 
     // TOPへ戻る処理
     $(function(){
-      var pagetop = $('#page-top');
+      var pagetop = $('#pagetop');
       pagetop.hide();
       $(window).scroll(function () {
          if ($(this).scrollTop() > 100) {
@@ -623,10 +670,6 @@
          } else {
               pagetop.fadeOut();
          }
-      });
-      pagetop.click(function () {
-         $('body, html').animate({ scrollTop: 0 }, 500);
-         return false;
       });
     });
 
