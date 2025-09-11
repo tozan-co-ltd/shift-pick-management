@@ -611,7 +611,7 @@ function tableDisplayCommon(page, data) {
             scrollCollapse: true,   // 縦スクロール表示
             searchHighlight: true,  // 検索ハイライト
             orderFixed: [18, "asc"],
-            order: [[0, "asc"] , [7, "asc"], [1, "asc"]],    // ID昇順
+            order: [[0, "asc"] , [16, "asc"], [1, "asc"]],    // ID昇順
             "oLanguage": {
                 "sSearch": ""
             },
