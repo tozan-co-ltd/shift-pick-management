@@ -1,0 +1,646 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.LoadProgressModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+}
+<div class="card shadow de-inspection masterInfo m-4">
+    <div class="print-area" id="print-area">
+        <div class="card-header">
+            @ViewData["Title"]
+        </div>
+        <div class="card-body" id="card-body">
+            <div id="ErrorBlock" class="mb-3 text-danger text-center"></div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
+            
+                <div class="d-flex justify-content-start align-items-center unset-pdl mr-3">
+                    <span class="warehouse-name-drs span-paragraph">デポ</span>
+                    <div>
+                        <div id="selectDepos"></div>
+                            <select class="form-select" asp-items="@Model.MDepoList" id="selectDepo"></select>
+                    </div>
+                    <span class="loader mr-2 ml-2" style="display: none; vertical-align: middle; " role="status" id="loading"></span>
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="d-flex justify-content-start align-items-center unset-pdl ml-5">
+                    <span >現在時刻: </span>
+                    <span id="current-time"></span>
+
+                </div>
+                
+                <div id="not-print-area" style="margin-left: auto;">
+                    <button class="btn btn-secondary print-btn mr-4" id="search-btn" onclick="showColorLegend()">
+                        <span class="text">凡例</span>
+                    </button>
+                    <button class="btn btn-secondary print-btn mr-4" id="search-btn" onclick="window.print()" >
+                        <span class="text"><i class="fa-solid fa-print"></i></span>
+                    </button>
+                </div>
+            </div>
+
+
+            <div id="timeline-chart" class="scroll-inner"></div>
+            <div id="container"></div>
+            <p id="page-top"><a href="#" class="page_top_btn">PAGE<br />TOP</a></p>
+        </div>
+    </div>
+    <div id="legend-area" style="display:none">
+        <button class="round_btn" id="legend-button" onclick="hideColorLegend()"></button>
+        <div class="color_legend">
+            <div class="d-flex justify-content-start align-items-center mb-3">
+                <span style="width: 100px">時刻</span>
+                <div class="ml-2 mr-3 d-flex justify-content-end">
+                    <div class="border-box"><span class="border-box-line" style="background-color: #0099ff"></span></div>：昼勤開始時間
+                </div>
+                <div class="mr-2 d-flex justify-content-end">
+                    <div class="border-box"><span class="border-box-line" style="background-color:#e6b422"></span></div>：現在時刻
+                </div>
+            </div>
+            <div class="d-flex justify-content-start align-items-center mb-3">
+                <span style="width: 100px">便予定</span>
+                <div class="d-flex justify-content-between">
+                    <div class="ml-2 mr-2 d-flex justify-content-end">
+                        <div class="progress-border-box"><span class="progress-color-box" style="background-color: #aaffff">到着前</span></div>
+                    </div>
+                    <div class="mr-2 d-flex justify-content-end">
+                        <div class="progress-border-box"><span class="progress-color-box" style="background-color: #ec52ac">停車中</span></div>
+                    </div>
+                    <div class="mr-2 d-flex justify-content-end">
+                        <div class="progress-border-box"><span class="progress-color-box" style="background-color: #cccccc">出発後</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-start mb-2">
+                <span style="width: 100px">便実績</span>
+                <div class="trip-box">
+                    <div class="d-flex">
+                        <div class="mr-2" style="width: 205px; text-align:left">
+                            紐付け有
+                        </div>
+
+                    </div>
+                    <div class="d-flex">
+                        <div class="mr-2 d-flex justify-content-end">
+                            <div class="progress-border-box"><span class="progress-color-box" style="background-color: #ccff66">停車中</span></div>
+                        </div>
+                        <div class="mr-2 d-flex justify-content-end">
+                            <div class="progress-border-box"><span class="progress-color-box" style="background-color: #33cc00">出発実績有</span></div>
+                        </div>
+                        <div class="mr-1 d-flex justify-content-end">
+                            <div class="progress-border-box"><span class="progress-color-box" style="background-color: #cee6c1; color: gray">出発実績無</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-start align-items-center">
+                <span style="width: 100px"></span>
+                <div class="trip-box">
+                    <div class="d-flex">
+                        <div class="mr-2" style="width: 205px; text-align:left">
+                            紐付け無し
+                        </div>
+
+                    </div>
+                    <div class="d-flex">
+                        <div class="mr-2 d-flex justify-content-end">
+                            <div class="progress-border-box"><span class="progress-color-box" style="background-color: #ffff66">停車中</span></div>
+                        </div>
+                        <div class="mr-2 d-flex justify-content-end">
+                            <div class="progress-border-box"><span class="progress-color-box" style="background-color: #ffc800">出発実績有</span></div>
+                        </div>
+                        <div class="mr-1 d-flex justify-content-end">
+                            <div class="progress-border-box"><span class="progress-color-box" style="background-color: #ffedb3; color: gray;">出発実績無</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+</div>
+
+<!--  Detail Modal-->
+<div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="loader-modal" id="loading-modal">
+            <div class="three-quarter-spinner"></div>
+        </div>
+        <div class="modal-content trip-record-modal" id="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-modal-label"></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-12">
+                    <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <figure class="mb-2 modal-img"><img src="" id="modalImage" /></figure>
+                <div id="tripRecord-buttons"></div>
+                <table class="table table-sm p-2 modal-table">
+                    <tbody id="tripRecord-contatiner">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        model = @Html.Raw(Json.Serialize(Model));
+        $("#selectDepo").find("option[value='" + model.selectedDepo.depoID + "']").attr("selected", "selected");
+        window.setInterval(function () {
+            getLoadProgressJson();
+        }, 300000);
+        getLoadProgressJson()
+    });
+
+    function getLoadProgressJson(){
+        let today = GetDateString(new Date());
+        // let today = "2025/9/9 23:00"
+        $("#current-time")[0].innerHTML = today;
+        var depoID = $('select[id="selectDepo"]')[0].value;
+        let data = {depoId: depoID, loadDate: today};
+
+        $.ajax({
+                type: 'GET',
+                data: data,
+                dataType: 'JSON',
+                url: '@Url.Action("GetLoadProgressJson", "LoadProgress")'
+        }).done(function (response) {
+            if(response.res == "OK"){
+                loadProgressDataSets(response.data, today);
+                document.querySelector("#loading").style.display = "none";
+            }
+            else{
+                $("#ErrorBlock").text(response.error)
+            }
+        });
+
+        data = {workDay: today}
+        $.ajax({
+                type: 'POST',
+                data: data,
+                url: '@Url.Action("GetLoadRecords", "LoadProgress")'
+        }).done(function (response) {
+            model.loadRecords = response;
+        });
+    }
+
+     // デポ選択時
+    $(function () {
+        $('select[id="selectDepo"]').change(function () {
+            // ロード中表示
+            document.querySelector("#loading").style.display = "inline-block";
+
+            var depo = $('select[id="selectDepo"]')[0];
+            var selectedDepoID = 0;
+            var depoName = "";
+            for(var i=0; i < depo.length; i++){
+                if(depo[i].selected){
+                    // $("#stationTitle")[0].innerText = getStationTitle(depo[i].innerText);
+                    selectedDepoID = depo[i].value;
+                    getLoadProgressJson(selectedDepoID)
+                }
+            }
+
+        });
+    })
+
+    function loadProgressDataSets(datasets, dateFormat){
+        document.getElementById("timeline-chart").innerHTML = "";
+
+        var width = $('#card-body').width() - 60, height = 90;
+        var padding = { top: 0, right: 10, bottom: 10, left: 65 }
+        var barHeight = 135;
+        var lineCount = 0;
+        
+        // 日時を時刻に変換
+        $.each(datasets, function (index, data) {
+            $.each(data.value, function (index, data) {
+                data.from = moment(data.from);
+                data.to = moment(data.to);
+            })
+        })
+
+        // d3.jsで描画
+        $.each(datasets, function (index, data) {
+            var dataset = data.value;
+            var timelineStartTime = moment(moment(dateFormat).startOf('day'));
+            var timelineEndTime = moment(moment(moment(dateFormat))).add(1, 'days').startOf('day');
+            if(lineCount % 2 == 0){
+                height = 90
+            }
+            else{
+                height = 120
+            }
+
+            var svg = d3.select('#timeline-chart')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+
+            // x軸(時間軸)
+            var xScale = d3.scaleTime()
+                .domain([timelineStartTime, timelineEndTime])
+                .range([padding.left, width - padding.right])
+            var chartHeight = 90;
+            var xAxis = d3.axisBottom(xScale)
+            .ticks(14)
+
+            if(lineCount % 2 == 0){
+                xAxis.tickSize(chartHeight)
+                .tickFormat('')
+            }
+            else{
+                xAxis.tickSize(chartHeight - padding.bottom)
+                .tickFormat(d3.timeFormat('%H:%M'))
+            }
+           
+            var gX = svg.append('g')
+                .call(xAxis)
+
+            // y軸(ラベル)
+            var dateDispFormat = data.key
+            if(dateDispFormat.includes('実績')){
+                dateDispFormat = dateDispFormat.replace("実績", "")
+            }
+            var chartCenterY = (padding.top + chartHeight) / 2
+            var chartTripCenterY = 10000
+            var scheduleOrRecord = ""
+            if(lineCount % 2 == 0){
+                // chartTripCenterY = padding.top + chartHeight
+                chartTripCenterY = chartHeight - 10
+                scheduleOrRecord = "予定"
+            }
+            else{
+                scheduleOrRecord = "実績"
+            }
+            svg.append('text')
+                .text(dateDispFormat)
+                .attr('x',0)
+                .attr('y', chartTripCenterY)
+                .attr('dy', '0.5rem')
+                .attr('font-weight', 'bold')
+
+            svg.append('text')
+                .text(scheduleOrRecord)
+                .attr('x',30)
+                .attr('y', chartCenterY)
+                .attr('dy', '0.5rem')
+
+            // データの描画
+            const scheduleG = svg.selectAll()
+                .data(dataset)
+                .enter()
+                .append('g')        // 要素のグループ化
+
+            let yRect = 1;
+            let yText = 0;
+
+
+            // 短形の描画
+            scheduleG.append('rect')
+                .attr('x', function (d) {
+                    return xScale(d['from'])
+                })
+                .attr('y', yRect)
+                .attr('width', function (d) {
+                    return xScale(d['to']) - xScale(d['from'])
+                })
+                .attr('height', function (d) {
+                    // 現在時刻
+                    if (d.trip_lane_status_name == '現在時刻') {
+                        return barHeight
+                    // 昼勤開始時間
+                    } else if(d.trip_lane_status_name == '昼勤開始時間'){
+                        return chartHeight
+                    // 運行便
+                    } else {
+                        if(lineCount % 2 == 0){
+                            return chartHeight
+                        } else {
+                            return chartHeight - padding.bottom
+                        }
+                    }
+                })
+                .attr('fill', function (d) {
+                    var color = '';
+                   
+                    // 現在時刻             赤 #ff0000
+                    if (d.trip_lane_status_name == '現在時刻')
+                        color = '#e6b422';
+                    // 昼勤開始時間         青 #0099ff
+                    else if (d.trip_lane_status_name == '昼勤開始時間')
+                        color = '#0099ff';
+                    // 出発後　　　　　　　 灰 #cccccc
+                    else if (d.trip_lane_status_name == '出発後')
+                        color = '#cccccc';
+                    // 到着前　　　　　　　 薄いブルー #aaffff
+                    else if (d.trip_lane_status_name == '到着前')
+                        color = '#aaffff';
+                    // 停車中               メインカラー #ec52ac
+                    else if (d.trip_lane_status_name == '停車中')
+                        color = '#ec52ac';
+                    // 紐付け有かつ出発済かつ出発実績有   緑 #33cc00
+                    else if (d.trip_lane_status_name == '紐付け有出発済' && d.has_depart_data)
+                        color = '#33cc00';
+                    // 紐付け有かつ出発済かつ出発実績無   緑 #33cc00
+                    else if (d.trip_lane_status_name == '紐付け有出発済' && !d.has_depart_data)
+                        color = '#cee6c1';
+                    // 紐づけ無かつ出発済かつ出発実績有   濃い黄 #cee6c1
+                    else if (d.trip_lane_status_name == '紐付け無出発済' && d.has_depart_data)
+                        color = '#ffc800';
+                    // 紐づけ無かつ出発済かつ出発実績無   薄い黄 #cee6c1
+                    else if (d.trip_lane_status_name == '紐付け無出発済' && !d.has_depart_data)
+                        color = '#ffedb3';
+                    // 紐付け有かつ停車中   薄い緑2 #ccff66
+                    else if (d.trip_lane_status_name == '紐付け有停車中')
+                        color = '#ccff66';
+                    // 紐づけ無かつ停車中   黄 #ffff66
+                    else if (d.trip_lane_status_name == '紐付け無停車中')
+                        color = '#ffff66';
+                    return color
+                })
+                .attr("stroke-width", 3)
+                .attr('opacity', 0.7)
+                .attr('class', function(d){
+                    if(d.schedule_or_record == 'record')
+                        return 'trip_record'
+                    else
+                        return ''
+                })
+                .attr('id', function(d){
+                     if(d.schedule_or_record == 'record')
+                        return d.trip_record_id
+                    else
+                        return ''
+                })
+                
+            // 運行便名の描画
+            scheduleG.append('text')
+                .attr('transform', 'translate(5, 1)')   // SVGの表示領域
+                .attr('x', function (d) {
+                    return xScale((d['from'] + d['to'])/2) -5            // x座標(親要素からの相対位置)
+                })
+                .attr('y', yText)                       // y座標(親要素からの相対位置)
+                .text(function (d) {
+                    // 現在時刻・休憩時間の場合は、便名表示なし
+                    if (d.trip_lane_status_name == '現在時刻' || d.trip_lane_status_name == '休憩時間') {
+                        return ''
+                        // 運行便の場合は、便名表示あり
+                    } else if (d.routeName != undefined && d.routeSeq != undefined) {
+                        return '枝番' + toFullWidth(d.routeSeq)
+                    } else if(d.routeName != undefined){
+                        return '枝番なし'
+                    }
+                })
+                .attr('font-size', '15px')               // 文字サイズ
+                .attr('writing-mode', 'tb')             // 縦書き
+                .attr('dominant-baseline', 'central')   // テキスト中央揃え
+                .attr('height', function (d) {
+                    return xScale(d['to']) - xScale(d['from'])
+                })
+                .attr('fill', function(d){
+                    // テキスト色
+                    var color = '#000000'
+                    // 出発時データが存在せず、かつ出発済みの実績データの場合
+                    if(!d.has_depart_data && d.trip_lane_status_name.includes('出発済') && d.schedule_or_record == 'record')
+                        color = 'gray'
+                    return color
+                })
+
+                lineCount ++ ;
+        });
+    }
+
+    function toFullWidth(str) {
+        // 半角英数字を全角に変換
+        str = str.toString().replace(/[A-Za-z0-9]/g, function(s) {
+        return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
+        });
+        return str;
+    }
+
+    // 便実績クリック時
+    $(function () {
+      $(document).on('click', '.trip_record', function (event) {
+        // trip_record_id をもとに便実績情報を取得
+        model = @Html.Raw(Json.Serialize(Model));
+        var id = event.target.id;
+        var trip = model.loadRecords.find(item => item.tripRecordID == id);
+
+       // 表示用の要素を初期化
+        while(container.firstChild){
+            container.removeChild(container.firstChild);
+        }
+
+        const item = createItem(event.pageX-50 , event.pageY-90, trip);
+        container.appendChild(item);
+        // 便実績情報を基にボタンを作成
+      });
+    });
+
+    // 便実績以外クリック時
+    // 便の詳細情報非表示
+    $(function (){
+        document.body.onclick = function ( event ) {
+            if(event.target.id == ""){
+                while(container.firstChild){
+                    container.removeChild(container.firstChild);
+                }
+            }
+        }
+    })
+
+    // アイテムを作成する関数
+    function createItem(x, y, trip) {
+        const navElement = document.getElementById('sidenavAccordion'); 
+        var navWidth = navElement.offsetWidth;
+        var navbarContent = document.getElementById('body');
+        if (!navbarContent.classList.contains('sb-sidenav-toggled')) {
+          x -= navWidth;
+        }
+
+
+      const item = document.createElement('div');
+      item.classList.add('item');
+      item.style.left = x + 'px';
+      item.style.top = y + 'px';
+      item.style.position = 'absolute'; // 絶対座標で配置
+      item.style.backgroundColor = 'black';
+      item.style.color = 'white';
+      item.innerHTML = "到着予定時間: " + GetTimeString(new Date(trip.arrivalScheduledTime)) + "<br />"
+      + "出発予定時間: " + GetTimeString(new Date(trip.departureScheduledTime)) + "<br /><br />"
+      + "到着実績: " + GetTimeString(new Date(trip.arrivedAt)) + "<br />"
+      + "出発実績: " + GetTimeString(new Date(trip.departedAt)) + "<br />"
+      + "<a class=\"btn btn-success btn-icon-split ml-2 mr-3\""
+      + "onclick=\"EditTripRecordModal('" + trip.tripRecordID + "', 'true')\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
+      + "<i class=\"fa-solid fa-truck ml-2 mr-2\"> 到着画像</i></a>"
+      + "<a class=\"btn btn-success btn-icon-split mr-2\""
+      + "onclick=\"EditTripRecordModal('" + trip.tripRecordID + "', 'false')\" data-id=\"" + trip.TripRecordID + "\" data-toggle=\"modal\" data-target=\"#detail-modal\">"
+      + "<i class=\"fa-solid fa-truck ml-2 mr-2\"> 出発画像</i></a>";
+      // アイテムの内容
+      item.style.border = '2px solid #000000'
+      return item;
+    }
+
+    // 荷量画像モーダル作成
+    function EditTripRecordModal(tripRecordID, isArrived) {
+        // デフォルトの操作を無効化
+        event.preventDefault();
+
+        // ローディング画像表示
+        $("#modal-content").css('display', 'none');
+        $("#loading-modal").css('display', 'inline-block');
+
+        // LoadOutputModel取得
+        var tripRecordModel = model.loadRecords;
+        tripRecordModel.forEach(function (item) {
+            if (item.tripRecordID == tripRecordID) {
+
+                // フォーム情報取得
+                let url = window.location.href + '/GetModalItems';
+                url = url.replace('LoadProgress', 'LoadRecord');
+                let method = 'POST';
+                let data = { model: item, isArrived: isArrived };
+
+                // Ajax call
+                $.ajax({
+                    url: url,
+                    method: method,
+                    data: data
+                }).done(function (response) {
+                    var imagePath = "";
+                    var arriveOrDeparture = "";
+                    var arriveOrDepartureDate = "";
+                    var loadStatus = "";
+                    var tag = "-";
+                    var workDayForFile = GetDayStringForFile(new Date(item.workDay));
+                    var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
+                    var truckNumber = item.truckNumber;
+                    var authorizedKubun = response.authorizedKubun;
+                    if (truckNumber == "0") truckNumber = "-";
+                    if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
+                    if (item.tag != null) tag = item.tag;
+
+                    // 到着か出発かで変わる要素の登録
+                    if (isArrived == "true") {
+                        $('#detail-modal-label').text("到着荷量画像");
+                        loadStatus = item.arrivalLoadStatus;
+                        imagePath = response.arrivalLoadImgPath;
+                        arriveOrDeparture = "到着時間";
+                        arriveOrDepartureDate = GetDateString(new Date(item.arrivedAt));
+                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_A_" + loadStatus + ".jpg";
+                    }
+                    else {
+                        $('#detail-modal-label').text("出発荷量画像");
+                        loadStatus = item.departureLoadStatus;
+                        imagePath = response.departureLoadImgPath;
+                        arriveOrDeparture = "出発時間";
+                        arriveOrDepartureDate = GetDateString(new Date(item.departedAt));
+                        downloadFileName = item.tripName + "_" + item.tripBranchSeq + "_" + workDayForFile + "_D_" + loadStatus + ".jpg";
+                    }
+
+                    $('#modalImage').attr("src", "data:image/jpeg;base64," + imagePath);
+
+                    var workDay = GetDayString(new Date(item.workDay));
+
+                    // テーブルの追加
+                    var container = $("#tripRecord-contatiner");
+                    container.empty();
+                    let tr = "<tr>"
+                        + "<td>荷量</td>"
+                        + "<td>" + loadStatus + "%</td>"
+                        + "</tr><tr>"
+                        + "<td>荷量の相違あり</td>"
+                        + "<td>"
+                        + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">";
+                   
+                    tr += "<label id=\"loadStatusSelect\" ></label>";
+
+                    tr += "</div>"
+                        + "</td>"
+                        + "</tr><tr>"
+                        + "<td>便名称_便枝番</td>"
+                        + "<td>" + tripNameAndBranchSeq + "</td>"
+                        + "</tr><tr>"
+                        + "<td>タグ</td>"
+                        + "<td>" + tag + "</td>"
+                        + "</tr><tr>"
+                        + "<td>乗務員</td>"
+                        + "<td>" + item.driverName + "</td>"
+                        + "</tr><tr>"
+                        + "<td>ステーション名</td>"
+                        + "<td>" + item.stationName + "</td>"
+                        + "</tr><tr>"
+                        + "<td>車両番号</td>"
+                        + "<td>" + truckNumber + "</td>"
+                        + "</tr><tr>"
+                        + "<td>識別番号</td>"
+                        + "<td>" + item.identifyNumber + "</td>"
+                        + "</tr><tr>"
+                        + "<td>稼働日</td>"
+                        + "<td>" + workDay + "</td>"
+                        + "</tr><tr>"
+                        + "<td>" + arriveOrDeparture + "</td>"
+                        + "<td>" + arriveOrDepartureDate + "</td>"
+                        + "</tr>";
+                    container.append(tr);
+                    if (authorizedKubun == "1") {
+                        $('#loadStatusSelect').val(response.annotationLoadClass);
+                    } else if (response.annotationLoadStatus != null) {
+                        $('#loadStatusSelect').text(response.annotationLoadStatus + "%");
+                    } else {
+                        $('#loadStatusSelect').text("-");
+                    }
+
+                    // ローディング画像非表示
+                    $("#modal-content").css('display', 'inline-block');
+                    $("#loading-modal").css('display', 'none');
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#edit-modal-error-message").text(errorMessage);
+                });
+
+            }
+        });
+
+        
+    }
+
+    // TOPへ戻る処理
+    $(function(){
+      var pagetop = $('#page-top');
+      pagetop.hide();
+      $(window).scroll(function () {
+         if ($(this).scrollTop() > 100) {
+              pagetop.fadeIn();
+         } else {
+              pagetop.fadeOut();
+         }
+      });
+      pagetop.click(function () {
+         $('body, html').animate({ scrollTop: 0 }, 500);
+         return false;
+      });
+    });
+
+    // ウィンドウサイズ変更時に進捗表を再表示させる
+    window.addEventListener('resize', function(){
+        getLoadProgressJson();
+    });
+
+    // 凡例の表示切替
+    function hideColorLegend(){
+        $('#legend-area').hide();
+    }
+
+    function showColorLegend(){
+        $('#legend-area').show();
+    }
+</script>

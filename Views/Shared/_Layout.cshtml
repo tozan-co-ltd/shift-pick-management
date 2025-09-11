@@ -58,7 +58,7 @@
 
     }
 }
-<body class="@bodyClass">
+<body class="@bodyClass" id="body">
     <nav class="sb-topnav navbar navbar-expand navbar-dark @wrapperClass">
         <!-- Navbar Brand-->
         <a id="home-title" class="navbar-brand ps-3 navbar-logo" asp-controller="Top" asp-action="Index">
@@ -115,7 +115,7 @@
                                 var currentCategoryID = Model.GetCategoryIDFromControlerName(currentController);
                                 if (menuList.Count != 0 && !(categoryID == 4 && (Model.AuthorizedKubun != "1" && Model.AuthorizedKubun != "2")))
                                 {
-                                    @if (categoryID == 1 || categoryID == 3)
+                                    @if (categoryID == 3)
                                     {
                                         <li class="nav-item">
                                             <a class="nav-link collapsed" asp-area="" asp-controller="@menuList[0].Controller" asp-action="@menuList[0].Action">
@@ -229,6 +229,10 @@
 
     <!--paginating-->
     <script src="js/paginathing.min.js"></script>
+
+    <!--d3.js-->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js" type="text/javascript"></script>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
 

@@ -14,6 +14,7 @@ namespace ai_truck_load_measurement.Models
         private readonly List<M_WebMenu> referenceList = new List<M_WebMenu>()
         {
             new M_WebMenu{CategoryID = 1, MenuID = 1, MenuName = "ステーション状況", Controller = "Top", Action="Index"},
+            new M_WebMenu{CategoryID = 1, MenuID = 2, MenuName = "便予実進捗", Controller = "LoadProgress", Action = "Index"},
             new M_WebMenu{CategoryID = 2, MenuID = 1, MenuName = "荷量分布", Controller = "LoadDistribution", Action = "Index"},
             new M_WebMenu{CategoryID = 2, MenuID = 2, MenuName = "荷量推移", Controller = "LoadTransition", Action = "Index"},
             new M_WebMenu{CategoryID = 2, MenuID = 3, MenuName = "荷量と運行実績", Controller = "LoadOperationRecord", Action = "Index"},
@@ -42,7 +43,7 @@ namespace ai_truck_load_measurement.Models
 
                 var selectCategoryList = new List<M_WebMenuCategory>()
                 {
-                    new M_WebMenuCategory{CategoryID = 1, CategoryName = "ステーション状況"},
+                    new M_WebMenuCategory{CategoryID = 1, CategoryName = "状況"},
                     new M_WebMenuCategory{CategoryID = 2, CategoryName = "実績" },
                     new M_WebMenuCategory{CategoryID = 3, CategoryName = "お知らせ"},
                     new M_WebMenuCategory{CategoryID = 4, CategoryName = "マスター" },
