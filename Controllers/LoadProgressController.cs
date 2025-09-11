@@ -80,6 +80,7 @@ namespace ai_truck_load_measurement.Controllers
                                 var LoadRecord = new List<object>();
                                 var dayShiftStartTimeObject = new
                                 {
+                                    trip_id = lst.TripID,
                                     from = loadDate.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.ToString("HH:mm"),
                                     to = loadDate.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.AddMinutes(5).ToString("HH:mm"),
                                     trip_lane_status_name = "昼勤開始時間"

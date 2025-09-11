@@ -4,6 +4,18 @@
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
 }
+
+<style>
+    .trip_name{
+        cursor: pointer;
+    }
+
+        .trip_name:hover {
+            text-decoration: underline;
+        color: blue;
+    }
+
+</style>
 <div class="card shadow de-inspection masterInfo m-4">
     
     <div class="card-header">
@@ -287,6 +299,8 @@
                 .attr('y', chartTripCenterY)
                 .attr('dy', '0.5rem')
                 .attr('font-weight', 'bold')
+                .attr('onclick', 'tripNameClick(' + data.value[0].trip_id + ')')
+                .attr('class', 'trip_name')
 
             svg.append('text')
                 .text(scheduleOrRecord)
@@ -414,7 +428,18 @@
                         color = 'gray'
                     return color
                 })
-
+                .attr('class', function(d){
+                    if(d.schedule_or_record == 'record')
+                        return 'trip_record'
+                    else
+                        return ''
+                })
+                .attr('id', function(d){
+                     if(d.schedule_or_record == 'record')
+                        return d.trip_record_id
+                    else
+                        return ''
+                })
                 lineCount ++ ;
 
             // function zoomed(event) {
@@ -436,11 +461,23 @@
         return str;
     }
 
+    // 便名称クリック時
+    function tripNameClick(tripID){
+        console.log('click' + tripID);
+        window.location.href = "M_TripBranchNumber?tripId=" + tripID + "&isChecked=False";
+    }
+    $(function () {
+      $(document).on('click', '.trip_name', function (event) {
+        // trip_id をもとに便枝番マスター画面に遷移
+        var id = event.target.id;
+        window.href = "M_TripBranchNumber?tripId=" + id + "&isChecked=False";
+      });
+    });
+
     // 便実績クリック時
     $(function () {
       $(document).on('click', '.trip_record', function (event) {
         // trip_record_id をもとに便実績情報を取得
-        model = @Html.Raw(Json.Serialize(Model));
         var id = event.target.id;
         var trip = model.loadRecords.find(item => item.tripRecordID == id);
 
