@@ -32,10 +32,9 @@ namespace ai_truck_load_measurement.Controllers
 
             // 便実績情報取得
             var loadRecords = GetLoadRecords(workDay);
-            var loadRecordsConvertedStatus = LoadRecordController.ConversionForTable(loadRecords);
 
             // 便実績紐づけチェック
-            model.LoadRecords = CheckLoadRecords(loadRecordsConvertedStatus.ToList(), trips);
+            model.LoadRecords = CheckLoadRecords(loadRecords.ToList(), trips);
             model.TripBranchNumbers = tripBranchNumbers;
 
             return model;
@@ -344,6 +343,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             var sql = LoadProgressConnectController.CreateSQLToSelectLoadRecordsFromWorkDay(workDay);
             var loadRecords = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql);
+            var loadRecordsConvertedStatus = LoadRecordController.ConversionForTable(loadRecords);
             return loadRecords;
         }
 

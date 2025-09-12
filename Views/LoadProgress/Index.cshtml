@@ -173,7 +173,7 @@
 
     function getLoadProgressJson(){
         let today = GetDateString(new Date());
-        // let today = "2025/9/9 23:00"
+        // let today = "2025/8/19 23:00"
         $("#current-time")[0].innerHTML = today;
         var depoID = $('select[id="selectDepo"]')[0].value;
         let data = {depoId: depoID, loadDate: today};
@@ -551,8 +551,8 @@
             if (item.tripRecordID == tripRecordID) {
 
                 // フォーム情報取得
-                let url = window.location.href + '/GetModalItems';
-                url = url.replace('LoadProgress', 'LoadRecord');
+                let url = window.location.href ;
+                url = url.replace('LoadProgress', 'LoadRecord')+ '/GetModalItems';
                 let method = 'POST';
                 let data = { model: item, isArrived: isArrived };
 
