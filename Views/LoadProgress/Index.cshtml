@@ -173,7 +173,7 @@
 
     function getLoadProgressJson(){
         let today = GetDateString(new Date());
-        // let today = "2025/9/9 23:00"
+        // let today = "2025/8/19 23:00"
         $("#current-time")[0].innerHTML = today;
         var depoID = $('select[id="selectDepo"]')[0].value;
         let data = {depoId: depoID, loadDate: today};
@@ -364,7 +364,7 @@
                     // 紐付け有かつ出発済かつ出発実績有   緑 #33cc00
                     else if (d.trip_lane_status_name == '紐付け有出発済' && d.has_depart_data)
                         color = '#33cc00';
-                    // 紐付け有かつ出発済かつ出発実績無   緑 #33cc00
+                    // 紐付け有かつ出発済かつ出発実績無   薄い緑 #cee6c1
                     else if (d.trip_lane_status_name == '紐付け有出発済' && !d.has_depart_data)
                         color = '#cee6c1';
                     // 紐づけ無かつ出発済かつ出発実績有   濃い黄 #cee6c1
@@ -551,8 +551,8 @@
             if (item.tripRecordID == tripRecordID) {
 
                 // フォーム情報取得
-                let url = window.location.href + '/GetModalItems';
-                url = url.replace('LoadProgress', 'LoadRecord');
+                let url = window.location.href ;
+                url = url.replace('LoadProgress', 'LoadRecord')+ '/GetModalItems';
                 let method = 'POST';
                 let data = { model: item, isArrived: isArrived };
 
