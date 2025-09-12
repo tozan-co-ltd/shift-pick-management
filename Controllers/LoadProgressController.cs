@@ -68,6 +68,7 @@ namespace ai_truck_load_measurement.Controllers
                     // 使用する便名
                     var lstTripName = GetTripNames(trips);
 
+                    // 便枝番情報を辞書に追加
                     tripBranchNumbers.ForEach(lst =>
                     {
                         // 便名の存在をチェック
@@ -159,6 +160,7 @@ namespace ai_truck_load_measurement.Controllers
                         }
                     });
 
+                    // 便実績情報を辞書に追加
                     if(loadRecords.Count > 0)
                     {
                         loadRecords.ForEach(lst =>
