@@ -32,10 +32,9 @@ namespace ai_truck_load_measurement.Controllers
 
             // 便実績情報取得
             var loadRecords = GetLoadRecords(workDay);
-            var loadRecordsConvertedStatus = LoadRecordController.ConversionForTable(loadRecords);
 
             // 便実績紐づけチェック
-            model.LoadRecords = CheckLoadRecords(loadRecordsConvertedStatus.ToList(), trips);
+            model.LoadRecords = CheckLoadRecords(loadRecords.ToList(), trips);
             model.TripBranchNumbers = tripBranchNumbers;
 
             return model;
@@ -68,6 +67,7 @@ namespace ai_truck_load_measurement.Controllers
                     // 使用する便名
                     var lstTripName = GetTripNames(trips);
 
+                    // 便枝番情報を辞書に追加
                     tripBranchNumbers.ForEach(lst =>
                     {
                         // 便名の存在をチェック
@@ -80,6 +80,7 @@ namespace ai_truck_load_measurement.Controllers
                                 var LoadRecord = new List<object>();
                                 var dayShiftStartTimeObject = new
                                 {
+                                    trip_id = lst.TripID,
                                     from = loadDate.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.ToString("HH:mm"),
                                     to = loadDate.ToString("yyyy/MM/dd") + " " + lst.DayShiftStartTime.AddMinutes(5).ToString("HH:mm"),
                                     trip_lane_status_name = "昼勤開始時間"
@@ -158,6 +159,7 @@ namespace ai_truck_load_measurement.Controllers
                         }
                     });
 
+                    // 便実績情報を辞書に追加
                     if(loadRecords.Count > 0)
                     {
                         loadRecords.ForEach(lst =>
@@ -341,6 +343,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             var sql = LoadProgressConnectController.CreateSQLToSelectLoadRecordsFromWorkDay(workDay);
             var loadRecords = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql);
+            var loadRecordsConvertedStatus = LoadRecordController.ConversionForTable(loadRecords);
             return loadRecords;
         }
 
