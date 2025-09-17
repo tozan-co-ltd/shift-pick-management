@@ -94,4 +94,12 @@ namespace ai_truck_load_measurement.Models
         // 選択された便名称
         public string? SelectedTripName { get; set; }
     }
+
+    public class PivotStatusModel : CommonModel
+    {
+        public List<string> HeaderColumuns { get; set; }
+        public string YColumnName {  get; set; }
+        public List<string> XColumnNames {  get; set; }
+        public string ValueColumnNames {  get; set; }
+    }
 }
