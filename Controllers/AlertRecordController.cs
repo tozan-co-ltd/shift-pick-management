@@ -229,12 +229,70 @@ namespace ai_truck_load_measurement.Controllers
             var timeAlert = "";
             var scheduledTimeToday = new DateTime(recordtime.Year, recordtime.Month, recordtime.Day, scheduledTime.Hour, scheduledTime.Minute, scheduledTime.Second);
 
+            // 到着予定が到着予定が0時～1時半の間　かつ　到着実績が22時半～23時59分の場合
+            // 到着予定の日付を+1する
+            if (HasDateChangedMinus(scheduledTimeToday) && HasDateChangedPlus(recordtime))
+                scheduledTimeToday = scheduledTime.AddDays(1);
+
+            // 到着予定が22時～23時59分　かつ　到着実績が0時～1時半の場合
+            // 到着予定の日付を-1する
+            if (HasDateChangedPlus(scheduledTimeToday) && HasDateChangedMinus(recordtime))
+                scheduledTimeToday = scheduledTime.AddDays(-1);
+
             if (scheduledTimeToday.AddHours(-1) > recordtime)
                 timeAlert = "(早)";
-            else if (recordtime > scheduledTimeToday.AddHours(1))
+            else if (recordtime > scheduledTimeToday.AddMinutes(20))
                 timeAlert = "(遅)";
 
             return timeAlert;
+        }
+
+        /// <summary>
+        /// 日付の時刻が22時半～23時59分の間か判定する
+        /// </summary>
+        /// <param name="targetDate"></param>
+        /// <returns></returns>
+        private bool HasDateChangedPlus(DateTime targetDate)
+        {
+            // 引数の時間に+1時間半したもの
+            var addAnHourAndAHalf = targetDate.AddHours(1).AddMinutes(30);
+            // それの日付データ
+            var addAnHourAndAHalfDate = new DateTime(addAnHourAndAHalf.Year, addAnHourAndAHalf.Month, addAnHourAndAHalf.Day);
+            var targetDay = new DateTime(targetDate.Year, targetDate.Month, targetDate.Day);
+            // 引数データの日付と比べて変わっているか
+            // 変わっている場合、予定データの日付に+1
+            if (targetDay < addAnHourAndAHalfDate)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 日付の時刻が0時～1時半の間か判定する
+        /// </summary>
+        /// <param name="targetDate"></param>
+        /// <returns></returns>
+        private bool HasDateChangedMinus(DateTime targetDate)
+        {
+            // 実績の時間に-1時間半したもの
+            var minusAnHourAndAHalf = targetDate.AddHours(-1).AddMinutes(-30);
+            // それの日付データ
+            var minusAnHourAndAHalfDate = new DateTime(minusAnHourAndAHalf.Year, minusAnHourAndAHalf.Month, minusAnHourAndAHalf.Day);
+            var targetDay = new DateTime(targetDate.Year, targetDate.Month, targetDate.Day);
+            // 実績データの日付と比べて変わっているか
+            // 変わっている場合、予定データの日付に+1
+            if (targetDay > minusAnHourAndAHalfDate)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
