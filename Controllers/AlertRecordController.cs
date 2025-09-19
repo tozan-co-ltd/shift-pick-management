@@ -229,13 +229,17 @@ namespace ai_truck_load_measurement.Controllers
             var timeAlert = "";
             var scheduledTimeToday = new DateTime(recordtime.Year, recordtime.Month, recordtime.Day, scheduledTime.Hour, scheduledTime.Minute, scheduledTime.Second);
 
-            // 到着予定が到着予定が0時～1時半の間　かつ　到着実績が22時半～23時59分の場合
-            // 到着予定の日付を+1する
+            // 実績が登録されていない場合
+            if(scheduledTimeToday.ToString("yyyy/MM/dd") == "0001/01/01")
+                return timeAlert;
+
+            // 予定が到着予定が0時～1時半の間　かつ　実績が22時半～23時59分の場合
+            // 予定の日付を+1する
             if (HasDateChangedMinus(scheduledTimeToday) && HasDateChangedPlus(recordtime))
                 scheduledTimeToday = scheduledTime.AddDays(1);
 
-            // 到着予定が22時～23時59分　かつ　到着実績が0時～1時半の場合
-            // 到着予定の日付を-1する
+            // 予定が22時～23時59分　かつ　実績が0時～1時半の場合
+            // 予定の日付を-1する
             if (HasDateChangedPlus(scheduledTimeToday) && HasDateChangedMinus(recordtime))
                 scheduledTimeToday = scheduledTime.AddDays(-1);
 
