@@ -235,5 +235,68 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="startOfPeriod"></param>
+        /// <param name="endOfPeriod"></param>
+        /// <param name="checkedDepo"></param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectDepartedAtIsNull(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepo)
+        {
+            string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
+            string formatEndOfPeriod = endOfPeriod.ToString("yyyy/MM/dd");
+            var sql = $@"
+                SELECT
+	                a.work_day
+	                ,a.depo_id
+	                ,b.null_count1
+	                ,c.null_count2
+                FROM 
+	                (SELECT 
+		                work_day
+		                ,depo_id
+	                FROM t_trip_records AS d
+	                INNER JOIN m_stations AS e
+	                ON d.station_id = e.station_id
+	                GROUP BY work_day, depo_id
+	                )AS a
+                LEFT OUTER JOIN
+	                (SELECT
+		                work_day
+		                ,depo_id
+		                ,COUNT(trip_record_id) AS null_count1
+	                FROM t_trip_records AS f
+	                INNER JOIN m_stations AS g
+	                ON f.station_id = g.station_id
+	                WHERE departed_at IS NULL
+	                AND f.trip_id IS NOT NULL
+	                GROUP BY work_day, depo_id
+	                ) AS b
+                ON a.work_day = b.work_day
+                AND a.depo_id = b.depo_id
+                LEFT OUTER JOIN
+	                (SELECT
+		                work_day
+		                ,depo_id
+		                ,COUNT(trip_record_id) AS null_count2
+	                FROM t_trip_records AS h
+	                INNER JOIN m_stations AS i
+	                ON h.station_id = i.station_id
+	                WHERE departed_at IS NULL
+	                AND h.trip_id IS NULL
+	                GROUP BY work_day, depo_id
+	                ) AS c
+                ON a.work_day = c.work_day
+                AND a.depo_id = c.depo_id
+                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
+            ";
+            sql += LoadRecordConnectController.SQLOfCheckedDepos(checkedDepo);
+            sql += $@"
+                ORDER BY work_day
+            ";
+            return sql;
+        }
     }
+
 }
