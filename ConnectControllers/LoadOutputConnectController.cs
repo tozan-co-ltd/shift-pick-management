@@ -250,8 +250,9 @@ namespace ai_truck_load_measurement.ConnectControllers
                 SELECT
 	                a.work_day
 	                ,a.depo_id
-	                ,b.null_count1
-	                ,c.null_count2
+                    ,Depos.name
+	                ,b.null_count
+	                ,c.no_identify_number_null_count
                 FROM 
 	                (SELECT 
 		                work_day
@@ -265,7 +266,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                (SELECT
 		                work_day
 		                ,depo_id
-		                ,COUNT(trip_record_id) AS null_count1
+		                ,COUNT(trip_record_id) AS null_count
 	                FROM t_trip_records AS f
 	                INNER JOIN m_stations AS g
 	                ON f.station_id = g.station_id
@@ -279,7 +280,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                (SELECT
 		                work_day
 		                ,depo_id
-		                ,COUNT(trip_record_id) AS null_count2
+		                ,COUNT(trip_record_id) AS no_identify_number_null_count
 	                FROM t_trip_records AS h
 	                INNER JOIN m_stations AS i
 	                ON h.station_id = i.station_id
@@ -289,11 +290,13 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                ) AS c
                 ON a.work_day = c.work_day
                 AND a.depo_id = c.depo_id
-                WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
+                INNER JOIN m_depos AS Depos
+                ON a.depo_id = Depos.depo_id
+                WHERE a.work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
             ";
             sql += LoadRecordConnectController.SQLOfCheckedDepos(checkedDepo);
             sql += $@"
-                ORDER BY work_day
+                ORDER BY a.work_day
             ";
             return sql;
         }
