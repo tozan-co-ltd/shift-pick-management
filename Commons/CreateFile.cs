@@ -365,7 +365,7 @@ namespace ai_truck_load_measurement.Commons
         /// <param name="folderName">フォルダ名</param>
         /// <param name="headerName">ヘッダー名</param>
         /// <returns>作成結果,出力フォルダフルパス</returns>
-        public static (bool, string) CheckCreateExcel(DataTable dtOne, DataTable dtTwo, string tmpFilename, bool sheetTwo, string sheetNameOne, string sheetNameTwo, string gamenName)
+        public static (bool, string) CheckCreateExcel(DataTable dtOne, DataTable dtTwo, string tmpFilename, bool sheetTwo, string sheetNameOne, string sheetNameTwo, string gamenName, List<string> checkedDepos)
         {
             try
             {
@@ -373,7 +373,7 @@ namespace ai_truck_load_measurement.Commons
                 var sheetName = tmpFilename.Replace(".xlsx", "");
 
                 // ヘッダーリストを作成
-                List<string> headerList = CreateHeaderList(gamenName);
+                List<string> headerList = CreateHeaderList(gamenName, checkedDepos);
                 List<string> headerListTwo = new();
                 if (sheetTwo)
                 {
@@ -663,7 +663,7 @@ namespace ai_truck_load_measurement.Commons
         /// </summary>
         /// <param name="headerName">ヘッダー名</param>
         /// <returns>ヘッダーリスト</returns>
-        public static List<string> CreateHeaderList(string gamenName)
+        public static List<string> CreateHeaderList(string gamenName, List<string> checkedDepos)
         {
             List<string> headerList = new();
             switch (gamenName)
@@ -720,6 +720,21 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("作成者");
                     headerList.Add("更新日時");
                     headerList.Add("更新者");
+                    break;
+                case "日次出発実績無データ":
+                    headerList.Add("稼働日");
+                    headerList.Add("出発実績無合計");
+                    foreach(var depoID in checkedDepos)
+                    {
+                        var depoName = "";
+                        if (depoID == "1")
+                            depoName = "SyncBace名和北";
+                        else if (depoID == "3")
+                            depoName = "船見デポ";
+                        headerList.Add(depoName + "-識別番号有");
+                        headerList.Add(depoName + "-識別番号無");
+                        headerList.Add(depoName + "-総稼働数");
+                    }
                     break;
                 default:
                     headerList.Add("便名称");

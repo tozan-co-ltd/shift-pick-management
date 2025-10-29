@@ -1444,3 +1444,26 @@ html {
     border-right: 3px solid #000;
     transform: translateY(20%) rotate(-45deg);
 }
+
+
+.departed-at-is-null-table thead th {
+    border-right: 1px solid #404040;
+}
+
+.departed-at-is-null-table tbody td:first-child {
+    border-left: 1px solid #404040;
+}
+
+.departed-at-is-null-table tbody td {
+    border-right: 1px solid #404040;
+}
+
+.departed-at-is-null-table.dataTable {
+    border-collapse: separate;
+}
+
+.trip-count-all{
+    /*font-weight: bold !important;
+    background-color: #cccccc !important;*/
+    color: gray;
+}
