@@ -736,6 +736,14 @@ namespace ai_truck_load_measurement.Commons
                         headerList.Add(depoName + "-総稼働数");
                     }
                     break;
+                case "月次紐づけ切れ調査":
+                    headerList.Add("識別番号");
+                    headerList.Add("到着実績");
+                    headerList.Add("想定される便");
+                    headerList.Add("直近の到着予定");
+                    headerList.Add("到着ズレ時間(分)");
+                    headerList.Add("想定される便枝番");
+                    break;
                 default:
                     headerList.Add("便名称");
                     headerList.Add("便枝番");

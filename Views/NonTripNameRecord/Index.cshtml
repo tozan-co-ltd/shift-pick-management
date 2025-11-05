@@ -1,5 +1,5 @@
 ﻿@using ai_truck_load_measurement.Commons;
-@model ai_truck_load_measurement.Models.NonDepartedAtRecordViewModel;
+@model ai_truck_load_measurement.Models.NonTripNameRecordViewModel;
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
@@ -85,11 +85,9 @@
 </div>
 <script type="text/javascript">
 
-    let userName = "";
-    // 画面ロード時
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
-        userName = model.userName;
+        console.log(model);
         var today = new Date();
         var oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -99,7 +97,34 @@
         depoCheckDisplay(model);
         tableDisplay();
     });
-    // 便実績テーブル表示
+    
+     // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        pushAllCheckBox();
+    });
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            pushDepoCheckBox();
+        });
+    });
+
+     // 検索ボタン押下時
+    function onSearchClick() {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            // ロード中表示
+            document.querySelector("#loading").style.display = "inline-block";
+            tableDisplay();
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+    // 実績テーブル表示
     function tableDisplay() {
 
         // 期間の開始、終了日付の取得
@@ -126,13 +151,13 @@
             data: data
         }).done(function (response) {
             console.log(response);
-            $("#departedAtIsNullTable").empty().html(response);
+            $("#tripRecordTable").empty().html(response);
             
             // 日本語表示
             const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
             const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
 
-            // ID(2列目)昇順
+           // ID(2列目)昇順
             $("#tripRecordDataTable").DataTable({
                 "language": {
                     "url": language_url,
@@ -173,30 +198,6 @@
             $("#edit-modal-error-message").text(errorMessage);
         });
     }
-     // 検索ボタン押下時
-    function onSearchClick() {
-        DeleteErrorMessages();
-        if (isWithin90Days()) {
-            // ロード中表示
-            document.querySelector("#loading").style.display = "inline-block";
-            tableDisplay();
-        }
-        else {
-            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
-            $("#div-error-message").text(errorMessage);
-        }
-    }
-     // 「すべて」チェックボックス押下時
-    $('input[id=allDepo]').change(function () {
-        pushAllCheckBox();
-    });
-
-    // 各デポチェックボックス押下時
-    $(function () {
-        $('input[name="depos"]').change(function () {
-            pushDepoCheckBox();
-        });
-    })
 
      // Excel出力
     async function onExportFileTrips(page, gamenName) {
@@ -213,7 +214,6 @@
             // フォーム情報取得
             let data = {
                 "gamenName": gamenName,
-                checkedDepos: checkedDepos,
                 startOfPeriod: startOfPeriod,
                 endOfPeriod: endOfPeriod,
                 checkedDepos: checkedDepos
