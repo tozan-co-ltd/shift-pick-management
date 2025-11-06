@@ -5,6 +5,7 @@ using ai_truck_load_measurement.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Data;
+using NPOI.SS.Formula.Functions;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -236,45 +237,43 @@ namespace ai_truck_load_measurement.Controllers
 
         }
 
+        /// <summary>
+        /// 実績リストをエクセル用のデータテーブルに変換する
+        /// </summary>
+        /// <param name="statuses"></param>
+        /// <param name="startOfPeriod"></param>
+        /// <param name="endOfPeriod"></param>
+        /// <param name="checkedDepos"></param>
+        /// <returns></returns>
         public DataTable ConvertedDataTableForExcel(List<DepartedAtIsNullStatusModel> statuses, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             DataTable convertTable = new DataTable();
-            convertTable.Columns.Add("workDay", typeof(string));
-            convertTable.Columns.Add("totalNullCount", typeof(int));
 
-            foreach(var depoID in checkedDepos)
-            {
-                convertTable.Columns.Add("nullCount" + depoID, typeof(string));
-                convertTable.Columns.Add("noIdentifyNumberNullCount" + depoID, typeof(string));
-                convertTable.Columns.Add("tripCount" + depoID, typeof(string));
-            }
+            // 列の設定
+            convertTable = SettingDataTableColumns(convertTable, checkedDepos);
 
+            // 選択した期間1日ごとに
             for (DateTime date = startOfPeriod; date <= endOfPeriod; date = date.AddDays(1))
             {
                 DataRow dataRow = convertTable.NewRow();
                 dataRow["workDay"] = date.ToString("yyyy/MM/dd");
                 var totalNullCount = 0;
 
-                var html = $@"
-                            <tr>
-                                <td>{date.ToString("yyyy/MM/dd")}</td>
-                    ";
-
+                // デポごとに
                 foreach (var depoID in checkedDepos)
                 {
+                    // 稼働日とデポIDが一致するデータを取得
                     var status = statuses.Find(x => x.WorkDay == date && x.DepoID.ToString() == depoID);
+
+                    // データが存在する場合
                     if (status != null)
                     {
-                        dataRow["nullCount" + depoID] = status.NullCount;
-                        dataRow["noIdentifyNumberNullCount" + depoID] = status.NoIdentifyNumberNullCount;
-                        dataRow["tripCount" + depoID] = status.TripCount;
+                        dataRow = SettingDataRowParameter(dataRow, depoID, status.NullCount, status.NoIdentifyNumberNullCount, status.TripCount);
                         totalNullCount += status.NullCount + status.NoIdentifyNumberNullCount;
                     }
                     else
                     {
-                        dataRow["nullCount" + depoID] = 0;
-                        dataRow["noIdentifyNumberNullCount" + depoID] = 0;
-                        dataRow["tripCount" + depoID] = 0;
+                        dataRow = SettingDataRowParameter(dataRow, depoID, 0, 0, 0);
                     }
                 }
 
@@ -282,6 +281,44 @@ namespace ai_truck_load_measurement.Controllers
                 convertTable.Rows.Add(dataRow);
             }
             return convertTable;
+        }
+
+        /// <summary>
+        /// datatableの列設定
+        /// </summary>
+        /// <param name="table">設定先datatable</param>
+        /// <param name="checkedDepos">選択したデポ</param>
+        /// <returns></returns>
+        private DataTable SettingDataTableColumns(DataTable table, List<string> checkedDepos)
+        {
+            table.Columns.Add("workDay", typeof(string));
+            table.Columns.Add("totalNullCount", typeof(int));
+
+            // デポごとに列追加
+            foreach (var depoID in checkedDepos)
+            {
+                table.Columns.Add("nullCount" + depoID, typeof(string));
+                table.Columns.Add("noIdentifyNumberNullCount" + depoID, typeof(string));
+                table.Columns.Add("tripCount" + depoID, typeof(string));
+            }
+            return table;
+        }
+
+        /// <summary>
+        /// datatableの行の設定
+        /// </summary>
+        /// <param name="dataRow">設定先のdatarow</param>
+        /// <param name="depoID">デポID</param>
+        /// <param name="nullCount">識別番号有、出発実績無のデータ数</param>
+        /// <param name="noIdentifyNumberNullCount">識別番号無、出発実績無のデータ数</param>
+        /// <param name="tripCount">便実績総数</param>
+        /// <returns></returns>
+        private DataRow SettingDataRowParameter(DataRow dataRow, string depoID, int nullCount, int noIdentifyNumberNullCount, int tripCount)
+        {
+            dataRow["nullCount" + depoID] = nullCount;
+            dataRow["noIdentifyNumberNullCount" + depoID] = noIdentifyNumberNullCount;
+            dataRow["tripCount" + depoID] = tripCount;
+            return dataRow;
         }
     }
 }
