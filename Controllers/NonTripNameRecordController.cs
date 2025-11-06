@@ -2,10 +2,13 @@
 using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
+using DocumentFormat.OpenXml.Vml.Spreadsheet;
 using JetBrains.Annotations;
+using MathNet.Numerics;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
+using NPOI.SS.Formula.Functions;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -22,9 +25,17 @@ namespace ai_truck_load_measurement.Controllers
             return View(model);
         }
 
-        public List<NonTripNameRecordModel> GetNonTripNameRecordModel(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        /// <summary>
+        /// 便名称無し、識別番号有のデータのリストを取得する
+        /// </summary>
+        /// <param name="startOfPeriod">期間の開始日</param>
+        /// <param name="endOfPeriod">期間の終了日</param>
+        /// <param name="checkedDepos">選択されたデポリスト</param>
+        /// <returns></returns>
+        public List<NonTripNameRecordModel> GetNonTripNameRecordList(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
-            var model = new List<NonTripNameRecordModel>();
+            var recordList = new List<NonTripNameRecordModel>();
+
             // 選択したデポの便リスト取得
             var tripSql = M_TripConnectController.CreateSQLToSelectMTrips(false, checkedDepos);
             var trips = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(tripSql);
@@ -37,46 +48,114 @@ namespace ai_truck_load_measurement.Controllers
             var identifyNumberSql = NonTripNameRecordConnectController.CreateSQLToSelectNonTripNameIdentifyNumbers(startOfPeriod, endOfPeriod, checkedDepos);
             var identifyNumbers = ConnectToSQLServer.ExecuteQueryToList<string>(identifyNumberSql);
 
+            // 識別番号ごとに
             foreach (var identifyNumber in identifyNumbers)
             {
+                // 識別番号に対応する実績リスト取得
                 var sameIdentifyNumberRecords = records.FindAll(x => x.IdentifyNumber == identifyNumber);
+
+                // 実績リストが空の場合
                 if(sameIdentifyNumberRecords == null)
                     continue;
+
+                // 識別番号に対応する便情報取得
                 var trip = trips.Find(x =>  x.IdentifyNumber == identifyNumber);
-                if(trip != null)
-                {
-                    var tripBranchNumberSql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(trip.TripID, false);
-                    var tripBranchNumbers = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberModel>(tripBranchNumberSql);
-                    tripBranchNumbers = M_TripBranchNumberController.AddTripBranchSeq(tripBranchNumbers);
-                    foreach (var record in sameIdentifyNumberRecords)
-                    {
-                        var comparisonTime = new DateTime(1900, 1, 1, record.ArrivedAt.Hour, record.ArrivedAt.Minute, record.ArrivedAt.Second);
-                        // 一番到着予定が近い便枝番取得
-                        var nearestBranchNumber = tripBranchNumbers.OrderBy(x => Math.Abs((x.ArrivalScheduledTime - comparisonTime).TotalSeconds)).First();
-                        // 到着予定と実績の差を取得
-                        var defferentTime = (int)(comparisonTime - nearestBranchNumber.ArrivalScheduledTime).TotalMinutes;
-                        // 各パラメータ設定
-                        record.GuessTripName = trip.TripName;
-                        record.NearestArrivaLScheduledTime = nearestBranchNumber.ArrivalScheduledTime.ToString("HH:mm");
-                        record.GuessTripBranchNumber = nearestBranchNumber.TripBranchSeq.ToString();
-                        record.ArrivalTimeDefference = defferentTime.ToString();
-                        model.Add(record);
-                    }
-                }
-                else
-                {
-                    foreach (var record in sameIdentifyNumberRecords)
-                    {
-                        record.GuessTripName = "なし";
-                        record.NearestArrivaLScheduledTime = "なし";
-                        record.GuessTripBranchNumber = "なし";
-                        record.ArrivalTimeDefference = "なし";
-                        model.Add(record);
-                    }
-                }
+
+                // 識別番号が同じ実績の便情報、便枝番情報を登録
+                recordList = AddSameIdentifyNumberRecords(recordList, sameIdentifyNumberRecords, trip);
 
             }
-            return model;
+            return recordList;
+        }
+
+        /// <summary>
+        /// 識別番号が同じ実績の便情報、便枝番情報を登録
+        /// </summary>
+        /// <param name="recordList">全実績リスト</param>
+        /// <param name="sameIdentifyNumberRecords">識別番号が同じ実績のリスト</param>
+        /// <param name="trip">便情報</param>
+        /// <returns></returns>
+        private List<NonTripNameRecordModel> AddSameIdentifyNumberRecords(List<NonTripNameRecordModel> recordList, List<NonTripNameRecordModel> sameIdentifyNumberRecords, M_TripModel trip)
+        {
+            // 識別番号に対応する便情報が存在した場合
+            if (trip != null)
+            {
+                // 便枝番リスト取得
+                var tripBranchNumberSql = M_TripBranchNumberConnectController.CreateSQLToSelectMTripBranchNumbers(trip.TripID, false);
+                var tripBranchNumbers = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberModel>(tripBranchNumberSql);
+                tripBranchNumbers = M_TripBranchNumberController.AddTripBranchSeq(tripBranchNumbers);
+
+                foreach (var record in sameIdentifyNumberRecords)
+                {
+                    // 直近の便枝番情報取得
+                    var addRecord = GetNearestTripBranchNumber(record, tripBranchNumbers, trip.TripName!);
+                    recordList.Add(addRecord);
+                }
+            }
+            // 識別番号に対応する便情報が存在しない場合
+            else
+            {
+                foreach (var record in sameIdentifyNumberRecords)
+                {
+                    var addRecord = SettingRecordParameter(record, "なし", "なし", "なし", "なし");
+                    recordList.Add(addRecord);
+                }
+            }
+            return recordList;
+        }
+
+        /// <summary>
+        /// 一番到着予定が近い便枝番の取得、パラメータ設定
+        /// </summary>
+        /// <param name="record">取得元の実績</param>
+        /// <param name="tripBranchNumbers">取得元の便の便枝番リスト</param>
+        /// <param name="tripName">取得元の便名称</param>
+        /// <returns></returns>
+        private NonTripNameRecordModel GetNearestTripBranchNumber(NonTripNameRecordModel record, List<M_TripBranchNumberModel> tripBranchNumbers, string tripName)
+        {
+            var comparisonTime = new DateTime(1900, 1, 1, record.ArrivedAt.Hour, record.ArrivedAt.Minute, record.ArrivedAt.Second);
+            // 日付をまたがない場合に一番到着予定が近い便枝番取得
+            var nearestBranchNumberToday = tripBranchNumbers.OrderBy(x => Math.Abs((x.ArrivalScheduledTime - comparisonTime).TotalSeconds)).First();
+            // 日付をまたいだ場合に一番到着予定が近い便枝番取得
+            var nearestBranchNumberNextDay = tripBranchNumbers.OrderBy(x => Math.Abs((x.ArrivalScheduledTime.AddDays(1) - comparisonTime).TotalSeconds)).First();
+
+            // 一番到着予定が近い便枝番と到着予定時刻を取得
+            var nearestBranchNumber = new M_TripBranchNumberModel();
+            var arrivalScheduledTime = new DateTime();
+            if (Math.Abs((nearestBranchNumberToday.ArrivalScheduledTime - comparisonTime).TotalSeconds) < Math.Abs((nearestBranchNumberNextDay.ArrivalScheduledTime.AddDays(1) - comparisonTime).TotalSeconds))
+            {
+                nearestBranchNumber = nearestBranchNumberToday;
+                arrivalScheduledTime = nearestBranchNumber.ArrivalScheduledTime;
+            }
+            else
+            {
+                nearestBranchNumber = nearestBranchNumberNextDay;
+                arrivalScheduledTime = nearestBranchNumber.ArrivalScheduledTime.AddDays(1);
+            }
+
+            // 各パラメータ設定
+            record = SettingRecordParameter(record, tripName, nearestBranchNumber.ArrivalScheduledTime.ToString("HH:mm"), 
+                nearestBranchNumber.TripBranchSeq.ToString(), ((int)(comparisonTime - arrivalScheduledTime).TotalMinutes).ToString());
+ 
+            return record;
+        }
+
+        /// <summary>
+        /// 便名称無し、識別番号有のデータのパラメータ登録
+        /// </summary>
+        /// <param name="record">設定したい実績</param>
+        /// <param name="tripName">便名称</param>
+        /// <param name="arrivalScheduledTime">到着予定時間</param>
+        /// <param name="tripBranchNumber">便枝番</param>
+        /// <param name="arrivalTimeDefference">到着予定との予実差</param>
+        /// <returns></returns>
+        private NonTripNameRecordModel SettingRecordParameter(NonTripNameRecordModel record, string tripName, string arrivalScheduledTime, string tripBranchNumber, string arrivalTimeDefference)
+        {
+            record.GuessTripName = tripName;
+            record.NearestArrivaLScheduledTime =arrivalScheduledTime;
+            record.GuessTripBranchNumber = tripBranchNumber;
+            record.ArrivalTimeDefference = arrivalTimeDefference;
+            return record;
         }
 
         /// <summary>
@@ -92,7 +171,7 @@ namespace ai_truck_load_measurement.Controllers
             {
                 if (checkedDepos.Count > 0)
                 {
-                    nonTripNameRecordList = GetNonTripNameRecordModel(startOfPeriod, endOfPeriod, checkedDepos);
+                    nonTripNameRecordList = GetNonTripNameRecordList(startOfPeriod, endOfPeriod, checkedDepos);
                 }
 
                 // テーブルのヘッダ部分
@@ -103,10 +182,10 @@ namespace ai_truck_load_measurement.Controllers
                                 <tr align=""center"">
                                     <th class=""font-weight-bold"">識別番号</th>
                                     <th class=""font-weight-bold"">到着実績</th>
-                                    <th class=""font-weight-bold"">想定される便</th>
-                                    <th class=""font-weight-bold"">直近の到着予定</th>
-                                    <th class=""font-weight-bold"">到着ズレ時間(分)</th>
+                                    <th class=""font-weight-bold"">便名称</th>
                                     <th class=""font-weight-bold"">想定される便枝番</th>
+                                    <th class=""font-weight-bold"">便枝番の到着予定</th>
+                                    <th class=""font-weight-bold"">到着ズレ時間(分)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -121,9 +200,9 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{nonTripNameRecord.IdentifyNumber}</td>
                                 <td>{nonTripNameRecord.ArrivedAt.ToString("yyyy/MM/dd HH:mm")}</td>
                                 <td>{nonTripNameRecord.GuessTripName}</td>
+                                <td>{nonTripNameRecord.GuessTripBranchNumber}</td>
                                 <td>{nonTripNameRecord.NearestArrivaLScheduledTime}</td>
                                 <td>{nonTripNameRecord.ArrivalTimeDefference}</td>
-                                <td>{nonTripNameRecord.GuessTripBranchNumber}</td>
                             </tr>
                     ";
                     }
@@ -175,7 +254,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 if (checkedDepos.Count > 0)
                 {
-                    nonTripNameRecordList = GetNonTripNameRecordModel(startOfPeriod, endOfPeriod, checkedDepos);
+                    nonTripNameRecordList = GetNonTripNameRecordList(startOfPeriod, endOfPeriod, checkedDepos);
                 }
 
                 var nonTripNameRecordDT = ToDataTable<NonTripNameRecordModel>(nonTripNameRecordList);
@@ -251,8 +330,7 @@ namespace ai_truck_load_measurement.Controllers
             var table = new DataTable();
 
             typeof(T).GetProperties().ToList().ForEach(
-                p => table.Columns.Add(p.Name,
-                                       Nullable.GetUnderlyingType(p.PropertyType) ?? p.PropertyType)
+                p => table.Columns.Add(p.Name, typeof(string))
                 );
 
             foreach (var item in list)
