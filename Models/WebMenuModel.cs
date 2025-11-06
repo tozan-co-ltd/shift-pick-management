@@ -28,7 +28,7 @@ namespace ai_truck_load_measurement.Models
             new M_WebMenu{CategoryID = 4, MenuID = 5, MenuName = "通知マスター", Controller = "M_Notification", Action = "Index"},
             new M_WebMenu{CategoryID = 5, MenuID = 1, MenuName = "日次出発実績無データ", Controller = "NonDepartedAtRecord", Action = "Index"},
             new M_WebMenu{CategoryID = 5, MenuID = 2, MenuName = "紐づけ切れ実績 識別番号有", Controller = "NonTripNameRecord", Action = "Index"},
-            new M_WebMenu{CategoryID = 5, MenuID = 3, MenuName = "識別番号無実績", Controller = "NonIdentifyNumberRecord", Action = "Index"},
+            new M_WebMenu{CategoryID = 5, MenuID = 3, MenuName = "紐づけ切れ実績 識別番号無", Controller = "NonIdentifyNumberRecord", Action = "Index"},
         };
 
         /// <summary>

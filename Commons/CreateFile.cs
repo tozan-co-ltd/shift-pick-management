@@ -744,6 +744,15 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("到着ズレ時間(分)");
                     headerList.Add("想定される便枝番");
                     break;
+                case "紐づけ切れ実績 識別番号無":
+                    headerList.Add("便実績ID");
+                    headerList.Add("到着実績");
+                    headerList.Add("出発実績");
+                    headerList.Add("稼働日");
+                    headerList.Add("ステーション名");
+                    headerList.Add("到着荷量画像パス");
+                    headerList.Add("出発荷量画像パス");
+                    break;
                 default:
                     headerList.Add("便名称");
                     headerList.Add("便枝番");

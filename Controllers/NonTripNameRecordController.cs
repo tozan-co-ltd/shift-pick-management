@@ -204,7 +204,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{nonTripNameRecord.NearestArrivaLScheduledTime}</td>
                                 <td>{nonTripNameRecord.ArrivalTimeDefference}</td>
                             </tr>
-                    ";
+                        ";
                     }
                 }
                 searchData += $@"
