@@ -736,7 +736,7 @@ namespace ai_truck_load_measurement.Commons
                         headerList.Add(depoName + "-総稼働数");
                     }
                     break;
-                case "月次紐づけ切れ調査":
+                case "紐づけ切れ実績 識別番号有":
                     headerList.Add("識別番号");
                     headerList.Add("到着実績");
                     headerList.Add("想定される便");

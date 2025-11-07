@@ -226,7 +226,6 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="download"></param>
         /// <param name="startOfPeriod">期間開始日</param>
         /// <param name="endOfPeriod">期間終了日</param>
-        /// <param name="isOnlyHasAmountDefference">荷量の相違ありのみのデータか</param>
         /// <returns></returns>
         public JsonResult ZipDownload(string download, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
