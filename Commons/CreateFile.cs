@@ -753,6 +753,13 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("到着荷量画像パス");
                     headerList.Add("出発荷量画像パス");
                     break;
+                case "紐づけ切れ回数":
+                    headerList.Add("便ID");
+                    headerList.Add("便名称");
+                    headerList.Add("紐づけ切れ回数");
+                    headerList.Add("実績総数");
+                    headerList.Add("デポ名");
+                    break;
                 default:
                     headerList.Add("便名称");
                     headerList.Add("便枝番");

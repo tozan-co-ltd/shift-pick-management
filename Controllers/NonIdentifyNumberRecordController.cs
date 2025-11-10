@@ -78,11 +78,17 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     foreach (var record in records)
                     {
+                        var arrivedAt = record.ArrivedAt.ToString("yyyy/MM/dd HH:mm");
+                        if (arrivedAt == "0001/01/01 00:00")
+                            arrivedAt = "-";
+                        var departedAt = record.DepartedAt.ToString("yyyy/MM/dd HH:mm");
+                        if (departedAt == "0001/01/01 00:00")
+                            departedAt = "-";
                         searchData += $@"
                             <tr>
                                 <td>{record.TripRecordID}</td>
-                                <td>{record.ArrivedAt.ToString("yyyy/MM/dd HH:mm")}</td>
-                                <td>{record.DepartedAt}</td>
+                                <td>{arrivedAt}</td>
+                                <td>{departedAt}</td>
                                 <td>{record.WorkDay.ToString("yyyy/MM/dd")}</td>
                                 <td>{record.StationName}</td>
                                 <td>

@@ -16,7 +16,6 @@
                 <div class="card border-left-custom">
                     <div class="card-body">
                         <ul class="mb-0">
-                            <li>最長90日の期間が検索できます。</li>
                             <li>便枝番とは、便が各拠点へ訪問した回数を示すために昼勤開始時間から順に割り当てた番号です。</li>
                         </ul>
                     </div>
@@ -110,15 +109,9 @@
      // 検索ボタン押下時
     function onSearchClick() {
         DeleteErrorMessages();
-        if (isWithin90Days()) {
-            // ロード中表示
-            document.querySelector("#loading").style.display = "inline-block";
-            tableDisplay();
-        }
-        else {
-            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
-            $("#div-error-message").text(errorMessage);
-        }
+        // ロード中表示
+        document.querySelector("#loading").style.display = "inline-block";
+        tableDisplay();
     }
 
     // 実績テーブル表示
