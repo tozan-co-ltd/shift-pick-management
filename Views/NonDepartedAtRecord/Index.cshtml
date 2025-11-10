@@ -16,7 +16,6 @@
                 <div class="card border-left-custom">
                     <div class="card-body">
                         <ul class="mb-0">
-                            <li>最長90日の期間が検索できます。</li>
                             <li>期間内の出発実績が登録されていないデータの件数を表示します。</li>
                         </ul>
                     </div>
@@ -44,7 +43,7 @@
 
         <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
             <div class="d-flex justify-content-start align-items-center unset-pdl">
-                <span class="warehouse-name-drs span-paragraph">稼働日</span>
+                <span class="warehouse-name-drs span-paragraph">期間</span>
                 <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
                 <label class="m-1">～</label>
                 <input type="text" id="endOfPeriod" class="form-control pickerDate endDate mr-3">
@@ -143,16 +142,11 @@
                 scrollX: true,          // 横スクロール可
                 scrollCollapse: true,   // 縦スクロール表示
                 searchHighlight: true,  // 検索ハイライト
-                // orderFixed: [18, "asc"],
-                // order: [[0, "asc"] , [16, "asc"], [1, "asc"]],    // ID昇順
                 "oLanguage": {
                     "sSearch": ""
                 },
                 dom: dom_structure,
-                // "columnDefs": [
-                //     { className:"dt-body-left", "targets": [2] },
-                //     { className: "dt-body-left", "targets": [0], },
-                // ],
+                pageLength: 100,
                 fixedColumns: {
                     leftColumns: 3,
                 },
@@ -176,15 +170,9 @@
      // 検索ボタン押下時
     function onSearchClick() {
         DeleteErrorMessages();
-        if (isWithin90Days()) {
-            // ロード中表示
-            document.querySelector("#loading").style.display = "inline-block";
-            tableDisplay();
-        }
-        else {
-            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
-            $("#div-error-message").text(errorMessage);
-        }
+        // ロード中表示
+        document.querySelector("#loading").style.display = "inline-block";
+        tableDisplay();
     }
      // 「すべて」チェックボックス押下時
     $('input[id=allDepo]').change(function () {
@@ -201,30 +189,24 @@
      // Excel出力
     async function onExportFileTrips(page, gamenName) {
         DeleteErrorMessages();
-        if (isWithin90Days()) {
 
-            // 期間の開始、終了日付の取得
-            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
-            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
-            // デポ情報取得
-            var checkedDepos = getCheckedDepos();
+        // デポ情報取得
+        var checkedDepos = getCheckedDepos();
 
-            // フォーム情報取得
-            let data = {
-                "gamenName": gamenName,
-                checkedDepos: checkedDepos,
-                startOfPeriod: startOfPeriod,
-                endOfPeriod: endOfPeriod,
-                checkedDepos: checkedDepos
-            };
+        // フォーム情報取得
+        let data = {
+            "gamenName": gamenName,
+            checkedDepos: checkedDepos,
+            startOfPeriod: startOfPeriod,
+            endOfPeriod: endOfPeriod,
+            checkedDepos: checkedDepos
+        };
 
-            // Excel出力共通処理
-            onExportFileTripsCommon(page, data);
-        }
-        else {
-            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
-            $("#div-error-message").text(errorMessage);
-        }
+        // Excel出力共通処理
+        onExportFileTripsCommon(page, data);
     }
 </script>
