@@ -153,9 +153,14 @@ namespace ai_truck_load_measurement.Controllers
                 arrivalScheduledTime = nearestBranchNumber.ArrivalScheduledTime.AddDays(1);
             }
 
+            var arrivalTimeDeff = ((int)(comparisonTime - arrivalScheduledTime).TotalMinutes).ToString();
+            if ((comparisonTime - arrivalScheduledTime).TotalMinutes > 0)
+                arrivalTimeDeff = "+" + arrivalTimeDeff;
+
+
             // 各パラメータ設定
             record = SettingRecordParameter(record, tripName, nearestBranchNumber.ArrivalScheduledTime.ToString("HH:mm"), 
-                nearestBranchNumber.TripBranchSeq.ToString(), ((int)(comparisonTime - arrivalScheduledTime).TotalMinutes).ToString());
+                nearestBranchNumber.TripBranchSeq.ToString(), arrivalTimeDeff);
  
             return record;
         }
@@ -218,6 +223,9 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     foreach (var nonTripNameRecord in nonTripNameRecordList)
                     {
+                        var remark = nonTripNameRecord.Remark;
+                        if (string.IsNullOrEmpty(remark))
+                            remark = "-";
                         searchData += $@"
                             <tr>
                                 <td hidden>{nonTripNameRecord.TripRecordID}</td>
@@ -227,7 +235,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{nonTripNameRecord.GuessTripBranchNumber}</td>
                                 <td>{nonTripNameRecord.NearestArrivaLScheduledTime}</td>
                                 <td>{nonTripNameRecord.ArrivalTimeDefference}</td>
-                                <td>{nonTripNameRecord.Remark}</td>
+                                <td>{remark}</td>
                                 <td>
                                     <a class=""btn btn-success btn-icon-split ml-1 mr-1""
                                         onclick=""OnArrivalNonTripNameLoadImageClick('{nonTripNameRecord.TripRecordID}', this, 'NonTripNameRecord')"" data-id=""{nonTripNameRecord.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">

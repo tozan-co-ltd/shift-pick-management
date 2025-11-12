@@ -123,7 +123,8 @@
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
         addDepos(model);
-        depoCheckDisplay(model);
+        $('input[id=allDepo]')[0].checked = true;
+        pushAllCheckBox();
         tableDisplay();
     });
 
@@ -198,6 +199,9 @@
                 fixedColumns: {
                     leftColumns: 3,
                 },
+                "columnDefs": [
+                    { className:"dt-body-left", "targets": [5] },
+                ],
                 pageLength: 100,
             });
             var table = $("#tripRecordDataTable").DataTable();

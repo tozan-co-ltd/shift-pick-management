@@ -67,6 +67,7 @@ namespace ai_truck_load_measurement.Controllers
                                     <th class=""font-weight-bold"">出発実績</th>
                                     <th class=""font-weight-bold"">稼働日</th>
                                     <th class=""font-weight-bold"">ステーション名</th>
+                                    <th class=""font-weight-bold"">紐づけ切れ理由</th>
                                     <th class=""font-weight-bold"">到着荷量画像</th>
                                     <th class=""font-weight-bold"">出発荷量画像</th>
                                 </tr>
@@ -84,6 +85,9 @@ namespace ai_truck_load_measurement.Controllers
                         var departedAt = record.DepartedAt.ToString("yyyy/MM/dd HH:mm");
                         if (departedAt == "0001/01/01 00:00")
                             departedAt = "-";
+                        var remark = record.Remark;
+                        if (string.IsNullOrEmpty(remark))
+                            remark = "-";
                         searchData += $@"
                             <tr>
                                 <td>{record.TripRecordID}</td>
@@ -91,6 +95,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{departedAt}</td>
                                 <td>{record.WorkDay.ToString("yyyy/MM/dd")}</td>
                                 <td>{record.StationName}</td>
+                                <td>{remark}</td>
                                 <td>
                                     <a class=""btn btn-success btn-icon-split ml-1 mr-1""
                                         onclick=""OnArrivalNonIdentifyNumberLoadImageClick('{record.TripRecordID}', this, 'NonIdentifyNumberRecord')"" data-id=""{record.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">

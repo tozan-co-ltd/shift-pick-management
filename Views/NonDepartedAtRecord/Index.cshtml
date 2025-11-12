@@ -95,7 +95,8 @@
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
         addDepos(model);
-        depoCheckDisplay(model);
+        $('input[id=allDepo]')[0].checked = true;
+        pushAllCheckBox();
         tableDisplay();
     });
     // 便実績テーブル表示

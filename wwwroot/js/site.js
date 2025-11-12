@@ -480,6 +480,7 @@ function EditModal(tripRecordID, isArrived, page) {
                         + "<option value=\"予定時間超過(遅)\">予定時間超過(遅)</option>"
                         + "<option value=\"識別番号読取ミス\">識別番号読取ミス</option>"
                         + "<option value=\"マスター未登録\">マスター未登録</option>"
+                        + "<option value=\"識別番号なし\">識別番号なし</option>"
                         + "<option value=\"枠外駐車\">枠外駐車</option>"
                         + "<option value=\"トラック未確認\">トラック未確認</option>"
                         + "<option value=\"その他\">その他</option>"
@@ -1038,6 +1039,14 @@ function depoCheckDisplay(model) {
         if (depos[i].id == "depo" + mainDepoID) {
             depos[i].checked = true;
         }
+    }
+}
+
+// 画面表示時に全てのデポにチェックを入れる
+function allDepoCheckDisplay(model) {
+    var depos = $('input[name=depos]');
+    for (var i = 0; i < depos.length; i++) {
+        depos[i].checked = true;
     }
 }
 
