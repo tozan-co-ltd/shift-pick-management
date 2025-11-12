@@ -6,9 +6,11 @@ using DocumentFormat.OpenXml.Vml.Spreadsheet;
 using JetBrains.Annotations;
 using MathNet.Numerics;
 using Microsoft.AspNetCore.Mvc;
+using NPOI.HSSF.Record;
 using NPOI.SS.Formula.Functions;
 using System.Data;
 using System.Data.SqlClient;
+using X.PagedList;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -22,7 +24,25 @@ namespace ai_truck_load_measurement.Controllers
             model.UserName = user.UserName;
             model.MainDepoID = user.MainDepoID;
             model.MainDepoName = user.MainDepoName;
-            return View(model);
+
+            try
+            {
+                // 便実績情報取得SQL作成
+                var sql = LoadRecordConnectController.CreatSQLToSelectTripRecord();
+                // DB接続
+                IEnumerable<LoadRecordModel> tripRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql);
+                // テーブル情報を変換
+                tripRecordList = LoadRecordController.ConversionForTable(tripRecordList);
+
+                model.TripRecordList = tripRecordList.ToPagedList();
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return View(model);
+            }
         }
 
         /// <summary>
@@ -180,6 +200,7 @@ namespace ai_truck_load_measurement.Controllers
                         <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
                             <thead>
                                 <tr align=""center"">
+                                    <th hidden>便実績ID</th>
                                     <th class=""font-weight-bold"">識別番号</th>
                                     <th class=""font-weight-bold"">到着実績</th>
                                     <th class=""font-weight-bold"">便名称</th>
@@ -199,16 +220,17 @@ namespace ai_truck_load_measurement.Controllers
                     {
                         searchData += $@"
                             <tr>
+                                <td hidden>{nonTripNameRecord.TripRecordID}</td>
                                 <td>{nonTripNameRecord.IdentifyNumber}</td>
                                 <td>{nonTripNameRecord.ArrivedAt.ToString("yyyy/MM/dd HH:mm")}</td>
                                 <td>{nonTripNameRecord.GuessTripName}</td>
                                 <td>{nonTripNameRecord.GuessTripBranchNumber}</td>
                                 <td>{nonTripNameRecord.NearestArrivaLScheduledTime}</td>
                                 <td>{nonTripNameRecord.ArrivalTimeDefference}</td>
-                                <td>a{nonTripNameRecord.Remarks}</td>
+                                <td>{nonTripNameRecord.Remark}</td>
                                 <td>
                                     <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                        onclick=""OnArrivalNonIdentifyNumberLoadImageClick('{nonTripNameRecord.TripRecordID}', this, 'NonIdentifyNumberRecord')"" data-id=""{nonTripNameRecord.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                        onclick=""OnArrivalNonTripNameLoadImageClick('{nonTripNameRecord.TripRecordID}', this, 'NonTripNameRecord')"" data-id=""{nonTripNameRecord.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
                                         <i class=""fa-solid fa-truck""></i>
                                     </a>
                                 </td>
@@ -222,7 +244,11 @@ namespace ai_truck_load_measurement.Controllers
                     </div>
                 ";
 
-                return Json(searchData);
+                return Json(new SearchedTripRecordListModel
+                {
+                    searchedTripRecordHTML = searchData,
+                    searchedTripRecordLength = nonTripNameRecordList.Count()
+                });
             }
             catch (SqlException)
             {

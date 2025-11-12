@@ -476,15 +476,15 @@ function EditModal(tripRecordID, isArrived, page) {
                         + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">"
                         + "<select name=\"loadRemarkSelect\"  class=\"form-select mr-2\" id=\"loadRemarkSelect\" >"
                         + "<option value=\"\" hidden></option>"
-                        + "<option value=\"1\">予定時間超過(早)</option>"
-                        + "<option value=\"3\">予定時間超過(遅)</option>"
-                        + "<option value=\"4\">ID読取ミス</option>"
-                        + "<option value=\"5\">マスター未登録</option>"
-                        + "<option value=\"6\">枠外駐車</option>"
-                        + "<option value=\"7\">トラック未確認</option>"
-                        + "<option value=\"8\">その他</option>"
+                        + "<option value=\"予定時間超過(早)\">予定時間超過(早)</option>"
+                        + "<option value=\"予定時間超過(遅)\">予定時間超過(遅)</option>"
+                        + "<option value=\"識別番号読取ミス\">識別番号読取ミス</option>"
+                        + "<option value=\"マスター未登録\">マスター未登録</option>"
+                        + "<option value=\"枠外駐車\">枠外駐車</option>"
+                        + "<option value=\"トラック未確認\">トラック未確認</option>"
+                        + "<option value=\"その他\">その他</option>"
                         + "</select>"
-                        + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "', '" + page + "')\" id=\"verificationRequired\">"
+                        + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onRemarkRequiredClick('" + item.tripRecordID + "', '" + page + "')\" id=\"remarkRequired\">"
                         + "<span class=\"text\">登録</span>"
                         + "</a>";
                 } else {
@@ -578,6 +578,35 @@ function onVerificationRequiredClick(tripRecordID, isArrived, page) {
         });
     }
 }
+
+// 紐づけ切れ理由登録ボタン押下時
+function onRemarkRequiredClick(tripRecordID, page) {
+    event.preventDefault();
+    var remark = $('[name=loadRemarkSelect]').val();
+    if (remark != "") {
+
+        DeleteErrorMessages()
+        // フォーム情報取得
+        let url = window.location.href + '/UpdateRemark';
+        url = url.replace(page, 'LoadRecord');
+        let method = 'POST';
+        let data = { tripRecordID: tripRecordID, remark: remark };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            // 完了モーダル表示
+            alert('登録が完了しました。');
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#edit-modal-error-message").text(errorMessage);
+        });
+    }
+}
+
 //---------------------------------------------------------------------//
 
 

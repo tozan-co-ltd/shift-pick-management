@@ -299,6 +299,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <th class=""font-weight-bold"">到着<br>予定</th>
                                 <th class=""font-weight-bold"">出発<br>予定</th>
                                 <th class=""font-weight-bold"">稼働日</th>
+                                <th class=""font-weight-bold"">紐づけ切れ理由</th>
                                 <th hidden>便実績ID</th>
                                 <th hidden>便名称有無</th>
                             </tr>
@@ -349,6 +350,7 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{arrivalScheduledTime}</td>
                             <td>{departureScheduledTime}</td>
                             <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
+                            <td>-</td>
                             <td hidden>{item.TripRecordID}</td>
                             <td hidden>{hasTripName}</td>
                         </tr>
@@ -432,6 +434,56 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
+
+        /// <summary>
+        /// 荷量の相違ありテーブルの設定値を保存する
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="loadStatus">荷量クラス</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        public IActionResult UpdateRemark(int tripRecordID, string remark)
+        {
+            string? errorMessage;
+            NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                // 初期値でクリックした場合は何も起こらない
+                if (string.IsNullOrEmpty(remark))
+                {
+                    return NotFound();
+                }
+
+                // 更新
+                var sql = LoadRecordConnectController.CreateSQLToUpdateRemark(tripRecordID,remark);
+               
+
+                ConnectToSQLServer.ExecuteQuery(sql);
+
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+            catch (Exception ex)
+            {
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+        }
 
         /// <summary>
         /// 指定した期間内に存在する便名称のリストを取得してセレクトリストアイテム化する

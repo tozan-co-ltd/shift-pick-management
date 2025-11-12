@@ -224,7 +224,6 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
-       
         /// <summary>
         /// 荷量の相違ありテーブルの到着出発クラスに保存する値
         /// </summary>
@@ -242,6 +241,27 @@ namespace ai_truck_load_measurement.ConnectControllers
                 arrivalOrDeparture = "departure";
             }
             return arrivalOrDeparture;
+        }
+
+        /// <summary>
+        /// 荷量の相違ありデータ更新SQL
+        /// </summary>
+        /// <param name="tripRecordID">便実績ID</param>
+        /// <param name="loadStatus">荷量クラス</param>
+        /// <param name="updatedBy">更新者</param>
+        /// <param name="updatedAt">更新日時</param>
+        /// <param name="isArrived">到着か否か</param>
+        /// <returns></returns>
+        public static string CreateSQLToUpdateRemark(int tripRecordID,  string remark)
+        {
+            var sql = $@"
+                UPDATE t_trip_records
+                SET
+                    remark = '{remark}'
+                WHERE
+                    trip_record_id = '{tripRecordID}'
+            ";
+            return sql;
         }
 
         /// <summary>
