@@ -97,7 +97,7 @@ namespace ai_truck_load_measurement.Controllers
             {
                 foreach (var record in sameIdentifyNumberRecords)
                 {
-                    var addRecord = SettingRecordParameter(record, "なし", "なし", "なし", "なし");
+                    var addRecord = SettingRecordParameter(record, "なし", "-", "なし", "-");
                     recordList.Add(addRecord);
                 }
             }
@@ -186,6 +186,8 @@ namespace ai_truck_load_measurement.Controllers
                                     <th class=""font-weight-bold"">想定される便枝番</th>
                                     <th class=""font-weight-bold"">便枝番の到着予定</th>
                                     <th class=""font-weight-bold"">到着ズレ時間(分)</th>
+                                    <th class=""font-weight-bold"">紐づけ切れ理由</th>
+                                    <th class=""font-weight-bold"">到着荷量画像</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -203,6 +205,13 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{nonTripNameRecord.GuessTripBranchNumber}</td>
                                 <td>{nonTripNameRecord.NearestArrivaLScheduledTime}</td>
                                 <td>{nonTripNameRecord.ArrivalTimeDefference}</td>
+                                <td>a{nonTripNameRecord.Remarks}</td>
+                                <td>
+                                    <a class=""btn btn-success btn-icon-split ml-1 mr-1""
+                                        onclick=""OnArrivalNonIdentifyNumberLoadImageClick('{nonTripNameRecord.TripRecordID}', this, 'NonIdentifyNumberRecord')"" data-id=""{nonTripNameRecord.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
+                                        <i class=""fa-solid fa-truck""></i>
+                                    </a>
+                                </td>
                             </tr>
                         ";
                     }

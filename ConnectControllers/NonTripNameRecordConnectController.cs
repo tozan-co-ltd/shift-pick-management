@@ -7,10 +7,12 @@ namespace ai_truck_load_measurement.ConnectControllers
         public static string CreateSQLToSelectNonTripNameRecords(DateTime startOfPeriod , DateTime endOfPeriod, List<string> checkedDepos)
         {
             var sql = $@"
-                SELECT TripRecords.identify_number
+                SELECT TripRecords.trip_record_id
+                      ,TripRecords.identify_number
                       ,TripRecords.work_day
                       ,TripRecords.arrived_at
                       ,TripRecords.is_deleted
+                      ,TripRecords.remarks
                 FROM t_trip_records AS TripRecords
                INNER JOIN
 	                m_stations AS Depos

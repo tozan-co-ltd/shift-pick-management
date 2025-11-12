@@ -72,6 +72,8 @@ namespace ai_truck_load_measurement.Models
         public string? DepoName { get; set; }
         // タグ
         public string? Tag {  get; set; }
+        // 備考
+        public string? Remarks { get; set; }
 
         // 便実績リスト
         public IPagedList<LoadRecordModel>? TripRecordList { get; set; }

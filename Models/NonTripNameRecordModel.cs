@@ -2,12 +2,14 @@
 {
     public class NonTripNameRecordModel : CommonModel
     {
+        public int TripRecordID { get; set; }
         public string IdentifyNumber {  get; set; }
         public DateTime ArrivedAt {  get; set; }
         public string? GuessTripName {  get; set; }
         public string? NearestArrivaLScheduledTime { get; set; }
         public string? ArrivalTimeDefference { get; set; }
         public string? GuessTripBranchNumber {  get; set; }
+        public string? Remarks { get; set; }
     }
 
     public class NonTripNameRecordViewModel : CommonModel
