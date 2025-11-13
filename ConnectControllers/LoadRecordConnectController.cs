@@ -53,6 +53,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                     departed_at,
                     arrival_load_class,
                     departure_load_class,
+                    remark,
                     arrival_load_img_path,
                     departure_load_img_path
                 FROM t_trip_records AS TripRecords

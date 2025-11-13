@@ -489,7 +489,8 @@ function EditModal(tripRecordID, isArrived, page) {
                         + "<span class=\"text\">登録</span>"
                         + "</a>";
                 } else {
-                    tr += "<label id=\"loadStatusSelect\" ></label>";
+                    tr += "<label id=\"loadStatusSelect\" ></label>"
+                        + "<label id=\"loadRemarkSelect\" ></label";
                 }
 
                 tr += "</div>"
@@ -522,8 +523,10 @@ function EditModal(tripRecordID, isArrived, page) {
                 container.append(tr);
                 if (authorizedKubun == "1" || authorizedKubun == "2") {
                     $('#loadStatusSelect').val(response.annotationLoadClass);
+                    $('#loadRemarkSelect').val(response.remark);
                 } else if (response.annotationLoadStatus != null) {
                     $('#loadStatusSelect').text(response.annotationLoadStatus + "%");
+                    $('#loadRemarkSelect').text(response.remark);
                 } else {
                     $('#loadStatusSelect').text("-");
                 }
@@ -599,6 +602,7 @@ function onRemarkRequiredClick(tripRecordID, page) {
             method: method,
             data: data
         }).done(function (response) {
+            tableDisplay(page);
             // 完了モーダル表示
             alert('登録が完了しました。');
         }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -658,7 +662,7 @@ function tableDisplayCommon(page, data) {
             scrollX: true,          // 横スクロール可
             scrollCollapse: true,   // 縦スクロール表示
             searchHighlight: true,  // 検索ハイライト
-            orderFixed: [18, "asc"],
+            orderFixed: [19, "asc"],
             order: [[0, "asc"] , [16, "asc"], [1, "asc"]],    // ID昇順
             "oLanguage": {
                 "sSearch": ""

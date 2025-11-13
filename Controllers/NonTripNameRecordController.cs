@@ -310,12 +310,12 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // ファイル名
-                var tmpFilename = $"月次紐づけ切れデータ_{startDate}-{endDate}.xlsx";
+                var tmpFilename = $"紐づけ切れ-ID有_{startDate}-{endDate}.xlsx";
                 // 2シートあり
                 bool sheetTwo = true;
 
                 // シート名
-                string sheetNameOne = "月次紐づけ切れデータ";
+                string sheetNameOne = "紐づけ切れ-ID有";
                 string sheetNameTwo = "検索条件";
 
 

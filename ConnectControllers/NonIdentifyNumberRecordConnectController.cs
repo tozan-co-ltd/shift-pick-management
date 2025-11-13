@@ -40,6 +40,7 @@
 	                FORMAT(departed_at, 'yyyy/MM/dd HH:mm') AS departed_at,
 	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
 	                Stations.name AS station_name,
+                    remark,
                     arrival_load_img_path,
                     departure_load_img_path
                 FROM t_trip_records AS TripRecords

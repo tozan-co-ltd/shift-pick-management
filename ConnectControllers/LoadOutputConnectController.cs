@@ -39,6 +39,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departed_at,
 	                arrival_load_class,
 	                departure_load_class,
+                    remark,
 	                arrival_load_img_path,
 	                departure_load_img_path
                 ";
@@ -185,7 +186,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     Depos.name AS depo_name,
 	                FORMAT(CONVERT(DATETIME, TripRecords.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
 	                FORMAT(CONVERT(DATETIME, TripRecords.departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
-	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day
+	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
+                    remark
                 ";
             if (isOnlyHasAmountDeference)
             {

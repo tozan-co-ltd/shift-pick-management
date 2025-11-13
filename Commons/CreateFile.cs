@@ -544,7 +544,7 @@ namespace ai_truck_load_measurement.Commons
 
                     using ExcelWorksheet sheet = package.Workbook.Worksheets[sheetName];
                     // フィルター設定
-                    sheet.Cells["A1:Q1"].AutoFilter = true;
+                    sheet.Cells["A1:R1"].AutoFilter = true;
                     // ウィンドウ枠の固定
                     sheet.View.FreezePanes(2, 1);
                     // セル自動選択
@@ -737,12 +737,14 @@ namespace ai_truck_load_measurement.Commons
                     }
                     break;
                 case "紐づけ切れ - ID有":
+                    headerList.Add("便実績ID");
                     headerList.Add("識別番号");
                     headerList.Add("到着実績");
                     headerList.Add("想定される便");
                     headerList.Add("直近の到着予定");
                     headerList.Add("到着ズレ時間(分)");
                     headerList.Add("想定される便枝番");
+                    headerList.Add("紐づけ切れ理由");
                     break;
                 case "紐づけ切れ - ID無":
                     headerList.Add("便実績ID");
@@ -750,6 +752,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("出発実績");
                     headerList.Add("稼働日");
                     headerList.Add("ステーション名");
+                    headerList.Add("紐づけ切れ理由");
                     headerList.Add("到着荷量画像パス");
                     headerList.Add("出発荷量画像パス");
                     break;
@@ -778,6 +781,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("到着予定時間");
                     headerList.Add("出発予定時間");
                     headerList.Add("稼働日");
+                    headerList.Add("紐づけ切れ理由");
                     break;
             }
             return headerList;
