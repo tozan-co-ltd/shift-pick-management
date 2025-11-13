@@ -27,7 +27,6 @@ namespace ai_truck_load_measurement.Controllers
         public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<M_TripBranchNumberModel> trips)
         {
             var searchData = string.Empty;
-            List<AlertRecordModel> alertRecordList = new();
             List<LoadRecordModel> loadRecordList = new();
             try
             {
@@ -59,39 +58,43 @@ namespace ai_truck_load_measurement.Controllers
                             <tbody>
                 ";
                 // テーブルのbody部分
-                if (alertRecordList.Count > 0)
+                if (loadRecordList.Count > 0)
                 {
-                    foreach (var alertRecord in alertRecordList)
+                    for (DateTime date = startOfPeriod; date <= endOfPeriod; date = date.AddDays(1))
                     {
-                        // アラート履歴に対応した便実績
-                        var loadRecord = loadRecordList.Find(x => x.TripRecordID == alertRecord.TripRecordID)!;
-                        // アラート項目部分のhtml取得
-                        var alertItems = GetAlertItems(alertRecord, loadRecord);
-                        var alertItemsHTML = ConversionAlertItemsToHTML(alertItems);
+                        var targetDateRecords = loadRecordList.FindAll(x => x.WorkDay == date);
 
                         searchData += $@"
                             <tr>
-                                <td hidden>{alertRecord.AlertRecordID}</td>
-                                <td>{loadRecord.TripName}</td>
-                                <td>{loadRecord.TripBranchSeq}</td>
-                                <td>{loadRecord.StationName}</td>
-                                <td>{loadRecord.DriverName}</td>
-                                <td>{alertItemsHTML}</td>
-                                <td>{loadRecord.WorkDay.ToString("yyyy/MM/dd")}</td>
-                                <td>
-                                    <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                        onclick=""OnArrivalAlertImageClick('{alertRecord.AlertRecordID}', this)"" data-id=""{alertRecord.AlertRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
-                                        <i class=""fa-solid fa-truck""></i>
-                                    </a>
-                                </td>
-                                <td>
-                                    <a class=""btn btn-success btn-icon-split ml-1 mr-1""
-                                        onclick=""OnDepartureAlertImageClick('{alertRecord.AlertRecordID}', this)"" data-id=""{alertRecord.AlertRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">
-                                    <i class=""fa-solid fa-truck""></i>
-                                    </a>
-                                </td>
+                                <td>{date.ToString("yyyy/MM/dd")}</td>
+                        ";
+                        
+                        foreach (var trip in trips)
+                        {
+                            var targetDateRecord = targetDateRecords.Find(x => x.TripName == trip.TripName);
+                            if (targetDateRecord != null)
+                            {
+                                var comparisonTime = new DateTime(0, 0, 0, targetDateRecord.ArrivedAt.Hour, targetDateRecord.ArrivedAt.Minute, targetDateRecord.ArrivedAt.Second);
+                                var timeDeff = (comparisonTime - targetDateRecord.ArrivalScheduledTime).TotalMinutes;
+                                if (timeDeff >= 60 * 20)
+                                    timeDeff -= 60 * 24;
+                                else if (timeDeff <= - 60 * 23)
+                                    timeDeff += 60 * 24;
+                                searchData += $@"
+                                <td>{(int)timeDeff}</td>
+                            ";
+                            }
+                            else
+                            {
+                                searchData += $@"
+                                <td>なし</td>
+                            ";
+                            }
+                        }
+
+                        searchData += $@"
                             </tr>
-                    ";
+                        ";
                     }
                 }
                 searchData += $@"
@@ -103,7 +106,7 @@ namespace ai_truck_load_measurement.Controllers
                 return Json(new SearchedTripRecordListModel
                 {
                     searchedTripRecordHTML = searchData,
-                    searchedTripRecordLength = alertRecordList.Count()
+                    searchedTripRecordLength = loadRecordList.Count()
                 });
             }
             catch (SqlException)
