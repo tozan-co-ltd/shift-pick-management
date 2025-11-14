@@ -34,7 +34,7 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 var sql = NonDepartedAtRecordConnectController.CreateSQLToSelectDepartedAtIsNull(startOfPeriod, endOfPeriod, checkedDepos);
-                List<DepartedAtIsNullStatusModel> statuses = ConnectToSQLServer.ExecuteQueryToList<DepartedAtIsNullStatusModel>(sql);
+                List<NonDepartedAtRecordModel> statuses = ConnectToSQLServer.ExecuteQueryToList<NonDepartedAtRecordModel>(sql);
 
                 var html = $@"
                 <div class=""mt-3"">
@@ -168,7 +168,7 @@ namespace ai_truck_load_measurement.Controllers
                 if (checkedDepos.Count > 0)
                 {
                     var sql = NonDepartedAtRecordConnectController.CreateSQLToSelectDepartedAtIsNull(startOfPeriod, endOfPeriod, checkedDepos);
-                    List<DepartedAtIsNullStatusModel> statuses = ConnectToSQLServer.ExecuteQueryToList<DepartedAtIsNullStatusModel>(sql);
+                    List<NonDepartedAtRecordModel> statuses = ConnectToSQLServer.ExecuteQueryToList<NonDepartedAtRecordModel>(sql);
 
                     // 荷量のクラスを数値化
                     tTripRecordDT = ConvertedDataTableForExcel(statuses, startOfPeriod, endOfPeriod, checkedDepos);
@@ -245,7 +245,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod"></param>
         /// <param name="checkedDepos"></param>
         /// <returns></returns>
-        public DataTable ConvertedDataTableForExcel(List<DepartedAtIsNullStatusModel> statuses, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        public DataTable ConvertedDataTableForExcel(List<NonDepartedAtRecordModel> statuses, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             DataTable convertTable = new DataTable();
 

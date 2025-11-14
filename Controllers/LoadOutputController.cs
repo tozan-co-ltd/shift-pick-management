@@ -198,7 +198,7 @@ namespace ai_truck_load_measurement.Controllers
             try
             {
                 var sql = LoadOutputConnectController.CreateSQLToSelectDepartedAtIsNull(startOfPeriod, endOfPeriod, checkedDepos);
-                List<DepartedAtIsNullStatusModel> statuses = ConnectToSQLServer.ExecuteQueryToList<DepartedAtIsNullStatusModel>(sql);
+                List<NonDepartedAtRecordModel> statuses = ConnectToSQLServer.ExecuteQueryToList<NonDepartedAtRecordModel>(sql);
 
                 var html = $@"
                 <div class=""mt-3"">

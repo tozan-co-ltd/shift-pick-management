@@ -1,6 +1,6 @@
 ﻿namespace ai_truck_load_measurement.Models
 {
-    public class DepartedAtIsNullStatusModel : CommonModel
+    public class NonDepartedAtRecordModel : CommonModel
     {
         public DateTime WorkDay { get; set; }
         public int DepoID { get; set; }
