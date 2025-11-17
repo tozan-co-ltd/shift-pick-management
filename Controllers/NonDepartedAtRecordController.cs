@@ -33,8 +33,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             try
             {
-                var sql = NonDepartedAtRecordConnectController.CreateSQLToSelectDepartedAtIsNull(startOfPeriod, endOfPeriod, checkedDepos);
-                List<NonDepartedAtRecordModel> statuses = ConnectToSQLServer.ExecuteQueryToList<NonDepartedAtRecordModel>(sql);
+                List<NonDepartedAtRecordModel> statuses = NonDepartedAtRecordConnectController.GetNonDepartedAtRecords(startOfPeriod, endOfPeriod, checkedDepos);
 
                 var html = $@"
                 <div class=""mt-3"">

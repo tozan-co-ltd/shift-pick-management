@@ -1,13 +1,25 @@
-﻿namespace ai_truck_load_measurement.ConnectControllers
+﻿using ai_truck_load_measurement.Commons;
+using ai_truck_load_measurement.Models;
+
+namespace ai_truck_load_measurement.ConnectControllers
 {
     public class NonDepartedAtRecordConnectController
-    {  /// <summary>
-       /// 
-       /// </summary>
-       /// <param name="startOfPeriod"></param>
-       /// <param name="endOfPeriod"></param>
-       /// <param name="checkedDepo"></param>
-       /// <returns></returns>
+    {  
+        
+        public static List<NonDepartedAtRecordModel> GetNonDepartedAtRecords(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepo)
+        {
+            var sql = CreateSQLToSelectDepartedAtIsNull(startOfPeriod, endOfPeriod, checkedDepo);
+            var nonDepartedAtRecords = ConnectToSQLServer.ExecuteQueryToList<NonDepartedAtRecordModel>(sql);
+            return nonDepartedAtRecords;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="startOfPeriod"></param>
+        /// <param name="endOfPeriod"></param>
+        /// <param name="checkedDepo"></param>
+        /// <returns></returns>
         public static string CreateSQLToSelectDepartedAtIsNull(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepo)
         {
             string formatStartOfPeriod = startOfPeriod.ToString("yyyy/MM/dd");
@@ -16,7 +28,7 @@
                 SELECT
                     a.work_day
                     ,a.depo_id
-                    ,Depos.name
+                    ,Depos.name AS depo_name
                     ,b.null_count
                     ,c.no_identify_number_null_count
 	                ,d.trip_count

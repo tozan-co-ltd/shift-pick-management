@@ -7,6 +7,7 @@
         public string DepoName { get; set; }
         public int NullCount { get; set; }
         public int NoIdentifyNumberNullCount { get; set; }
+        public int TotalNullCount {  get; set; }
         public int TripCount { get; set; }
     }
 
