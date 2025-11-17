@@ -24,7 +24,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
         /// <returns></returns>
-        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<M_TripBranchNumberModel> trips)
+        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<SelectedTripModel> trips)
         {
             var searchData = string.Empty;
             List<LoadRecordModel> loadRecordList = new();
@@ -39,24 +39,8 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // テーブルのヘッダ部分
-                searchData += $@"
-                    <div class=""mt-3"">
-                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripTable"">
-                            <thead>
-                                <tr align=""center"">
-                                    <th hidden>便実績ID</th>
-                                    <th class=""font-weight-bold""></th>
-                ";
-                foreach(var trip in trips)
-                {
-                    searchData += $@"<th class=""font-weight-bold"">{trip.TripName}_{trip.TripBranchSeq}</th>
-                    ";
-                }
-                searchData += $@"
-                                </tr>
-                            </thead>
-                            <tbody>
-                ";
+                searchData += GetTableHeader(trips);
+
                 // テーブルのbody部分
                 if (loadRecordList.Count > 0)
                 {
@@ -71,23 +55,23 @@ namespace ai_truck_load_measurement.Controllers
                         
                         foreach (var trip in trips)
                         {
-                            var targetDateRecord = targetDateRecords.Find(x => x.TripName == trip.TripName);
+                            var targetDateRecord = targetDateRecords.Find(x => x.TripName == trip.TripName && x.TripBranchSeq == trip.TripBranchSeq.ToString());
                             if (targetDateRecord != null)
                             {
-                                var comparisonTime = new DateTime(0, 0, 0, targetDateRecord.ArrivedAt.Hour, targetDateRecord.ArrivedAt.Minute, targetDateRecord.ArrivedAt.Second);
-                                var timeDeff = (comparisonTime - targetDateRecord.ArrivalScheduledTime).TotalMinutes;
-                                if (timeDeff >= 60 * 20)
-                                    timeDeff -= 60 * 24;
-                                else if (timeDeff <= - 60 * 23)
-                                    timeDeff += 60 * 24;
-                                searchData += $@"
-                                <td>{(int)timeDeff}</td>
+                                var comparisonTime = new DateTime(1900, 1, 1, targetDateRecord.ArrivedAt.Hour, targetDateRecord.ArrivedAt.Minute, targetDateRecord.ArrivedAt.Second);
+                                var timeDeff = GetTimeDeff(targetDateRecord.ArrivalScheduledTime, comparisonTime);
+
+                                var timeDeffString = "";
+                                if (timeDeff < 0) timeDeffString = $"{timeDeff}m";
+                                else timeDeffString = $"+{timeDeff}m";
+                                    searchData += $@"
+                                <td>{timeDeffString}</td>
                             ";
                             }
                             else
                             {
                                 searchData += $@"
-                                <td>なし</td>
+                                <td>-</td>
                             ";
                             }
                         }
@@ -96,6 +80,9 @@ namespace ai_truck_load_measurement.Controllers
                             </tr>
                         ";
                     }
+
+                    searchData += GetAverageTimeDeff(loadRecordList, trips);
+                    searchData += GetCountTimeOver(loadRecordList, trips);
                 }
                 searchData += $@"
                             </tbody>
@@ -120,5 +107,135 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
+
+        private string GetTableHeader( List<SelectedTripModel> trips)
+        {
+            var tableHeader = $@"
+                    <div class=""mt-3"">
+                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripTable"">
+                            <thead>
+                                <tr align=""center"">
+                                    <th class=""font-weight-bold""></th>
+            ";
+
+            foreach (var trip in trips)
+            {
+                tableHeader += $@"<th class=""font-weight-bold"">{trip.TripName}_{trip.TripBranchSeq}</th>
+                ";
+            }
+
+            tableHeader += $@"
+                                </tr>
+                            </thead>
+                            <tbody>
+            ";
+            return tableHeader;
+        }
+
+        private int GetTimeDeff(DateTime targetDate, DateTime comparisonTime)
+        {
+            var timeDeff = (comparisonTime - targetDate).TotalMinutes;
+            if (timeDeff >= 60 * 20)
+                timeDeff -= 60 * 24;
+            else if (timeDeff <= -60 * 23)
+                timeDeff += 60 * 24;
+            return (int)timeDeff;
+        }
+
+        public string GetAverageTimeDeff(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
+        {
+            var averageTimeDeffString = $@"
+                    <tr>
+                        <td>平均ズレ時間</td>
+
+            ";
+            foreach(var trip in trips)
+            {
+                // 便毎に実績のリストを作成
+                var targetTripRecords = loadRecordList.FindAll(x => x.TripName == trip.TripName && x.TripBranchSeq == trip.TripBranchSeq.ToString());
+
+                // 予実差の総和を取得
+                var targetTripTimeDeffSam = 0;
+                foreach (var tripRecord in targetTripRecords)
+                {
+                    var comparisonTime = new DateTime(1900, 1, 1, tripRecord.ArrivedAt.Hour, tripRecord.ArrivedAt.Minute, tripRecord.ArrivedAt.Second);
+                    targetTripTimeDeffSam += GetTimeDeff(tripRecord.ArrivalScheduledTime, comparisonTime);
+                }
+
+                // 便毎の予実差の平均取得
+                var averageTimeDeff = (double)targetTripTimeDeffSam / (double)targetTripRecords.Count;
+
+                averageTimeDeffString += $@"
+                        <td>{averageTimeDeff}m</td>
+                ";
+            }
+            averageTimeDeffString += "</tr>";
+
+            return averageTimeDeffString;
+        }
+
+        private string GetCountEarlyTimeOver(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
+        {
+            var earlyTimeOverString = $@"
+                    <tr>
+                        <td>アラート範囲(早着)</td>
+
+            ";
+            foreach (var trip in trips)
+            {
+                // 便毎に実績のリストを作成
+                var targetTripRecords = loadRecordList.FindAll(x => x.TripName == trip.TripName && x.TripBranchSeq == trip.TripBranchSeq.ToString());
+
+                // 予実差の総和を取得
+                var targetTripEarlyOverCount = 0;
+                foreach (var tripRecord in targetTripRecords)
+                {
+                    var comparisonTime = new DateTime(1900, 1, 1, tripRecord.ArrivedAt.Hour, tripRecord.ArrivedAt.Minute, tripRecord.ArrivedAt.Second);
+                    var timeDeff = GetTimeDeff(tripRecord.ArrivalScheduledTime, comparisonTime);
+                    if(timeDeff < -60)
+                        targetTripEarlyOverCount++;
+                }
+
+
+                earlyTimeOverString += $@"
+                        <td>{targetTripEarlyOverCount}回</td>
+                ";
+            }
+            earlyTimeOverString += "</tr>";
+
+            return earlyTimeOverString;
+        }
+
+        private string GetCountLateTimeOver(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
+        {
+            var lateTimeOverString = $@"
+                    <tr>
+                        <td>アラート範囲(遅着)</td>
+
+            ";
+            foreach (var trip in trips)
+            {
+                // 便毎に実績のリストを作成
+                var targetTripRecords = loadRecordList.FindAll(x => x.TripName == trip.TripName && x.TripBranchSeq == trip.TripBranchSeq.ToString());
+
+                // 予実差の総和を取得
+                var targetTripLateOverCount = 0;
+                foreach (var tripRecord in targetTripRecords)
+                {
+                    var comparisonTime = new DateTime(1900, 1, 1, tripRecord.ArrivedAt.Hour, tripRecord.ArrivedAt.Minute, tripRecord.ArrivedAt.Second);
+                    var timeDeff = GetTimeDeff(tripRecord.ArrivalScheduledTime, comparisonTime);
+                    if (timeDeff < +20)
+                        targetTripLateOverCount++;
+                }
+
+
+                lateTimeOverString += $@"
+                        <td>{targetTripLateOverCount}回</td>
+                ";
+            }
+            lateTimeOverString += "</tr>";
+
+            return lateTimeOverString;
+        }
     }
 }

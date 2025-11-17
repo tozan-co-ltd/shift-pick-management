@@ -5,13 +5,14 @@ namespace ai_truck_load_measurement.ConnectControllers
 {
     public class ArrivalTimeDefferenceConnectController
     {
-        public static string CreateSQLToSelectArrivalRecordAndSchedule(List<M_TripBranchNumberModel> trips, DateTime startOfPeriod, DateTime endOfPeriod)
+        public static string CreateSQLToSelectArrivalRecordAndSchedule(List<SelectedTripModel> trips, DateTime startOfPeriod, DateTime endOfPeriod)
         {
             var sql = $@"
                 SELECT
                     trip_id
+                    ,trip_name
                     ,trip_branch_seq
-                    ,arrival_scheduled_time
+                    ,CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time
                     ,work_day
                     ,arrived_at
                 FROM
@@ -23,7 +24,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
-        private static string CreateSQLToTripConditions(List<M_TripBranchNumberModel> trips)
+        private static string CreateSQLToTripConditions(List<SelectedTripModel> trips)
         {
             var sql = "AND (";
             if(trips.Count == 0)
@@ -37,7 +38,7 @@ namespace ai_truck_load_measurement.ConnectControllers
                 if (i != 0)
                     sql += "OR";
 
-                sql += $@"(trip_id = {trips[i].TripID} AND trip_branch_seq = {trips[i].TripBranchSeq})
+                sql += $@"(trip_name = '{trips[i].TripName}' AND trip_branch_seq = {trips[i].TripBranchSeq})
                 ";
             }
 

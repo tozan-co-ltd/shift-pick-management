@@ -153,9 +153,8 @@
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
         addDepos(model);
-        
-        periodChange('ArrivalTimeDefference');
         depoCheckDisplay(model);
+        periodChange('ArrivalTimeDefference');
     });
 
     // 「すべて」チェックボックス押下時
@@ -186,7 +185,7 @@
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "ArrivalTimeDefference")';
         let method = 'Post';
-        let data = { startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, checkedDepos: checkedDepos };
+        let data = {trips: arrayTrips, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod};
 
         // Ajax call
         $.ajax({
@@ -194,8 +193,8 @@
             method: method,
             data: data
         }).done(function (response) {
-
-            $('#alertRecordTable').empty().html(response.searchedTripRecordHTML);
+            console.log(response.searchedTripRecordHTML);
+            $('#tripRecordTable').empty().html(response.searchedTripRecordHTML);
             tableLength = response.searchedTripRecordLength + 1;
             // 日本語表示
             const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
@@ -316,4 +315,33 @@
     $('#endOfPeriod').change(function () {
         periodChange('ArrivalTimeDefference');
     })
+
+     function allToggleOpen() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (!smallItems.classList.contains('show')) {
+                smallItems.classList.add('show');
+                toggleIcon.classList.remove('collapsed');
+            }
+        });
+    }
+
+    function allToggleClose() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (smallItems.classList.contains('show')) {
+                smallItems.classList.remove('show');
+                toggleIcon.classList.add('collapsed');
+            }
+        });
+    }
+
 </script>

@@ -11,4 +11,12 @@
         public int ArrivalTimeDeff {  get; set; }
 
     }
+
+    public class SelectedTripModel
+    {
+        public string? TripName { get; set; }
+        public int TripBranchSeq { get; set; }
+        public string? SelectedTripName {  get; set; }
+    }
+
 }
