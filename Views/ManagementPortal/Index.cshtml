@@ -145,7 +145,9 @@
 
         <div id="cardlayout-wrap">
             <section class="card-list">
-                <h2 class="card-title mt-1" id="card-title1" >出発実績無データ推移</h2>
+                <h2 class="card-title mt-1" id="card-title1" >
+                    <a href="~/NonDepartedAtRecord" style="color:black">出発実績無データ推移</a>
+                </h2>
                 <p class="truck-status" id="truck-status1">　</p>
                 <div class="chartjs-graph chartjs-arrival" id="transitionChart">
                     <canvas id="binedabanChartArrival"></canvas>
@@ -207,13 +209,17 @@
                 </div>
             </section>
             <section class="card-list">
-                <h2 class="card-title mt-1" id="card-title2" >ID無データ実績</h2>
+                <h2 class="card-title mt-1" id="card-title2" >
+                    <a href="~/NonIdentifyNumberRecord" style="color:black">ID無データ実績</a>
+                </h2>
                 <div id="tripRecordTable" style="padding: 10px">
                 </div>
             </section> 
             <section class="card-list">
-                <h2 class="card-title mt-1" id="card-title3" >SB・船見9月度紐づけ切れ便内訳</h2>
-                <p class="truck-status" id="truck-status1">　</p>
+                <h2 class="card-title mt-1" id="card-title3" >
+                    <a href="~/NonTripNameRecord" style="color:black">SB・船見9月度紐づけ切れ回数TOP10</a>
+                </h2>
+                <p class="truck-status mr-3" style="text-align: end" id="non-trip-name-record-status"></p>
                 <div class="chartjs-graph chartjs-arrival" id="nonTripNameRecordChart">
                     <canvas id="binedabanChartnonTripNameRecord"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
@@ -263,18 +269,27 @@
                                         //Y軸の範囲を指定
                                         ticks: {
                                             min: 0.0,
-                                            stepSize: 1.0,
-                                            fontSize: 20
+                                            stepSize: 5.0,
+                                            fontSize: 20,
+                                            callback: function(value, index, values) {
+                                                if (index % 2 === 0) {
+                                                    return "";
+                                                }
+                                                return value;
+                                            }
                                         }
                                     }]
                                 },
+                               
                             }
                         });
                     </script>
                 </div>
             </section>
             <section class="card-list">
-                <h2 class="card-title mt-1" id="card-title4" >デポ別月次紐づけ切れ原因割合</h2>
+                <h2 class="card-title mt-1" id="card-title4" >
+                    <a href="~/CountNonTripNameRecord" style="color:black">デポ別月次紐づけ切れ原因割合</a>
+                </h2>
                 <p class="truck-status" id="truck-status1">　</p>
                 <div class="chartjs-graph chartjs-arrival" id="allHimodukegireChart">
                     <canvas id="binedabanChartAllHimoduke"></canvas>
@@ -485,13 +500,18 @@
     function createNonTripNameRecordDatasets(countNonTripNameRecords){
         var nonTripNameRecordCounts = [];
         var nonTripNameRecordIdentifyNumbers =[];
+        var allTripCount = 0;
+        for(var i=0; i<countNonTripNameRecords.length && i < 10; i++){
+            nonTripNameRecordCounts.push(countNonTripNameRecords[i].tripCount);
+            nonTripNameRecordIdentifyNumbers.push(countNonTripNameRecords[i].identifyNumber);
+        }
         countNonTripNameRecords.forEach(function(countNonTripNameRecord){
-            nonTripNameRecordCounts.push(countNonTripNameRecord.tripCount);
-            nonTripNameRecordIdentifyNumbers.push(countNonTripNameRecord.identifyNumber);
+            allTripCount += countNonTripNameRecord.tripCount;
         });
         // データセット作成、登録
         var chartColor = graphColors[0];
         var label = "";
+        $('#non-trip-name-record-status')[0].textContent = "総件数：" + allTripCount + "件";
         nonTripNameRecordChart.data.labels = nonTripNameRecordIdentifyNumbers;
         createAndPushDatasets(nonTripNameRecordChart, chartColor, nonTripNameRecordCounts, label);
 
@@ -601,4 +621,11 @@
 
         allHimodukegireChart.update();
     }
+
+    var cardList = document.getElementsByClassName('card-list');
+    Array.prototype.forEach.call(cardList, function(item){
+        item.onclick = function(){
+            console.log("tetetetest");
+        }
+    });
 </script>
