@@ -587,11 +587,12 @@
         nonTripNameRecordChart.data.labels = nonTripNameRecordIdentifyNumbers;
         createAndPushDatasets(nonTripNameRecordChart, chartColor, nonTripNameRecordCounts, label);
 
-        nonTripNameRecordChart.update();
+        setChartYAxesLabels(countNonTripNameRecords);
 
+        nonTripNameRecordChart.update();
     }
 
-    // 紐づけ切れ-ID無のグラフクリック時
+    // 紐づけ切れ-ID有のグラフクリック時
     document.getElementById('binedabanChartnonTripNameRecord').addEventListener('click', e => {
         const elements = nonTripNameRecordChart.getElementAtEvent(e);
         if (elements.length) {
@@ -600,7 +601,25 @@
             if(trip != null)
                 window.location.href = "/M_TripBranchNumber?tripId=" + trip.tripID + "&isChecked=False";
       }
-    });
+    })
+
+    function setChartYAxesLabels(countNonTripNameRecords){
+        var maxTripCount = countNonTripNameRecords[0].tripCount;
+        if(maxTripCount <= 10){
+            nonTripNameRecordChart.options.scales.yAxes[0].ticks.stepSize = 1.0;
+            nonTripNameRecordChart.options.scales.yAxes[0].ticks.callback = function(value, index, values) {return value;};
+        }
+        else{
+            nonTripNameRecordChart.options.scales.yAxes[0].ticks.stepSize = 5.0;
+            nonTripNameRecordChart.options.scales.yAxes[0].ticks.callback = function(value, index, values){
+                if (index % 2 === values.length % 2) {
+                    return "";
+                }
+                return value;
+            };
+        }
+    }
+
 
     // 紐づけ切れ-ID無 取得
     function getNonIdentifyNumberRecord(data){
