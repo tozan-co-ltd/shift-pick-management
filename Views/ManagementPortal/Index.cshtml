@@ -216,8 +216,8 @@
                 </div>
             </section> 
             <section class="card-list">
-                <h2 class="card-title mt-1" id="card-title3" >
-                    <a href="~/NonTripNameRecord" style="color:black">SB・船見9月度紐づけ切れ回数TOP10</a>
+                <h2 class="card-title mt-1" >
+                    <a href="~/NonTripNameRecord" style="color:black" id="card-title3">SB・船見紐づけ切れ回数TOP10</a>
                 </h2>
                 <p class="truck-status mr-3" style="text-align: end" id="non-trip-name-record-status"></p>
                 <div class="chartjs-graph chartjs-arrival" id="nonTripNameRecordChart">
@@ -411,6 +411,20 @@
         getCountNonTripNameRecord(data);
     }
 
+    // 選択したデポの名称取得
+    function getDepoNames(){
+        var checkedDepos = getCheckedDepos();
+        var depoNames = [];
+        checkedDepos.forEach(function(depoID){
+            if(depoID == 1)
+                depoNames.push("SB");
+            else if(depoID == 3)
+                depoNames.push("船見");
+        });
+        return depoNames;
+    }
+
+    // 便マスター情報取得
     function getTrips(checkedDepos){
         let url = window.location.origin + '@Url.Action("GetTrips", "ManagementPortal")';
         let method = 'Post';
@@ -423,6 +437,7 @@
             data: data,
             async: false,
         }).done(function (response) {
+            // ビューモデルの便マスターリスト更新
             model.trips = response;
         }).fail(function (jqXHR, textStatus, errorThrown) {
             var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -463,17 +478,21 @@
             data: data,
             async: false,
         }).done(function (response) {
+            // 出発実績無データのデータセット作成、登録
             createTransitionDatasets(response, selectedDates, data.checkedDepos);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             var errorMessage = jqXHR.responseJSON.errorMessage;
             $("#div-error-message").text(errorMessage);
         });
     }
-
+        
+    // 出発実績無データのデータセット作成、登録
     function createTransitionDatasets(nonDepartedAtRecords, selectedDates, checkedDepos){
+        // デポごとに日付、データ件数のリストを作成
         for(var i=0; i<checkedDepos.length; i++){
             var depoRecords = nonDepartedAtRecords.filter(item => item.depoID == checkedDepos[i]);
             var sameDepoStatuses = [];
+            // 日付ごとに日付とデータ件数を属性として持つデータを作成
             selectedDates.forEach(function(day){
                 var targetRecord = depoRecords.find(item => GetDayStringForChart(new Date(item.workDay)) == day);
                 if(targetRecord != null){
@@ -518,6 +537,9 @@
         let url = window.location.origin + '@Url.Action("GetCountNonTripNameRecords", "ManagementPortal")';
         let method = 'Post';
 
+        // グラフタイトル設定
+        setNonTripNameRecordTitle();
+
         // Ajax call
         $.ajax({
             url: url,
@@ -525,6 +547,7 @@
             data: data,
             async: false,
         }).done(function (response) {
+            // 紐づけ切れ-ID有データのデータセット作成、登録
             createNonTripNameRecordDatasets(response);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -532,6 +555,20 @@
         });
     }
 
+    // グラフタイトル設定
+    function setNonTripNameRecordTitle(){
+        var depoNames = getDepoNames();
+        var depoNameString = "";
+        for(var i=0; i<depoNames.length; i++){
+            if(i != 0)
+                depoNameString += "・";
+            depoNameString += depoNames[i];
+        }
+        depoNameString += "紐づけ切れ回数TOP10";
+        $("#card-title3")[0].innerText = depoNameString;
+    }
+    
+    // 紐づけ切れ-ID有データのデータセット作成、登録
     function createNonTripNameRecordDatasets(countNonTripNameRecords){
         var nonTripNameRecordCounts = [];
         var nonTripNameRecordIdentifyNumbers =[];
@@ -553,6 +590,17 @@
         nonTripNameRecordChart.update();
 
     }
+
+    // 紐づけ切れ-ID無のグラフクリック時
+    document.getElementById('binedabanChartnonTripNameRecord').addEventListener('click', e => {
+        const elements = nonTripNameRecordChart.getElementAtEvent(e);
+        if (elements.length) {
+            var trip = model.trips.find(x => x.identifyNumber == elements[0]._model.label);
+            // 識別番号に対応する便が存在する場合、該当便の便枝番マスターに遷移
+            if(trip != null)
+                window.location.href = "/M_TripBranchNumber?tripId=" + trip.tripID + "&isChecked=False";
+      }
+    });
 
     // 紐づけ切れ-ID無 取得
     function getNonIdentifyNumberRecord(data){
@@ -634,7 +682,7 @@
 
     function createCountNonTripNameRecordDatas(remarksAndCountNonTripNameRemarks, checkedDepos){
         var remarks = remarksAndCountNonTripNameRemarks.allRemarks;
-        var labels = ["SB", "船見"];
+        var labels = getDepoNames();
         allHimodukegireChart.data.labels = labels;
         for(var i=0; i < remarks.length; i++){
             var nonTripNameRemarkCounts = [];
@@ -645,7 +693,6 @@
                 else
                     nonTripNameRemarkCounts.push(0);
             });
-            console.log(nonTripNameRemarkCounts);
             // データセット作成、登録
             var chartColor = graphColors[i];
             var label = remarks[i];
@@ -656,11 +703,4 @@
 
         allHimodukegireChart.update();
     }
-
-    var cardList = document.getElementsByClassName('card-list');
-    Array.prototype.forEach.call(cardList, function(item){
-        item.onclick = function(){
-            console.log("tetetetest");
-        }
-    });
 </script>
