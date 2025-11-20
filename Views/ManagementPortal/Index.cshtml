@@ -251,7 +251,8 @@
                                     xAxes: [{
                                         //軸ラベル表示
                                         scaleLabel: {
-                                            display: false,
+                                            display: true,
+                                            labelString: '識別番号',
                                             fontSize: 24
                                         },
                                         ticks: {
@@ -309,7 +310,6 @@
                 <div class="chartjs-graph chartjs-arrival" id="allHimodukegireChart">
                     <canvas id="binedabanChartAllHimoduke"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
-
                     <script>
                         var ctx = document.getElementById("binedabanChartAllHimoduke");
                         function adjustCanvasHeight() {
@@ -467,7 +467,7 @@
         // グラフの表示期間設定
         transitionChart.data.labels = selectedDates;
 
-           // フォーム情報取得
+        // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetNonDepartedAtRecords", "ManagementPortal")';
         let method = 'Post';
 
@@ -647,7 +647,7 @@
                     searchPlaceholder: "フリーワード(全件)"
                 },
                 lengthChange: true,     // 件数切替
-                info: true,            // 総件数
+                info: true,             // 総件数
                 scrollX: true,          // 横スクロール可
                 scrollCollapse: true,   // 縦スクロール表示
                 searchHighlight: true,  // 検索ハイライト
