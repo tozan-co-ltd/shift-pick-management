@@ -47,6 +47,23 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
+        public List<M_TripModel> GetTrips(List<string> checkedDepos)
+        {
+            var trips = new List<M_TripModel>();
+            try
+            {
+                var sql = M_TripConnectController.CreateSQLToSelectMTrips(false, checkedDepos);
+                trips = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(sql);
+                return trips;
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return trips;
+            }
+        }
+
         public RemarksAndCountNonTripNameRemarkModel GetCountNonTripNameRemarks(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             var model = new RemarksAndCountNonTripNameRemarkModel();

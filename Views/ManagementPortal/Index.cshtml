@@ -280,6 +280,21 @@
                                         }
                                     }]
                                 },
+                                
+                               tooltips: {
+                                    callbacks: {
+                                        label: function(tooltipItem, data) {
+                                            var label = tooltipItem.label;
+                                            var trip = model.trips.find(x => x.identifyNumber == label);
+                                            if(trip != null)
+                                                label = trip.tripName + "：" + tooltipItem.value;
+                                            else
+                                                label = "未登録番号：" + tooltipItem.value;
+                                            return label;
+                                        }
+
+                                    }
+                                }
                                
                             }
                         });
@@ -389,10 +404,30 @@
             checkedDepos: checkedDepos
         };
 
+        getTrips(checkedDepos);
         getNonDepartedAtRecord(data);
         getNonTripNameRecord(data);
         getNonIdentifyNumberRecord(data);
         getCountNonTripNameRecord(data);
+    }
+
+    function getTrips(checkedDepos){
+        let url = window.location.origin + '@Url.Action("GetTrips", "ManagementPortal")';
+        let method = 'Post';
+        let data = {checkedDepos: checkedDepos};
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false,
+        }).done(function (response) {
+            model.trips = response;
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        });
     }
 
     // 出発実績無データ取得

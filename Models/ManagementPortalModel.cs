@@ -2,6 +2,7 @@
 {
     public class ManagementPortalModel : CommonModel
     {
+        public List<M_TripModel> Trips { get; set; }
     }
 
     public class CountNonTripNameRemarkModel : CommonModel

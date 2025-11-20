@@ -3,7 +3,7 @@
     public class CountNonTripNameRecordModel : CommonModel
     {
         public int TripID {  get; set; }
-        public int IdentifyNumber {  get; set; }
+        public string? IdentifyNumber {  get; set; }
         public string? TripName { get; set; }
         public int NoNameCount {  get; set; }
         public int TripCount {  get; set; }
