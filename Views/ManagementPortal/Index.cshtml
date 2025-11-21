@@ -14,7 +14,7 @@
          display: -ms-flexbox;
          display: flex;
          -ms-flex-pack: justify;
-         margin: 1em auto;
+         margin: 0.8em auto;
          width: 100%;
          -ms-flex-wrap: wrap;
          flex-wrap: wrap;
@@ -42,7 +42,7 @@
          margin: 0 0 0;
          color: #333;
          text-align: center;
-         font-size: 2.0em;
+         font-size: 1.8em;
          font-weight: bold;
      }
 
@@ -64,7 +64,8 @@
          color: #493511;
          text-align: end;
          font-weight: bold;
-         font-size: 1.5em;
+         font-size: 1.3em;
+         margin-bottom: 0;
      }
 
      .card-list {
@@ -212,14 +213,7 @@
                     </script>
                 </div>
             </section>
-            <section class="card-list">
-                <h2 class="card-title mt-1" id="card-title2" >
-                    <a href="~/NonIdentifyNumberRecord" style="color:black">3.ID無実績</a>
-                </h2>
-                <p class="truck-status mr-3" id="non-identify-number-record-status"></p>
-                <div id="tripRecordTable" style="padding: 10px">
-                </div>
-            </section> 
+            
             <section class="card-list">
                 <h2 class="card-title mt-1" >
                     <a href="~/NonTripNameRecord" style="color:black" id="card-title3">SB・船見紐づけ切れ回数TOP10</a>
@@ -298,6 +292,14 @@
                             }
                         });
                     </script>
+                </div>
+            </section>
+            <section class="card-list">
+                <h2 class="card-title mt-1" id="card-title2">
+                    <a href="~/NonIdentifyNumberRecord" style="color:black">3.ID無実績</a>
+                </h2>
+                <p class="truck-status mr-3" id="non-identify-number-record-status"></p>
+                <div id="tripRecordTable" style="padding: 10px">
                 </div>
             </section>
             <section class="card-list">
@@ -666,7 +668,7 @@
                 "columnDefs": [
                     { className:"dt-body-left", "targets": [5] },
                 ],
-                pageLength: 10,        
+                pageLength: 5,        
                 order: [[2, "desc"]],    // ID昇順
             });
             var table = $("#tripRecordDataTable").DataTable();
