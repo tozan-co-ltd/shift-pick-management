@@ -25,7 +25,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
         /// <returns></returns>
-        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos, bool isNoNameCountNot0)
         {
             var searchData = string.Empty;
             List<CountNonTripNameRecordModel> countNonTripNameRecordList = new();
@@ -33,20 +33,21 @@ namespace ai_truck_load_measurement.Controllers
             {
                 if (checkedDepos.Count > 0)
                 {
-                    var sql = CountNonTripNameRecordConnectController.CreateSQLToSelectCountNonTripNameRecord(startOfPeriod, endOfPeriod, checkedDepos);
+                    var sql = CountNonTripNameRecordConnectController.CreateSQLToSelectCountNonTripNameRecord(startOfPeriod, endOfPeriod, checkedDepos, isNoNameCountNot0);
                     countNonTripNameRecordList = ConnectToSQLServer.ExecuteQueryToList<CountNonTripNameRecordModel>(sql);
                 }
 
                 // テーブルのヘッダ部分
                 searchData += $@"
                     <div class=""mt-3"">
-                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
+                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" style=""width: 80%"" id=""tripRecordDataTable"">
                             <thead>
                                 <tr align=""center"">
                                     <th class=""font-weight-bold"">便ID</th>
                                     <th class=""font-weight-bold"">便名称</th>
                                     <th class=""font-weight-bold"">紐付け切れ回数</th>
                                     <th class=""font-weight-bold"">実績総数</th>
+                                    <th class=""font-weight-bold"">紐づけ切れ割合い</th>
                                     <th class=""font-weight-bold"">デポ名</th>
                                 </tr>
                             </thead>
@@ -57,12 +58,14 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     foreach (var countNonTripNameRecord in countNonTripNameRecordList)
                     {
+                        var noNamePercentege = Math.Round((double)countNonTripNameRecord.NoNameCount / (double)countNonTripNameRecord.TripCount * 1000) / 10;
                         searchData += $@"
                             <tr>
                                 <td>{countNonTripNameRecord.TripID}</td>
                                 <td>{countNonTripNameRecord.TripName}</td>
                                 <td>{countNonTripNameRecord.NoNameCount}</td>
                                 <td>{countNonTripNameRecord.TripCount}</td>
+                                <td>{noNamePercentege}%</td>
                                 <td>{countNonTripNameRecord.DepoName}</td>
                             </tr>
                         ";
@@ -93,7 +96,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="startOfPeriod">期間の開始日時</param>
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos, bool isNoNameCountNot0)
         {
             string? errorMessage;
             string startDate = startOfPeriod.ToString("yyyyMMdd");
@@ -114,7 +117,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 if (checkedDepos.Count > 0)
                 {
-                    var sql = CountNonTripNameRecordConnectController.CreateSQLToSelectCountNonTripNameRecord(startOfPeriod, endOfPeriod, checkedDepos);
+                    var sql = CountNonTripNameRecordConnectController.CreateSQLToSelectCountNonTripNameRecord(startOfPeriod, endOfPeriod, checkedDepos, isNoNameCountNot0);
                     countNonTripNameRecordDT = ConnectToSQLServer.ConnectToDataTable(sql);
                 }
 
