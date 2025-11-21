@@ -721,7 +721,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("更新日時");
                     headerList.Add("更新者");
                     break;
-                case "出発実績無データ":
+                case "1.出発実績無データ":
                     headerList.Add("稼働日");
                     headerList.Add("出発実績無合計");
                     foreach(var depoID in checkedDepos)
@@ -736,7 +736,7 @@ namespace ai_truck_load_measurement.Commons
                         headerList.Add(depoName + "-総稼働数");
                     }
                     break;
-                case "紐づけ切れ - ID有":
+                case "2.紐づけ切れ - ID有":
                     headerList.Add("便実績ID");
                     headerList.Add("識別番号");
                     headerList.Add("到着実績");
@@ -746,7 +746,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("想定される便枝番");
                     headerList.Add("紐づけ切れ理由");
                     break;
-                case "紐づけ切れ - ID無":
+                case "3.紐づけ切れ - ID無":
                     headerList.Add("便実績ID");
                     headerList.Add("到着実績");
                     headerList.Add("出発実績");
@@ -756,7 +756,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("到着荷量画像パス");
                     headerList.Add("出発荷量画像パス");
                     break;
-                case "紐づけ切れ回数":
+                case "4.紐づけ切れ回数":
                     headerList.Add("便ID");
                     headerList.Add("便名称");
                     headerList.Add("紐づけ切れ回数");

@@ -29,7 +29,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod"></param>
         /// <param name="checkedDepos"></param>
         /// <returns></returns>
-        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos, bool isTotalNullCountNot0)
         {
             try
             {
@@ -84,9 +84,10 @@ namespace ai_truck_load_measurement.Controllers
                 for (DateTime date = startOfPeriod; date <= endOfPeriod; date = date.AddDays(1))
                 {
                     var totalNullCount = 0;
+                    var dayHTML = "";
                     var countHTML = "";
 
-                    html += $@"
+                    dayHTML += $@"
                             <tr>
                                 <td>{date.ToString("yyyy/MM/dd")}</td>
                     ";
@@ -113,10 +114,17 @@ namespace ai_truck_load_measurement.Controllers
                         }
                     }
 
-                    html += $@"
+                    dayHTML += $@"
                                 <td style=""font-weight: bold"">{totalNullCount}</td>
                                 {countHTML}
-                            </tr>";
+                            </tr>
+                    ";
+
+                    if ((isTotalNullCountNot0 && totalNullCount != 0) || !isTotalNullCountNot0)
+                    {
+                        html += dayHTML;
+                    }
+                    
                 }
 
                 html += $@"
@@ -144,7 +152,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="startOfPeriod">期間の開始日時</param>
         /// <param name="endOfPeriod">期間の終了日時</param>
         /// <returns></returns>
-        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        public JsonResult ExportFile(string gamenName, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos, bool isTotalNullCountNot0)
         {
             string? errorMessage;
             string startDate = startOfPeriod.ToString("yyyyMMdd");
@@ -170,7 +178,7 @@ namespace ai_truck_load_measurement.Controllers
                     List<NonDepartedAtRecordModel> statuses = ConnectToSQLServer.ExecuteQueryToList<NonDepartedAtRecordModel>(sql);
 
                     // 荷量のクラスを数値化
-                    tTripRecordDT = ConvertedDataTableForExcel(statuses, startOfPeriod, endOfPeriod, checkedDepos);
+                    tTripRecordDT = ConvertedDataTableForExcel(statuses, startOfPeriod, endOfPeriod, checkedDepos, isTotalNullCountNot0);
                 }
 
                 // 便実績が0の場合
@@ -244,7 +252,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="endOfPeriod"></param>
         /// <param name="checkedDepos"></param>
         /// <returns></returns>
-        public DataTable ConvertedDataTableForExcel(List<NonDepartedAtRecordModel> statuses, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        public DataTable ConvertedDataTableForExcel(List<NonDepartedAtRecordModel> statuses, DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos, bool isTotalNullCountNot0)
         {
             DataTable convertTable = new DataTable();
 
@@ -277,7 +285,8 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 dataRow["totalNullCount"] = totalNullCount;
-                convertTable.Rows.Add(dataRow);
+                if ((isTotalNullCountNot0 && totalNullCount != 0) || !isTotalNullCountNot0)
+                    convertTable.Rows.Add(dataRow);
             }
             return convertTable;
         }
