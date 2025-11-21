@@ -118,7 +118,7 @@ namespace ai_truck_load_measurement.Controllers
             foreach(var item in modelList)
             {
                 var remarkCount = item.RemarkCount;
-                item.RemarkPercentage = (double)remarkCount  / (double)allRemarksCount * 100;
+                item.RemarkPercentage = Math.Ceiling((double)remarkCount  / (double)allRemarksCount * 1000) / 10;
             }
 
 

@@ -62,7 +62,7 @@
 
      .truck-status {
          color: #493511;
-         text-align: center;
+         text-align: end;
          font-weight: bold;
          font-size: 1.5em;
      }
@@ -95,7 +95,11 @@
                 <div class="card border-left-custom">
                     <div class="card-body">
                         <ul class="mb-0">
-                            <li>便枝番とは、便が各拠点へ訪問した回数を示すために昼勤開始時間から順に割り当てた番号です。</li>
+                            <li>管理用画面各種のポータル画面になります</li>
+                            <li>各グラフ、表のタイトルをクリックすると対応した管理画面に遷移します</li>
+                            <li>初期状態では「デポ：すべて、期間：1ヶ月前～本日」でデータが表示されます</li>
+                            <li>紐づけ切れ回数TOP10グラフでは、識別番号に対応する便がある場合、グラフをクリックすると該当便枝番マスターに遷移します</li>
+                            <li>紐づけ切れ割合グラフにおける「原因未登録」は、紐づけ切れ原因がまだ登録されていないデフォルトの状態であることを指します</li>
                         </ul>
                     </div>
                 </div>
@@ -146,9 +150,9 @@
         <div id="cardlayout-wrap">
             <section class="card-list">
                 <h2 class="card-title mt-1" id="card-title1" >
-                    <a href="~/NonDepartedAtRecord" style="color:black">出発実績無データ推移</a>
+                    <a href="~/NonDepartedAtRecord" style="color:black">1.出発実績無し件数推移</a>
                 </h2>
-                <p class="truck-status" id="truck-status1">　</p>
+                <p class="truck-status mr-3" id="non-departed-at-record-status"></p>
                 <div class="chartjs-graph chartjs-arrival" id="transitionChart">
                     <canvas id="binedabanChartArrival"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
@@ -192,7 +196,7 @@
                                         //軸ラベル表示
                                         scaleLabel: {
                                             display: true,
-                                            labelString: '出発実績無しデータ数',
+                                            labelString: '件数',
                                             fontSize: 24
                                         },
                                         //Y軸の範囲を指定
@@ -210,8 +214,9 @@
             </section>
             <section class="card-list">
                 <h2 class="card-title mt-1" id="card-title2" >
-                    <a href="~/NonIdentifyNumberRecord" style="color:black">ID無データ実績</a>
+                    <a href="~/NonIdentifyNumberRecord" style="color:black">3.ID無実績</a>
                 </h2>
+                <p class="truck-status mr-3" id="non-identify-number-record-status"></p>
                 <div id="tripRecordTable" style="padding: 10px">
                 </div>
             </section> 
@@ -219,7 +224,7 @@
                 <h2 class="card-title mt-1" >
                     <a href="~/NonTripNameRecord" style="color:black" id="card-title3">SB・船見紐づけ切れ回数TOP10</a>
                 </h2>
-                <p class="truck-status mr-3" style="text-align: end" id="non-trip-name-record-status"></p>
+                <p class="truck-status mr-3" id="non-trip-name-record-status"></p>
                 <div class="chartjs-graph chartjs-arrival" id="nonTripNameRecordChart">
                     <canvas id="binedabanChartnonTripNameRecord"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
@@ -270,14 +275,7 @@
                                         //Y軸の範囲を指定
                                         ticks: {
                                             min: 0.0,
-                                            stepSize: 5.0,
                                             fontSize: 20,
-                                            callback: function(value, index, values) {
-                                                if (index % 2 === 0) {
-                                                    return "";
-                                                }
-                                                return value;
-                                            }
                                         }
                                     }]
                                 },
@@ -488,6 +486,9 @@
         
     // 出発実績無データのデータセット作成、登録
     function createTransitionDatasets(nonDepartedAtRecords, selectedDates, checkedDepos){
+        // 総件数
+        var allNullCount = 0;
+
         // デポごとに日付、データ件数のリストを作成
         for(var i=0; i<checkedDepos.length; i++){
             var depoRecords = nonDepartedAtRecords.filter(item => item.depoID == checkedDepos[i]);
@@ -497,6 +498,7 @@
                 var targetRecord = depoRecords.find(item => GetDayStringForChart(new Date(item.workDay)) == day);
                 if(targetRecord != null){
                     var totalNullCount = targetRecord.nullCount + targetRecord.noIdentifyNumberNullCount;
+                    allNullCount += totalNullCount;
                     sameDepoStatuses.push({ x: day, y: totalNullCount });
                 }else{
                     sameDepoStatuses.push({x: day, y:0});
@@ -512,6 +514,7 @@
             var chartColor = graphColors[i];
             createAndPushDatasets(transitionChart, chartColor, sameDepoStatuses, label);
         }
+        $('#non-departed-at-record-status')[0].textContent = "総件数：" + allNullCount + "件";
         transitionChart.update();
     }
 
@@ -538,7 +541,7 @@
         let method = 'Post';
 
         // グラフタイトル設定
-        setNonTripNameRecordTitle();
+        setChartTitle(3, "紐づけ切れ回数TOP10");
 
         // Ajax call
         $.ajax({
@@ -556,16 +559,18 @@
     }
 
     // グラフタイトル設定
-    function setNonTripNameRecordTitle(){
+    function setChartTitle(titleCount, titleString){
         var depoNames = getDepoNames();
         var depoNameString = "";
+        if(titleCount == 3)
+            depoNameString = "2.";
         for(var i=0; i<depoNames.length; i++){
             if(i != 0)
                 depoNameString += "・";
             depoNameString += depoNames[i];
         }
-        depoNameString += "紐づけ切れ回数TOP10";
-        $("#card-title3")[0].innerText = depoNameString;
+        depoNameString += titleString;
+        $("#card-title" + titleCount)[0].innerText = depoNameString;
     }
     
     // 紐づけ切れ-ID有データのデータセット作成、登録
@@ -646,11 +651,11 @@
                     "url": language_url,
                     searchPlaceholder: "フリーワード(全件)"
                 },
-                lengthChange: true,     // 件数切替
-                info: true,             // 総件数
+                lengthChange: false,     // 件数切替
+                info: false,             // 総件数
                 scrollX: true,          // 横スクロール可
                 scrollCollapse: true,   // 縦スクロール表示
-                searchHighlight: true,  // 検索ハイライト
+                searching: false,  // 検索ハイライト
                 "oLanguage": {
                     "sSearch": ""
                 },
@@ -661,7 +666,8 @@
                 "columnDefs": [
                     { className:"dt-body-left", "targets": [5] },
                 ],
-                pageLength: 10,
+                pageLength: 10,        
+                order: [[2, "desc"]],    // ID昇順
             });
             var table = $("#tripRecordDataTable").DataTable();
             table.on('draw', function () {
@@ -674,6 +680,9 @@
 
             if (document.querySelector("#loading") != null)
                 document.querySelector("#loading").style.display = "none";
+
+
+            $('#non-identify-number-record-status')[0].textContent = "総件数：" + response.searchedTripRecordLength + "件";
         }).fail(function (jqXHR, textStatus, errorThrown) {
             var errorMessage = jqXHR.responseJSON.errorMessage;
             $("#edit-modal-error-message").text(errorMessage);
@@ -684,6 +693,9 @@
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetCountNonTripNameRemarks", "ManagementPortal")';
         let method = 'Post';
+
+        // グラフタイトル設定
+        setChartTitle(4, "紐づけ切れ原因割合");
 
         // Ajax call
         $.ajax({
@@ -719,7 +731,6 @@
                 label = "原因未登録";
             createAndPushDatasets(allHimodukegireChart, chartColor, nonTripNameRemarkCounts, label);
         }
-
         allHimodukegireChart.update();
     }
 </script>
