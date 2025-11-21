@@ -202,7 +202,7 @@ namespace ai_truck_load_measurement.Controllers
                 // テーブルのヘッダ部分
                 searchData += $@"
                     <div class=""mt-3"">
-                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
+                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripDataTable"">
                             <thead>
                                 <tr align=""center"">
                                     <th hidden>便実績ID</th>

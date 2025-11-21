@@ -45,7 +45,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <tr align=""center"">
                                     <th class=""font-weight-bold"">便ID</th>
                                     <th class=""font-weight-bold"">便名称</th>
-                                    <th class=""font-weight-bold"">紐付け切れ回数</th>
+                                    <th class=""font-weight-bold"">紐づけ切れ回数</th>
                                     <th class=""font-weight-bold"">実績総数</th>
                                     <th class=""font-weight-bold"">紐づけ切れ割合い</th>
                                     <th class=""font-weight-bold"">デポ名</th>

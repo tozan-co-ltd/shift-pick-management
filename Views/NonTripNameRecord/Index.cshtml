@@ -181,7 +181,7 @@
             const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
 
            // ID(2列目)昇順
-            $("#tripRecordDataTable").DataTable({
+            $("#tripDataTable").DataTable({
                 "language": {
                     "url": language_url,
                     searchPlaceholder: "フリーワード(全件)"
@@ -196,15 +196,12 @@
                     "sSearch": ""
                 },
                 dom: dom_structure,
-                fixedColumns: {
-                    leftColumns: 3,
-                },
                 "columnDefs": [
-                    { className:"dt-body-left", "targets": [7] },
+                    { className:"dt-body-left", "targets": [3, 7] },
                 ],
                 pageLength: 100,
             });
-            var table = $("#tripRecordDataTable").DataTable();
+            var table = $("#tripDataTable").DataTable();
             table.on('draw', function () {
                 var body = $(table.table().body());
 
