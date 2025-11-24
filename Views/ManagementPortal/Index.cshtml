@@ -157,7 +157,6 @@
                 <div class="chartjs-graph chartjs-arrival" id="transitionChart">
                     <canvas id="binedabanChartArrival"></canvas>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
-
                     <script>
                         var ctx = document.getElementById("binedabanChartArrival");
                         function adjustCanvasHeight() {
@@ -272,7 +271,7 @@
                                     }]
                                 },
                                 
-                               tooltips: {
+                                tooltips: {
                                     callbacks: {
                                         label: function(tooltipItem, data) {
                                             var label = tooltipItem.label;
@@ -285,8 +284,7 @@
                                         }
 
                                     }
-                                }
-                               
+                                },
                             }
                         });
                     </script>
@@ -330,7 +328,17 @@
                                     legend: {
                                         display: true
                                     },
+                                    tooltips: {
+                                        callbacks: {
+                                            label: function(tooltipItem, data) {
+                                                 return data.labels[tooltipItem.index]
+                                                        + "："
+                                                        + (data.datasets[0].data[tooltipItem.index])
+                                                        + " % "
+                                            }
 
+                                        }
+                                    },
                                 }
                             });
                     </script>
