@@ -203,7 +203,7 @@
                                         //Y軸の範囲を指定
                                         ticks: {
                                             min: 0.0,
-                                            max: 10.0,
+                                            stepSize: 1.0,
                                             fontSize: 20
                                         }
                                     }]
@@ -221,8 +221,6 @@
                 <p class="truck-status mr-3" id="non-trip-name-record-status"></p>
                 <div class="chartjs-graph chartjs-arrival" id="nonTripNameRecordChart">
                     <canvas id="binedabanChartnonTripNameRecord"></canvas>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
-
                     <script>
                         var ctx = document.getElementById("binedabanChartnonTripNameRecord");
                         function adjustCanvasHeight() {
@@ -322,48 +320,19 @@
                         adjustCanvasHeight();
 
                         var allHimodukegireChart = new Chart(ctx, {
-                            type: 'bar',
-                            data: {
-                                labels: [],
-                                datasets: []
-                            },
-                            options: {
-                                //凡例は表示
-                                legend: {
-                                    display: true
+                            type: 'pie',
+                                data: {
+                                    labels: [],
+                                    datasets: []
                                 },
-                                scales: {
-                                    //X軸
-                                    xAxes: [{
-                                        //軸ラベル表示
-                                        scaleLabel: {
-                                            display: true,
-                                            fontSize: 24
-                                        },
-                                        ticks: {
-                                            fontSize: 20
-                                        },
-                                        stacked: true
-                                    }],
-                                    //Y軸
-                                    yAxes: [{
-                                        //軸ラベル表示
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: '原因割合(%)',
-                                            fontSize: 24
-                                        },
-                                        //Y軸の範囲を指定
-                                        ticks: {
-                                            min: 0.0,
-                                            max: 100.0,
-                                            fontSize: 20
-                                        },
-                                        stacked: true,
-                                    }]
-                                },
-                            }
-                        });
+                                options: {
+                                    //凡例は表示
+                                    legend: {
+                                        display: true
+                                    },
+
+                                }
+                            });
                     </script>
                 </div>
             </section>
@@ -653,8 +622,8 @@
                     "url": language_url,
                     searchPlaceholder: "フリーワード(全件)"
                 },
-                lengthChange: false,     // 件数切替
-                info: false,             // 総件数
+                lengthChange: false,    // 件数切替
+                info: false,            // 総件数
                 scrollX: true,          // 横スクロール可
                 scrollCollapse: true,   // 縦スクロール表示
                 searching: false,  // 検索ハイライト
@@ -662,9 +631,6 @@
                     "sSearch": ""
                 },
                 dom: dom_structure,
-                fixedColumns: {
-                    leftColumns: 3,
-                },
                 "columnDefs": [
                     { className:"dt-body-left", "targets": [5] },
                 ],
@@ -706,33 +672,30 @@
             data: data,
             async: false,
         }).done(function (response) {
-            createCountNonTripNameRecordDatas(response, data.checkedDepos);
+            createCountNonTripNameRecordDatas(response);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             var errorMessage = jqXHR.responseJSON.errorMessage;
             $("#div-error-message").text(errorMessage);
         });
     }
 
-    function createCountNonTripNameRecordDatas(remarksAndCountNonTripNameRemarks, checkedDepos){
-        var remarks = remarksAndCountNonTripNameRemarks.allRemarks;
-        var labels = getDepoNames();
-        allHimodukegireChart.data.labels = labels;
-        for(var i=0; i < remarks.length; i++){
-            var nonTripNameRemarkCounts = [];
-            checkedDepos.forEach(function(depoID){
-                var nonTripNameRemark = remarksAndCountNonTripNameRemarks.nonTripNameRemarks.find(item => item.depoID == depoID && item.remark == remarks[i]);
-                if(nonTripNameRemark != null)
-                    nonTripNameRemarkCounts.push(nonTripNameRemark.remarkPercentage);
-                else
-                    nonTripNameRemarkCounts.push(0);
-            });
-            // データセット作成、登録
-            var chartColor = graphColors[i];
-            var label = remarks[i];
-            if(label == "")
+    function createCountNonTripNameRecordDatas(countNonTripNameRemarks){
+        var nonTripNameRemarkCounts = [];
+        var backGroundColors = [];
+        var labels = [];
+        for(var i=0; i<countNonTripNameRemarks.length; i++){
+            nonTripNameRemarkCounts.push(countNonTripNameRemarks[i].remarkPercentage);
+            backGroundColors.push(graphColors[i]);
+            var label = countNonTripNameRemarks[i].remark;
+            if(label == '')
                 label = "原因未登録";
-            createAndPushDatasets(allHimodukegireChart, chartColor, nonTripNameRemarkCounts, label);
-        }
+            labels.push(label);
+        };
+        var datasets = {backgroundColor: backGroundColors, data: nonTripNameRemarkCounts}; 
+            
+        allHimodukegireChart.data.datasets.push(datasets);
+        allHimodukegireChart.data.labels = labels;
         allHimodukegireChart.update();
     }
+
 </script>

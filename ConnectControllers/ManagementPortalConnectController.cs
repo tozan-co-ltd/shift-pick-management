@@ -34,8 +34,6 @@
             var sql = $@"
                 SELECT TripRecords.remark
                        ,COUNT(remark) AS remark_count
-	                   ,Stations.depo_id
-                       ,Depos.name AS depo_name
                 FROM t_trip_records AS TripRecords
                 INNER JOIN
                     m_stations AS Stations
@@ -48,22 +46,10 @@
                 WHERE TripRecords.work_day BETWEEN '{startOfPeriod.ToString("yyyy/MM/dd")}' AND '{endOfPeriod.ToString("yyyy/MM/dd")}'
                 AND TripRecords.trip_id IS NULL
                 {LoadRecordConnectController.SQLOfCheckedDepos(checkedDepos)}
-                GROUP BY remark, Stations.depo_id, Depos.name
-            ";
-            return sql;
-        }
-
-        public static string CreateSQLToSelectRemarks()
-        {
-            var sql = $@"
-                SELECT TripRecords.remark
-                FROM t_trip_records AS TripRecords
-
-                WHERE TripRecords.work_day BETWEEN '2025/10/1' AND '2025/10/31'
-                AND TripRecords.trip_id IS NULL
                 GROUP BY remark
             ";
             return sql;
         }
+
     }
 }

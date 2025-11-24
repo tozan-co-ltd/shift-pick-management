@@ -64,45 +64,26 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-        public RemarksAndCountNonTripNameRemarkModel GetCountNonTripNameRemarks(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        public List<CountNonTripNameRemarkModel> GetCountNonTripNameRemarks(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
-            var model = new RemarksAndCountNonTripNameRemarkModel();
             var countNonTripNameRemarks = new List<CountNonTripNameRemarkModel>();
             try
             {
                 // データ取得
                 var countSql = ManagementPortalConnectController.CreateSQLToSelectNonTripNameRemarkCount(startOfPeriod, endOfPeriod, checkedDepos);
                 countNonTripNameRemarks = ConnectToSQLServer.ExecuteQueryToList<CountNonTripNameRemarkModel>(countSql);
-                var remarksSql = ManagementPortalConnectController.CreateSQLToSelectRemarks();
-                var remarks = ConnectToSQLServer.ExecuteQueryToList<string>(remarksSql);
 
                 // 紐づけ切れ理由の割合取得
-                var nonTripNameRemarks = GetRemarkPercentageFromDepo(countNonTripNameRemarks, checkedDepos);
-
-                model.AllRemarks = remarks;
-                model.NonTripNameRemarks = nonTripNameRemarks;
-                return model;
+                var nonTripNameRemarks = GetRemarkPercentage(countNonTripNameRemarks);
+                return nonTripNameRemarks;
             }
             catch (Exception ex)
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return model;
+                return countNonTripNameRemarks;
             }
         }
-
-        private List<CountNonTripNameRemarkModel> GetRemarkPercentageFromDepo(List<CountNonTripNameRemarkModel> modelList, List<string> checkedDepos)
-        {
-            var returnList = new List<CountNonTripNameRemarkModel>();
-            foreach(var depoID in checkedDepos)
-            {
-                var modelListInDepo = modelList.FindAll(x => x.DepoID.ToString() == depoID);
-                var getRemarkpercentageList = GetRemarkPercentage(modelListInDepo);
-                returnList.AddRange(getRemarkpercentageList);
-            }
-            return returnList;
-        }
-
 
         /// <summary>
         /// 紐づけ切れ理由の割合取得
