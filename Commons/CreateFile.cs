@@ -721,7 +721,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("更新日時");
                     headerList.Add("更新者");
                     break;
-                case "1.出発実績無データ":
+                case "1.出発実績無し件数":
                     headerList.Add("稼働日");
                     headerList.Add("出発実績無合計");
                     foreach(var depoID in checkedDepos)

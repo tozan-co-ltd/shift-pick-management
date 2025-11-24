@@ -215,7 +215,7 @@
             
             <section class="card-list">
                 <h2 class="card-title mt-1" >
-                    <a href="~/NonTripNameRecord" style="color:black" id="card-title3"></a>
+                    <a href="~/NonTripNameRecord" style="color:black" id="card-title2"></a>
                 </h2>
                 <p class="truck-status mr-3" id="non-trip-name-record-status"></p>
                 <div class="chartjs-graph chartjs-arrival" id="nonTripNameRecordChart">
@@ -291,8 +291,8 @@
                 </div>
             </section>
             <section class="card-list">
-                <h2 class="card-title mt-1" id="card-title2">
-                    <a href="~/NonIdentifyNumberRecord" style="color:black">3.ID無実績</a>
+                <h2 class="card-title mt-1" id="card-title3">
+                    <a href="~/NonIdentifyNumberRecord" style="color:black"></a>
                 </h2>
                 <p class="truck-status mr-3" id="non-identify-number-record-status"></p>
                 <div id="tripRecordTable" style="padding: 10px">
@@ -381,6 +381,13 @@
             checkedDepos: checkedDepos
         };
 
+        // 各種タイトル設定
+        setChartTitle(1, " 出発実績無し件数推移");
+        setChartTitle(2, " 紐づけ切れ-ID有 TOP10");
+        setChartTitle(3, " 紐づけ切れ-ID無");
+        setChartTitle(4, " 紐づけ切れ原因割合");
+
+        // 各種グラフ表示
         getTrips(checkedDepos);
         getNonDepartedAtRecord(data);
         getNonTripNameRecord(data);
@@ -424,6 +431,7 @@
 
     // 出発実績無データ取得
     function getNonDepartedAtRecord(data){
+
 
         // 選択期間の日数を取得
         var startDate = new Date($('#startOfPeriod').val());
@@ -519,9 +527,6 @@
         let url = window.location.origin + '@Url.Action("GetCountNonTripNameRecords", "ManagementPortal")';
         let method = 'Post';
 
-        // グラフタイトル設定
-        setChartTitle(3, " 紐づけ切れ-ID有 TOP10");
-
         // Ajax call
         $.ajax({
             url: url,
@@ -541,8 +546,8 @@
     function setChartTitle(titleCount, titleString){
         var depoNames = getDepoNames();
         var depoNameString = "";
-        if(titleCount == 3)
-            depoNameString = "2.";
+        if(titleCount != 4)
+            depoNameString = titleCount + ".";
         for(var i=0; i<depoNames.length; i++){
             if(i != 0)
                 depoNameString += "・";
@@ -670,9 +675,6 @@
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("GetCountNonTripNameRemarks", "ManagementPortal")';
         let method = 'Post';
-
-        // グラフタイトル設定
-        setChartTitle(4, " 紐づけ切れ原因割合");
 
         // Ajax call
         $.ajax({
