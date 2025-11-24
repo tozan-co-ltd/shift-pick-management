@@ -625,6 +625,7 @@
                 lengthChange: false,    // 件数切替
                 info: false,            // 総件数
                 scrollX: true,          // 横スクロール可
+                scrollY: "250px",       // 縦スクロール高さ
                 scrollCollapse: true,   // 縦スクロール表示
                 searching: false,  // 検索ハイライト
                 "oLanguage": {
@@ -634,7 +635,7 @@
                 "columnDefs": [
                     { className:"dt-body-left", "targets": [5] },
                 ],
-                pageLength: 5,        
+                pageLength: 20,        
                 order: [[2, "desc"]],    // ID昇順
             });
             var table = $("#tripRecordDataTable").DataTable();
