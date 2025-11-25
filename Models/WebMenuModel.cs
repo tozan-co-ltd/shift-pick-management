@@ -26,6 +26,11 @@ namespace ai_truck_load_measurement.Models
             new M_WebMenu{CategoryID = 4, MenuID = 3, MenuName = "便枝番マスター", Controller = "M_TripBranchNumber", Action = "Index"},
             new M_WebMenu{CategoryID = 4, MenuID = 4, MenuName = "ユーザーマスター", Controller = "M_User", Action = "Index"},
             new M_WebMenu{CategoryID = 4, MenuID = 5, MenuName = "通知マスター", Controller = "M_Notification", Action = "Index"},
+            new M_WebMenu{CategoryID = 5, MenuID = 1, MenuName = "管理用ポータル画面", Controller = "ManagementPortal", Action = "Index"},
+            new M_WebMenu{CategoryID = 5, MenuID = 2, MenuName = "1.出発実績無し件数", Controller = "NonDepartedAtRecord", Action = "Index"},
+            new M_WebMenu{CategoryID = 5, MenuID = 3, MenuName = "2.紐づけ切れ - ID有", Controller = "NonTripNameRecord", Action = "Index"},
+            new M_WebMenu{CategoryID = 5, MenuID = 4, MenuName = "3.紐づけ切れ - ID無", Controller = "NonIdentifyNumberRecord", Action = "Index"},
+            new M_WebMenu{CategoryID = 5, MenuID = 5, MenuName = "4.紐づけ切れ回数", Controller = "CountNonTripNameRecord", Action = "Index"},
         };
 
         /// <summary>
@@ -47,6 +52,7 @@ namespace ai_truck_load_measurement.Models
                     new M_WebMenuCategory{CategoryID = 2, CategoryName = "実績" },
                     new M_WebMenuCategory{CategoryID = 3, CategoryName = "お知らせ"},
                     new M_WebMenuCategory{CategoryID = 4, CategoryName = "マスター" },
+                    new M_WebMenuCategory{CategoryID = 5, CategoryName = "管理用" },
                 };
 
                 return selectCategoryList;

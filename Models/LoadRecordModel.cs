@@ -71,7 +71,9 @@ namespace ai_truck_load_measurement.Models
         // デポ名
         public string? DepoName { get; set; }
         // タグ
-        public string? Tag {  get; set; }
+        public string? Tag { get; set; }
+        // 備考
+        public string? Remark { get; set; }
 
         // 便実績リスト
         public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
@@ -94,4 +96,13 @@ namespace ai_truck_load_measurement.Models
         // 選択された便名称
         public string? SelectedTripName { get; set; }
     }
+
+    public class PivotStatusModel : CommonModel
+    {
+        public List<string> HeaderColumuns { get; set; }
+        public string YColumnName {  get; set; }
+        public List<string> XColumnNames {  get; set; }
+        public string ValueColumnNames {  get; set; }
+    }
+
 }

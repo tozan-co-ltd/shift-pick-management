@@ -56,7 +56,6 @@ namespace ai_truck_load_measurement.Controllers
         /// <returns></returns>
         public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber, List<string> checkedDepos)
         {
-            var searchData = string.Empty;
             SearchedTripRecordListModel searchedTripRecordListModel = new();
             try
             {
@@ -70,6 +69,205 @@ namespace ai_truck_load_measurement.Controllers
                 searchedTripRecordListModel = LoadRecordController.SearchData(sql, "LoadOutput");
 
                 return Json(searchedTripRecordListModel);
+            }
+            catch (SqlException)
+            {
+                return Json(new { res = "NG", errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                return Json(new { res = "NG", errorMessage = errorMessage });
+            }
+        }
+
+        public JsonResult SearchPivotData(DateTime startOfPeriod, DateTime endOfPeriod, bool isOnlyHasAmountDefference, bool hasTripName, bool hasIdentifyNumber, List<string> checkedDepos, PivotStatusModel statuses)
+        {
+            var searchData = string.Empty;
+            SearchedTripRecordListModel searchedTripRecordListModel = new();
+            try
+            {
+                if (checkedDepos.Count == 0)
+                {
+                    return Json(searchedTripRecordListModel);
+                }
+
+                var sql = LoadOutputConnectController.CreateSQLToSelectTripRecordForDataTable(startOfPeriod, endOfPeriod, isOnlyHasAmountDefference, hasTripName, hasIdentifyNumber, checkedDepos);
+                var datatable = ConnectToSQLServer.ConnectToDataTable(sql);
+                var resultTable = new DataTable();
+                var headers = statuses.HeaderColumuns;
+                if(!headers.Contains(statuses.YColumnName))
+                    headers.Add(statuses.YColumnName);
+                foreach(var header in headers)
+                {
+                    resultTable.Columns.Add(header, datatable.Columns[header].DataType);
+                }
+
+                var headersIdx = headers.Select(i => datatable.Columns.IndexOf(i)).ToArray();
+                var xColumnIdx = statuses.XColumnNames.Select(i => datatable.Columns.IndexOf(i)).ToArray();
+
+                Dictionary<object, DataRow> dict = new Dictionary<object, DataRow>();
+
+                // 入力のDataTableの行を反復処理します
+                foreach (DataRow dr in datatable.Rows)
+                {
+                    // yColumnName、xColumnNames、およびvalueColumnNameの値を取得します
+                    var y = dr[statuses.YColumnName];
+                    var x = string.Join("_", xColumnIdx.Select(i => dr[i].ToString()).ToArray());
+                    var val = dr[statuses.ValueColumnNames].ToString();
+
+                    // 新しい列をresultTableに追加します（存在しない場合）
+                    if (!resultTable.Columns.Contains(x))
+                    {
+                        resultTable.Columns.Add(x);
+                    }
+
+                    // 現在のy値のためのDataRowを取得または作成します
+                    if (!dict.TryGetValue(y, out DataRow? row))
+                    {
+                        row = resultTable.NewRow();
+                        row.ItemArray = headersIdx.Select(i => dr[i]).ToArray();
+                        resultTable.Rows.Add(row);
+                        dict[y] = row;
+                    }
+
+                    // ピボットテーブル内のyとxの交差点に値を設定します
+                    row[x] = val;
+                }
+
+                var html = CreatePivotTable(resultTable);
+                return Json(html);
+            }
+            catch (SqlException)
+            {
+                return Json(new { res = "NG", errorMessage = "E3004: " + ErrorMessagesResources.E3004 });
+            }
+            catch (Exception)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                return Json(new { res = "NG", errorMessage = errorMessage });
+            }
+        }
+
+        public string CreatePivotTable(DataTable dataTable)
+        {
+            var html = $@"
+                <div class=""mt-3"">
+                    <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
+                        <thead>
+                            <tr align=""center"">"
+            ;
+
+            foreach (DataColumn col in dataTable.Columns)
+            {
+                html += $"<th>{col.ColumnName}</th>";
+            }
+
+            html += $@"
+                            </tr>
+                        </thead>
+                        <tbody>"
+            ;
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                html += " <tr>";
+                foreach (DataColumn col in row.ItemArray)
+                { 
+                    html += $"<td>{col.ColumnName}</td>";
+                }
+                html += "</tr>";
+            }
+            html += $@"
+                        </tbody>
+                    </table>
+                </div>
+            ";
+            return html;
+        }
+
+        /// <summary>
+        /// 出発実績
+        /// </summary>
+        /// <param name="startOfPeriod"></param>
+        /// <param name="endOfPeriod"></param>
+        /// <param name="checkedDepos"></param>
+        /// <returns></returns>
+        public JsonResult SearchDepartedAtIsNullDatas(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        {
+            try
+            {
+                var sql = LoadOutputConnectController.CreateSQLToSelectDepartedAtIsNull(startOfPeriod, endOfPeriod, checkedDepos);
+                List<NonDepartedAtRecordModel> statuses = ConnectToSQLServer.ExecuteQueryToList<NonDepartedAtRecordModel>(sql);
+
+                var html = $@"
+                <div class=""mt-3"">
+                    <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripRecordDataTable"">
+                        <thead>
+                            <tr align=""center"">
+                            <th>稼働日</th>"
+               ;
+
+                foreach (var depoID in checkedDepos)
+                {
+                    var depoName = "";
+                    if (depoID == "1")
+                        depoName = "SyncBase名和北";
+                    else if (depoID == "3")
+                        depoName = "船見デポ";
+
+                    html += $@"<th>{depoName} 識別番号有</th>
+                        <th>{depoName} 識別番号無</th>"
+                    ;
+                }
+
+                html += $@"
+                            <th>当日合計</th>
+                            </tr>
+                        </thead>
+                        <tbody>"
+                ;
+
+                for (DateTime date = startOfPeriod; date <= endOfPeriod; date = date.AddDays(1))
+                {
+                    var totalNullCount = 0;
+
+                    html += $@"
+                            <tr>
+                                <td>{date.ToString("yyyy/MM/dd")}</td>
+                ";
+
+                    foreach (var depoName in checkedDepos)
+                    {
+                        var status = statuses.Find(x => x.WorkDay == date && x.DepoID.ToString() == depoName);
+                        if (status != null)
+                        {
+                            html += $@"
+                                <td>{status.NullCount}</td>
+                                <td>{status.NoIdentifyNumberNullCount}</td>
+                            ";
+                            totalNullCount += status.NullCount + status.NoIdentifyNumberNullCount;
+                        }
+                        else
+                        {
+                            html += $@"
+                                <td>0</td>
+                                <td>0</td>
+                        ";
+                        }
+                    }
+
+                    html += $@"
+                                <td>{totalNullCount}</td>
+                            </tr>";
+                }
+
+                html += $@"
+                        </tbody>
+                    </table>
+                </div>
+            ";
+                return Json(html);
             }
             catch (SqlException)
             {
@@ -143,7 +341,7 @@ namespace ai_truck_load_measurement.Controllers
                 try
                 {
                     // Excelファイル作成チェック
-                    var createRs = CreateFile.CheckCreateExcel(tTripRecordDT, searchConditionDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
+                    var createRs = CreateFile.CheckCreateExcel(tTripRecordDT, searchConditionDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName, checkedDepos);
 
                     if (createRs.Item1)
                     {
