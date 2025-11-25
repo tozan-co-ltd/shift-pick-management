@@ -39,7 +39,7 @@
                     Trips.trip_name,
 	                TripRecords.identify_number,
                     COUNT(CASE WHEN TripRecords.trip_name IS NULL THEN 1 END) AS no_name_count,
-                    COUNT(*) AS trip_count,
+                    COUNT(CASE WHEN TripRecords.trip_name IS NOT NULL THEN 1 END) AS trip_count,
                     Depos.name AS depo_name
                     FROM t_trip_records AS TripRecords
                     INNER JOIN
