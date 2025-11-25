@@ -299,13 +299,83 @@
                 </div>
             </section>
             <section class="card-list">
-                <h2 class="card-title mt-1" id="card-title4" >
+                <h2 class="card-title mt-1">
+                    <a href="~/NonTripNameRecord" style="color:black" id="card-title4"></a>
+                </h2>
+                <p class="truck-status mr-3" id="non-trip-name-record-status"></p>
+                <div class="chartjs-graph chartjs-arrival" id="countNonTripNameRecordChart">
+                    <canvas id="binedabanChartCountNonTripNameRecord"></canvas>
+                    <script>
+                        var ctx = document.getElementById("binedabanChartCountNonTripNameRecord");
+                        function adjustCanvasHeight() {
+                            var canvas = document.getElementById("binedabanChartCountNonTripNameRecord");
+                            var width = window.innerWidth;
+                        }
+
+                        window.addEventListener('resize', adjustCanvasHeight);
+
+                        adjustCanvasHeight();
+
+                        var countNonTripNameRecordChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [],
+                                datasets: []
+                            },
+                            options: {
+                                //凡例は非表示
+                                legend: {
+                                    display: true
+                                },
+                                scales: {
+                                    //X軸
+                                    xAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '識別番号',
+                                            fontSize: 24
+                                        },
+                                        ticks: {
+                                            fontSize: 20
+                                        },
+                                        stacked: true,
+                                    }],
+                                    //Y軸
+                                    yAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '回数',
+                                            fontSize: 24
+                                        },
+                                        //Y軸の範囲を指定
+                                        ticks: {
+                                            min: 0.0,
+                                            fontSize: 20,
+                                            callback: function(value, index, values) {
+                                                if (Math.floor(value) === value) {
+                                                    return value;
+                                                }
+                                            },
+                                        },
+                                        stacked: true,
+                                    }]
+                                },
+
+                               
+                            }
+                        });
+                    </script>
+                </div>
+            </section>
+            <section class="card-list">
+                <h2 class="card-title mt-1" id="card-title5" >
                     <a href="~/CountNonTripNameRecord" style="color:black"></a>
                 </h2>
                 <p class="truck-status" id="truck-status1">　</p>
                 <div class="chartjs-graph chartjs-arrival" id="allHimodukegireChart">
                     <canvas id="binedabanChartAllHimoduke"></canvas>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
                     <script>
                         var ctx = document.getElementById("binedabanChartAllHimoduke");
                         function adjustCanvasHeight() {
@@ -372,6 +442,7 @@
         // グラフの初期化
         transitionChart.data.datasets = [];
         nonTripNameRecordChart.data.datasets = [];
+        countNonTripNameRecordChart.data.datasets = [];
         allHimodukegireChart.data.datasets = [];
 
         // サマリ表示用データ作成
@@ -382,10 +453,11 @@
         };
 
         // 各種タイトル設定
-        setChartTitle(1, " 出発実績無し件数推移");
-        setChartTitle(2, " 紐づけ切れ-ID有 TOP10");
-        setChartTitle(3, " 紐づけ切れ-ID無");
-        setChartTitle(4, " 紐づけ切れ原因割合");
+        setChartTitle(1, "1.", " 出発実績無し件数推移");
+        setChartTitle(2, "2.紐づけ切れ-ID有(", ") TOP10");
+        setChartTitle(3, "3.紐づけ切れ-ID無(", ")");
+        setChartTitle(4, "4.便別紐づけ切れ回数(", ") TOP10");
+        setChartTitle(5, "", " 紐づけ切れ原因比");
 
         // 各種グラフ表示
         getTrips(checkedDepos);
@@ -393,6 +465,20 @@
         getNonTripNameRecord(data);
         getNonIdentifyNumberRecord(data);
         getCountNonTripNameRecord(data);
+        getCountNonTripNameRemark(data);
+    }
+
+     // グラフタイトル設定
+    function setChartTitle(titleCount, titleStringBefore, titleStringAfter){
+        var depoNames = getDepoNames();
+        var depoNameString = "";
+        for(var i=0; i<depoNames.length; i++){
+            if(i != 0)
+                depoNameString += "・";
+            depoNameString += depoNames[i];
+        }
+        depoNameString = titleStringBefore + depoNameString + titleStringAfter;
+        $("#card-title" + titleCount)[0].innerText = depoNameString;
     }
 
     // 選択したデポの名称取得
@@ -542,20 +628,6 @@
         });
     }
 
-    // グラフタイトル設定
-    function setChartTitle(titleCount, titleString){
-        var depoNames = getDepoNames();
-        var depoNameString = "";
-        if(titleCount != 4)
-            depoNameString = titleCount + ".";
-        for(var i=0; i<depoNames.length; i++){
-            if(i != 0)
-                depoNameString += "・";
-            depoNameString += depoNames[i];
-        }
-        depoNameString += titleString;
-        $("#card-title" + titleCount)[0].innerText = depoNameString;
-    }
     
     // 紐づけ切れ-ID有データのデータセット作成、登録
     function createNonTripNameRecordDatasets(countNonTripNameRecords){
@@ -592,6 +664,7 @@
       }
     })
 
+    // y軸のラベルの設定
     function setChartYAxesLabels(countNonTripNameRecords){
         var maxTripCount = countNonTripNameRecords[0].tripCount;
         if(maxTripCount <= 10){
@@ -670,10 +743,12 @@
             $("#edit-modal-error-message").text(errorMessage);
         });
     }
-    // 紐づけ切れ回数　取得
+    
+    // 便名称別紐づけ切れ回数取得
     function getCountNonTripNameRecord(data){
+
         // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("GetCountNonTripNameRemarks", "ManagementPortal")';
+        let url = window.location.origin + '@Url.Action("GetCountNonTripNameAndInTripMasterRecords", "ManagementPortal")';
         let method = 'Post';
 
         // Ajax call
@@ -690,7 +765,44 @@
         });
     }
 
-    function createCountNonTripNameRecordDatas(countNonTripNameRemarks){
+    function createCountNonTripNameRecordDatas(countNonTripNameRecords){
+        var noNameCounts = [];
+        var tripCounts = [];
+        var labels = [];
+        countNonTripNameRecords.forEach(function(countNonTripNameRecord){
+            noNameCounts.push(countNonTripNameRecord.noNameCount);
+            tripCounts.push(countNonTripNameRecord.tripCount);
+            labels.push(countNonTripNameRecord.identifyNumber);
+        });
+
+        createAndPushDatasets(countNonTripNameRecordChart, graphColors[1], noNameCounts, "紐づけ切れ");
+        createAndPushDatasets(countNonTripNameRecordChart, graphColors[0], tripCounts, "紐づけ有り");
+        countNonTripNameRecordChart.data.labels = labels;
+
+        countNonTripNameRecordChart.update();
+    }
+
+    // 紐づけ切れ原因比　取得
+    function getCountNonTripNameRemark(data){
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetCountNonTripNameRemarks", "ManagementPortal")';
+        let method = 'Post';
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false,
+        }).done(function (response) {
+            createCountNonTripNameRemarkDatas(response);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        });
+    }
+
+    function createCountNonTripNameRemarkDatas(countNonTripNameRemarks){
         var nonTripNameRemarkCounts = [];
         var backGroundColors = [];
         var labels = [];
