@@ -430,6 +430,7 @@
     </div>
 </div>
 <script type="text/javascript">
+    // 画面読み込み時
      $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
         var today = new Date();
@@ -443,6 +444,7 @@
         summaryDisplay();
     });
 
+    // グラフ一括表示、更新
     function summaryDisplay(){
         // 期間の開始、終了日付の取得
         var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
@@ -561,7 +563,7 @@
             data: data,
             async: false,
         }).done(function (response) {
-            // 出発実績無データのデータセット作成、登録
+            // 出発実績無し件数のデータセット作成、登録
             createTransitionDatasets(response, selectedDates, data.checkedDepos);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -569,7 +571,7 @@
         });
     }
         
-    // 出発実績無データのデータセット作成、登録
+    // 出発実績無し件数のデータセット作成、登録
     function createTransitionDatasets(nonDepartedAtRecords, selectedDates, checkedDepos){
         // 総件数
         var allNullCount = 0;
@@ -646,10 +648,13 @@
         var nonTripNameRecordCounts = [];
         var nonTripNameRecordIdentifyNumbers =[];
         var allTripCount = 0;
+
+        // 識別番号ごとに紐づけ切れ回数と識別番号のリストをそれぞれ作成
         for(var i=0; i<countNonTripNameRecords.length && i < 10; i++){
             nonTripNameRecordCounts.push(countNonTripNameRecords[i].tripCount);
             nonTripNameRecordIdentifyNumbers.push(countNonTripNameRecords[i].identifyNumber);
         }
+        // 総件数取得
         countNonTripNameRecords.forEach(function(countNonTripNameRecord){
             allTripCount += countNonTripNameRecord.tripCount;
         });
@@ -684,10 +689,12 @@
     // y軸のラベルの設定
     function setChartYAxesLabels(countNonTripNameRecords){
         var maxTripCount = countNonTripNameRecords[0].tripCount;
+        // 便の最大数が10以下の時
         if(maxTripCount <= 10){
             nonTripNameRecordChart.options.scales.yAxes[0].ticks.stepSize = 1.0;
             nonTripNameRecordChart.options.scales.yAxes[0].ticks.callback = function(value, index, values) {return value;};
         }
+        // 便の最大数が10より大きい時
         else{
             nonTripNameRecordChart.options.scales.yAxes[0].ticks.stepSize = 5.0;
             nonTripNameRecordChart.options.scales.yAxes[0].ticks.callback = function(value, index, values){
@@ -741,15 +748,6 @@
                 pageLength: 20,        
                 order: [[2, "desc"]],    // ID昇順
             });
-            var table = $("#tripRecordDataTable").DataTable();
-            table.on('draw', function () {
-                var body = $(table.table().body());
-
-                body.unhighlight();
-                body.highlight(table.search());
-            });
-
-
             if (document.querySelector("#loading") != null)
                 document.querySelector("#loading").style.display = "none";
 
@@ -775,6 +773,7 @@
             data: data,
             async: false,
         }).done(function (response) {
+            // 便名称別紐づけ切れ回数のデータセット作成、登録
             createCountNonTripNameRecordDatas(response);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -782,16 +781,19 @@
         });
     }
 
+    // 便名称別紐づけ切れ回数のデータセット作成、登録
     function createCountNonTripNameRecordDatas(countNonTripNameRecords){
         var noNameCounts = [];
         var tripCounts = [];
         var labels = [];
+        // 識別番号ごとに紐づけ切れ、紐付け有りそれぞれの回数のリストを作成
         countNonTripNameRecords.forEach(function(countNonTripNameRecord){
             noNameCounts.push(countNonTripNameRecord.noNameCount);
             tripCounts.push(countNonTripNameRecord.tripCount);
             labels.push(countNonTripNameRecord.identifyNumber);
         });
 
+        // リストからデータセット作成、登録
         createAndPushDatasets(countNonTripNameRecordChart, graphColors[1], noNameCounts, "紐づけ切れ");
         createAndPushDatasets(countNonTripNameRecordChart, graphColors[0], tripCounts, "紐づけ有り");
         countNonTripNameRecordChart.data.labels = labels;
@@ -819,6 +821,7 @@
             data: data,
             async: false,
         }).done(function (response) {
+            // 紐づけ切れ原因比のデータセット作成、登録
             createCountNonTripNameRemarkDatas(response);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             var errorMessage = jqXHR.responseJSON.errorMessage;
@@ -826,10 +829,12 @@
         });
     }
 
+    // 紐づけ切れ原因比のデータセット作成、登録
     function createCountNonTripNameRemarkDatas(countNonTripNameRemarks){
         var nonTripNameRemarkCounts = [];
         var backGroundColors = [];
         var labels = [];
+        // 紐づけ切れ原因毎に比率のリストを作成
         for(var i=0; i<countNonTripNameRemarks.length; i++){
             nonTripNameRemarkCounts.push(countNonTripNameRemarks[i].remarkPercentage);
             backGroundColors.push(graphColors[i]);

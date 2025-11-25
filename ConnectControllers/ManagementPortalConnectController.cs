@@ -5,9 +5,9 @@
         /// <summary>
         /// 識別番号有、便名称無のデータを識別番号ごとに数えたデータを取得するSQL
         /// </summary>
-        /// <param name="startOfPeriod"></param>
-        /// <param name="endOfPeriod"></param>
-        /// <param name="checkedDepos"></param>
+        /// <param name="startOfPeriod">期間の開始日</param>
+        /// <param name="endOfPeriod">期間の終了日</param>
+        /// <param name="checkedDepos">選択したデポ</param>
         /// <returns></returns>
         public static string CreateSQLToSelectCountNonTripNameRecordGroupByIdentifyNumber(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
@@ -29,6 +29,13 @@
             return sql;
         }
 
+        /// <summary>
+        /// 識別番号有、便マスターに該当する識別番号の便ありのデータの紐づけ切れ回数と紐付け有回数を取得するSQL
+        /// </summary>
+        /// <param name="startOfPeriod">期間の開始日</param>
+        /// <param name="endOfPeriod">期間の終了日</param>
+        /// <param name="checkedDepos">選択したデポ</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectCountNonTripNameRecordAndInTripMaster(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             var sql = $@"
@@ -67,6 +74,13 @@
             return sql;
         }
 
+        /// <summary>
+        /// 紐づけ切れ原因の一覧とそれぞれの回数を取得するSQL
+        /// </summary>
+        /// <param name="startOfPeriod">期間の開始日</param>
+        /// <param name="endOfPeriod">期間の終了日</param>
+        /// <param name="checkedDepos">選択したデポ</param>
+        /// <returns></returns>
         public static string CreateSQLToSelectNonTripNameRemarkCount(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             var sql = $@"

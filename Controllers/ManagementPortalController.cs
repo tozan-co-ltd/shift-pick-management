@@ -62,7 +62,7 @@ namespace ai_truck_load_measurement.Controllers
         }
 
         /// <summary>
-        /// 
+        /// 便別紐づけ切れ回数 TO10 取得
         /// </summary>
         /// <param name="startOfPeriod"></param>
         /// <param name="endOfPeriod"></param>
