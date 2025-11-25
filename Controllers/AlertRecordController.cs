@@ -400,7 +400,7 @@ namespace ai_truck_load_measurement.Controllers
                 try
                 {
                     // Excelファイル作成チェック
-                    var createRs = CreateFile.CheckCreateExcel(searchConditionDT, tAlertRecordDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName);
+                    var createRs = CreateFile.CheckCreateExcel(searchConditionDT, tAlertRecordDT, tmpFilename, sheetTwo, sheetNameOne, sheetNameTwo, gamenName, checkedDepos);
 
                     if (createRs.Item1)
                     {

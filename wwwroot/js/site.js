@@ -468,9 +468,29 @@ function EditModal(tripRecordID, isArrived, page) {
                         + "</select>"
                         + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onVerificationRequiredClick('" + item.tripRecordID + "', '" + isArrived + "', '" + page + "')\" id=\"verificationRequired\">"
                         + "<span class=\"text\">要検証</span>"
+                        + "</a>"
+                        + "</div>"
+                        + "</tr><tr>"
+                        + "<td>紐づけ切れ理由</td>"
+                        + "<td>"
+                        + "<div class=\"select-modal d-flex xs-block justify-content-start align-items-center p-0\">"
+                        + "<select name=\"loadRemarkSelect\"  class=\"form-select mr-2\" id=\"loadRemarkSelect\" >"
+                        + "<option value=\"\" hidden></option>"
+                        + "<option value=\"予定時間超過(早)\">予定時間超過(早)</option>"
+                        + "<option value=\"予定時間超過(遅)\">予定時間超過(遅)</option>"
+                        + "<option value=\"識別番号読取ミス\">識別番号読取ミス</option>"
+                        + "<option value=\"マスター未登録\">マスター未登録</option>"
+                        + "<option value=\"識別番号なし\">識別番号なし</option>"
+                        + "<option value=\"枠外駐車\">枠外駐車</option>"
+                        + "<option value=\"トラック未確認\">トラック未確認</option>"
+                        + "<option value=\"その他\">その他</option>"
+                        + "</select>"
+                        + "<a href=\"#\" class=\"btn btn-update\" onclick=\"onRemarkRequiredClick('" + item.tripRecordID + "', '" + page + "')\" id=\"remarkRequired\">"
+                        + "<span class=\"text\">登録</span>"
                         + "</a>";
                 } else {
-                    tr += "<label id=\"loadStatusSelect\" ></label>";
+                    tr += "<label id=\"loadStatusSelect\" ></label>"
+                        + "<label id=\"loadRemarkSelect\" ></label";
                 }
 
                 tr += "</div>"
@@ -503,8 +523,10 @@ function EditModal(tripRecordID, isArrived, page) {
                 container.append(tr);
                 if (authorizedKubun == "1" || authorizedKubun == "2") {
                     $('#loadStatusSelect').val(response.annotationLoadClass);
+                    $('#loadRemarkSelect').val(response.remark);
                 } else if (response.annotationLoadStatus != null) {
                     $('#loadStatusSelect').text(response.annotationLoadStatus + "%");
+                    $('#loadRemarkSelect').text(response.remark);
                 } else {
                     $('#loadStatusSelect').text("-");
                 }
@@ -560,6 +582,36 @@ function onVerificationRequiredClick(tripRecordID, isArrived, page) {
         });
     }
 }
+
+// 紐づけ切れ理由登録ボタン押下時
+function onRemarkRequiredClick(tripRecordID, page) {
+    event.preventDefault();
+    var remark = $('[name=loadRemarkSelect]').val();
+    if (remark != "") {
+
+        DeleteErrorMessages()
+        // フォーム情報取得
+        let url = window.location.href + '/UpdateRemark';
+        url = url.replace(page, 'LoadRecord');
+        let method = 'POST';
+        let data = { tripRecordID: tripRecordID, remark: remark };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            tableDisplay(page);
+            // 完了モーダル表示
+            alert('登録が完了しました。');
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#edit-modal-error-message").text(errorMessage);
+        });
+    }
+}
+
 //---------------------------------------------------------------------//
 
 
@@ -610,8 +662,8 @@ function tableDisplayCommon(page, data) {
             scrollX: true,          // 横スクロール可
             scrollCollapse: true,   // 縦スクロール表示
             searchHighlight: true,  // 検索ハイライト
-            orderFixed: [18, "asc"],
-            order: [[0, "asc"] , [7, "asc"], [1, "asc"]],    // ID昇順
+            orderFixed: [19, "asc"],
+            order: [[0, "asc"] , [16, "asc"], [1, "asc"]],    // ID昇順
             "oLanguage": {
                 "sSearch": ""
             },
@@ -991,6 +1043,14 @@ function depoCheckDisplay(model) {
         if (depos[i].id == "depo" + mainDepoID) {
             depos[i].checked = true;
         }
+    }
+}
+
+// 画面表示時に全てのデポにチェックを入れる
+function allDepoCheckDisplay(model) {
+    var depos = $('input[name=depos]');
+    for (var i = 0; i < depos.length; i++) {
+        depos[i].checked = true;
     }
 }
 

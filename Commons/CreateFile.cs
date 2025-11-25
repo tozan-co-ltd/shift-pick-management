@@ -365,7 +365,7 @@ namespace ai_truck_load_measurement.Commons
         /// <param name="folderName">フォルダ名</param>
         /// <param name="headerName">ヘッダー名</param>
         /// <returns>作成結果,出力フォルダフルパス</returns>
-        public static (bool, string) CheckCreateExcel(DataTable dtOne, DataTable dtTwo, string tmpFilename, bool sheetTwo, string sheetNameOne, string sheetNameTwo, string gamenName)
+        public static (bool, string) CheckCreateExcel(DataTable dtOne, DataTable dtTwo, string tmpFilename, bool sheetTwo, string sheetNameOne, string sheetNameTwo, string gamenName, List<string> checkedDepos)
         {
             try
             {
@@ -373,7 +373,7 @@ namespace ai_truck_load_measurement.Commons
                 var sheetName = tmpFilename.Replace(".xlsx", "");
 
                 // ヘッダーリストを作成
-                List<string> headerList = CreateHeaderList(gamenName);
+                List<string> headerList = CreateHeaderList(gamenName, checkedDepos);
                 List<string> headerListTwo = new();
                 if (sheetTwo)
                 {
@@ -544,7 +544,7 @@ namespace ai_truck_load_measurement.Commons
 
                     using ExcelWorksheet sheet = package.Workbook.Worksheets[sheetName];
                     // フィルター設定
-                    sheet.Cells["A1:Q1"].AutoFilter = true;
+                    sheet.Cells["A1:R1"].AutoFilter = true;
                     // ウィンドウ枠の固定
                     sheet.View.FreezePanes(2, 1);
                     // セル自動選択
@@ -663,7 +663,7 @@ namespace ai_truck_load_measurement.Commons
         /// </summary>
         /// <param name="headerName">ヘッダー名</param>
         /// <returns>ヘッダーリスト</returns>
-        public static List<string> CreateHeaderList(string gamenName)
+        public static List<string> CreateHeaderList(string gamenName, List<string> checkedDepos)
         {
             List<string> headerList = new();
             switch (gamenName)
@@ -721,6 +721,48 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("更新日時");
                     headerList.Add("更新者");
                     break;
+                case "1.出発実績無し件数":
+                    headerList.Add("稼働日");
+                    headerList.Add("出発実績無合計");
+                    foreach(var depoID in checkedDepos)
+                    {
+                        var depoName = "";
+                        if (depoID == "1")
+                            depoName = "SyncBace名和北";
+                        else if (depoID == "3")
+                            depoName = "船見デポ";
+                        headerList.Add(depoName + "-識別番号有");
+                        headerList.Add(depoName + "-識別番号無");
+                        headerList.Add(depoName + "-総稼働数");
+                    }
+                    break;
+                case "2.紐づけ切れ - ID有":
+                    headerList.Add("便実績ID");
+                    headerList.Add("識別番号");
+                    headerList.Add("到着実績");
+                    headerList.Add("想定される便");
+                    headerList.Add("直近の到着予定");
+                    headerList.Add("到着ズレ時間(分)");
+                    headerList.Add("想定される便枝番");
+                    headerList.Add("紐づけ切れ理由");
+                    break;
+                case "3.紐づけ切れ - ID無":
+                    headerList.Add("便実績ID");
+                    headerList.Add("到着実績");
+                    headerList.Add("出発実績");
+                    headerList.Add("稼働日");
+                    headerList.Add("ステーション名");
+                    headerList.Add("紐づけ切れ理由");
+                    headerList.Add("到着荷量画像パス");
+                    headerList.Add("出発荷量画像パス");
+                    break;
+                case "4.紐づけ切れ回数":
+                    headerList.Add("便ID");
+                    headerList.Add("便名称");
+                    headerList.Add("紐づけ切れ回数");
+                    headerList.Add("実績総数");
+                    headerList.Add("デポ名");
+                    break;
                 default:
                     headerList.Add("便名称");
                     headerList.Add("便枝番");
@@ -739,6 +781,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("到着予定時間");
                     headerList.Add("出発予定時間");
                     headerList.Add("稼働日");
+                    headerList.Add("紐づけ切れ理由");
                     break;
             }
             return headerList;

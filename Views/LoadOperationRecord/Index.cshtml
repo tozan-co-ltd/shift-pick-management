@@ -523,8 +523,8 @@
             method: method,
             data: data
         }).done(function (response) {
-            var option = document.createElement("option");
             for (var i = 0; i < response.length; i++) {
+            var option = document.createElement("option");
                 // セレクトボックスの選択肢生成
                 if (response[i].text == null) {
                     option.text = "";
