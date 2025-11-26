@@ -1,0 +1,869 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.ManagementPortalModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+}
+<style>
+     /* カードレイアウト部分をラッピングし、
+         Flexboxを指定"space-between"で各アイテムを均等に配置し、
+         最初と最後のアイテムを端に寄せます。*/
+     #cardlayout-wrap {
+         position: relative;
+         display: -webkit-box;
+         display: -ms-flexbox;
+         display: flex;
+         -ms-flex-pack: justify;
+         margin: 0.8em auto;
+         width: 100%;
+         -ms-flex-wrap: wrap;
+         flex-wrap: wrap;
+         -webkit-box-pack: justify;
+         justify-content: space-between;
+     }
+
+
+
+         /* カードレイアウト内の画像を幅いっぱいに表示 */
+         #cardlayout-wrap img {
+             display: block;
+             max-width: 100%;
+             height: auto;
+             margin: auto;
+         }
+
+     .card-figure {
+         margin: 0 0 0;
+         padding: 0.5em;
+     }
+
+     /* カードレイアウトのタイトル部分 */
+     .card-title {
+         margin: 0 0 0;
+         color: #333;
+         text-align: center;
+         font-size: 1.8em;
+         font-weight: bold;
+     }
+
+     /* カードレイアウトの説明文部分 */
+     .created-at {
+         margin: 0 0.5em 0;
+         color: #493511;
+         text-align: center;
+     }
+
+     .station-number {
+         margin: 0;
+         padding: 0.5em;
+         color: #493511;
+         font-size: 1.4em;
+     }
+
+     .truck-status {
+         color: #493511;
+         text-align: end;
+         font-weight: bold;
+         font-size: 1.3em;
+         margin-bottom: 0;
+     }
+
+     .card-list {
+         margin: 0.5em auto;
+         padding: 0;
+         width: calc(96% / 2); /* 96%幅を3で割るという指定 */
+         background: #ffffff;
+         box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+         border-radius: 10px;
+     }
+
+     .top-title {
+         color: #493511;
+         font-size: 1.8em;
+     }
+
+</style>
+
+<div class="card shadow de-inspection masterInfo m-4">
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="card border-left-custom">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>各タイトルをクリックすると対応した管理画面に遷移します</li>
+                            <li>初期状態では「デポ：すべて、期間：1ヶ月前～本日」でデータが表示されます</li>
+                            <li>グラフ2・4では、識別番号に対応する便がある場合、グラフをクリックすると該当便枝番マスターに遷移します</li>
+                            <li>紐づけ切れ原因比における「原因未登録」は、紐づけ切れ原因がまだ登録されていない状態であることを指します</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">デポ</span>
+                <div>
+                    <label class="mr-2"><input type="checkbox" class=" mr-2" id="allDepo" />すべて  [</label>
+                    <label id="selectDepos"></label>]
+                </div>
+            </div>
+        </div>
+
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">期間</span>
+                <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
+                <label class="m-1">～</label>
+                <input type="text" id="endOfPeriod" class="form-control pickerDate endDate mr-3">
+                <div class="input-group-append mr-3">
+                    <a class="btn btn-secondary btn-icon-split" onclick="summaryDisplay()">
+                        <span class="icon text-white-50">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <span class="text">検索</span>
+                    </a>
+                </div>
+                <span class="loader" style="display:inline-block; vertical-align: middle;" role="status" id="loading"></span>
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <hr />
+
+       
+
+        <div id="cardlayout-wrap">
+            <section class="card-list">
+                <h2 class="card-title mt-1" >
+                    <a href="~/NonDepartedAtRecord" style="color:black" id="card-title1"></a>
+                </h2>
+                <p class="truck-status mr-3" id="non-departed-at-record-status"></p>
+                <div class="chartjs-graph chartjs-arrival" id="transitionChart">
+                    <canvas id="binedabanChartArrival"></canvas>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
+                    <script>
+                        var ctx = document.getElementById("binedabanChartArrival");
+                        function adjustCanvasHeight() {
+                            var canvas = document.getElementById("binedabanChartArrival");
+                            var width = window.innerWidth;
+                        }
+
+                        window.addEventListener('resize', adjustCanvasHeight);
+
+                        adjustCanvasHeight();
+
+                        var transitionChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: [],
+                                datasets: []
+                            },
+                            options: {
+                                //凡例は表示
+                                legend: {
+                                    display: true
+                                },
+                                scales: {
+                                    //X軸
+                                    xAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            fontSize: 24
+                                        },
+                                        ticks: {
+                                            fontSize: 20
+                                        }
+                                    }],
+                                    //Y軸
+                                    yAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '件数',
+                                            fontSize: 24
+                                        },
+                                        //Y軸の範囲を指定
+                                        ticks: {
+                                            min: 0.0,
+                                            stepSize: 1.0,
+                                            fontSize: 20
+                                        }
+                                    }]
+                                },
+                            }
+                        });
+                    </script>
+                </div>
+            </section>
+            
+            <section class="card-list">
+                <h2 class="card-title mt-1" >
+                    <a href="~/NonTripNameRecord" style="color:black" id="card-title2"></a>
+                </h2>
+                <p class="truck-status mr-3" id="non-trip-name-record-status"></p>
+                <div class="chartjs-graph chartjs-arrival" id="nonTripNameRecordChart">
+                    <canvas id="binedabanChartnonTripNameRecord"></canvas>
+                    <script>
+                        var ctx = document.getElementById("binedabanChartnonTripNameRecord");
+                        function adjustCanvasHeight() {
+                            var canvas = document.getElementById("binedabanChartnonTripNameRecord");
+                            var width = window.innerWidth;
+                        }
+
+                        window.addEventListener('resize', adjustCanvasHeight);
+
+                        adjustCanvasHeight();
+
+                        var nonTripNameRecordChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [],
+                                datasets: []
+                            },
+                            options: {
+                                //凡例は非表示
+                                legend: {
+                                    display: false
+                                },
+                                scales: {
+                                    //X軸
+                                    xAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '識別番号',
+                                            fontSize: 24
+                                        },
+                                        ticks: {
+                                            fontSize: 20
+                                        }
+                                    }],
+                                    //Y軸
+                                    yAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '回数',
+                                            fontSize: 24
+                                        },
+                                        //Y軸の範囲を指定
+                                        ticks: {
+                                            min: 0.0,
+                                            fontSize: 20,
+                                        }
+                                    }]
+                                },
+                                
+                                tooltips: {
+                                    callbacks: {
+                                        label: function(tooltipItem, data) {
+                                            var label = tooltipItem.label;
+                                            var trip = model.trips.find(x => x.identifyNumber == label);
+                                            if(trip != null)
+                                                label = trip.tripName + "：" + tooltipItem.value;
+                                            else
+                                                label = "未登録番号：" + tooltipItem.value;
+                                            return label;
+                                        }
+
+                                    }
+                                },
+                            }
+                        });
+                    </script>
+                </div>
+            </section>
+            <section class="card-list">
+                <h2 class="card-title mt-1">
+                    <a href="~/NonIdentifyNumberRecord" style="color:black" id="card-title3"></a>
+                </h2>
+                <p class="truck-status mr-3" id="non-identify-number-record-status"></p>
+                <div id="tripRecordTable" style="padding: 10px">
+                </div>
+            </section>
+            <section class="card-list">
+                <h2 class="card-title mt-1">
+                    <a href="~/CountNonTripNameRecord" style="color:black" id="card-title4"></a>
+                </h2>
+                <p class="truck-status mr-3" id="non-trip-name-record-status"></p>
+                <div class="chartjs-graph chartjs-arrival" id="countNonTripNameRecordChart">
+                    <canvas id="binedabanChartCountNonTripNameRecord"></canvas>
+                    <script>
+                        var ctx = document.getElementById("binedabanChartCountNonTripNameRecord");
+                        function adjustCanvasHeight() {
+                            var canvas = document.getElementById("binedabanChartCountNonTripNameRecord");
+                            var width = window.innerWidth;
+                        }
+
+                        window.addEventListener('resize', adjustCanvasHeight);
+
+                        adjustCanvasHeight();
+
+                        var countNonTripNameRecordChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [],
+                                datasets: []
+                            },
+                            options: {
+                                //凡例は非表示
+                                legend: {
+                                    display: true
+                                },
+                                tooltips: {
+                                    callbacks: {
+                                        title: function(tooltipItems) {
+                                            var label = tooltipItems[0].label;
+                                            var trip = model.trips.find(x => x.identifyNumber == label);
+                                            if(trip != null)
+                                                label = label + ":" + trip.tripName;
+                                            return label;
+                                        }
+
+                                    }
+                                },
+                                scales: {
+                                    //X軸
+                                    xAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '識別番号',
+                                            fontSize: 24
+                                        },
+                                        ticks: {
+                                            fontSize: 20
+                                        },
+                                        stacked: true,
+                                    }],
+                                    //Y軸
+                                    yAxes: [{
+                                        //軸ラベル表示
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: '回数',
+                                            fontSize: 24
+                                        },
+                                        //Y軸の範囲を指定
+                                        ticks: {
+                                            min: 0.0,
+                                            fontSize: 20,
+                                            callback: function(value, index, values) {
+                                                if (Math.floor(value) === value) {
+                                                    return value;
+                                                }
+                                            },
+                                        },
+                                        stacked: true,
+                                    }]
+                                },
+
+                               
+                            }
+                        });
+                    </script>
+                </div>
+            </section>
+            <section class="card-list">
+                <h2 class="card-title mt-1" id="card-title5" >
+                    <a style="color:black"></a>
+                </h2>
+                <p class="truck-status" id="truck-status1">　</p>
+                <div class="chartjs-graph chartjs-arrival" id="allHimodukegireChart">
+                    <canvas id="binedabanChartAllHimoduke"></canvas>
+                    <script>
+                        var ctx = document.getElementById("binedabanChartAllHimoduke");
+                        function adjustCanvasHeight() {
+                            var canvas = document.getElementById("binedabanChartAllHimoduke");
+                            var width = window.innerWidth;
+                        }
+
+                        window.addEventListener('resize', adjustCanvasHeight);
+
+                        adjustCanvasHeight();
+
+                        var allHimodukegireChart = new Chart(ctx, {
+                            type: 'pie',
+                                data: {
+                                    labels: [],
+                                    datasets: []
+                                },
+                                options: {
+                                    //凡例は表示
+                                    legend: {
+                                        display: true
+                                    },
+                                    tooltips: {
+                                        callbacks: {
+                                            label: function(tooltipItem, data) {
+                                                 return data.labels[tooltipItem.index]
+                                                        + "："
+                                                        + (data.datasets[0].remarkCounts[tooltipItem.index])
+                                                        + "件, "
+                                                        + (data.datasets[0].data[tooltipItem.index])
+                                                        + " % "
+                                            }
+
+                                        }
+                                    },
+                                }
+                            });
+                    </script>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    // 画面読み込み時
+     $(document).ready(function () {
+        model = @Html.Raw(Json.Serialize(Model));
+        var today = new Date();
+        var oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 30);
+        $('#endOfPeriod').val(GetDayString(today));
+        $('#startOfPeriod').val(GetDayString(oneWeekAgo));
+        addDepos(model);
+        $('input[id=allDepo]')[0].checked = true;
+        pushAllCheckBox();
+        summaryDisplay();
+    });
+
+    // グラフ一括表示、更新
+    function summaryDisplay(){
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // デポ情報取得
+        var checkedDepos = getCheckedDepos();
+        
+        // グラフの初期化
+        transitionChart.data.datasets = [];
+        nonTripNameRecordChart.data.datasets = [];
+        countNonTripNameRecordChart.data.datasets = [];
+        allHimodukegireChart.data.datasets = [];
+
+        // サマリ表示用データ作成
+        let data = {
+            startOfPeriod: startOfPeriod,
+            endOfPeriod: endOfPeriod,
+            checkedDepos: checkedDepos
+        };
+
+        // 各種タイトル設定
+        setChartTitle(1, "1.出発実績無し件数推移(", ")");
+        setChartTitle(2, "2.紐づけ切れ-ID有(", ") TOP10");
+        setChartTitle(3, "3.紐づけ切れ-ID無(", ")");
+        setChartTitle(4, "4.便別紐づけ切れ回数(", ") TOP10");
+        setChartTitle(5, "紐づけ切れ原因比(", ")");
+
+        // 各種グラフ表示
+        getTrips(checkedDepos);
+        getNonDepartedAtRecord(data);
+        getNonTripNameRecord(data);
+        getNonIdentifyNumberRecord(data);
+        getCountNonTripNameRecord(data);
+        getCountNonTripNameRemark(data);
+    }
+
+     // グラフタイトル設定
+    function setChartTitle(titleCount, titleStringBefore, titleStringAfter){
+        var depoNames = getDepoNames();
+        var depoNameString = "";
+        for(var i=0; i<depoNames.length; i++){
+            if(i != 0)
+                depoNameString += "・";
+            depoNameString += depoNames[i];
+        }
+        depoNameString = titleStringBefore + depoNameString + titleStringAfter;
+        $("#card-title" + titleCount)[0].innerText = depoNameString;
+    }
+
+    // 選択したデポの名称取得
+    function getDepoNames(){
+        var checkedDepos = getCheckedDepos();
+        var depoNames = [];
+        checkedDepos.forEach(function(depoID){
+            if(depoID == 1)
+                depoNames.push("SB");
+            else if(depoID == 3)
+                depoNames.push("船見");
+        });
+        return depoNames;
+    }
+
+    // 便マスター情報取得
+    function getTrips(checkedDepos){
+        let url = window.location.origin + '@Url.Action("GetTrips", "ManagementPortal")';
+        let method = 'Post';
+        let data = {checkedDepos: checkedDepos};
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false,
+        }).done(function (response) {
+            // ビューモデルの便マスターリスト更新
+            model.trips = response;
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        });
+    }
+
+    // 出発実績無データ取得
+    function getNonDepartedAtRecord(data){
+
+
+        // 選択期間の日数を取得
+        var startDate = new Date($('#startOfPeriod').val());
+        var endDate = new Date($('#endOfPeriod').val());
+        var diffMilliSec = endDate - startDate;
+        var diffDays = parseInt(diffMilliSec / 1000 / 60 / 60 / 24);
+
+        var selectedDates = [];
+        var currentDate = startDate;
+
+        for(var i=0; i<=diffDays; i++){
+            var dateForChart = GetDayStringForChart(currentDate);
+            selectedDates.push(dateForChart);
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+
+        // グラフの表示期間設定
+        transitionChart.data.labels = selectedDates;
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetNonDepartedAtRecords", "ManagementPortal")';
+        let method = 'Post';
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false,
+        }).done(function (response) {
+            // 出発実績無し件数のデータセット作成、登録
+            createTransitionDatasets(response, selectedDates, data.checkedDepos);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        });
+    }
+        
+    // 出発実績無し件数のデータセット作成、登録
+    function createTransitionDatasets(nonDepartedAtRecords, selectedDates, checkedDepos){
+        // 総件数
+        var allNullCount = 0;
+
+        // デポごとに日付、データ件数のリストを作成
+        for(var i=0; i<checkedDepos.length; i++){
+            var depoRecords = nonDepartedAtRecords.filter(item => item.depoID == checkedDepos[i]);
+            var sameDepoStatuses = [];
+            // 日付ごとに日付とデータ件数を属性として持つデータを作成
+            selectedDates.forEach(function(day){
+                var targetRecord = depoRecords.find(item => GetDayStringForChart(new Date(item.workDay)) == day);
+                if(targetRecord != null){
+                    var totalNullCount = targetRecord.nullCount + targetRecord.noIdentifyNumberNullCount;
+                    allNullCount += totalNullCount;
+                    sameDepoStatuses.push({ x: day, y: totalNullCount });
+                }else{
+                    sameDepoStatuses.push({x: day, y:0});
+                }
+            });
+
+            // データセット作成、登録
+            var label = "";
+            if(checkedDepos[i] == 1)
+             label = "SyncBace名和北";
+            else if(checkedDepos[i] == 3)
+             label = "船見デポ";
+            var chartColor = graphColors[i];
+            createAndPushDatasets(transitionChart, chartColor, sameDepoStatuses, label);
+        }
+        $('#non-departed-at-record-status')[0].textContent = "総件数：" + allNullCount + "件";
+        transitionChart.update();
+    }
+
+    // chartjs用のデータセット作成
+    function createChartDatasets(color, label){
+        var datasets = {
+            label: label,
+            borderColor: color,
+            fill: false,
+            data: [],
+            tension: 0,
+            pointRadius: '5',
+            backgroundColor: color,
+            spanGaps: true,
+        }
+        return datasets;
+    }
+        
+    
+    // 紐づけ切れ-ID有 取得
+    function getNonTripNameRecord(data){
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetCountNonTripNameRecords", "ManagementPortal")';
+        let method = 'Post';
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false,
+        }).done(function (response) {
+            // 紐づけ切れ-ID有データのデータセット作成、登録
+            createNonTripNameRecordDatasets(response);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        });
+    }
+
+    
+    // 紐づけ切れ-ID有データのデータセット作成、登録
+    function createNonTripNameRecordDatasets(countNonTripNameRecords){
+        var nonTripNameRecordCounts = [];
+        var nonTripNameRecordIdentifyNumbers =[];
+        var allTripCount = 0;
+
+        // 識別番号ごとに紐づけ切れ回数と識別番号のリストをそれぞれ作成
+        for(var i=0; i<countNonTripNameRecords.length && i < 10; i++){
+            nonTripNameRecordCounts.push(countNonTripNameRecords[i].tripCount);
+            nonTripNameRecordIdentifyNumbers.push(countNonTripNameRecords[i].identifyNumber);
+        }
+        // 総件数取得
+        countNonTripNameRecords.forEach(function(countNonTripNameRecord){
+            allTripCount += countNonTripNameRecord.tripCount;
+        });
+        // データセット作成、登録
+        var chartColor = graphColors[0];
+        var label = "";
+        $('#non-trip-name-record-status')[0].textContent = "総件数：" + allTripCount + "件";
+        nonTripNameRecordChart.data.labels = nonTripNameRecordIdentifyNumbers;
+        createAndPushDatasets(nonTripNameRecordChart, chartColor, nonTripNameRecordCounts, label);
+
+        setChartYAxesLabels(countNonTripNameRecords);
+
+        nonTripNameRecordChart.update();
+    }
+
+    // 紐づけ切れ-ID有のグラフクリック時
+    document.getElementById('binedabanChartnonTripNameRecord').addEventListener('click', e => {
+        const elements = nonTripNameRecordChart.getElementAtEvent(e);
+        graphClick(elements);
+    });
+
+    // グラフクリック時のイベント
+    function graphClick(elements){
+        if (elements.length) {
+            var trip = model.trips.find(x => x.identifyNumber == elements[0]._model.label);
+            // 識別番号に対応する便が存在する場合、該当便の便枝番マスターに遷移
+            if(trip != null)
+                window.location.href = "M_TripBranchNumber?tripId=" + trip.tripID + "&isChecked=False";
+      }
+    }
+
+    // y軸のラベルの設定
+    function setChartYAxesLabels(countNonTripNameRecords){
+        var maxTripCount = countNonTripNameRecords[0].tripCount;
+        // 便の最大数が10以下の時
+        if(maxTripCount <= 10){
+            nonTripNameRecordChart.options.scales.yAxes[0].ticks.stepSize = 1.0;
+            nonTripNameRecordChart.options.scales.yAxes[0].ticks.callback = function(value, index, values) {return value;};
+        }
+        // 便の最大数が10より大きい時
+        else{
+            nonTripNameRecordChart.options.scales.yAxes[0].ticks.stepSize = 5.0;
+            nonTripNameRecordChart.options.scales.yAxes[0].ticks.callback = function(value, index, values){
+                if (index % 2 === values.length % 2) {
+                    return "";
+                }
+                return value;
+            };
+        }
+    }
+
+
+    // 紐づけ切れ-ID無 取得
+    function getNonIdentifyNumberRecord(data){
+           // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("SearchData", "NonIdentifyNumberRecord")';
+        let method = 'Post';
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            $("#tripRecordTable").empty().html(response.searchedTripRecordHTML);
+            tableLength = response.searchedTripRecordLength + 1;
+
+            // 日本語表示
+            const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+            const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
+
+           // ID(2列目)昇順
+            $("#tripRecordDataTable").DataTable({
+                "language": {
+                    "url": language_url,
+                    searchPlaceholder: "フリーワード(全件)"
+                },
+                lengthChange: false,    // 件数切替
+                info: false,            // 総件数
+                scrollX: true,          // 横スクロール可
+                scrollY: "250px",       // 縦スクロール高さ
+                scrollCollapse: true,   // 縦スクロール表示
+                searching: false,  // 検索ハイライト
+                "oLanguage": {
+                    "sSearch": ""
+                },
+                dom: dom_structure,
+                "columnDefs": [
+                    { className:"dt-body-left", "targets": [5] },
+                ],
+                pageLength: 20,        
+                order: [[2, "desc"]],    // ID昇順
+            });
+            if (document.querySelector("#loading") != null)
+                document.querySelector("#loading").style.display = "none";
+
+
+            $('#non-identify-number-record-status')[0].textContent = "総件数：" + response.searchedTripRecordLength + "件";
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#edit-modal-error-message").text(errorMessage);
+        });
+    }
+    
+    // 便名称別紐づけ切れ回数取得
+    function getCountNonTripNameRecord(data){
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetCountNonTripNameAndInTripMasterRecords", "ManagementPortal")';
+        let method = 'Post';
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false,
+        }).done(function (response) {
+            // 便名称別紐づけ切れ回数のデータセット作成、登録
+            createCountNonTripNameRecordDatas(response);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        });
+    }
+
+    // 便名称別紐づけ切れ回数のデータセット作成、登録
+    function createCountNonTripNameRecordDatas(countNonTripNameRecords){
+        var noNameCounts = [];
+        var tripCounts = [];
+        var labels = [];
+        // 識別番号ごとに紐づけ切れ、紐付け有りそれぞれの回数のリストを作成
+        countNonTripNameRecords.forEach(function(countNonTripNameRecord){
+            noNameCounts.push(countNonTripNameRecord.noNameCount);
+            tripCounts.push(countNonTripNameRecord.tripCount);
+            labels.push(countNonTripNameRecord.identifyNumber);
+        });
+
+        // リストからデータセット作成、登録
+        createAndPushDatasets(countNonTripNameRecordChart, graphColors[1], noNameCounts, "紐づけ切れ");
+        createAndPushDatasets(countNonTripNameRecordChart, graphColors[0], tripCounts, "紐づけ有り");
+        countNonTripNameRecordChart.data.labels = labels;
+
+        countNonTripNameRecordChart.update();
+    }
+
+    // 便別紐づけ切れ回数のグラフクリック時
+    document.getElementById('binedabanChartCountNonTripNameRecord').addEventListener('click', e => {
+        const elements = countNonTripNameRecordChart.getElementAtEvent(e);
+        graphClick(elements);
+    });
+
+
+    // 紐づけ切れ原因比　取得
+    function getCountNonTripNameRemark(data){
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetCountNonTripNameRemarks", "ManagementPortal")';
+        let method = 'Post';
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false,
+        }).done(function (response) {
+            // 紐づけ切れ原因比のデータセット作成、登録
+            createCountNonTripNameRemarkDatas(response);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        });
+    }
+
+    // 紐づけ切れ原因比のデータセット作成、登録
+    function createCountNonTripNameRemarkDatas(countNonTripNameRemarks){
+        var nonTripNameRemarkPercentages = [];
+        var nonTripNameRemarkCounts = [];
+        var backGroundColors = [];
+        var labels = [];
+        // 紐づけ切れ原因毎に比率のリストを作成
+        for(var i=0; i<countNonTripNameRemarks.length; i++){
+            nonTripNameRemarkPercentages.push(countNonTripNameRemarks[i].remarkPercentage);
+            nonTripNameRemarkCounts.push(countNonTripNameRemarks[i].remarkCount);
+            backGroundColors.push(graphColors[i]);
+            var label = countNonTripNameRemarks[i].remark;
+            if(label == '')
+                label = "原因未登録";
+            labels.push(label);
+        };
+        var datasets = {backgroundColor: backGroundColors, data: nonTripNameRemarkPercentages, remarkCounts: nonTripNameRemarkCounts}; 
+            
+        allHimodukegireChart.data.datasets.push(datasets);
+        allHimodukegireChart.data.labels = labels;
+        allHimodukegireChart.update();
+    }
+
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        pushAllCheckBox();
+    });
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            pushDepoCheckBox();
+        });
+    });
+
+</script>

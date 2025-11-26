@@ -257,7 +257,6 @@
 
         // M_TripModel取得
         var tripModel = @Html.Raw(Json.Serialize(Model));
-        console.log(tripModel);
         tripModel.m_TripList.forEach(function (item) {
             var dayShiftStartTime = GetTimeString(new Date(item.dayShiftStartTime));
             var applicableStartDateTime = GetDateString(new Date(item.applicableStartDateTime));

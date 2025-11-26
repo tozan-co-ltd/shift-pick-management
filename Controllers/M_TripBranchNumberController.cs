@@ -167,7 +167,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="tripBranchNumberList">枝連番を追加する対象便枝番リスト</param>
         /// <returns></returns>
-        private List<M_TripBranchNumberModel> AddTripBranchSeq(List<M_TripBranchNumberModel> tripBranchNumberList)
+        public static List<M_TripBranchNumberModel> AddTripBranchSeq(List<M_TripBranchNumberModel> tripBranchNumberList)
         {
             var countBeforeShiftStartTimeRow = 0; // 到着予定時間が昼勤開始時間より早い行の数
             var tripBranchSeq = 1; // 枝連番
