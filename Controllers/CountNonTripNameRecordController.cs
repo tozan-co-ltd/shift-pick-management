@@ -45,9 +45,9 @@ namespace ai_truck_load_measurement.Controllers
                                 <tr align=""center"">
                                     <th class=""font-weight-bold"">便ID</th>
                                     <th class=""font-weight-bold"">便名称</th>
+                                    <th class=""font-weight-bold"">紐づけ切れ割合い</th>
                                     <th class=""font-weight-bold"">紐づけ切れ回数</th>
                                     <th class=""font-weight-bold"">実績総数</th>
-                                    <th class=""font-weight-bold"">紐づけ切れ割合い</th>
                                     <th class=""font-weight-bold"">デポ名</th>
                                 </tr>
                             </thead>
@@ -63,9 +63,9 @@ namespace ai_truck_load_measurement.Controllers
                             <tr>
                                 <td>{countNonTripNameRecord.TripID}</td>
                                 <td>{countNonTripNameRecord.TripName}</td>
+                                <td>{noNamePercentege}%</td>
                                 <td>{countNonTripNameRecord.NoNameCount}</td>
                                 <td>{countNonTripNameRecord.TripCount}</td>
-                                <td>{noNamePercentege}%</td>
                                 <td>{countNonTripNameRecord.DepoName}</td>
                             </tr>
                         ";
