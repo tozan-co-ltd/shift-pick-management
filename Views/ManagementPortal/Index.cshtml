@@ -850,4 +850,17 @@
         allHimodukegireChart.update();
     }
 
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        pushAllCheckBox();
+    });
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            pushDepoCheckBox();
+        });
+    });
+
 </script>
