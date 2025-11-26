@@ -295,7 +295,6 @@
     $(document).ready(function () {
         // M_UserModel取得
         var userModel = @Html.Raw(Json.Serialize(Model));
-        console.log(userModel);
     })
 
     // 編集ボタン押下
@@ -405,7 +404,6 @@
         let url = window.location.origin + '@Url.Action("Delete", "M_User")';
         let method = 'POST';
         let data = { "userId": $('#deleteUserID').val() };
-        console.log($('#deleteUserId').val);
 
         // Ajax call
         $.ajax({
