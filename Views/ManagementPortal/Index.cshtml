@@ -415,6 +415,8 @@
                                             label: function(tooltipItem, data) {
                                                  return data.labels[tooltipItem.index]
                                                         + "："
+                                                        + (data.datasets[0].remarkCounts[tooltipItem.index])
+                                                        + "件, "
                                                         + (data.datasets[0].data[tooltipItem.index])
                                                         + " % "
                                             }
@@ -831,19 +833,21 @@
 
     // 紐づけ切れ原因比のデータセット作成、登録
     function createCountNonTripNameRemarkDatas(countNonTripNameRemarks){
+        var nonTripNameRemarkPercentages = [];
         var nonTripNameRemarkCounts = [];
         var backGroundColors = [];
         var labels = [];
         // 紐づけ切れ原因毎に比率のリストを作成
         for(var i=0; i<countNonTripNameRemarks.length; i++){
-            nonTripNameRemarkCounts.push(countNonTripNameRemarks[i].remarkPercentage);
+            nonTripNameRemarkPercentages.push(countNonTripNameRemarks[i].remarkPercentage);
+            nonTripNameRemarkCounts.push(countNonTripNameRemarks[i].remarkCount);
             backGroundColors.push(graphColors[i]);
             var label = countNonTripNameRemarks[i].remark;
             if(label == '')
                 label = "原因未登録";
             labels.push(label);
         };
-        var datasets = {backgroundColor: backGroundColors, data: nonTripNameRemarkCounts}; 
+        var datasets = {backgroundColor: backGroundColors, data: nonTripNameRemarkPercentages, remarkCounts: nonTripNameRemarkCounts}; 
             
         allHimodukegireChart.data.datasets.push(datasets);
         allHimodukegireChart.data.labels = labels;
