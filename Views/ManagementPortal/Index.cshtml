@@ -96,11 +96,10 @@
                 <div class="card border-left-custom">
                     <div class="card-body">
                         <ul class="mb-0">
-                            <li>管理用画面各種のポータル画面になります</li>
-                            <li>各グラフ、表のタイトルをクリックすると対応した管理画面に遷移します</li>
+                            <li>各タイトルをクリックすると対応した管理画面に遷移します</li>
                             <li>初期状態では「デポ：すべて、期間：1ヶ月前～本日」でデータが表示されます</li>
-                            <li>紐づけ切れ回数TOP10グラフでは、識別番号に対応する便がある場合、グラフをクリックすると該当便枝番マスターに遷移します</li>
-                            <li>紐づけ切れ原因比における「原因未登録」は、紐づけ切れ原因がまだ登録されていないデフォルトの状態であることを指します</li>
+                            <li>グラフ2・4では、識別番号に対応する便がある場合、グラフをクリックすると該当便枝番マスターに遷移します</li>
+                            <li>紐づけ切れ原因比における「原因未登録」は、紐づけ切れ原因がまだ登録されていない状態であることを指します</li>
                         </ul>
                     </div>
                 </div>
@@ -415,6 +414,8 @@
                                             label: function(tooltipItem, data) {
                                                  return data.labels[tooltipItem.index]
                                                         + "："
+                                                        + (data.datasets[0].remarkCounts[tooltipItem.index])
+                                                        + "件, "
                                                         + (data.datasets[0].data[tooltipItem.index])
                                                         + " % "
                                             }
@@ -467,11 +468,11 @@
         };
 
         // 各種タイトル設定
-        setChartTitle(1, "1.", " 出発実績無し件数推移");
+        setChartTitle(1, "1.出発実績無し件数推移(", ")");
         setChartTitle(2, "2.紐づけ切れ-ID有(", ") TOP10");
         setChartTitle(3, "3.紐づけ切れ-ID無(", ")");
         setChartTitle(4, "4.便別紐づけ切れ回数(", ") TOP10");
-        setChartTitle(5, "", " 紐づけ切れ原因比");
+        setChartTitle(5, "紐づけ切れ原因比(", ")");
 
         // 各種グラフ表示
         getTrips(checkedDepos);
@@ -682,7 +683,7 @@
             var trip = model.trips.find(x => x.identifyNumber == elements[0]._model.label);
             // 識別番号に対応する便が存在する場合、該当便の便枝番マスターに遷移
             if(trip != null)
-                window.location.href = "/M_TripBranchNumber?tripId=" + trip.tripID + "&isChecked=False";
+                window.location.href = "M_TripBranchNumber?tripId=" + trip.tripID + "&isChecked=False";
       }
     }
 
@@ -831,23 +832,38 @@
 
     // 紐づけ切れ原因比のデータセット作成、登録
     function createCountNonTripNameRemarkDatas(countNonTripNameRemarks){
+        var nonTripNameRemarkPercentages = [];
         var nonTripNameRemarkCounts = [];
         var backGroundColors = [];
         var labels = [];
         // 紐づけ切れ原因毎に比率のリストを作成
         for(var i=0; i<countNonTripNameRemarks.length; i++){
-            nonTripNameRemarkCounts.push(countNonTripNameRemarks[i].remarkPercentage);
+            nonTripNameRemarkPercentages.push(countNonTripNameRemarks[i].remarkPercentage);
+            nonTripNameRemarkCounts.push(countNonTripNameRemarks[i].remarkCount);
             backGroundColors.push(graphColors[i]);
             var label = countNonTripNameRemarks[i].remark;
             if(label == '')
                 label = "原因未登録";
             labels.push(label);
         };
-        var datasets = {backgroundColor: backGroundColors, data: nonTripNameRemarkCounts}; 
+        var datasets = {backgroundColor: backGroundColors, data: nonTripNameRemarkPercentages, remarkCounts: nonTripNameRemarkCounts}; 
             
         allHimodukegireChart.data.datasets.push(datasets);
         allHimodukegireChart.data.labels = labels;
         allHimodukegireChart.update();
     }
+
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        pushAllCheckBox();
+    });
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            pushDepoCheckBox();
+        });
+    });
 
 </script>

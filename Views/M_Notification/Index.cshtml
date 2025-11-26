@@ -348,7 +348,6 @@
 <script type="text/javascript">
     $(document).ready(function () {
         model = @Html.Raw(Json.Serialize(Model));
-        console.log(model);
         addDepos(model);
         depoCheckDisplay(model);
         tableDisplay();
