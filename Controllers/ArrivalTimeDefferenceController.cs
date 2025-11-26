@@ -82,7 +82,8 @@ namespace ai_truck_load_measurement.Controllers
                     }
 
                     searchData += GetAverageTimeDeff(loadRecordList, trips);
-                    searchData += GetCountTimeOver(loadRecordList, trips);
+                    searchData += GetCountEarlyTimeOver(loadRecordList, trips);
+                    searchData += GetCountLateTimeOver(loadRecordList, trips);
                 }
                 searchData += $@"
                             </tbody>
@@ -163,7 +164,7 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // 便毎の予実差の平均取得
-                var averageTimeDeff = (double)targetTripTimeDeffSam / (double)targetTripRecords.Count;
+                var averageTimeDeff = Math.Ceiling((double)targetTripTimeDeffSam / (double)targetTripRecords.Count * 10) /10;
 
                 averageTimeDeffString += $@"
                         <td>{averageTimeDeff}m</td>
@@ -192,7 +193,7 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     var comparisonTime = new DateTime(1900, 1, 1, tripRecord.ArrivedAt.Hour, tripRecord.ArrivedAt.Minute, tripRecord.ArrivedAt.Second);
                     var timeDeff = GetTimeDeff(tripRecord.ArrivalScheduledTime, comparisonTime);
-                    if(timeDeff < -60)
+                    if(timeDeff <= -60)
                         targetTripEarlyOverCount++;
                 }
 
@@ -224,7 +225,7 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     var comparisonTime = new DateTime(1900, 1, 1, tripRecord.ArrivedAt.Hour, tripRecord.ArrivedAt.Minute, tripRecord.ArrivedAt.Second);
                     var timeDeff = GetTimeDeff(tripRecord.ArrivalScheduledTime, comparisonTime);
-                    if (timeDeff < +20)
+                    if (timeDeff >= +20)
                         targetTripLateOverCount++;
                 }
 
