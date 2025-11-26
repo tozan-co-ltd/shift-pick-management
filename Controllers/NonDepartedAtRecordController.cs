@@ -49,7 +49,7 @@ namespace ai_truck_load_measurement.Controllers
                     var lastCol = "";
                     var depoName = "";
                     if (depoID == "1")
-                        depoName = "SyncBace名和";
+                        depoName = "SyncBace名和北";
                     else if (depoID == "3")
                         depoName = "船見デポ";
                     if (depoID == checkedDepos.Last())

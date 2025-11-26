@@ -17,6 +17,12 @@
                     <div class="card-body">
                         <ul class="mb-0">
                             <li>期間内の出発実績が登録されていないデータの件数を表示します。</li>
+                            <li>出発実績が登録されない原因としては、以下のものが考えられます。
+                                <ul>
+                                    <li>トラックの状態遷移キャッチエラー</li>
+                                    <li>OCRの動作停止による読み取りエラー</li>
+                                </ul>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -95,7 +101,7 @@
         userName = model.userName;
         var today = new Date();
         var oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 30);
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
         addDepos(model);
