@@ -682,7 +682,7 @@
             var trip = model.trips.find(x => x.identifyNumber == elements[0]._model.label);
             // 識別番号に対応する便が存在する場合、該当便の便枝番マスターに遷移
             if(trip != null)
-                window.location.href = "/M_TripBranchNumber?tripId=" + trip.tripID + "&isChecked=False";
+                window.location.href = "M_TripBranchNumber?tripId=" + trip.tripID + "&isChecked=False";
       }
     }
 
