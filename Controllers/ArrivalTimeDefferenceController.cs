@@ -286,6 +286,11 @@ namespace ai_truck_load_measurement.Controllers
             return lateTimeOverString;
         }
 
+        /// <summary>
+        /// アラート範囲(遅着)回数取得
+        /// </summary>
+        /// <param name="targetTripRecords">便実績リスト</param>
+        /// <returns></returns>
         private int GetCountLateTimeOver(List<LoadRecordModel> targetTripRecords)
         {
             var targetTripLateOverCount = 0;
@@ -403,6 +408,14 @@ namespace ai_truck_load_measurement.Controllers
 
         }
 
+        /// <summary>
+        /// 便実績から予実差平均表示用のデータテーブルに変換する
+        /// </summary>
+        /// <param name="loadRecordList"></param>
+        /// <param name="trips"></param>
+        /// <param name="startOfPeriod"></param>
+        /// <param name="endOfPeriod"></param>
+        /// <returns></returns>
         public DataTable ConversionLoadRecordToDataTable(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips, DateTime startOfPeriod, DateTime endOfPeriod)
         {
             var convertedTable = new DataTable();
@@ -520,6 +533,11 @@ namespace ai_truck_load_measurement.Controllers
             return dataRow;
         }
 
+        /// <summary>
+        /// 「便名称_便枝番」のリスト作成
+        /// </summary>
+        /// <param name="trips"></param>
+        /// <returns></returns>
         private List<string> GetTripNameAndBranchSeqs(List<SelectedTripModel> trips)
         {
             var tripNameAndBranchSeqs = new List<string>();
