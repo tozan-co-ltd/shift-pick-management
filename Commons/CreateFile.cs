@@ -663,7 +663,7 @@ namespace ai_truck_load_measurement.Commons
         /// </summary>
         /// <param name="headerName">ヘッダー名</param>
         /// <returns>ヘッダーリスト</returns>
-        public static List<string> CreateHeaderList(string gamenName, List<string> checkedDepos)
+        public static List<string> CreateHeaderList(string gamenName, List<string> strings)
         {
             List<string> headerList = new();
             switch (gamenName)
@@ -724,7 +724,7 @@ namespace ai_truck_load_measurement.Commons
                 case "1.出発実績無し件数":
                     headerList.Add("稼働日");
                     headerList.Add("出発実績無合計");
-                    foreach(var depoID in checkedDepos)
+                    foreach(var depoID in strings)
                     {
                         var depoName = "";
                         if (depoID == "1")
@@ -762,6 +762,13 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("紐づけ切れ回数");
                     headerList.Add("実績総数");
                     headerList.Add("デポ名");
+                    break;
+                case "到着時間予実差平均表示":
+                    headerList.Add("");
+                    foreach(var tripNameAndBranchSeq in strings)
+                    {
+                        headerList.Add(tripNameAndBranchSeq);
+                    }
                     break;
                 default:
                     headerList.Add("便名称");
