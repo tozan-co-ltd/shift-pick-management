@@ -75,6 +75,11 @@ label{
     content: '\f0ad';
 }
 
+
+.icon-categoryid-5::before {
+    content: '\f013';
+}
+
 /* || レスポンシブデザイン */
 @media screen and (max-width: 1200px) {
     html {
