@@ -37,7 +37,7 @@
                 <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
             }
         </div>
-        <form id="ArrivalTimeDefferenceForm">
+        <form id="CountAlertRecordForm">
             <div class="span-paragraph mb-3">
                 <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
                     <div class="d-flex justify-content-start align-items-center unset-pdl">
@@ -107,7 +107,7 @@
         </form>
 
         <div class="col-16 d-flex justify-content-start align-items-center mb-3 unset-pdl">
-            <button type="submit" class="btn btn-secondary btn-icon-split" id="search-btn" onclick="onSearchClick('ArrivalTimeDefference')">
+            <button type="submit" class="btn btn-secondary btn-icon-split" id="search-btn" onclick="onSearchClick('CountAlertRecord')">
                 <span class="icon text-white-50">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
@@ -120,7 +120,7 @@
         <div class="mg-bot-20 mb-3">
             <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
                 <div class="input-group-append mr-1">
-                    <a class="btn btn-info btn-icon-split" onclick="onExportFileAlert('ArrivalTimeDefference', '@Model.ViewTitle')" id="exportFile">
+                    <a class="btn btn-info btn-icon-split" onclick="onExportFileAlert('CountAlertRecord', '@Model.ViewTitle')" id="exportFile">
                         <span class="icon text-white-50">
                             <i class="fas fa-file-export"></i>
                         </span>
@@ -135,3 +135,189 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    // 画面ロード時
+    $(document).ready(function () {
+        model = @Html.Raw(Json.Serialize(Model));
+        var today = new Date();
+        var oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        $('#endOfPeriod').val(GetDayString(today));
+        $('#startOfPeriod').val(GetDayString(oneWeekAgo));
+        addDepos(model);
+        depoCheckDisplay(model);
+        periodChange();
+    });
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        pushAllCheckBox();
+        periodChange();
+    });
+
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            pushDepoCheckBox();
+        periodChange();
+        });
+    })
+
+    // アラート履歴テーブルの表示
+    function tableDisplay() {
+        // チェックボックスの入力情報取得
+        var checkedDepos = getCheckedDepos();
+
+
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("SearchData", "CountAlertRecord")';
+        let method = 'Post';
+        let data = {selectedTrips: arrayTrips, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, checkedDepos: checkedDepos};
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            console.log(response.searchedTripRecordHTML);
+            $('#tripRecordTable').empty().html(response.searchedTripRecordHTML);
+            tableLength = response.searchedTripRecordLength + 1;
+            // 日本語表示
+            const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+            const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
+
+            // ID(2列目)昇順
+            $("#tripTable").DataTable({
+                "language": {
+                    "url": language_url
+                },
+                lengthChange: true,     // 件数切替
+                info: true,            // 総件数
+                scrollX: true,          // 横スクロール可
+                scrollCollapse: true,   // 縦スクロール表示
+                order: [[0, "asc"]],    // ID降順
+                searchHighlight: true,  // 検索ハイライト
+
+                "oLanguage": {
+                    "sSearch": "フリーワード(全件)"
+                },
+                dom: dom_structure
+            });
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#edit-modal-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#edit-modal-error-message").text(errorMessage);
+            }
+        });
+    }
+
+    // 検索ボタン押下時
+    function onSearchClick() {
+        DeleteErrorMessages();
+        // 選択された便が0件の場合
+        if(arrayTrips.length == 0){
+            var errorMessage = 'E1017: 便を選択してください。';
+            $("#div-error-message").text(errorMessage);
+            return;
+        }
+
+
+        if (isWithin90Days()) {
+            tableDisplay();
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+    // Excel出力
+    async function onExportFileAlert(page, gamenName) {
+        event.preventDefault();
+        $('#div-error-message').text("");
+
+        // チェックボックスの入力情報取得
+        var checkedDepos = getCheckedDepos();
+
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // フォーム情報取得
+        let data = {
+            "gamenName": gamenName,
+            "startOfPeriod": startOfPeriod,
+            "endOfPeriod": endOfPeriod,
+            "selectedTrips": arrayTrips,
+            checkedDepos: checkedDepos
+        };
+
+        // Excel出力共通処理
+        onExportFileTripsCommon(page, data);
+
+    }
+
+
+     // ドロップダウンの表示・非表示
+    dropdownButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropdownContainer.classList.toggle('show');
+    });
+
+    // コンテンツ外をクリックした場合、プルダウンを閉じる
+    document.addEventListener('click', (e) => {
+        if (!dropdownContainer.contains(e.target)) {
+            dropdownContainer.classList.remove('show');
+        }
+    });
+
+    // 期間の開始日付変更時
+    $('#startOfPeriod').change(function () {
+        periodChange();
+    });
+
+    // 期間の終了日時変更時
+    $('#endOfPeriod').change(function () {
+        periodChange();
+    })
+
+     function allToggleOpen() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (!smallItems.classList.contains('show')) {
+                smallItems.classList.add('show');
+                toggleIcon.classList.remove('collapsed');
+            }
+        });
+    }
+
+    function allToggleClose() {
+        event.preventDefault();
+        // 中項目のヘッダーをクリックで小項目を表示/非表示
+        let mediumHeaders = dropdownContent.querySelectorAll('.medium-header');
+        mediumHeaders.forEach(header => {
+            const smallItems = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.toggle-icon');
+            if (smallItems.classList.contains('show')) {
+                smallItems.classList.remove('show');
+                toggleIcon.classList.add('collapsed');
+            }
+        });
+    }
+
+</script>

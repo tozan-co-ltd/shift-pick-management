@@ -770,6 +770,16 @@ namespace ai_truck_load_measurement.Commons
                         headerList.Add(tripNameAndBranchSeq);
                     }
                     break;
+                case "アラート回数詳細表示":
+                    headerList.Add("便名称_便枝番");
+                    headerList.Add("到着時間(早)");
+                    headerList.Add("出発時間(早)");
+                    headerList.Add("到着時間(遅)");
+                    headerList.Add("出発時間(遅)");
+                    headerList.Add("到着荷量(下限)");
+                    headerList.Add("出発荷量(下限)");
+                    headerList.Add("実績総件数");
+                    break;
                 default:
                     headerList.Add("便名称");
                     headerList.Add("便枝番");

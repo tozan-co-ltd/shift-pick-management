@@ -11,8 +11,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                 FROM m_notifications AS Notifications
                 INNER JOIN m_trips AS Trips
                 ON Trips.trip_id = Notifications.trip_id
-                WHERE notification_start_datetime < '{startOfPeriod}'
-                AND notification_end_datetime > '{endOfPeriod}'
+                WHERE notification_start_datetime < '{startOfPeriod.ToString("yyyy/MM/dd")}'
+                AND notification_end_datetime > '{endOfPeriod.ToString("yyyy/MM/dd")}'
                 {CreateSQLToSelectedTrips(selectedTrips)}
             ";
             return sql;
@@ -28,9 +28,40 @@ namespace ai_truck_load_measurement.ConnectControllers
                 else
                     sql += "OR ";
 
-                sql += $@"(trip_name = '{selectedTrips[i].TripName}' AND trip_branche_seq = {selectedTrips[i].TripBranchSeq})
+                sql += $@"(trip_name = '{selectedTrips[i].TripName}' AND trip_branch_seq = {selectedTrips[i].TripBranchSeq})
                 ";
             }
+            return sql;
+        }
+
+        public static string CreateSQLToSelectTripNameFromPeriodAndNotifications(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
+        {
+            var sql = $@"
+                SELECT DISTINCT
+                    trip_name,
+                    TripRecords.trip_branch_seq,
+                    TripHistories.depo_id,
+                    name As depo_name
+                FROM t_trip_records AS TripRecords
+                INNER JOIN
+                    m_trip_histories AS TripHistories
+                ON 
+                    TripRecords.trip_id = TripHistories.trip_id
+                INNER JOIN
+                    m_depos AS Depos
+                ON
+                    TripHistories.depo_id = Depos.depo_id
+                INNER JOIN
+	                m_notifications AS Notifications
+                ON
+	                TripHistories.trip_id = Notifications.trip_id
+                AND TripRecords.trip_branch_seq = Notifications.trip_branch_seq
+                WHERE work_day BETWEEN '{startOfPeriod.ToString("yyyy/MM/dd")}' AND '{endOfPeriod.ToString("yyyy/MM/dd")}'
+                AND trip_name IS NOT NULL
+                AND notification_start_datetime < '{startOfPeriod.ToString("yyyy/MM/dd")}'
+                AND notification_end_datetime > '{endOfPeriod.ToString("yyyy/MM/dd")}'
+                {LoadRecordConnectController.SQLOfCheckedDepos(checkedDepos)}
+            ";
             return sql;
         }
     }
