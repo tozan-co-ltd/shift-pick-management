@@ -167,7 +167,7 @@ namespace ai_truck_load_measurement.Controllers
         private string GetAverageTimeDeffHTML(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
         {
             var averageTimeDeffString = $@"
-                    <tr>
+                    <tr style=""font-weight: bold"">
                         <td>平均ズレ時間</td>
 
             ";
@@ -217,7 +217,7 @@ namespace ai_truck_load_measurement.Controllers
         private string GetCountEarlyTimeOverHTML(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
         {
             var earlyTimeOverString = $@"
-                    <tr>
+                    <tr style=""font-weight: bold"">
                         <td>アラート範囲(早着)</td>
 
             ";
@@ -265,7 +265,7 @@ namespace ai_truck_load_measurement.Controllers
         private string GetCountLateTimeOverHTML(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
         {
             var lateTimeOverString = $@"
-                    <tr>
+                    <tr style=""font-weight: bold"">
                         <td>アラート範囲(遅着)</td>
 
             ";
