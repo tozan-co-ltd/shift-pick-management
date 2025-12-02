@@ -662,7 +662,7 @@ function tableDisplayCommon(page, data) {
             scrollX: true,          // 横スクロール可
             scrollCollapse: true,   // 縦スクロール表示
             searchHighlight: true,  // 検索ハイライト
-            orderFixed: [19, "asc"],
+            orderFixed: [18, "asc"],
             order: [[0, "asc"] , [16, "asc"], [1, "asc"]],    // ID昇順
             "oLanguage": {
                 "sSearch": ""

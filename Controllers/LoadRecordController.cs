@@ -353,9 +353,9 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{arrivalScheduledTime}</td>
                             <td>{departureScheduledTime}</td>
                             <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
-                            <td>{remark}</td>
                             <td hidden>{item.TripRecordID}</td>
                             <td hidden>{hasTripName}</td>
+                            <td>{remark}</td>
                         </tr>
                 ";
                 }

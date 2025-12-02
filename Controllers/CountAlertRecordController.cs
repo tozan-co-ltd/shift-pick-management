@@ -15,19 +15,8 @@ namespace ai_truck_load_measurement.Controllers
             var model = new AlertRecordViewModel();
             try
             {
-                var alertRecordController = new AlertRecordController();
                 // ログイン中ユーザー情報取得
                 var user = ClaimsLoginUserData();
-                // アラート履歴情報取得SQL作成
-                var alertRecordSql = AlertRecordConnectController.CreateSQLToSelectAlertRecord();
-                // DB接続
-                List<AlertRecordModel> alertRecordList = AlertRecordConnectController.ConnectTAlertRecords<AlertRecordModel>(alertRecordSql);
-
-                // 便実績情報取得SQL作成
-                var loadRecordSql = AlertRecordConnectController.CreateSQLToSelectTripRecordFromAlertRecord(alertRecordList);
-                List<LoadRecordModel> loadRecordList = AlertRecordConnectController.ConnectTAlertRecords<LoadRecordModel>(loadRecordSql);
-
-              
                 // ログインユーザーのメインデポ情報取得
                 model.MainDepoID = user.MainDepoID;
                 model.MainDepoName = user.MainDepoName;
