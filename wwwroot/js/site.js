@@ -330,7 +330,7 @@ function OnArrivalLoadImageClick(tripRecordID, button, page) {
     // テーブルに表示されている便実績のIDをリスト化
     trs = button.parentNode.parentNode.parentNode.childNodes;
     for (i = 0; i < trs.length - tableLength; i++) {
-        arrayTrs.push(trs[i + tableLength].childNodes[35].textContent);
+        PushTripRecordIDToArrayTrs(arrayTrs, trs);
     }
     EditModal(tripRecordID, isArrived, page);
 }
@@ -344,9 +344,19 @@ function OnDepartureLoadImageClick(tripRecordID, button, page) {
     // テーブルに表示されている便実績のIDをリスト化
     trs = button.parentNode.parentNode.parentNode.childNodes;
     for (i = 0; i < trs.length - tableLength; i++) {
-        arrayTrs.push(trs[i + tableLength].childNodes[35].textContent);
+        PushTripRecordIDToArrayTrs(arrayTrs, trs);
     }
     EditModal(tripRecordID, isArrived, page);
+}
+
+// テーブルに表示されている便実績のIDをリスト化
+function PushTripRecordIDToArrayTrs(arrayTrs, trs) {
+    // 押したボタンの列の要素を取得
+    var arrayChildNodes = trs[i + tableLength].childNodes;
+    // 列の要素の内便実績IDのIndexを取得
+    var tripRecordIDIndex = Array.from(arrayChildNodes).findIndex(x => x.className == 'trip-record-id');
+    // リストに便実績IDを追加
+    arrayTrs.push(trs[i + tableLength].childNodes[tripRecordIDIndex].textContent);
 }
 
 // 荷量画像モーダル作成
@@ -662,8 +672,8 @@ function tableDisplayCommon(page, data) {
             scrollX: true,          // 横スクロール可
             scrollCollapse: true,   // 縦スクロール表示
             searchHighlight: true,  // 検索ハイライト
-            orderFixed: [19, "asc"],
-            order: [[0, "asc"] , [16, "asc"], [1, "asc"]],    // ID昇順
+            orderFixed: [4, "asc"], // 便名称無しを下に表示する
+            order: [[0, "asc"] , [18, "asc"], [1, "asc"]],    // 便名称、稼働日、枝番で昇順
             "oLanguage": {
                 "sSearch": ""
             },

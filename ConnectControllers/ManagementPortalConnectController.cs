@@ -99,6 +99,7 @@
                 AND TripRecords.trip_id IS NULL
                 {LoadRecordConnectController.SQLOfCheckedDepos(checkedDepos)}
                 GROUP BY remark
+                ORDER BY remark_count DESC
             ";
             return sql;
         }
