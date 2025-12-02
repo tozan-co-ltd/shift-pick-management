@@ -1472,3 +1472,31 @@ html {
     background-color: #cccccc !important;*/
     color: gray;
 }
+
+.arrival-time-deff-table-top td {
+    border-collapse: collapse !important;
+    font-weight: bold;
+    border-top: double 5px;
+}
+
+.arrival-time-deff-table-bottom td {
+    border-collapse: collapse !important;
+    font-weight: bold;
+    border-bottom: double 5px;
+}
+/* årê¸Çà¯Ç≠ */
+.arrival-time-deff-table thead th:first-child {
+    border-left: 1px solid #404040;
+}
+
+.arrival-time-deff-table thead th {
+    border-right: 1px solid #404040;
+}
+
+.arrival-time-deff-table tbody td:first-child {
+    border-left: 1px solid #404040;
+}
+
+.arrival-time-deff-table tbody td {
+    border-right: 1px solid #404040;
+}

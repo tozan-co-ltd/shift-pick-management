@@ -40,7 +40,7 @@ namespace ai_truck_load_measurement.Controllers
                 }
 
                 // テーブルのヘッダ部分
-                searchData += GetTableHeader(trips);
+                searchData += GetTableHeader(trips, "tripTable");
 
                 // テーブルのbody部分
                 if (loadRecordList.Count > 0)
@@ -61,12 +61,23 @@ namespace ai_truck_load_measurement.Controllers
                             {
                                 var comparisonTime = new DateTime(1900, 1, 1, targetDateRecord.ArrivedAt.Hour, targetDateRecord.ArrivedAt.Minute, targetDateRecord.ArrivedAt.Second);
                                 var timeDeff = GetTimeDeff(targetDateRecord.ArrivalScheduledTime, comparisonTime);
+                                var emphasizeColorStyle = "";
 
                                 var timeDeffString = "";
-                                if (timeDeff < 0) timeDeffString = $"{timeDeff}m";
-                                else timeDeffString = $"+{timeDeff}m";
+                                if (timeDeff < 0)
+                                {
+                                    if (timeDeff <= -60)
+                                        emphasizeColorStyle = $" style=\"background-color:#ccddee\"";
+                                    timeDeffString = $"{emphasizeColorStyle}>{timeDeff}分";
+                                }
+                                else
+                                {
+                                    if (timeDeff >= 20)
+                                        emphasizeColorStyle = $@" style=""background-color:#f0908d""";
+                                    timeDeffString = $@"{emphasizeColorStyle}>+{timeDeff}分";
+                                }
                                     searchData += $@"
-                                <td>{timeDeffString}</td>
+                                <td{timeDeffString}</td>
                             ";
                             }
                             else
@@ -82,15 +93,21 @@ namespace ai_truck_load_measurement.Controllers
                         ";
                     }
 
-                    searchData += GetAverageTimeDeffHTML(loadRecordList, trips);
-                    searchData += GetCountEarlyTimeOverHTML(loadRecordList, trips);
-                    searchData += GetCountLateTimeOverHTML(loadRecordList, trips);
-                }
-                searchData += $@"
+                    //searchData += GetAverageTimeDeffHTML(loadRecordList, trips);
+                    //searchData += GetCountEarlyTimeOverHTML(loadRecordList, trips);
+                    //searchData += GetCountLateTimeOverHTML(loadRecordList, trips); 
+                    searchData += $@"
                             </tbody>
-                        </table>
+                            <tbody>
+                            <tr hidden></tr>
+                            {GetAverageTimeDeffHTML(loadRecordList, trips)}
+                            {GetCountEarlyTimeOverHTML(loadRecordList, trips)}
+                            {GetCountLateTimeOverHTML(loadRecordList, trips)}
+                            </tbody>
                     </div>
-                ";
+                    ";
+                }
+                
 
                 return Json(new SearchedTripRecordListModel
                 {
@@ -115,14 +132,14 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="trips">選択した便</param>
         /// <returns></returns>
-        private string GetTableHeader( List<SelectedTripModel> trips)
+        private string GetTableHeader( List<SelectedTripModel> trips, string tableID)
         {
             var tableHeader = $@"
                     <div class=""mt-3"">
-                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center"" id=""tripTable"">
+                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center arrival-time-deff-table"" id=""{tableID}"">
                             <thead>
                                 <tr align=""center"">
-                                    <th class=""font-weight-bold""></th>
+                                    <th class=""font-weight-bold"">稼働日</th>
             ";
 
             foreach (var trip in trips)
@@ -167,7 +184,7 @@ namespace ai_truck_load_measurement.Controllers
         private string GetAverageTimeDeffHTML(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
         {
             var averageTimeDeffString = $@"
-                    <tr style=""font-weight: bold"">
+                    <tr class=""arrival-time-deff-table-top"" >
                         <td>平均ズレ時間</td>
 
             ";
@@ -180,7 +197,7 @@ namespace ai_truck_load_measurement.Controllers
                 var averageTimeDeff = GetAverageTimeDeff(targetTripRecords);
 
                 averageTimeDeffString += $@"
-                        <td>{averageTimeDeff}m</td>
+                        <td>{averageTimeDeff}分</td>
                 ";
             }
             averageTimeDeffString += "</tr>";
@@ -218,7 +235,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             var earlyTimeOverString = $@"
                     <tr style=""font-weight: bold"">
-                        <td>アラート範囲(早着)</td>
+                        <td style=""background-color:#ccddee"">アラート範囲(早着)</td>
 
             ";
             foreach (var trip in trips)
@@ -265,8 +282,8 @@ namespace ai_truck_load_measurement.Controllers
         private string GetCountLateTimeOverHTML(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
         {
             var lateTimeOverString = $@"
-                    <tr style=""font-weight: bold"">
-                        <td>アラート範囲(遅着)</td>
+                    <tr class=""arrival-time-deff-table-bottom"">
+                        <td style=""background-color:#f0908d"">アラート範囲(遅着)</td>
 
             ";
             foreach (var trip in trips)
