@@ -329,6 +329,8 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{item.TripName}</td>
                             <td>{item.TripBranchSeq}</td>   
                             <td>{item.Tag}</td>   
+                            <td class=""trip-record-id"" hidden>{item.TripRecordID}</td>
+                            <td hidden>{hasTripName}</td>
                             <td>{item.IdentifyNumber}</td>
                             <td>{item.ArrivedAt.ToString("yyyy/MM/dd HH:mm")}</td>
                             <td>{departed}</td>
@@ -354,8 +356,6 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{departureScheduledTime}</td>
                             <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
                             <td>{remark}</td>
-                            <td hidden>{item.TripRecordID}</td>
-                            <td hidden>{hasTripName}</td>
                         </tr>
                 ";
                 }
