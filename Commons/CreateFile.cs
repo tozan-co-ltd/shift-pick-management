@@ -764,7 +764,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("デポ名");
                     break;
                 case "到着時間予実差平均表示":
-                    headerList.Add("");
+                    headerList.Add("稼働日");
                     foreach(var tripNameAndBranchSeq in strings)
                     {
                         headerList.Add(tripNameAndBranchSeq);
@@ -779,6 +779,14 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("到着荷量(下限)");
                     headerList.Add("出発荷量(下限)");
                     headerList.Add("実績総件数");
+                    break;
+                case "荷量平均表示":
+                    headerList.Add("稼働日");
+                    foreach (var tripNameAndBranchSeq in strings)
+                    {
+                        headerList.Add(tripNameAndBranchSeq + " 到着");
+                        headerList.Add(tripNameAndBranchSeq + " 出発");
+                    }
                     break;
                 default:
                     headerList.Add("便名称");

@@ -458,8 +458,8 @@ namespace ai_truck_load_measurement.Controllers
                         var timeDeff = GetTimeDeff(targetDateRecord.ArrivalScheduledTime, comparisonTime);
 
                         var timeDeffString = "";
-                        if (timeDeff < 0) timeDeffString = $"{timeDeff}m";
-                        else timeDeffString = $"+{timeDeff}m";
+                        if (timeDeff < 0) timeDeffString = $"{timeDeff}分";
+                        else timeDeffString = $"+{timeDeff}分";
 
                         dataRow[trip.TripName + "_" + trip.TripBranchSeq] = timeDeffString;
                     }
