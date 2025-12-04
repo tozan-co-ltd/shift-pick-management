@@ -205,7 +205,7 @@
                 info: true,            // 総件数
                 scrollX: true,          // 横スクロール可
                 scrollCollapse: true,   // 縦スクロール表示
-                order: [[0, "asc"]],    // ID降順
+                order: [[0, "asc"]],    // ID昇順
                 searchHighlight: true,  // 検索ハイライト
 
                 "oLanguage": {
@@ -214,18 +214,6 @@
                 dom: dom_structure
             });
 
-             // ID(2列目)昇順
-            $("#resultTable").DataTable({
-                "language": {
-                    "url": language_url
-                },
-                lengthChange: false,     // 件数切替
-                info: false,            // 総件数
-                scrollX: true,          // 横スクロール可
-                scrollCollapse: true,   // 縦スクロール表示
-                searchHighlight: false,  // 検索ハイライト
-                dom: dom_structure
-            });
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;

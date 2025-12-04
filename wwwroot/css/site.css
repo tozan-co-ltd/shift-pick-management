@@ -1474,14 +1474,16 @@ html {
 }
 
 .arrival-time-deff-table-top td {
-    border-collapse: collapse !important;
     font-weight: bold;
+    font-style: italic;
     border-top: double 5px;
+    border-spacing: 0px 15px;
 }
 
 .arrival-time-deff-table-bottom td {
     border-collapse: collapse !important;
     font-weight: bold;
+    font-style:italic;
     border-bottom: double 5px;
 }
 /* Œrü‚ğˆø‚­ */

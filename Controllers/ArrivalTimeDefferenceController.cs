@@ -67,13 +67,17 @@ namespace ai_truck_load_measurement.Controllers
                                 if (timeDeff < 0)
                                 {
                                     if (timeDeff <= -60)
-                                        emphasizeColorStyle = $" style=\"background-color:#ccddee\"";
+                                        emphasizeColorStyle = $" style=\"background-color:#A3C1E0\"";
+                                    else if(timeDeff <= -30)
+                                        emphasizeColorStyle = $" style=\"background-color:#eff4f9\"";
                                     timeDeffString = $"{emphasizeColorStyle}>{timeDeff}分";
                                 }
                                 else
                                 {
                                     if (timeDeff >= 20)
                                         emphasizeColorStyle = $@" style=""background-color:#f0908d""";
+                                    else if(timeDeff >= 10)
+                                        emphasizeColorStyle = $" style=\"background-color:#FBE4E4\"";
                                     timeDeffString = $@"{emphasizeColorStyle}>+{timeDeff}分";
                                 }
                                     searchData += $@"
@@ -93,9 +97,6 @@ namespace ai_truck_load_measurement.Controllers
                         ";
                     }
 
-                    //searchData += GetAverageTimeDeffHTML(loadRecordList, trips);
-                    //searchData += GetCountEarlyTimeOverHTML(loadRecordList, trips);
-                    //searchData += GetCountLateTimeOverHTML(loadRecordList, trips); 
                     searchData += $@"
                             </tbody>
                             <tbody>
@@ -184,7 +185,7 @@ namespace ai_truck_load_measurement.Controllers
         private string GetAverageTimeDeffHTML(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
         {
             var averageTimeDeffString = $@"
-                    <tr class=""arrival-time-deff-table-top"" >
+                    <tr class=""arrival-time-deff-table-top mt-2"" >
                         <td>平均ズレ時間</td>
 
             ";
@@ -221,7 +222,7 @@ namespace ai_truck_load_measurement.Controllers
             }
 
             // 便毎の予実差の平均取得
-            var averageTimeDeff = Math.Ceiling((double)targetTripTimeDeffSam / (double)targetTripRecords.Count * 10) / 10;
+            var averageTimeDeff = Math.Round((double)targetTripTimeDeffSam / (double)targetTripRecords.Count, MidpointRounding.AwayFromZero);
             return averageTimeDeff;
         }
 
@@ -234,8 +235,8 @@ namespace ai_truck_load_measurement.Controllers
         private string GetCountEarlyTimeOverHTML(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
         {
             var earlyTimeOverString = $@"
-                    <tr style=""font-weight: bold"">
-                        <td style=""background-color:#ccddee"">アラート範囲(早着)</td>
+                    <tr style=""font-weight: bold; font-style:italic"">
+                        <td style=""background-color:#A3C1E0"">アラート範囲(早着)</td>
 
             ";
             foreach (var trip in trips)
@@ -247,7 +248,7 @@ namespace ai_truck_load_measurement.Controllers
                 var targetTripEarlyOverCount = GetCountEarlyTimeOver(targetTripRecords);
 
                 earlyTimeOverString += $@"
-                        <td>{targetTripEarlyOverCount}回</td>
+                        <td style=""background-color:#eff4f9"">{targetTripEarlyOverCount}回</td>
                 ";
             }
             earlyTimeOverString += "</tr>";
@@ -295,7 +296,7 @@ namespace ai_truck_load_measurement.Controllers
                 var targetTripLateOverCount = GetCountLateTimeOver(targetTripRecords);
 
                 lateTimeOverString += $@"
-                        <td>{targetTripLateOverCount}回</td>
+                        <td style=""background-color:#FBE4E4"">{targetTripLateOverCount}回</td>
                 ";
             }
             lateTimeOverString += "</tr>";
