@@ -25,7 +25,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
         /// <returns></returns>
-        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<SelectedTripModel> trips)
+        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<SelectedTripModel> trips, bool isRecordCountOneOrMore)
         {
             var searchData = string.Empty;
             List<LoadRecordModel> loadRecordList = new();
@@ -45,9 +45,14 @@ namespace ai_truck_load_measurement.Controllers
                 // テーブルのbody部分
                 if (loadRecordList.Count > 0)
                 {
+                    // 選択した日付1日ごとに
                     for (DateTime date = startOfPeriod; date <= endOfPeriod; date = date.AddDays(1))
                     {
                         var targetDateRecords = loadRecordList.FindAll(x => x.WorkDay == date);
+
+                        // 選択した日付に実績が登録されていない、かつそれらを表示しない場合、処理を飛ばす
+                        if (targetDateRecords.Count == 0 && isRecordCountOneOrMore)
+                            continue;
 
                         searchData += $@"
                             <tr>

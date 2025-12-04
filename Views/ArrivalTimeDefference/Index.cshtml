@@ -16,12 +16,14 @@
                 <div class="card border-left-custom">
                     <div class="card-body">
                         <ul class="mb-0">
-                            <li>通知マスターで設定した条件に合致した便が表示されます。</li>
-                            <li>アラート項目列にはアラート通知に合致した項目が記録されています。</li>
-                            <li>アラート通知「到着時間(早or遅)」「出発時間(早or遅)」は到着・出発実績が予定より「60分～90分早い」or「20分～30分遅い」場合に発します。</li>
-                            <li>到着荷量(下限)・出発荷量(下限)は通知マスターで設定した下限値を下回った場合に記録されます。</li>
-                            <li>最長90日の期間が検索できます。</li>
-                            <li>便枝番とは、便が各拠点へ訪問した回数を示すために昼勤開始時間から順に割り当てた番号です。</li>
+                            <li>選択した便の到着予定と実績の差、および選択した期間内の差の平均値とアラート範囲回数が表示されます。</li>
+                            <li>「アラート範囲(早着)」項目は、期間内の便の到着時間が予定時間より60分～90分早く着いた回数です。</li>
+                            <li>「アラート範囲(遅着)」項目は、期間内の便の到着時間が予定時間より20分～30分遅く着いた回数です。</li>
+                            <li>予実差がアラート範囲内のとき、早着は青色、遅着は赤色で強調表示されます。
+                                <ul>
+                                    <li>また、予実差が閾値との半分以上ある場合、それぞれ薄い青色、薄い赤色で強調表示されます。</li>
+                                </ul>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -114,29 +116,29 @@
             </button>
         </div>
 
+        <div id="tableArea" style="display: none">
         <hr />
-
-        <div class="mg-bot-20 mb-3">
-            <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
-                <div class="input-group-append mr-1">
-                    <a class="btn btn-info btn-icon-split" onclick="onExportFileAlert('ArrivalTimeDefference', '@Model.ViewTitle')" id="exportFile">
-                        <span class="icon text-white-50">
-                            <i class="fas fa-file-export"></i>
-                        </span>
-                        <span class="text">Excel出力</span>
-                    </a>
+            <div class="mg-bot-20 mb-3">
+                <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                    <div class="input-group-append mr-1">
+                        <a class="btn btn-info btn-icon-split" onclick="onExportFileAlert('ArrivalTimeDefference', '@Model.ViewTitle')" id="exportFile">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-file-export"></i>
+                            </span>
+                            <span class="text">Excel出力</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
-            <span class="warehouse-name-drs span-paragraph">絞り込み条件</span>
-            <label><input type="checkbox" class=" mr-2" id="isTotalNullCountNot0" name="searchCondition" />便実績が1つも登録されていない日を非表示</label>
-        </div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
+                <span class="warehouse-name-drs span-paragraph">絞り込み条件</span>
+                <label><input type="checkbox" class=" mr-2" id="isRecordCountOneOrMore" name="searchCondition" />便実績が1つも登録されていない日を非表示</label>
+            </div>
 
-        <div class="mt-3" id="tripRecordTable">
+            <div class="mt-3" id="tripRecordTable">
+            </div>
         </div>
-    </div>
 </div>
 
 <script type="text/javascript">
@@ -172,6 +174,7 @@
     function tableDisplay() {
         // チェックボックスの入力情報取得
         var checkedDepos = getCheckedDepos();
+        var isRecordCountOneOrMore = $('#isRecordCountOneOrMore')[0].checked;
 
 
         // 期間の開始、終了日付の取得
@@ -181,7 +184,7 @@
         // フォーム情報取得
         let url = window.location.origin + '@Url.Action("SearchData", "ArrivalTimeDefference")';
         let method = 'Post';
-        let data = {trips: arrayTrips, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod};
+        let data = {trips: arrayTrips, startOfPeriod: startOfPeriod, endOfPeriod: endOfPeriod, isRecordCountOneOrMore: isRecordCountOneOrMore};
 
         // Ajax call
         $.ajax({
@@ -225,10 +228,31 @@
         });
     }
 
+      // チェックボックス押下時
+    $('input[name="searchCondition"]').change(function () {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay();
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    });
+
     // 検索ボタン押下時
     function onSearchClick() {
         DeleteErrorMessages();
+
+        // 選択された便が0件の場合
+        if(arrayTrips.length == 0){
+            var errorMessage = 'E1017: 便を選択してください。';
+            $("#div-error-message").text(errorMessage);
+            return;
+        }
+
         if (isWithin90Days()) {
+            $('#tableArea').css('display', 'block');
             tableDisplay();
         }
         else {
