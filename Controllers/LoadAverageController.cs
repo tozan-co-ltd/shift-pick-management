@@ -175,8 +175,8 @@ namespace ai_truck_load_measurement.Controllers
 
                 // 便毎の到着・出発荷量の平均取得
                 averageLoadStatusesString += $@"
-                        <td>{GetAverageLoadStatuse(loadRecordList, true)}</td>
-                        <td>{GetAverageLoadStatuse(loadRecordList, false)}</td>
+                        <td>{GetAverageLoadStatuse(targetTripRecords, true)}</td>
+                        <td>{GetAverageLoadStatuse(targetTripRecords, false)}</td>
                 ";
             }
             averageLoadStatusesString += "</tr>";
@@ -209,8 +209,8 @@ namespace ai_truck_load_measurement.Controllers
                 if (loadClass >= 3)
                 {
                     // 荷量クラスから荷量の値の最低値、最高値に変換
-                    totalLoadStatusMin += (loadRecord.ArrivalLoadClass - 3) * 10 + 1;
-                    totalLoadStatusMax += (loadRecord.ArrivalLoadClass - 2) * 10;
+                    totalLoadStatusMin += (loadClass - 3) * 10 + 1;
+                    totalLoadStatusMax += (loadClass - 2) * 10;
                     loadRecordCount++;
                 }
             }

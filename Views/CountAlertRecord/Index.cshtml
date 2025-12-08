@@ -115,23 +115,26 @@
             </button>
         </div>
 
-        <hr />
 
-        <div class="mg-bot-20 mb-3">
-            <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
-                <div class="input-group-append mr-1">
-                    <a class="btn btn-info btn-icon-split" onclick="onExportFileAlert('CountAlertRecord', '@Model.ViewTitle')" id="exportFile">
-                        <span class="icon text-white-50">
-                            <i class="fas fa-file-export"></i>
-                        </span>
-                        <span class="text">Excel出力</span>
-                    </a>
+        <div id="tableArea" style="display: none">
+            <hr />
+
+            <div class="mg-bot-20 mb-3">
+                <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                    <div class="input-group-append mr-1">
+                        <a class="btn btn-info btn-icon-split" onclick="onExportFileAlert('CountAlertRecord', '@Model.ViewTitle')" id="exportFile">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-file-export"></i>
+                            </span>
+                            <span class="text">Excel出力</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
 
 
-        <div class="mt-3" id="tripRecordTable">
+            <div class="mt-3" id="tripRecordTable">
+            </div>
         </div>
     </div>
 </div>
@@ -233,6 +236,7 @@
 
 
         if (isWithin90Days()) {
+            $('#tableArea').css('display', 'block');
             tableDisplay();
         }
         else {
