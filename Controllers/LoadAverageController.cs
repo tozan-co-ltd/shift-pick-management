@@ -26,7 +26,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="isBeforeApplicablePeriod">適用期間外のデータを含めるか</param>
         /// <returns></returns>
-        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<SelectedTripModel> trips)
+        public JsonResult SearchData(DateTime startOfPeriod, DateTime endOfPeriod, List<SelectedTripModel> trips, bool isRecordCountOneOrMore)
         {
             var searchData = string.Empty;
             List<LoadRecordModel> loadRecordList = new();
@@ -62,6 +62,10 @@ namespace ai_truck_load_measurement.Controllers
                     {
                         var targetDateRecords = loadRecordList.FindAll(x => x.WorkDay == date);
 
+                        // 選択した日付に実績が登録されていない、かつそれらを表示しない場合、処理を飛ばす
+                        if (targetDateRecords.Count == 0 && isRecordCountOneOrMore)
+                            continue;
+
                         searchData += $@"
                             <tr>
                                 <td>{date.ToString("yyyy/MM/dd")}</td>
@@ -70,22 +74,8 @@ namespace ai_truck_load_measurement.Controllers
                         foreach (var trip in trips)
                         {
                             var targetDateRecord = targetDateRecords.Find(x => x.TripName == trip.TripName && x.TripBranchSeq == trip.TripBranchSeq.ToString());
-                            if (targetDateRecord != null)
-                            {
-                                var arrivalLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(targetDateRecord.ArrivalLoadClass);
-                                var departureLoadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(targetDateRecord.DepartureLoadClass);
-                                searchData += $@"
-                                <td>{arrivalLoadStatus}</td>
-                                <td>{departureLoadStatus}</td>
-                                ";
-                            }
-                            else
-                            {
-                                searchData += $@"
-                                <td>-</td>
-                                <td>-</td>
-                            ";
-                            }
+                            var targetNotification = notificationList.Find(x => x.TripName == trip.TripName && x.TripBranchSeq == trip.TripBranchSeq);
+                            searchData += GetLoadStatusesHTML(targetDateRecord, trip, targetNotification);
                         }
 
                         searchData += $@"
@@ -97,9 +87,8 @@ namespace ai_truck_load_measurement.Controllers
                             </tbody>
                             <tbody>
                             <tr hidden></tr>
-                            {GetAverageLoadStatusesHTML(loadRecordList, trips)}
                             {GetLowerLoadStatusesHTML(notificationList, trips)}
-                            {GetCountLowerLoadAlertHTML(loadRecordList, notificationList, trips)}
+                            {GetCountLowerLoadAlertsHTML(loadRecordList, notificationList, trips)}
                             </tbody>
                     </div>
                     ";
@@ -123,7 +112,6 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
-
         /// <summary>
         /// 選択した便毎にデータテーブルのヘッダー箇所を作成する
         /// </summary>
@@ -133,7 +121,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             var tableHeader = $@"
                     <div class=""mt-3"">
-                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center arrival-time-deff-table"" id=""{tableID}"">
+                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center statistics-table"" id=""{tableID}"">
                             <thead>
                                 <tr align=""center"">
                                     <th class=""font-weight-bold"">稼働日</th>
@@ -155,78 +143,37 @@ namespace ai_truck_load_measurement.Controllers
             return tableHeader;
         }
 
-        /// <summary>
-        /// 荷量平均HTML取得
-        /// </summary>
-        /// <param name="loadRecordList">実績リスト</param>
-        /// <param name="trips">選択した便</param>
-        /// <returns></returns>
-        private string GetAverageLoadStatusesHTML(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
+        private string GetLoadStatusesHTML(LoadRecordModel? loadRecord, SelectedTripModel trip, M_NotificationModel? notification)
         {
-            var averageLoadStatusesString = $@"
-                    <tr class=""arrival-time-deff-table-top mt-2"" >
-                        <td>荷量平均</td>
+            var arrivalLowerLoadClass = 0;
+            var departureLowerLoadClass = 0;
 
-            ";
-            foreach (var trip in trips)
+            if (notification != null)
             {
-                // 便毎に実績のリストを作成
-                var targetTripRecords = loadRecordList.FindAll(x => x.TripName == trip.TripName && x.TripBranchSeq == trip.TripBranchSeq.ToString());
+                arrivalLowerLoadClass = notification.ArrivalLowerLoadClass;
+                departureLowerLoadClass = notification.DepartureLowerLoadClass;
+            }
 
-                // 便毎の到着・出発荷量の平均取得
-                averageLoadStatusesString += $@"
-                        <td>{GetAverageLoadStatuse(targetTripRecords, true)}</td>
-                        <td>{GetAverageLoadStatuse(targetTripRecords, false)}</td>
+            if (loadRecord != null)
+                return $@"      
+                                {GetLoadStatusHTML(loadRecord.ArrivalLoadClass, arrivalLowerLoadClass)}
+                                {GetLoadStatusHTML(loadRecord.DepartureLoadClass, departureLowerLoadClass)}
                 ";
-            }
-            averageLoadStatusesString += "</tr>";
-
-            return averageLoadStatusesString;
+            else
+                return $@"
+                                <td>-</td>
+                                <td>-</td>
+                ";
         }
 
-        /// <summary>
-        /// 荷量平均取得
-        /// </summary>
-        /// <param name="loadRecordList">便実績リスト</param>
-        /// <param name="isArrive">到着か否か</param>
-        /// <returns></returns>
-        private string GetAverageLoadStatuse(List<LoadRecordModel> loadRecordList, bool isArrive)
+        private string GetLoadStatusHTML(int loadClass, int lowerLoadClass)
         {
-            var totalLoadStatusMax = 0.0;
-            var totalLoadStatusMin = 0.0;
-            var loadRecordCount = 0;
-            var loadClass = 0;
-            foreach (var loadRecord in loadRecordList)
-            {
-                if (isArrive)
-                    loadClass = loadRecord.ArrivalLoadClass;
-                else
-                    loadClass = loadRecord.DepartureLoadClass;
-
-                if (loadClass == 2)
-                    loadRecordCount++;
-
-                if (loadClass >= 3)
-                {
-                    // 荷量クラスから荷量の値の最低値、最高値に変換
-                    totalLoadStatusMin += (loadClass - 3) * 10 + 1;
-                    totalLoadStatusMax += (loadClass - 2) * 10;
-                    loadRecordCount++;
-                }
-            }
-
-            return GetAverageLoadStatusString(loadRecordCount, totalLoadStatusMin, totalLoadStatusMax);
-        }
-
-        private string GetAverageLoadStatusString(int loadRecordCount, double totalLoadStatusMin, double totalLoadStatusMax)
-        {
-            if (loadRecordCount <= 0)
-                return "-";
-
-            return
-                totalLoadStatusMax != 0
-                        ? $"{Math.Round(totalLoadStatusMin / loadRecordCount, MidpointRounding.AwayFromZero)}-{Math.Round(totalLoadStatusMax / loadRecordCount, MidpointRounding.AwayFromZero)}%"
-                        : "0%";
+            var loadStatus = LoadRecordController.ConversionLoadClassToLoadStatus(loadClass);
+            var emphasizedColorStyle = "";
+            if (loadClass < lowerLoadClass && loadClass != -1)
+                emphasizedColorStyle = $" style=\"background-color: #FF5858; color: #FFF; border-color: #404040;\"";
+            var html = $"<td{emphasizedColorStyle}>{loadStatus}</td>";
+            return html;
         }
 
         /// <summary>
@@ -238,7 +185,7 @@ namespace ai_truck_load_measurement.Controllers
         private string GetLowerLoadStatusesHTML(List<M_NotificationModel> notificationList, List<SelectedTripModel> trips)
         {
             var lowerLoadStatusesHTML = $@"
-                    <tr style=""font-weight: bold; font-style:italic"" >
+                    <tr  class=""statistics-table-top mt-2"" >
                         <td>荷量下限値</td>
 
             ";
@@ -271,10 +218,10 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="loadRecordList">実績リスト</param>
         /// <param name="trips">選択した便</param>
         /// <returns></returns>
-        private string GetCountLowerLoadAlertHTML(List<LoadRecordModel> loadRecordList, List<M_NotificationModel> notificationList, List<SelectedTripModel> trips)
+        private string GetCountLowerLoadAlertsHTML(List<LoadRecordModel> loadRecordList, List<M_NotificationModel> notificationList, List<SelectedTripModel> trips)
         {
             var lowerLoadStatusesHTML = $@"
-                    <tr class=""arrival-time-deff-table-bottom mt-2"" >
+                    <tr class=""statistics-table-bottom mt-2"" >
                         <td>荷量アラート回数</td>
 
             ";
@@ -286,15 +233,31 @@ namespace ai_truck_load_measurement.Controllers
                 var targetNotification = notificationList.Find(x => x.TripName == trip.TripName && x.TripBranchSeq == trip.TripBranchSeq);
 
                 if (targetTripRecords != null && targetNotification != null)
+                {
                     // 便名称_便枝番に対応する実績と通知マスターが両方存在する場合
                     // HTMLに到着、出発の荷量下限を下回った回数をそれぞれ記入
-                    lowerLoadStatusesHTML += $@"
-                            <td>{targetTripRecords.FindAll(x => x.ArrivalLoadClass < targetNotification.ArrivalLowerLoadClass).Count}回</td>
-                            <td>{targetTripRecords.FindAll(x => x.DepartureLoadClass < targetNotification.DepartureLowerLoadClass).Count}回</td>
-                    ";
+                    // 通知マスターに下限荷量が設定されていない場合、「設定無し」と記入
+                    if (targetNotification.ArrivalLowerLoadClass > 2)
+                        lowerLoadStatusesHTML += $@"
+                            <td>{targetTripRecords.FindAll(x => x.ArrivalLoadClass < targetNotification.ArrivalLowerLoadClass && x.ArrivalLoadClass >= 2).Count}回</td>
+                        ";
+                    else
+                        lowerLoadStatusesHTML += $@"
+                            <td>設定無し</td>
+                        ";
+
+                    if (targetNotification.DepartureLowerLoadClass > 2)
+                        lowerLoadStatusesHTML += $@"
+                            <td>{targetTripRecords.FindAll(x => x.DepartureLoadClass < targetNotification.DepartureLowerLoadClass && x.DepartureLoadClass >= 2).Count}回</td>
+                        ";
+                    else
+                        lowerLoadStatusesHTML += $@"
+                            <td>設定無し</td>
+                        ";
+                }
                 else
-                    // 存在しない場合、「設定無し」と記入
-                    lowerLoadStatusesHTML += $@"
+                        // 存在しない場合、「設定無し」と記入
+                        lowerLoadStatusesHTML += $@"
                             <td>設定無し</td>
                             <td>設定無し</td>
                     ";
@@ -483,10 +446,6 @@ namespace ai_truck_load_measurement.Controllers
             {
                 // 便毎に実績のリストを作成
                 var targetTripRecords = loadRecordList.FindAll(x => x.TripName == trip.TripName && x.TripBranchSeq == trip.TripBranchSeq.ToString());
-
-                // 便毎の到着・出発荷量の平均取得
-                dataRow[trip.TripName + "_" + trip.TripBranchSeq + " 到着"] = GetAverageLoadStatuse(loadRecordList, true);
-                dataRow[trip.TripName + "_" + trip.TripBranchSeq + " 出発"] = GetAverageLoadStatuse(loadRecordList, false);
             }
             return dataRow;
         }

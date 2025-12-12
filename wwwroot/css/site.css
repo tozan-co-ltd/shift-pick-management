@@ -1473,32 +1473,43 @@ html {
     color: gray;
 }
 
-.arrival-time-deff-table-top td {
-    font-weight: bold;
-    font-style: italic;
-    border-top: double 5px;
-    border-spacing: 0px 15px;
+.statistics-table-top td:first-child {
+    background-color: #4D79A7;
+    color:#FFFFFF;
+    border-color: #000000;
 }
 
-.arrival-time-deff-table-bottom td {
+.statistics-table-top td {
+    font-weight: bold;
+    border-top: double 5px;
+    border-spacing: 0px 15px;
+    background-color: #ABC1D7;
+}
+
+.statistics-table-bottom td:first-child {
+    background-color: #FF5858;
+    color:#FFFFFF;
+}
+.statistics-table-bottom td {
     border-collapse: collapse !important;
     font-weight: bold;
-    font-style:italic;
     border-bottom: double 5px;
+    background-color: #FFE5E5;
+    border-color: #000000;
 }
 /* årê¸Çà¯Ç≠ */
-.arrival-time-deff-table thead th:first-child {
+.statistics-table thead th:first-child {
     border-left: 1px solid #404040;
 }
 
-.arrival-time-deff-table thead th {
+.statistics-table thead th {
     border-right: 1px solid #404040;
 }
 
-.arrival-time-deff-table tbody td:first-child {
+.statistics-table tbody td:first-child {
     border-left: 1px solid #404040;
 }
 
-.arrival-time-deff-table tbody td {
+.statistics-table tbody td {
     border-right: 1px solid #404040;
 }

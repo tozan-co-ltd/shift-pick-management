@@ -58,7 +58,9 @@ namespace ai_truck_load_measurement.Controllers
                         loadRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(loadRecordSql);
                         var notificationSql = CountAlertRecordConnectController.CreateSQLToSelectNotifications(startOfPeriod, endOfPeriod, selectedTrips);
                         var notificationList = ConnectToSQLServer.ExecuteQueryToList<M_NotificationModel>(notificationSql);
-                        countAlertRecordList = GetAlertCounts(alertRecordList, loadRecordList, notificationList);
+                        var countTripRecordSql = CountAlertRecordConnectController.CreateSQLToSelectTripRecordCount(startOfPeriod, endOfPeriod, selectedTrips);
+                        var countTripRecordList = ConnectToSQLServer.ExecuteQueryToList<CountTripRecordModel>(countTripRecordSql);
+                        countAlertRecordList = GetAlertCounts(alertRecordList, loadRecordList, notificationList, countTripRecordList);
                     }
                 }
 
@@ -70,8 +72,8 @@ namespace ai_truck_load_measurement.Controllers
                                 <tr align=""center"">
                                     <th class=""font-weight-bold"">便名称_便枝番</th>
                                     <th class=""font-weight-bold"">到着時間(早)</th>
-                                    <th class=""font-weight-bold"">出発時間(早)</th>
                                     <th class=""font-weight-bold"">到着時間(遅)</th>
+                                    <th class=""font-weight-bold"">出発時間(早)</th>
                                     <th class=""font-weight-bold"">出発時間(遅)</th>
                                     <th class=""font-weight-bold"">到着荷量(下限)</th>
                                     <th class=""font-weight-bold"">出発荷量(下限)</th>
@@ -89,13 +91,13 @@ namespace ai_truck_load_measurement.Controllers
                         searchData += $@"
                             <tr>
                                 <td>{alertCount.SelectedTripName}</td>
-                                <td>{alertCount.EarlyArriveCount}</td>
-                                <td>{alertCount.EarlyDepartCount}</td>
-                                <td>{alertCount.LateArriveCount}</td>
-                                <td>{alertCount.LateDepartCount}</td>
-                                <td>{alertCount.ArrivalLoadCount}</td>
-                                <td>{alertCount.DepartureLoadCount}</td>
-                                <td>{alertCount.AllRecordCount}</td>
+                                <td>{alertCount.EarlyArriveCount}回 / {alertCount.TripRecordCount}回</td>
+                                <td>{alertCount.LateArriveCount}回 / {alertCount.TripRecordCount}回</td>
+                                <td>{alertCount.EarlyDepartCount}回 / {alertCount.TripRecordCount}回</td>
+                                <td>{alertCount.LateDepartCount}回 / {alertCount.TripRecordCount}回</td>
+                                <td>{alertCount.ArrivalLoadCount}回 / {alertCount.TripRecordCount}回</td>
+                                <td>{alertCount.DepartureLoadCount}回 / {alertCount.TripRecordCount}回</td>
+                                <td>{alertCount.AllRecordCount}回 / {alertCount.TripRecordCount}回</td>
                             </tr>
                     ";
                     }
@@ -124,23 +126,22 @@ namespace ai_truck_load_measurement.Controllers
         }
 
 
-        public List<CountAlertRecordModel> GetAlertCounts(List<AlertRecordModel> alertRecordList, List<LoadRecordModel> loadRecordList, List<M_NotificationModel> notificationList)
+        public List<CountAlertRecordModel> GetAlertCounts(List<AlertRecordModel> alertRecordList, List<LoadRecordModel> loadRecordList, List<M_NotificationModel> notificationList, List<CountTripRecordModel> countTripRecordList)
         {
             var alertCounts = new List<CountAlertRecordModel>();
-            var earlyArriveCount = 0;
-            var lateArriveCount = 0;
-            var earlyDepartCount = 0;
-            var lateDepartCount = 0;
-            var arrivalLoadCount = 0;
-            var departureLoadCount = 0;
-            var allRecordCount = 0;
-            var tripName = "";
-            var tripBranchSeq = "";
-
             foreach (var notification in notificationList)
             {
                 var sameNotificationRecords = alertRecordList.FindAll(x => x.NotificationID == notification.NotificationID);
-                foreach(var alertRecord in sameNotificationRecords)
+                var tripRecordCount = countTripRecordList.Find(x => x.TripID == notification.TripID && x.TripBranchSeq == notification.TripBranchSeq)!.TripRecordCount; var earlyArriveCount = 0;
+                var lateArriveCount = 0;
+                var earlyDepartCount = 0;
+                var lateDepartCount = 0;
+                var arrivalLoadCount = 0;
+                var departureLoadCount = 0;
+                var allRecordCount = 0;
+                var tripName = notification.TripName;
+                var tripBranchSeq = notification.TripBranchSeq;
+                foreach (var alertRecord in sameNotificationRecords)
                 {
                     var loadRecord = loadRecordList.Find(x => x.TripRecordID == alertRecord.TripRecordID);
                     var alertItems = new AlertRecordController().GetAlertItems(alertRecord, loadRecord);
@@ -151,8 +152,6 @@ namespace ai_truck_load_measurement.Controllers
                     arrivalLoadCount = ContainCount(arrivalLoadCount, alertItems, "到着荷量(下限)");
                     departureLoadCount = ContainCount(departureLoadCount, alertItems, "出発荷量(下限)");
                     allRecordCount++;
-                    tripName = loadRecord.TripName;
-                    tripBranchSeq = loadRecord.TripBranchSeq;
                 }
                 var countAlertRecordModel = new CountAlertRecordModel()
                 {
@@ -163,6 +162,7 @@ namespace ai_truck_load_measurement.Controllers
                     ArrivalLoadCount = arrivalLoadCount,
                     DepartureLoadCount = departureLoadCount,
                     AllRecordCount = allRecordCount,
+                    TripRecordCount = tripRecordCount,
                     SelectedTripName = tripName + "_" + tripBranchSeq,
                 };
                 alertCounts.Add(countAlertRecordModel);
@@ -246,7 +246,9 @@ namespace ai_truck_load_measurement.Controllers
                         loadRecordList = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(loadRecordSql);
                         var notificationSql = CountAlertRecordConnectController.CreateSQLToSelectNotifications(startOfPeriod, endOfPeriod, selectedTrips);
                         var notificationList = ConnectToSQLServer.ExecuteQueryToList<M_NotificationModel>(notificationSql);
-                        countAlertRecordList = GetAlertCounts(alertRecordList, loadRecordList, notificationList);
+                        var countTripRecordSql = CountAlertRecordConnectController.CreateSQLToSelectTripRecordCount(startOfPeriod, endOfPeriod, selectedTrips);
+                        var countTripRecordList = ConnectToSQLServer.ExecuteQueryToList<CountTripRecordModel>(countTripRecordSql);
+                        countAlertRecordList = GetAlertCounts(alertRecordList, loadRecordList, notificationList, countTripRecordList);
                     }
                 }
 
@@ -267,7 +269,6 @@ namespace ai_truck_load_measurement.Controllers
                 // シート名
                 string sheetNameOne = "アラート回数詳細";
                 string sheetNameTwo = "検索条件";
-
 
                 try
                 {

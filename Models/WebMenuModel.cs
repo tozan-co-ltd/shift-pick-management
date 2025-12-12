@@ -31,9 +31,9 @@ namespace ai_truck_load_measurement.Models
             new M_WebMenu{CategoryID = 5, MenuID = 3, MenuName = "2.紐づけ切れ - ID有", Controller = "NonTripNameRecord", Action = "Index"},
             new M_WebMenu{CategoryID = 5, MenuID = 4, MenuName = "3.紐づけ切れ - ID無", Controller = "NonIdentifyNumberRecord", Action = "Index"},
             new M_WebMenu{CategoryID = 5, MenuID = 5, MenuName = "4.紐づけ切れ回数", Controller = "CountNonTripNameRecord", Action = "Index"},
-            new M_WebMenu{CategoryID = 6, MenuID = 1, MenuName = "到着時間予実差平均表示", Controller = "ArrivalTimeDefference", Action = "Index"},
+            new M_WebMenu{CategoryID = 6, MenuID = 1, MenuName = "早着・遅着実績", Controller = "ArrivalTimeDefference", Action = "Index"},
             new M_WebMenu{CategoryID = 6, MenuID = 2, MenuName = "アラート回数詳細表示", Controller = "CountAlertRecord", Action = "Index"},
-            new M_WebMenu{CategoryID = 6, MenuID = 3, MenuName = "荷量平均表示", Controller = "LoadAverage", Action = "Index"},
+            new M_WebMenu{CategoryID = 6, MenuID = 3, MenuName = "荷量アラート実績", Controller = "LoadAverage", Action = "Index"},
         };
 
         /// <summary>

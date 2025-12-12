@@ -16,7 +16,7 @@
                 <div class="card border-left-custom">
                     <div class="card-body">
                         <ul class="mb-0">
-                            <li>選択した便の到着予定と実績の差、および選択した期間内の差の平均値とアラート範囲回数が表示されます。</li>
+                            <li>選択した便の到着予定と実績の差、および選択した期間内のアラート範囲回数が表示されます。</li>
                             <li>「アラート範囲(早着)」項目は、期間内の便の到着時間が予定時間より60分～90分早く着いた回数です。</li>
                             <li>「アラート範囲(遅着)」項目は、期間内の便の到着時間が予定時間より20分～30分遅く着いた回数です。</li>
                             <li>予実差がアラート範囲内のとき、早着は青色、遅着は赤色で強調表示されます。
@@ -147,7 +147,7 @@
         model = @Html.Raw(Json.Serialize(Model));
         var today = new Date();
         var oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 29);
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
         addDepos(model);
@@ -214,6 +214,7 @@
                 "oLanguage": {
                     "sSearch": "フリーワード(全件)"
                 },
+                pageLength: 30,
                 dom: dom_structure
             });
 

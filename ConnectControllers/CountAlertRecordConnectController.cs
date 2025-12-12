@@ -21,16 +21,20 @@ namespace ai_truck_load_measurement.ConnectControllers
         private static string CreateSQLToSelectedTrips(List<SelectedTripModel> selectedTrips)
         {
             var sql = "";
+            if (selectedTrips.Count == 0)
+                return sql;
+
             for(int i=0; i<selectedTrips.Count; i++)
             {
                 if (i == 0)
-                    sql += "AND ";
+                    sql += "AND (";
                 else
                     sql += "OR ";
 
                 sql += $@"(trip_name = '{selectedTrips[i].TripName}' AND trip_branch_seq = {selectedTrips[i].TripBranchSeq})
                 ";
             }
+            sql += ")";
             return sql;
         }
 
@@ -61,6 +65,22 @@ namespace ai_truck_load_measurement.ConnectControllers
                 AND notification_start_datetime < '{startOfPeriod.ToString("yyyy/MM/dd")}'
                 AND notification_end_datetime > '{endOfPeriod.ToString("yyyy/MM/dd")}'
                 {LoadRecordConnectController.SQLOfCheckedDepos(checkedDepos)}
+            ";
+            return sql;
+        }
+
+        public static string CreateSQLToSelectTripRecordCount(DateTime startOfPeriod, DateTime endOfPeriod, List<SelectedTripModel> selectedTrips)
+        {
+            var sql = $@"
+                SELECT 
+                    trip_id
+                    ,trip_name
+	                ,trip_branch_seq
+	                ,COUNT(trip_record_id) AS trip_record_count
+                FROM t_trip_records
+                WHERE work_day BETWEEN '{startOfPeriod}' AND '{endOfPeriod}'
+                {CreateSQLToSelectedTrips(selectedTrips)}
+                GROUP BY trip_id, trip_name, trip_branch_seq
             ";
             return sql;
         }

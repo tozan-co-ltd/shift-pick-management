@@ -72,17 +72,17 @@ namespace ai_truck_load_measurement.Controllers
                                 if (timeDeff < 0)
                                 {
                                     if (timeDeff <= -60)
-                                        emphasizeColorStyle = $" style=\"background-color:#A3C1E0\"";
+                                        emphasizeColorStyle = $" style=\"background-color:#4D79A7; color:#FFF; border-color: #404040;\"";
                                     else if(timeDeff <= -30)
-                                        emphasizeColorStyle = $" style=\"background-color:#eff4f9\"";
+                                        emphasizeColorStyle = $" style=\"background-color:#ABC1D7\"";
                                     timeDeffString = $"{emphasizeColorStyle}>{timeDeff}分";
                                 }
                                 else
                                 {
                                     if (timeDeff >= 20)
-                                        emphasizeColorStyle = $@" style=""background-color:#f0908d""";
+                                        emphasizeColorStyle = $@" style=""background-color:#FF5858; color: #FFF; border-color: #404040;""";
                                     else if(timeDeff >= 10)
-                                        emphasizeColorStyle = $" style=\"background-color:#FBE4E4\"";
+                                        emphasizeColorStyle = $" style=\"background-color:#FFE5E5\"";
                                     timeDeffString = $@"{emphasizeColorStyle}>+{timeDeff}分";
                                 }
                                     searchData += $@"
@@ -106,7 +106,6 @@ namespace ai_truck_load_measurement.Controllers
                             </tbody>
                             <tbody>
                             <tr hidden></tr>
-                            {GetAverageTimeDeffHTML(loadRecordList, trips)}
                             {GetCountEarlyTimeOverHTML(loadRecordList, trips)}
                             {GetCountLateTimeOverHTML(loadRecordList, trips)}
                             </tbody>
@@ -142,7 +141,7 @@ namespace ai_truck_load_measurement.Controllers
         {
             var tableHeader = $@"
                     <div class=""mt-3"">
-                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center arrival-time-deff-table"" id=""{tableID}"">
+                        <table class=""table table-sm stripe hover nowrap datatable-normal table-center statistics-table"" id=""{tableID}"">
                             <thead>
                                 <tr align=""center"">
                                     <th class=""font-weight-bold"">稼働日</th>
@@ -181,55 +180,6 @@ namespace ai_truck_load_measurement.Controllers
             return (int)timeDeff;
         }
 
-        /// <summary>
-        /// 平均ズレ時間HTML取得
-        /// </summary>
-        /// <param name="loadRecordList">実績リスト</param>
-        /// <param name="trips">選択した便</param>
-        /// <returns></returns>
-        private string GetAverageTimeDeffHTML(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
-        {
-            var averageTimeDeffString = $@"
-                    <tr class=""arrival-time-deff-table-top mt-2"" >
-                        <td>平均ズレ時間</td>
-
-            ";
-            foreach(var trip in trips)
-            {
-                // 便毎に実績のリストを作成
-                var targetTripRecords = loadRecordList.FindAll(x => x.TripName == trip.TripName && x.TripBranchSeq == trip.TripBranchSeq.ToString());
-
-                // 便毎の予実差の平均取得
-                var averageTimeDeff = GetAverageTimeDeff(targetTripRecords);
-
-                averageTimeDeffString += $@"
-                        <td>{averageTimeDeff}分</td>
-                ";
-            }
-            averageTimeDeffString += "</tr>";
-
-            return averageTimeDeffString;
-        }
-
-        /// <summary>
-        /// 予実差の平均取得
-        /// </summary>
-        /// <param name="targetTripRecords">便実績リスト</param>
-        /// <returns></returns>
-        private double GetAverageTimeDeff(List<LoadRecordModel> targetTripRecords)
-        {
-            // 予実差の総和を取得
-            var targetTripTimeDeffSam = 0;
-            foreach (var tripRecord in targetTripRecords)
-            {
-                var comparisonTime = new DateTime(1900, 1, 1, tripRecord.ArrivedAt.Hour, tripRecord.ArrivedAt.Minute, tripRecord.ArrivedAt.Second);
-                targetTripTimeDeffSam += GetTimeDeff(tripRecord.ArrivalScheduledTime, comparisonTime);
-            }
-
-            // 便毎の予実差の平均取得
-            var averageTimeDeff = Math.Round((double)targetTripTimeDeffSam / (double)targetTripRecords.Count, MidpointRounding.AwayFromZero);
-            return averageTimeDeff;
-        }
 
         /// <summary>
         /// アラート範囲(早着)回数HTML取得
@@ -240,8 +190,8 @@ namespace ai_truck_load_measurement.Controllers
         private string GetCountEarlyTimeOverHTML(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
         {
             var earlyTimeOverString = $@"
-                    <tr style=""font-weight: bold; font-style:italic"">
-                        <td style=""background-color:#A3C1E0"">アラート範囲(早着)</td>
+                    <tr  class=""statistics-table-top mt-2"">
+                        <td>アラート範囲(早着)</td>
 
             ";
             foreach (var trip in trips)
@@ -253,7 +203,7 @@ namespace ai_truck_load_measurement.Controllers
                 var targetTripEarlyOverCount = GetCountEarlyTimeOver(targetTripRecords);
 
                 earlyTimeOverString += $@"
-                        <td style=""background-color:#eff4f9"">{targetTripEarlyOverCount}回</td>
+                        <td>{targetTripEarlyOverCount}回</td>
                 ";
             }
             earlyTimeOverString += "</tr>";
@@ -288,8 +238,8 @@ namespace ai_truck_load_measurement.Controllers
         private string GetCountLateTimeOverHTML(List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
         {
             var lateTimeOverString = $@"
-                    <tr class=""arrival-time-deff-table-bottom"">
-                        <td style=""background-color:#f0908d"">アラート範囲(遅着)</td>
+                    <tr class=""statistics-table-bottom"">
+                        <td>アラート範囲(遅着)</td>
 
             ";
             foreach (var trip in trips)
@@ -301,7 +251,7 @@ namespace ai_truck_load_measurement.Controllers
                 var targetTripLateOverCount = GetCountLateTimeOver(targetTripRecords);
 
                 lateTimeOverString += $@"
-                        <td style=""background-color:#FBE4E4"">{targetTripLateOverCount}回</td>
+                        <td>{targetTripLateOverCount}回</td>
                 ";
             }
             lateTimeOverString += "</tr>";
@@ -475,37 +425,11 @@ namespace ai_truck_load_measurement.Controllers
                 }
                 convertedTable.Rows.Add(dataRow);
             }
-            // 平均ズレ時間行追加
-            convertedTable.Rows.Add(GetAverageTimeDeffRow(convertedTable, loadRecordList, trips));
             // アラート範囲(早着)回数行追加
             convertedTable.Rows.Add(GetCountEarlyTimeOverRow(convertedTable, loadRecordList, trips));
             // アラート範囲(遅着)回数行追加
             convertedTable.Rows.Add(GetCountLateTimeOverRow(convertedTable, loadRecordList, trips));
             return convertedTable;
-        }
-
-        /// <summary>
-        /// 平均ズレ時間行追加
-        /// </summary>
-        /// <param name="convertedTable">追加先テーブル</param>
-        /// <param name="loadRecordList">便実績リスト</param>
-        /// <param name="trips">便リスト</param>
-        /// <returns></returns>
-        private DataRow GetAverageTimeDeffRow(DataTable convertedTable, List<LoadRecordModel> loadRecordList, List<SelectedTripModel> trips)
-        {
-            var dataRow = convertedTable.NewRow();
-            dataRow["workDay"] = "平均ズレ時間";
-            foreach (var trip in trips)
-            {
-                // 便毎に実績のリストを作成
-                var targetTripRecords = loadRecordList.FindAll(x => x.TripName == trip.TripName && x.TripBranchSeq == trip.TripBranchSeq.ToString());
-
-                // 便毎の予実差の平均取得
-                var averageTimeDeff = GetAverageTimeDeff(targetTripRecords);
-
-                dataRow[trip.TripName + "_" + trip.TripBranchSeq] = averageTimeDeff;
-            }
-            return dataRow;
         }
 
         /// <summary>
