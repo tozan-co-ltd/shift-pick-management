@@ -71,13 +71,14 @@ namespace ai_truck_load_measurement.Controllers
                             <thead>
                                 <tr align=""center"">
                                     <th class=""font-weight-bold"">便名称_便枝番</th>
+                                    <th class=""font-weight-bold"">実績総数</th>
                                     <th class=""font-weight-bold"">到着時間(早)</th>
                                     <th class=""font-weight-bold"">到着時間(遅)</th>
                                     <th class=""font-weight-bold"">出発時間(早)</th>
                                     <th class=""font-weight-bold"">出発時間(遅)</th>
                                     <th class=""font-weight-bold"">到着荷量(下限)</th>
                                     <th class=""font-weight-bold"">出発荷量(下限)</th>
-                                    <th class=""font-weight-bold"">実績総数</th>
+                                    <th class=""font-weight-bold"">アラート総数</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -91,13 +92,14 @@ namespace ai_truck_load_measurement.Controllers
                         searchData += $@"
                             <tr>
                                 <td>{alertCount.SelectedTripName}</td>
-                                <td>{alertCount.EarlyArriveCount}回 / {alertCount.TripRecordCount}回</td>
-                                <td>{alertCount.LateArriveCount}回 / {alertCount.TripRecordCount}回</td>
-                                <td>{alertCount.EarlyDepartCount}回 / {alertCount.TripRecordCount}回</td>
-                                <td>{alertCount.LateDepartCount}回 / {alertCount.TripRecordCount}回</td>
-                                <td>{alertCount.ArrivalLoadCount}回 / {alertCount.TripRecordCount}回</td>
-                                <td>{alertCount.DepartureLoadCount}回 / {alertCount.TripRecordCount}回</td>
-                                <td>{alertCount.AllRecordCount}回 / {alertCount.TripRecordCount}回</td>
+                                <td>{alertCount.TripRecordCount}回</td>
+                                <td>{alertCount.EarlyArriveCount}回</td>
+                                <td>{alertCount.LateArriveCount}回</td>
+                                <td>{alertCount.EarlyDepartCount}回</td>
+                                <td>{alertCount.LateDepartCount}回</td>
+                                <td>{alertCount.ArrivalLoadCount}回</td>
+                                <td>{alertCount.DepartureLoadCount}回</td>
+                                <td>{alertCount.AllRecordCount}回</td>
                             </tr>
                     ";
                     }
