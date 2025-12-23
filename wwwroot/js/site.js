@@ -330,7 +330,7 @@ function OnArrivalLoadImageClick(tripRecordID, button, page) {
     // テーブルに表示されている便実績のIDをリスト化
     trs = button.parentNode.parentNode.parentNode.childNodes;
     for (i = 0; i < trs.length - tableLength; i++) {
-        arrayTrs.push(trs[i + tableLength].childNodes[35].textContent);
+        PushTripRecordIDToArrayTrs(arrayTrs, trs);
     }
     EditModal(tripRecordID, isArrived, page);
 }
@@ -344,9 +344,19 @@ function OnDepartureLoadImageClick(tripRecordID, button, page) {
     // テーブルに表示されている便実績のIDをリスト化
     trs = button.parentNode.parentNode.parentNode.childNodes;
     for (i = 0; i < trs.length - tableLength; i++) {
-        arrayTrs.push(trs[i + tableLength].childNodes[35].textContent);
+        PushTripRecordIDToArrayTrs(arrayTrs, trs);
     }
     EditModal(tripRecordID, isArrived, page);
+}
+
+// テーブルに表示されている便実績のIDをリスト化
+function PushTripRecordIDToArrayTrs(arrayTrs, trs) {
+    // 押したボタンの列の要素を取得
+    var arrayChildNodes = trs[i + tableLength].childNodes;
+    // 列の要素の内便実績IDのIndexを取得
+    var tripRecordIDIndex = Array.from(arrayChildNodes).findIndex(x => x.className == 'trip-record-id');
+    // リストに便実績IDを追加
+    arrayTrs.push(trs[i + tableLength].childNodes[tripRecordIDIndex].textContent);
 }
 
 // 荷量画像モーダル作成
