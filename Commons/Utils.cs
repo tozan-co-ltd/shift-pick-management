@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Reflection;
 
 namespace ai_truck_load_measurement.Commons
@@ -171,5 +172,26 @@ namespace ai_truck_load_measurement.Commons
             }
         }
 
+        /// <summary>
+        /// ListをDataTableに変換する
+        /// </summary>
+        public static DataTable ToDataTable<T>(IList<T> list)
+        {
+            var table = new DataTable();
+
+            typeof(T).GetProperties().ToList().ForEach(
+                p => table.Columns.Add(p.Name, typeof(string))
+                );
+
+            foreach (var item in list)
+            {
+                DataRow row = table.NewRow();
+                typeof(T).GetProperties().ToList().ForEach(
+                    p => row[p.Name] = p.GetValue(item) ?? DBNull.Value
+                    );
+                table.Rows.Add(row);
+            }
+            return table;
+        }
     }
 }

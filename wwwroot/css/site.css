@@ -75,6 +75,11 @@ label{
     content: '\f0ad';
 }
 
+
+.icon-categoryid-5::before {
+    content: '\f013';
+}
+
 /* || レスポンシブデザイン */
 @media screen and (max-width: 1200px) {
     html {
@@ -1466,4 +1471,45 @@ html {
     /*font-weight: bold !important;
     background-color: #cccccc !important;*/
     color: gray;
+}
+
+.statistics-table-top td:first-child {
+    background-color: #4D79A7;
+    color:#FFFFFF;
+    border-color: #000000;
+}
+
+.statistics-table-top td {
+    font-weight: bold;
+    border-top: double 5px;
+    border-spacing: 0px 15px;
+    background-color: #ABC1D7;
+}
+
+.statistics-table-bottom td:first-child {
+    background-color: #FF5858;
+    color:#FFFFFF;
+}
+.statistics-table-bottom td {
+    border-collapse: collapse !important;
+    font-weight: bold;
+    border-bottom: double 5px;
+    background-color: #FFE5E5;
+    border-color: #000000;
+}
+/* 罫線を引く */
+.statistics-table thead th:first-child {
+    border-left: 1px solid #404040;
+}
+
+.statistics-table thead th {
+    border-right: 1px solid #404040;
+}
+
+.statistics-table tbody td:first-child {
+    border-left: 1px solid #404040;
+}
+
+.statistics-table tbody td {
+    border-right: 1px solid #404040;
 }

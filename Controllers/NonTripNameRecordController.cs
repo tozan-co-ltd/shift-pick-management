@@ -300,7 +300,7 @@ namespace ai_truck_load_measurement.Controllers
                     nonTripNameRecordList = GetNonTripNameRecordList(startOfPeriod, endOfPeriod, checkedDepos);
                 }
 
-                var nonTripNameRecordDT = ToDataTable<NonTripNameRecordModel>(nonTripNameRecordList);
+                var nonTripNameRecordDT = Utils.ToDataTable<NonTripNameRecordModel>(nonTripNameRecordList);
 
                 // 便実績が0の場合
                 if (nonTripNameRecordDT.Rows.Count == 0)
@@ -365,26 +365,6 @@ namespace ai_truck_load_measurement.Controllers
 
         }
 
-        /// <summary>
-        /// List内のNullデータをDBNull.Valueとして登録する
-        /// </summary>
-        public DataTable ToDataTable<T>(IList<T> list)
-        {
-            var table = new DataTable();
-
-            typeof(T).GetProperties().ToList().ForEach(
-                p => table.Columns.Add(p.Name, typeof(string))
-                );
-
-            foreach (var item in list)
-            {
-                DataRow row = table.NewRow();
-                typeof(T).GetProperties().ToList().ForEach(
-                    p => row[p.Name] = p.GetValue(item) ?? DBNull.Value
-                    );
-                table.Rows.Add(row);
-            }
-            return table;
-        }
+       
     }
 }
