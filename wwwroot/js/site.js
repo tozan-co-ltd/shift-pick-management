@@ -672,8 +672,8 @@ function tableDisplayCommon(page, data) {
             scrollX: true,          // 横スクロール可
             scrollCollapse: true,   // 縦スクロール表示
             searchHighlight: true,  // 検索ハイライト
-            orderFixed: [4, "asc"], // 便名称無しを下に表示する
-            order: [[0, "asc"] , [18, "asc"], [1, "asc"]],    // 便名称、稼働日、枝番で昇順
+            orderFixed: [18, "asc"],
+            order: [[0, "asc"] , [16, "asc"], [1, "asc"]],    // ID昇順
             "oLanguage": {
                 "sSearch": ""
             },

@@ -294,7 +294,11 @@ namespace ai_truck_load_measurement.ConnectControllers
             return sql;
         }
 
-
+        /// <summary>
+        /// 選択したデポをもとにSQLの条件文を作成する
+        /// </summary>
+        /// <param name="checkedDepos">選択したデポ</param>
+        /// <returns></returns>
         public static string SQLOfCheckedDepos(List<string> checkedDepos)
         {
             var sql = "";
@@ -311,6 +315,33 @@ namespace ai_truck_load_measurement.ConnectControllers
                 }
                 sql += ")";
             }
+            return sql;
+        }
+
+        /// <summary>
+        /// 選択した便名称と便枝番をもとにSQLの条件分を作成する
+        /// </summary>
+        /// <param name="trips">選択した便情報モデルリスト</param>
+        /// <returns></returns>
+        public static string CreateSQLToTripConditions(List<SelectedTripModel> trips)
+        {
+            var sql = "AND (";
+            if (trips.Count == 0)
+            {
+                sql += "1=0)";
+                return sql;
+            }
+
+            for (int i = 0; i < trips.Count; i++)
+            {
+                if (i != 0)
+                    sql += "OR";
+
+                sql += $@"(trip_name = '{trips[i].TripName}' AND trip_branch_seq = {trips[i].TripBranchSeq})
+                ";
+            }
+
+            sql += ")";
             return sql;
         }
     }

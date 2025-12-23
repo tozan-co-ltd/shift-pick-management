@@ -663,7 +663,7 @@ namespace ai_truck_load_measurement.Commons
         /// </summary>
         /// <param name="headerName">ヘッダー名</param>
         /// <returns>ヘッダーリスト</returns>
-        public static List<string> CreateHeaderList(string gamenName, List<string> checkedDepos)
+        public static List<string> CreateHeaderList(string gamenName, List<string> strings)
         {
             List<string> headerList = new();
             switch (gamenName)
@@ -724,7 +724,7 @@ namespace ai_truck_load_measurement.Commons
                 case "1.出発実績無し件数":
                     headerList.Add("稼働日");
                     headerList.Add("出発実績無合計");
-                    foreach(var depoID in checkedDepos)
+                    foreach(var depoID in strings)
                     {
                         var depoName = "";
                         if (depoID == "1")
@@ -762,6 +762,31 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("紐づけ切れ回数");
                     headerList.Add("実績総数");
                     headerList.Add("デポ名");
+                    break;
+                case "早着・遅着実績":
+                    headerList.Add("稼働日");
+                    foreach(var tripNameAndBranchSeq in strings)
+                    {
+                        headerList.Add(tripNameAndBranchSeq);
+                    }
+                    break;
+                case "アラート回数詳細表示":
+                    headerList.Add("便名称_便枝番");
+                    headerList.Add("到着時間(早)");
+                    headerList.Add("出発時間(早)");
+                    headerList.Add("到着時間(遅)");
+                    headerList.Add("出発時間(遅)");
+                    headerList.Add("到着荷量(下限)");
+                    headerList.Add("出発荷量(下限)");
+                    headerList.Add("実績総件数");
+                    break;
+                case "荷量アラート実績":
+                    headerList.Add("稼働日");
+                    foreach (var tripNameAndBranchSeq in strings)
+                    {
+                        headerList.Add(tripNameAndBranchSeq + " 到着");
+                        headerList.Add(tripNameAndBranchSeq + " 出発");
+                    }
                     break;
                 default:
                     headerList.Add("便名称");

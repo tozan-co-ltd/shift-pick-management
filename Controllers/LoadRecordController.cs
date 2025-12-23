@@ -355,6 +355,8 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{arrivalScheduledTime}</td>
                             <td>{departureScheduledTime}</td>
                             <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
+                            <td hidden>{item.TripRecordID}</td>
+                            <td hidden>{hasTripName}</td>
                             <td>{remark}</td>
                         </tr>
                 ";
@@ -537,7 +539,7 @@ namespace ai_truck_load_measurement.Controllers
         /// </summary>
         /// <param name="tripRecordList">便実績リスト</param>
         /// <returns></returns>
-        private string CreateSelectTripNameAndBranchSeqHTML(List<LoadRecordModel> tripRecordList, List<string> checkedDepos)
+        public static string CreateSelectTripNameAndBranchSeqHTML(List<LoadRecordModel> tripRecordList, List<string> checkedDepos)
         {
             var html = "";
 
