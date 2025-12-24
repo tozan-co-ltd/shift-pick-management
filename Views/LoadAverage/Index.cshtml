@@ -149,7 +149,7 @@
         model = @Html.Raw(Json.Serialize(Model));
         var today = new Date();
         var oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 30);
         $('#endOfPeriod').val(GetDayString(today));
         $('#startOfPeriod').val(GetDayString(oneWeekAgo));
         addDepos(model);
@@ -212,6 +212,8 @@
                 order: [[0, "asc"]],    // ID降順
                 searchHighlight: true,  // 検索ハイライト
 
+                pageLength: 30,
+                lengthMenu: [10, 20, 30, 40, 50],
                 "oLanguage": {
                     "sSearch": "フリーワード(全件)"
                 },
