@@ -286,6 +286,8 @@ namespace ai_truck_load_measurement.Controllers
                                 <th class=""font-weight-bold"">便名称</th>
                                 <th class=""font-weight-bold"">便枝番</th>
                                 <th class=""font-weight-bold"">タグ</th>
+                                <th hidden>便実績ID</th>
+                                <th hidden>便名称有無</th>
                                 <th class=""font-weight-bold"">識別<br>番号</th>
                                 <th class=""font-weight-bold"">到着実績</th>
                                 <th class=""font-weight-bold"">出発実績</th>
@@ -301,8 +303,6 @@ namespace ai_truck_load_measurement.Controllers
                                 <th class=""font-weight-bold"">出発<br>予定</th>
                                 <th class=""font-weight-bold"">稼働日</th>
                                 <th class=""font-weight-bold"">紐づけ切れ理由</th>
-                                <th hidden>便実績ID</th>
-                                <th hidden>便名称有無</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -355,8 +355,6 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{arrivalScheduledTime}</td>
                             <td>{departureScheduledTime}</td>
                             <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
-                            <td hidden>{item.TripRecordID}</td>
-                            <td hidden>{hasTripName}</td>
                             <td>{remark}</td>
                         </tr>
                 ";
