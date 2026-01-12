@@ -699,7 +699,7 @@ function tableDisplayCommon(page, data) {
             document.querySelector("#loading").style.display = "none";
     }).fail(function (jqXHR, textStatus, errorThrown) {
         var errorMessage = jqXHR.responseJSON.errorMessage;
-        $("#edit-modal-error-message").text(errorMessage);
+        $("#div-error-message").text(errorMessage);
     });
 }
 

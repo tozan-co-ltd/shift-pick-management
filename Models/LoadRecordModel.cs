@@ -1,83 +1,221 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ai_truck_load_measurement.Properties;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
 namespace ai_truck_load_measurement.Models
 {
     public class LoadRecordModel : CommonModel
     {
-        // 便実績ID
+        /// <summary>
+        /// 便実績ID
+        /// </summary>
         public int TripRecordID { get; set; }
-        // 便名称
+
+        /// <summary>
+        /// 便ID
+        /// </summary>
+        public int TripID {  get; set; }
+
+        /// <summary>
+        /// 便名称
+        /// </summary>
+        [Display(Name = "便名称")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? TripName { get; set; }
-        // 便枝番  
+
+        /// <summary>
+        /// 便枝番ID
+        /// </summary>
+        public int TripBranchNumberID {  get; set; }
+
+        /// <summary>
+        /// 便枝番  
+        /// </summary>
+        [Display(Name = "便枝番")]
         public string? TripBranchSeq { get; set; }
-        // 乗務員
+
+        /// <summary>
+        /// 乗務員
+        /// </summary>
+        [Display(Name = "乗務員")]
         public string? DriverName { get; set; }
-        // ステーションID
+
+        /// <summary>
+        /// ステーションID
+        /// </summary>
         public int StationID { get; set; }
-        // ステーション名
+
+        /// <summary>
+        /// ステーション名
+        /// </summary>
+        [Display(Name = "ステーション名")]
         public string? StationName { get; set; }
-        // 車両番号
+
+        /// <summary>
+        /// 車両ID
+        /// </summary>
+        public int TruckID {  get; set; }
+
+        /// <summary>
+        /// 車両番号
+        /// </summary>
+        [Display(Name = "車両番号")]
         public string? TruckNumber { get; set; }
-        // 識別番号
+
+        /// <summary>
+        /// 識別番号
+        /// </summary>
+        [Display(Name = "識別番号")]
         public string? IdentifyNumber { get; set; }
-        // 到着予定時間
+
+        /// <summary>
+        /// 到着予定時間
+        /// </summary>
+        [Display(Name = "到着予定時間")]
         public DateTime ArrivalScheduledTime { get; set; }
-        // 出発予定時間
+
+        /// <summary>
+        /// 出発予定時間
+        /// </summary>
+        [Display(Name = "出発予定時間")]
         public DateTime DepartureScheduledTime { get; set; }
-        // 稼働日
+
+        /// <summary>
+        /// 稼働日
+        /// </summary>
         public DateTime WorkDay { get; set; }
-        // 到着日時
+
+        /// <summary>
+        /// 到着日時
+        /// </summary>
+        [Display(Name = "到着実績")]
         public DateTime ArrivedAt { get; set; }
-        // 出発日時
+
+        /// <summary>
+        /// 出発日時
+        /// </summary>
+        [Display(Name = "出発実績")]
         public DateTime DepartedAt { get; set; }
-        // 到着荷量
+
+        /// <summary>
+        /// 到着荷量
+        /// </summary>
         public int ArrivalLoadClass { get; set; }
-        // 到着荷量の%表示
+
+        /// <summary>
+        /// 到着荷量の%表示
+        /// </summary>
         public string? ArrivalLoadStatus { get; set; }
-        // 出発荷量
+
+        /// <summary>
+        /// 出発荷量
+        /// </summary>
         public int DepartureLoadClass { get; set; }
-        // 出発荷量の%表示
+
+        /// <summary>
+        /// 出発荷量の%表示
+        /// </summary>
         public string? DepartureLoadStatus { get; set; }
-        // 訂正後到着荷量
+
+        /// <summary>
+        /// 訂正後到着荷量
+        /// </summary>
         public int RevisionArrivalLoadClass { get; set; }
-        // 訂正後到着荷量の%表示
+
+        /// <summary>
+        /// 訂正後到着荷量の%表示
+        /// </summary>
+        [Display(Name = "到着荷量")]
         public string? RevisionArrivalLoadStatus { get; set; }
-        // 訂正後出発荷量
+
+        /// <summary>
+        /// 訂正後出発荷量
+        /// </summary>
         public int RevisionDepartureLoadClass { get; set; }
-        // 訂正後出発荷量の%表示
+
+        /// <summary>
+        /// 訂正後出発荷量の%表示
+        /// </summary>
+        [Display(Name = "出発荷量")]
         public string? RevisionDepartureLoadStatus { get; set; }
-        // 到着荷量画像パス
+
+        /// <summary>
+        /// 到着荷量画像パス
+        /// </summary>
+        [Display(Name = "到着荷量画像")]
         public string? ArrivalLoadImgPath { get; set; }
-        // 出発荷量画像パス
+
+        /// <summary>
+        /// 出発荷量画像パス
+        /// </summary>
+        [Display(Name = "出発荷量画像")]
         public string? DepartureLoadImgPath { get; set; }
-        // メインデポ
+
+        /// <summary>
+        /// メインデポ
+        /// </summary>
         public M_DepoModel? MainDepo {  get; set; }
-        // 訂正後荷量クラス
+
+        /// <summary>
+        /// 訂正後荷量クラス
+        /// </summary>
         public int AnnotationLoadClass { get; set; }
-        // 訂正後荷量の%表示
+
+        /// <summary>
+        /// 訂正後荷量の%表示
+        /// </summary>
         public string? AnnotationLoadStatus { get; set; }
-        // 到着か出発か
+
+        /// <summary>
+        /// 到着か出発か
+        /// </summary>
         public string? ArrivalDepartureClass { get; set; }
-        // 便名称のリスト
+
+        /// <summary>
+        /// 便名称のリスト
+        /// </summary>
         public List<SelectListItem>? TripNameList { get; set; }
-        // 選択された便名称
+
+        /// <summary>
+        /// 選択された便名称
+        /// </summary>
         public string? SelectedTripName { get; set; }
-        // 昼勤開始時間
+
+        /// <summary>
+        /// 昼勤開始時間
+        /// </summary>
         public DateTime? DayShiftStartTime { get; set; }
-        // デポID
+
+        /// <summary>
+        /// デポID
+        /// </summary>
         public int DepoID {  get; set; }
-        // デポ名
+
+        /// <summary>
+        /// デポ名
+        /// </summary>
         public string? DepoName { get; set; }
-        // タグ
+
+        /// <summary>
+        /// タグ
+        /// </summary>
         public string? Tag { get; set; }
-        // 備考
+
+        /// <summary>
+        /// 紐づけ切れ原因
+        /// </summary>
         public string? Remark { get; set; }
 
-        // 便実績リスト
+        /// <summary>
+        /// 便実績リスト
+        /// </summary>
         public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
-        // 管理権限区分
+
+        /// <summary>
+        /// 管理権限区分
+        /// </summary>
         public int AuthorizedKubun {  get; set; }
     }
 
@@ -96,13 +234,4 @@ namespace ai_truck_load_measurement.Models
         // 選択された便名称
         public string? SelectedTripName { get; set; }
     }
-
-    public class PivotStatusModel : CommonModel
-    {
-        public List<string> HeaderColumuns { get; set; }
-        public string YColumnName {  get; set; }
-        public List<string> XColumnNames {  get; set; }
-        public string ValueColumnNames {  get; set; }
-    }
-
 }
