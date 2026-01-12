@@ -133,6 +133,7 @@
             return sql;
         }
 
+
         public static string CreateSQLToSelectTripBranchSeqsFromIdentifyNumber(string identifyNumber, DateTime arrivedAt)
         {
             var sql = $@"
@@ -153,6 +154,25 @@
                 AND TripBranchNumbers.applicable_end_datetime > '{arrivedAt}'
                 AND TripBranchNumbers.applicable_start_datetime < '{arrivedAt}'
                 ORDER BY arrival_scheduled_time
+            ";
+            return sql;
+        }
+
+        public static string CreateSQLToSelectTripNameFromIdentifyNumber(string identifyNumber, DateTime arrivedAt)
+        {
+            var sql = $@"
+                SELECT 
+	                trip_name
+                FROM m_trip_histories AS TripHistories
+                INNER JOIN
+                m_trucks AS Trucks
+                ON TripHistories.truck_id = Trucks.truck_id
+                INNER JOIN
+                m_trips AS Trips
+                ON TripHistories.trip_id = Trips.trip_id
+                WHERE identify_number = '{identifyNumber}'
+                AND TripHistories.applicable_end_datetime > '{arrivedAt}'
+                AND TripHistories.applicable_start_datetime < '{arrivedAt}'
             ";
             return sql;
         }

@@ -41,7 +41,7 @@
                             <label>@Html.DisplayName("TripName")</label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
-                            <label>@Model.TripName</label>
+                            <label name="TripName">@Model.TripName</label>
                         </div>
                     </div>
                     <div class="col-12 input-group div-input-group">
@@ -197,14 +197,12 @@
         GetTripBranchSeqs();
         model = @Html.Raw(Json.Serialize(Model));
         console.log(model);
-        // if(model.tripBranchSeq != 0){
-        // console.log("test");
-        //     $('[name=TripBranchNumberID]').val(model.tripBranchNumberID);
-        // console.log("test2");
-        // }
+        if(model.tripBranchNumberID != 0){
+            $('[name=TripBranchNumberID]').val(model.tripBranchNumberID);
+        }
     });
 
-        // 便枝番取得
+    // 便枝番取得
     function GetTripBranchSeqs() {
         var identifyNumber = $('[name=IdentifyNumber]').val();
         var arrivedAt = $('[name=ArrivedAt]').val();
@@ -229,13 +227,47 @@
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
                 var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#edit-modal-error-message").text(errorMessage);
+                $("#div-error-message").text(errorMessage);
             } else {
                 var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
-                $("#edit-modal-error-message").text(errorMessage);
+                $("#div-error-message").text(errorMessage);
             }
         });
     }
+
+    function GetTripName(){
+        var identifyNumber = $('[name=IdentifyNumber]').val();
+        var arrivedAt = $('[name=ArrivedAt]').val(); 
+        
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripName", "EditLoadRecord")';
+        let method = 'POST';
+        let data = { identifyNumber: identifyNumber, arrivedAt: arrivedAt };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false,
+        }).done(function (response) {
+            console.log($('[name=TripName]'));
+            $('[name=TripName]')[0].innerText = response;
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
+            }
+        });
+    }
+
+    $('[name=IdentifyNumber]').change(function () {
+        GetTripBranchSeqs();
+        GetTripName();
+    });
 
     // 登録ボタン押下
     function OnRegister() {

@@ -214,6 +214,12 @@ namespace ai_truck_load_measurement.Controllers
                 return "-";
         }
 
+        /// <summary>
+        /// 便枝番リスト取得
+        /// </summary>
+        /// <param name="identifyNumber">識別番号</param>
+        /// <param name="arrivedAt">到着実績</param>
+        /// <returns></returns>
         public List<SelectListItem> GetTripBranchSeqs(string identifyNumber, DateTime arrivedAt)
         {
             var tripBranchNumberItems = new List<SelectListItem>();
@@ -251,6 +257,25 @@ namespace ai_truck_load_measurement.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return tripBranchNumberItems;
+            }
+        }
+
+        public string GetTripName(string identifyNumber, DateTime arrivedAt)
+        {
+            var tripName = string.Empty;
+            try
+            {
+                var sql = EditLoadRecordConnectController.CreateSQLToSelectTripNameFromIdentifyNumber(identifyNumber, arrivedAt);
+                tripName = ConnectToSQLServer.ExecuteQueryToList<string>(sql).FirstOrDefault();
+                if (string.IsNullOrEmpty(tripName))
+                    tripName = "便マスター未登録番号";
+                return tripName;
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return tripName;
             }
         }
     }
