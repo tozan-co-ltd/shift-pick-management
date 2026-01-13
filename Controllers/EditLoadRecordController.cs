@@ -180,7 +180,7 @@ namespace ai_truck_load_measurement.Controllers
                 SelectListItem firstItem = new()
                 {
                     Text = "選択してください",
-                    Value = "",
+                    Value = "0",
                     Selected = true,
                     Disabled = true
                 };
@@ -233,7 +233,7 @@ namespace ai_truck_load_measurement.Controllers
                 SelectListItem firstItem = new()
                 {
                     Text = "選択してください",
-                    Value = "",
+                    Value = "0",
                     Selected = true,
                     Disabled = true
                 };
@@ -276,6 +276,23 @@ namespace ai_truck_load_measurement.Controllers
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return tripName;
+            }
+        }
+
+        public M_TripBranchNumberModel GetScheduledTime(int tripBranchNumberID)
+        {
+            var schedules = new M_TripBranchNumberModel();
+            try
+            {
+                var sql = EditLoadRecordConnectController.CreateSQLToSelectScheduledTimeFromTripBranchNumberID(tripBranchNumberID);
+                schedules = ConnectToSQLServer.ExecuteQueryToList<M_TripBranchNumberModel>(sql).First();
+                return schedules;
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                ViewData["ErrorMessage"] = errorMessage + ex.Message;
+                return schedules;
             }
         }
     }

@@ -122,6 +122,10 @@
             return sql;
         }
 
+        /// <summary>
+        /// 識別番号一覧取得SQL
+        /// </summary>
+        /// <returns></returns>
         public static string CreateSQLToSelectIdentifyNumbers()
         {
             var sql = $@"
@@ -133,7 +137,12 @@
             return sql;
         }
 
-
+        /// <summary>
+        /// 識別番号から便枝番マスタ情報を取得するSQL
+        /// </summary>
+        /// <param name="identifyNumber"></param>
+        /// <param name="arrivedAt"></param>
+        /// <returns></returns>
         public static string CreateSQLToSelectTripBranchSeqsFromIdentifyNumber(string identifyNumber, DateTime arrivedAt)
         {
             var sql = $@"
@@ -158,6 +167,12 @@
             return sql;
         }
 
+        /// <summary>
+        /// 識別番号空便名称を取得するSQL
+        /// </summary>
+        /// <param name="identifyNumber"></param>
+        /// <param name="arrivedAt"></param>
+        /// <returns></returns>
         public static string CreateSQLToSelectTripNameFromIdentifyNumber(string identifyNumber, DateTime arrivedAt)
         {
             var sql = $@"
@@ -173,6 +188,23 @@
                 WHERE identify_number = '{identifyNumber}'
                 AND TripHistories.applicable_end_datetime > '{arrivedAt}'
                 AND TripHistories.applicable_start_datetime < '{arrivedAt}'
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 便枝番IDから到着・出発予定時間を取得するSQL
+        /// </summary>
+        /// <param name="tripBranchNumberID"></param>
+        /// <returns></returns>
+        public static string CreateSQLToSelectScheduledTimeFromTripBranchNumberID(int tripBranchNumberID)
+        {
+            var sql = $@"
+            SELECT
+                CONVERT(DATETIME, arrival_scheduled_time) AS arrival_scheduled_time
+                ,CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time
+            FROM m_trip_branch_numbers
+            WHERE trip_branch_number_id = {tripBranchNumberID}
             ";
             return sql;
         }
