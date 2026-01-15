@@ -64,7 +64,7 @@
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayName("Remark")<span style="color:red">*</span></label>
+                            <label>@Html.DisplayName("Remark")</label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <select class="form-select" name="Remark" asp-for="Remark" asp-items="@Model.UnLinkedReasonSelectList" required></select>
@@ -73,7 +73,7 @@
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayName("StationName")<span style="color:red">*</span></label>
+                            <label>@Html.DisplayName("StationName")</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <label>@Model.StationName</label>
@@ -81,7 +81,7 @@
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayName("RegistArrivalScheduledTime")<span style="color:red">*</span></label>
+                            <label>@Html.DisplayName("RegistArrivalScheduledTime")</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <input class="form-control" asp-for="RegistArrivalScheduledTime" autocomplete="off" id="RegistArrivalScheduledTime" readonly>
@@ -90,7 +90,7 @@
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayName("RegistDepartureScheduledTime")<span style="color:red">*</span></label>
+                            <label>@Html.DisplayName("RegistDepartureScheduledTime")</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <input class="form-control" asp-for="RegistDepartureScheduledTime" autocomplete="off" id="RegistDepartureScheduledTime" readonly>
@@ -109,7 +109,7 @@
                     </div>
                     <div class="col-12 input-group div-input-group">
                         <div class="col-12 col-sm-4 col-md-2 column-1st">
-                            <label>@Html.DisplayName("DepartedAt")<span style="color:red">*</span></label>
+                            <label>@Html.DisplayName("DepartedAt")</span></label>
                         </div>
                         <div class="col-12 col-sm-8 col-md-5 column-2nd">
                             <input class="form-control" name="DepartedAt" type="datetime-local" asp-for="DepartedAt" autocomplete="off" id="DepartedAt" required>

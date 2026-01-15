@@ -206,6 +206,7 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 紐づけ切れ原因
         /// </summary>
+        [Display(Name = "紐づけ切れ原因")]
         public string? Remark { get; set; }
 
         /// <summary>

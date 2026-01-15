@@ -168,7 +168,7 @@
         }
 
         /// <summary>
-        /// 識別番号空便名称を取得するSQL
+        /// 識別番号から便名称を取得するSQL
         /// </summary>
         /// <param name="identifyNumber"></param>
         /// <param name="arrivedAt"></param>

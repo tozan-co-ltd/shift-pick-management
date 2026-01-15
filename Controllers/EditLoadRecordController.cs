@@ -176,7 +176,7 @@ namespace ai_truck_load_measurement.Controllers
 
                 var identifyNumberSql = EditLoadRecordConnectController.CreateSQLToSelectIdentifyNumbers();
                 var identifyNumberList = ConnectToSQLServer.ExecuteQueryToList<string>(identifyNumberSql);
-                // 車両番号のセレクトリスト作成
+                // 識別番号のセレクトリスト作成
                 SelectListItem firstItem = new()
                 {
                     Text = "選択してください",
@@ -260,6 +260,12 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
+        /// <summary>
+        /// 便名称取得
+        /// </summary>
+        /// <param name="identifyNumber"></param>
+        /// <param name="arrivedAt"></param>
+        /// <returns></returns>
         public string GetTripName(string identifyNumber, DateTime arrivedAt)
         {
             var tripName = string.Empty;
@@ -279,6 +285,11 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
+        /// <summary>
+        /// 出発・到着予定時間取得
+        /// </summary>
+        /// <param name="tripBranchNumberID"></param>
+        /// <returns></returns>
         public M_TripBranchNumberModel GetScheduledTime(int tripBranchNumberID)
         {
             var schedules = new M_TripBranchNumberModel();
