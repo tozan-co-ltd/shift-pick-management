@@ -1,4 +1,6 @@
-﻿namespace ai_truck_load_measurement.ConnectControllers
+﻿using ai_truck_load_measurement.Models;
+
+namespace ai_truck_load_measurement.ConnectControllers
 {
     public class EditLoadRecordConnectController
     {
@@ -87,6 +89,7 @@
             var sql = $@"
                 SELECT 
                     TripRecords.trip_record_id,
+                    TripRecords.trip_id,
 	                trip_name,
                     TripRecords.trip_branch_number_id,
 	                TripRecords.trip_branch_seq,
@@ -177,7 +180,10 @@
         {
             var sql = $@"
                 SELECT 
-	                trip_name
+	                TripHistories.trip_id,
+                    trip_name,
+	                driver_name,
+	                truck_number
                 FROM m_trip_histories AS TripHistories
                 INNER JOIN
                 m_trucks AS Trucks
@@ -205,6 +211,118 @@
                 ,CONVERT(DATETIME, departure_scheduled_time) AS departure_scheduled_time
             FROM m_trip_branch_numbers
             WHERE trip_branch_number_id = {tripBranchNumberID}
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 便実績更新SQL
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public static string CreateSQLToUpdateTripRecord(EditLoadRecordModel model)
+        {
+            var sql = $@"
+                UPDATE t_trip_records
+                SET
+            ";
+            if (model.TripID != 0)
+            {
+                sql += $@"
+                    trip_id = {model.TripID},
+                    trip_name = '{model.TripName}',
+                    driver_name = '{model.DriverName}',
+                    truck_number = '{model.TruckNumber}',
+                    identify_number = '{model.IdentifyNumber}',
+                ";
+            }
+            if(model.TripBranchNumberID != 0)
+            {
+                sql += $@"
+                    trip_branch_number_id = {model.TripBranchNumberID},
+                    trip_branch_seq = '{model.TripBranchSeq}',
+                    arrival_scheduled_time = '{model.RegistArrivalScheduledTime}',
+                    departure_scheduled_time = '{model.RegistDepartureScheduledTime}',
+                ";
+            }
+            if (!string.IsNullOrEmpty(model.DepartureLoadImgPath))
+            {
+                sql += $@"
+                    departure_load_img_path = '{model.DepartureLoadImgPath}',
+                ";
+            }
+            if (model.DepartedAt.ToString("yyyy/MM/dd HH:mm:ss") != "0001/01/01 00:00:00")
+            {
+                sql += $@"
+                    departed_at = '{model.DepartedAt.ToString("yyyy/MM/dd HH:mm:ss")}',
+                ";
+            }
+            sql += $@"
+                    arrived_at = '{model.ArrivedAt.ToString("yyyy/MM/dd HH:mm:ss")}',
+                    arrival_load_img_path = '{model.ArrivalLoadImgPath}',
+                    unlinked_reason_id = {model.UnlinkedReasonID}
+                    is_deleted = '{model.IsDeleted}'
+                WHERE trip_record_id = {model.TripRecordID}
+            ";
+                return sql;
+        }
+
+        /// <summary>
+        /// 紐づけ切れ原因リスト取得SQL
+        /// </summary>
+        /// <returns></returns>
+        public static string CreateSQLToSelectUnlinkedReasons()
+        {
+            var sql = $@"
+                SELECT *
+                FROM m_unlinked_reasons
+            ";
+            return sql;
+        }
+
+        public static string CreateSQLToInsertCorrectionItems(CorrectionItemModel model, DateTime createdAt, string createdBy)
+        {
+            string formatCreatedAt = createdAt.ToString("yyyy/MM/dd HH:mm:ss");
+
+            var sql = $@"
+                INSERT INTO t_correction_items(
+                    trip_record_id, 
+                    is_identify_number_changed,
+                    before_identify_number,
+                    is_trip_id_changed,
+                    before_trip_id,
+                    is_trip_branch_number_id_changed,
+                    before_trip_branch_number_id,
+                    is_arrived_at_changed,
+                    before_arrived_at,
+                    is_departed_at_changed,
+                    before_departed_at,
+                    is_arrival_load_img_path_changed,
+                    before_arrival_load_img_path,
+                    is_departure_load_img_path_changed,
+                    before_departure_load_img_path,
+                    created_at,
+                    created_by
+                )
+                VALUES (
+                    '{model.TripRecordID}',
+                    '{model.IsIdentifyNumberChanged}',
+                    '{model.BeforeIdentifyNumber}',
+                    '{model.IsTripIDChanged}',
+                    '{model.BeforeTripID}',
+                    '{model.IsTripBranchNumberIDChanged}',
+                    '{model.BeforeTripBranchNumberID}',
+                    '{model.IsArrivedAtChanged}',
+                    '{model.BeforeArrivedAt}',
+                    '{model.IsDepartedAtChanged}',
+                    '{model.BeforeDepartedAt}',
+                    '{model.IsArrivalLoadImgPathChanged}',
+                    '{model.BeforeArrivalLoadImgPath}',
+                    '{model.IsDepartureLoadImgPathChanged}',
+                    '{model.BeforeDepartureLoadImgPath}',
+                    '{formatCreatedAt}',
+                    '{createdBy}'
+                );
             ";
             return sql;
         }

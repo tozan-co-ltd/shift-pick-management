@@ -210,6 +210,17 @@ namespace ai_truck_load_measurement.Models
         public string? Remark { get; set; }
 
         /// <summary>
+        /// 紐づけ切れ原因ID
+        /// </summary>
+        public int UnlinkedReasonID { get; set; }
+
+        /// <summary>
+        /// 紐づけ切れ原因
+        /// </summary>
+        [Display(Name = "紐づけ切れ原因")]
+        public string? UnlinkedReason { get; set; }
+
+        /// <summary>
         /// 便実績リスト
         /// </summary>
         public IPagedList<LoadRecordModel>? TripRecordList { get; set; }

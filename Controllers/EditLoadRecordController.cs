@@ -2,14 +2,17 @@
 using ai_truck_load_measurement.ConnectControllers;
 using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
+using DocumentFormat.OpenXml.Math;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data.SqlClient;
 using X.PagedList;
 
 namespace ai_truck_load_measurement.Controllers
 {
     public class EditLoadRecordController : BaseController
     {
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         public IActionResult Index()
         {
             LoadRecordViewModel model = new();
@@ -176,6 +179,10 @@ namespace ai_truck_load_measurement.Controllers
 
                 var identifyNumberSql = EditLoadRecordConnectController.CreateSQLToSelectIdentifyNumbers();
                 var identifyNumberList = ConnectToSQLServer.ExecuteQueryToList<string>(identifyNumberSql);
+
+                var unlinkedReasonSql = EditLoadRecordConnectController.CreateSQLToSelectUnlinkedReasons();
+                var unlinkedReasonList = ConnectToSQLServer.ExecuteQueryToList<UnlinkedReasonModel>(unlinkedReasonSql);
+
                 // 識別番号のセレクトリスト作成
                 SelectListItem firstItem = new()
                 {
@@ -185,6 +192,8 @@ namespace ai_truck_load_measurement.Controllers
                     Disabled = true
                 };
                 model.IdentifyNumberSelectList.Add(firstItem);
+                model.UnLinkedReasonSelectList.Add(firstItem);
+
                 foreach (var identifyNumber in identifyNumberList)
                 {
                     SelectListItem menuItem = new()
@@ -196,6 +205,21 @@ namespace ai_truck_load_measurement.Controllers
 
                     model.IdentifyNumberSelectList.Add(menuItem);
                 }
+
+                foreach (var unlinkedReason in unlinkedReasonList)
+                {
+                    SelectListItem menuItem = new()
+                    {
+                        Text = unlinkedReason.UnlinkedReasonName,
+                        Value = unlinkedReason.UnlinkedReasonID.ToString(),
+                        Selected = false
+                    };
+
+                    model.UnLinkedReasonSelectList.Add(menuItem);
+                }
+
+                model.ArrivalLoadImgPath = LoadRecordController.CheckAndConvertImagePath(model.ArrivalLoadImgPath);
+                model.DepartureLoadImgPath = LoadRecordController.CheckAndConvertImagePath(model.DepartureLoadImgPath);
 
                 return View(model);
             }
@@ -266,22 +290,22 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="identifyNumber"></param>
         /// <param name="arrivedAt"></param>
         /// <returns></returns>
-        public string GetTripName(string identifyNumber, DateTime arrivedAt)
+        public M_TripModel GetTripModel(string identifyNumber, DateTime arrivedAt)
         {
-            var tripName = string.Empty;
+            var tripModel = new M_TripModel();
             try
             {
                 var sql = EditLoadRecordConnectController.CreateSQLToSelectTripNameFromIdentifyNumber(identifyNumber, arrivedAt);
-                tripName = ConnectToSQLServer.ExecuteQueryToList<string>(sql).FirstOrDefault();
-                if (string.IsNullOrEmpty(tripName))
-                    tripName = "便マスター未登録番号";
-                return tripName;
+                tripModel = ConnectToSQLServer.ExecuteQueryToList<M_TripModel>(sql).FirstOrDefault();
+                if (string.IsNullOrEmpty(tripModel.TripName))
+                    tripModel.TripName = "便マスター未登録番号";
+                return tripModel;
             }
             catch (Exception ex)
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999;
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
-                return tripName;
+                return tripModel;
             }
         }
 
@@ -305,6 +329,124 @@ namespace ai_truck_load_measurement.Controllers
                 ViewData["ErrorMessage"] = errorMessage + ex.Message;
                 return schedules;
             }
+        }
+
+        /// <summary>
+        /// 便実績登録
+        /// </summary>
+        /// <param name="model">登録情報</param>
+        [HttpPost]
+        public IActionResult Register(EditLoadRecordModel model)
+        {
+            string? errorMessage;
+            try
+            {
+                // ログイン中ユーザー情報取得
+                var user = ClaimsLoginUserData();
+
+                //入力規則チェック
+                if (!ModelState.IsValid)
+                {
+                    // log取得
+                    errorMessage = "E1011: " + ErrorMessagesResources.E1011;
+                    _logger.Error($"便実績更新失敗 {errorMessage}");
+
+                    return NotFound(new { errorMessage });
+                }
+
+                // 変更項目モデル作成
+                var correctionItems = GetCorrectionItems(model, user.UserName);
+                var correctionItemSql = EditLoadRecordConnectController.CreateSQLToInsertCorrectionItems(correctionItems, DateTime.Now, user.UserName);
+                ConnectToSQLServer.ExecuteQuery(correctionItemSql);
+
+                // 便実績更新
+                var sql = EditLoadRecordConnectController.CreateSQLToUpdateTripRecord(model);
+                ConnectToSQLServer.ExecuteQuery(sql);
+
+                // log取得
+                _logger.Info($"便実績更新成功 便実績ID:{model.TripRecordID}");
+                
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // log取得
+                errorMessage = "E3004: " + ErrorMessagesResources.E3004;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+            catch (Exception ex)
+            {
+                // log取得
+                errorMessage = "E9999: " + ErrorMessagesResources.E9999;
+                var exceptionMessage = ex.Message;
+                _logger.Error($"{exceptionMessage} {errorMessage}");
+
+                return NotFound(new { errorMessage });
+            }
+        }
+
+        private CorrectionItemModel GetCorrectionItems(EditLoadRecordModel model, string userName)
+        {
+            CorrectionItemModel result = new CorrectionItemModel();
+            var sql = EditLoadRecordConnectController.CreateSQLToSelectTripRecordFromID(model.TripRecordID);
+            var beforeModel = ConnectToSQLServer.ExecuteQueryToList<LoadRecordModel>(sql).First();
+
+            result.TripRecordID = model.TripRecordID;
+
+            // 各項目の変更有無設定
+            if(beforeModel.TripID != model.TripID)
+                result.IsTripIDChanged = true;
+            else
+                result.IsTripIDChanged = false;
+
+            if(beforeModel.IdentifyNumber != model.IdentifyNumber)
+                result.IsIdentifyNumberChanged = true;
+            else
+                result.IsIdentifyNumberChanged = false;
+
+            if(beforeModel.TripBranchNumberID != model.TripBranchNumberID)
+                result.IsTripBranchNumberIDChanged = true;
+            else
+                result.IsTripBranchNumberIDChanged = false;
+
+            if(beforeModel.ArrivedAt != model.ArrivedAt)
+                result.IsArrivedAtChanged = true;
+            else
+                result.IsArrivedAtChanged = false;
+
+            if(beforeModel.DepartedAt != model.DepartedAt)
+                result.IsDepartedAtChanged = true;
+            else
+                result.IsDepartedAtChanged= false;
+
+            if(beforeModel.ArrivalLoadImgPath != model.ArrivalLoadImgPath)
+                result.IsArrivalLoadImgPathChanged = true;
+            else
+                result.IsArrivalLoadImgPathChanged= false;
+
+            if (beforeModel.DepartureLoadImgPath != model.DepartureLoadImgPath)
+                result.IsDepartureLoadImgPathChanged = true;
+            else
+                result.IsDepartureLoadImgPathChanged = false;
+
+            // 変更前の各項目の値保存
+            result.BeforeTripID = beforeModel.TripID;
+            result.BeforeIdentifyNumber = beforeModel.IdentifyNumber;
+            result.BeforeTripBranchNumberID = beforeModel.TripBranchNumberID;
+            result.BeforeArrivedAt = beforeModel.ArrivedAt;
+            result.BeforeDepartedAt = beforeModel.DepartedAt;
+            result.BeforeArrivalLoadImgPath = beforeModel.ArrivalLoadImgPath;
+            result.BeforeDepartureLoadImgPath = beforeModel.DepartureLoadImgPath;
+
+            if (beforeModel.RevisionArrivalLoadClass != model.RevisionArrivalLoadClass)
+                LoadRecordController.InsertOrUpdateAnnotationLoads2(model.TripRecordID, model.RevisionArrivalLoadClass, userName, true);
+
+            if (beforeModel.RevisionDepartureLoadClass != model.RevisionDepartureLoadClass)
+                LoadRecordController.InsertOrUpdateAnnotationLoads2(model.TripRecordID, model.RevisionDepartureLoadClass, userName, false);
+            return result;
         }
     }
 }
