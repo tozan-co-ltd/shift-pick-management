@@ -85,9 +85,8 @@ namespace ai_truck_load_measurement.Controllers
                         var departedAt = record.DepartedAt.ToString("yyyy/MM/dd HH:mm");
                         if (departedAt == "0001/01/01 00:00")
                             departedAt = "-";
-                        var remark = record.Remark;
-                        if (string.IsNullOrEmpty(remark))
-                            remark = "-";
+                        var unlinkedReason = record.UnlinkedReasonName;
+                        if (string.IsNullOrEmpty(unlinkedReason)) unlinkedReason = "-";
                         searchData += $@"
                             <tr>
                                 <td>{record.TripRecordID}</td>
@@ -95,7 +94,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{departedAt}</td>
                                 <td>{record.WorkDay.ToString("yyyy/MM/dd")}</td>
                                 <td>{record.StationName}</td>
-                                <td>{remark}</td>
+                                <td>{unlinkedReason}</td>
                                 <td>
                                     <a class=""btn btn-success btn-icon-split ml-1 mr-1""
                                         onclick=""OnArrivalNonIdentifyNumberLoadImageClick('{record.TripRecordID}', this, 'NonIdentifyNumberRecord')"" data-id=""{record.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">

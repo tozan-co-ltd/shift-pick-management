@@ -218,7 +218,7 @@ namespace ai_truck_load_measurement.Models
         /// 紐づけ切れ原因
         /// </summary>
         [Display(Name = "紐づけ切れ原因")]
-        public string? UnlinkedReason { get; set; }
+        public string? UnlinkedReasonName { get; set; }
 
         /// <summary>
         /// 便実績リスト

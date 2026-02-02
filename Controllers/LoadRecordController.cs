@@ -323,8 +323,8 @@ namespace ai_truck_load_measurement.Controllers
                     if (item.TripName == "-") hasTripName = 1;
                     var departed = item.DepartedAt.ToString("yyyy/MM/dd HH:mm");
                     if(departed == "0001/01/01 00:00") departed = "-";
-                    var remark = item.Remark;
-                    if (string.IsNullOrEmpty(remark)) remark = "-";
+                    var unlinkedReason = item.UnlinkedReasonName;
+                    if (string.IsNullOrEmpty(unlinkedReason)) unlinkedReason = "-";
                     searchData += $@"
                         <tr>
                             <td>{item.TripName}</td>
@@ -356,7 +356,7 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{arrivalScheduledTime}</td>
                             <td>{departureScheduledTime}</td>
                             <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
-                            <td>{remark}</td>
+                            <td>{unlinkedReason}</td>
                         </tr>
                 ";
                 }

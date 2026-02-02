@@ -13,12 +13,17 @@
         /// <summary>
         /// 紐づけ切れ原因
         /// </summary>
-        public string Remark { get; set; }
+        public string UnlinkedReasonName { get; set; }
+
+        /// <summary>
+        /// 紐づけ切れ原因ID
+        /// </summary>
+        public int UnlinkedReasonID { get; set; }
 
         /// <summary>
         /// 原因毎の発生数
         /// </summary>
-        public int RemarkCount { get; set; }
+        public int UnlinkedReasonCount { get; set; }
 
         /// <summary>
         /// 全体における原因の比率

@@ -33,7 +33,8 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departed_at,
 	                arrival_load_class,
 	                departure_load_class,
-                    remark,
+                    TripRecords.unlinked_reason_id,
+                    unlinked_reason_name,
 	                arrival_load_img_path,
 	                departure_load_img_path
                 ";
@@ -63,6 +64,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_trip_branch_numbers AS TripBranchNumbers
                 ON
                 TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id
+                LEFT OUTER JOIN
+                m_unlinked_reasons AS UnlinkedReasons
+                ON
+                TripRecords.unlinked_reason_id = UnlinkedReasons.unlinked_reason_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
             ";
             if (hasTripName)
@@ -104,7 +109,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departed_at,
 	                arrival_load_class AS revision_arrival_load_class,
 	                departure_load_class AS revision_departure_load_class,
-                    remark,
+                    unlinked_reason_id,
 	                arrival_load_img_path,
 	                departure_load_img_path
                 FROM t_trip_records AS TripRecords
@@ -260,7 +265,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             sql += $@"
                     arrived_at = '{model.ArrivedAt.ToString("yyyy/MM/dd HH:mm:ss")}',
                     arrival_load_img_path = '{model.ArrivalLoadImgPath}',
-                    unlinked_reason_id = {model.UnlinkedReasonID}
+                    unlinked_reason_id = {model.UnlinkedReasonID},
                     is_deleted = '{model.IsDeleted}'
                 WHERE trip_record_id = {model.TripRecordID}
             ";

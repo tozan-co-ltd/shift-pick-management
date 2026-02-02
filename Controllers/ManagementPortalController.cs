@@ -144,11 +144,11 @@ namespace ai_truck_load_measurement.Controllers
         {
             var allRemarksCount = 0;
             foreach(var item in modelList)
-                allRemarksCount += item.RemarkCount;
+                allRemarksCount += item.UnlinkedReasonCount;
 
             foreach(var item in modelList)
             {
-                var remarkCount = item.RemarkCount;
+                var remarkCount = item.UnlinkedReasonCount;
                 item.RemarkPercentage = Math.Ceiling((double)remarkCount  / (double)allRemarksCount * 1000) / 10;
             }
 
