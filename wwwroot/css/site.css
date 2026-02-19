@@ -80,6 +80,10 @@ label{
     content: '\f013';
 }
 
+.icon-categoryid-6::before {
+    content: '\f013';
+}
+
 /* || レスポンシブデザイン */
 @media screen and (max-width: 1200px) {
     html {
