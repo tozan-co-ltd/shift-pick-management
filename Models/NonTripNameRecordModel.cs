@@ -11,7 +11,7 @@ namespace ai_truck_load_measurement.Models
         public string? NearestArrivaLScheduledTime { get; set; }
         public string? ArrivalTimeDefference { get; set; }
         public string? GuessTripBranchNumber {  get; set; }
-        public string? Remark { get; set; }
+        public string? UnlinkedReasonName { get; set; }
     }
 
     public class NonTripNameRecordViewModel : CommonModel

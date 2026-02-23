@@ -11,7 +11,8 @@
                     departed_at,
                     work_day,
 	                Stations.name AS station_name,
-                    remark,
+                    TripRecords.unlinked_reason_id,
+                    unlinked_reason_name,
                     arrival_load_img_path,
                     departure_load_img_path
                 FROM t_trip_records AS TripRecords
@@ -23,6 +24,10 @@
                 m_depos AS Depos
                 ON
                 Stations.depo_id = Depos.depo_id
+                LEFT OUTER JOIN
+                m_unlinked_reasons AS UnlinkedReasons
+                ON
+                TripRecords.unlinked_reason_id = UnlinkedReasons.unlinked_reason_id
                 WHERE identify_number IS NULL
                 AND is_deleted = 0
                 AND work_day BETWEEN '{startOfPeriod}' AND '{endOfPeriod}'

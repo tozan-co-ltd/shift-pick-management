@@ -1,0 +1,387 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.EditLoadRecordModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle + " - 登録";
+}
+
+<div class="card shadow masterInfo m-4">
+
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+        <div class="row">
+            <div class="col-lg-7 mb-2">
+                <div class="card border-left-custom">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>識別番号を選択すると便名称、便枝番リストが更新されます。</li>
+                            <li>便枝番を選択すると到着・出発予定時間が更新されます。</li>
+                            <li>「削除する」にチェックを入れて登録した場合、便実績一覧から該当実績が削除されます。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <form class="col-md-12" method="post" enctype="multipart/form-data" name="form" id="tripRecordForm" >
+                    <div style="display:flex">
+                        <div style="width:50%">
+                            <input hidden type="text" asp-for="TripRecordID" id="tripRecordID" required />
+                            <input hidden type="text" asp-for="TripID" id="tripID" required />
+                            <div class=" input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("TripName")</label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <input class="form-control" asp-for="TripName" autocomplete="off" id="TripName" name="TripName" readonly>
+                                    <span class="text-danger w-100" asp-validation-for="TripName"></span>
+                                </div>
+                            </div>
+                            <div class="input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("TripBranchSeq")</label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <select class="form-select" name="TripBranchNumberID" asp-for="TripBranchNumberID" asp-items="@Model.TripBranchNumberSelectList" id="TripBranchNumberID" required></select>
+                                    <span class="text-danger w-100" asp-validation-for="TripBranchNumberID"></span>
+                                </div>
+                            </div>
+                            <input hidden type="text" asp-for="TripBranchSeq" id="tripBranchSeq" name="TripBranchSeq" required />
+                            <div class="input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("IdentifyNumber")</label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <select class="form-select" name="IdentifyNumber" asp-for="IdentifyNumber" asp-items="@Model.IdentifyNumberSelectList" required></select>
+                                    <span class="text-danger w-100" asp-validation-for="IdentifyNumber"></span>
+                                </div>
+                            </div>
+                            <input hidden type="text" asp-for="TruckNumber" id="truckNumber" required />
+                            <input hidden type="text" asp-for="DriverName" id="driverName" required />
+                            <div class="input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("Remark")</label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <select class="form-select" name="UnlinkedReasonID" asp-for="UnlinkedReasonID" asp-items="@Model.UnLinkedReasonSelectList"></select>
+                                </div>
+                            </div>
+                            <div class="input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("StationName")</span></label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <label>@Model.StationName</label>
+                                </div>
+                            </div>
+                            <div class="input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("RegistArrivalScheduledTime")</span></label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <input class="form-control" asp-for="RegistArrivalScheduledTime" autocomplete="off" id="RegistArrivalScheduledTime" readonly>
+                                    <span class="text-danger w-100" asp-validation-for="RegistArrivalScheduledTime"></span>
+                                </div>
+                            </div>
+                            <div class="input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("RegistDepartureScheduledTime")</span></label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <input class="form-control" asp-for="RegistDepartureScheduledTime" autocomplete="off" id="RegistDepartureScheduledTime" readonly>
+                                    <span class="text-danger w-100" asp-validation-for="RegistDepartureScheduledTime"></span>
+                                </div>
+                            </div>
+                            <div class="input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("ArrivedAt")<span style="color:red">*</span></label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <input class="form-control" name="ArrivedAt" type="datetime-local" asp-for="ArrivedAt" autocomplete="off" id="ArrivedAt" required>
+                                    <small class="form-text text-muted w-100 p-1">YYYY/MM/DD hh:mmで入力してください</small>
+                                    <span class="text-danger w-100" asp-validation-for="ArrivedAt"></span>
+                                </div>
+                            </div>
+                            <div class="input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("DepartedAt")</span></label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <input class="form-control" name="DepartedAt" type="datetime-local" asp-for="DepartedAt" autocomplete="off" id="DepartedAt" required>
+                                    <small class="form-text text-muted w-100 p-1">YYYY/MM/DD hh:mmで入力してください</small>
+                                    <span class="text-danger w-100" asp-validation-for="DepartedAt"></span>
+                                </div>
+                            </div>
+                            <div class="input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("RevisionArrivalLoadStatus")<span style="color:red">*</span></label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <select class="form-select" name="RevisionArrivalLoadClass" asp-for="RevisionArrivalLoadClass" required>
+                                        <option value="" selected disabled id="firstSelect">選択してください</option>
+                                        <option value="-1">-</option>
+                                        <option value="2">0%</option>
+                                        <option value="3">1-10%</option>
+                                        <option value="4">11-20%</option>
+                                        <option value="5">21-30%</option>
+                                        <option value="6">31-40%</option>
+                                        <option value="7">41-50%</option>
+                                        <option value="8">51-60%</option>
+                                        <option value="9">61-70%</option>
+                                        <option value="10">71-80%</option>
+                                        <option value="11">81-90%</option>
+                                        <option value="12">91-100%</option>
+                                    </select>
+                                    <span class="text-danger w-100" asp-validation-for="RevisionArrivalLoadClass"></span>
+                                </div>
+                            </div>
+                            <div class="input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("RevisionDepartureLoadStatus")<span style="color:red">*</span></label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <select class="form-select" name="RevisionDepartureLoadClass" asp-for="RevisionDepartureLoadClass" required>
+                                        <option value="" selected disabled id="firstSelect">選択してください</option>
+                                        <option value="-1">-</option>
+                                        <option value="2">0%</option>
+                                        <option value="3">1-10%</option>
+                                        <option value="4">11-20%</option>
+                                        <option value="5">21-30%</option>
+                                        <option value="6">31-40%</option>
+                                        <option value="7">41-50%</option>
+                                        <option value="8">51-60%</option>
+                                        <option value="9">61-70%</option>
+                                        <option value="10">71-80%</option>
+                                        <option value="11">81-90%</option>
+                                        <option value="12">91-100%</option>
+                                    </select>
+                                    <span class="text-danger w-100" asp-validation-for="RevisionDepartureLoadClass"></span>
+                                </div>
+                            </div>
+                            <div class="input-group div-input-group">
+                                <div class="col-sm-4 col-md-2 column-1st">
+                                    <label>@Html.DisplayName("IsDeleted")<span style="color:red">*</span></label>
+                                </div>
+                                <div class="col-sm-8 col-md-5 column-2nd">
+                                    <input type="checkbox" class="mr-2" asp-for="IsDeleted" autocomplete="off" name="IsDeleted" id="isDeleted">
+                                    <label for="isDeleted">削除する</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div style="width:50%">
+                            <figure class="mb-1 arrival-img"><img src="" id="arrivalImage" /></figure>
+                            <label class="mb-3">到着荷量画像</label>
+                            <figure class="mb-1 departure-img"><img src="" id="departureImage" /></figure>
+                            <label class="mb-3">出発荷量画像</label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex xs-block justify-content-start align-items-center p-0">
+                        <div class="input-group-append mr-4">
+                            <a class="btn btn-secondary btn-icon-split" asp-controller="EditLoadRecord" asp-action="Index">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-arrow-left-long"></i>
+                                </span>
+                                <span class="text">戻る</span>
+                            </a>
+                        </div>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary btn-icon-split" style="min-width: 80px" onclick="OnRegister()">
+                                <span class="text">登録</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function(){
+        getTripBranchSeqs();
+        model = @Html.Raw(Json.Serialize(Model));
+        if(model.tripBranchNumberID != 0){
+            $('[name=TripBranchNumberID]').val(model.tripBranchNumberID);
+        }
+        var arrivalLoadImgPath = model.arrivalLoadImgPath;
+        var departureLoadImgPath = model.departureLoadImgPath;
+        $('#arrivalImage').attr("src", "data:image/jpeg;base64," + arrivalLoadImgPath);
+        $('#departureImage').attr("src", "data:image/jpeg;base64," + departureLoadImgPath);
+    });
+
+    // 便枝番取得
+    function getTripBranchSeqs() {
+        var identifyNumber = $('[name=IdentifyNumber]').val();
+        var arrivedAt = $('[name=ArrivedAt]').val();
+
+        if(identifyNumber == null)
+            return;
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripBranchSeqs", "EditLoadRecord")';
+        let method = 'POST';
+        let data = { identifyNumber: identifyNumber, arrivedAt: arrivedAt };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false,
+        }).done(function (response) {
+            // 便枝番セレクトリストの更新
+            AddOptionToSelectList(response, "TripBranchNumberID");
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
+            }
+        });
+    }
+
+    function getTripName(){
+        var identifyNumber = $('[name=IdentifyNumber]').val();
+        var arrivedAt = $('[name=ArrivedAt]').val(); 
+        
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetTripModel", "EditLoadRecord")';
+        let method = 'POST';
+        let data = { identifyNumber: identifyNumber, arrivedAt: arrivedAt };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false,
+        }).done(function (response) {
+            $('[name=TripName]').val(response.tripName);
+            console.log($('[name=TripID]').val());
+            $('[name=TripID]').val(response.tripID);
+            console.log($('[name=TripID]').val());
+            $('[name=DriverName]').val(response.driverName);
+            $('[name=TruckNumber]').val(response.truckNumber);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
+            }
+        });
+    }
+
+    // 識別番号変更時
+    $('[name=IdentifyNumber]').change(function () {
+        getTripBranchSeqs();
+        getTripName();
+        changeTripBranchSeq();
+    });
+
+    // 便枝番セレクトボックス変更時
+    $('[name=TripBranchNumberID]').change(function () {
+        changeTripBranchSeq();
+    });
+
+    // 便枝番変更時
+    function changeTripBranchSeq(){
+        var tripBranchNumberID = $('[name=TripBranchNumberID]').val();
+
+        var selectedIndex = $('[name=TripBranchNumberID]')[0].selectedIndex;
+        $('[name=TripBranchSeq]').val($('[name=TripBranchNumberID]')[0][selectedIndex].text);
+        // セレクトボックス未入力の場合
+        if(tripBranchNumberID == null){
+            // 予定時間に「便枝番を選択してください」表示
+            $('[name=RegistArrivalScheduledTime]').val("便枝番を選択してください");
+            $('[name=RegistDepartureScheduledTime]').val("便枝番を選択してください");
+            return;
+        }
+
+        // フォーム情報取得
+        let url = window.location.origin + '@Url.Action("GetScheduledTime", "EditLoadRecord")';
+        let method = 'POST';
+        let data = { tripBranchNumberID: tripBranchNumberID };
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            async: false,
+        }).done(function (response) {
+            $('[name=RegistArrivalScheduledTime]').val(GetTimeString(new Date(response.arrivalScheduledTime)));
+            $('[name=RegistDepartureScheduledTime]').val(GetTimeString(new Date(response.departureScheduledTime)));
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                var errorMessage = jqXHR.responseJSON.errorMessage;
+                $("#div-error-message").text(errorMessage);
+            } else {
+                var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                $("#div-error-message").text(errorMessage);
+            }
+        });
+    }
+
+    // 登録ボタン押下
+    function OnRegister() {
+
+        var form = $("#tripRecordForm");
+
+        form.submit(function (event) {
+
+            $("#div-error-message").text("");
+
+            // ページの更新を禁止する
+            event.preventDefault();
+
+            // 送信イベントが他のハンドラーに伝播するのを防ぐ
+            event.stopImmediatePropagation();
+
+            // フォーム情報取得
+            let url = window.location.origin + '@Url.Action("Register", "EditLoadRecord")';
+            let method = 'POST';
+            let formId = 'tripRecordForm';
+            let data = form.serializeArray();
+
+            // Ajax call
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            }).done(function (response) {
+                $('#' + formId)[0].reset();
+                // 完了モーダル表示
+                AlertMessage('', '完了', '登録が完了しました。', null, null);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    // データが見つからなかった場合
+                    var errorMessage = jqXHR.responseJSON.errorMessage;
+                    $("#div-error-message").text(errorMessage);
+                } else {
+                    // その他のエラーの場合
+                    var errorMessage = 'E3002: サーバーに接続できませんでした。' + ' HttpRequest : ' + jqXHR.status + ' textStatus : ' + textStatus;
+                    $("#div-error-message").text(errorMessage);
+                }
+            });
+        });
+    }
+</script>
