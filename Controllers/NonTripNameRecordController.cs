@@ -135,9 +135,16 @@ namespace ai_truck_load_measurement.Controllers
         {
             var comparisonTime = new DateTime(1900, 1, 1, record.ArrivedAt.Hour, record.ArrivedAt.Minute, record.ArrivedAt.Second);
             // 日付をまたがない場合に一番到着予定が近い便枝番取得
-            var nearestBranchNumberToday = tripBranchNumbers.OrderBy(x => Math.Abs((x.ArrivalScheduledTime - comparisonTime).TotalSeconds)).First();
+            var nearestBranchNumberToday = tripBranchNumbers.OrderBy(x => Math.Abs((x.ArrivalScheduledTime - comparisonTime).TotalSeconds)).FirstOrDefault();
             // 日付をまたいだ場合に一番到着予定が近い便枝番取得
-            var nearestBranchNumberNextDay = tripBranchNumbers.OrderBy(x => Math.Abs((x.ArrivalScheduledTime.AddDays(1) - comparisonTime).TotalSeconds)).First();
+            var nearestBranchNumberNextDay = tripBranchNumbers.OrderBy(x => Math.Abs((x.ArrivalScheduledTime.AddDays(1) - comparisonTime).TotalSeconds)).FirstOrDefault();
+
+            // 便情報だけ登録されていて便枝番が登録されていないパターン
+            if(nearestBranchNumberToday == null ||  nearestBranchNumberNextDay == null)
+            {
+                record = SettingRecordParameter(record, tripName, "なし", "-", "-");
+                return record;
+            }
 
             // 一番到着予定が近い便枝番と到着予定時刻を取得
             var nearestBranchNumber = new M_TripBranchNumberModel();
@@ -159,10 +166,11 @@ namespace ai_truck_load_measurement.Controllers
 
 
             // 各パラメータ設定
-            record = SettingRecordParameter(record, tripName, nearestBranchNumber.ArrivalScheduledTime.ToString("HH:mm"), 
+            record = SettingRecordParameter(record, tripName, nearestBranchNumber.ArrivalScheduledTime.ToString("HH:mm"),
                 nearestBranchNumber.TripBranchSeq.ToString(), arrivalTimeDeff);
- 
+
             return record;
+            
         }
 
         /// <summary>
@@ -299,7 +307,7 @@ namespace ai_truck_load_measurement.Controllers
                     nonTripNameRecordList = GetNonTripNameRecordList(startOfPeriod, endOfPeriod, checkedDepos);
                 }
 
-                var nonTripNameRecordDT = ToDataTable<NonTripNameRecordModel>(nonTripNameRecordList);
+                var nonTripNameRecordDT = Utils.ToDataTable<NonTripNameRecordModel>(nonTripNameRecordList);
 
                 // 便実績が0の場合
                 if (nonTripNameRecordDT.Rows.Count == 0)
@@ -364,26 +372,6 @@ namespace ai_truck_load_measurement.Controllers
 
         }
 
-        /// <summary>
-        /// List内のNullデータをDBNull.Valueとして登録する
-        /// </summary>
-        public DataTable ToDataTable<T>(IList<T> list)
-        {
-            var table = new DataTable();
-
-            typeof(T).GetProperties().ToList().ForEach(
-                p => table.Columns.Add(p.Name, typeof(string))
-                );
-
-            foreach (var item in list)
-            {
-                DataRow row = table.NewRow();
-                typeof(T).GetProperties().ToList().ForEach(
-                    p => row[p.Name] = p.GetValue(item) ?? DBNull.Value
-                    );
-                table.Rows.Add(row);
-            }
-            return table;
-        }
+       
     }
 }
