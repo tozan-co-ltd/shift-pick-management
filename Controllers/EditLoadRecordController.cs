@@ -109,7 +109,7 @@ namespace ai_truck_load_measurement.Controllers
                             <td>
                                 <a class=""btn btn-success btn-icon-split ml-1 mr-1""
                                     onclick=""onRegisterClick('EditLoadRecord', '{item.TripRecordID}')"" data-id=""{item.TripRecordID}"" >
-                                    <i class=""fa-solid fa-truck""></i>
+                                    <i class=""fa-solid fa-pen""></i>
                                 </a>
                             </td>
                             <td>{item.TripName}</td>
@@ -345,7 +345,7 @@ namespace ai_truck_load_measurement.Controllers
                 var user = ClaimsLoginUserData();
 
                 //入力規則チェック
-                if (!ModelState.IsValid)
+                if (!ModelState.IsValid || model.TripBranchNumberID == 0)
                 {
                     // log取得
                     errorMessage = "E1011: " + ErrorMessagesResources.E1011;

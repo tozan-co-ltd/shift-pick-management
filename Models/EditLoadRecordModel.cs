@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using ai_truck_load_measurement.Properties;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace ai_truck_load_measurement.Models
@@ -15,6 +16,7 @@ namespace ai_truck_load_measurement.Models
         public List<SelectListItem> IdentifyNumberSelectList { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> UnLinkedReasonSelectList { get; set; } = new List<SelectListItem>();
         [Display(Name = "到着予定時間")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? RegistArrivalScheduledTime { get; set; }
         [Display(Name = "出発予定時間")]
         public string? RegistDepartureScheduledTime { get; set; }

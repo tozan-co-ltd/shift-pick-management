@@ -25,7 +25,9 @@
                 <div class="card border-left-custom">
                     <div class="card-body">
                         <ul class="mb-0">
-                            <li>適用開始日時は、適用開始日の前日の夜勤が終了する予定日時を入力してください。</li>
+                            <li>識別番号を選択すると便名称、便枝番リストが更新されます。</li>
+                            <li>便枝番を選択すると到着・出発予定時間が更新されます。</li>
+                            <li>「削除する」にチェックを入れて登録した場合、便実績一覧から該当実績が削除されます。</li>
                         </ul>
                     </div>
                 </div>
@@ -74,8 +76,7 @@
                                     <label>@Html.DisplayName("Remark")</label>
                                 </div>
                                 <div class="col-sm-8 col-md-5 column-2nd">
-                                    <select class="form-select" name="UnlinkedReasonID" asp-for="UnlinkedReasonID" asp-items="@Model.UnLinkedReasonSelectList" required></select>
-                                    <span class="text-danger w-100" asp-validation-for="UnlinkedReasonID"></span>
+                                    <select class="form-select" name="UnlinkedReasonID" asp-for="UnlinkedReasonID" asp-items="@Model.UnLinkedReasonSelectList"></select>
                                 </div>
                             </div>
                             <div class="input-group div-input-group">

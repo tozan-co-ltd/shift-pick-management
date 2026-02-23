@@ -28,12 +28,15 @@ namespace ai_truck_load_measurement.Models
         /// <summary>
         /// 便枝番ID
         /// </summary>
+        [Display(Name = "便枝番")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public int TripBranchNumberID {  get; set; }
 
         /// <summary>
         /// 便枝番  
         /// </summary>
         [Display(Name = "便枝番")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? TripBranchSeq { get; set; }
 
         /// <summary>
@@ -68,6 +71,7 @@ namespace ai_truck_load_measurement.Models
         /// 識別番号
         /// </summary>
         [Display(Name = "識別番号")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? IdentifyNumber { get; set; }
 
         /// <summary>
@@ -128,6 +132,7 @@ namespace ai_truck_load_measurement.Models
         /// 訂正後到着荷量の%表示
         /// </summary>
         [Display(Name = "到着荷量")]
+        [Required(ErrorMessageResourceName = "E1001", ErrorMessageResourceType = typeof(ErrorMessagesResources))]
         public string? RevisionArrivalLoadStatus { get; set; }
 
         /// <summary>
