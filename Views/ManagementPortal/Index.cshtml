@@ -839,10 +839,10 @@
         // 紐づけ切れ原因毎に比率のリストを作成
         for(var i=0; i<countNonTripNameRemarks.length; i++){
             nonTripNameRemarkPercentages.push(countNonTripNameRemarks[i].remarkPercentage);
-            nonTripNameRemarkCounts.push(countNonTripNameRemarks[i].remarkCount);
+            nonTripNameRemarkCounts.push(countNonTripNameRemarks[i].unlinkedReasonCount);
             backGroundColors.push(graphColors[i]);
-            var label = countNonTripNameRemarks[i].remark;
-            if(label == '')
+            var label = countNonTripNameRemarks[i].unlinkedReasonName;
+            if(label == null)
                 label = "原因未登録";
             labels.push(label);
         };

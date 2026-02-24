@@ -84,8 +84,9 @@
         public static string CreateSQLToSelectNonTripNameRemarkCount(DateTime startOfPeriod, DateTime endOfPeriod, List<string> checkedDepos)
         {
             var sql = $@"
-                SELECT TripRecords.remark
-                       ,COUNT(remark) AS remark_count
+                SELECT TripRecords.unlinked_reason_id
+                       ,unlinked_reason_name
+                       ,COUNT(TripRecords.unlinked_reason_id) AS unlinked_reason_count
                 FROM t_trip_records AS TripRecords
                 INNER JOIN
                     m_stations AS Stations
@@ -95,11 +96,15 @@
 	                m_depos AS Depos
                 ON
 	                Stations.depo_id = Depos.depo_id
+                LEFT OUTER JOIN
+                m_unlinked_reasons AS UnlinkedReasons
+                ON
+                TripRecords.unlinked_reason_id = UnlinkedReasons.unlinked_reason_id
                 WHERE TripRecords.work_day BETWEEN '{startOfPeriod.ToString("yyyy/MM/dd")}' AND '{endOfPeriod.ToString("yyyy/MM/dd")}'
                 AND TripRecords.trip_id IS NULL
                 {LoadRecordConnectController.SQLOfCheckedDepos(checkedDepos)}
-                GROUP BY remark
-                ORDER BY remark_count DESC
+                GROUP BY TripRecords.unlinked_reason_id, unlinked_reason_name
+                ORDER BY unlinked_reason_count DESC
             ";
             return sql;
         }

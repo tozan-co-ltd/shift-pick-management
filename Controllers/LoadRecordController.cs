@@ -1,17 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Drawing.Imaging;
-using System.Drawing;
-using System.Data;
-using ai_truck_load_measurement.Models;
+﻿using ai_truck_load_measurement.Commons;
 using ai_truck_load_measurement.ConnectControllers;
+using ai_truck_load_measurement.Models;
 using ai_truck_load_measurement.Properties;
-using System.Data.SqlClient;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
-using NPOI.SS.Formula.Functions;
-using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Bibliography;
-using ai_truck_load_measurement.Commons;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using NPOI.SS.Formula.Functions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace ai_truck_load_measurement.Controllers
 {
@@ -322,8 +323,8 @@ namespace ai_truck_load_measurement.Controllers
                     if (item.TripName == "-") hasTripName = 1;
                     var departed = item.DepartedAt.ToString("yyyy/MM/dd HH:mm");
                     if(departed == "0001/01/01 00:00") departed = "-";
-                    var remark = item.Remark;
-                    if (string.IsNullOrEmpty(remark)) remark = "-";
+                    var unlinkedReason = item.UnlinkedReasonName;
+                    if (string.IsNullOrEmpty(unlinkedReason)) unlinkedReason = "-";
                     searchData += $@"
                         <tr>
                             <td>{item.TripName}</td>
@@ -355,7 +356,7 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{arrivalScheduledTime}</td>
                             <td>{departureScheduledTime}</td>
                             <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
-                            <td>{remark}</td>
+                            <td>{unlinkedReason}</td>
                         </tr>
                 ";
                 }
@@ -382,7 +383,7 @@ namespace ai_truck_load_measurement.Controllers
         /// <param name="loadStatus">荷量クラス</param>
         /// <param name="isArrived">到着か否か</param>
         /// <returns></returns>
-        public IActionResult InsertOrUpdateAnnotationLoads(int tripRecordID, int loadStatus, bool isArrived)
+        public IActionResult InsertOrUpdateAnnotationLoads(int tripRecordID, int loadClass, bool isArrived)
         {
             string? errorMessage;
             NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -392,28 +393,12 @@ namespace ai_truck_load_measurement.Controllers
                 var user = ClaimsLoginUserData();
 
                 // 初期値でクリックした場合は何も起こらない
-                if (loadStatus == 0)
+                if (loadClass == 0)
                 {
                     return NotFound();
                 }
 
-                // 「荷量の相違あり」で保存した値が既に存在するか
-                var isSameAnnotationLoadsExist = IsSameAnnotationLoadsExist(tripRecordID, isArrived);
-                var sql = "";
-
-                // 「荷量の相違あり」の設定値を更新、保存
-                if (isSameAnnotationLoadsExist)
-                {
-                    // 更新
-                    sql = LoadRecordConnectController.CreateSQLToUpdateAnnotationLoads(tripRecordID, loadStatus, user.UserName, DateTime.Now, isArrived);
-                }
-                else
-                {
-                    // 新規保存
-                    sql = LoadRecordConnectController.CreateSQLToInsertAnnotaionLoads(tripRecordID, loadStatus, user.UserName, DateTime.Now, isArrived);
-                }
-
-                ConnectToSQLServer.ExecuteQuery(sql);
+                InsertOrUpdateAnnotationLoads2(tripRecordID, loadClass, user.UserName, isArrived);
 
                 return Ok();
             }
@@ -437,13 +422,37 @@ namespace ai_truck_load_measurement.Controllers
             }
         }
 
+        public static void InsertOrUpdateAnnotationLoads2(int tripRecordID, int loadClass, string userName, bool isArrived)
+        {
+            // 「荷量の相違あり」で保存した値が既に存在するか
+            var isSameAnnotationLoadsExist = IsSameAnnotationLoadsExist(tripRecordID, isArrived);
+            var sql = "";
+
+            // 「荷量の相違あり」の設定値を更新、保存
+            if (isSameAnnotationLoadsExist)
+            {
+                // 更新
+                sql = LoadRecordConnectController.CreateSQLToUpdateAnnotationLoads(tripRecordID, loadClass, userName, DateTime.Now, isArrived);
+            }
+            else
+            {
+                // 新規保存
+                sql = LoadRecordConnectController.CreateSQLToInsertAnnotaionLoads(tripRecordID, loadClass, userName, DateTime.Now, isArrived);
+            }
+
+            ConnectToSQLServer.ExecuteQuery(sql);
+        }
+
 
         /// <summary>
         /// 荷量の相違ありテーブルの設定値を保存する
         /// </summary>
         /// <param name="tripRecordID">便実績ID</param>
         /// <param name="loadStatus">荷量クラス</param>
-        /// <param name="isArrived">到着か否か</param>
+        /// <param name="isArrived">到着か否か</para
+        /// 
+        /// 
+        /// m>
         /// <returns></returns>
         public IActionResult UpdateRemark(int tripRecordID, string remark)
         {

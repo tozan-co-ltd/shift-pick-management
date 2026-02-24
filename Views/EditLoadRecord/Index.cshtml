@@ -1,0 +1,370 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.LoadRecordViewModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+}
+<div class="card shadow de-inspection masterInfo m-4">
+    <div class="card-header">
+        @ViewData["Title"]
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="card border-left-custom">
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>最長90日の期間が検索できます。</li>
+                            <li>便枝番とは、便が各拠点へ訪問した回数を示すために昼勤開始時間から順に割り当てた番号です。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">デポ</span>
+                <div>
+                    <label class="mr-2"><input type="checkbox" class=" mr-2" id="allDepo" />すべて  [</label>
+                    <label id="selectDepos"></label>]
+                </div>
+            </div>
+        </div>
+
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+            <div class="d-flex justify-content-start align-items-center unset-pdl">
+                <span class="warehouse-name-drs span-paragraph">期間</span>
+                <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
+                <label class="m-1">～</label>
+                <input type="text" id="endOfPeriod" class="form-control pickerDate endDate mr-3">
+                <div class="input-group-append mr-3">
+                    <a class="btn btn-secondary btn-icon-split" onclick="onSearchClick('EditLoadRecord')">
+                        <span class="icon text-white-50">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <span class="text">検索</span>
+                    </a>
+                </div>
+                <span class="loader" style="display:inline-block; vertical-align: middle;" role="status" id="loading"></span>
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="mg-bot-20 mb-3">
+            <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
+                <div class="input-group-append mr-1">
+                    <a class="btn btn-info btn-icon-split" onclick="onExportFileTrips('EditLoadRecord', '@Model.ViewTitle')" id="exportFile">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-file-export"></i>
+                        </span>
+                        <span class="text">Excel出力</span>
+                    </a>
+                </div>
+                <div class="input-group-append mr-3">
+                    <a class="btn btn-info btn-icon-split" onclick="onExportAllImages('EditLoadRecord')">
+                        <span class="icon text-white-50">
+                            <i class="fa-solid fa-circle-down"></i>
+                        </span>
+                        <span class="text">画像一括出力</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mb-3">
+            <span class="warehouse-name-drs span-paragraph">絞り込み条件</span>
+            <label><input type="checkbox" class=" mr-2" id="isOnlyHasAmountDefference" name="searchCondition" />荷量の相違あり</label>
+            <label><input type="checkbox" class="ml-3 mr-2" id="hasTripName" name="searchCondition" />便名称あり</label>
+            <label><input type="checkbox" class="ml-3 mr-2" id="hasIdentifyNumber" name="searchCondition" />識別番号あり</label>
+        </div>
+
+        <div class="mt-3" id="tripRecordTable">
+        </div>
+    </div>
+</div>
+
+<!--  Detail Modal-->
+<div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="loader-modal" id="loading-modal">
+            <div class="three-quarter-spinner"></div>
+        </div>
+        <div class="modal-content trip-record-modal" id="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-modal-label"></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 col-md-12">
+                    <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
+                </div>
+                <figure class="mb-2 modal-img"><img src="" id="modalImage" /></figure>
+                <div id="tripRecord-buttons"></div>
+                <table class="table table-sm p-2 modal-table">
+                    <tbody id="tripRecord-contatiner">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    let userName = "";
+    // 画面ロード時
+    $(document).ready(function () {
+        model = @Html.Raw(Json.Serialize(Model));
+        userName = model.userName;
+        tableLength = model.tripRecordList.length + 1;
+        var today = new Date();
+        var oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        $('#endOfPeriod').val(GetDayString(today));
+        $('#startOfPeriod').val(GetDayString(oneWeekAgo));
+        addDepos(model);
+        depoCheckDisplay(model);
+        tableDisplay('EditLoadRecord');
+    });
+
+
+    // チェックボックス押下時
+    $('input[name="searchCondition"]').change(function () {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay('EditLoadRecord');
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    });
+
+
+    // 実績修正ボタン押下時
+    function onRegisterClick(page, tripRecordID) {
+        event.preventDefault();
+
+        location.href = "" + page + "/Register?tripRecordID=" + tripRecordID;
+    }
+
+    // 検索ボタン押下時
+    function onSearchClick(page) {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            // ロード中表示
+            document.querySelector("#loading").style.display = "inline-block";
+            tableDisplay(page);
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+    // 便実績テーブル表示
+    function tableDisplay(page) {
+        // チェックボックスの入力情報取得
+        var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+        var hasTripName = $('#hasTripName')[0].checked;
+        var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
+
+
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // デポ情報取得
+        var checkedDepos = getCheckedDepos();
+
+        // テーブル表示用データ作成
+        let data = { startOfPeriod: startOfPeriod,
+            endOfPeriod: endOfPeriod,
+            isOnlyHasAmountDefference: isOnlyHasAmountDefference,
+            hasTripName: hasTripName,
+            hasIdentifyNumber: hasIdentifyNumber,
+            checkedDepos: checkedDepos
+        };
+
+        // フォーム情報取得
+        let url = window.location.href + '/SearchData';
+        let method = 'Post';
+
+        // Ajax call
+        $.ajax({
+            url: url,
+            method: method,
+            data: data
+        }).done(function (response) {
+            var tableHTML = response.searchedTripRecordHTML;
+            tableLength = response.searchedTripRecordLength + 1;
+            $('#tripRecordTable').empty().html(tableHTML);
+            // 日本語表示
+            const language_url = "https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json";
+            const dom_structure = "<'top d-flex align-items-center'li<'ml-auto'f>>rt<'bottom'p><'clear'>";
+
+            // ID(2列目)昇順
+            $("#tripRecordDataTable").DataTable({
+                "language": {
+                    "url": language_url,
+                    searchPlaceholder: "フリーワード(全件)"
+                },
+                lengthChange: true,     // 件数切替
+                info: true,            // 総件数
+                scrollX: true,          // 横スクロール可
+                scrollCollapse: true,   // 縦スクロール表示
+                searchHighlight: true,  // 検索ハイライト
+                orderFixed: [5, "asc"], // 便名称無しを下に表示する
+                order: [[1, "asc"] , [19, "asc"], [2, "asc"]],    // 便名称、稼働日、枝番で昇順
+                "oLanguage": {
+                    "sSearch": ""
+                },
+                dom: dom_structure,
+                "columnDefs": [
+                    { className:"dt-body-left", "targets": [3] },
+                    { className: "dt-body-left", "targets": [1], },
+                ],
+                fixedColumns: {
+                    leftColumns: 4,
+                },
+            });
+            var table = $("#tripRecordDataTable").DataTable();
+            table.on('draw', function () {
+                var body = $(table.table().body());
+
+                body.unhighlight();
+                body.highlight(table.search());
+            });
+
+
+            if (document.querySelector("#loading") != null)
+                document.querySelector("#loading").style.display = "none";
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseJSON.errorMessage;
+            $("#div-error-message").text(errorMessage);
+        });
+    }
+
+    // Excel出力
+    async function onExportFileTrips(page, gamenName) {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+
+            // チェックボックスの入力情報取得
+            var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+            var hasTripName = $('#hasTripName')[0].checked;
+            var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
+
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
+
+            // フォーム情報取得
+            let data = {
+                "gamenName": gamenName,
+                "startofPeriod": startOfPeriod,
+                "endOfPeriod": endOfPeriod,
+                "isOnlyHasAmountDefference": isOnlyHasAmountDefference,
+                hasTripName: hasTripName,
+                hasIdentifyNumber: hasIdentifyNumber,
+                checkedDepos: checkedDepos
+            };
+
+            // Excel出力共通処理
+            onExportFileTripsCommon(page, data);
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+
+    // 画像一括出力ボタン押下
+    function onExportAllImages(page) {
+        event.preventDefault();
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            // チェックボックスの入力情報取得
+            var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+            var hasTripName = $('#hasTripName')[0].checked;
+            var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
+
+            let data = {
+                download: "download",
+                startOfPeriod: startOfPeriod,
+                endOfPeriod: endOfPeriod,
+                isOnlyHasAmountDefference: isOnlyHasAmountDefference,
+                hasTripName: hasTripName,
+                hasIdentifyNumber: hasIdentifyNumber,
+                checkedDepos: checkedDepos
+            };
+
+            onExportAllImagesCommon(page, data);
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        pushAllCheckBox();
+    });
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            pushDepoCheckBox();
+        });
+    })
+
+    // 画面表示時にログインユーザーのメインデポにチェックを入れる
+    function depoCheckDisplay(model) {
+        var mainDepoID = model.mainDepoID;
+        if (mainDepoID == 0)
+            return;
+        var depos = $('input[name=depos]');
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].id == "depo" + mainDepoID) {
+                depos[i].checked = true;
+            }
+        }
+    }
+
+    // 選択されたデポのIDリストを取得する
+    function getCheckedDepos() {
+        var depos = $('input[name=depos]');
+        var checkedDepos = [];
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].checked) {
+                checkedDepos.push(depos[i].value);
+            }
+        }
+        return checkedDepos;
+    }
+</script>

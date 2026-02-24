@@ -231,9 +231,8 @@ namespace ai_truck_load_measurement.Controllers
                 {
                     foreach (var nonTripNameRecord in nonTripNameRecordList)
                     {
-                        var remark = nonTripNameRecord.Remark;
-                        if (string.IsNullOrEmpty(remark))
-                            remark = "-";
+                        var unlinkedReason = nonTripNameRecord.UnlinkedReasonName;
+                        if (string.IsNullOrEmpty(unlinkedReason)) unlinkedReason = "-";
                         searchData += $@"
                             <tr>
                                 <td hidden>{nonTripNameRecord.TripRecordID}</td>
@@ -243,7 +242,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <td>{nonTripNameRecord.GuessTripBranchNumber}</td>
                                 <td>{nonTripNameRecord.NearestArrivaLScheduledTime}</td>
                                 <td>{nonTripNameRecord.ArrivalTimeDefference}</td>
-                                <td>{remark}</td>
+                                <td>{unlinkedReason}</td>
                                 <td>
                                     <a class=""btn btn-success btn-icon-split ml-1 mr-1""
                                         onclick=""OnArrivalNonTripNameLoadImageClick('{nonTripNameRecord.TripRecordID}', this, 'NonTripNameRecord')"" data-id=""{nonTripNameRecord.TripRecordID}"" data-toggle=""modal"" data-target=""#detail-modal"">

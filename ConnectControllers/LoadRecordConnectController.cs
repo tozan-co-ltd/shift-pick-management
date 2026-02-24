@@ -258,7 +258,7 @@ namespace ai_truck_load_measurement.ConnectControllers
             var sql = $@"
                 UPDATE t_trip_records
                 SET
-                    remark = '{remark}'
+                    unlinked_reason_id = '{remark}'
                 WHERE
                     trip_record_id = '{tripRecordID}'
             ";

@@ -39,7 +39,8 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                departed_at,
 	                arrival_load_class,
 	                departure_load_class,
-                    remark,
+                    TripRecords.unlinked_reason_id,
+                    unlinked_reason_name,
 	                arrival_load_img_path,
 	                departure_load_img_path
                 ";
@@ -69,6 +70,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_trip_branch_numbers AS TripBranchNumbers
                 ON
                 TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id
+                LEFT OUTER JOIN
+                m_unlinked_reasons AS UnlinkedReasons
+                ON
+                TripRecords.unlinked_reason_id = UnlinkedReasons.unlinked_reason_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
             ";
             if (hasTripName)
