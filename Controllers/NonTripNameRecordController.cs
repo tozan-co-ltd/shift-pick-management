@@ -142,7 +142,7 @@ namespace ai_truck_load_measurement.Controllers
             // 便情報だけ登録されていて便枝番が登録されていないパターン
             if(nearestBranchNumberToday == null ||  nearestBranchNumberNextDay == null)
             {
-                record = SettingRecordParameter(record, tripName, "なし", "-", "-");
+                record = SettingRecordParameter(record, tripName, "-", "なし", "-");
                 return record;
             }
 
