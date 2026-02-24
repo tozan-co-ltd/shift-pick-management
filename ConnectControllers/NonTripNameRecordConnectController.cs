@@ -19,11 +19,11 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                m_stations AS Depos
                 ON 
 	                TripRecords.station_id = Depos.station_id
-                WHERE TripRecords.work_day BETWEEN '{startOfPeriod}' AND '{endOfPeriod}'
                 LEFT OUTER JOIN
                 m_unlinked_reasons AS UnlinkedReasons
                 ON
                 TripRecords.unlinked_reason_id = UnlinkedReasons.unlinked_reason_id
+                WHERE TripRecords.work_day BETWEEN '{startOfPeriod}' AND '{endOfPeriod}'
                 AND TripRecords.trip_id IS NULL
                 AND TripRecords.identify_number IS NOT NULL
                 {LoadRecordConnectController.SQLOfCheckedDepos(checkedDepos)}
