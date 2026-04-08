@@ -418,6 +418,20 @@
                     </script>
                 </div>
             </div>
+
+            <p class="justify-content-end " style="text-align:left">
+                <div class="d-flex justify-content-end align-items-center">
+                    <a href="#" class="btn btn-secondary btn-icon-split mr-2" onclick="zoomResetChart()" id="zoomReset">
+                        <span class="text">リセット</span>
+                    </a>
+                    <a href="#" class="btn btn-secondary btn-icon-split mr-2" style="width:50px" onclick="zoomOutChart()" id="zoomOut">
+                        <span class="text">-</span>
+                    </a>
+                    <a href="#" class="btn btn-secondary btn-icon-split" style="width:50px" onclick="zoomInChart()" id="zoomIn">
+                        <span class="text">+</span>
+                    </a>
+                </div>
+            </p>
             
             <hr />
             <div class="mg-bot-20 mt-3">
@@ -714,6 +728,7 @@
                 async: false
             }).done(function (response) {
                 // 荷量クラスをパーセントとして保存する用の配列
+                console.log(response);
                 var arrivalLoadStatuses = [];
                 var departureLoadStatuses = [];
                 var allLoadStatuses = [];
@@ -880,20 +895,74 @@
                 $('#allChart').css('display', 'none');
                 $('#clearChart').css('display', 'none');
             }
-            else if(checkBoxVal == "arrivaldeparture"){
+            else if (checkBoxVal == "arrivaldeparture") {
                 $('#arrivalChart').css('display', 'none');
                 $('#departureChart').css('display', 'none');
                 $('#allChart').css('display', 'block');
                 $('#clearChart').css('display', 'none');
             }
-            else{
+            else {
                 $('#arrivalChart').css('display', 'none');
                 $('#departureChart').css('display', 'none');
                 $('#allChart').css('display', 'none');
                 $('#clearChart').css('display', 'block');
             }
         })
-    })
+    });
+
+    var zoomFactor = 0.2;
+
+    // ズームリセットボタン押下時処理
+    function zoomResetChart(){
+        event.preventDefault();
+        arrivalChart.resetZoom();
+        departureChart.resetZoom();
+        allChart.resetZoom();
+        clearChart.resetZoom();
+    }
+
+    // ズームインボタン押下時処理
+    function zoomInChart() {
+        event.preventDefault();
+        zoomInChartCommon(arrivalChart);
+        zoomInChartCommon(departureChart);
+        zoomInChartCommon(allChart);
+        zoomInChartCommon(clearChart);
+    }
+
+    // チャートごとのズームイン処理
+    function zoomInChartCommon(chart) {
+        var scale = chart.scales['x軸'];
+        var range = scale.max - scale.min;
+        var delta = range * zoomFactor;
+
+        scale.options.ticks.min += delta;
+        scale.options.ticks.max -= delta;
+
+        chart.update();
+    }
+
+    // ズームアウトボタンの押下時処理
+    function zoomOutChart() {
+        event.preventDefault();
+        zoomOutChartCommon(arrivalChart);
+        zoomOutChartCommon(departureChart);
+        zoomOutChartCommon(allChart);
+        zoomOutChartCommon(clearChart);
+    }
+
+    // チャートごとのズームアウト処理
+    function zoomOutChartCommon(chart) {
+        event.preventDefault();
+        var scale = chart.scales['x軸'];
+        var range = scale.max - scale.min;
+        var delta = range * zoomFactor;
+        console.log(scale.options.ticks.min);
+        scale.options.ticks.min -= delta;
+        scale.options.ticks.max += delta;
+
+        chart.update();
+    }
 
     // 便実績テーブル表示
     function tableDisplay(page) {
