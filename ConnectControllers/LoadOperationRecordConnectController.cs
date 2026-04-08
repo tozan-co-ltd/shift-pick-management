@@ -89,6 +89,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ON trips.trip_id = histories.trip_id
                 WHERE work_day = '{workDay.ToString("yyyy/MM/dd")}'
                 AND trip_records.trip_name = '{tripName}'
+                AND applicable_end_datetime > '{workDay.ToString("yyyy/MM/dd")}'
+                AND applicable_start_datetime < '{workDay.ToString("yyyy/MM/dd")}'
             ";
             return sql;
         }
