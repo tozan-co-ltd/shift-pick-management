@@ -122,9 +122,6 @@
                 </div>
             </div>
         }
-        <div class="mb-3" >
-            <p style="color:red;" id="funamiCaution"></p>
-        </div>
         <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
             <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
                 <span class="warehouse-name-drs span-paragraph">デポ</span>
@@ -174,7 +171,6 @@
         // モデル取得
         var top_model = @Html.Raw(Json.Serialize(Model));
         viewCards(top_model, top_model.mainDepoName);
-        switchFunamiCaution(top_model.mainDepoID);
         window.setInterval(function () {
             onUpdateClick();
         }, 60000);
@@ -249,7 +245,6 @@
             data: data
         }).done(function (response) {
             viewCards(response, depoName);
-            switchFunamiCaution(depoID); 
             document.querySelector("#loading").style.display = "none";
         }).fail(function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 404) {
@@ -283,16 +278,6 @@
 
         });
     })
-
-    function switchFunamiCaution(depoID){
-        // 船見デポの場合、注意文表示
-        if (depoID == 3) {
-            $("#funamiCaution")[0].innerText = "※注：荷量把握稼働中(1番～14番)以外は常に「空車」表示となります";
-        }
-        else {
-            $("#funamiCaution")[0].innerText = "";
-        }
-    }
 
     function getStationTitle(depoName){
         if(depoName == null){
