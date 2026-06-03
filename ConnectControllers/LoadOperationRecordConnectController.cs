@@ -123,7 +123,8 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                arrival_load_class,
 	                departure_load_class,
 	                arrival_load_img_path,
-	                departure_load_img_path
+	                departure_load_img_path,
+                    unlinked_reason_name
                 FROM t_trip_records AS TripRecords
                 INNER JOIN
                 m_stations AS Stations
@@ -137,6 +138,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_trip_branch_numbers AS TripBranchNumbers
                 ON
                 TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id
+                LEFT OUTER JOIN
+                m_unlinked_reasons AS UnlinkedReasons
+                ON
+                TripRecords.unlinked_reason_id = UnlinkedReasons.unlinked_reason_id
                 WHERE ({selectedDays})
                 AND trip_name = '{tripName}'
             ";

@@ -192,7 +192,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                FORMAT(CONVERT(DATETIME, TripRecords.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
 	                FORMAT(CONVERT(DATETIME, TripRecords.departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
 	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
-                    remark
+                    unlinked_reason_name
                 ";
             if (isOnlyHasAmountDeference)
             {
@@ -221,6 +221,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_trip_branch_numbers AS TripBranchNumbers
                 ON
                 TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id
+                LEFT OUTER JOIN
+                m_unlinked_reasons AS UnlinkedReasons
+                ON
+                TripRecords.unlinked_reason_id = UnlinkedReasons.unlinked_reason_id
                 WHERE work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 ";
             if (hasTripName)

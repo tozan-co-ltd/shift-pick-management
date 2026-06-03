@@ -110,7 +110,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     Depos.name AS depo_name,
 	                FORMAT(CONVERT(DATETIME, TripRecords.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
 	                FORMAT(CONVERT(DATETIME, TripRecords.departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
-	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day
+	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
+                    unlinked_reason_name
                 FROM t_trip_records AS TripRecords
                 INNER JOIN
                 m_stations AS Stations
