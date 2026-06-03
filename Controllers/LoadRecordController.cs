@@ -79,7 +79,7 @@ namespace ai_truck_load_measurement.Controllers
                 if (string.IsNullOrEmpty(row["trip_name"].ToString())) row["trip_name"] = "-";
                 if (string.IsNullOrEmpty(row["driver_name"].ToString())) row["driver_name"] = "-";
                 if (string.IsNullOrEmpty(row["departed_at"].ToString())) row["departed_at"] = "-";
-                if (string.IsNullOrEmpty(row["remark"].ToString())) row["remark"] = "-";
+                if (string.IsNullOrEmpty(row["unlinked_reason_name"].ToString())) row["unlinked_reason_name"] = "-";
                 row["converted_identify_number"] = ConvertNumberToFourDigitOrHyphen(row["identify_number"].ToString());
                 ConvertString(row, "trip_branch_seq", "converted_branch_seq");
                 ConvertString(row, "truck_number", "converted_truck_number");
