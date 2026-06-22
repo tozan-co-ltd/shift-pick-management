@@ -60,7 +60,8 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                arrival_load_class,
 	                departure_load_class,
 	                arrival_load_img_path,
-	                departure_load_img_path
+	                departure_load_img_path,
+                    ai_model_name
                 FROM t_trip_records AS TripRecords
                 INNER JOIN
                 m_stations AS Stations
@@ -111,6 +112,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                FORMAT(CONVERT(DATETIME, TripRecords.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
 	                FORMAT(CONVERT(DATETIME, TripRecords.departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
 	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
+                    ai_model_name,
                     unlinked_reason_name
                 FROM t_trip_records AS TripRecords
                 INNER JOIN
@@ -125,6 +127,10 @@ namespace ai_truck_load_measurement.ConnectControllers
                 m_trip_branch_numbers AS TripBranchNumbers
                 ON
                 TripRecords.trip_branch_number_id = TripBranchNumbers.trip_branch_number_id
+                LEFT OUTER JOIN
+                m_unlinked_reasons AS UnlinkedReasons
+                ON
+                TripRecords.unlinked_reason_id = UnlinkedReasons.unlinked_reason_id
                 WHERE ({selectedTrips})
                 AND work_day BETWEEN '{formatStartOfPeriod}' AND '{formatEndOfPeriod}'
                 ORDER BY trip_name, work_day, trip_branch_seq
