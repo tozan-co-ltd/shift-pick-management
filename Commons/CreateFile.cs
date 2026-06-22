@@ -806,6 +806,7 @@ namespace ai_truck_load_measurement.Commons
                     headerList.Add("到着予定時間");
                     headerList.Add("出発予定時間");
                     headerList.Add("稼働日");
+                    headerList.Add("AIモデル名");
                     headerList.Add("紐づけ切れ理由");
                     break;
             }

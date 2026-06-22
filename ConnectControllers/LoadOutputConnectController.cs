@@ -42,7 +42,8 @@ namespace ai_truck_load_measurement.ConnectControllers
                     TripRecords.unlinked_reason_id,
                     unlinked_reason_name,
 	                arrival_load_img_path,
-	                departure_load_img_path
+	                departure_load_img_path,
+                    ai_model_name
                 ";
             if (isOnlyHasAmountDeference)
             {
@@ -192,6 +193,7 @@ namespace ai_truck_load_measurement.ConnectControllers
 	                FORMAT(CONVERT(DATETIME, TripRecords.arrival_scheduled_time), 'HH:mm') AS arrival_scheduled_time,
 	                FORMAT(CONVERT(DATETIME, TripRecords.departure_scheduled_time), 'HH:mm') AS departure_scheduled_time,
 	                FORMAT(work_day, 'yyyy/MM/dd') AS work_day,
+                    ai_model_name,
                     unlinked_reason_name
                 ";
             if (isOnlyHasAmountDeference)
