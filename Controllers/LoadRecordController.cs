@@ -303,6 +303,7 @@ namespace ai_truck_load_measurement.Controllers
                                 <th class=""font-weight-bold"">到着<br>予定</th>
                                 <th class=""font-weight-bold"">出発<br>予定</th>
                                 <th class=""font-weight-bold"">稼働日</th>
+                                <th class=""font-weight-bold"">AIモデル名</th>
                                 <th class=""font-weight-bold"">紐づけ切れ理由</th>
                             </tr>
                         </thead>
@@ -356,6 +357,7 @@ namespace ai_truck_load_measurement.Controllers
                             <td>{arrivalScheduledTime}</td>
                             <td>{departureScheduledTime}</td>
                             <td>{item.WorkDay.ToString("yyyy/MM/dd")}</td>
+                            <td>{item.AIModelName}</td>
                             <td>{unlinkedReason}</td>
                         </tr>
                 ";

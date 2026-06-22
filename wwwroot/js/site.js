@@ -391,6 +391,7 @@ function EditModal(tripRecordID, isArrived, page) {
                 var loadStatus = "";
                 var downloadFileName = "";
                 var tag = "-";
+                var unlinkedReasonName = "";
                 var workDayForFile = GetDayStringForFile(new Date(item.workDay));
                 var tripNameAndBranchSeq = item.tripName + "_" + item.tripBranchSeq;
                 var truckNumber = item.truckNumber;
@@ -398,6 +399,7 @@ function EditModal(tripRecordID, isArrived, page) {
                 if (truckNumber == "0") truckNumber = "-";
                 if (tripNameAndBranchSeq == "-_-") tripNameAndBranchSeq = "-";
                 if (item.tag != null) tag = item.tag;
+                if (item.unlinkedReasonName != null) unlinkedReasonName = item.unlinkedReasonName;
 
                 // 到着か出発かで変わる要素の登録
                 if (isArrived) {
@@ -502,7 +504,6 @@ function EditModal(tripRecordID, isArrived, page) {
                     tr += "<label id=\"loadStatusSelect\" ></label>"
                         + "<label id=\"loadRemarkSelect\" ></label";
                 }
-
                 tr += "</div>"
                     + "</td>"
                     + "</tr><tr>"
@@ -529,14 +530,17 @@ function EditModal(tripRecordID, isArrived, page) {
                     + "</tr><tr>"
                     + "<td>" + arriveOrDeparture + "</td>"
                     + "<td>" + arriveOrDepartureDate + "</td>"
+                    + "</tr><tr>"
+                    + "<td>AIモデル名</td>"
+                    + "<td>" + item.aiModelName + "</td>"
                     + "</tr>";
                 container.append(tr);
                 if (authorizedKubun == "1" || authorizedKubun == "2") {
                     $('#loadStatusSelect').val(response.annotationLoadClass);
-                    $('#loadRemarkSelect').val(response.remark);
+                    $('#loadRemarkSelect').val(unlinkedReasonName);
                 } else if (response.annotationLoadStatus != null) {
                     $('#loadStatusSelect').text(response.annotationLoadStatus + "%");
-                    $('#loadRemarkSelect').text(response.remark);
+                    $('#loadRemarkSelect').text(unlinkedReasonName);
                 } else {
                     $('#loadStatusSelect').text("-");
                 }

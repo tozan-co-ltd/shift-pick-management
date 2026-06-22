@@ -226,6 +226,12 @@ namespace ai_truck_load_measurement.Models
         public string? UnlinkedReasonName { get; set; }
 
         /// <summary>
+        /// AIモデル名
+        /// </summary>
+        [Display(Name = "AIモデル名")]
+        public string? AIModelName {  get; set; }
+
+        /// <summary>
         /// 便実績リスト
         /// </summary>
         public IPagedList<LoadRecordModel>? TripRecordList { get; set; }
