@@ -758,6 +758,8 @@ function GetDayString(date) {
         year: "numeric", month: "2-digit",
         day: "2-digit"
     });
+    if (day == "1/01/01")
+        return "-";
     return day;
 }
 

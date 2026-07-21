@@ -1,0 +1,15 @@
+﻿namespace ai_truck_load_measurement.ConnectControllers
+{
+    public class AIModelDescriptionConnectController
+    {
+        public static string CreateSQLToSelectAIModelDescriptions()
+        {
+            var sql = $@"
+                SELECT *
+                FROM m_ai_models
+                ORDER BY start_date DESC
+            ";
+            return sql;
+        }
+    }
+}
