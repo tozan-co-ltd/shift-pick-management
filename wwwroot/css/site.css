@@ -1274,6 +1274,19 @@ table.dataTable span.column_highlight {
         width: 100%;
     }
 
+    .news-list .item .mini-title {
+        margin: 0;
+        width: 50%;
+    }
+    .news-list .item .content {
+        margin: 0;
+        width: 100%;
+    }
+    .news-list .item .type {
+        margin: 0;
+        width: 25%;
+    }
+
 @media screen and (max-width: 767px) {
     .news-list .item div {
         flex-wrap: wrap;

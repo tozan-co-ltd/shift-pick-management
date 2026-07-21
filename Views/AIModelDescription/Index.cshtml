@@ -1,0 +1,99 @@
+﻿@using ai_truck_load_measurement.Commons;
+@model ai_truck_load_measurement.Models.AIModelDescriptionViewModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.ViewTitle;
+}
+<div class="card shadow de-inspection m-4">
+    <div class="card-header d-flex">
+        <label style="text-align: center">@ViewData["Title"]</label>
+    </div>
+    <div class="card-body">
+        <div class="col-16 d-flex align-items-center mb-3 unset-pdl">
+            <div class="radio-group mr-3">
+                <div class="radio-area">
+                    <input type="radio" id="arrivalChartButton" name="chartRadios" value="荷量" checked onclick="tabClick('荷量')"/>
+                    <label for="arrivalChartButton">　荷量　</label>
+                </div>
+                <div class="radio-area">
+                    <input type="radio" id="departureChartButton" name="chartRadios" value="センサー" onclick="tabClick('センサー')"/>
+                    <label for="departureChartButton">センサー</label>
+                </div>
+            </div>
+        </div>
+        @if (Model.DescriptionList.Count > 0)
+        {
+            <div class="news-container news-list mb-3">
+
+                <dl class="item" style="margin-bottom: 0rem;">
+                    <dd style="margin-bottom: 0rem;">
+                        <div>
+                            <p class="type" style="display: flex; align-items: center; font-weight:bold">バージョン</p>
+                            <p class="mini-title" style="display: flex; align-items: center; font-weight:bold">モデル名</p>
+                            <p class="content" style="display: flex; align-items: center; font-weight:bold">更新内容</p>
+                            <p class="date" style="display: flex; align-items: center; font-weight:bold">開始日</p>
+                            <p class="date" style="display: flex; align-items: center; font-weight:bold">終了日</p>
+                        </div>
+                    </dd>
+                </dl>
+                <div id="AIModels"></div>
+            </div>
+        }
+    </div>
+</div>
+<script type="text/javascript">
+     $(document).ready(function () {
+        model = @Html.Raw(Json.Serialize(Model));
+        tabClick("センサー");
+        tabClick("荷量");
+    });
+
+    function tabClick(typeValue){
+        var aiModels = document.getElementById("AIModels");
+        while (aiModels.firstChild) {
+            aiModels.removeChild(aiModels.firstChild);
+        }
+        model.descriptionList.forEach(function (item){
+            if(item.type == typeValue){
+                console.log(item.type + ", " + typeValue);
+                var dl = document.createElement("dl");
+                dl.className = "item mb-0";
+
+                var dd = document.createElement("dd");
+                dd.className = "mb-0";
+
+                var div = document.createElement("div");
+
+                var version = document.createElement("p");
+                version.className = "type d-flex align-items-center";
+                version.textContent = item.version;
+
+                var title = document.createElement("p");
+                title.className = "mini-title d-flex align-items-center";
+                title.textContent = item.aiModelName;
+
+                var content = document.createElement("p");
+                content.className = "content d-flex align-items-center";
+                content.textContent = item.description;
+                
+                var startDate = document.createElement("p");
+                startDate.className = "date d-flex align-items-center";
+                startDate.textContent = GetDayString(new Date(item.startDate));
+
+                var endDate = document.createElement("p");
+                endDate.className = "date d-flex align-items-center"
+                endDate.textContent = GetDayString(new Date(item.endDate));
+
+                div.appendChild(version);
+                div.appendChild(title);
+                div.appendChild(content);
+                div.appendChild(startDate);
+                div.appendChild(endDate);
+
+                dd.appendChild(div);
+                dl.appendChild(dd);
+                aiModels.appendChild(dl);
+            }
+        });
+    }
+</script>
