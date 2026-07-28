@@ -2,12 +2,12 @@
 @model ai_truck_load_measurement.Models.NewsListViewModel;
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = Model.ViewTitle;
+    ViewData["Title"] = "更新履歴";
 }
 <div class="card shadow de-inspection m-4">
     <div class="card-header d-flex">
         <label style="text-align: center">@ViewData["Title"]</label>
-        @if(Model.AuthorizedKubun == 2)
+        @if (Model.AuthorizedKubun == 2)
         {
             <button class="btn btn-primary print-btn mr-4" id="search-btn" style="margin-left: auto;" data-toggle="modal" data-target="#insert-modal" onclick="OnInsertClick()">
                 <span class="text">追加</span>
@@ -16,11 +16,11 @@
     </div>
     <div class="card-body">
 
-        @if(Model.NewsList.Count > 0)
+        @if (Model.NewsList.Count > 0)
         {
             <div class="news-container news-list mb-3">
 
-                @foreach(var item in Model.NewsList)
+                @foreach (var item in Model.NewsList)
                 {
                     <dl class="item" style="margin-bottom: 0rem;">
                         <dd style="margin-bottom: 0rem;">
@@ -66,10 +66,7 @@
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <select class="form-select" name="CategoryClass" asp-for="CategoryClass" required id="CategoryClass">
-                                    <option value="" selected disabled id="firstSelect">選択してください</option>
-                                    <option value="1">メンテナンス</option>
-                                    <option value="2">障害・不具合</option>
-                                    <option value="3">操作案内</option>
+                                    <option value="0">アップデート</option>
                                 </select>
                                 <span class="text-danger w-100" asp-validation-for="CategoryClass"></span>
                             </div>
@@ -133,10 +130,7 @@
                             </div>
                             <div class="col-12 col-sm-8 col-md-9 column-2nd">
                                 <select class="form-select" name="CategoryClass" asp-for="CategoryClass" required id="CategoryClassEdit">
-                                    <option value="" selected disabled id="firstSelect">選択してください</option>
-                                    <option value="1">メンテナンス</option>
-                                    <option value="2">障害・不具合</option>
-                                    <option value="3">操作案内</option>
+                                    <option value="0" selected>アップデート</option>
                                 </select>
                                 <span class="text-danger w-100" asp-validation-for="CategoryClass"></span>
                             </div>
@@ -187,7 +181,6 @@
 
     // 登録ボタン押下時
     function OnInsertClick(){
-        document.getElementById('firstSelect').selected = true;
 
         var today = new Date();
         $('#NewsDate').val(GetDayString(today));
