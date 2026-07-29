@@ -15,10 +15,26 @@ namespace ai_truck_load_measurement.Controllers
         {
             var user = ClaimsLoginUserData();
             NewsListViewModel model = new();
-            var sql = NewsConnectController.CreateSQLToSelectNews();
+            var sql = NewsConnectController.CreateSQLToSelectNewsWithoutUpdate();
             model.NewsList = ConnectToSQLServer.ExecuteQueryToList<NewsModel>(sql);
             model.AuthorizedKubun = user.AuthorizedKubun;
             foreach(var news in model.NewsList)
+            {
+                news.CategoryStatus = ConversionCategoryClassToCategoryStatus(news);
+            }
+            // 新規通知有無更新
+            UpdateHasNewsNotification(false);
+            return View(model);
+        }
+
+        public IActionResult UpdateHistory()
+        {
+            var user = ClaimsLoginUserData();
+            NewsListViewModel model = new();
+            var sql = NewsConnectController.CreateSQLToSelectUpdate();
+            model.NewsList = ConnectToSQLServer.ExecuteQueryToList<NewsModel>(sql);
+            model.AuthorizedKubun = user.AuthorizedKubun;
+            foreach (var news in model.NewsList)
             {
                 news.CategoryStatus = ConversionCategoryClassToCategoryStatus(news);
             }

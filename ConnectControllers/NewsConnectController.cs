@@ -8,7 +8,7 @@ namespace ai_truck_load_measurement.ConnectControllers
         /// お知らせ情報取得SQL
         /// </summary>
         /// <returns></returns>
-        public static string CreateSQLToSelectNews()
+        public static string CreateSQLToSelectNewsWithoutUpdate()
         {
             var sql = $@"
             SELECT
@@ -19,6 +19,28 @@ namespace ai_truck_load_measurement.ConnectControllers
                 ,created_at
                 ,created_by
             FROM t_news
+            WHERE category_class <> 0
+            ORDER BY news_date DESC , news_id DESC
+            ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 更新履歴取得SQL
+        /// </summary>
+        /// <returns></returns>
+        public static string CreateSQLToSelectUpdate()
+        {
+            var sql = $@"
+            SELECT
+                news_id
+                ,news_content
+                ,category_class
+                ,news_date
+                ,created_at
+                ,created_by
+            FROM t_news
+            WHERE category_class = 0
             ORDER BY news_date DESC , news_id DESC
             ";
             return sql;
