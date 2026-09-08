@@ -1,7 +1,7 @@
-﻿using ai_truck_load_measurement.Commons;
-using ai_truck_load_measurement.ConnectControllers;
-using ai_truck_load_measurement.Models;
-using ai_truck_load_measurement.Properties;
+﻿using shift_pick_management.Commons;
+using shift_pick_management.ConnectControllers;
+using shift_pick_management.Models;
+using shift_pick_management.Properties;
 using DocumentFormat.OpenXml.Vml.Spreadsheet;
 using JetBrains.Annotations;
 using MathNet.Numerics;
@@ -12,7 +12,7 @@ using System.Data;
 using System.Data.SqlClient;
 using X.PagedList;
 
-namespace ai_truck_load_measurement.Controllers
+namespace shift_pick_management.Controllers
 {
     public class NonTripNameRecordController : BaseController
     {

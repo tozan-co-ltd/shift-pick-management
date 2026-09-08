@@ -1,4 +1,4 @@
-using ai_truck_load_measurement.Filters;
+using shift_pick_management.Filters;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -7,17 +7,17 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ƒRƒ“ƒeƒi‚ÉƒT[ƒrƒX‚ğ’Ç‰Á
+// ï¿½Rï¿½ï¿½ï¿½eï¿½iï¿½ÉƒTï¿½[ï¿½rï¿½Xï¿½ï¿½Ç‰ï¿½
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(typeof(AccessControlFilter));
     options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
 });
 
-// ƒZƒbƒVƒ‡ƒ“‚Ì’Ç‰Á
+// ï¿½Zï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Ì’Ç‰ï¿½
 builder.Services.AddSession();
 
-// ƒNƒbƒL[”FØ‚É•K—v‚ÈƒT[ƒrƒX‚ğ“o˜^
+// ï¿½Nï¿½bï¿½Lï¿½[ï¿½Fï¿½Ø‚É•Kï¿½vï¿½ÈƒTï¿½[ï¿½rï¿½Xï¿½ï¿½oï¿½^
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -36,7 +36,7 @@ builder.Services.AddAuthentication(options =>
     //options.ExpireTimeSpan = TimeSpan.FromMinutes(1440);
 });
 
-// ƒRƒ“ƒeƒi‚É”F‰Â‚ğ’Ç‰Á
+// ï¿½Rï¿½ï¿½ï¿½eï¿½iï¿½É”Fï¿½Â‚ï¿½Ç‰ï¿½
 builder.Services.AddAuthorization(options =>
 {
     //options.AddPolicy("1", policy =>
@@ -49,11 +49,11 @@ builder.Services.AddAuthorization(options =>
     //});
 });
 
-// MVC‚Å—˜—p‚·‚éƒT[ƒrƒX‚ğ“o˜^
+// MVCï¿½Å—ï¿½ï¿½pï¿½ï¿½ï¿½ï¿½Tï¿½[ï¿½rï¿½Xï¿½ï¿½oï¿½^
 builder.Services.AddMvc(options =>
 {
-    // ƒOƒ[ƒoƒ‹ƒtƒBƒ‹ƒ^‚É³”FƒtƒBƒ‹ƒ^‚ğ’Ç‰Á
-    // ‘S‚Ä‚ÌƒRƒ“ƒgƒ[ƒ‰[‚ÅƒƒOƒCƒ“•K{
+    // ï¿½Oï¿½ï¿½ï¿½[ï¿½oï¿½ï¿½ï¿½tï¿½Bï¿½ï¿½ï¿½^ï¿½Éï¿½ï¿½Fï¿½tï¿½Bï¿½ï¿½ï¿½^ï¿½ï¿½Ç‰ï¿½
+    // ï¿½Sï¿½Ä‚ÌƒRï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½[ï¿½Åƒï¿½ï¿½Oï¿½Cï¿½ï¿½ï¿½Kï¿½{
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     options.Filters.Add(new AuthorizeFilter(policy));
     options.EnableEndpointRouting = false;
@@ -69,23 +69,23 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-// HTTPS•K{
+// HTTPSï¿½Kï¿½{
 app.UseHttpsRedirection();
-// Ã“Iƒtƒ@ƒCƒ‹‚Ì’ñ‹Ÿ
+// ï¿½Ã“Iï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ì’ï¿½
 app.UseStaticFiles();
-//ƒ‹[ƒeƒBƒ“ƒO
+//ï¿½ï¿½ï¿½[ï¿½eï¿½Bï¿½ï¿½ï¿½O
 app.UseRouting();
-// CookieŒ´‘¥‹@”\—LŒø‰»
+// Cookieï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½\ï¿½Lï¿½ï¿½ï¿½ï¿½
 app.UseCookiePolicy();
-// ID—LŒø‰»
+// IDï¿½Lï¿½ï¿½ï¿½ï¿½
 app.UseAuthentication();
-// ”FØ‹@”\—LŒø‰»
+// ï¿½Fï¿½Ø‹@ï¿½\ï¿½Lï¿½ï¿½ï¿½ï¿½
 app.UseAuthorization();
-// ƒZƒbƒVƒ‡ƒ“ó‘Ô—LŒø‰»
+// ï¿½Zï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô—Lï¿½ï¿½ï¿½ï¿½
 app.UseSession();
 app.UseMvc();
 
-// ‹K‘¥ƒ‹[ƒeƒBƒ“ƒO
+// ï¿½Kï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½eï¿½Bï¿½ï¿½ï¿½O
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Top}/{action=Index}/{id?}");

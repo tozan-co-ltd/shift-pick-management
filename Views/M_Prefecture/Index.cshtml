@@ -1,0 +1,35 @@
+<div class="card shadow de-inspection m-4">
+    <div class="card-header">
+        “s“¹•{Œ§ƒ}ƒXƒ^[
+    </div>
+    <div class="card-body">
+        <h2>“s“¹•{Œ§ƒ}ƒXƒ^[</h2>
+
+        <p>@Model.UserName@‚±‚ñ‚É‚¿‚ÍI</p>
+
+        @if (Model.Registered)
+        {
+            <div class="alert alert-success">
+                <strong>“o˜^Ï‚İ</strong>
+                @if (Model.RegisteredAt.HasValue)
+                {
+                    <div>ŠÔ: @Model.RegisteredAt</div>
+                }
+            </div>
+        }
+        else
+        {
+            <div>
+                <p>@(string.IsNullOrEmpty(Model.Message) ? "“s“¹•{Œ§î•ñ‚ğ“ü—Í‚µ‚Ä“o˜^‚µ‚Ä‚­‚¾‚³‚¢B" : Model.Message)</p>
+                <form asp-action="Register" method="post">
+                    <div class="form-group">
+                        <label>“s“¹•{Œ§–¼</label>
+                        <input name="PrefectureName" class="form-control" />
+                    </div>
+                    <input type="hidden" name="UserName" value="@Model.UserName" />
+                    <button type="submit" class="btn btn-primary">“o˜^</button>
+                </form>
+            </div>
+        }
+    </div>
+</div>

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using X.PagedList;
 
-namespace ai_truck_load_measurement.Models
+namespace shift_pick_management.Models
 {
     public class LoadTransitionModel : LoadRecordModel
     {

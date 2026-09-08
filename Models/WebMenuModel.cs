@@ -1,10 +1,10 @@
 ﻿using Dapper;
-using ai_truck_load_measurement.Commons;
+using shift_pick_management.Commons;
 using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
-namespace ai_truck_load_measurement.Models
+namespace shift_pick_management.Models
 {
     /// <summary>
     /// WEBメニューのModel

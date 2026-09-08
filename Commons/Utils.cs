@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Reflection;
 
-namespace ai_truck_load_measurement.Commons
+namespace shift_pick_management.Commons
 {
     public static class Utils
     {

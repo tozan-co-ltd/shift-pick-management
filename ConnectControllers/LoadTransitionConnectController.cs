@@ -1,11 +1,11 @@
 ﻿using Dapper;
-using ai_truck_load_measurement.Commons;
-using ai_truck_load_measurement.Models;
+using shift_pick_management.Commons;
+using shift_pick_management.Models;
 using System.Data.SqlClient;
 using System.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace ai_truck_load_measurement.ConnectControllers
+namespace shift_pick_management.ConnectControllers
 {
     public class LoadTransitionConnectController 
     {

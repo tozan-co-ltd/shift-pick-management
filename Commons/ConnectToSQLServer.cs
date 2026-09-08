@@ -1,9 +1,9 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
 using System.Data;
-using ai_truck_load_measurement.Models;
+using shift_pick_management.Models;
 
-namespace ai_truck_load_measurement.Commons
+namespace shift_pick_management.Commons
 {
     /// <summary>
     /// SQLServer接続に関する関数

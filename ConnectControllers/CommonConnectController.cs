@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace ai_truck_load_measurement.ConnectControllers
+namespace shift_pick_management.ConnectControllers
 {
     /// <summary>
     /// connectControlerの共通処理

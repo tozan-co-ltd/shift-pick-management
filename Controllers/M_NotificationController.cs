@@ -1,7 +1,7 @@
-﻿using ai_truck_load_measurement.Commons;
-using ai_truck_load_measurement.ConnectControllers;
-using ai_truck_load_measurement.Models;
-using ai_truck_load_measurement.Properties;
+﻿using shift_pick_management.Commons;
+using shift_pick_management.ConnectControllers;
+using shift_pick_management.Models;
+using shift_pick_management.Properties;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,7 +9,7 @@ using System.Data.SqlClient;
 using System.Data;
 using X.PagedList;
 
-namespace ai_truck_load_measurement.Controllers
+namespace shift_pick_management.Controllers
 {
     public class M_NotificationController : BaseController
     {

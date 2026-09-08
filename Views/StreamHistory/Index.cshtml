@@ -1,0 +1,37 @@
+<div class="card shadow de-inspection m-4">
+    <div class="card-header">
+        ストリーム履歴
+    </div>
+    <div class="card-body">
+        <h2>ストリーム履歴</h2>
+
+        <p>@Model.UserName　こんにちは！</p>
+
+        <p>発生日時: @Model.OccurredAt</p>
+
+        @if (Model.Acknowledged)
+        {
+            <div class="alert alert-success">
+                <strong>既に応答済み</strong>
+                @if (Model.AcknowledgedAt.HasValue)
+                {
+                    <div>応答時間: @Model.AcknowledgedAt</div>
+                }
+            </div>
+        }
+        else
+        {
+            <div>
+                <p>@(string.IsNullOrEmpty(Model.Message) ? "履歴を確認して応答してください。" : Model.Message)</p>
+                <form asp-action="Acknowledge" method="post">
+                    <div class="form-group">
+                        <label>ストリーム名</label>
+                        <input name="StreamName" class="form-control" />
+                    </div>
+                    <input type="hidden" name="UserName" value="@Model.UserName" />
+                    <button type="submit" class="btn btn-primary">応答</button>
+                </form>
+            </div>
+        }
+    </div>
+</div>

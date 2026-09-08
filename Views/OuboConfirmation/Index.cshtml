@@ -1,0 +1,31 @@
+﻿@model shift_pick_management.Models.OuboConfirmationModel
+<div class="card shadow de-inspection m-4">
+    <div class="card-header">
+        応募確認
+    </div>
+    <div class="card-body">
+        <p>@Model.UserName　こんにちは！</p>
+
+        @if (Model.Confirmed)
+        {
+            <div class="alert alert-success">
+                <strong>確認済み</strong>
+                @if (Model.ConfirmedAt.HasValue)
+                {
+                    <div>時間: @Model.ConfirmedAt</div>
+                }
+            </div>
+        }
+        else
+        {
+            <div>
+                <p>@(string.IsNullOrEmpty(Model.Message) ? "確認してもよろしいでしょうか?" : Model.Message)</p>
+                <form asp-action="Confirm" method="post">
+                    <input type="hidden" asp-for="UserName" />
+                    <input type="hidden" asp-for="Message" />
+                    <button type="submit" class="btn btn-primary">確認</button>
+                </form>
+            </div>
+        }
+    </div>
+</div>

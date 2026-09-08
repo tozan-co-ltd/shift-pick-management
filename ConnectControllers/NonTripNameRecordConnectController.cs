@@ -1,6 +1,6 @@
-﻿using ai_truck_load_measurement.Controllers;
+﻿using shift_pick_management.Controllers;
 
-namespace ai_truck_load_measurement.ConnectControllers
+namespace shift_pick_management.ConnectControllers
 {
     public class NonTripNameRecordConnectController : BaseController
     {

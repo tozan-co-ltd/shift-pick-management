@@ -1,13 +1,13 @@
-﻿using ai_truck_load_measurement.Commons;
-using ai_truck_load_measurement.ConnectControllers;
-using ai_truck_load_measurement.Models;
-using ai_truck_load_measurement.Properties;
+﻿using shift_pick_management.Commons;
+using shift_pick_management.ConnectControllers;
+using shift_pick_management.Models;
+using shift_pick_management.Properties;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Data;
 using NPOI.SS.Formula.Functions;
 
-namespace ai_truck_load_measurement.Controllers
+namespace shift_pick_management.Controllers
 {
     public class NonDepartedAtRecordController : BaseController
     {

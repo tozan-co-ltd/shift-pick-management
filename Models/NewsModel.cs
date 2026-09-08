@@ -1,7 +1,7 @@
-﻿using ai_truck_load_measurement.Properties;
+﻿using shift_pick_management.Properties;
 using System.ComponentModel.DataAnnotations;
 
-namespace ai_truck_load_measurement.Models
+namespace shift_pick_management.Models
 {
     public class NewsModel : CommonModel
     {

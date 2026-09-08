@@ -1,6 +1,6 @@
 ﻿using X.PagedList;
 
-namespace ai_truck_load_measurement.Models
+namespace shift_pick_management.Models
 {
     /// <summary>
     /// トップ画面のModel

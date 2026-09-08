@@ -1,16 +1,16 @@
-﻿using ai_truck_load_measurement.ConnectControllers;
-using ai_truck_load_measurement.Models;
-using ai_truck_load_measurement.Properties;
+﻿using shift_pick_management.ConnectControllers;
+using shift_pick_management.Models;
+using shift_pick_management.Properties;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
-using ai_truck_load_measurement.Commons;
+using shift_pick_management.Commons;
 using System.Data;
 using Dapper;
 using DocumentFormat.OpenXml.Office.CustomUI;
 
-namespace ai_truck_load_measurement.Controllers
+namespace shift_pick_management.Controllers
 {
     public class M_TripController : BaseController
     {

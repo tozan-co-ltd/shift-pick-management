@@ -1,9 +1,9 @@
-﻿using ai_truck_load_measurement.Models;
-using ai_truck_load_measurement.Properties;
+﻿using shift_pick_management.Models;
+using shift_pick_management.Properties;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
-namespace ai_truck_load_measurement.Models
+namespace shift_pick_management.Models
 {
     /// <summary>
     /// 車両マスターのモデル

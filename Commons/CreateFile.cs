@@ -1,5 +1,5 @@
-﻿using ai_truck_load_measurement.Models;
-using ai_truck_load_measurement.Properties;
+﻿using shift_pick_management.Models;
+using shift_pick_management.Properties;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OfficeOpenXml;
 
-namespace ai_truck_load_measurement.Commons
+namespace shift_pick_management.Commons
 {
     public static class CreateFile
     {

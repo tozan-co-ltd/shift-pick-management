@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using ai_truck_load_measurement.Properties;
+using shift_pick_management.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using X.PagedList;
 
-namespace ai_truck_load_measurement.Models
+namespace shift_pick_management.Models
 {
     public class LoadOutputModel : LoadRecordModel
     {

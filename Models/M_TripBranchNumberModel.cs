@@ -1,10 +1,10 @@
-﻿using ai_truck_load_measurement.Properties;
+﻿using shift_pick_management.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Spire.Xls;
 using System.ComponentModel.DataAnnotations;
 using X.PagedList;
 
-namespace ai_truck_load_measurement.Models
+namespace shift_pick_management.Models
 {
     /// <summary>
     /// 便枝番マスター用モデル

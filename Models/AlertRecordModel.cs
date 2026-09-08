@@ -1,7 +1,7 @@
 ﻿using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Mozilla;
 
-namespace ai_truck_load_measurement.Models
+namespace shift_pick_management.Models
 {
     /// <summary>
     /// アラート履歴モデル

@@ -1,0 +1,39 @@
+<div class="card shadow de-inspection m-4">
+    <div class="card-header">
+        通知ストリーム
+    </div>
+    <div class="card-body">
+        <h2>通知ストリーム</h2>
+
+        <p>@Model.UserName　さん、通知を確認してください。</p>
+
+        @if (Model.Confirmed)
+        {
+            <div class="alert alert-success">
+                <strong>確認済み</strong>
+                @if (Model.ConfirmedAt.HasValue)
+                {
+                    <div>時間: @Model.ConfirmedAt</div>
+                }
+            </div>
+        }
+        else
+        {
+            <div>
+                <p>@(string.IsNullOrEmpty(Model.Message) ? "この通知を確認しますか？" : Model.Message)</p>
+                <form asp-action="Confirm" method="post">
+                    <div class="form-group">
+                        <label>タイトル</label>
+                        <input name="Title" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>内容</label>
+                        <textarea name="Content" class="form-control"></textarea>
+                    </div>
+                    <input type="hidden" name="UserName" value="@Model.UserName" />
+                    <button type="submit" class="btn btn-primary">確認</button>
+                </form>
+            </div>
+        }
+    </div>
+</div>

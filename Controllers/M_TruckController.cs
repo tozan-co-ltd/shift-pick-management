@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ai_truck_load_measurement.Models;
-using ai_truck_load_measurement.Properties;
-using ai_truck_load_measurement.ConnectControllers;
+using shift_pick_management.Models;
+using shift_pick_management.Properties;
+using shift_pick_management.ConnectControllers;
 using X.PagedList;
-using ai_truck_load_measurement.Commons;
+using shift_pick_management.Commons;
 using System.Data.SqlClient;
 using System.Data;
 
-namespace ai_truck_load_measurement.Controllers
+namespace shift_pick_management.Controllers
 {
     /// <summary>
     /// 車両マスター画面

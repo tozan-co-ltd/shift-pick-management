@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ai_truck_load_measurement.Models;
-using ai_truck_load_measurement.ConnectControllers;
-using ai_truck_load_measurement.Commons;
+using shift_pick_management.Models;
+using shift_pick_management.ConnectControllers;
+using shift_pick_management.Commons;
 
-namespace ai_truck_load_measurement.Controllers
+namespace shift_pick_management.Controllers
 {
 
     public class BaseController : Controller

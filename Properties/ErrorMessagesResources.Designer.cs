@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ai_truck_load_measurement.Properties {
+namespace shift_pick_management.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ai_truck_load_measurement.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ai_truck_load_measurement.Properties.ErrorMessagesResources", typeof(ErrorMessagesResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("shift_pick_management.Properties.ErrorMessagesResources", typeof(ErrorMessagesResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

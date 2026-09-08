@@ -1,12 +1,12 @@
-﻿using ai_truck_load_measurement.Commons;
-using ai_truck_load_measurement.ConnectControllers;
-using ai_truck_load_measurement.Models;
-using ai_truck_load_measurement.Properties;
+﻿using shift_pick_management.Commons;
+using shift_pick_management.ConnectControllers;
+using shift_pick_management.Models;
+using shift_pick_management.Properties;
 using DocumentFormat.OpenXml.Office.CustomUI;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing.Imaging;
 using X.PagedList;
-using static ai_truck_load_measurement.Models.ViewCardModel;
+using static shift_pick_management.Models.ViewCardModel;
 using System.IO;
 using System.Drawing;
 using System;
@@ -15,7 +15,7 @@ using System.Collections;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Data.SqlClient;
 
-namespace ai_truck_load_measurement.Controllers
+namespace shift_pick_management.Controllers
 {
     /// <summary>
     /// トップ画面

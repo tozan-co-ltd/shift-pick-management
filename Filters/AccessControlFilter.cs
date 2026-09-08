@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ai_truck_load_measurement.Models;
+using shift_pick_management.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
-using ai_truck_load_measurement.Commons;
+using shift_pick_management.Commons;
 using System.ComponentModel.Design;
 using System.Data;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using ai_truck_load_measurement.ConnectControllers;
+using shift_pick_management.ConnectControllers;
 
-namespace ai_truck_load_measurement.Filters
+namespace shift_pick_management.Filters
 {
 
     public class AccessControlFilter : IActionFilter

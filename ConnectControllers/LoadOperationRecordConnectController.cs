@@ -1,10 +1,10 @@
-﻿using ai_truck_load_measurement.Commons;
+﻿using shift_pick_management.Commons;
 using System.Data.SqlClient;
-using ai_truck_load_measurement.Models;
+using shift_pick_management.Models;
 using Dapper;
 
 
-namespace ai_truck_load_measurement.ConnectControllers
+namespace shift_pick_management.ConnectControllers
 {
     public class LoadOperationRecordConnectController 
     {

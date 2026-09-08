@@ -1,6 +1,6 @@
-﻿using ai_truck_load_measurement.Commons;
-using ai_truck_load_measurement.Models;
-using ai_truck_load_measurement.Properties;
+﻿using shift_pick_management.Commons;
+using shift_pick_management.Models;
+using shift_pick_management.Properties;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -10,10 +10,10 @@ using System.Linq.Expressions;
 using System.Security.Claims;
 using System.DirectoryServices;
 using DirectoryEntry = System.DirectoryServices.DirectoryEntry;
-using ai_truck_load_measurement.ConnectControllers;
+using shift_pick_management.ConnectControllers;
 using System.Text.RegularExpressions;
 
-namespace ai_truck_load_measurement.Controllers
+namespace shift_pick_management.Controllers
 {
     /// <summary>
     /// ログイン関係
