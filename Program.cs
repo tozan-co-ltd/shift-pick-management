@@ -7,17 +7,17 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// �R���e�i�ɃT�[�r�X��ǉ�
+// コンテナにサービスを追加
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(typeof(AccessControlFilter));
     options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
 });
 
-// �Z�b�V�����̒ǉ�
+// セッションの追加
 builder.Services.AddSession();
 
-// �N�b�L�[�F�؂ɕK�v�ȃT�[�r�X��o�^
+// クッキー認証に必要なサービスを登録
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -36,7 +36,7 @@ builder.Services.AddAuthentication(options =>
     //options.ExpireTimeSpan = TimeSpan.FromMinutes(1440);
 });
 
-// �R���e�i�ɔF��ǉ�
+// コンテナに認可を追加
 builder.Services.AddAuthorization(options =>
 {
     //options.AddPolicy("1", policy =>
@@ -49,11 +49,11 @@ builder.Services.AddAuthorization(options =>
     //});
 });
 
-// MVC�ŗ��p����T�[�r�X��o�^
+// MVCで利用するサービスを登録
 builder.Services.AddMvc(options =>
 {
-    // �O���[�o���t�B���^�ɏ��F�t�B���^��ǉ�
-    // �S�ẴR���g���[���[�Ń��O�C���K�{
+    // グローバルフィルタに承認フィルタを追加
+    // 全てのコントローラーでログイン必須
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     options.Filters.Add(new AuthorizeFilter(policy));
     options.EnableEndpointRouting = false;
@@ -69,23 +69,24 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-// HTTPS�K�{
+// HTTPS必須
 app.UseHttpsRedirection();
-// �ÓI�t�@�C���̒�
+// 静的ファイルの提供
 app.UseStaticFiles();
-//���[�e�B���O
+// ルーティング
 app.UseRouting();
-// Cookie�����@�\�L����
+// Cookie原則機能有効化
 app.UseCookiePolicy();
-// ID�L����
+// ID有効化
 app.UseAuthentication();
-// �F�؋@�\�L����
+// 認証機能有効化
 app.UseAuthorization();
-// �Z�b�V������ԗL����
+// セッション状態有効化
 app.UseSession();
+// MVC有効化
 app.UseMvc();
 
-// �K�����[�e�B���O
+// 規則ルーティング
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Top}/{action=Index}/{id?}");
