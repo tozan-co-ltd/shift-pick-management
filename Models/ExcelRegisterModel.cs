@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace shift_pick_management.Models
 {
-    public class ExcelRegisterModel
+    public class ExcelRegisterModel : CommonModel
     {
         [Display(Name = "FileName")]
         public string FileName { get; set; } = string.Empty;

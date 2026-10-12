@@ -16,15 +16,11 @@ namespace shift_pick_management.Controllers
             {
                 if (claimsLoginUserList.Count > 0)
                 {
-                    Int32.TryParse(claimsLoginUserList.Where(x => x.Type == "MainDepoID").First().Value, out var mainDepoID);
                     Int32.TryParse(claimsLoginUserList.Where(x => x.Type == "AuthorizedKubun").First().Value, out var authorizedKubun);
                     var loginUserModel = new LoginUserModel
                     {
                         AuthorizedKubun = authorizedKubun,
-                        UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value,
-                        ADName = claimsLoginUserList.Where(x => x.Type == "ADName").First().Value,
-                        MainDepoName = claimsLoginUserList.Where(x => x.Type == "MainDepoName").First().Value,
-                        MainDepoID = mainDepoID,
+                        UserName = claimsLoginUserList.Where(x => x.Type == "UserName").First().Value
                     };
                     return loginUserModel;
                 }

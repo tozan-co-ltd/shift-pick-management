@@ -91,8 +91,6 @@ namespace shift_pick_management.Controllers
                     new Claim("UserName", loginUserModel.UserName),
                     new Claim("ADName", model.LoginId),
                     new Claim("AuthorizedKubun", loginUserModel.AuthorizedKubun.ToString()),
-                    new Claim("MainDepoID", loginUserModel.MainDepoID.ToString()),
-                    new Claim("MainDepoName", loginUserModel.MainDepoName),
                 };
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
@@ -107,23 +105,18 @@ namespace shift_pick_management.Controllers
                 // サインイン
                 // 認証クッキーをレスポンスに追加
                 await HttpContext.SignInAsync(
-                  CookieAuthenticationDefaults.AuthenticationScheme,
-                  principal,
-                  authProperties
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    principal,
+                    authProperties
                 );
 
-              
+
                 // log取得
                 _logger.Info($"ログイン成功 ログインID:{model.LoginId}, ログインユーザー名:{loginUserModel.UserName}");
 
-                if (!string.IsNullOrEmpty(model.ReturnUrl) && model.ReturnUrl.Contains("AlertRecord"))
-                {
-                    var isArrived = GetIsArrived(model.ReturnUrl);
-                    string alertRecordID = Regex.Replace(model.ReturnUrl, @"[^0-9]", "");
-                    return RedirectToAction("Index", "AlertRecord", new {TransitionAlertRecordID = alertRecordID, TransitionIsArrived = isArrived});
-                }
+                // TODO：ログイン後のリダイレクト先（ReturnUrl）を決定
 
-                return RedirectToAction("Index", "Top");
+                return RedirectToAction("Index", "OuboConfirmation");
             }
             catch (Exception ex)
             {
@@ -136,14 +129,6 @@ namespace shift_pick_management.Controllers
 
                 return View(model);
             }
-        }
-
-        private bool GetIsArrived(string returnUrl)
-        {
-            var isArrived = false;
-            if (returnUrl.Contains("True"))
-                isArrived = true;
-            return isArrived;
         }
 
         /// <summary>
@@ -165,7 +150,7 @@ namespace shift_pick_management.Controllers
                 // ログイン画面へリダイレクト
                 return RedirectToAction("Index");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var errorMessage = "E9999: " + ErrorMessagesResources.E9999 + ex.Message;
                 ViewData["ErrorMessage"] = errorMessage;
@@ -186,36 +171,28 @@ namespace shift_pick_management.Controllers
                 var loginId = loginModel.LoginId;
                 var password = loginModel.Password;
 
-                if (loginId == "test1000" && password =="1111")
+                if (loginId == "test1000" && password == "1111")
                 {
                     LoginUserModel testUserModel = new()
                     {
                         UserName = "テストユーザー",
-                        AuthorizedKubun = 0,
-                        MainDepoID = 0,
-                        MainDepoName = ""
+                        AuthorizedKubun = 1,
                     };
                     return testUserModel;
                 }
 
                 // ActiveDirectory認証処理
                 var authenticateUserName = GetAuthenticateUserName(loginId, password);
-                if(authenticateUserName == null)
+                if (authenticateUserName == null)
                 {
                     return null;
                 }
 
-                var mainDepo = GetMainDepo(loginId);
-                var mainDepoName = "";
-                if (mainDepo.Name != null)
-                    mainDepoName = mainDepo.Name;
 
                 LoginUserModel loginUserModel = new()
                 {
                     UserName = authenticateUserName,
                     AuthorizedKubun = GetAuthorizedKubunOfUser(loginId),
-                    MainDepoID = mainDepo.DepoID,
-                    MainDepoName = mainDepoName
                 };
 
                 return loginUserModel;
@@ -236,7 +213,7 @@ namespace shift_pick_management.Controllers
         {
             try
             {
-                if(loginId == null || password == null)
+                if (loginId == null || password == null)
                 {
                     return null;
                 }
@@ -279,23 +256,7 @@ namespace shift_pick_management.Controllers
 
         }
 
-        /// <summary>
-        /// ログインIDを元にログイン時のメインデポを取得する
-        /// </summary>
-        /// <param name="loginID"></param>
-        /// <returns></returns>
-        private M_DepoModel GetMainDepo(string loginID)
-        {
-            M_DepoModel model = new M_DepoModel();
-            var sql = LoginConnectController.CreateSQLToSelectDepoFromADName(loginID);
-            var depoList = LoginConnectController.ConnectMDepos(sql);
-            if (depoList.Count > 0)
-            {
-                model = depoList[0];
-            }
-            return model;
 
-        }
         /// <summary>
         /// ユーザーの権限区分情報取得
         /// </summary>
