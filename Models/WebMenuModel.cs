@@ -13,30 +13,15 @@ namespace shift_pick_management.Models
     {
         private readonly List<M_WebMenu> referenceList = new List<M_WebMenu>()
         {
-            new M_WebMenu{CategoryID = 1, MenuID = 1, MenuName = "ステーション状況", Controller = "Top", Action="Index"},
-            new M_WebMenu{CategoryID = 1, MenuID = 2, MenuName = "便予実進捗", Controller = "LoadProgress", Action = "Index"},
-            new M_WebMenu{CategoryID = 2, MenuID = 1, MenuName = "荷量分布", Controller = "LoadDistribution", Action = "Index"},
-            new M_WebMenu{CategoryID = 2, MenuID = 2, MenuName = "荷量推移", Controller = "LoadTransition", Action = "Index"},
-            new M_WebMenu{CategoryID = 2, MenuID = 3, MenuName = "荷量と運行実績", Controller = "LoadOperationRecord", Action = "Index"},
-            new M_WebMenu{CategoryID = 2, MenuID = 4, MenuName = "実績出力", Controller = "LoadOutput", Action = "Index"},
-            new M_WebMenu{CategoryID = 3, MenuID = 1, MenuName = "お知らせ", Controller = "News", Action = "Index"},
-            new M_WebMenu{CategoryID = 3, MenuID = 2, MenuName = "AIモデル一覧", Controller = "AIModelDescription", Action = "Index"},
-            new M_WebMenu{CategoryID = 3, MenuID = 3, MenuName = "更新履歴", Controller = "News", Action = "UpdateHistory"},
-            new M_WebMenu{CategoryID = 4, MenuID = 1, MenuName = "車両マスター", Controller = "M_Truck", Action = "Index"},
-            new M_WebMenu{CategoryID = 4, MenuID = 2, MenuName = "便マスター", Controller = "M_Trip", Action = "Index"},
-            new M_WebMenu{CategoryID = 4, MenuID = 3, MenuName = "便枝番マスター", Controller = "M_TripBranchNumber", Action = "Index"},
-            new M_WebMenu{CategoryID = 4, MenuID = 4, MenuName = "ユーザーマスター", Controller = "M_User", Action = "Index"},
-            new M_WebMenu{CategoryID = 4, MenuID = 5, MenuName = "通知マスター", Controller = "M_Notification", Action = "Index"},
-            new M_WebMenu{CategoryID = 5, MenuID = 1, MenuName = "アラート履歴", Controller = "AlertRecord", Action = "Index"},
-            new M_WebMenu{CategoryID = 5, MenuID = 2, MenuName = "1.早着・遅着実績", Controller = "ArrivalTimeDefference", Action = "Index"},
-            new M_WebMenu{CategoryID = 5, MenuID = 3, MenuName = "2.荷量アラート実績", Controller = "LoadAverage", Action = "Index"},
-            new M_WebMenu{CategoryID = 5, MenuID = 4, MenuName = "3.アラート回数詳細表示", Controller = "CountAlertRecord", Action = "Index"},
-            new M_WebMenu{CategoryID = 6, MenuID = 1, MenuName = "管理用ポータル画面", Controller = "ManagementPortal", Action = "Index"},
-            new M_WebMenu{CategoryID = 6, MenuID = 2, MenuName = "1.出発実績無し件数", Controller = "NonDepartedAtRecord", Action = "Index"},
-            new M_WebMenu{CategoryID = 6, MenuID = 3, MenuName = "2.紐づけ切れ - ID有", Controller = "NonTripNameRecord", Action = "Index"},
-            new M_WebMenu{CategoryID = 6, MenuID = 4, MenuName = "3.紐づけ切れ - ID無", Controller = "NonIdentifyNumberRecord", Action = "Index"},
-            new M_WebMenu{CategoryID = 6, MenuID = 5, MenuName = "4.紐づけ切れ回数", Controller = "CountNonTripNameRecord", Action = "Index"},
-            new M_WebMenu{CategoryID = 6, MenuID = 5, MenuName = "5.便実績修正", Controller = "EditLoadRecord", Action = "Index"},
+            new M_WebMenu{CategoryID = 1, MenuID = 1, MenuName = "応募確認", Controller = "OuboConfirmation", Action = "Index"},
+            new M_WebMenu{CategoryID = 2, MenuID = 1, MenuName = "空きエクセル登録", Controller = "ExcelRegister", Action = "Index"},
+            new M_WebMenu{CategoryID = 3, MenuID = 1, MenuName = "通知配信", Controller = "NotificationStream", Action = "Index"},
+            new M_WebMenu{CategoryID = 3, MenuID = 2, MenuName = "配信履歴", Controller = "StreamHistory", Action = "Index"},
+            new M_WebMenu{CategoryID = 4, MenuID = 1, MenuName = "管理者マスタ", Controller = "M_Manager", Action = "Index"},
+            new M_WebMenu{CategoryID = 4, MenuID = 2, MenuName = "事業所マスタ", Controller = "M_Office", Action = "Index"},
+            new M_WebMenu{CategoryID = 4, MenuID = 3, MenuName = "利用者マスタ", Controller = "M_User", Action = "Index"},
+            new M_WebMenu{CategoryID = 4, MenuID = 4, MenuName = "通知管理マスタ", Controller = "M_Notification", Action = "Index"},
+            new M_WebMenu{CategoryID = 4, MenuID = 5, MenuName = "都道府県マスタ", Controller = "M_Prefecture", Action = "Index"}
         };
 
         /// <summary>
@@ -54,12 +39,10 @@ namespace shift_pick_management.Models
 
                 var selectCategoryList = new List<M_WebMenuCategory>()
                 {
-                    new M_WebMenuCategory{CategoryID = 1, CategoryName = "状況"},
-                    new M_WebMenuCategory{CategoryID = 2, CategoryName = "実績" },
-                    new M_WebMenuCategory{CategoryID = 3, CategoryName = "お知らせ"},
+                    new M_WebMenuCategory{CategoryID = 1, CategoryName = "応募確認"},
+                    new M_WebMenuCategory{CategoryID = 2, CategoryName = "空きエクセル登録" },
+                    new M_WebMenuCategory{CategoryID = 3, CategoryName = "配信管理"},
                     new M_WebMenuCategory{CategoryID = 4, CategoryName = "マスター" },
-                    new M_WebMenuCategory{CategoryID = 5, CategoryName = "管理用(物流担当者)" },
-                    new M_WebMenuCategory{CategoryID = 6, CategoryName = "管理用(システム担当者)" },
                 };
 
                 return selectCategoryList;

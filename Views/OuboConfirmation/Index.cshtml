@@ -1,31 +1,612 @@
-﻿@model shift_pick_management.Models.OuboConfirmationModel
-<div class="card shadow de-inspection m-4">
+@using shift_pick_management.Commons;
+@model shift_pick_management.Models.OuboConfirmationModel;
+@{
+    Model.GetBaseView(User, ViewContext);
+    ViewData["Title"] = Model.ViewTitle;
+}
+<div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
-        応募確認
+        @ViewData["Title"]
     </div>
-    <div class="card-body">
-        <p>@Model.UserName　こんにちは！</p>
 
-        @if (Model.Confirmed)
-        {
-            <div class="alert alert-success">
-                <strong>確認済み</strong>
-                @if (Model.ConfirmedAt.HasValue)
-                {
-                    <div>時間: @Model.ConfirmedAt</div>
-                }
+    <div class="card-body">
+        <div class="form-group col-sm-12 pl-3">
+            <p id="div-error-message" class="mt-1 text-danger"></p>
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
+            }
+        </div>
+
+        <div class="mg-bot-20">
+            <div class="col-16 sp-tablet mb-3">
+                <div class="col-16 align-items-center unset-pdl sp-cs-dpl">
+                    <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                        <span class="warehouse-name-drs span-paragraph">就業日付期間</span>
+                        <input type="text" id="startOfPeriod" class="form-control pickerDate startDate">
+                        <label class="m-1">～</label>
+                        <input type="text" id="endOfPeriod" class="form-control pickerDate endDate mr-3">
+                        <div class="input-group-append mr-3">
+                            <a class="btn btn-secondary btn-icon-split" data-toggle="modal" data-target="#prefecture-modal">
+                                <span class="text">都道府県選択</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-16 align-items-center unset-pdl sp-cs-dpl">
+                    <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                        <span class="warehouse-name-drs span-paragraph">利用者ID</span>
+                        <input type="text" class="form-control input-form">
+                    </div>
+                </div>
+                <div class="col-16 align-items-center unset-pdl sp-cs-dpl">
+                    <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                        <span class="warehouse-name-drs span-paragraph">名前</span>
+                        <input type="text" class="form-control input-form">
+                    </div>
+                </div>
+                <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                    <div class="d-flex justify-content-start align-items-center unset-pdl">
+                        <span class="warehouse-name-drs span-paragraph">状況</span>
+                        <div>
+                            <label class="mr-5">
+                                <input type="checkbox" class=" mr-2" name="situation" id="all" /><label for="all" class="mr-2">すべて</label>
+                                <input type="checkbox" class=" mr-2" name="situation" id="preserve" /><label for="preserve" class="mr-2">予約</label>
+                                <input type="checkbox" class=" mr-2" name="situation" id="entry" /><label for="entry" class="mr-2">エント</label>
+                                <input type="checkbox" class=" mr-2" name="situation" id="confirm" /><label for="confirm" class="mr-2">確定</label>
+                                <input type="checkbox" class=" mr-2" name="situation" id="ng" /><label for="ng" class="mr-2">NG</label>
+                                <input type="checkbox" class=" mr-2" name="situation" id="hoshou" /><label for="hoshou" class="mr-2">補償</label>
+                            </label>
+                        </div>
+
+                    </div>
+                    <div class="input-group-append" style="margin-left:auto; max-width: 500px;">
+                        <a class="btn btn-secondary btn-icon-split mr-2" onclick="onExportFileTrips('LoadOutput', '@Model.ViewTitle')" id="exportFile">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-file-export"></i>
+                            </span>
+                            <span class="text">出力</span>
+                        </a>
+                        <a class="btn btn-secondary btn-icon-split" onclick="onSearchClick('LoadOutput')">
+                            <span class="icon text-white-50">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <span class="text">表示</span>
+                        </a>
+                    </div>
+                </div>
+
             </div>
-        }
-        else
-        {
-            <div>
-                <p>@(string.IsNullOrEmpty(Model.Message) ? "確認してもよろしいでしょうか?" : Model.Message)</p>
-                <form asp-action="Confirm" method="post">
-                    <input type="hidden" asp-for="UserName" />
-                    <input type="hidden" asp-for="Message" />
-                    <button type="submit" class="btn btn-primary">確認</button>
-                </form>
-            </div>
-        }
+        </div>
     </div>
 </div>
+<div class="card shadow de-inspection masterInfo m-4">
+    <div class="card-body">
+        <span>表示結果</span>
+
+        <table class="table table-sm stripe hover nowrap datatable-normal table-center">
+            <thead>
+                <tr align="center">
+                    <th class="font-weight-bold">最終更新</th>
+                    <th class="font-weight-bold">就業日付</th>
+                    <th class="font-weight-bold">事業所名</th>
+                    <th class="font-weight-bold">利用者ID</th>
+                    <th class="font-weight-bold">派遣利用者</th>
+                    <th class="font-weight-bold">状況</th>
+                    <th class="font-weight-bold">状況選択</th>
+                    <th class="font-weight-bold">予約日時</th>
+                    <th class="font-weight-bold">エントリー日時</th>
+                    <th class="font-weight-bold">確定日時</th>
+                    <th class="font-weight-bold">NG日時</th>
+                    <th class="font-weight-bold">補償日時</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD</td>
+                    <td>XXXXXXXXXXXXXXXXX</td>
+                    <td>XXX</td>
+                    <td>XXXXXXX</td>
+                    <td>予約</td>
+                    <td>
+                        <input type="radio" class=" mr-2" name="situation0" id="preserve0" checked /><label for="preserve0" class="mr-2">予約</label>
+                        <input type="radio" class=" mr-2" name="situation0" id="entry0" /><label for="entry0" class="mr-2">エント</label>
+                        <input type="radio" class=" mr-2" name="situation0" id="confirm0" /><label for="confirm0" class="mr-2">確定</label>
+                        <input type="radio" class=" mr-2" name="situation0" id="ng0" /><label for="ng0" class="mr-2">NG</label>
+                        <input type="radio" class=" mr-2" name="situation0" id="hoshou0" /><label for="hoshou0" class="mr-2">補償</label>
+                    </td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD</td>
+                    <td>XXXXXXXXXXXXXXXXX</td>
+                    <td>XXX</td>
+                    <td>XXXXXXX</td>
+                    <td>エント</td>
+                    <td>
+                        <input type="radio" class=" mr-2" name="situation1" id="preserve1" /><label for="preserve0" class="mr-2">予約</label>
+                        <input type="radio" class=" mr-2" name="situation1" id="entry1" checked /><label for="entry0" class="mr-2">エント</label>
+                        <input type="radio" class=" mr-2" name="situation1" id="confirm1" /><label for="confirm0" class="mr-2">確定</label>
+                        <input type="radio" class=" mr-2" name="situation1" id="ng1" /><label for="ng0" class="mr-2">NG</label>
+                        <input type="radio" class=" mr-2" name="situation1" id="hoshou1" /><label for="hoshou0" class="mr-2">補償</label>
+                    </td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD</td>
+                    <td>XXXXXXXXXXXXXXXXX</td>
+                    <td>XXX</td>
+                    <td>XXXXXXX</td>
+                    <td>確定</td>
+                    <td>
+                        <input type="radio" class=" mr-2" name="situation2" id="preserve2" /><label for="preserve0" class="mr-2">予約</label>
+                        <input type="radio" class=" mr-2" name="situation2" id="entry2" /><label for="entry0" class="mr-2">エント</label>
+                        <input type="radio" class=" mr-2" name="situation2" id="confirm2" checked /><label for="confirm0" class="mr-2">確定</label>
+                        <input type="radio" class=" mr-2" name="situation2" id="ng2" /><label for="ng0" class="mr-2">NG</label>
+                        <input type="radio" class=" mr-2" name="situation2" id="hoshou2" /><label for="hoshou0" class="mr-2">補償</label>
+                    </td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD</td>
+                    <td>XXXXXXXXXXXXXXXXX</td>
+                    <td>XXX</td>
+                    <td>XXXXXXX</td>
+                    <td>NG</td>
+                    <td>
+                        <input type="radio" class=" mr-2" name="situation3" id="preserve3" /><label for="preserve0" class="mr-2">予約</label>
+                        <input type="radio" class=" mr-2" name="situation3" id="entry3" /><label for="entry0" class="mr-2">エント</label>
+                        <input type="radio" class=" mr-2" name="situation3" id="confirm3" /><label for="confirm0" class="mr-2">確定</label>
+                        <input type="radio" class=" mr-2" name="situation3" id="ng3" checked /><label for="ng0" class="mr-2">NG</label>
+                        <input type="radio" class=" mr-2" name="situation3" id="hoshou3" /><label for="hoshou0" class="mr-2">補償</label>
+                    </td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                </tr>
+                <tr style="background-color: #ADE0EE">
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD</td>
+                    <td>XXXXXXXXXXXXXXXXX</td>
+                    <td>XXX</td>
+                    <td>XXXXXXX</td>
+                    <td>確定</td>
+                    <td>
+                        <input type="radio" class=" mr-2" name="situation4" id="preserve4" /><label for="preserve0" class="mr-2">予約</label>
+                        <input type="radio" class=" mr-2" name="situation4" id="entry4" /><label for="entry0" class="mr-2">エント</label>
+                        <input type="radio" class=" mr-2" name="situation4" id="confirm4" checked /><label for="confirm0" class="mr-2">確定</label>
+                        <input type="radio" class=" mr-2" name="situation4" id="ng4" /><label for="ng0" class="mr-2">NG</label>
+                        <input type="radio" class=" mr-2" name="situation4" id="hoshou4" /><label for="hoshou0" class="mr-2">補償</label>
+                    </td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD</td>
+                    <td>XXXXXXXXXXXXXXXXX</td>
+                    <td>XXX</td>
+                    <td>XXXXXXX</td>
+                    <td>NG</td>
+                    <td>
+                        <input type="radio" class=" mr-2" name="situation5" id="preserve5" /><label for="preserve0" class="mr-2">予約</label>
+                        <input type="radio" class=" mr-2" name="situation5" id="entry5" /><label for="entry0" class="mr-2">エント</label>
+                        <input type="radio" class=" mr-2" name="situation5" id="confirm5" /><label for="confirm0" class="mr-2">確定</label>
+                        <input type="radio" class=" mr-2" name="situation5" id="ng5" checked /><label for="ng0" class="mr-2">NG</label>
+                        <input type="radio" class=" mr-2" name="situation5" id="hoshou5" /><label for="hoshou0" class="mr-2">補償</label>
+                    </td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                </tr>
+                <tr style="background-color:#ED1A3D">
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD</td>
+                    <td>XXXXXXXXXXXXXXXXX</td>
+                    <td>XXX</td>
+                    <td>XXXXXXX</td>
+                    <td>予約</td>
+                    <td>
+                        <input type="radio" class=" mr-2" name="situation6" id="preserve6" checked /><label for="preserve0" class="mr-2">予約</label>
+                        <input type="radio" class=" mr-2" name="situation6" id="entry6" /><label for="entry0" class="mr-2">エント</label>
+                        <input type="radio" class=" mr-2" name="situation6" id="confirm6" /><label for="confirm0" class="mr-2">確定</label>
+                        <input type="radio" class=" mr-2" name="situation6" id="ng6" /><label for="ng0" class="mr-2">NG</label>
+                        <input type="radio" class=" mr-2" name="situation6" id="hoshou6" /><label for="hoshou0" class="mr-2">補償</label>
+                    </td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD</td>
+                    <td>XXXXXXXXXXXXXXXXX</td>
+                    <td>XXX</td>
+                    <td>XXXXXXX</td>
+                    <td>補償</td>
+                    <td>
+                        <input type="radio" class=" mr-2" name="situation7" id="preserve7" /><label for="preserve0" class="mr-2">予約</label>
+                        <input type="radio" class=" mr-2" name="situation7" id="entry7" /><label for="entry0" class="mr-2">エント</label>
+                        <input type="radio" class=" mr-2" name="situation7" id="confirm7" /><label for="confirm0" class="mr-2">確定</label>
+                        <input type="radio" class=" mr-2" name="situation7" id="ng7" /><label for="ng0" class="mr-2">NG</label>
+                        <input type="radio" class=" mr-2" name="situation7" id="hoshou7" checked /><label for="hoshou0" class="mr-2">補償</label>
+                    </td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                </tr>
+                <tr>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD</td>
+                    <td>XXXXXXXXXXXXXXXXX</td>
+                    <td>XXX</td>
+                    <td>XXXXXXX</td>
+                    <td>エント</td>
+                    <td>
+                        <input type="radio" class=" mr-2" name="situation8" id="preserve8" /><label for="preserve0" class="mr-2">予約</label>
+                        <input type="radio" class=" mr-2" name="situation8" id="entry8" checked /><label for="entry0" class="mr-2">エント</label>
+                        <input type="radio" class=" mr-2" name="situation8" id="confirm8" /><label for="confirm0" class="mr-2">確定</label>
+                        <input type="radio" class=" mr-2" name="situation8" id="ng8" /><label for="ng0" class="mr-2">NG</label>
+                        <input type="radio" class=" mr-2" name="situation8" id="hoshou8" /><label for="hoshou0" class="mr-2">補償</label>
+                    </td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD</td>
+                    <td>XXXXXXXXXXXXXXXXX</td>
+                    <td>XXX</td>
+                    <td>XXXXXXX</td>
+                    <td>エント</td>
+                    <td>
+                        <input type="radio" class=" mr-2" name="situation9" id="preserve9" /><label for="preserve0" class="mr-2">予約</label>
+                        <input type="radio" class=" mr-2" name="situation9" id="entry9" checked /><label for="entry0" class="mr-2">エント</label>
+                        <input type="radio" class=" mr-2" name="situation9" id="confirm9" /><label for="confirm0" class="mr-2">確定</label>
+                        <input type="radio" class=" mr-2" name="situation9" id="ng9" /><label for="ng0" class="mr-2">NG</label>
+                        <input type="radio" class=" mr-2" name="situation9" id="hoshou9" /><label for="hoshou0" class="mr-2">補償</label>
+                    </td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>YYYY/MM/DD hh:mm</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="ml-4 mr-4 mb-4 d-flex">
+    <span>確定をチェックして登録してください。キャンセルする場合は確定を外して登録を押してください。</span>
+    <div style="margin-left:auto">
+        <a class="btn btn-primary btn-icon-split" onclick="onSearchClick('LoadOutput')">
+            <span class="text">登録</span>
+        </a>
+    </div>
+</div>
+
+
+<!--  Prefecture Modal-->
+<div class="modal fade" id="prefecture-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:55vw; width:100%;">
+        <div class="modal-content trip-record-modal" id="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-modal-label">都道府県選択</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex flex-wrap">
+                    <a class="btn btn-primary mr-2" data-toggle="modal" data-target="#detail-modal">長崎　</a>
+                    <a class="btn btn-primary mr-2">福岡　</a>
+                    <a class="btn btn-primary mr-2">山口　</a>
+                    <a class="btn btn-primary mr-2">島根　</a>
+                    <a class="btn btn-primary mr-2">鳥取　</a>
+                    <a class="btn btn-primary mr-2">京都　</a>
+                    <a class="btn btn-primary mr-2">石川　</a>
+                    <a class="btn btn-primary mr-2">富山　</a>
+                    <a class="btn btn-primary mr-2">新潟　</a>
+                    <a class="btn btn-primary mr-2">群馬　</a>
+                    <a class="btn btn-primary mr-2">秋田　</a>
+                </div>
+                <div class="d-flex flex-wrap mt-2">
+                    <a class="btn btn-primary mr-2">佐賀　</a>
+                    <a class="btn btn-primary mr-2">大分　</a>
+                    <a class="btn btn-primary mr-2">広島　</a>
+                    <a class="btn btn-primary mr-2">岡山　</a>
+                    <a class="btn btn-primary mr-2">兵庫　</a>
+                    <a class="btn btn-primary mr-2">滋賀　</a>
+                    <a class="btn btn-primary mr-2">福井　</a>
+                    <a class="btn btn-primary mr-2">長野　</a>
+                    <a class="btn btn-primary mr-2">埼玉　</a>
+                    <a class="btn btn-primary mr-2">栃木　</a>
+                    <a class="btn btn-primary mr-2">山形　</a>
+                    <a class="btn btn-primary mr-2">北海道</a>
+                </div>
+                <div class="d-flex flex-wrap mt-2">
+                    <a class="btn btn-primary mr-2">熊本　</a>
+                    <a class="btn btn-primary mr-2">宮崎　</a>
+                    <a class="btn btn-primary mr-2">愛媛　</a>
+                    <a class="btn btn-primary mr-2">香川　</a>
+                    <a class="btn btn-primary mr-2">大阪　</a>
+                    <a class="btn btn-primary mr-2">奈良　</a>
+                    <a class="btn btn-primary mr-2">岐阜　</a>
+                    <a class="btn btn-primary mr-2">山梨　</a>
+                    <a class="btn btn-primary mr-2">東京　</a>
+                    <a class="btn btn-primary mr-2">茨城　</a>
+                    <a class="btn btn-primary mr-2">福島　</a>
+                    <a class="btn btn-primary mr-2">青森　</a>
+                </div>
+                <div class="d-flex flex-wrap mt-2">
+                    <a class="btn btn-primary mr-2">沖縄　</a>
+                    <a class="btn btn-primary mr-2">鹿児島</a>
+                    <a class="btn btn-primary mr-2">高知　</a>
+                    <a class="btn btn-primary mr-2">徳島　</a>
+                    <a class="btn btn-primary mr-2">和歌山</a>
+                    <a class="btn btn-primary mr-2">三重　</a>
+                    <a class="btn btn-primary mr-2">愛知　</a>
+                    <a class="btn btn-primary mr-2">静岡　</a>
+                    <a class="btn btn-primary mr-2">神奈川</a>
+                    <a class="btn btn-primary mr-2">千葉　</a>
+                    <a class="btn btn-primary mr-2">宮城　</a>
+                    <a class="btn btn-primary mr-2">岩手　</a>
+                </div>
+                <div class="d-flex mt-3">
+                    <span>選択した事業所：XXXXXXXX, XXXXXXXXX, XXXX</span>
+                    <a class="btn btn-secondary" style="margin-left:auto">登録</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  Detail Modal-->
+<div class="modal fade" id="detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content trip-record-modal" id="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detail-modal-label">事業所選択</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label class="checkbox-item">
+                    <input type="checkbox" />XXXXXXX
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" />XXXXXXX
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" />XXXXXXX
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" />XXXXXXX
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" />XXXXXXX
+                </label>
+
+                <div class="d-flex mt-3">
+                    <button class="btn btn-secondary" style="margin-left:auto" type="button" data-dismiss="modal" aria-label="Close">確定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    let userName = "";
+    // 画面ロード時
+    $(document).ready(function () {
+        model = @Html.Raw(Json.Serialize(Model));
+        userName = model.userName;
+        tableLength = model.tripRecordList.length + 1;
+        var today = new Date();
+        var oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        $('#endOfPeriod').val(GetDayString(today));
+        $('#startOfPeriod').val(GetDayString(oneWeekAgo));
+        addDepos(model);
+        depoCheckDisplay(model);
+        tableDisplay('LoadOutput');
+    });
+
+
+    // チェックボックス押下時
+    $('input[name="searchCondition"]').change(function () {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            tableDisplay('LoadOutput');
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    });
+
+
+    // 検索ボタン押下時
+    function onSearchClick(page) {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            // ロード中表示
+            document.querySelector("#loading").style.display = "inline-block";
+            tableDisplay(page);
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+    // 便実績テーブル表示
+    function tableDisplay(page) {
+        // チェックボックスの入力情報取得
+        var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+        var hasTripName = $('#hasTripName')[0].checked;
+        var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
+
+
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // デポ情報取得
+        var checkedDepos = getCheckedDepos();
+
+        // テーブル表示用データ作成
+        let data = { startOfPeriod: startOfPeriod,
+            endOfPeriod: endOfPeriod,
+            isOnlyHasAmountDefference: isOnlyHasAmountDefference,
+            hasTripName: hasTripName,
+            hasIdentifyNumber: hasIdentifyNumber,
+            checkedDepos: checkedDepos
+        };
+
+        tableDisplayCommon(page, data);
+    }
+
+    // Excel出力
+    async function onExportFileTrips(page, gamenName) {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+
+            // チェックボックスの入力情報取得
+            var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+            var hasTripName = $('#hasTripName')[0].checked;
+            var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
+
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
+
+            // フォーム情報取得
+            let data = {
+                "gamenName": gamenName,
+                "startofPeriod": startOfPeriod,
+                "endOfPeriod": endOfPeriod,
+                "isOnlyHasAmountDefference": isOnlyHasAmountDefference,
+                hasTripName: hasTripName,
+                hasIdentifyNumber: hasIdentifyNumber,
+                checkedDepos: checkedDepos
+            };
+
+            // Excel出力共通処理
+            onExportFileTripsCommon(page, data);
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+
+    // 画像一括出力ボタン押下
+    function onExportAllImages(page) {
+        event.preventDefault();
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            // チェックボックスの入力情報取得
+            var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+            var hasTripName = $('#hasTripName')[0].checked;
+            var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
+
+            let data = {
+                download: "download",
+                startOfPeriod: startOfPeriod,
+                endOfPeriod: endOfPeriod,
+                isOnlyHasAmountDefference: isOnlyHasAmountDefference,
+                hasTripName: hasTripName,
+                hasIdentifyNumber: hasIdentifyNumber,
+                checkedDepos: checkedDepos
+            };
+
+            onExportAllImagesCommon(page, data);
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        pushAllCheckBox();
+    });
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            pushDepoCheckBox();
+        });
+    })
+
+    // 画面表示時にログインユーザーのメインデポにチェックを入れる
+    function depoCheckDisplay(model) {
+        var mainDepoID = model.mainDepoID;
+        if (mainDepoID == 0)
+            return;
+        var depos = $('input[name=depos]');
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].id == "depo" + mainDepoID) {
+                depos[i].checked = true;
+            }
+        }
+    }
+
+    // 選択されたデポのIDリストを取得する
+    function getCheckedDepos() {
+        var depos = $('input[name=depos]');
+        var checkedDepos = [];
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].checked) {
+                checkedDepos.push(depos[i].value);
+            }
+        }
+        return checkedDepos;
+    }
+</script>

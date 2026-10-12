@@ -13,11 +13,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - AI荷量把握</title>
+    <title>@ViewData["Title"] - Shift Pick (湘南プラス)</title>
 
     <!-- ▼ファビコン -->
-    <link rel="shortcut icon" type="image/png" href="~/images\webicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="~/images\webicon.png">
+    <link rel="icon" type="image/jpeg" href="~/images/ShounanPlus_Shift_Pick_AppIcon.jpg" asp-append-version="true">
+    <link rel="apple-touch-icon" href="~/images/ShounanPlus_Shift_Pick_AppIcon.jpg" asp-append-version="true">
 
     <!-- ▼CSSファイル読み込み -->
     <!--Bootstrap admin template-->
@@ -61,10 +61,10 @@
 <body class="@bodyClass" id="body">
     <nav class="sb-topnav navbar navbar-expand navbar-dark @wrapperClass">
         <!-- Navbar Brand-->
-        <a id="home-title" class="navbar-brand ps-3 navbar-logo" asp-controller="Top" asp-action="Index">
-            <img class="login-img card-img-top" src="~/images/webicon.png" /> 
+        <a id="home-title" class="navbar-brand ps-3 navbar-logo" asp-controller="OuboConfirmation" asp-action="Index">
+            <img class="login-img card-img-top" src="~/images/ShounanPlus_Shift_Pick_AppIcon.jpg" asp-append-version="true" />
             @{
-                var navBarText = "AI荷量把握";
+                var navBarText = "Shift Pick (湘南プラス)";
 #if DEBUG
                 navBarText = "テスト環境";
 #endif

@@ -2,7 +2,7 @@ using System;
 
 namespace shift_pick_management.Models
 {
-    public class StreamHistoryModel
+    public class StreamHistoryModel : CommonModel
     {
         public int HistoryID { get; set; }
         public string StreamName { get; set; } = string.Empty;

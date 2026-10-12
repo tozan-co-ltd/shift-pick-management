@@ -2,7 +2,7 @@ using System;
 
 namespace shift_pick_management.Models
 {
-    public class OuboConfirmationModel
+    public class OuboConfirmationModel : CommonModel
     {
         public string UserName { get; set; } = string.Empty;
         public bool Confirmed { get; set; }

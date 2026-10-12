@@ -2,7 +2,7 @@ using System;
 
 namespace shift_pick_management.Models
 {
-    public class M_PrefectureModel
+    public class M_PrefectureModel : CommonModel
     {
         public int PrefectureID { get; set; }
         public string PrefectureName { get; set; } = string.Empty;

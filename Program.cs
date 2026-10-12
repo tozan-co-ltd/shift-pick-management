@@ -89,6 +89,6 @@ app.UseMvc();
 // 規則ルーティング
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Top}/{action=Index}/{id?}");
+    pattern: "{controller=OuboConfirmation}/{action=Index}/{id?}");
 
 app.Run();

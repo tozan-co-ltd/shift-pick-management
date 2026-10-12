@@ -1,4 +1,4 @@
-﻿@model shift_pick_management.Models.LoginModel
+@model shift_pick_management.Models.LoginModel
 @{
     ViewData["Title"] = "ログイン";
     Layout = "_LayoutLogin";
@@ -6,7 +6,7 @@
 
 <style>
     body {
-        background-color: #F9C8E0;
+        background-color: #E9F1FA;
     }
 
     .system-logo img {
@@ -73,33 +73,33 @@
         position: relative;
     }
 
-    .input-icon-with input {
-        margin: 8px 0;
-        padding: 0.3em;
-        transition: 0.3s;
-        outline: none;
+        .input-icon-with input {
+            margin: 8px 0;
+            padding: 0.3em;
+            transition: 0.3s;
+            outline: none;
         }
 
-    .input-icon-with input:focus {
-        border-color: var(--base-color-main);
-    }
+            .input-icon-with input:focus {
+                border-color: var(--base-color-main);
+            }
 
-    .input-icon-with input {
-        padding-left: 40px;
-    }
+        .input-icon-with input {
+            padding-left: 40px;
+        }
 
-    .input-icon-with span {
-        position: absolute;
-        top: 8px;
-        left: 0;
-        padding: 9px 8px;
-        transition: 0.3s;
-        color: #aaaaaa;
-    }
+        .input-icon-with span {
+            position: absolute;
+            top: 8px;
+            left: 0;
+            padding: 9px 8px;
+            transition: 0.3s;
+            color: #aaaaaa;
+        }
 
-    .input-icon-with input:focus + span {
-        color: var(--base-color-main);
-    }
+        .input-icon-with input:focus + span {
+            color: var(--base-color-main);
+        }
 
     .login-footer {
         background-color: white;
@@ -133,10 +133,10 @@
     <div class="card text-center col-10 login-area">
         <div class="card-body">
             <div class="system-logo">
-                <img class="login-img card-img-top" src="~/images/webicon.png" />
+                <img class="login-img card-img-top" src="~/images/ShounanPlus_Shift_Pick_AppIcon.jpg" />
             </div>
             <div class="system-title">
-                <span>AI荷量把握</span>
+                <span>Shift Pick 管理者用</span>
             </div>
             <div class="system-version">
                 <span>Ver. @Model.SystemVersion</span>

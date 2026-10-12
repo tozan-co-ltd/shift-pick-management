@@ -2,7 +2,7 @@ using System;
 
 namespace shift_pick_management.Models
 {
-    public class NotificationStreamModel
+    public class NotificationStreamModel : CommonModel
     {
         public int NotificationID { get; set; }
         public string Title { get; set; } = string.Empty;

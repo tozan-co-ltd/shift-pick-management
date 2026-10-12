@@ -1,13 +1,14 @@
-﻿@using shift_pick_management.Commons;
+@using shift_pick_management.Commons;
 @model shift_pick_management.Models.M_UserListViewModel;
 @{
     Model.GetBaseView(User, ViewContext);
-    ViewData["Title"] = Model.CategoryTitle + " - " + Model.ViewTitle;
+    ViewData["Title"] = "利用者マスタ登録";
 }
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
         @ViewData["Title"]
     </div>
+
     <div class="card-body">
 
         <div class="form-group col-sm-12 pl-3">
@@ -18,102 +19,301 @@
                 <span class="mt-1 text-danger">@ViewData["ErrorMessage"]</span>
             }
         </div>
-
-        <div class="row mb-3">
-            <div class="col-lg-10">
-                <div class="card border-left-custom">
-                    <div class="card-body">
-                        <ul class="mb-0">
-                            <li>メインデポに設定されたデポが各画面のデフォルト値として登録されます。</li>
-                            <li>管理者権限が「管理者」のユーザーはマスターと荷量実績の荷量の相違を登録・編集できます。</li>
-                        </ul>
+        <div class="col-16 sp-tablet mb-3">
+            <div class="sp-cs-dpl">
+                <div class="d-flex justify-content-start  mb-3 unset-pdl">
+                    <div class="d-flex nowrap mr-5 align-items-center">
+                        <span class="warehouse-name-drs span-paragraph">利用者ID</span>
+                        <input type="text" class="form-control input-form">
+                    </div>
+                    <div class="d-flex nowrap align-items-center">
+                        <span class="warehouse-name-drs span-paragraph">アップロード</span>
+                        <input class="form-control" type="file" required id="fileBox" multiple name="files">
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="mg-bot-20">
-            <div class="col-12 d-flex xs-block justify-content-start align-items-center p-0">
-                <div class="input-group-append mr-2">
-                    <a class="btn btn-primary btn-icon-split btn-register" asp-controller="M_User" asp-action="Register">
-                        <span class="icon text-white-50">
-                            <i class="fas fa-plus"></i>
-                        </span>
-                        <span class="text">新規作成</span>
-                    </a>
+            <div class="sp-cs-dpl">
+                <div class="d-flex justify-content-start align-items-center mb-3 unset-pdl">
+                    <div class="d-flex nowrap mr-5 align-items-center">
+                        <span class="warehouse-name-drs span-paragraph">利用者名</span>
+                        <input type="text" class="form-control input-form">
+                    </div>
+                    <div class="d-flex nowrap align-items-center">
+                        <span class="warehouse-name-drs"></span>
+                        <input type="radio" class=" mr-2" name="torikomi" id="parts" checked /><label for="parts" class="mr-2">部分取込</label>
+                        <input type="radio" class=" mr-2" name="torikomi" id="torikomiAll" /><label for="torikomiAll" class="mr-2">全体取込</label>
+                    </div>
                 </div>
-                <div class="input-group-append">
-                    <a href="#" class="btn btn-info btn-icon-split" onclick="onExportFile('M_User', '@Model.ViewTitle')">
+            </div>
+            <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl">
+                <div class="d-flex justify-content-start align-items-center unset-pdl">
+                    <span class="warehouse-name-drs span-paragraph">状況</span>
+                    <div>
+                        <label class="mr-5">
+                            <input type="checkbox" class=" mr-2" name="situation" id="all" /><label for="all" class="mr-2">すべて</label>
+                            <input type="checkbox" class=" mr-2" name="situation" id="preserve" /><label for="preserve" class="mr-2">利用中</label>
+                            <input type="checkbox" class=" mr-2" name="situation" id="preserve" /><label for="preserve" class="mr-2">未ログイン</label>
+                            <input type="checkbox" class=" mr-2" name="situation" id="entry" /><label for="entry" class="mr-2">停止</label>
+                        </label>
+                    </div>
+
+                </div>
+                <div class="input-group-append" style="margin-left:auto; ">
+                    <a class="btn btn-secondary btn-icon-split mr-2" data-toggle="modal" data-target="#edit-modal" id="exportFile">
                         <span class="icon text-white-50">
-                            <i class="fas fa-file-export"></i>
+                            <i class="fa-solid fa-square-plus"></i>
                         </span>
-                        <span class="text">Excel出力</span>
+                        <span class="text">新規</span>
+                    </a>
+                    <a class="btn btn-secondary btn-icon-split">
+                        <span class="icon text-white-50">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <span class="text">表示</span>
                     </a>
                 </div>
             </div>
         </div>
+
+    </div>
+</div>
+<div class="card shadow de-inspection masterInfo m-4">
+    <div class="col-16 d-flex justify-content-start align-items-center unset-pdl sp-cs-dpl mt-4 ml-4 mb-0">
+        <div class="input-group-append align-items-center">
+            <input type="checkbox" class="mr-2" onclick="pushAllCheck()" id="allCheck">
+            <label for="allCheck" class="text">すべての利用者</label>
+        </div>
+    </div>
+    <div class="card-body">
+
         <div class="mt-3">
-            <table class="table table-sm stripe hover nowrap datatable-normal table-center">
+            <table class="table table-sm stripe hover nowrap datatable-normal table-left">
                 <thead>
                     <tr align="center">
-                        <th width="40"></th>
-                        <th class="font-weight-bold">ユーザーID</th>
-                        <th class="font-weight-bold">AD名</th>
-                        <th class="font-weight-bold">メインデポ</th>
-                        <th class="font-weight-bold">管理権限</th>
-                        <th class="font-weight-bold">メール受け取り要否</th>
-                        <th class="font-weight-bold">メールアドレス</th>
-                        <th class="font-weight-bold">更新日時</th>
-                        <th class="font-weight-bold">更新者</th>
+                        <th>メール<br />対象</th>
+                        <th>編集</th>
+                        <th class="font-weight-bold">利用者ID</th>
+                        <th class="font-weight-bold">利用者名</th>
+                        <th class="font-weight-bold">都道府県</th>
+                        <th class="font-weight-bold">住所</th>
+                        <th class="font-weight-bold">電話番号</th>
+                        <th class="font-weight-bold">性別</th>
+                        <th class="font-weight-bold">入社日</th>
+                        <th class="font-weight-bold">ログインID(メールアドレス)</th>
+                        <th class="font-weight-bold">希望事務所</th>
+                        <th class="font-weight-bold">最終ログイン日</th>
+                        <th class="font-weight-bold">停止日</th>
+                        <th class="font-weight-bold">登録日付</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if (@Model.M_UserList != null)
-                    {
-                        @foreach (var item in @Model.M_UserList)
-                        {
-                            <tr>
-                                <td>
-                                    <a class="btn btn-success btn-icon-split ml-1 mr-1"
-                                    onclick="OnEditClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#edit-modal">
-                                        <i class="fa-solid fa-pen"></i>
-                                    </a>
-                                    <button class="btn btn-danger btn-icon-split"
-                                    onclick="OnDeleteClick('@item.UserID')" data-id="@item.UserID" data-toggle="modal" data-target="#delete-modal">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </td>
-                                <td>@item.UserID</td>
-                                <td>@item.ADName</td>
-                                <td>@item.DepoName</td>
-                                @if(item.AuthorizedKubun == 0)
-                                {
-                                    <td>なし</td>
-                                }
-                                else if(item.AuthorizedKubun == 1)
-                                {
-                                    <td>管理者</td>
-                                }
-                                else if(item.AuthorizedKubun == 2)
-                                {
-                                    <td>システム管理者</td>
-                                }
-                                @if (item.IsRequiredMail)
-                                {
-                                    <td>受け取る</td>
-                                }
-                                else
-                                {
-                                    <td>受け取らない</td>
-                                }
-                                <td>@item.MailAddress</td>
-                                <td>@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
-                                <td>@item.UpdatedBy</td>
-                            </tr>
-                        }
-                    }
+                    <tr>
+                        <td class="cell-center"><input type="checkbox" name="mailTarget" id="target1" /></td>
+                        <td>
+                            <a class="btn btn-secondary" id="exportFile" data-toggle="modal" data-target="#edit-modal">
+                                <span class="text">選択</span>
+                            </a>
+                        </td>
+                        <td>XXXXXXX</td>
+                        <td>XXXXXXXXXXXXXXXXX</td>
+                        <td>XXXX</td>
+                        <td>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</td>
+                        <td>XXX-XXXX-XXXX</td>
+                        <td class="cell-center">男</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>XXXX@@XXXX.XX.XX</td>
+                        <td>XXXX, XXXX, XXXXX</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                    </tr>
+                    <tr>
+                        <td class="cell-center"><input type="checkbox" name="mailTarget" id="target2" /></td>
+                        <td>
+                            <a class="btn btn-secondary" id="exportFile" data-toggle="modal" data-target="#edit-modal">
+                                <span class="text">選択</span>
+                            </a>
+                        </td>
+                        <td>XXXXXXX</td>
+                        <td>XXXXXXXXXXXXXXXXX</td>
+                        <td>XXXX</td>
+                        <td>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</td>
+                        <td>XXX-XXXX-XXXX</td>
+                        <td class="cell-center">男</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>XXXX@@XXXX.XX.XX</td>
+                        <td>XXXX</td>
+                        <td>未ログイン</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                    </tr>
+                    <tr>
+                        <td class="cell-center"><input type="checkbox" name="mailTarget" id="target3" /></td>
+                        <td>
+                            <a class="btn btn-secondary" id="exportFile" data-toggle="modal" data-target="#edit-modal">
+                                <span class="text">選択</span>
+                            </a>
+                        </td>
+                        <td>XXXXXXX</td>
+                        <td>XXXXXXXXXXXXXXXXX</td>
+                        <td>XXXX</td>
+                        <td>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</td>
+                        <td>XXX-XXXX-XXXX</td>
+                        <td class="cell-center">男</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>XXXX@@XXXX.XX.XX</td>
+                        <td>XXXXX</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                    </tr>
+                    <tr>
+                        <td class="cell-center"><input type="checkbox" name="mailTarget" id="target4" /></td>
+                        <td>
+                            <a class="btn btn-secondary" id="exportFile" data-toggle="modal" data-target="#edit-modal">
+                                <span class="text">選択</span>
+                            </a>
+                        </td>
+                        <td>XXXXXXX</td>
+                        <td>XXXXXXXXXXXXXXXXX</td>
+                        <td>XXXX</td>
+                        <td>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</td>
+                        <td>XXX-XXXX-XXXX</td>
+                        <td class="cell-center">女</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>XXXX@@XXXX.XX.XX</td>
+                        <td>XXXXX, XXXX</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                    </tr>
+                    <tr>
+                        <td class="cell-center"><input type="checkbox" name="mailTarget" id="target5" /></td>
+                        <td>
+                            <a class="btn btn-secondary" id="exportFile" data-toggle="modal" data-target="#edit-modal">
+                                <span class="text">選択</span>
+                            </a>
+                        </td>
+                        <td>XXXXXXX</td>
+                        <td>XXXXXXXXXXXXXXXXX</td>
+                        <td>XXXX</td>
+                        <td>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</td>
+                        <td>XXX-XXXX-XXXX</td>
+                        <td class="cell-center">女</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>XXXX@@XXXX.XX.XX</td>
+                        <td>XXXXXX</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                    </tr>
+                    <tr>
+                        <td class="cell-center"><input type="checkbox" name="mailTarget" id="target6" /></td>
+                        <td>
+                            <a class="btn btn-secondary" id="exportFile" data-toggle="modal" data-target="#edit-modal">
+                                <span class="text">選択</span>
+                            </a>
+                        </td>
+                        <td>XXXXXXX</td>
+                        <td>XXXXXXXXXXXXXXXXX</td>
+                        <td>XXXX</td>
+                        <td>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</td>
+                        <td>XXX-XXXX-XXXX</td>
+                        <td class="cell-center">男</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>XXXX@@XXXX.XX.XX</td>
+                        <td>XXXX, XXXX, XXXXX</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                    </tr>
+                    <tr>
+                        <td class="cell-center"><input type="checkbox" name="mailTarget" id="target7" /></td>
+                        <td>
+                            <a class="btn btn-secondary" id="exportFile" data-toggle="modal" data-target="#edit-modal">
+                                <span class="text">選択</span>
+                            </a>
+                        </td>
+                        <td>XXXXXXX</td>
+                        <td>XXXXXXXXXXXXXXXXX</td>
+                        <td>XXXX</td>
+                        <td>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</td>
+                        <td>XXX-XXXX-XXXX</td>
+                        <td class="cell-center">男</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>XXXX@@XXXX.XX.XX</td>
+                        <td>XXXX</td>
+                        <td>未ログイン</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                    </tr>
+                    <tr>
+                        <td class="cell-center"><input type="checkbox" name="mailTarget" id="target8" /></td>
+                        <td>
+                            <a class="btn btn-secondary" id="exportFile" data-toggle="modal" data-target="#edit-modal">
+                                <span class="text">選択</span>
+                            </a>
+                        </td>
+                        <td>XXXXXXX</td>
+                        <td>XXXXXXXXXXXXXXXXX</td>
+                        <td>XXXX</td>
+                        <td>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</td>
+                        <td>XXX-XXXX-XXXX</td>
+                        <td class="cell-center">男</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>XXXX@@XXXX.XX.XX</td>
+                        <td>XXXXX</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                    </tr>
+                    <tr>
+                        <td class="cell-center"><input type="checkbox" name="mailTarget" id="target9" /></td>
+                        <td>
+                            <a class="btn btn-secondary" id="exportFile" data-toggle="modal" data-target="#edit-modal">
+                                <span class="text">選択</span>
+                            </a>
+                        </td>
+                        <td>XXXXXXX</td>
+                        <td>XXXXXXXXXXXXXXXXX</td>
+                        <td>XXXX</td>
+                        <td>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</td>
+                        <td>XXX-XXXX-XXXX</td>
+                        <td class="cell-center">女</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>XXXX@@XXXX.XX.XX</td>
+                        <td>XXXXX, XXXX</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                    </tr>
+                    <tr>
+                        <td class="cell-center"><input type="checkbox" name="mailTarget" id="target10" /></td>
+                        <td>
+                            <a class="btn btn-secondary" id="exportFile" data-toggle="modal" data-target="#edit-modal">
+                                <span class="text">選択</span>
+                            </a>
+                        </td>
+                        <td>XXXXXXX</td>
+                        <td>XXXXXXXXXXXXXXXXX</td>
+                        <td>XXXX</td>
+                        <td>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</td>
+                        <td>XXX-XXXX-XXXX</td>
+                        <td class="cell-center">女</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>XXXX@@XXXX.XX.XX</td>
+                        <td>XXXXXX</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                        <td>YYYY/MM/DD</td>
+                    </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="mt-3" style="margin:auto;">
+            <a class="btn btn-secondary" id="exportFile" data-toggle="modal" data-target="#mail-modal">
+                <span class="text">メール送信</span>
+            </a>
         </div>
     </div>
 </div>
@@ -133,65 +333,86 @@
                     <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
-                    <form class="col-md-12" id="mUserForm">
+                    <form class="col-md-12" id="mTripForm">
                         <div class="col-14 input-group div-input-group">
-                            <div class="col-14 input-group div-input-group">
-                                <div class="col-12 col-sm-4 col-md-3 column-1st">
-                                    <label>@Html.DisplayName("UserID")</label>
-                                </div>
-                                <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                    <input class="form-control" type="text" asp-for="UserID" autocomplete="off" readonly id="UserID">
-                                </div>
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>利用者ID</label>
                             </div>
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
-                                <label>@Html.DisplayName("ADName")<span style="color:red">*</span></label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input class="form-control" type="text" asp-for="ADName" autocomplete="off" value="" required id="ADName">
-                                <span class="text-danger w-100" asp-validation-for="ADName"></span>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <input class="form-control" type="text" autocomplete="off" value="" required>
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
-                                <label>@Html.DisplayName("DepoID")<span style="color:red">*</span></label>
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>パスワード</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <select class="form-select" name="DepoID" asp-for="DepoID" asp-items="@Model.MDepoList" required id="DepoID"></select>
-                                <span class="text-danger w-100" asp-validation-for="DepoID"></span>
-                            </div>
-                        </div>
-                        <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
-                                <label>@Html.DisplayName("AuthorizedKubun")<span style="color:red">*</span></label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <select class="form-select" name="AuthorizedKubun" asp-for="AuthorizedKubun" required id="AuthorizedKubun">
-                                    <option value="" selected disabled id="firstSelect">選択してください</option>
-                                    <option value="0">一般</option>
-                                    <option value="1">管理者</option>
-                                    <option value="2">システム管理者</option>
-                                </select>
-                                <span class="text-danger w-100" asp-validation-for="AuthorizedKubun"></span>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <input class="form-control" type="text" autocomplete="off" value="" required>
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
-                                <label>@Html.DisplayName("IsRequiredMail")<span style="color:red">*</span></label>
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>利用者名</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input type="radio" class="mr-2" asp-for="IsRequiredMail" autocomplete="off" value="true" name="IsRequiredMail" id="isRequiredMail">
-                                <label for="isRequiredMail">受け取る</label>
-                                <input type="radio" class="mr-2 ml-3" asp-for="IsRequiredMail" autocomplete="off" value="false" name="IsRequiredMail" id="isNotRequiredMail" checked>
-                                <label for="isNotRequiredMail">受け取らない</label>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <input class="form-control" type="text" autocomplete="off" value="" required>
                             </div>
                         </div>
                         <div class="col-14 input-group div-input-group">
-                            <div class="col-12 col-sm-4 col-md-3 column-1st">
-                                <label>@Html.DisplayName("MailAddress")</label>
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>住所</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-9 column-2nd">
-                                <input class="form-control" type="text" asp-for="MailAddress" autocomplete="off" value="" id="MailAddress">
-                                <span class="text-danger w-100" asp-validation-for="MailAddress"></span>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <textarea class="form-control" type="text" autocomplete="off" value="" required></textarea>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>電話番号</label>
+                            </div>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <input class="form-control" type="text" autocomplete="off" value="" required>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>利用者名</label>
+                            </div>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <input class="form-control" type="text" autocomplete="off" value="" required>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>性別</label>
+                            </div>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <input type="radio" name="sex" id="man" required><label for="man">男</label>
+                                <input type="radio" name="sex" id="woman" required /><label for="woman">女</label>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl ">
+                                <label>入社日</label>
+                            </div>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <input class="form-control pickerDate " type="text" autocomplete="off" value="" required>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>ログインID</label><br /><label style="font-size:smaller">(メールアドレス)</label>
+                            </div>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <input class="form-control" type="text" autocomplete="off" value="" required>
+                            </div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>利用停止</label>
+                            </div>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <input type="checkbox" autocomplete="off" value="" required>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
@@ -210,213 +431,260 @@
     </div>
 </div>
 
-<!--  Delete Modal-->
-<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<!--  Mail Modal-->
+<div class="modal fade" id="mail-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 40vw; width:100%" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="delete-modal-label">削除</h5>
+                <h5 class="modal-title" id="edit-modal-label">編集</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <div class="modal-body unset-pd">
+            <div class="modal-body">
                 <div class="col-12 col-md-12">
-                    <p id="delete-modal-error-message" class="mt-1 text-danger"></p>
+                    <p id="edit-modal-error-message" class="mt-1 text-danger"></p>
                 </div>
                 <div class="d-flex justify-content-center">
-                    <div class="col-12 col-md-12">
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
-                                <label>ユーザーID</label>
+                    <form class="col-md-12" id="mTripForm">
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>配信日時</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteUserID" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
-                                <label>AD名</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteADName" type="text" disabled>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <input class="form-control" type="text" autocomplete="off" value="" required>
                             </div>
                         </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
-                                <label>メインデポ</label>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>配信対象</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteDepoName" type="text" disabled>
+                            <div class="col-12  col-md-8 column-2nd">XXXXX, XXXXXX, XXXXXX</div>
+                        </div>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>通知タイトル</label>
+                            </div>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <select class="form-control" autocomplete="off" value="" required>
+                                    <option selected>選択してください</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
-                                <label>管理権限</label>
+                        <div class="col-14 input-group div-input-group">
+                            <div class="col-12 col-md-4 column-1st label-input-model-pl">
+                                <label>通知内容</label>
                             </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteAuthorizedKubun" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
-                                <label>メール受け取り要否</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteIsRequiredMail" type="text" disabled>
-                            </div>
-                        </div>
-                        <div class="col-12 d-flex flex-wrap">
-                            <div class="col-12 col-sm-4 col-md-4">
-                                <label>メールアドレス</label>
-                            </div>
-                            <div class="col-12 col-sm-8 col-md-8 mb-2">
-                                <input class="form-control" id="deleteMailAddress" type="text" disabled>
+                            <div class="col-12  col-md-8 column-2nd">
+                                <textarea class="form-control" type="text" autocomplete="off" value="" required style="height: 50vh"></textarea>
                             </div>
                         </div>
                         <div class="col-12 d-flex flex-wrap justify-content-center p-2 p-md-3">
                             <button class="btn btn-secondary btn-icon-split mb-2 mr-0 mr-sm-5" data-dismiss="modal" aria-label="Close">
                                 <span class="text">キャンセル</span>
                             </button>
-                            <button class="btn btn-danger btn-icon-split mb-2" onclick="OnExecuteDelete()">
-                                <span class="text" style="min-width:84px">削除</span>
+                            <button class="btn btn-success btn-icon-split mb-2" onclick="OnExecuteEdit()">
+                                <span class="text" style="min-width:84px">更新</span>
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
 
             </div>
         </div>
     </div>
 </div>
-
 <script type="text/javascript">
-    // ロード時の処理
+    let userName = "";
+    // 画面ロード時
     $(document).ready(function () {
-        // M_UserModel取得
-        var userModel = @Html.Raw(Json.Serialize(Model));
-    })
+        model = @Html.Raw(Json.Serialize(Model));
+        userName = model.userName;
+        tableLength = model.tripRecordList.length + 1;
+        var today = new Date();
+        var oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        $('#endOfPeriod').val(GetDayString(today));
+        $('#startOfPeriod').val(GetDayString(oneWeekAgo));
+        addDepos(model);
+        depoCheckDisplay(model);
+        tableDisplay('LoadOutput');
+    });
 
-    // 編集ボタン押下
-    function OnEditClick(userID) {
+
+    // チェックボックス押下時
+    $('input[name="searchCondition"]').change(function () {
         DeleteErrorMessages();
-
-        // M_UserModel取得
-        var userModel = @Html.Raw(Json.Serialize(Model));
-        var radio = document.getElementsByName("AuthorizedKubun");
-        userModel.m_UserList.forEach(function (item) {
-            if (item.userID == userID) {
-                $("#UserID").val(item.userID);
-                $("#ADName").val(item.adName);
-                $("#DepoID").val(item.depoID);
-                $("#AuthorizedKubun").val(item.authorizedKubun);
-                IsRequiredMailCheck(item.isRequiredMail);
-                $("#MailAddress").val(item.mailAddress);
-            }
-        });
-    }
-
-    // // 現在の管理区分にチェックを入れる
-    // function AuthorizedKubunCheck(authorizedKubun) {
-    //     document.getElementsByName("AuthorizedKubun").forEach(function (item) {
-    //         if (item.value == authorizedKubun)
-    //             item.checked = true;
-    //     });
-    // }
-
-    // 現在のメール受け取り要否をチェックボックスに反映する
-    function IsRequiredMailCheck(isRequired) {
-        if (isRequired) {
-            document.getElementById("isRequiredMail").checked = true;
+        if (isWithin90Days()) {
+            tableDisplay('LoadOutput');
         }
         else {
-            document.getElementById("isNotRequiredMail").checked = true;
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
         }
-    
+    });
+
+
+    // 検索ボタン押下時
+    function onSearchClick(page) {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+            // ロード中表示
+            document.querySelector("#loading").style.display = "inline-block";
+            tableDisplay(page);
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
     }
 
-    // 更新
-    function OnExecuteEdit() {
-        $('#mUserForm').submit(function (event) {
-            DeleteErrorMessages();
+    // 便実績テーブル表示
+    function tableDisplay(page) {
+        // チェックボックスの入力情報取得
+        var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+        var hasTripName = $('#hasTripName')[0].checked;
+        var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
 
-            // ページの更新を禁止する
-            event.preventDefault();
 
-            // 送信イベントが他のハンドラーに伝播するのを防ぐ
-            event.stopImmediatePropagation();
+        // 期間の開始、終了日付の取得
+        var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+        var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+        // デポ情報取得
+        var checkedDepos = getCheckedDepos();
+
+        // テーブル表示用データ作成
+        let data = { startOfPeriod: startOfPeriod,
+            endOfPeriod: endOfPeriod,
+            isOnlyHasAmountDefference: isOnlyHasAmountDefference,
+            hasTripName: hasTripName,
+            hasIdentifyNumber: hasIdentifyNumber,
+            checkedDepos: checkedDepos
+        };
+
+        tableDisplayCommon(page, data);
+    }
+
+    // Excel出力
+    async function onExportFileTrips(page, gamenName) {
+        DeleteErrorMessages();
+        if (isWithin90Days()) {
+
+            // チェックボックスの入力情報取得
+            var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+            var hasTripName = $('#hasTripName')[0].checked;
+            var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
+
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
+
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
 
             // フォーム情報取得
-            let url = window.location.origin + '@Url.Action("Edit", "M_User")';
-            let method = 'POST';
-            let formId = 'mUserForm';
-            let data = $('#' + formId).serializeArray();
+            let data = {
+                "gamenName": gamenName,
+                "startofPeriod": startOfPeriod,
+                "endOfPeriod": endOfPeriod,
+                "isOnlyHasAmountDefference": isOnlyHasAmountDefference,
+                hasTripName: hasTripName,
+                hasIdentifyNumber: hasIdentifyNumber,
+                checkedDepos: checkedDepos
+            };
 
-            // Ajax call
-            $.ajax({
-                url: url,
-                method: method,
-                data: data
-            }).done(function (response) {
-                $('#edit-modal').hide();
-                // 完了モーダル表示
-                AlertMessage('', '完了', '登録が完了しました。', null, null);
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                var errorMessage = jqXHR.responseJSON.errorMessage;
-                $("#edit-modal-error-message").text(errorMessage);
-            });
-        });
+            // Excel出力共通処理
+            onExportFileTripsCommon(page, data);
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
     }
 
-    // 削除ボタン押下
-    function OnDeleteClick(userID) {
-        // M_UserModel取得
-        var userModel = @Html.Raw(Json.Serialize(Model));
-        userModel.m_UserList.forEach(function (item) {
 
-            if (item.userID == userID) {
-                $("#deleteUserID").val(item.userID);
-                $("#deleteADName").val(item.adName);
-                $("#deleteDepoName").val(item.depoName);
-                var authorizedKubun = "";
-                if (item.authorizedKubun == 0) {
-                    authorizedKubun = "管理者";
-                }else if(item.authorizedKubun == 1){
-                    authorizedKubun = "なし";
-                }
-                $("#deleteAuthorizedKubun").val(authorizedKubun);
-                if (item.isRequiredMail) {
-                    $("#deleteIsRequiredMail").val("受け取る");
-                }
-                else{
-                    $("#deleteIsRequiredMail").val("受け取らない");
-                }
-                $("#deleteMailAddress").val(item.mailAddress);
-            }
-        });
-    }
-
-    // 削除
-    function OnExecuteDelete() {
+    // 画像一括出力ボタン押下
+    function onExportAllImages(page) {
+        event.preventDefault();
         DeleteErrorMessages();
+        if (isWithin90Days()) {
+            // チェックボックスの入力情報取得
+            var isOnlyHasAmountDefference = $('#isOnlyHasAmountDefference')[0].checked;
+            var hasTripName = $('#hasTripName')[0].checked;
+            var hasIdentifyNumber = $('#hasIdentifyNumber')[0].checked;
+            // 期間の開始、終了日付の取得
+            var startOfPeriod = GetDayString(new Date($('#startOfPeriod').val()));
+            var endOfPeriod = GetDayString(new Date($('#endOfPeriod').val()));
 
-        // フォーム情報取得
-        let url = window.location.origin + '@Url.Action("Delete", "M_User")';
-        let method = 'POST';
-        let data = { "userId": $('#deleteUserID').val() };
+            // デポ情報取得
+            var checkedDepos = getCheckedDepos();
 
-        // Ajax call
-        $.ajax({
-            url: url,
-            method: method,
-            data: data
-        }).done(function (response) {
-            $('#delete-modal').hide();
-            // 完了モーダル表示
-            AlertMessage('', '完了', '登録が完了しました。', null, null);
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            var errorMessage = jqXHR.responseJSON.errorMessage;
-            $("#delete-modal-error-message").text(errorMessage);
+            let data = {
+                download: "download",
+                startOfPeriod: startOfPeriod,
+                endOfPeriod: endOfPeriod,
+                isOnlyHasAmountDefference: isOnlyHasAmountDefference,
+                hasTripName: hasTripName,
+                hasIdentifyNumber: hasIdentifyNumber,
+                checkedDepos: checkedDepos
+            };
+
+            onExportAllImagesCommon(page, data);
+        }
+        else {
+            var errorMessage = 'E1007: 検索できる期間は最長90日です。90日を超えないように選択してください。';
+            $("#div-error-message").text(errorMessage);
+        }
+    }
+
+    // 「すべて」チェックボックス押下時
+    $('input[id=allDepo]').change(function () {
+        pushAllCheckBox();
+    });
+
+    // 各デポチェックボックス押下時
+    $(function () {
+        $('input[name="depos"]').change(function () {
+            pushDepoCheckBox();
         });
+    })
+
+    // 画面表示時にログインユーザーのメインデポにチェックを入れる
+    function depoCheckDisplay(model) {
+        var mainDepoID = model.mainDepoID;
+        if (mainDepoID == 0)
+            return;
+        var depos = $('input[name=depos]');
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].id == "depo" + mainDepoID) {
+                depos[i].checked = true;
+            }
+        }
+    }
+
+    // 選択されたデポのIDリストを取得する
+    function getCheckedDepos() {
+        var depos = $('input[name=depos]');
+        var checkedDepos = [];
+        for (var i = 0; i < depos.length; i++) {
+            if (depos[i].checked) {
+                checkedDepos.push(depos[i].value);
+            }
+        }
+        return checkedDepos;
+    }
+
+    // 「すべて」ボタン押下時処理
+    function pushAllCheck() {
+        var targets = $('input[name="mailTarget"]');
+        for (var i = 0; i < targets.length; i++) {
+            if($('#allCheck')[0].checked){
+                targets[i].checked = true;
+            }
+            else{
+                targets[i].checked = false;
+            }
+        }
     }
 </script>
