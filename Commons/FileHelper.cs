@@ -11,7 +11,7 @@ using OfficeOpenXml;
 
 namespace shift_pick_management.Commons
 {
-    public static class CreateFile
+    public static class FileHelper
     {
         /// <summary>
         /// DataTableをCSV形式の文字列に変換
