@@ -20,7 +20,7 @@
     <link rel="apple-touch-icon" href="~/images/ShounanPlus_Shift_Pick_AppIcon.jpg" asp-append-version="true">
 
     <!-- ▼CSSファイル読み込み -->
-    <!--Bootstrap admin template-->
+    <!--Bootstrap admin template (Bootstrap 5.2 含む。site.css が --bs-border-color-translucent 等を参照)-->
     <link rel="stylesheet" href="~/lib/startbootstrap-sb-admin-gh-pages/css/styles.css" />
     <!-- font-awesome -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -38,6 +38,8 @@
     <link rel="stylesheet" type="text/css" href="~/lib/datatables/fixedColumns.dataTables.min.css">
     <!-- 内部ファイル -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <!-- 画面枠(サイドバー・トップバー) -->
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <!-- 日本語表示 -->
     <link rel="stylesheet" type="application/json" href="~/lib/datatables/Japanese.json">
     <!-- jquery-->
@@ -47,135 +49,117 @@
 @{
     /* 開発環境はナビゲーションバーを紫色に変更 */
     var wrapperClass = "";
+    var navBarText = "Shift Pick (湘南プラス)";
 #if DEBUG
     wrapperClass = "navbar-dark-test";
+    navBarText = "テスト環境";
 #endif
-
-    var bodyClass = Context.Request.Cookies["Sidebar"];
-    if (string.IsNullOrWhiteSpace(bodyClass))
-    {
-        bodyClass = "sb-nav-fixed";
-
-    }
+    var currentController = ViewContext.RouteData.Values["controller"].ToString();
 }
-<body class="@bodyClass" id="body">
-    <nav class="sb-topnav navbar navbar-expand navbar-dark @wrapperClass">
-        <!-- Navbar Brand-->
-        <a id="home-title" class="navbar-brand ps-3 navbar-logo" asp-controller="OuboConfirmation" asp-action="Index">
-            <img class="login-img card-img-top" src="~/images/ShounanPlus_Shift_Pick_AppIcon.jpg" asp-append-version="true" />
-            @{
-                var navBarText = "Shift Pick (湘南プラス)";
-#if DEBUG
-                navBarText = "テスト環境";
-#endif
-            }
-            @navBarText
-        </a>
-        <!-- Sidebar Toggle-->
-        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-angles-left"></i></button>
-        <!-- Navbar Search-->
-        <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-        </div>
-        <!-- Navbar-->
-        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-            <li class="nav-item dropdown">
-                <div class="d-flex justify-content-end align-items-center" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="text-white">@(User.Identity.IsAuthenticated ? User.FindFirst("UserName").Value : null)</span>
-                    <a class="nav-link dropdown-toggle"><i class="fas fa-user fa-fw"></i></a>
-                </div>
-                <!-- Dropdown -->
-                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" id="navbarDropdown"
-                aria-labelledby="navbarDropdown">
-                    <div id="user-detail-dropdown-item" class="dropdown-item text-gray-600">
-                        <a class="dropdown-item mt-2 logout" href="#" data-toggle="modal" data-target="#logoutModal">
-                            <i class="fas fa-sign-out-alt fa-fw mr-2"></i>
-                            ログアウト
-                        </a>
-                    </div>
-                </div>
-            </li>
-        </ul>
-        <!-- Topbar Navbar -->
-    </nav>
+<body id="page-top">
 
-    <!-- Side Navbar-->
-    <div id="layoutSidenav">
-        <div id="layoutSidenav_nav">
-            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-                <div class="sb-sidenav-menu">
-                    <div class="nav">
-                        <ul class="navbar-nav bg-gradient-imagecolor sidebar sidebar-dark accordion" id="accordionSidebar">
-                            @foreach (var category in Model.WebMenuCategoryList())
-                            {
-                                var categoryMenuList = Model.GetWebMenuCategoryList(category);
-                                var categoryName = categoryMenuList.M_WebMenuCategoryModel.CategoryName;
-                                var categoryID = categoryMenuList.M_WebMenuCategoryModel.CategoryID;
-                                var menuList = categoryMenuList.WebMenuList;
-                                var currentController = ViewContext.RouteData.Values["controller"].ToString();
-                                var currentCategoryID = Model.GetCategoryIDFromControlerName(currentController);
-                                if (menuList.Count != 0 && !(categoryID >= 4 && (Model.AuthorizedKubun != "1" && Model.AuthorizedKubun != "2")))
-                                {
-                                   @*  @if (categoryID == 3)
-                                    {
-                                        <li class="nav-item">
-                                            <a class="nav-link collapsed" asp-area="" asp-controller="@menuList[0].Controller" asp-action="@menuList[0].Action">
-                                                <i class="icon-category @("icon-categoryid-" + categoryID)"></i>
-                                                <span>@menuList[0].MenuName</span>
-                                            </a>
-                                        </li>
-                                    }
-                                    else
-                                    { *@
-                                        <li class="nav-item">
-                                            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse@(categoryID)"
-                                               aria-expanded="true" aria-controls="collapse@(categoryID)">
-                                                <i class="icon-category @("icon-categoryid-" + categoryID)"></i>
-                                                <span>@(categoryName)</span>
-                                            </a>
-                                            @if (currentCategoryID == categoryID || (currentCategoryID == null && categoryID == 1))
-                                            {
-                                                <div id="collapse@(categoryID)" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                                                    <div class="bg-white py-2 collapse-inner rounded">
-                                                        @foreach (var obj in menuList)
-                                                        {
-                                                            @if (obj.MenuName != "便枝番マスター")
-                                                            {
-                                                                <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
-                                                            }
-                                                        }
-                                                    </div>
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div id="collapse@(categoryID)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                                                    <div class="bg-white py-2 collapse-inner rounded">
-                                                        @foreach (var obj in menuList)
-                                                        {
-                                                            @if (obj.MenuName != "便枝番マスター")
-                                                            {
-                                                                <a class="collapse-item collapse-item-imagecolor" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action" onclick="toggleSidebar()">@obj.MenuName</a>
-                                                            }
-                                                        }
-                                                    </div>
-                                                </div>
-                                            }
-                                        </li>
-                                    @* } *@
-                                    
-                                }
-                            }
-                        </ul>
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-imagecolor sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <div id="statemainicon">
+                <!-- Sidebar - Brand -->
+                <a id="home-title" class="sidebar-brand d-flex align-items-center justify-content-center" title="Home" asp-controller="OuboConfirmation" asp-action="Index">
+                    <div class="sidebar-brand-icon">
+                        <img src="~/images/ShounanPlus_Shift_Pick_AppIcon.jpg" asp-append-version="true" id="main-icon" />
                     </div>
+                    <div class="sidebar-brand-text mx-3">@navBarText</div>
+                </a>
+            </div>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            @foreach (var category in Model.WebMenuCategoryList())
+            {
+                var categoryMenuList = Model.GetWebMenuCategoryList(category);
+                var categoryName = categoryMenuList.M_WebMenuCategoryModel.CategoryName;
+                var categoryID = categoryMenuList.M_WebMenuCategoryModel.CategoryID;
+                var menuList = categoryMenuList.WebMenuList;
+                if (menuList.Count != 0 && !(categoryID >= 4 && (Model.AuthorizedKubun != "1" && Model.AuthorizedKubun != "2")))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse@(categoryID)"
+                           aria-expanded="true" aria-controls="collapse@(categoryID)">
+                            <i class="icon-category @("icon-categoryid-" + categoryID)"></i>
+                            <span>@(categoryName)</span>
+                        </a>
+                        <div id="collapse@(categoryID)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                            <div class="bg-white py-2 collapse-inner rounded">
+                                @foreach (var obj in menuList)
+                                {
+                                    <a class="collapse-item collapse-item-imagecolor @(obj.Controller == currentController ? "active" : "")" asp-area="" asp-controller="@obj.Controller" asp-action="@obj.Action">@obj.MenuName</a>
+                                }
+                            </div>
+                        </div>
+                    </li>
+                }
+            }
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="fadeLayer"></div>
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-dark topbar static-top shadow @wrapperClass">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link text-white d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-white small">@(User.Identity.IsAuthenticated ? User.FindFirst("UserName").Value : null)</span>
+                                <i class="fas fa-user-circle fa-lg mr-2 text-white"></i>
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="userDropdown">
+                                <a class="dropdown-item text-center logout" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-fw mr-2"></i>
+                                    ログアウト
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+                <!-- Begin Page Content -->
+                <div id="index-page-area" class="container-fluid">
+                    @RenderBody()
                 </div>
-            </nav>
+            </div>
+            <!-- End of Main Content -->
         </div>
-        <div id="layoutSidenav_content">
-            <main>
-                @RenderBody()
-            </main>
-        </div>
+        <!-- End of Content Wrapper -->
     </div>
+    <!-- End of Page Wrapper -->
+
 
     <!-- Logout Modal-->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
@@ -200,8 +184,8 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
-    <!--Bootstrap admin template-->
-    <script src="~/lib/startbootstrap-sb-admin-gh-pages/js/scripts.js"></script>
+    <!--Bootstrap admin template (SB Admin 2)-->
+    <script src="~/js/sb-admin-2.js" asp-append-version="true"></script>
 
     <!--jQueryの動的validation-->
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>

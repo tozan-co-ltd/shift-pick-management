@@ -1,0 +1,133 @@
+/* || 画面枠(SB Admin 2 サイドバー・トップバー) */
+/* sumaken-web の site.css / sb-admin-2.css と同じ挙動に合わせる */
+
+/* site.css の body { margin: 20px; margin-bottom: 60px; } を打ち消す */
+#page-top {
+    margin: 0;
+}
+
+/* sb-admin-2.css 側でコメントアウトされているサイドバー幅・高さを復元 */
+.sidebar {
+    min-height: 100vh;
+    position: fixed !important;
+    z-index: 100;
+    padding-top: 4rem !important;
+}
+
+@media (min-width: 768px) {
+    .sidebar {
+        width: 14rem !important;
+    }
+}
+
+/* サイドバー背景色(旧サイドナビと同じダークグレー) */
+.bg-gradient-imagecolor {
+    background-color: #212529;
+}
+
+#statemainicon {
+    display: contents;
+}
+
+#main-icon {
+    max-width: 50px;
+    background: #ffffff;
+    border-radius: 10px;
+    object-fit: cover;
+    border: solid #ffffff;
+}
+
+.sidebar-brand-text {
+    font-size: 0.95rem;
+}
+
+/* トップバー(ピンク)を画面上部に固定 */
+.topbar {
+    height: 3.8rem;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999 !important;
+}
+
+/* site.css の .nav-item .nav-link { display: block !important; } を打ち消し、ユーザーメニューを縦中央に */
+.topbar .nav-item .nav-link {
+    display: flex !important;
+    align-items: center;
+    height: 3.8rem;
+}
+
+.container-fluid {
+    padding-top: 6rem;
+    padding-left: 15rem;
+    z-index: 0;
+    overflow: scroll;
+    height: 100vh;
+}
+
+/* 旧サイドナビ用の site.css ルールを打ち消す */
+@media (max-width: 1024px) {
+    #sidebarToggle {
+        position: static;
+        left: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        z-index: 100;
+    }
+
+    .sidebar .nav-item .nav-link {
+        width: 6.5rem;
+    }
+
+    .sidebar .nav-item .collapse {
+        left: calc(6.5rem + 1.5rem / 2);
+    }
+
+    .container-fluid {
+        padding-top: 5.2rem;
+        padding-left: 7.8rem;
+    }
+}
+
+@media (max-height: 768px) {
+    .sidebar .nav-item .collapse {
+        top: -100% !important;
+    }
+
+    .sidebar .nav-item .collapse .collapse-inner, .sidebar .nav-item .collapsing .collapse-inner {
+        font-size: 80% !important;
+    }
+}
+
+/* スマホサイズ */
+@media (max-width: 576px) {
+    #statemainicon {
+        display: none;
+    }
+
+    .sidebar {
+        z-index: 0;
+        padding-top: 3.5rem !important;
+    }
+
+    .sidebar .nav-item .collapse {
+        top: -150% !important;
+    }
+
+    .topbar {
+        height: 3rem;
+    }
+
+    .topbar .nav-item .nav-link {
+        height: 3rem;
+    }
+
+    .container-fluid {
+        padding-top: 3.6rem;
+        padding-left: 1rem;
+    }
+}
