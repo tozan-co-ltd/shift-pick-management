@@ -3,6 +3,19 @@
 @{
     Model.GetBaseView(User, ViewContext);
     ViewData["Title"] = "都道府県マスタ";
+
+    // 8地方区分(都道府県コード順)
+    var areaList = new List<(string AreaID, string AreaName, string[] Prefectures)>
+    {
+        ("area_hokkaido", "北海道", new[] { "北海道" }),
+        ("area_tohoku", "東北", new[] { "青森", "岩手", "宮城", "秋田", "山形", "福島" }),
+        ("area_kanto", "関東", new[] { "茨城", "栃木", "群馬", "埼玉", "千葉", "東京", "神奈川" }),
+        ("area_chubu", "中部", new[] { "新潟", "富山", "石川", "福井", "山梨", "長野", "岐阜", "静岡", "愛知" }),
+        ("area_kinki", "近畿", new[] { "三重", "滋賀", "京都", "大阪", "兵庫", "奈良", "和歌山" }),
+        ("area_chugoku", "中国", new[] { "鳥取", "島根", "岡山", "広島", "山口" }),
+        ("area_shikoku", "四国", new[] { "徳島", "香川", "愛媛", "高知" }),
+        ("area_kyushu", "九州 / 沖縄", new[] { "福岡", "佐賀", "長崎", "熊本", "大分", "宮崎", "鹿児島", "沖縄" }),
+    };
 }
 <div class="card shadow de-inspection masterInfo m-4">
     <div class="card-header">
@@ -11,159 +24,75 @@
 
     <div class="card-body">
 
-        @*  <div class="area-block d-flex">
-            <input type="checkbox" class="area-check" data-area="area_all">
-            <div class="area-header">
-                <span class="area-title">全国</span>
+        @if (Model.Registered)
+        {
+            <div class="alert alert-success">
+                @(Model.SelectedPrefectures.Count)件の都道府県を登録しました。(@Model.RegisteredAt?.ToString("yyyy/MM/dd HH:mm:ss"))
             </div>
-        </div> *@
-        <div class="area-block d-flex">
-            <input type="checkbox" class="area-check" data-area="area_hokkaido" name="area_header">
-            <div class="area-header">
-                <span class="area-title">北海道</span>
-            </div>
-            <div class="pref-list">
-                <label><input type="checkbox" name="area_hokkaido" value="北海道"> 北海道</label>
-            </div>
-        </div>
+        }
 
-        <div class="area-block d-flex">
-            <input type="checkbox" class="area-check" data-area="area_tohoku" name="area_header">
-            <div class="area-header">
-                <span class="area-title">東北</span>
-            </div>
-            <div class="pref-list">
-                <label><input type="checkbox" name="area_tohoku" value="青森"> 青森</label>
-                <label><input type="checkbox" name="area_tohoku" value="岩手"> 岩手</label>
-                <label><input type="checkbox" name="area_tohoku" value="宮城"> 宮城</label>
-                <label><input type="checkbox" name="area_tohoku" value="秋田"> 秋田</label>
-                <label><input type="checkbox" name="area_tohoku" value="山形"> 山形</label>
-                <label><input type="checkbox" name="area_tohoku" value="福島"> 福島</label>
-            </div>
-        </div>
+        <form asp-controller="M_Prefecture" asp-action="Register" method="post">
+            @foreach (var area in areaList)
+            {
+                <div class="area-block d-flex">
+                    <div class="area-header">
+                        <label>
+                            <input type="checkbox" class="area-check" data-area="@area.AreaID">
+                            <span class="area-title">@area.AreaName</span>
+                        </label>
+                    </div>
+                    <div class="pref-list">
+                        @foreach (var pref in area.Prefectures)
+                        {
+                            <label><input type="checkbox" class="pref-check" data-area="@area.AreaID" name="SelectedPrefectures" value="@pref" checked="@Model.SelectedPrefectures.Contains(pref)"> @pref</label>
+                        }
+                    </div>
+                </div>
+            }
 
-        <div class="area-block d-flex">
-            <input type="checkbox" class="area-check" data-area="area_north_kanto" name="area_header">
-            <div class="area-header">
-                <span class="area-title">北関東</span>
+            <div class="text-right">
+                <button type="submit" class="btn btn-secondary pref-submit">確定</button>
             </div>
-            <div class="pref-list">
-                <label><input type="checkbox" name="area_north_kanto" value="茨城"> 茨城</label>
-                <label><input type="checkbox" name="area_north_kanto" value="栃木"> 栃木</label>
-                <label><input type="checkbox" name="area_north_kanto" value="群馬"> 群馬</label>
-            </div>
-        </div>
-
-        <div class="area-block d-flex">
-            <input type="checkbox" class="area-check" data-area="area_south_kanto" name="area_header">
-            <div class="area-header">
-                <span class="area-title">南関東</span>
-            </div>
-            <div class="pref-list">
-                <label><input type="checkbox" name="area_south_kanto" value="東京"> 東京</label>
-                <label><input type="checkbox" name="area_south_kanto" value="神奈川"> 神奈川</label>
-                <label><input type="checkbox" name="area_south_kanto" value="千葉"> 千葉</label>
-                <label><input type="checkbox" name="area_south_kanto" value="埼玉"> 埼玉</label>
-            </div>
-        </div>
-
-        <div class="area-block d-flex">
-            <input type="checkbox" class="area-check" data-area="area_tokai" name="area_header">
-            <div class="area-header">
-                <span class="area-title">東海</span>
-            </div>
-            <div class="pref-list">
-                <label><input type="checkbox" name="area_tokai" value="愛知"> 愛知</label>
-                <label><input type="checkbox" name="area_tokai" value="岐阜"> 岐阜</label>
-                <label><input type="checkbox" name="area_tokai" value="三重"> 三重</label>
-                <label><input type="checkbox" name="area_tokai" value="静岡"> 静岡</label>
-            </div>
-        </div>
-
-        <div class="area-block d-flex">
-            <input type="checkbox" class="area-check" data-area="area_kansai" name="area_header">
-            <div class="area-header">
-                <span class="area-title">関西</span>
-            </div>
-            <div class="pref-list">
-                <label><input type="checkbox" name="area_kansai" value="大阪"> 大阪</label>
-                <label><input type="checkbox" name="area_kansai" value="兵庫"> 兵庫</label>
-                <label><input type="checkbox" name="area_kansai" value="京都"> 京都</label>
-                <label><input type="checkbox" name="area_kansai" value="奈良"> 奈良</label>
-                <label><input type="checkbox" name="area_kansai" value="滋賀"> 滋賀</label>
-                <label><input type="checkbox" name="area_kansai" value="和歌山"> 和歌山</label>
-            </div>
-        </div>
-
-        <div class="area-block d-flex">
-            <input type="checkbox" class="area-check" data-area="area_kyushu" name="area_header">
-            <div class="area-header">
-                <span class="area-title">九州 / 沖縄</span>
-            </div>
-            <div class="pref-list">
-                <label><input type="checkbox" name="area_kyushu" value="福岡"> 福岡</label>
-                <label><input type="checkbox" name="area_kyushu" value="佐賀"> 佐賀</label>
-                <label><input type="checkbox" name="area_kyushu" value="長崎"> 長崎</label>
-                <label><input type="checkbox" name="area_kyushu" value="熊本"> 熊本</label>
-                <label><input type="checkbox" name="area_kyushu" value="大分"> 大分</label>
-                <label><input type="checkbox" name="area_kyushu" value="宮崎"> 宮崎</label>
-                <label><input type="checkbox" name="area_kyushu" value="鹿児島"> 鹿児島</label>
-                <label><input type="checkbox" name="area_kyushu" value="沖縄"> 沖縄</label>
-            </div>
-        </div>
-
-        <button class="pref-submit">確定</button>
+        </form>
     </div>
 
 </div>
 
 <script type="text/javascript">
 
-
-    // エリアチェックボックス押下時
-    document.querySelectorAll('.area-check').forEach(area => {
-      area.addEventListener('change', function () {
-          const areaName = this.dataset.area;
-          const checked = this.checked;
-
-          if(areaName == "area_all"){
-
-            // 同じエリアの都道府県チェックをすべて連動
-            document.querySelectorAll('input[name^=area]')
-              .forEach(pref => pref.checked = checked);
-          }
-
-        // 同じエリアの都道府県チェックをすべて連動
-        document.querySelectorAll(`input[name="${areaName}"]`)
-          .forEach(pref => pref.checked = checked);
-      });
-    });
-
-    // 都道府県チェックをクリックしたらエリアチェックを更新
-    document.querySelectorAll('.pref-list input[type="checkbox"]').forEach(pref => {
-      pref.addEventListener('change', function () {
-
-        // 親エリア名を取得（例：area_kansai）
-        const areaName = this.name;
-
-        // 同じエリアの都道府県チェックを全部取得
-        const prefs = document.querySelectorAll(`input[name="${areaName}"]`);
-
-        // エリアチェックボックスを取得
+    // 都道府県のチェック状態からエリアチェックを更新
+    function syncAreaCheck(areaName) {
+        const prefs = document.querySelectorAll(`.pref-check[data-area="${areaName}"]`);
         const areaCheck = document.querySelector(`.area-check[data-area="${areaName}"]`);
 
         const total = prefs.length;
         const checkedCount = Array.from(prefs).filter(p => p.checked).length;
 
-        // 全チェック → ON
-        if (checkedCount === total) {
-          areaCheck.checked = true;
-        }
-        // 全部OFF → OFF
-        else {
-          areaCheck.checked = false;
-        }
-      });
+        // 全チェック → ON、一部チェック → 中間表示、全部OFF → OFF
+        areaCheck.checked = checkedCount === total;
+        areaCheck.indeterminate = checkedCount > 0 && checkedCount < total;
+    }
+
+    // エリアチェックボックス押下時
+    document.querySelectorAll('.area-check').forEach(area => {
+        area.addEventListener('change', function () {
+            const areaName = this.dataset.area;
+            const checked = this.checked;
+
+            // 同じエリアの都道府県チェックをすべて連動
+            document.querySelectorAll(`.pref-check[data-area="${areaName}"]`)
+                .forEach(pref => pref.checked = checked);
+        });
     });
+
+    // 都道府県チェックをクリックしたらエリアチェックを更新
+    document.querySelectorAll('.pref-check').forEach(pref => {
+        pref.addEventListener('change', function () {
+            syncAreaCheck(this.dataset.area);
+        });
+    });
+
+    // 初期表示(登録後の再表示)時にエリアチェックを合わせる
+    document.querySelectorAll('.area-check').forEach(area => syncAreaCheck(area.dataset.area));
 
 </script>

@@ -10,5 +10,6 @@ namespace shift_pick_management.Models
         public bool Registered { get; set; }
         public DateTime? RegisteredAt { get; set; }
         public string Message { get; set; } = string.Empty;
+        public List<string> SelectedPrefectures { get; set; } = new();
     }
 }

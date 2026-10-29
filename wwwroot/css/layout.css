@@ -131,3 +131,56 @@
         padding-left: 1rem;
     }
 }
+
+/* 都道府県マスタ */
+.area-block {
+    align-items: flex-start;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.area-header {
+    flex: 0 0 9rem;
+    font-weight: bold;
+    padding: 0.75rem 0;
+}
+
+.area-header label,
+.pref-list label {
+    margin: 0;
+    cursor: pointer;
+}
+
+.pref-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    border-left: 1px solid #e3e6f0;
+    padding: 0.75rem 0 0.75rem 1rem;
+}
+
+.pref-list label {
+    min-width: 5rem;
+}
+
+.pref-submit {
+    min-width: 8rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 576px) {
+    .area-block {
+        flex-direction: column;
+    }
+
+    .area-header {
+        flex-basis: auto;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0;
+    }
+
+    .pref-list {
+        border-left: none;
+        padding-left: 0;
+        padding-top: 0;
+    }
+}
