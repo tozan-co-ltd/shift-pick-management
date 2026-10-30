@@ -1,16 +1,16 @@
-/* || ƒVƒXƒeƒ€‘S‘Ì‚Ì”zFEƒtƒHƒ“ƒg */
+/* || ã‚·ã‚¹ãƒ†ãƒ å…¨ä½“ã®é…è‰²ãƒ»ãƒ•ã‚©ãƒ³ãƒˆ */
 :root {
-    /* ƒƒCƒ“ƒJƒ‰[ */
+    /* ãƒ¡ã‚¤ãƒ³ã‚«ãƒ©ãƒ¼ */
     --base-color-main: rgb(236, 82, 172);
     --rgb-base-color-main: 236, 82, 172;
-    /* ƒAƒNƒZƒ“ƒgƒJƒ‰[(ƒ{ƒ^ƒ““™) */
+    /* ã‚¢ã‚¯ã‚»ãƒ³ãƒˆã‚«ãƒ©ãƒ¼(ãƒœã‚¿ãƒ³ç­‰) */
     --base-color-accent: rgb(240, 132, 75);
     --rgb-base-color-accent: 240, 132, 75;
-    /* ”wŒiƒJƒ‰[ */
+    /* èƒŒæ™¯ã‚«ãƒ©ãƒ¼ */
     --base-color-bg: rgba(var(--rgb-base-color-main), 0.3);
 }
 
-/* || ƒVƒXƒeƒ€‘S‘Ì‚ÌƒŒƒCƒAƒEƒg */
+/* || ã‚·ã‚¹ãƒ†ãƒ å…¨ä½“ã®ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ */
 html {
     font-size: 14px;
 }
@@ -49,7 +49,7 @@ label{
     text-wrap: nowrap;
 }
 
-/* || WEBƒƒjƒ…[ƒJƒeƒSƒŠ[‚ÌƒAƒCƒRƒ“ */
+/* || WEBãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚«ãƒ†ã‚´ãƒªãƒ¼ã®ã‚¢ã‚¤ã‚³ãƒ³ */
 .icon-category {
     width: 1.2857142857142858em;
     text-align: center;
@@ -59,39 +59,34 @@ label{
     color: rgba(255, 255, 255, 0.8);
 }
 
+/* å¿œå‹Ÿç¢ºèª (clipboard-check) */
 .icon-categoryid-1::before {
-    content: '\f26c';
+    content: '\f46c';
 }
 
+/* ç©ºãã‚¨ã‚¯ã‚»ãƒ«ç™»éŒ² (file-import) */
 .icon-categoryid-2::before {
-    content: '\f0d1';
+    content: '\f56f';
 }
 
+/* é…ä¿¡ç®¡ç† (paper-plane) */
 .icon-categoryid-3::before {
-    content: '\f05a';
+    content: '\f1d8';
 }
 
+/* ãƒã‚¹ã‚¿ãƒ¼ (wrench) */
 .icon-categoryid-4::before {
     content: '\f0ad';
 }
 
-
-.icon-categoryid-5::before {
-    content: '\f013';
-}
-
-.icon-categoryid-6::before {
-    content: '\f013';
-}
-
-/* || ƒŒƒXƒ|ƒ“ƒVƒuƒfƒUƒCƒ“ */
+/* || ãƒ¬ã‚¹ãƒãƒ³ã‚·ãƒ–ãƒ‡ã‚¶ã‚¤ãƒ³ */
 @media screen and (max-width: 1200px) {
     html {
         font-size: 80% !important;
     }
 }
 
-/* ‹­’²ƒ{ƒ^ƒ“ */
+/* å¼·èª¿ãƒœã‚¿ãƒ³ */
 .btn-accent {
     color: #fff;
     background-color: var(--base-color-accent);
@@ -199,7 +194,7 @@ label{
     border-left-color: var(--subcolor);
 }
 
-/* ƒiƒrƒQ[ƒVƒ‡ƒ“ƒo[ */
+/* ãƒŠãƒ“ã‚²ãƒ¼ã‚·ãƒ§ãƒ³ãƒãƒ¼ */
 .navbar-dark {
     background-color: #EC52AC;
 }
@@ -218,7 +213,7 @@ label{
 }
 
 
-/* ƒhƒƒbƒvƒ_ƒEƒ“ƒƒjƒ…[ */
+/* ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ãƒ¡ãƒ‹ãƒ¥ãƒ¼ */
 .dropdown-menu {
     --bs-dropdown-min-width: 20rem !important;
     min-width: 14rem;
@@ -242,9 +237,9 @@ label{
 .page-link:hover {
     background-color: var(--othercolor) !important;
 }
-/*ªƒy[ƒWƒƒ[ƒfƒUƒCƒ“ã‘‚«*/
+/*â†‘ãƒšãƒ¼ã‚¸ãƒ£ãƒ¼ãƒ‡ã‚¶ã‚¤ãƒ³ä¸Šæ›¸ã*/
 
-/*«table update animation*/
+/*â†“table update animation*/
 .table-update-row {
     animation: blinking 0.6s 4 ease-in-out alternate;
 }
@@ -258,9 +253,9 @@ label{
         background-color: var(--subcolor);
     }
 }
-/*ªtable update animation*/
+/*â†‘table update animation*/
 
-/*«table-hover*/
+/*â†“table-hover*/
 .table-hover-evant tr:hover td {
     background-color: var(--sublightcolor) !important;
 }
@@ -274,7 +269,7 @@ th.table-border-less, td.table-border-less {
 .table-hover-evant tr:hover tr.table-border-less, .table-hover-evant tr:hover td.table-border-less {
     background-color: #fff !important;
 }
-/*ªtable-hover*/
+/*â†‘table-hover*/
 
 .fadeIn {
     animation-name: fadeInAnime;
@@ -427,13 +422,13 @@ body {
     }
 }
 
-/* || dataTable‚ÌƒJƒXƒ^ƒ}ƒCƒY */
+/* || dataTableã®ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚º */
 table.dataTable {
     width: 100% !important;
     margin: 0;
 }
 
-/* ƒf[ƒ^ƒe[ƒuƒ‹‚Ìƒ{ƒ^ƒ“ */
+/* ãƒ‡ãƒ¼ã‚¿ãƒ†ãƒ¼ãƒ–ãƒ«ã®ãƒœã‚¿ãƒ³ */
 table .btn-icon-split {
     padding: 4px;
 }
@@ -442,9 +437,9 @@ table .btn-primary.btn-icon-split {
     height: 39px;
     width: 101px;
 }
-/* ƒf[ƒ^ƒe[ƒuƒ‹‚Ìƒ{ƒ^ƒ“ */
+/* ãƒ‡ãƒ¼ã‚¿ãƒ†ãƒ¼ãƒ–ãƒ«ã®ãƒœã‚¿ãƒ³ */
 
-/* ƒJ[ƒh ƒtƒH[ƒ€*/
+/* ã‚«ãƒ¼ãƒ‰ ãƒ•ã‚©ãƒ¼ãƒ */
 .selectItem{
     width: 350px;
 }
@@ -597,7 +592,7 @@ select[readonly] {
     width: 218px;
 }
 
-/*“ü‰×—\’èÆ‰ï*/
+/*å…¥è·äºˆå®šç…§ä¼š*/
 .warehouse-name-drs {
     width: 160px;
     min-width: 160px;
@@ -625,7 +620,7 @@ select[readonly] {
     max-width: 350px;
 }
 
-/*ƒXƒ}[ƒgƒtƒHƒ“‘Î‰*/
+/*ã‚¹ãƒãƒ¼ãƒˆãƒ•ã‚©ãƒ³å¯¾å¿œ*/
 @media (max-width: 1200px) {
     .sp-cs-dpl{
         display: block !important;
@@ -806,7 +801,7 @@ select[readonly] {
     }*/
 }
 
-/*@--------------Input form ---------------*/
+/*ã€€--------------Input form ---------------*/
 .div-input-group {
     margin-bottom: 10px;
 }
@@ -819,22 +814,22 @@ select[readonly] {
 .column-2nd {
     margin-bottom: 0.25rem !important;
 }
-/*@--------------Input form ---------------*/
+/*ã€€--------------Input form ---------------*/
 
-/*@--------------Edit Input Modal ---------------*/
+/*ã€€--------------Edit Input Modal ---------------*/
 .label-input-model-pl {
     padding-left: 0.6rem !important;
 }
 
-/*@--------------Edit Input form ---------------*/
+/*ã€€--------------Edit Input form ---------------*/
 
 
-/*@--------------Set color for all text ---------------*/
+/*ã€€--------------Set color for all text ---------------*/
 .dataTable, .form-control, .border-top-0, table {
     color: #3a3b45 !important;
 }
 
-/*@--------------Set color for all text---------------*/
+/*ã€€--------------Set color for all text---------------*/
 
 .unset-pd {
     padding: unset !important;
@@ -892,7 +887,7 @@ select[readonly] {
     text-align: center !important;
 }
 
-/*@-------------- Modal ---------------*/
+/*ã€€-------------- Modal ---------------*/
 .modalLabel a{
     white-space: nowrap;
 }
@@ -943,14 +938,14 @@ select[readonly] {
     position: absolute;
     right: 0;
 }
-/*@-------------- Modal ---------------*/
+/*ã€€-------------- Modal ---------------*/
 
 .excel-date {
     border: solid 1px #000;
     padding: 5px;
 }
 
-/*@-------------- radio button to toggle ---------------*/
+/*ã€€-------------- radio button to toggle ---------------*/
 .radio-group {
     display: flex;
     margin-bottom: 0.5rem;
@@ -984,7 +979,7 @@ select[readonly] {
 .radio-area input[type=radio]:checked + label {
     background-color: rgb(236, 82, 172);
 }
-/*@-------------- radio button to toggle ---------------*/
+/*ã€€-------------- radio button to toggle ---------------*/
 
 
 .label-delete {
@@ -1101,7 +1096,7 @@ table.dataTable span.column_highlight {
         margin-right: 8px;
     }
 
-/* ƒAƒCƒRƒ“—pi”CˆÓj*/
+/* ã‚¢ã‚¤ã‚³ãƒ³ç”¨ï¼ˆä»»æ„ï¼‰*/
 .toggle-icon {
     display: inline-block;
     width: 10px;
@@ -1311,7 +1306,7 @@ table.dataTable span.column_highlight {
     line-height: 1;
 }
 
-/* ‘•ü */
+/* è£…é£¾ */
 
 * {
     box-sizing: border-box;
@@ -1359,9 +1354,9 @@ body {
     margin-right: 15px;
     margin-bottom: 15px;
     opacity: .6;
-    background: #F2F0E9; /*”wŒiF*/
-    color: #333; /*ƒ}[ƒN‚ÌF*/
-    border: 2px solid #555; /*ŠO˜g‚Ìü*/
+    background: #F2F0E9; /*èƒŒæ™¯è‰²*/
+    color: #333; /*ãƒãƒ¼ã‚¯ã®è‰²*/
+    border: 2px solid #555; /*å¤–æ ã®ç·š*/
     vertical-align: middle;
     text-align: center;
     align-items: center;
@@ -1388,9 +1383,9 @@ body {
     right: 30px;
     width: 20px;
     height: 20px;
-    border: 2px solid #333; /* ˜g‚Ì’²® */
-    border-radius: 50%; /* ŠÛ‚İ‚Ì“x‡‚¢ */
-    background: #fff; /* ƒ{ƒ^ƒ“‚Ì”wŒiF */
+    border: 2px solid #333; /* æ ã®èª¿æ•´ */
+    border-radius: 50%; /* ä¸¸ã¿ã®åº¦åˆã„ */
+    background: #fff; /* ãƒœã‚¿ãƒ³ã®èƒŒæ™¯è‰² */
 }
 
     .round_btn::before, .round_btn::after {
@@ -1398,9 +1393,9 @@ body {
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 2px; /* –_‚Ì•i‘¾‚³j */
-        height: 15px; /* –_‚Ì‚‚³ */
-        background: #333; /* ƒoƒcˆó‚ÌF */
+        width: 2px; /* æ£’ã®å¹…ï¼ˆå¤ªã•ï¼‰ */
+        height: 15px; /* æ£’ã®é«˜ã• */
+        background: #333; /* ãƒãƒ„å°ã®è‰² */
     }
 
     .round_btn::before {
@@ -1412,7 +1407,7 @@ body {
     }
 
 .trip-box {
-    border: 2px solid #000; /* ˜g‚Ì’²® */
+    border: 2px solid #000; /* æ ã®èª¿æ•´ */
     padding: 5px;
 }
 
@@ -1514,7 +1509,7 @@ html {
     background-color: #FFE5E5;
     border-color: #000000;
 }
-/* Œrü‚ğˆø‚­ */
+/* ç½«ç·šã‚’å¼•ã */
 .statistics-table thead th:first-child {
     border-left: 1px solid #404040;
 }

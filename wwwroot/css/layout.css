@@ -58,6 +58,12 @@
     height: 3.8rem;
 }
 
+/* site.css の旧トップナビ用の位置指定(top: 45px; left: -195px;)を打ち消し、トップバーの真下に表示 */
+.topbar .dropdown .dropdown-menu {
+    top: 100%;
+    left: auto;
+}
+
 .container-fluid {
     padding-top: 6rem;
     padding-left: 15rem;
